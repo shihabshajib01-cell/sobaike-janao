@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="bn">
+  <head>
+    <meta charset="utf-8" />
+    <title>সবাইকে জানাও | Sobaike Janao</title>
+    <script>
+      // Single Page Apps for GitHub Pages
+      // Redirects 404 errors to /sobaike-janao/ while preserving the route in the URL fragment (#)
+      (function() {
+        var l = window.location;
+        var pathSegments = l.pathname.split('/').filter(Boolean);
+        var repoName = 'sobaike-janao';
+        
+        // Find segments after the repo name if present
+        var repoIndex = pathSegments.indexOf(repoName);
+        var routeSegments = repoIndex !== -1 ? pathSegments.slice(repoIndex + 1) : pathSegments;
+        var routePath = routeSegments.length > 0 ? '/' + routeSegments.join('/') : '/';
+        
+        // Build the target redirect URL preserving the sub-route in the hash fragment (#)
+        var targetUrl = l.protocol + '//' + l.host + '/' + repoName + '/#' + (routePath === '/' ? '' : routePath) + (l.search || '') + (l.hash || '');
+        window.location.replace(targetUrl);
+      })();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
+

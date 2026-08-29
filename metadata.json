@@ -1,0 +1,10 @@
+{
+  "name": "Sobaike Janao (সবাইকে জানাও) 23",
+  "description": "Bangladesh moderated citizen reporting platform with public feed, 3-segment reporting wizard, Google Maps location picker, and anonymous report tracking.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

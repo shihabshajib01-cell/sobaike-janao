@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>সবাইকে জানাও | Sobaike Janao - বাংলাদেশ গণ-অভিযোগ ও তথ্য প্ল্যাটফর্ম</title>
+    <meta name="description" content="সবাইকে জানাও (Sobaike Janao) - বাংলাদেশভিত্তিক গণ-অভিযোগ ও সামাজিক সচেতনতা প্ল্যাটফর্ম।" />
+    <meta property="og:title" content="সবাইকে জানাও (Sobaike Janao)" />
+    <meta property="og:description" content="বাংলাদেশভিত্তিক গণ-অভিযোগ ও সামাজিক সচেতনতা প্ল্যাটফর্ম।" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0F828C" />
+
+    <!-- Official Brand Favicons & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./brand/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./brand/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="./brand/favicon-48x48.png" />
+    <link rel="shortcut icon" href="./brand/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./brand/apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('sobaike-janao-theme') || localStorage.getItem('theme');
+          var theme = 'light';
+          if (stored === 'dark') {
+            theme = 'dark';
+          } else if (stored === 'light') {
+            theme = 'light';
+          } else if (stored === 'system') {
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
+          } else {
+            // First visit: no theme stored in localStorage -> ALWAYS default to Light Mode
+            theme = 'light';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.style.colorScheme = 'light';
+          document.documentElement.classList.remove('dark');
+        }
+
+        // Viewport & screen reporting diagnostic for mobile browsers
+        function logViewportStatus() {
+          var vv = window.visualViewport;
+          var report = {
+            innerWidth: window.innerWidth,
+            innerHeight: window.innerHeight,
+            outerWidth: window.outerWidth,
+            outerHeight: window.outerHeight,
+            screenWidth: window.screen ? window.screen.width : null,
+            screenHeight: window.screen ? window.screen.height : null,
+            devicePixelRatio: window.devicePixelRatio || 1,
+            visualViewport: vv ? {
+              width: Math.round(vv.width),
+              height: Math.round(vv.height),
+              scale: Number(vv.scale ? vv.scale.toFixed(2) : 1),
+              offsetTop: Math.round(vv.offsetTop || 0),
+              offsetLeft: Math.round(vv.offsetLeft || 0)
+            } : 'Not Supported'
+          };
+          console.info('[Viewport Diagnostic] Initial Screen & Viewport Metrics:', report);
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', logViewportStatus, { once: true });
+        } else {
+          logViewportStatus();
+        }
+      })();
+    </script>
+  </head>
+  <body class="bg-page text-primary antialiased selection:bg-surface-subtle">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
