@@ -58,7 +58,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Jump section tracking for Step 3
   const [step3JumpSection, setStep3JumpSection] = useState<
-    'narrative' | 'location' | 'identity' | 'attachments' | undefined
+    'narrative' | 'location' | 'identity' | 'parties' | 'attachments' | undefined
   >(undefined);
 
   // Submission state
@@ -306,6 +306,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         formattedAddress: '',
       };
 
+      const isHarassment = formData.segment === 'harassment';
+      const isPartySegment = formData.segment === 'rickshaw' || formData.segment === 'extortion';
+
       const payload = {
         segment: formData.segment,
         subcategoryId: formData.subcategoryId,
@@ -314,21 +317,21 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         incidentDate: formData.incidentDate || undefined,
         incidentTime: formData.incidentTime || undefined,
         frequency: formData.frequency || 'one-time',
-        subjectType: formData.subjectType || 'individual',
-        reportedSubject: formData.reportedSubject || undefined,
-        roleOrDesignation: formData.roleOrDesignation || undefined,
-        organization: formData.organization || undefined,
-        publicProfileHandle: formData.publicProfileHandle || undefined,
-        identifyingDescription: formData.identifyingDescription || undefined,
+        subjectType: isPartySegment ? (formData.subjectType || 'individual') : undefined,
+        reportedSubject: isPartySegment ? (formData.reportedSubject?.trim() || undefined) : undefined,
+        roleOrDesignation: isPartySegment ? (formData.roleOrDesignation?.trim() || undefined) : undefined,
+        organization: isPartySegment ? (formData.organization?.trim() || undefined) : undefined,
+        publicProfileHandle: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
+        identifyingDescription: isPartySegment ? (formData.identifyingDescription?.trim() || undefined) : undefined,
         mentionedParties:
-          formData.mentionedParties && formData.mentionedParties.length > 0
-            ? formData.mentionedParties
+          isPartySegment && formData.mentionedParties && formData.mentionedParties.length > 0
+            ? formData.mentionedParties.filter((p) => p.name?.trim() || p.organization?.trim())
             : undefined,
-        relationshipContext: formData.relationshipContext || undefined,
-        intimateWhatHappened: formData.intimateWhatHappened || undefined,
-        intimatePlatform: formData.intimatePlatform || undefined,
+        relationshipContext: isPartySegment ? (formData.relationshipContext?.trim() || undefined) : undefined,
+        intimateWhatHappened: isHarassment ? (formData.intimateWhatHappened || undefined) : undefined,
+        intimatePlatform: isHarassment ? (formData.intimatePlatform || undefined) : undefined,
         location: loc,
-        privacyChoice: formData.privacyChoice || 'anonymous',
+        privacyChoice: isHarassment ? (formData.privacyChoice || 'anonymous') : 'anonymous',
         publicationPreferences: formData.publicationPreferences || {
           showSubjectName: false,
           showOrganization: false,
@@ -336,7 +339,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           showDescription: true,
         },
         adminContact:
-          formData.adminName || formData.adminContact
+          isHarassment && (formData.adminName || formData.adminContact)
             ? {
                 name: formData.adminName || '',
                 contact: formData.adminContact || '',

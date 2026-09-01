@@ -11,9 +11,12 @@ import {
   Clock,
   Repeat,
   Edit2,
+  Users,
+  Plus,
+  Trash2,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
-import { DraftReport, ReportLocationData } from '../../services/types';
+import { DraftReport, ReportLocationData, MentionedParty } from '../../services/types';
 import {
   SEGMENT_SUBCATEGORIES,
   INTIMATE_WHAT_HAPPENED_OPTIONS,
@@ -42,7 +45,7 @@ export interface Step3ComplaintDetailsProps {
   onUpdateFormData: (updates: Partial<DraftReport>) => void;
   onBack?: () => void;
   onNext?: () => void;
-  initialOpenSection?: 'narrative' | 'location' | 'identity' | 'attachments';
+  initialOpenSection?: 'narrative' | 'location' | 'identity' | 'parties' | 'attachments';
   language: 'bn' | 'en';
 }
 
@@ -54,12 +57,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       pendingImages,
       onPendingImagesChange,
       onUpdateFormData,
-      onNext,
       initialOpenSection,
       language,
     },
     ref
   ) => {
+    // Segment structure conditions
+    const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
+    const showsIdentitySection = segment === 'harassment';
+
     // Determine active subcategory option
     const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
       (s) => s.id === formData.subcategoryId
@@ -68,18 +74,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const isDigitalHarassment =
       segment === 'harassment' && currentSubcategoryOption?.categoryGroup === 'digital_intimate';
 
-    // Fallback default title computation if title was not populated
-    const fallbackTitle =
-      (language === 'bn' ? currentSubcategoryOption?.nameBn : currentSubcategoryOption?.nameEn) ||
-      currentSubcategoryOption?.nameEn ||
-      currentSubcategoryOption?.nameBn ||
-      '';
-
-    // Accordion visibility states - Narrative, Location and Identity start open across all segments
+    // Accordion visibility states - segment aware defaults
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => ({
       narrative: true,
       location: true,
-      identity: true,
+      identity: showsIdentitySection,
+      parties: showsPartySection,
       attachments: initialOpenSection === 'attachments',
     }));
 
@@ -100,9 +100,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Validation errors state
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    // Toggle specific accordion - Narrative and Location are mandatory sections that remain expanded
+    // Toggle specific accordion - Mandatory/core sections stay expanded
     const toggleSection = (secKey: string) => {
       if (secKey === 'narrative' || secKey === 'location') {
+        return;
+      }
+      if (showsPartySection && secKey === 'parties') {
         return;
       }
       setOpenSections((prev) => ({
@@ -129,7 +132,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
     const handleToggleDetailedLocation = (enabled: boolean) => {
       if (!enabled) {
-        // Clear all hidden detailed fields to prevent sending precise coordinates
         onUpdateFormData({
           isDetailedLocation: false,
           location: {
@@ -150,7 +152,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       }
     };
 
-    // Privacy toggles
+    // Privacy toggles (Harassment only)
     const isIdentityPrivate = formData.privacyChoice === 'anonymous';
     const isPublicIdentityRequested = formData.privacyChoice === 'public_identity';
 
@@ -180,6 +182,33 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           confirmPublicIdentity: false,
         });
       }
+    };
+
+    // Mentioned Parties Handlers (Rickshaw / Extortion only)
+    const handleAddAdditionalParty = () => {
+      const newParty: MentionedParty = {
+        id: `party-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        type: 'individual',
+        name: '',
+        roleOrDesignation: '',
+        organization: '',
+        phoneOrContact: '',
+        identifyingDescription: '',
+      };
+      const updated = [...(formData.mentionedParties || []), newParty];
+      onUpdateFormData({ mentionedParties: updated });
+    };
+
+    const handleRemoveAdditionalParty = (id: string) => {
+      const updated = (formData.mentionedParties || []).filter((p) => p.id !== id);
+      onUpdateFormData({ mentionedParties: updated });
+    };
+
+    const handleUpdateAdditionalParty = (id: string, updates: Partial<MentionedParty>) => {
+      const updated = (formData.mentionedParties || []).map((p) =>
+        p.id === id ? { ...p, ...updates } : p
+      );
+      onUpdateFormData({ mentionedParties: updated });
     };
 
     // Filter districts based on selected division
@@ -234,33 +263,37 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
       }
 
-      if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
-        newErrors.adminContact =
-          language === 'bn'
-            ? 'মডারেটরের সাথে যোগাযোগের নম্বর বা ইমেইল দিন'
-            : 'Contact info is required for admin follow-up';
-      }
-
-      if (formData.privacyChoice === 'public_identity') {
-        if (!formData.adminName?.trim()) {
-          newErrors.adminName =
-            language === 'bn' ? 'আপনার নাম উল্লেখ করুন' : 'Your name is required';
-        }
-        if (!formData.adminContact?.trim()) {
+      // Harassment Identity Validation
+      if (showsIdentitySection) {
+        if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
           newErrors.adminContact =
-            language === 'bn' ? 'যোগাযোগের তথ্য দিন' : 'Contact info is required';
+            language === 'bn'
+              ? 'মডারেটরের সাথে যোগাযোগের নম্বর বা ইমেইল দিন'
+              : 'Contact info is required for admin follow-up';
+        }
+
+        if (formData.privacyChoice === 'public_identity') {
+          if (!formData.adminName?.trim()) {
+            newErrors.adminName =
+              language === 'bn' ? 'আপনার নাম উল্লেখ করুন' : 'Your name is required';
+          }
+          if (!formData.adminContact?.trim()) {
+            newErrors.adminContact =
+              language === 'bn' ? 'যোগাযোগের তথ্য দিন' : 'Contact info is required';
+          }
         }
       }
 
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
 
-        // Keep all required sections open when errors exist
+        // Keep all required/core sections open when errors exist
         setOpenSections((prev) => ({
           ...prev,
           narrative: true,
           location: true,
-          identity: true,
+          identity: showsIdentitySection ? true : prev.identity,
+          parties: showsPartySection ? true : prev.parties,
           attachments: prev.attachments || false,
         }));
 
@@ -270,7 +303,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         } else if (newErrors.division || newErrors.district) {
           const elem = document.getElementById('composer-section-location');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (newErrors.adminContact || newErrors.adminName) {
+        } else if (showsIdentitySection && (newErrors.adminContact || newErrors.adminName)) {
           const elem = document.getElementById('composer-section-identity');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -317,7 +350,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           icon={<FileText className="w-5 h-5" />}
         >
           <div className="space-y-4 pt-2 text-left">
-            {/* Title / Headline (Auto-populated with optional edit disclosure) */}
+            {/* Title / Headline */}
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[14px] font-semibold text-secondary">
@@ -481,7 +514,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               </div>
             </div>
 
-            {/* Conditional Intimate Threat Questions if sensitive category */}
+            {/* Conditional Digital Threat Questions if sensitive category (Harassment) */}
             {isSensitiveSubcat && (
               <div className="p-4 rounded-xl bg-surface-subtle border border-subtle space-y-3.5 mt-2">
                 <h4 className="text-[14px] font-bold text-primary">
@@ -638,7 +671,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       handleLocationChange({ district: e.target.value });
                       if (errors.district) setErrors((prev) => ({ ...prev, district: '' }));
                     }}
-                    placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
+                    placeholder={language === 'bn' ? ' যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
                     className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
                       errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                     }`}
@@ -674,7 +707,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               </div>
             </div>
 
-            {/* Detailed Location & Map Picker Progressive Disclosure */}
+            {/* Detailed Location & Map Picker */}
             <div className="pt-2">
               <button
                 type="button"
@@ -769,146 +802,399 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </div>
         </Accordion>
 
-        {/* SECTION 3: Identity & Privacy (পরিচয় ও গোপনীয়তা) */}
-        <Accordion
-          id="composer-section-identity"
-          isOpen={Boolean(openSections.identity)}
-          onToggle={() => toggleSection('identity')}
-          title={language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}
-          summary={
-            formData.privacyChoice === 'anonymous'
-              ? language === 'bn'
-                ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
-                : 'Anonymous (Default)'
-              : formData.privacyChoice === 'admin_only'
-              ? language === 'bn'
-                ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
-                : 'Admin Only'
-              : language === 'bn'
-              ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
-              : 'Public Identity (If Approved)'
-          }
-          hasError={Boolean(errors.adminContact || errors.adminName)}
-          icon={<Shield className="w-5 h-5" />}
-        >
-          <div className="space-y-4 pt-2 text-left">
-            {/* Primary Toggle: Keep Identity Private (Default ON) */}
-            <div className="p-4 rounded-2xl bg-surface-subtle border border-subtle space-y-3">
-              <Toggle
-                id="toggle-keep-identity-private"
-                checked={isIdentityPrivate}
-                onChange={(checked) => handlePrimaryPrivacyToggle(checked)}
-                label={
-                  language === 'bn'
-                    ? 'আমার পরিচয় ও যোগাযোগের তথ্য গোপন রাখুন'
-                    : 'Keep my identity and contact information private'
-                }
-                description={
-                  language === 'bn'
-                    ? 'ডিফল্টভাবে আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশ করা হবে না।'
-                    : 'Your identity and contact information are private by default.'
-                }
-                className="w-full"
-              />
+        {/* SECTION 3 (HARASSMENT): Identity & Privacy (পরিচয় ও গোপনীয়তা) */}
+        {showsIdentitySection && (
+          <Accordion
+            id="composer-section-identity"
+            isOpen={Boolean(openSections.identity)}
+            onToggle={() => toggleSection('identity')}
+            title={language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}
+            summary={
+              formData.privacyChoice === 'anonymous'
+                ? language === 'bn'
+                  ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
+                  : 'Anonymous (Default)'
+                : formData.privacyChoice === 'admin_only'
+                ? language === 'bn'
+                  ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
+                  : 'Admin Only'
+                : language === 'bn'
+                ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
+                : 'Public Identity (If Approved)'
+            }
+            hasError={Boolean(errors.adminContact || errors.adminName)}
+            icon={<Shield className="w-5 h-5" />}
+          >
+            <div className="space-y-4 pt-2 text-left">
+              {/* Primary Toggle: Keep Identity Private */}
+              <div className="p-4 rounded-2xl bg-surface-subtle border border-subtle space-y-3">
+                <Toggle
+                  id="toggle-keep-identity-private"
+                  checked={isIdentityPrivate}
+                  onChange={(checked) => handlePrimaryPrivacyToggle(checked)}
+                  label={
+                    language === 'bn'
+                      ? 'আমার পরিচয় ও যোগাযোগের তথ্য গোপন রাখুন'
+                      : 'Keep my identity and contact information private'
+                  }
+                  description={
+                    language === 'bn'
+                      ? 'ডিফল্টভাবে আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশ করা হবে না।'
+                      : 'Your identity and contact information are private by default.'
+                  }
+                  className="w-full"
+                />
 
-              {/* When Private is OFF -> Reveal Contact Fields */}
-              {!isIdentityPrivate && (
-                <div className="pt-3 border-t border-subtle/70 space-y-3">
-                  <div className="flex items-center gap-2 text-[14px] font-semibold text-primary">
-                    <Lock className="w-4 h-4 text-primary" />
-                    <span>
+                {/* When Private is OFF -> Reveal Contact Fields */}
+                {!isIdentityPrivate && (
+                  <div className="pt-3 border-t border-subtle/70 space-y-3">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-primary">
+                      <Lock className="w-4 h-4 text-primary" />
+                      <span>
+                        {language === 'bn'
+                          ? 'মডারেটরের সাথে যোগাযোগের তথ্য'
+                          : 'Moderator Follow-up Contact Information'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label
+                          htmlFor="reporter-admin-name"
+                          className="block text-[14px] font-semibold text-primary mb-1"
+                        >
+                          {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
+                        </label>
+                        <input
+                          id="reporter-admin-name"
+                          type="text"
+                          value={formData.adminName || ''}
+                          onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
+                          placeholder={language === 'bn' ? 'নাম' : 'Name'}
+                          className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                        />
+                        {errors.adminName && (
+                          <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminName}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="reporter-admin-contact"
+                          className="block text-[14px] font-semibold text-primary mb-1"
+                        >
+                          {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone Number or Email *'}
+                        </label>
+                        <input
+                          id="reporter-admin-contact"
+                          type="text"
+                          value={formData.adminContact || ''}
+                          onChange={(e) => {
+                            onUpdateFormData({ adminContact: e.target.value });
+                            if (errors.adminContact)
+                              setErrors((prev) => ({ ...prev, adminContact: '' }));
+                          }}
+                          placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
+                          className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
+                            errors.adminContact ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                          }`}
+                        />
+                        {errors.adminContact && (
+                          <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminContact}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Secondary Optional Toggle: Request Public Identity */}
+                    <div className="pt-2">
+                      <Toggle
+                        id="toggle-request-public-identity"
+                        checked={isPublicIdentityRequested}
+                        onChange={(checked) => handlePublicIdentityToggle(checked)}
+                        label={
+                          language === 'bn'
+                            ? 'অনুমোদিত হলে আমার পরিচয় প্রকাশের অনুরোধ করছি'
+                            : 'Request public identity if approved'
+                        }
+                        description={
+                          language === 'bn'
+                            ? 'অনুমোদিত হলে প্রকাশযোগ্য সংস্করণে আপনার নাম দেখানো হতে পারে।'
+                            : 'If approved for public display, your name may appear in the public version.'
+                        }
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Workflow Notice */}
+              <div className="p-3.5 rounded-xl bg-surface border border-subtle flex items-start gap-2.5 text-[14px] text-secondary">
+                <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <p className="leading-relaxed">
+                  {isIdentityPrivate
+                    ? language === 'bn'
+                      ? 'আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশযোগ্য সংস্করণে অন্তর্ভুক্ত হবে না।'
+                      : 'Your identity and contact information will not be included in the public version.'
+                    : language === 'bn'
+                    ? 'আপনার যোগাযোগের তথ্য ব্যক্তিগত মডারেশন প্রক্রিয়ার মধ্যে থাকবে এবং স্বয়ংক্রিয়ভাবে প্রকাশ করা হবে না।'
+                    : 'Your contact details remain within the private moderation workflow and are not automatically shown publicly.'}
+                </p>
+              </div>
+            </div>
+          </Accordion>
+        )}
+
+        {/* SECTION 3 (RICKSHAW & EXTORTION): Person or Organization (ব্যক্তি বা প্রতিষ্ঠানের তথ্য) */}
+        {showsPartySection && (
+          <Accordion
+            id="composer-section-parties"
+            isOpen={Boolean(openSections.parties)}
+            onToggle={() => toggleSection('parties')}
+            title={language === 'bn' ? '৩. ব্যক্তি বা প্রতিষ্ঠানের তথ্য' : '3. Person or Organization'}
+            summary={
+              formData.reportedSubject
+                ? `${formData.reportedSubject}${formData.organization ? ` (${formData.organization})` : ''}`
+                : language === 'bn'
+                ? 'অভিযুক্ত বা সংশ্লিষ্ট ব্যক্তি/প্রতিষ্ঠানের বিবরণ'
+                : 'Accused party or organization details'
+            }
+            icon={<Users className="w-5 h-5" />}
+          >
+            <div className="space-y-4 pt-2 text-left">
+              {/* Subject Type Selection */}
+              <div>
+                <label className="block text-[14px] font-bold text-primary mb-2">
+                  {language === 'bn'
+                    ? 'অভিযোগ কার বিরুদ্ধে বা কার সাথে সংশ্লিষ্ট?'
+                    : 'Who is this complaint regarding?'}
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                  {[
+                    { id: 'individual', nameBn: 'ব্যক্তি / চালক', nameEn: 'Individual' },
+                    { id: 'business', nameBn: 'দোকান / গ্যারেজ', nameEn: 'Business / Garage' },
+                    { id: 'group', nameBn: 'দল / সিন্ডিকেট', nameEn: 'Group / Syndicate' },
+                    { id: 'organization', nameBn: 'প্রতিষ্ঠান / কর্তৃপক্ষ', nameEn: 'Organization' },
+                    { id: 'unknown', nameBn: 'অজ্ঞাত / নিশ্চিত নই', nameEn: 'Unknown' },
+                  ].map((st) => (
+                    <button
+                      key={st.id}
+                      type="button"
+                      onClick={() =>
+                        onUpdateFormData({
+                          subjectType: st.id as 'individual' | 'business' | 'group' | 'organization' | 'unknown',
+                        })
+                      }
+                      className={`px-3 py-2 rounded-xl text-[14px] font-semibold border transition-all text-center min-h-[44px] flex items-center justify-center cursor-pointer ${
+                        (formData.subjectType || 'individual') === st.id
+                          ? 'bg-accent text-accent-fg border-accent shadow-xs'
+                          : 'bg-surface hover:bg-surface-subtle border-subtle text-secondary'
+                      }`}
+                    >
+                      {language === 'bn' ? st.nameBn : st.nameEn}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Primary Subject Details */}
+              <div className="p-4 rounded-2xl bg-surface-subtle border border-subtle space-y-3.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {/* Name or Identifier */}
+                  <div>
+                    <label
+                      htmlFor="party-subject-name"
+                      className="block text-[14px] font-bold text-primary mb-1"
+                    >
                       {language === 'bn'
-                        ? 'মডারেটরের সাথে যোগাযোগের তথ্য'
-                        : 'Moderator Follow-up Contact Information'}
-                    </span>
+                        ? 'ব্যক্তি, প্রতিষ্ঠান বা শনাক্তকারী নাম (ঐচ্ছিক)'
+                        : 'Name or Identifying Title (Optional)'}
+                    </label>
+                    <input
+                      id="party-subject-name"
+                      type="text"
+                      value={formData.reportedSubject || ''}
+                      onChange={(e) => onUpdateFormData({ reportedSubject: e.target.value })}
+                      placeholder={
+                        language === 'bn'
+                          ? 'যেমন: গ্যারেজ মালিক, নির্দিষ্ট ব্যক্তি বা দোকানের নাম'
+                          : 'e.g. Garage owner, specific person or shop name'
+                      }
+                      className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                    />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label
-                        htmlFor="reporter-admin-name"
-                        className="block text-[14px] font-semibold text-primary mb-1"
-                      >
-                        {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
-                      </label>
-                      <input
-                        id="reporter-admin-name"
-                        type="text"
-                        value={formData.adminName || ''}
-                        onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
-                        placeholder={language === 'bn' ? 'নাম' : 'Name'}
-                        className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                      />
-                      {errors.adminName && (
-                        <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminName}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="reporter-admin-contact"
-                        className="block text-[14px] font-semibold text-primary mb-1"
-                      >
-                        {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone Number or Email *'}
-                      </label>
-                      <input
-                        id="reporter-admin-contact"
-                        type="text"
-                        value={formData.adminContact || ''}
-                        onChange={(e) => {
-                          onUpdateFormData({ adminContact: e.target.value });
-                          if (errors.adminContact)
-                            setErrors((prev) => ({ ...prev, adminContact: '' }));
-                        }}
-                        placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
-                        className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
-                          errors.adminContact ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                        }`}
-                      />
-                      {errors.adminContact && (
-                        <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminContact}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Secondary Optional Toggle: Request Public Identity */}
-                  <div className="pt-2">
-                    <Toggle
-                      id="toggle-request-public-identity"
-                      checked={isPublicIdentityRequested}
-                      onChange={(checked) => handlePublicIdentityToggle(checked)}
-                      label={
+                  {/* Role or Vehicle Number / Designation */}
+                  <div>
+                    <label
+                      htmlFor="party-role-designation"
+                      className="block text-[14px] font-bold text-primary mb-1"
+                    >
+                      {language === 'bn'
+                        ? 'পদবি, ভূমিকা বা গাড়ির নম্বর (ঐচ্ছিক)'
+                        : 'Role, Vehicle No. or Designation (Optional)'}
+                    </label>
+                    <input
+                      id="party-role-designation"
+                      type="text"
+                      value={formData.roleOrDesignation || ''}
+                      onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
+                      placeholder={
                         language === 'bn'
-                          ? 'অনুমোদিত হলে আমার পরিচয় প্রকাশের অনুরোধ করছি'
-                          : 'Request public identity if approved'
+                          ? 'যেমন: ব্যাটারি রিকশা নং, লাইন চালক, গ্যারেজ ম্যানেজার'
+                          : 'e.g. Rickshaw Plate No., Line In-charge'
                       }
-                      description={
-                        language === 'bn'
-                          ? 'অনুমোদিত হলে প্রকাশযোগ্য সংস্করণে আপনার নাম দেখানো হতে পারে।'
-                          : 'If approved for public display, your name may appear in the public version.'
-                      }
-                      className="w-full"
+                      className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
                     />
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Workflow Notice */}
-            <div className="p-3.5 rounded-xl bg-surface border border-subtle flex items-start gap-2.5 text-[14px] text-secondary">
-              <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <p className="leading-relaxed">
-                {isIdentityPrivate
-                  ? language === 'bn'
-                    ? 'আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশযোগ্য সংস্করণে অন্তর্ভুক্ত হবে না।'
-                    : 'Your identity and contact information will not be included in the public version.'
-                  : language === 'bn'
-                  ? 'আপনার যোগাযোগের তথ্য ব্যক্তিগত মডারেশন প্রক্রিয়ার মধ্যে থাকবে এবং স্বয়ংক্রিয়ভাবে প্রকাশ করা হবে না।'
-                  : 'Your contact details remain within the private moderation workflow and are not automatically shown publicly.'}
-              </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {/* Organization / Stand / Syndicate */}
+                  <div>
+                    <label
+                      htmlFor="party-organization"
+                      className="block text-[14px] font-semibold text-secondary mb-1"
+                    >
+                      {language === 'bn'
+                        ? 'সংস্থা, সমিতি বা স্ট্যান্ডের নাম (ঐচ্ছিক)'
+                        : 'Organization, Syndicate or Stand (Optional)'}
+                    </label>
+                    <input
+                      id="party-organization"
+                      type="text"
+                      value={formData.organization || ''}
+                      onChange={(e) => onUpdateFormData({ organization: e.target.value })}
+                      placeholder={
+                        language === 'bn'
+                          ? 'যেমন: স্থানীয় রিকশা মালিক সমিতি, নির্দিষ্ট চার্জিং গ্যারেজ'
+                          : 'e.g. Local Rickshaw Association, Charging Garage'
+                      }
+                      className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                    />
+                  </div>
+
+                  {/* Contact / Phone / Social Handle */}
+                  <div>
+                    <label
+                      htmlFor="party-public-handle"
+                      className="block text-[14px] font-semibold text-secondary mb-1"
+                    >
+                      {language === 'bn'
+                        ? 'ফোন নম্বর বা যোগাযোগের পরিচিতি (ঐচ্ছিক)'
+                        : 'Phone Number or Contact Info (Optional)'}
+                    </label>
+                    <input
+                      id="party-public-handle"
+                      type="text"
+                      value={formData.publicProfileHandle || ''}
+                      onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
+                      placeholder={language === 'bn' ? '০১৭xxxxxxxx বা অন্যান্য' : '017xxxxxxxx or other handle'}
+                      className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Identifying Description */}
+                <div>
+                  <label
+                    htmlFor="party-identifying-description"
+                    className="block text-[14px] font-semibold text-secondary mb-1"
+                  >
+                    {language === 'bn'
+                      ? 'শনাক্তকরণ বা অন্যান্য বিবরণ (ঐচ্ছিক)'
+                      : 'Identifying Description or Details (Optional)'}
+                  </label>
+                  <textarea
+                    id="party-identifying-description"
+                    rows={2}
+                    value={formData.identifyingDescription || ''}
+                    onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? 'গাড়ির রঙ, বিশেষ স্টিকার, শারীরিক বৈশিষ্ট্য বা অবস্থানগত বিবরণ...'
+                        : 'Vehicle color, stickers, physical description or location cues...'
+                    }
+                    className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent"
+                  />
+                </div>
+              </div>
+
+              {/* Additional Mentioned Parties */}
+              {formData.mentionedParties && formData.mentionedParties.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <h4 className="text-[14px] font-bold text-primary">
+                    {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional Mentioned Parties'}
+                  </h4>
+                  {formData.mentionedParties.map((party, pIdx) => (
+                    <div
+                      key={party.id || pIdx}
+                      className="p-3.5 rounded-xl bg-surface border border-subtle space-y-2.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[14px] font-bold text-primary">
+                          {language === 'bn' ? `পক্ষ #${pIdx + 2}` : `Party #${pIdx + 2}`}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAdditionalParty(party.id)}
+                          className="inline-flex items-center gap-1 text-[13px] text-red-500 hover:underline cursor-pointer p-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>{language === 'bn' ? 'মুছে ফেলুন' : 'Remove'}</span>
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                        <input
+                          type="text"
+                          value={party.name || ''}
+                          onChange={(e) => handleUpdateAdditionalParty(party.id, { name: e.target.value })}
+                          placeholder={language === 'bn' ? 'নাম / পদবি' : 'Name / Title'}
+                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-lg text-[15px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+                        />
+                        <input
+                          type="text"
+                          value={party.roleOrDesignation || ''}
+                          onChange={(e) =>
+                            handleUpdateAdditionalParty(party.id, { roleOrDesignation: e.target.value })
+                          }
+                          placeholder={language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / Designation'}
+                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-lg text-[15px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+                        />
+                        <input
+                          type="text"
+                          value={party.organization || ''}
+                          onChange={(e) =>
+                            handleUpdateAdditionalParty(party.id, { organization: e.target.value })
+                          }
+                          placeholder={language === 'bn' ? 'প্রতিষ্ঠান / সমিতি' : 'Organization'}
+                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-lg text-[15px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Additional Party Button */}
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={handleAddAdditionalParty}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface hover:bg-surface-subtle border border-subtle text-[14px] font-semibold text-primary cursor-pointer transition-colors min-h-[44px]"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>
+                    {language === 'bn'
+                      ? '+ আরও ব্যক্তি বা প্রতিষ্ঠান যোগ করুন'
+                      : '+ Add another person or organization'}
+                  </span>
+                </button>
+              </div>
             </div>
-          </div>
-        </Accordion>
+          </Accordion>
+        )}
 
         {/* SECTION 4: Attachments (সংযুক্তি - ঐচ্ছিক) */}
         <Accordion

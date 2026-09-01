@@ -7,6 +7,7 @@ import {
   Paperclip,
   Lock,
   Calendar,
+  Users,
 } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { DraftReport } from '../../services/types';
@@ -17,7 +18,10 @@ export interface Step4ReviewProps {
   segment: SectionKey;
   formData: DraftReport;
   pendingImages: AttachedImagePreview[];
-  onEditStep: (step: number, sectionKey?: 'narrative' | 'location' | 'identity' | 'attachments') => void;
+  onEditStep: (
+    step: number,
+    sectionKey?: 'narrative' | 'location' | 'identity' | 'parties' | 'attachments'
+  ) => void;
   onBack?: () => void;
   onSubmit?: () => void;
   isSubmitting?: boolean;
@@ -33,9 +37,29 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(true);
 
+  const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
+  const showsIdentitySection = segment === 'harassment';
+
   const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
     (s) => s.id === formData.subcategoryId
   );
+
+  const formatSubjectType = (st?: string) => {
+    switch (st) {
+      case 'individual':
+        return language === 'bn' ? 'ব্যক্তি / চালক' : 'Individual / Driver';
+      case 'business':
+        return language === 'bn' ? 'দোকান / গ্যারেজ' : 'Business / Garage';
+      case 'group':
+        return language === 'bn' ? 'দল / সিন্ডিকেট' : 'Group / Syndicate';
+      case 'organization':
+        return language === 'bn' ? 'প্রতিষ্ঠান / কর্তৃপক্ষ' : 'Organization';
+      case 'unknown':
+        return language === 'bn' ? 'অজ্ঞাত' : 'Unknown';
+      default:
+        return language === 'bn' ? 'ব্যক্তি' : 'Individual';
+    }
+  };
 
   return (
     <div className="space-y-6 text-left">
@@ -208,50 +232,138 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           </div>
         </div>
 
-        {/* Card 4: Identity & Privacy */}
-        <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-              <Shield className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onEditStep(3, 'identity')}
-              className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline cursor-pointer min-h-[44px] py-1"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-            </button>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle text-[14px] space-y-1">
-            <div className="flex items-center gap-2 font-bold text-primary">
-              <Lock className="w-4 h-4" />
-              <span>
-                {formData.privacyChoice === 'anonymous'
-                  ? language === 'bn'
-                    ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
-                    : 'Completely Anonymous'
-                  : formData.privacyChoice === 'admin_only'
-                  ? language === 'bn'
-                    ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
-                    : 'Admin Follow-up Only'
-                  : language === 'bn'
-                  ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
-                  : 'Public Identity (If Approved)'}
-              </span>
+        {/* Card 4 (HARASSMENT): Identity & Privacy */}
+        {showsIdentitySection && (
+          <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
+                <Shield className="w-4 h-4 text-primary" />
+                <span>{language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onEditStep(3, 'identity')}
+                className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline cursor-pointer min-h-[44px] py-1"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+                <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
+              </button>
             </div>
 
-            {formData.privacyChoice !== 'anonymous' && formData.adminContact && (
-              <p className="text-secondary pt-1">
-                {language === 'bn' ? 'যোগাযোগের তথ্য: ' : 'Contact: '}
-                <span className="font-mono">{formData.adminContact}</span>
-                {formData.adminName && ` (${formData.adminName})`}
-              </p>
-            )}
+            <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle text-[14px] space-y-1">
+              <div className="flex items-center gap-2 font-bold text-primary">
+                <Lock className="w-4 h-4" />
+                <span>
+                  {formData.privacyChoice === 'anonymous'
+                    ? language === 'bn'
+                      ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
+                      : 'Completely Anonymous'
+                    : formData.privacyChoice === 'admin_only'
+                    ? language === 'bn'
+                      ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
+                      : 'Admin Follow-up Only'
+                    : language === 'bn'
+                    ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
+                    : 'Public Identity (If Approved)'}
+                </span>
+              </div>
+
+              {formData.privacyChoice !== 'anonymous' && formData.adminContact && (
+                <p className="text-secondary pt-1">
+                  {language === 'bn' ? 'যোগাযোগের তথ্য: ' : 'Contact: '}
+                  <span className="font-mono">{formData.adminContact}</span>
+                  {formData.adminName && ` (${formData.adminName})`}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Card 4 (RICKSHAW & EXTORTION): Person or Organization */}
+        {showsPartySection && (
+          <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
+                <Users className="w-4 h-4 text-primary" />
+                <span>{language === 'bn' ? '৩. ব্যক্তি বা প্রতিষ্ঠানের তথ্য' : '3. Person or Organization'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onEditStep(3, 'parties')}
+                className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline cursor-pointer min-h-[44px] py-1"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+                <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle text-[14px] space-y-2">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <span className="text-muted block text-[13px]">
+                    {language === 'bn' ? 'ধরন ও নাম:' : 'Type & Name:'}
+                  </span>
+                  <p className="font-bold text-primary text-[15px]">
+                    {formData.reportedSubject || (language === 'bn' ? 'নির্দিষ্ট নাম উল্লেখ নেই' : 'Unspecified name')}
+                  </p>
+                </div>
+                <span className="px-2.5 py-1 rounded-lg bg-surface border border-subtle text-[13px] font-semibold text-secondary">
+                  {formatSubjectType(formData.subjectType)}
+                </span>
+              </div>
+
+              {(formData.roleOrDesignation || formData.organization) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1 border-t border-subtle/50 text-[13px] text-secondary">
+                  {formData.roleOrDesignation && (
+                    <p>
+                      <strong>{language === 'bn' ? 'ভূমিকা/গাড়ি নং: ' : 'Role/Vehicle No: '}</strong>
+                      {formData.roleOrDesignation}
+                    </p>
+                  )}
+                  {formData.organization && (
+                    <p>
+                      <strong>{language === 'bn' ? 'প্রতিষ্ঠান/সমিতি: ' : 'Organization: '}</strong>
+                      {formData.organization}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {formData.publicProfileHandle && (
+                <p className="text-[13px] text-secondary pt-0.5">
+                  <strong>{language === 'bn' ? 'যোগাযোগ: ' : 'Contact: '}</strong>
+                  <span className="font-mono">{formData.publicProfileHandle}</span>
+                </p>
+              )}
+
+              {formData.identifyingDescription && (
+                <div className="pt-1 text-[13px] text-secondary">
+                  <strong>{language === 'bn' ? 'শনাক্তকরণ বিবরণ: ' : 'Identifying Description: '}</strong>
+                  <p className="italic text-muted">{formData.identifyingDescription}</p>
+                </div>
+              )}
+
+              {formData.mentionedParties && formData.mentionedParties.length > 0 && (
+                <div className="pt-2 border-t border-subtle/50 text-[13px]">
+                  <span className="font-bold text-primary block mb-1">
+                    {language === 'bn'
+                      ? `অতিরিক্ত পক্ষ (${formData.mentionedParties.length} জন):`
+                      : `Additional Parties (${formData.mentionedParties.length}):`}
+                  </span>
+                  <div className="space-y-1">
+                    {formData.mentionedParties.map((p, idx) => (
+                      <p key={p.id || idx} className="text-secondary">
+                        • {p.name || (language === 'bn' ? 'পক্ষ' : 'Party')}
+                        {p.roleOrDesignation ? ` (${p.roleOrDesignation})` : ''}
+                        {p.organization ? ` - ${p.organization}` : ''}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Card 5: Attachments */}
         <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
