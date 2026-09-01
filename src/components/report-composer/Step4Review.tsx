@@ -31,6 +31,9 @@ export interface Step4ReviewProps {
   onSubmit?: () => void;
   isSubmitting?: boolean;
   language: 'bn' | 'en';
+  requiresSensitivePublishingConsent?: boolean;
+  sensitivePublishingConsentAccepted?: boolean;
+  onSensitivePublishingConsentChange?: (accepted: boolean) => void;
 }
 
 export const Step4Review: React.FC<Step4ReviewProps> = ({
@@ -39,6 +42,9 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   pendingImages,
   onEditStep,
   language,
+  requiresSensitivePublishingConsent = false,
+  sensitivePublishingConsentAccepted = false,
+  onSensitivePublishingConsentChange,
 }) => {
   const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
   const showsIdentitySection = segment === 'harassment';
@@ -413,15 +419,68 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         </div>
       </div>
 
-      {/* Responsible Moderation Notice */}
-      <div className="p-3.5 rounded-2xl bg-surface-subtle border border-subtle flex items-start gap-2.5 text-[13px] text-secondary">
-        <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-        <p className="leading-relaxed">
-          {language === 'bn'
-            ? 'জমা দেওয়ার পর প্রতিবেদনটি মডারেশন পর্যালোচনার জন্য গৃহীত হবে। দায়িত্বশীল ব্যবহারের স্বার্থে অসত্য বা উদ্দেশ্যপ্রণোদিত তথ্য প্রদান থেকে বিরত থাকুন।'
-            : 'Submitted reports will be queued for moderation review. Please ensure all details are factual and responsibly reported.'}
-        </p>
-      </div>
+      {/* Harassment: Sensitive Publishing & Privacy Notice */}
+      {requiresSensitivePublishingConsent && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-surface border border-subtle space-y-3.5 shadow-2xs">
+          <div className="flex items-center gap-2 text-[15px] font-bold text-primary">
+            <Shield className="w-4 h-4 text-primary shrink-0" />
+            <span>
+              {language === 'bn'
+                ? 'গুরুত্বপূর্ণ প্রকাশনা ও গোপনীয়তা নীতি'
+                : 'Important Publishing & Privacy Notice'}
+            </span>
+          </div>
+
+          <div
+            id="harassment-publishing-notice-body"
+            className="space-y-2 text-[13px] sm:text-[13.5px] leading-relaxed text-secondary"
+          >
+            <p>
+              {language === 'bn'
+                ? 'এই প্ল্যাটফর্ম কোনো আইনগত কর্তৃপক্ষ, আদালত বা বিচারিক সেবা নয়। এর উদ্দেশ্য জনস্বার্থে গুরুত্বপূর্ণ ঘটনা তুলে ধরা ও সচেতনতা তৈরি করা—কারও অপরাধ বা দায় নির্ধারণ করা নয়।'
+                : 'This platform is not a legal authority, court, or judicial service. Its purpose is to bring important matters of public interest to attention and raise awareness—not to determine guilt or legal responsibility.'}
+            </p>
+            <p>
+              {language === 'bn'
+                ? 'ভুল অভিযোগ বা হয়রানির ঝুঁকি কমাতে প্রকাশিত প্রতিবেদনে অভিযুক্ত ব্যক্তি, প্রতিষ্ঠান বা সংগঠনের আসল নাম প্রকাশ করা হবে না। প্রতিবেদনে এমন নাম বা পরিচয়মূলক তথ্য থাকলে মডারেশন টিম প্রকাশের আগে তা গোপন বা সম্পাদনা করতে পারে। নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশের জন্য অনুমোদিত নাও হতে পারে।'
+                : 'To reduce the risk of false accusation or harassment, published reports will not reveal the real name of an accused person, organization, or institution. If your report contains names or other identifying information, moderators may hide or edit those details before publication. If the report cannot be published safely, it may not be approved for the public feed.'}
+            </p>
+          </div>
+
+          <div className="pt-3 border-t border-subtle">
+            <label
+              htmlFor="harassment-publishing-consent-checkbox"
+              className="flex items-start gap-3 cursor-pointer select-none group min-h-[44px]"
+            >
+              <input
+                id="harassment-publishing-consent-checkbox"
+                type="checkbox"
+                checked={sensitivePublishingConsentAccepted}
+                onChange={(e) => onSensitivePublishingConsentChange?.(e.target.checked)}
+                aria-describedby="harassment-publishing-notice-body"
+                className="mt-0.5 w-4 h-4 rounded border-subtle text-accent focus:ring-2 focus:ring-[var(--ui-focus)] shrink-0 cursor-pointer"
+              />
+              <span className="text-[13px] sm:text-[13.5px] font-medium text-primary leading-snug group-hover:text-primary">
+                {language === 'bn'
+                  ? 'আমি বুঝেছি এবং সম্মত যে প্রকাশের আগে সংবেদনশীল নাম বা পরিচয় গোপন বা সম্পাদনা করা হতে পারে এবং নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশ নাও হতে পারে।'
+                  : 'I understand and agree that sensitive names or identifying information may be hidden or edited before publication, and the report may not be published if it cannot be shared safely.'}
+              </span>
+            </label>
+          </div>
+        </div>
+      )}
+
+      {/* Non-harassment: Responsible Moderation Notice */}
+      {!requiresSensitivePublishingConsent && (
+        <div className="p-3.5 rounded-2xl bg-surface-subtle border border-subtle flex items-start gap-2.5 text-[13px] text-secondary">
+          <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <p className="leading-relaxed">
+            {language === 'bn'
+              ? 'জমা দেওয়ার পর প্রতিবেদনটি মডারেশন পর্যালোচনার জন্য গৃহীত হবে। দায়িত্বশীল ব্যবহারের স্বার্থে অসত্য বা উদ্দেশ্যপ্রণোদিত তথ্য প্রদান থেকে বিরত থাকুন।'
+              : 'Submitted reports will be queued for moderation review. Please ensure all details are factual and responsibly reported.'}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

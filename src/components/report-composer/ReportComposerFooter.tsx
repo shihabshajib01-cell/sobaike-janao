@@ -11,6 +11,7 @@ export interface ReportComposerFooterProps {
   onNext: () => void;
   onSubmit: () => void;
   canContinue: boolean;
+  canSubmit?: boolean;
   isSubmitting?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   onNext,
   onSubmit,
   canContinue,
+  canSubmit = true,
   isSubmitting = false,
 }) => {
   return (
@@ -105,7 +107,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           type="button"
           variant="primary"
           size="lg"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !canSubmit}
           onClick={onSubmit}
           leftIcon={
             isSubmitting ? (

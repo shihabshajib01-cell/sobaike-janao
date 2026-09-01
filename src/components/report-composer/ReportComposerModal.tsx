@@ -68,6 +68,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     reportId: string;
   } | null>(null);
 
+  // Sensitive Harassment Publishing Consent State (session/modal level only - not in draft/db)
+  const [sensitivePublishingConsentAccepted, setSensitivePublishingConsentAccepted] = useState(false);
+
   // Close Confirmation state
   const [isConfirmCloseOpen, setIsConfirmCloseOpen] = useState(false);
 
@@ -79,6 +82,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Check for saved draft whenever the modal is opened
   useEffect(() => {
     if (isOpen) {
+      setSensitivePublishingConsentAccepted(false);
       const saved = DraftRepository.getDraft();
       if (saved && DraftRepository.hasMeaningfulDraft(saved)) {
         setSavedDraftAvailable(saved);
@@ -92,6 +96,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       }
     } else {
       setSubmitError(null);
+      setSensitivePublishingConsentAccepted(false);
     }
   }, [isOpen]);
 
@@ -106,6 +111,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const handleContinueSavedDraft = useCallback(() => {
     if (savedDraftAvailable) {
       retryCredentialsRef.current = null;
+      setSensitivePublishingConsentAccepted(false);
       setFormData(savedDraftAvailable);
       setSavedDraftAvailable(null);
     }
@@ -113,6 +119,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleStartNewComplaint = useCallback(() => {
     retryCredentialsRef.current = null;
+    setSensitivePublishingConsentAccepted(false);
     setFormData({
       ...INITIAL_DRAFT,
       segment: null,
@@ -124,6 +131,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleDeleteSavedDraft = useCallback(() => {
     retryCredentialsRef.current = null;
+    setSensitivePublishingConsentAccepted(false);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -155,6 +163,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setStep3JumpSection(undefined);
     }
 
+    if (step !== 4) {
+      setSensitivePublishingConsentAccepted(false);
+    }
+
     setFormData((prev) => ({
       ...prev,
       currentStep: step,
@@ -177,6 +189,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleSelectService = useCallback((segment: SectionKey) => {
     retryCredentialsRef.current = null;
+    setSensitivePublishingConsentAccepted(false);
     setFormData((prev) => {
       if (prev.segment === segment) return prev;
       return {
@@ -199,6 +212,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleSelectSubcategory = useCallback((subcategoryId: string, option: SubcategoryOption) => {
     retryCredentialsRef.current = null;
+    setSensitivePublishingConsentAccepted(false);
     setFormData((prev) => {
       // Auto-populate title if empty
       const updatedTitle = prev.title?.trim()
@@ -286,6 +300,16 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Submission handler
   const handleSubmitReport = useCallback(async () => {
     if (!formData.segment || !formData.subcategoryId) return;
+
+    // Harassment & Violence: Publishing & Privacy Notice Acknowledgement Guard
+    if (formData.segment === 'harassment' && !sensitivePublishingConsentAccepted) {
+      setSubmitError(
+        language === 'bn'
+          ? 'প্রতিবেদন জমা দেওয়ার আগে প্রকাশনা ও গোপনীয়তা নীতিটি বুঝেছেন তা নিশ্চিত করুন।'
+          : 'Please confirm the publishing and privacy notice before submitting this report.'
+      );
+      return;
+    }
 
     // Check if any image is actively preparing
     const isAnyCompressing = pendingImages.some((img) => img.isCompressing);
@@ -384,6 +408,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       if (response && response.reportId) {
         // Reset retry credentials on success
         retryCredentialsRef.current = null;
+        setSensitivePublishingConsentAccepted(false);
         // Clear saved draft on success
         DraftRepository.clearDraft();
         setSubmissionResult({
@@ -407,10 +432,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, pendingImages, language]);
+  }, [formData, pendingImages, language, sensitivePublishingConsentAccepted]);
 
   const handleStartAnother = useCallback(() => {
     retryCredentialsRef.current = null;
+    setSensitivePublishingConsentAccepted(false);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -425,6 +451,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Discard draft action
   const handleDiscardDraft = useCallback(() => {
     retryCredentialsRef.current = null;
+    setSensitivePublishingConsentAccepted(false);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -676,6 +703,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       onSubmit={handleSubmitReport}
                       isSubmitting={isSubmitting}
                       language={language}
+                      requiresSensitivePublishingConsent={formData.segment === 'harassment'}
+                      sensitivePublishingConsentAccepted={sensitivePublishingConsentAccepted}
+                      onSensitivePublishingConsentChange={setSensitivePublishingConsentAccepted}
                     />
                   )}
                 </>
@@ -696,6 +726,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     ? canContinueStep1
                     : formData.currentStep === 2
                     ? canContinueStep2
+                    : true
+                }
+                canSubmit={
+                  formData.segment === 'harassment'
+                    ? sensitivePublishingConsentAccepted
                     : true
                 }
                 isSubmitting={isSubmitting}
