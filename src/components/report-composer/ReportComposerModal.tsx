@@ -269,6 +269,29 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Submission handler
   const handleSubmitReport = useCallback(async () => {
     if (!formData.segment || !formData.subcategoryId) return;
+
+    // Check if any image is actively compressing
+    const isAnyCompressing = pendingImages.some((img) => img.isCompressing);
+    if (isAnyCompressing) {
+      setSubmitError(
+        language === 'bn'
+          ? 'ছবি কমপ্রেস করা সম্পন্ন হওয়া পর্যন্ত অপেক্ষা করুন।'
+          : 'Please wait until image compression completes.'
+      );
+      return;
+    }
+
+    // Check if any image failed compression
+    const hasCompressionError = pendingImages.some((img) => img.compressionError);
+    if (hasCompressionError) {
+      setSubmitError(
+        language === 'bn'
+          ? 'ত্রুটিযুক্ত ছবিগুলো মুছে ফেলুন অথবা অন্য ছবি নির্বাচন করুন।'
+          : 'Please remove or replace images that failed compression.'
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError(null);
 
