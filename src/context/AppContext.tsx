@@ -31,8 +31,6 @@ export interface AppContextType {
   toggleLanguage: () => void;
   isSearchModalOpen: boolean;
   setIsSearchModalOpen: (open: boolean) => void;
-  isShortcutsModalOpen: boolean;
-  setIsShortcutsModalOpen: (open: boolean) => void;
   isTabletMenuOpen: boolean;
   setIsTabletMenuOpen: (open: boolean) => void;
   isReportComposerOpen: boolean;
@@ -49,7 +47,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [language, setLanguage] = useState<Language>('bn');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
-  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState<boolean>(false);
   const [isTabletMenuOpen, setIsTabletMenuOpen] = useState<boolean>(false);
 
   // Global Report Composer Modal State
@@ -144,8 +141,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       toggleLanguage,
       isSearchModalOpen,
       setIsSearchModalOpen,
-      isShortcutsModalOpen,
-      setIsShortcutsModalOpen,
       isTabletMenuOpen,
       setIsTabletMenuOpen,
       isReportComposerOpen,
@@ -163,7 +158,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       language,
       toggleLanguage,
       isSearchModalOpen,
-      isShortcutsModalOpen,
       isTabletMenuOpen,
       isReportComposerOpen,
       reportComposerInitialSegment,

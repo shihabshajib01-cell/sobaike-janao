@@ -7,10 +7,8 @@ import { Header } from './Header';
 import { MobileHeader } from './MobileHeader';
 import { BottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
-import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { ViewportDebugger } from '../debug/ViewportDebugger';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
-import { useGlobalKeyboardShortcuts } from '../../hooks/useGlobalKeyboardShortcuts';
 import { HomePage } from '../../pages/HomePage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
 import { RickshawPage } from '../../pages/RickshawPage';
@@ -44,31 +42,9 @@ export const AppShell: React.FC = () => {
     language,
     isReportComposerOpen,
     reportComposerInitialSegment,
-    openReportComposer,
     closeReportComposer,
     navigateTo,
-    isSearchModalOpen,
-    setIsSearchModalOpen,
-    isShortcutsModalOpen,
-    setIsShortcutsModalOpen,
-    isTabletMenuOpen,
-    setIsTabletMenuOpen,
-    toggleLanguage,
   } = useApp();
-
-  // Enable global accessible keyboard shortcuts
-  useGlobalKeyboardShortcuts({
-    navigateTo,
-    openReportComposer,
-    isReportComposerOpen,
-    isSearchModalOpen,
-    setIsSearchModalOpen,
-    isShortcutsModalOpen,
-    setIsShortcutsModalOpen,
-    isTabletMenuOpen,
-    setIsTabletMenuOpen,
-    toggleLanguage,
-  });
 
   return (
     <div className="min-h-screen bg-page text-primary flex flex-col">
@@ -124,19 +100,7 @@ export const AppShell: React.FC = () => {
                   : 'Moderated Citizen Public Platform'}
               </span>
             </div>
-            <div className="flex items-center gap-4 text-[14px] text-muted">
-              <button
-                id="footer-shortcuts-trigger"
-                onClick={() => setIsShortcutsModalOpen(true)}
-                className="hover:text-primary transition-colors cursor-pointer flex items-center gap-1.5 focus:outline-none"
-                aria-label={language === 'bn' ? 'কীবোর্ড শর্টকাট দেখুন' : 'View Keyboard Shortcuts'}
-              >
-                <span>{language === 'bn' ? 'কীবোর্ড শর্টকাট' : 'Shortcuts'}</span>
-                <kbd className="px-1.5 py-0.5 text-[11px] font-mono font-bold bg-surface border border-subtle rounded shadow-2xs">
-                  ?
-                </kbd>
-              </button>
-              <span>•</span>
+            <div className="text-[14px] text-muted">
               <span>{language === 'bn' ? 'মুক্ত জনস্বার্থ রেকর্ড' : 'Public Interest Record'}</span>
             </div>
           </div>
@@ -151,14 +115,6 @@ export const AppShell: React.FC = () => {
       {/* 6. Global Search Dialog Modal */}
       <ErrorBoundary componentName="SearchModal" silent>
         <SearchModal />
-      </ErrorBoundary>
-
-      {/* 6b. Global Keyboard Shortcuts Modal */}
-      <ErrorBoundary componentName="KeyboardShortcutsModal" silent>
-        <KeyboardShortcutsModal
-          isOpen={isShortcutsModalOpen}
-          onClose={() => setIsShortcutsModalOpen(false)}
-        />
       </ErrorBoundary>
 
       {/* 7. Unified Global Report Composer Modal */}
@@ -180,4 +136,3 @@ export const AppShell: React.FC = () => {
     </div>
   );
 };
-
