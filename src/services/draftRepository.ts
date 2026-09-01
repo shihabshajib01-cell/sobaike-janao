@@ -8,7 +8,7 @@ export const INITIAL_DRAFT: DraftReport = {
   currentStep: 1,
   subcategoryId: '',
   title: '',
-  subjectType: 'individual',
+  subjectType: 'unknown',
   reportedSubject: '',
   mentionedParties: [],
   roleOrDesignation: '',

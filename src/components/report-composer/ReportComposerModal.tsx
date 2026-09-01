@@ -177,12 +177,24 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleSelectService = useCallback((segment: SectionKey) => {
     retryCredentialsRef.current = null;
-    setFormData((prev) => ({
-      ...prev,
-      segment,
-      // Clear subcategory if switching to a different segment
-      subcategoryId: prev.segment === segment ? prev.subcategoryId : '',
-    }));
+    setFormData((prev) => {
+      if (prev.segment === segment) return prev;
+      return {
+        ...prev,
+        segment,
+        subcategoryId: '',
+        title: '',
+        subjectType: 'unknown',
+        reportedSubject: '',
+        roleOrDesignation: '',
+        organization: '',
+        publicProfileHandle: '',
+        identifyingDescription: '',
+        mentionedParties: [],
+        intimateWhatHappened: '',
+        intimatePlatform: '',
+      };
+    });
   }, []);
 
   const handleSelectSubcategory = useCallback((subcategoryId: string, option: SubcategoryOption) => {
@@ -195,10 +207,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         ? option.nameBn
         : option.nameEn;
 
+      const isDifferentSubcat = prev.subcategoryId !== subcategoryId;
+
       return {
         ...prev,
         subcategoryId,
         title: updatedTitle,
+        ...(isDifferentSubcat && {
+          subjectType: 'unknown',
+        }),
       };
     });
   }, [language]);
@@ -317,7 +334,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         incidentDate: formData.incidentDate || undefined,
         incidentTime: formData.incidentTime || undefined,
         frequency: formData.frequency || 'one-time',
-        subjectType: isPartySegment ? (formData.subjectType || 'individual') : undefined,
+        subjectType: isPartySegment ? (formData.subjectType || 'unknown') : undefined,
         reportedSubject: isPartySegment ? (formData.reportedSubject?.trim() || undefined) : undefined,
         roleOrDesignation: isPartySegment ? (formData.roleOrDesignation?.trim() || undefined) : undefined,
         organization: isPartySegment ? (formData.organization?.trim() || undefined) : undefined,
