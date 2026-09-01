@@ -247,18 +247,18 @@ export const PublicReportRepository = {
     if (locPrivacy === 'public') {
       locationBn = pv.locationBn || `${pv.areaBn || ''}, ${pv.districtBn || ''}`;
       locationEn = pv.locationEn || `${pv.areaEn || ''}, ${pv.districtEn || ''}`;
-      districtBn = pv.districtBn;
-      districtEn = pv.districtEn;
-      areaBn = pv.areaBn;
-      areaEn = pv.areaEn;
+      districtBn = pv.districtBn || '';
+      districtEn = pv.districtEn || '';
+      areaBn = pv.areaBn || '';
+      areaEn = pv.areaEn || '';
       if (pv.coordinates && typeof pv.coordinates.lat === 'number' && typeof pv.coordinates.lng === 'number') {
         coordinates = pv.coordinates;
       }
     } else if (locPrivacy === 'generalized') {
-      districtBn = pv.districtBn;
-      districtEn = pv.districtEn;
-      areaBn = pv.areaBn;
-      areaEn = pv.areaEn;
+      districtBn = pv.districtBn || '';
+      districtEn = pv.districtEn || '';
+      areaBn = pv.areaBn || '';
+      areaEn = pv.areaEn || '';
       locationBn = [pv.areaBn, pv.districtBn].filter(Boolean).join(', ') || pv.districtBn || '';
       locationEn = [pv.areaEn, pv.districtEn].filter(Boolean).join(', ') || pv.districtEn || '';
       // No coordinates for generalized
@@ -269,9 +269,13 @@ export const PublicReportRepository = {
     }
 
     // Evidence summary: only approved public items
-    const evidenceSummary =
+    const evidenceSummaryBn =
       pv.sensitiveSettings?.evidencePrivacy === 'public' && pv.evidenceSummaryBn && pv.evidenceSummaryBn.length > 0
         ? pv.evidenceSummaryBn
+        : [];
+    const evidenceSummaryEn =
+      pv.sensitiveSettings?.evidencePrivacy === 'public' && pv.evidenceSummaryEn && pv.evidenceSummaryEn.length > 0
+        ? pv.evidenceSummaryEn
         : [];
 
     // Public Image Attachments (strictly only approved IDs when evidence is public)
@@ -332,20 +336,24 @@ export const PublicReportRepository = {
       areaBn,
       areaEn,
       coordinates,
-      incidentDateBn: pv.incidentDateBn,
-      incidentDateEn: pv.incidentDateEn,
-      publishedDateBn: pv.publishedAt ? new Date(pv.publishedAt).toLocaleDateString('bn-BD') : undefined,
+      incidentDateBn: pv.incidentDateBn || '',
+      incidentDateEn: pv.incidentDateEn || '',
+      publishedDateBn: pv.publishedAt ? new Date(pv.publishedAt).toLocaleDateString('bn-BD') : '',
       publishedDateEn: pv.publishedAt
         ? new Date(pv.publishedAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
-        : undefined,
-      evidenceSummary,
+        : '',
+      evidenceSummaryBn,
+      evidenceSummaryEn,
       images,
       media: {
         type: mediaType,
         images: images || [],
       },
       status: 'published',
+      statusBn: 'প্রকাশিত প্রতিবেদন',
+      statusEn: 'Published',
       isHighUrgency: Boolean(pv.isHighUrgency),
+      relatedReportCount: relatedReportIds.length,
       relatedReportIds,
       trustIndicators: {
         evidenceCount:

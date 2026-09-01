@@ -10,21 +10,27 @@ export interface ReportUpdate {
 }
 
 export interface ReportResponse {
-  respondentBn: string;
-  respondentEn: string;
-  dateBn: string;
-  dateEn: string;
+  respondentBn?: string;
+  respondentEn?: string;
+  respondentName?: string;
+  respondentTitle?: string;
+  organization?: string;
+  dateBn?: string;
+  dateEn?: string;
   statementBn: string;
   statementEn: string;
-  statusBn: string;
-  statusEn: string;
+  statusBn?: string;
+  statusEn?: string;
 }
 
 export interface ReportTrustIndicators {
-  evidenceSubmitted: boolean;
-  multipleReports: boolean;
-  updateAvailable: boolean;
-  responseReceived: boolean;
+  evidenceSubmitted?: boolean;
+  multipleReports?: boolean;
+  updateAvailable?: boolean;
+  responseReceived?: boolean;
+  evidenceCount?: number;
+  hasOfficialResponse?: boolean;
+  hasRelatedReports?: boolean;
 }
 
 export interface PublicReportImage {
@@ -74,7 +80,8 @@ export interface ReportItem {
   publishedDateEn: string;
   evidenceSummaryBn: string[];
   evidenceSummaryEn: string[];
-  relatedReportCount: number;
+  relatedReportCount?: number;
+  status?: string;
   statusBn: string;
   statusEn: string;
   isHighUrgency?: boolean;

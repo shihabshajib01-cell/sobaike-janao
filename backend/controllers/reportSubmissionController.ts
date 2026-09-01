@@ -467,7 +467,7 @@ export const ReportSubmissionController = {
 
   async submitAdditionalInfo(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const { pin, reporterResponse } = req.body;
 
       if (!id || !pin || !reporterResponse || typeof reporterResponse !== 'string' || !reporterResponse.trim()) {

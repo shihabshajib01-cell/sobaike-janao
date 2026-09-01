@@ -19,6 +19,8 @@
   },
   "include": [
     "src",
+    "server.ts",
+    "backend",
     "vite.config.ts"
   ]
 }

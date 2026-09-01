@@ -10,7 +10,7 @@ import { DbSubjectResponse } from '../types';
 export const PublicReportController = {
   async getAttachmentById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const attachment = ReportAttachmentRepository.getById(id);
       if (!attachment) {
         return res.status(404).json({
@@ -107,7 +107,7 @@ export const PublicReportController = {
 
   async getReportById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const report = PublicReportRepository.getPublishedById(id);
 
       if (!report) {
@@ -200,7 +200,7 @@ export const PublicReportController = {
 
   async submitSubjectResponse(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const body = req.body;
 
       if (!body.responderName || !body.contactEmailOrPhone || !body.officialStatement) {

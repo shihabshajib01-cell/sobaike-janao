@@ -37,7 +37,7 @@ export interface DbReportLocation {
 }
 
 export interface DbReportSubmission {
-  internalId: string;
+  internalId?: string;
   id: string; // Human-readable ID e.g. SJ-2026-482910
   pinHash: string; // Securely hashed PIN (never plain text)
   segment: SectionKey;
@@ -74,6 +74,10 @@ export interface DbReportSubmission {
     showGeneralLocation: boolean;
     showDescription: boolean;
   };
+  publicVersion?: DbPublicReportVersion;
+  activeClarification?: DbClarificationRequest;
+  relatedRelationships?: any[];
+  history?: any[];
   status: ReportStatus;
   statusBn: string;
   statusEn: string;
@@ -92,27 +96,29 @@ export interface DbPublicReportVersion {
   shortDescriptionEn: string;
   fullDescriptionBn: string;
   fullDescriptionEn: string;
-  subjectVisibility: 'public' | 'hidden';
+  subjectVisibility?: 'public' | 'hidden';
   reportedSubjectBn?: string;
   reportedSubjectEn?: string;
   subjectType?: 'individual' | 'business' | 'group' | 'location';
-  organizationVisibility: 'public' | 'hidden';
+  organizationVisibility?: 'public' | 'hidden';
   organization?: string;
-  locationVisibility: 'public' | 'generalized' | 'hidden';
+  locationVisibility?: 'public' | 'generalized' | 'hidden';
   locationBn: string;
   locationEn: string;
-  districtBn: string;
-  districtEn: string;
-  areaBn: string;
-  areaEn: string;
+  districtBn?: string;
+  districtEn?: string;
+  areaBn?: string;
+  areaEn?: string;
+  coordinates?: { lat: number; lng: number };
   approvedCoordinates?: { lat: number; lng: number };
-  evidenceVisibility: 'public' | 'hidden';
+  sensitiveSettings?: SensitiveInfoSettings;
+  evidenceVisibility?: 'public' | 'hidden';
   evidenceSummaryBn: string[];
   evidenceSummaryEn: string[];
-  reporterIdentityVisibility: 'public' | 'hidden';
+  reporterIdentityVisibility?: 'public' | 'hidden';
   publicReporterName?: string;
-  incidentDateBn: string;
-  incidentDateEn: string;
+  incidentDateBn?: string;
+  incidentDateEn?: string;
   isHighUrgency?: boolean;
   publicAttachmentIds?: string[];
   preparedAt: string;

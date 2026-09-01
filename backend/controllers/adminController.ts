@@ -82,7 +82,7 @@ export const AdminController = {
 
   async getReportDetail(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const submission = ReportSubmissionRepository.getById(id);
 
       if (!submission) {
@@ -125,7 +125,7 @@ export const AdminController = {
 
   async startReview(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const submission = ReportSubmissionRepository.getById(id);
 
       if (!submission) {
@@ -163,7 +163,7 @@ export const AdminController = {
 
   async requestMoreInfo(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const { message, requestedFields } = req.body;
 
       if (!message || typeof message !== 'string' || !message.trim()) {
@@ -221,7 +221,7 @@ export const AdminController = {
 
   async savePublicVersion(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const pvData = req.body;
 
       const submission = ReportSubmissionRepository.getById(id);
@@ -298,7 +298,7 @@ export const AdminController = {
 
   async approveReport(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const submission = ReportSubmissionRepository.getById(id);
 
       if (!submission) {
@@ -364,7 +364,7 @@ export const AdminController = {
 
   async previewPublicVersion(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const submission = ReportSubmissionRepository.getById(id);
 
       if (!submission) {
@@ -443,7 +443,7 @@ export const AdminController = {
 
   async publishReport(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const submission = ReportSubmissionRepository.getById(id);
 
       if (!submission) {
@@ -503,7 +503,7 @@ export const AdminController = {
 
   async unpublishReport(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const { reason } = req.body;
 
       if (!reason || typeof reason !== 'string' || !reason.trim()) {
@@ -557,7 +557,7 @@ export const AdminController = {
 
   async linkRelatedReport(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const { targetReportId, relationshipType } = req.body;
 
       if (!targetReportId || !relationshipType) {
@@ -596,7 +596,7 @@ export const AdminController = {
 
   async addUpdate(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const { titleBn, titleEn, contentBn, contentEn, dateBn, dateEn } = req.body;
 
       if (!titleBn || !contentBn) {
@@ -656,7 +656,7 @@ export const AdminController = {
 
   async publishResponse(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const resp = ResponseRepository.getById(id);
 
       if (!resp) {
@@ -687,7 +687,7 @@ export const AdminController = {
 
   async rejectResponse(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const { reason } = req.body;
       const resp = ResponseRepository.getById(id);
 
@@ -732,14 +732,14 @@ export const AdminController = {
 
   async getAttachmentById(req: AuthenticatedAdminRequest, res: Response) {
     try {
-      const { id } = req.params;
+      const id = String(req.params.id);
       const attachment = ReportAttachmentRepository.getById(id);
       if (!attachment) {
         return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Attachment not found.' } });
       }
 
       const filePath = getSafeUploadFilePath(attachment.storageKey);
-      if (!fs.existsSync(filePath)) {
+      if (!filePath || !fs.existsSync(filePath)) {
         return res.status(404).json({ error: { code: 'FILE_NOT_FOUND', message: 'Attachment file not found on disk.' } });
       }
 
