@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -9,6 +9,8 @@ import { BottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
 import { ViewportDebugger } from '../debug/ViewportDebugger';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
+import { LocationConsentModal } from '../location/LocationConsentModal';
+import { VisitorSessionService } from '../../services/visitorSessionService';
 import { HomePage } from '../../pages/HomePage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
 import { RickshawPage } from '../../pages/RickshawPage';
@@ -44,6 +46,23 @@ export const AppShell: React.FC = () => {
     closeReportComposer,
     navigateTo,
   } = useApp();
+
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Check if user has answered the first-visit location prompt
+    const choice = VisitorSessionService.getLocationChoice();
+    if (!choice) {
+      setIsLocationModalOpen(true);
+    } else {
+      // If user previously granted consent, restore session & watch
+      VisitorSessionService.initReturningVisitor();
+    }
+
+    return () => {
+      VisitorSessionService.stopLocationWatch();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-page text-primary flex flex-col">
@@ -125,7 +144,16 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      {/* 8. Dev-only Viewport Sizing Debugger */}
+      {/* 8. First-Visit Location Sharing Consent Modal */}
+      <ErrorBoundary componentName="LocationConsentModal" silent>
+        <LocationConsentModal
+          isOpen={isLocationModalOpen}
+          language={language}
+          onClose={() => setIsLocationModalOpen(false)}
+        />
+      </ErrorBoundary>
+
+      {/* 9. Dev-only Viewport Sizing Debugger */}
       {import.meta.env.DEV && <ViewportDebugger />}
     </div>
   );

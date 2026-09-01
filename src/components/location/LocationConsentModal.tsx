@@ -1,0 +1,112 @@
+import React, { useState } from 'react';
+import { MapPin, Loader2, ShieldCheck } from 'lucide-react';
+import { VisitorSessionService } from '../../services/visitorSessionService';
+
+interface LocationConsentModalProps {
+  isOpen: boolean;
+  language: 'bn' | 'en';
+  onClose: () => void;
+}
+
+export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
+  isOpen,
+  language,
+  onClose,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  if (!isOpen) return null;
+
+  const isBn = language === 'bn';
+
+  const handleShareLocation = async () => {
+    setIsLoading(true);
+    try {
+      await VisitorSessionService.requestAndRecordLocation();
+    } catch {
+      // Handled internally in service
+    } finally {
+      setIsLoading(false);
+      onClose();
+    }
+  };
+
+  const handleNotNow = async () => {
+    try {
+      await VisitorSessionService.handleNotNow();
+    } catch {
+      // Handled internally
+    } finally {
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-consent-title"
+      aria-describedby="location-consent-desc"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+    >
+      <div className="bg-surface border border-subtle rounded-2xl w-full max-w-md p-6 shadow-xl flex flex-col gap-5 text-primary">
+        {/* Icon & Heading */}
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <MapPin className="w-6 h-6" />
+          </div>
+          <div className="flex-1">
+            <h2 id="location-consent-title" className="text-lg font-bold tracking-tight">
+              {isBn ? 'আপনার অবস্থান শেয়ার করুন' : 'Share your location'}
+            </h2>
+            <div className="flex items-center gap-1.5 text-xs text-muted mt-0.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy Protected'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Body */}
+        <div id="location-consent-desc" className="flex flex-col gap-3 text-sm text-secondary leading-relaxed">
+          <p>
+            {isBn
+              ? 'আপনার অবস্থান আমাদের বুঝতে সাহায্য করে কোন এলাকা থেকে জনসাধারণের প্রতিবেদন ও প্ল্যাটফর্ম কার্যক্রম আসছে। আপনার অবস্থান শুধুমাত্র অনুমোদিত অ্যাডমিনরা দেখতে পারবেন।'
+              : 'Your location helps us understand where public reports and platform activity are coming from. Your location is visible only to authorized administrators.'}
+          </p>
+          <p className="text-xs text-muted bg-surface-muted/60 p-3 rounded-lg border border-subtle">
+            {isBn
+              ? 'আপনি অবস্থান ব্যবহারের অনুমতি দিলে, এই ওয়েবসাইট খোলা থাকা অবস্থায় অবস্থানের তথ্য হালনাগাদ হতে পারে। অবস্থান শেয়ার না করেও আপনি ওয়েবসাইট ব্যবহার করতে পারবেন।'
+              : 'If you allow location access, it may be updated while this website remains open. You can still use the website without sharing your location.'}
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row-reverse gap-2.5 pt-2">
+          <button
+            type="button"
+            onClick={handleShareLocation}
+            disabled={isLoading}
+            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...'}</span>
+              </>
+            ) : (
+              <span>{isBn ? 'অবস্থান শেয়ার করুন' : 'Share Location'}</span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={handleNotNow}
+            disabled={isLoading}
+            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-surface-muted hover:bg-surface-muted/80 text-secondary border border-subtle transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50"
+          >
+            <span>{isBn ? 'এখন নয়' : 'Not Now'}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
