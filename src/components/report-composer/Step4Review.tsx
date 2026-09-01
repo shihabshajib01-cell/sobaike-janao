@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  Edit2,
   Shield,
   FileText,
   MapPin,
@@ -9,6 +8,7 @@ import {
   Calendar,
   Users,
   Info,
+  Layers,
 } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { DraftReport } from '../../services/types';
@@ -18,6 +18,7 @@ import {
   getReportSubjectConfig,
   getSubjectOptionLabel,
 } from '../../data/reportSubjectOptions';
+import { ReviewSection } from './ReviewSection';
 
 export interface Step4ReviewProps {
   segment: SectionKey;
@@ -31,9 +32,6 @@ export interface Step4ReviewProps {
   onSubmit?: () => void;
   isSubmitting?: boolean;
   language: 'bn' | 'en';
-  requiresSensitivePublishingConsent?: boolean;
-  sensitivePublishingConsentAccepted?: boolean;
-  onSensitivePublishingConsentChange?: (accepted: boolean) => void;
 }
 
 export const Step4Review: React.FC<Step4ReviewProps> = ({
@@ -42,9 +40,6 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   pendingImages,
   onEditStep,
   language,
-  requiresSensitivePublishingConsent = false,
-  sensitivePublishingConsentAccepted = false,
-  onSensitivePublishingConsentChange,
 }) => {
   const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
   const showsIdentitySection = segment === 'harassment';
@@ -54,6 +49,85 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   );
 
   const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
+
+  // Independent Collapsible State - What Happened (incident) is expanded by default
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    service_type: false,
+    incident: true,
+    location: false,
+    identity_target: false,
+    attachments: false,
+  });
+
+  const toggleSection = (key: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const editLabel = language === 'bn' ? 'সম্পাদনা' : 'Edit';
+
+  // Computed Summaries for Collapsed states
+  const serviceTypeSummary = `${
+    SECTIONS[segment] ? (language === 'bn' ? SECTIONS[segment].nameBn : SECTIONS[segment].nameEn) : ''
+  } · ${
+    currentSubcategoryOption
+      ? language === 'bn'
+        ? currentSubcategoryOption.nameBn
+        : currentSubcategoryOption.nameEn
+      : formData.subcategoryId
+  }`;
+
+  const incidentSummary = `${formData.incidentDate || '-'} · ${
+    formData.frequency === 'repeated'
+      ? language === 'bn'
+        ? 'নিয়মিত'
+        : 'Repeated'
+      : language === 'bn'
+      ? 'এককালীন'
+      : 'One-time'
+  }`;
+
+  const locationSummary =
+    [
+      formData.location?.area,
+      formData.location?.district,
+      formData.location?.division,
+    ]
+      .filter(Boolean)
+      .join(', ') || (language === 'bn' ? 'অবস্থান নির্দিষ্ট নেই' : 'Unspecified location');
+
+  const identitySummary =
+    formData.privacyChoice === 'anonymous'
+      ? language === 'bn'
+        ? 'সম্পূর্ণ অজ্ঞাতনামা'
+        : 'Completely Anonymous'
+      : formData.privacyChoice === 'admin_only'
+      ? language === 'bn'
+        ? 'মডারেটরের জন্য সংরক্ষিত'
+        : 'Admin Follow-up Only'
+      : language === 'bn'
+      ? 'অনুমোদিত হলে প্রকাশ্য পরিচয়'
+      : 'Public Identity';
+
+  const targetSummary =
+    formData.reportedSubject ||
+    formData.organization ||
+    (formData.subjectType === 'unknown'
+      ? language === 'bn'
+        ? 'অজ্ঞাত / নির্দিষ্ট নেই'
+        : 'Unknown / Not specified'
+      : getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language));
+
+  const attachmentsSummary =
+    pendingImages.length > 0
+      ? language === 'bn'
+        ? `${pendingImages.length} টি ছবি সংযুক্ত`
+        : `${pendingImages.length} images attached`
+      : language === 'bn'
+      ? 'কোনো ছবি সংযুক্ত নেই'
+      : 'No attachments';
 
   return (
     <div className="space-y-4 md:space-y-5 text-left">
@@ -69,36 +143,26 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         />
       </div>
 
-      {/* Step Header */}
-      <div className="space-y-1">
+      {/* Clean Step Header without redundant explanations */}
+      <div className="text-left">
         <h3 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-primary">
-          {language === 'bn' ? '৪. তথ্যের পর্যালোচনা ও চূড়ান্ত জমা' : '4. Review & Submit'}
+          {language === 'bn' ? 'তথ্য যাচাই করুন' : 'Review your report'}
         </h3>
-        <p className="text-[13px] sm:text-[14px] leading-relaxed text-secondary">
-          {language === 'bn'
-            ? 'প্রতিবেদন জমা দেওয়ার পূর্বে প্রদত্ত তথ্যগুলো দেখে নিন। প্রয়োজনে সম্পাদনা করতে পারেন।'
-            : 'Review provided details before submission. You can jump back to edit any section.'}
-        </p>
       </div>
 
-      {/* Review Cards Grid */}
+      {/* Review Cards Grid - Independently Collapsible */}
       <div className="space-y-3 sm:space-y-3.5">
-        {/* Card 1: Service & Subcategory */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-subtle space-y-2.5 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-muted">
-              <span>{language === 'bn' ? 'সেবা ও ধরন' : 'Service & Type'}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onEditStep(1)}
-              className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline cursor-pointer min-h-[38px] py-1"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              <span>{language === 'bn' ? 'পরিবর্তন করুন' : 'Edit'}</span>
-            </button>
-          </div>
-
+        {/* Section 1: Service & Type */}
+        <ReviewSection
+          id="review-section-service"
+          isOpen={openSections.service_type}
+          onToggle={() => toggleSection('service_type')}
+          title={language === 'bn' ? 'সেবা ও ধরন' : 'Service & Type'}
+          summary={serviceTypeSummary}
+          icon={<Layers className="w-4 h-4" />}
+          onEdit={() => onEditStep(1)}
+          editLabel={editLabel}
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
             <div className="p-2.5 rounded-xl bg-surface-subtle border border-subtle">
               <span className="text-[12px] text-muted block mb-0.5">
@@ -120,26 +184,20 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               </p>
             </div>
           </div>
-        </div>
+        </ReviewSection>
 
-        {/* Card 2: What Happened & Timeline */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-subtle space-y-2.5 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-              <FileText className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '১. ঘটনার বিবরণ ও সময়কাল' : '1. What Happened & Timeline'}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onEditStep(3, 'narrative')}
-              className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline cursor-pointer min-h-[38px] py-1"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-            </button>
-          </div>
-
-          <div className="space-y-2 text-[13px]">
+        {/* Section 2: 1. What Happened & Timeline (Default Expanded) */}
+        <ReviewSection
+          id="review-section-incident"
+          isOpen={openSections.incident}
+          onToggle={() => toggleSection('incident')}
+          title={language === 'bn' ? '১. ঘটনার বিবরণ ও সময়কাল' : '1. What Happened & Timeline'}
+          summary={incidentSummary}
+          icon={<FileText className="w-4 h-4" />}
+          onEdit={() => onEditStep(3, 'narrative')}
+          editLabel={editLabel}
+        >
+          <div className="space-y-2.5 text-[13px] pt-0.5">
             <div>
               <span className="text-muted block text-[12px]">{language === 'bn' ? 'শিরোনাম:' : 'Headline:'}</span>
               <p className="font-bold text-primary text-[15px]">{formData.title || '-'}</p>
@@ -186,26 +244,20 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </ReviewSection>
 
-        {/* Card 3: Location */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-subtle space-y-2.5 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-              <MapPin className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '২. লোকেশন' : '2. Location'}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onEditStep(3, 'location')}
-              className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline cursor-pointer min-h-[38px] py-1"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-            </button>
-          </div>
-
-          <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[14px]">
+        {/* Section 3: 2. Location */}
+        <ReviewSection
+          id="review-section-location"
+          isOpen={openSections.location}
+          onToggle={() => toggleSection('location')}
+          title={language === 'bn' ? '২. লোকেশন' : '2. Location'}
+          summary={locationSummary}
+          icon={<MapPin className="w-4 h-4" />}
+          onEdit={() => onEditStep(3, 'location')}
+          editLabel={editLabel}
+        >
+          <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[14px] pt-1">
             <p className="font-semibold text-primary">
               {[
                 formData.location?.area,
@@ -224,27 +276,21 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               </p>
             )}
           </div>
-        </div>
+        </ReviewSection>
 
-        {/* Card 4 (HARASSMENT): Identity & Privacy */}
+        {/* Section 4 (HARASSMENT): 3. Identity & Privacy */}
         {showsIdentitySection && (
-          <div className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-subtle space-y-2.5 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-                <Shield className="w-4 h-4 text-primary" />
-                <span>{language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => onEditStep(3, 'identity')}
-                className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline cursor-pointer min-h-[38px] py-1"
-              >
-                <Edit2 className="w-3.5 h-3.5" />
-                <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-              </button>
-            </div>
-
-            <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-1">
+          <ReviewSection
+            id="review-section-identity"
+            isOpen={openSections.identity_target}
+            onToggle={() => toggleSection('identity_target')}
+            title={language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}
+            summary={identitySummary}
+            icon={<Shield className="w-4 h-4" />}
+            onEdit={() => onEditStep(3, 'identity')}
+            editLabel={editLabel}
+          >
+            <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-1 pt-1">
               <div className="flex items-center gap-2 font-bold text-primary">
                 <Lock className="w-3.5 h-3.5" />
                 <span>
@@ -270,32 +316,26 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 </p>
               )}
             </div>
-          </div>
+          </ReviewSection>
         )}
 
-        {/* Card 4 (RICKSHAW & EXTORTION): Contextual Target Details */}
+        {/* Section 4 (RICKSHAW & EXTORTION): 3. Contextual Target Details */}
         {showsPartySection && (
-          <div className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-subtle space-y-2.5 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-                <Users className="w-4 h-4 text-primary" />
-                <span>
-                  {language === 'bn'
-                    ? subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষ'
-                    : subjectConfig?.sectionTitleEn || '3. Target Details'}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => onEditStep(3, 'parties')}
-                className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline cursor-pointer min-h-[38px] py-1"
-              >
-                <Edit2 className="w-3.5 h-3.5" />
-                <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-              </button>
-            </div>
-
-            <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-2">
+          <ReviewSection
+            id="review-section-parties"
+            isOpen={openSections.identity_target}
+            onToggle={() => toggleSection('identity_target')}
+            title={
+              language === 'bn'
+                ? subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষ'
+                : subjectConfig?.sectionTitleEn || '3. Target Details'
+            }
+            summary={targetSummary}
+            icon={<Users className="w-4 h-4" />}
+            onEdit={() => onEditStep(3, 'parties')}
+            editLabel={editLabel}
+          >
+            <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-2 pt-1">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <span className="text-muted block text-[12px]">
@@ -368,27 +408,21 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 </div>
               )}
             </div>
-          </div>
+          </ReviewSection>
         )}
 
-        {/* Card 5: Attachments */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-subtle space-y-2.5 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-              <Paperclip className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '৪. সংযুক্তি' : '4. Attachments'}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onEditStep(3, 'attachments')}
-              className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline cursor-pointer min-h-[38px] py-1"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-            </button>
-          </div>
-
-          <div className="text-[13px] text-secondary">
+        {/* Section 5: 4. Attachments */}
+        <ReviewSection
+          id="review-section-attachments"
+          isOpen={openSections.attachments}
+          onToggle={() => toggleSection('attachments')}
+          title={language === 'bn' ? '৪. সংযুক্তি' : '4. Attachments'}
+          summary={attachmentsSummary}
+          icon={<Paperclip className="w-4 h-4" />}
+          onEdit={() => onEditStep(3, 'attachments')}
+          editLabel={editLabel}
+        >
+          <div className="text-[13px] text-secondary pt-1">
             {pendingImages.length > 0 ? (
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="font-bold text-primary">
@@ -416,71 +450,18 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               <p>{language === 'bn' ? 'কোনো ছবি সংযুক্ত নেই।' : 'No attachments.'}</p>
             )}
           </div>
-        </div>
+        </ReviewSection>
       </div>
 
-      {/* Harassment: Sensitive Publishing & Privacy Notice */}
-      {requiresSensitivePublishingConsent && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-surface border border-subtle space-y-3.5 shadow-2xs">
-          <div className="flex items-center gap-2 text-[15px] font-bold text-primary">
-            <Shield className="w-4 h-4 text-primary shrink-0" />
-            <span>
-              {language === 'bn'
-                ? 'গুরুত্বপূর্ণ প্রকাশনা ও গোপনীয়তা নীতি'
-                : 'Important Publishing & Privacy Notice'}
-            </span>
-          </div>
-
-          <div
-            id="harassment-publishing-notice-body"
-            className="space-y-2 text-[13px] sm:text-[13.5px] leading-relaxed text-secondary"
-          >
-            <p>
-              {language === 'bn'
-                ? 'এই প্ল্যাটফর্ম কোনো আইনগত কর্তৃপক্ষ, আদালত বা বিচারিক সেবা নয়। এর উদ্দেশ্য জনস্বার্থে গুরুত্বপূর্ণ ঘটনা তুলে ধরা ও সচেতনতা তৈরি করা—কারও অপরাধ বা দায় নির্ধারণ করা নয়।'
-                : 'This platform is not a legal authority, court, or judicial service. Its purpose is to bring important matters of public interest to attention and raise awareness—not to determine guilt or legal responsibility.'}
-            </p>
-            <p>
-              {language === 'bn'
-                ? 'ভুল অভিযোগ বা হয়রানির ঝুঁকি কমাতে প্রকাশিত প্রতিবেদনে অভিযুক্ত ব্যক্তি, প্রতিষ্ঠান বা সংগঠনের আসল নাম প্রকাশ করা হবে না। প্রতিবেদনে এমন নাম বা পরিচয়মূলক তথ্য থাকলে মডারেশন টিম প্রকাশের আগে তা গোপন বা সম্পাদনা করতে পারে। নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশের জন্য অনুমোদিত নাও হতে পারে।'
-                : 'To reduce the risk of false accusation or harassment, published reports will not reveal the real name of an accused person, organization, or institution. If your report contains names or other identifying information, moderators may hide or edit those details before publication. If the report cannot be published safely, it may not be approved for the public feed.'}
-            </p>
-          </div>
-
-          <div className="pt-3 border-t border-subtle">
-            <label
-              htmlFor="harassment-publishing-consent-checkbox"
-              className="flex items-start gap-3 cursor-pointer select-none group min-h-[44px]"
-            >
-              <input
-                id="harassment-publishing-consent-checkbox"
-                type="checkbox"
-                checked={sensitivePublishingConsentAccepted}
-                onChange={(e) => onSensitivePublishingConsentChange?.(e.target.checked)}
-                aria-describedby="harassment-publishing-notice-body"
-                className="mt-0.5 w-4 h-4 rounded border-subtle text-accent focus:ring-2 focus:ring-[var(--ui-focus)] shrink-0 cursor-pointer"
-              />
-              <span className="text-[13px] sm:text-[13.5px] font-medium text-primary leading-snug group-hover:text-primary">
-                {language === 'bn'
-                  ? 'আমি বুঝেছি এবং সম্মত যে প্রকাশের আগে সংবেদনশীল নাম বা পরিচয় গোপন বা সম্পাদনা করা হতে পারে এবং নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশ নাও হতে পারে।'
-                  : 'I understand and agree that sensitive names or identifying information may be hidden or edited before publication, and the report may not be published if it cannot be shared safely.'}
-              </span>
-            </label>
-          </div>
-        </div>
-      )}
-
-      {/* Non-harassment: Responsible Moderation Notice */}
-      {!requiresSensitivePublishingConsent && (
-        <div className="p-3.5 rounded-2xl bg-surface-subtle border border-subtle flex items-start gap-2.5 text-[13px] text-secondary">
-          <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-          <p className="leading-relaxed">
-            {language === 'bn'
-              ? 'জমা দেওয়ার পর প্রতিবেদনটি মডারেশন পর্যালোচনার জন্য গৃহীত হবে। দায়িত্বশীল ব্যবহারের স্বার্থে অসত্য বা উদ্দেশ্যপ্রণোদিত তথ্য প্রদান থেকে বিরত থাকুন।'
-              : 'Submitted reports will be queued for moderation review. Please ensure all details are factual and responsibly reported.'}
-          </p>
-        </div>
-      )}
+      {/* Responsible Moderation Notice for All Reports */}
+      <div className="p-3.5 rounded-2xl bg-surface-subtle border border-subtle flex items-start gap-2.5 text-[13px] text-secondary">
+        <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <p className="leading-relaxed">
+          {language === 'bn'
+            ? 'জমা দেওয়ার পর প্রতিবেদনটি মডারেশন পর্যালোচনার জন্য গৃহীত হবে। দায়িত্বশীল ব্যবহারের স্বার্থে অসত্য বা উদ্দেশ্যপ্রণোদিত তথ্য প্রদান থেকে বিরত থাকুন।'
+            : 'Submitted reports will be queued for moderation review. Please ensure all details are factual and responsibly reported.'}
+        </p>
+      </div>
     </div>
   );
 };

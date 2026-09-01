@@ -251,6 +251,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           language === 'bn'
             ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
             : 'Description must be at least 20 characters';
+      } else if (formData.description.length > 2000) {
+        newErrors.description =
+          language === 'bn'
+            ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+            : 'Please shorten the description to 2,000 characters.';
       }
 
       if (!formData.incidentDate) {
@@ -386,16 +391,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 htmlFor="complaint-desc-input"
                 className="block text-[14px] font-bold text-primary"
               >
-                {language === 'bn' ? 'কী ঘটেছিল? *' : 'What Happened? *'}
+                {language === 'bn' ? 'কী ঘটেছিল? *' : 'What happened? *'}
               </label>
-              <p className="text-[13px] text-secondary leading-normal mb-1.5">
-                {language === 'bn'
-                  ? 'কী ঘটেছিল, কীভাবে ঘটেছিল এবং এর প্রভাব কী ছিল তা লিখুন।'
-                  : 'Describe what happened, how it happened, and its impact.'}
-              </p>
               <textarea
                 id="complaint-desc-input"
                 rows={4}
+                maxLength={2000}
                 value={formData.description || ''}
                 onChange={(e) => {
                   onUpdateFormData({ description: e.target.value });
@@ -403,16 +404,31 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 }}
                 placeholder={
                   language === 'bn'
-                    ? 'কী ঘটেছিল, কীভাবে ঘটেছিল এবং এর প্রভাব কী ছিল তা লিখুন...'
-                    : 'Describe what happened, how it happened, and its impact...'
+                    ? 'ঘটনাটি সংক্ষেপে ও স্পষ্টভাবে লিখুন...'
+                    : 'Describe the incident clearly...'
                 }
                 className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[15px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed ${
                   errors.description ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                 }`}
               />
-              {errors.description && (
-                <p className="text-[13px] text-red-500 font-semibold">{errors.description}</p>
-              )}
+              <div className="flex items-center justify-between gap-2">
+                {errors.description ? (
+                  <p className="text-[13px] text-red-500 font-semibold">{errors.description}</p>
+                ) : (
+                  <span />
+                )}
+                {(formData.description?.length || 0) >= 1600 && (
+                  <span
+                    className={`text-[12px] font-mono shrink-0 ml-auto ${
+                      (formData.description?.length || 0) > 2000
+                        ? 'text-red-500 font-bold'
+                        : 'text-muted'
+                    }`}
+                  >
+                    {formData.description?.length || 0} / 2000
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Incident Date, Time & Frequency */}

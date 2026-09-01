@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
 import { DraftReport } from '../../services/types';
 import { DraftRepository, INITIAL_DRAFT } from '../../services/draftRepository';
 import { apiClient } from '../../services/apiClient';
@@ -11,8 +11,7 @@ import { Step2ComplaintTypeAccordion } from './Step2ComplaintTypeAccordion';
 import { Step3ComplaintDetails, Step3Handle } from './Step3ComplaintDetails';
 import { Step4Review } from './Step4Review';
 import { StepCompletion } from './StepCompletion';
-import { SubcategoryOption, SEGMENT_SUBCATEGORIES } from '../../data/reportOptions';
-import { isSupabaseConfigured } from '../../lib/supabase';
+import { SubcategoryOption } from '../../data/reportOptions';
 import {
   AlertCircle,
   FileText,
@@ -23,8 +22,10 @@ import {
   MapPin,
   X,
   Save,
+  Shield,
 } from 'lucide-react';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
 import { CategoryBadge } from '../ui/CategoryBadge';
 
 export interface ReportComposerModalProps {
@@ -46,8 +47,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Main form state - always start on Step 1 with no pre-selected segment unless specified
   const [formData, setFormData] = useState<DraftReport>(() => ({
     ...INITIAL_DRAFT,
-    segment: null,
-    currentStep: 1,
+    segment: initialSegment,
+    currentStep: initialSegment ? 2 : 1,
   }));
 
   // Attached media state (in-memory files)
@@ -68,8 +69,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     reportId: string;
   } | null>(null);
 
-  // Sensitive Harassment Publishing Consent State (session/modal level only - not in draft/db)
-  const [sensitivePublishingConsentAccepted, setSensitivePublishingConsentAccepted] = useState(false);
+  // Rape Pre-Report Publishing & Privacy Consent (session-level only - not stored in draft, storage or db)
+  const [rapePublishingConsentAccepted, setRapePublishingConsentAccepted] = useState(false);
+  const [isRapeConsentModalOpen, setIsRapeConsentModalOpen] = useState(false);
+  const [rapeConsentCheckbox, setRapeConsentCheckbox] = useState(false);
+  const pendingTargetStepRef = useRef<{ step: number; jumpSection?: string } | null>(null);
 
   // Close Confirmation state
   const [isConfirmCloseOpen, setIsConfirmCloseOpen] = useState(false);
@@ -82,7 +86,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Check for saved draft whenever the modal is opened
   useEffect(() => {
     if (isOpen) {
-      setSensitivePublishingConsentAccepted(false);
+      setRapePublishingConsentAccepted(false);
+      setRapeConsentCheckbox(false);
+      setIsRapeConsentModalOpen(false);
+      pendingTargetStepRef.current = null;
+
       const saved = DraftRepository.getDraft();
       if (saved && DraftRepository.hasMeaningfulDraft(saved)) {
         setSavedDraftAvailable(saved);
@@ -90,15 +98,18 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setSavedDraftAvailable(null);
         setFormData({
           ...INITIAL_DRAFT,
-          segment: null,
-          currentStep: 1,
+          segment: initialSegment,
+          currentStep: initialSegment ? 2 : 1,
         });
       }
     } else {
       setSubmitError(null);
-      setSensitivePublishingConsentAccepted(false);
+      setRapePublishingConsentAccepted(false);
+      setRapeConsentCheckbox(false);
+      setIsRapeConsentModalOpen(false);
+      pendingTargetStepRef.current = null;
     }
-  }, [isOpen]);
+  }, [isOpen, initialSegment]);
 
   // Persist draft to local storage on state change once actively editing
   useEffect(() => {
@@ -111,15 +122,31 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const handleContinueSavedDraft = useCallback(() => {
     if (savedDraftAvailable) {
       retryCredentialsRef.current = null;
-      setSensitivePublishingConsentAccepted(false);
-      setFormData(savedDraftAvailable);
-      setSavedDraftAvailable(null);
+      setRapePublishingConsentAccepted(false);
+      setRapeConsentCheckbox(false);
+
+      // If draft was saved on rape subcategory at step 3 or 4, require consent before displaying step 3/4
+      if (
+        savedDraftAvailable.subcategoryId === 'rape-sexual-violence' &&
+        savedDraftAvailable.currentStep >= 3
+      ) {
+        setFormData(savedDraftAvailable);
+        setSavedDraftAvailable(null);
+        pendingTargetStepRef.current = { step: savedDraftAvailable.currentStep };
+        setIsRapeConsentModalOpen(true);
+      } else {
+        setFormData(savedDraftAvailable);
+        setSavedDraftAvailable(null);
+      }
     }
   }, [savedDraftAvailable]);
 
   const handleStartNewComplaint = useCallback(() => {
     retryCredentialsRef.current = null;
-    setSensitivePublishingConsentAccepted(false);
+    setRapePublishingConsentAccepted(false);
+    setRapeConsentCheckbox(false);
+    setIsRapeConsentModalOpen(false);
+    pendingTargetStepRef.current = null;
     setFormData({
       ...INITIAL_DRAFT,
       segment: null,
@@ -131,7 +158,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleDeleteSavedDraft = useCallback(() => {
     retryCredentialsRef.current = null;
-    setSensitivePublishingConsentAccepted(false);
+    setRapePublishingConsentAccepted(false);
+    setRapeConsentCheckbox(false);
+    setIsRapeConsentModalOpen(false);
+    pendingTargetStepRef.current = null;
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -144,7 +174,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Helper to update form data
   const handleUpdateFormData = useCallback((updates: Partial<DraftReport>) => {
-    // Reset retry credentials if form data changes materially after an error
     retryCredentialsRef.current = null;
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
@@ -157,14 +186,22 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Step Navigation Handlers
   const handleGoToStep = useCallback((step: number, jumpSection?: string) => {
+    // If attempting to go to step 3 or 4 with rape subcategory without consent
+    if (
+      step >= 3 &&
+      formData.subcategoryId === 'rape-sexual-violence' &&
+      !rapePublishingConsentAccepted
+    ) {
+      pendingTargetStepRef.current = { step, jumpSection };
+      setRapeConsentCheckbox(false);
+      setIsRapeConsentModalOpen(true);
+      return;
+    }
+
     if (jumpSection) {
       setStep3JumpSection(jumpSection as any);
     } else {
       setStep3JumpSection(undefined);
-    }
-
-    if (step !== 4) {
-      setSensitivePublishingConsentAccepted(false);
     }
 
     setFormData((prev) => ({
@@ -175,7 +212,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, []);
+  }, [formData.subcategoryId, rapePublishingConsentAccepted]);
 
   const handleNextFromStep1 = useCallback(() => {
     setFormData((prev) => {
@@ -189,7 +226,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleSelectService = useCallback((segment: SectionKey) => {
     retryCredentialsRef.current = null;
-    setSensitivePublishingConsentAccepted(false);
+    setRapePublishingConsentAccepted(false);
     setFormData((prev) => {
       if (prev.segment === segment) return prev;
       return {
@@ -212,8 +249,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleSelectSubcategory = useCallback((subcategoryId: string, option: SubcategoryOption) => {
     retryCredentialsRef.current = null;
-    setSensitivePublishingConsentAccepted(false);
+    // Reset rape consent if switching subcategories
     setFormData((prev) => {
+      if (prev.subcategoryId !== subcategoryId) {
+        setRapePublishingConsentAccepted(false);
+      }
+
       // Auto-populate title if empty
       const updatedTitle = prev.title?.trim()
         ? prev.title
@@ -235,14 +276,24 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, [language]);
 
   const handleNextFromStep2 = useCallback(() => {
-    setFormData((prev) => {
-      if (!prev.subcategoryId) return prev;
-      return { ...prev, currentStep: 3 };
-    });
+    if (!formData.subcategoryId) return;
+
+    // Check Rape pre-report consent requirement
+    if (
+      formData.subcategoryId === 'rape-sexual-violence' &&
+      !rapePublishingConsentAccepted
+    ) {
+      pendingTargetStepRef.current = { step: 3 };
+      setRapeConsentCheckbox(false);
+      setIsRapeConsentModalOpen(true);
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, currentStep: 3 }));
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, []);
+  }, [formData.subcategoryId, rapePublishingConsentAccepted]);
 
   const handleNextFromStep3 = useCallback(() => {
     if (!step3Ref.current) return;
@@ -250,6 +301,38 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (!isValid) return;
     handleGoToStep(4);
   }, [handleGoToStep]);
+
+  // Rape Consent Modal Handlers
+  const handleAgreeRapeConsent = useCallback(() => {
+    setRapePublishingConsentAccepted(true);
+    setIsRapeConsentModalOpen(false);
+
+    const targetStep = pendingTargetStepRef.current?.step || 3;
+    const targetJump = pendingTargetStepRef.current?.jumpSection;
+    pendingTargetStepRef.current = null;
+
+    setStep3JumpSection(targetJump as any);
+    setFormData((prev) => ({
+      ...prev,
+      currentStep: targetStep,
+    }));
+
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
+
+  const handleCancelRapeConsent = useCallback(() => {
+    setIsRapeConsentModalOpen(false);
+    pendingTargetStepRef.current = null;
+    // If currently at step 3 or 4, reset back to step 2 safely
+    setFormData((prev) => {
+      if (prev.currentStep >= 3) {
+        return { ...prev, currentStep: 2 };
+      }
+      return prev;
+    });
+  }, []);
 
   // Close attempt handler - confirms if meaningful draft exists
   const handleRequestClose = useCallback(() => {
@@ -301,12 +384,28 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const handleSubmitReport = useCallback(async () => {
     if (!formData.segment || !formData.subcategoryId) return;
 
-    // Harassment & Violence: Publishing & Privacy Notice Acknowledgement Guard
-    if (formData.segment === 'harassment' && !sensitivePublishingConsentAccepted) {
+    // Rape pre-report consent defense guard
+    if (
+      formData.subcategoryId === 'rape-sexual-violence' &&
+      !rapePublishingConsentAccepted
+    ) {
+      pendingTargetStepRef.current = { step: 4 };
+      setRapeConsentCheckbox(false);
+      setIsRapeConsentModalOpen(true);
       setSubmitError(
         language === 'bn'
-          ? 'প্রতিবেদন জমা দেওয়ার আগে প্রকাশনা ও গোপনীয়তা নীতিটি বুঝেছেন তা নিশ্চিত করুন।'
-          : 'Please confirm the publishing and privacy notice before submitting this report.'
+          ? 'রিপোর্ট শুরুর আগের নীতিমালায় সম্মতি নিশ্চিত করুন।'
+          : 'Please confirm the pre-report policy acknowledgement.'
+      );
+      return;
+    }
+
+    // Length limit guard
+    if ((formData.description?.length || 0) > 2000) {
+      setSubmitError(
+        language === 'bn'
+          ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+          : 'Please shorten the description to 2,000 characters.'
       );
       return;
     }
@@ -408,7 +507,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       if (response && response.reportId) {
         // Reset retry credentials on success
         retryCredentialsRef.current = null;
-        setSensitivePublishingConsentAccepted(false);
+        setRapePublishingConsentAccepted(false);
         // Clear saved draft on success
         DraftRepository.clearDraft();
         setSubmissionResult({
@@ -432,11 +531,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, pendingImages, language, sensitivePublishingConsentAccepted]);
+  }, [formData, pendingImages, language, rapePublishingConsentAccepted]);
 
   const handleStartAnother = useCallback(() => {
     retryCredentialsRef.current = null;
-    setSensitivePublishingConsentAccepted(false);
+    setRapePublishingConsentAccepted(false);
+    setRapeConsentCheckbox(false);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -451,7 +551,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Discard draft action
   const handleDiscardDraft = useCallback(() => {
     retryCredentialsRef.current = null;
-    setSensitivePublishingConsentAccepted(false);
+    setRapePublishingConsentAccepted(false);
+    setRapeConsentCheckbox(false);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -703,9 +804,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       onSubmit={handleSubmitReport}
                       isSubmitting={isSubmitting}
                       language={language}
-                      requiresSensitivePublishingConsent={formData.segment === 'harassment'}
-                      sensitivePublishingConsentAccepted={sensitivePublishingConsentAccepted}
-                      onSensitivePublishingConsentChange={setSensitivePublishingConsentAccepted}
                     />
                   )}
                 </>
@@ -728,11 +826,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     ? canContinueStep2
                     : true
                 }
-                canSubmit={
-                  formData.segment === 'harassment'
-                    ? sensitivePublishingConsentAccepted
-                    : true
-                }
+                canSubmit={!isSubmitting}
                 isSubmitting={isSubmitting}
               />
             )}
@@ -740,7 +834,85 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         )}
       </Modal>
 
-      {/* Exit Draft Confirmation Dialog */}
+      {/* Mandatory Rape Pre-Report Consent Modal */}
+      <Modal
+        id="rape-pre-report-consent-modal"
+        isOpen={isRapeConsentModalOpen}
+        onClose={handleCancelRapeConsent}
+        maxWidth="md"
+        showHeader={false}
+      >
+        <div className="p-6 md:p-8 space-y-5 text-left">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-accent-soft text-accent flex items-center justify-center shrink-0 border border-accent/20 mt-0.5">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-[18px] sm:text-[20px] font-bold text-primary leading-tight">
+                {language === 'bn' ? 'রিপোর্ট শুরুর আগে' : 'Before you start'}
+              </h3>
+            </div>
+          </div>
+
+          <div className="space-y-3 text-[13.5px] sm:text-[14px] leading-relaxed text-secondary bg-surface-subtle p-4 rounded-2xl border border-subtle">
+            <p>
+              {language === 'bn'
+                ? 'এই প্ল্যাটফর্ম কোনো আইনগত বা বিচারিক সেবা নয়। এখানে প্রতিবেদন প্রকাশের উদ্দেশ্য জনস্বার্থে ঘটনা তুলে ধরা—কারও অপরাধ প্রমাণ করা নয়।'
+                : 'This platform is not a legal or judicial service. Reports are published to bring matters of public interest to attention—not to determine guilt.'}
+            </p>
+            <p>
+              {language === 'bn'
+                ? 'নিরাপত্তা ও অপব্যবহার রোধে প্রকাশিত প্রতিবেদনে অভিযুক্ত ব্যক্তি বা প্রতিষ্ঠানের আসল নাম দেখানো হবে না। এমন তথ্য থাকলে মডারেশন টিম তা গোপন বা সম্পাদনা করতে পারে। নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশ নাও হতে পারে।'
+                : 'To reduce harm and misuse, published reports will not reveal the real name of an accused person or organization. Moderators may hide or edit identifying information before publication. A report may not be published if it cannot be shared safely.'}
+            </p>
+          </div>
+
+          <div className="pt-1">
+            <label
+              htmlFor="rape-consent-checkbox"
+              className="flex items-start gap-3 cursor-pointer select-none group min-h-[44px]"
+            >
+              <input
+                id="rape-consent-checkbox"
+                type="checkbox"
+                checked={rapeConsentCheckbox}
+                onChange={(e) => setRapeConsentCheckbox(e.target.checked)}
+                className="mt-1 w-4 h-4 rounded border-subtle text-accent focus:ring-2 focus:ring-[var(--ui-focus)] shrink-0 cursor-pointer"
+              />
+              <span className="text-[13.5px] sm:text-[14px] font-semibold text-primary leading-snug group-hover:text-primary">
+                {language === 'bn'
+                  ? 'আমি বিষয়টি বুঝেছি এবং এই প্রকাশনা নীতিতে সম্মত।'
+                  : 'I understand and agree to this publishing policy.'}
+              </span>
+            </label>
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-3 border-t border-subtle">
+            <Button
+              id="rape-consent-back-btn"
+              type="button"
+              variant="outline"
+              onClick={handleCancelRapeConsent}
+              className="min-h-[44px] text-[15px]"
+            >
+              {language === 'bn' ? 'ফিরে যান' : 'Go back'}
+            </Button>
+
+            <Button
+              id="rape-consent-agree-btn"
+              type="button"
+              variant="primary"
+              disabled={!rapeConsentCheckbox}
+              onClick={handleAgreeRapeConsent}
+              className="min-h-[44px] text-[15px] px-5"
+            >
+              {language === 'bn' ? 'সম্মত হয়ে চালিয়ে যান' : 'Agree & Continue'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Exit Draft Confirmation Dialog - Clean, Clear Hierarchy */}
       <Modal
         id="draft-confirm-close-modal"
         isOpen={isConfirmCloseOpen}
@@ -748,56 +920,56 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         maxWidth="md"
         showHeader={false}
       >
-        <div className="p-6 md:p-8 space-y-6 text-left">
+        <div className="p-6 md:p-8 space-y-5 text-left">
           {/* Icon + Title Header */}
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-accent-soft text-accent flex items-center justify-center shrink-0 border border-accent/20">
-              <Save className="w-6 h-6" />
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-surface-subtle border border-subtle flex items-center justify-center shrink-0 text-primary mt-0.5">
+              <Save className="w-5 h-5" />
             </div>
-            <div className="space-y-1.5 flex-1 min-w-0">
-              <h3 className="text-[20px] md:text-[22px] font-bold text-primary leading-tight">
-                {language === 'bn'
-                  ? 'আপনার অভিযোগের তথ্য সংরক্ষিত আছে'
-                  : 'Your report draft is saved'}
+            <div className="space-y-1">
+              <h3 className="text-[19px] sm:text-[20px] font-bold text-primary leading-tight">
+                {language === 'bn' ? 'এখন বন্ধ করবেন?' : 'Close for now?'}
               </h3>
-              <p className="text-[15px] sm:text-[16px] leading-relaxed text-secondary">
+              <p className="text-[14px] sm:text-[14.5px] leading-relaxed text-secondary">
                 {language === 'bn'
-                  ? 'আপনি এখন বের হয়ে গেলে আপনার দেওয়া তথ্য নিরাপদে সংরক্ষিত থাকবে এবং পরবর্তীতে যেকোনো সময় আবার এখান থেকে চালিয়ে যেতে পারবেন।'
-                  : 'If you exit now, your entered details will be safely preserved so you can resume anytime.'}
+                  ? 'আপনার খসড়া সংরক্ষিত আছে। পরে আবার এখান থেকে চালিয়ে যেতে পারবেন।'
+                  : 'Your draft is saved. You can continue from here later.'}
               </p>
             </div>
           </div>
 
-          {/* Action Buttons: Danger (খসড়া বাতিল করুন) | Secondary (সংরক্ষণ করে বন্ধ করুন) | Primary (চালিয়ে যান) */}
+          {/* Action Buttons: Left: Delete draft | Right: Keep editing + Close */}
           <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-subtle">
             <button
               id="draft-discard-btn"
               type="button"
               onClick={handleDiscardDraft}
-              className="px-3.5 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-semibold text-[14px] sm:text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+              className="px-3 py-2 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-500/10 font-semibold text-[13.5px] sm:text-[14px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-red-500/40"
             >
               <Trash2 className="w-4 h-4" />
-              <span>{language === 'bn' ? 'খসড়া বাতিল করুন' : 'Discard Draft'}</span>
+              <span>{language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}</span>
             </button>
 
             <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5">
-              <button
-                id="draft-save-exit-btn"
-                type="button"
-                onClick={handleSaveAndExit}
-                className="px-4 py-2.5 rounded-xl border border-subtle bg-surface hover:bg-surface-subtle text-primary font-semibold text-[14px] sm:text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
-              >
-                {language === 'bn' ? 'সংরক্ষণ করে বন্ধ করুন' : 'Save & Close'}
-              </button>
-
-              <button
+              <Button
                 id="draft-continue-btn"
                 type="button"
+                variant="outline"
                 onClick={handleContinueEditing}
-                className="btn-primary-action px-6 py-2.5 rounded-xl font-bold text-[15px] sm:text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+                className="min-h-[44px] text-[15px]"
               >
-                {language === 'bn' ? 'চালিয়ে যান' : 'Continue'}
-              </button>
+                {language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Keep editing'}
+              </Button>
+
+              <Button
+                id="draft-save-exit-btn"
+                type="button"
+                variant="primary"
+                onClick={handleSaveAndExit}
+                className="min-h-[44px] text-[15px] px-6"
+              >
+                {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
+              </Button>
             </div>
           </div>
         </div>
