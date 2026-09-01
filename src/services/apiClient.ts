@@ -156,22 +156,25 @@ class ApiClient {
 
     // When no images are attached AND Supabase is configured, use the secure Supabase RPC
     if (!hasImages && isSupabaseConfigured() && supabase) {
-      const clientSubmissionId =
-        idempotencyKey?.trim() ||
-        (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-          ? crypto.randomUUID()
-          : `idem_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`);
+      const clientSubmissionId = idempotencyKey?.trim();
+      if (!clientSubmissionId) {
+        const idError: ApiError = {
+          code: 'MISSING_CLIENT_SUBMISSION_ID',
+          message: 'Client submission identifier is required.',
+          messageBn: 'ক্লায়েন্ট সাবমিশন আইডি আবশ্যক।',
+        };
+        throw idError;
+      }
 
       // Ensure 6-digit numeric PIN
-      let pin = trackingPin?.trim();
+      const pin = trackingPin?.trim();
       if (!pin || !/^[0-9]{6}$/.test(pin)) {
-        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-          const array = new Uint32Array(1);
-          window.crypto.getRandomValues(array);
-          pin = (100000 + (array[0] % 900000)).toString();
-        } else {
-          pin = Math.floor(100000 + Math.random() * 900000).toString();
-        }
+        const pinError: ApiError = {
+          code: 'INVALID_CREDENTIALS',
+          message: 'A valid secure 6-digit tracking PIN is required.',
+          messageBn: 'একটি বৈধ ৬-সংখ্যার ট্র্যাকিং পিন আবশ্যক।',
+        };
+        throw pinError;
       }
 
       const { data, error } = await supabase.rpc('submit_public_complaint', {

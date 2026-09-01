@@ -12,6 +12,7 @@ import { Step3ComplaintDetails, Step3Handle } from './Step3ComplaintDetails';
 import { Step4Review } from './Step4Review';
 import { StepCompletion } from './StepCompletion';
 import { SubcategoryOption, SEGMENT_SUBCATEGORIES } from '../../data/reportOptions';
+import { isSupabaseConfigured } from '../../lib/supabase';
 import {
   AlertCircle,
   FileText,
@@ -107,6 +108,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Draft Recovery Handlers
   const handleContinueSavedDraft = useCallback(() => {
     if (savedDraftAvailable) {
+      retryCredentialsRef.current = null;
       setFormData(savedDraftAvailable);
       setSavedDraftAvailable(null);
     }
@@ -142,6 +144,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
 
+  // Attached images update handler
+  const handlePendingImagesChange = useCallback((images: AttachedImagePreview[]) => {
+    retryCredentialsRef.current = null;
+    setPendingImages(images);
+  }, []);
+
   // Step Navigation Handlers
   const handleGoToStep = useCallback((step: number, jumpSection?: string) => {
     if (jumpSection) {
@@ -171,6 +179,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const handleSelectService = useCallback((segment: SectionKey) => {
+    retryCredentialsRef.current = null;
     setFormData((prev) => ({
       ...prev,
       segment,
@@ -180,6 +189,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const handleSelectSubcategory = useCallback((subcategoryId: string, option: SubcategoryOption) => {
+    retryCredentialsRef.current = null;
     setFormData((prev) => {
       // Auto-populate title if empty
       const updatedTitle = prev.title?.trim()
@@ -321,14 +331,23 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       // Ensure stable idempotency key and PIN across submission retries
       if (!retryCredentialsRef.current) {
-        let generatedPin = '';
-        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+        let securePin: string | null = null;
+        if (typeof window !== 'undefined' && window.crypto && typeof window.crypto.getRandomValues === 'function') {
           const array = new Uint32Array(1);
           window.crypto.getRandomValues(array);
-          generatedPin = (100000 + (array[0] % 900000)).toString();
-        } else {
-          generatedPin = Math.floor(100000 + Math.random() * 900000).toString();
+          securePin = (100000 + (array[0] % 900000)).toString();
         }
+
+        const isSupabaseSubmission = isSupabaseConfigured() && pendingImages.length === 0;
+        if (isSupabaseSubmission && !securePin) {
+          throw new Error(
+            language === 'bn'
+              ? 'নিরাপদ ট্র্যাকিং পিন তৈরি করা সম্ভব হয়নি। অনুগ্রহ করে একটি সমর্থিত ব্রাউজারে চেষ্টা করুন।'
+              : 'Secure tracking PIN generation is unavailable. Please use a modern supported browser.'
+          );
+        }
+
+        const generatedPin = securePin || Math.floor(100000 + Math.random() * 900000).toString();
 
         retryCredentialsRef.current = {
           clientSubmissionId: generateSecureIdempotencyKey(),
@@ -621,7 +640,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       segment={formData.segment}
                       formData={formData}
                       pendingImages={pendingImages}
-                      onPendingImagesChange={setPendingImages}
+                      onPendingImagesChange={handlePendingImagesChange}
                       onUpdateFormData={handleUpdateFormData}
                       onNext={handleNextFromStep3}
                       initialOpenSection={step3JumpSection}
