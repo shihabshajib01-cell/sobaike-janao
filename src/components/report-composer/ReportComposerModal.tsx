@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { CategoryBadge } from '../ui/CategoryBadge';
-import { useApp } from '../../context/AppContext';
 
 export interface ReportComposerModalProps {
   isOpen: boolean;
@@ -42,8 +41,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   language,
   onTrackReport,
 }) => {
-  const { showToast, navigateTo } = useApp();
-
   // Saved draft available for explicit recovery prompt
   const [savedDraftAvailable, setSavedDraftAvailable] = useState<DraftReport | null>(null);
 
@@ -322,26 +319,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           reportId: response.reportId,
           pin: response.pin,
         });
-
-        // Trigger persistent feedback notification toast
-        showToast({
-          type: 'success',
-          titleBn: 'অভিযোগ সফলভাবে জমা হয়েছে!',
-          titleEn: 'Report Submitted Successfully!',
-          messageBn: 'আপনার অভিযোগ মডারেশন পর্যালোচনার জন্য গৃহীত হয়েছে। রেফারেন্স নম্বরটি সংরক্ষণ করুন।',
-          messageEn: 'Your report has been received for moderation review. Please keep your reference ID.',
-          reportId: response.reportId,
-          pin: response.pin,
-          action: {
-            labelBn: 'রিপোর্ট ট্র্যাক করুন',
-            labelEn: 'Track Report',
-            onClick: () => {
-              onClose();
-              navigateTo(`/track-report?id=${encodeURIComponent(response.reportId)}`);
-            },
-          },
-          duration: null, // Persistent until explicitly dismissed
-        });
       } else {
         throw new Error(
           language === 'bn'
@@ -360,7 +337,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, pendingImages, language, showToast, navigateTo, onClose]);
+  }, [formData, pendingImages, language]);
 
   const handleStartAnother = useCallback(() => {
     DraftRepository.clearDraft();
