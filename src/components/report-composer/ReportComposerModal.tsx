@@ -691,7 +691,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         id="draft-confirm-close-modal"
         isOpen={isConfirmCloseOpen}
         onClose={handleContinueEditing}
-        maxWidth="md"
+        maxWidth="lg"
         showHeader={false}
       >
         <div className="p-6 md:p-8 space-y-6 text-left">
@@ -715,23 +715,23 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           </div>
 
           {/* Action Buttons: Danger (খসড়া বাতিল করুন) | Secondary (সংরক্ষণ করে বন্ধ করুন) | Primary (চালিয়ে যান) */}
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-subtle">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-subtle">
             <button
               id="draft-discard-btn"
               type="button"
               onClick={handleDiscardDraft}
-              className="px-3.5 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-semibold text-[14px] sm:text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/40 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100/60 dark:hover:bg-rose-900/40 font-medium text-[14px] sm:text-[15px] transition-colors cursor-pointer min-h-[44px] whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-rose-500/40 order-3 sm:order-1"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4 shrink-0" />
               <span>{language === 'bn' ? 'খসড়া বাতিল করুন' : 'Discard Draft'}</span>
             </button>
 
-            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div className="flex items-center gap-3 order-1 sm:order-2 flex-1 sm:flex-initial justify-end">
               <button
                 id="draft-save-exit-btn"
                 type="button"
                 onClick={handleSaveAndExit}
-                className="px-4 py-2.5 rounded-xl border border-subtle bg-surface hover:bg-surface-subtle text-primary font-semibold text-[14px] sm:text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-subtle bg-surface hover:bg-surface-subtle text-primary font-medium text-[14px] sm:text-[15px] transition-colors cursor-pointer min-h-[44px] whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
               >
                 {language === 'bn' ? 'সংরক্ষণ করে বন্ধ করুন' : 'Save & Close'}
               </button>
@@ -740,7 +740,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 id="draft-continue-btn"
                 type="button"
                 onClick={handleContinueEditing}
-                className="btn-primary-action px-6 py-2.5 rounded-xl font-bold text-[15px] sm:text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-primary text-inverse hover:opacity-90 font-semibold text-[14px] sm:text-[15px] min-h-[44px] cursor-pointer shadow-2xs whitespace-nowrap transition-all focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
               >
                 {language === 'bn' ? 'চালিয়ে যান' : 'Continue'}
               </button>
