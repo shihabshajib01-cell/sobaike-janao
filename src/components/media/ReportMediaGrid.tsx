@@ -151,7 +151,7 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
             {renderCell(sortedImages[0], 0, 'w-full h-full', 'half')}
             {renderCell(sortedImages[1], 1, 'w-full h-full', 'half')}
             {renderCell(sortedImages[2], 2, 'w-full h-full', 'half')}
-            {renderCell(sortedImages[3], 3, 'w-full h-full', 'half', count - 3)}
+            {renderCell(sortedImages[3], 3, 'w-full h-full', 'half', count - 4)}
           </div>
         )}
       </div>
