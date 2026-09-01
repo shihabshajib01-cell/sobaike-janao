@@ -7,6 +7,7 @@ import {
   mapSupabasePublicReportToItem,
   SupabasePublicReportRPC,
 } from './supabasePublicReportMapper';
+import { PublicEvidenceService } from './publicEvidenceService';
 
 export interface PublicReportFilters {
   segment?: SectionKey | 'all';
@@ -87,6 +88,33 @@ export const PublicReportService = {
         list = list.slice(0, filters.limit);
       }
 
+      // Batch enrich published reports with evidence images (single RPC call for all visible items)
+      const reportIds = list.map((r) => r.id);
+      if (reportIds.length > 0) {
+        try {
+          const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(reportIds);
+          for (const report of list) {
+            const reportImages =
+              evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+            report.images = reportImages;
+            report.media = {
+              type:
+                reportImages.length === 0
+                  ? 'none'
+                  : reportImages.length === 1
+                  ? 'single'
+                  : 'gallery',
+              images: reportImages,
+            };
+            if (reportImages.length > 0) {
+              report.trustIndicators.evidenceCount = reportImages.length;
+            }
+          }
+        } catch (evErr) {
+          console.error('[PublicReportService.getAll] Evidence enrichment error:', evErr);
+        }
+      }
+
       return list;
     }
 
@@ -163,6 +191,28 @@ export const PublicReportService = {
       }
 
       const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+
+      try {
+        const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
+        const reportImages =
+          evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+        report.images = reportImages;
+        report.media = {
+          type:
+            reportImages.length === 0
+              ? 'none'
+              : reportImages.length === 1
+              ? 'single'
+              : 'gallery',
+          images: reportImages,
+        };
+        if (reportImages.length > 0) {
+          report.trustIndicators.evidenceCount = reportImages.length;
+        }
+      } catch (evErr) {
+        console.error('[PublicReportService.getById] Evidence enrichment error:', evErr);
+      }
+
       return {
         report,
         responses: [],

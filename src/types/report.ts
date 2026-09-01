@@ -36,9 +36,9 @@ export interface ReportTrustIndicators {
 export interface PublicReportImage {
   id: string;
   url: string;
-  width: number;
-  height: number;
-  mimeType: 'image/jpeg' | 'image/png';
+  width?: number;
+  height?: number;
+  mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
   sortOrder: number;
   srcSet?: string;
   sizes?: string;
