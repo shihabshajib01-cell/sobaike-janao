@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Zap, PlusCircle, AlertCircle, RefreshCw, Info } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
-import { SUBCATEGORIES } from '../data/categories';
 import { PublicReportService } from '../services/publicReportService';
+import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
@@ -15,7 +15,8 @@ import { useApp } from '../context/AppContext';
 
 export const RickshawPage: React.FC = () => {
   const { language } = useApp();
-  const config = SECTIONS.rickshaw;
+  const { getSegment } = useTaxonomy();
+  const config = getSegment('rickshaw') || SECTIONS.rickshaw;
 
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
 

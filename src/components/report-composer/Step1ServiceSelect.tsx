@@ -2,6 +2,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { CategoryIcon } from '../branding/CategoryIcon';
+import { useTaxonomy } from '../../services/taxonomyService';
 
 export interface Step1ServiceSelectProps {
   selectedSegment: SectionKey | null;
@@ -15,6 +16,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   onSelectSegment,
   language,
 }) => {
+  const { segments } = useTaxonomy();
+
   const services: Array<{
     key: SectionKey;
     titleBn: string;
@@ -28,8 +31,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   }> = [
     {
       key: 'harassment',
-      titleBn: SECTIONS.harassment.nameBn,
-      titleEn: SECTIONS.harassment.nameEn,
+      titleBn: segments.harassment?.nameBn || SECTIONS.harassment.nameBn,
+      titleEn: segments.harassment?.nameEn || SECTIONS.harassment.nameEn,
       descBn: 'যৌন হয়রানি, নির্যাতন, প্রতারণা বা অনলাইন হয়রানি সম্পর্কিত অভিযোগ।',
       descEn: 'Report sexual harassment, abuse, relationship deception, or online harassment.',
       bgVar: 'var(--sec-harassment-bg)',
@@ -39,8 +42,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
     },
     {
       key: 'rickshaw',
-      titleBn: SECTIONS.rickshaw.nameBn,
-      titleEn: SECTIONS.rickshaw.nameEn,
+      titleBn: segments.rickshaw?.nameBn || SECTIONS.rickshaw.nameBn,
+      titleEn: segments.rickshaw?.nameEn || SECTIONS.rickshaw.nameEn,
       descBn: 'আপনার জানা অটোরিকশা চার্জিং স্টেশন বা গ্যারেজের অবস্থান ও প্রাসঙ্গিক তথ্য জানান।',
       descEn: 'Report an auto-rickshaw charging station or garage and its relevant details.',
       bgVar: 'var(--sec-rickshaw-bg)',
@@ -50,8 +53,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
     },
     {
       key: 'extortion',
-      titleBn: SECTIONS.extortion.nameBn,
-      titleEn: SECTIONS.extortion.nameEn,
+      titleBn: segments.extortion?.nameBn || SECTIONS.extortion.nameBn,
+      titleEn: segments.extortion?.nameEn || SECTIONS.extortion.nameEn,
       descBn: 'চাঁদা দাবি, জোরপূর্বক অর্থ আদায় বা চাপ প্রয়োগের ঘটনা জানান।',
       descEn: 'Report extortion, coercive collections, or pressure.',
       bgVar: 'var(--sec-extortion-bg)',

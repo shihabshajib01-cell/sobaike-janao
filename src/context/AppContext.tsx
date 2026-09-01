@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SectionKey } from '../theme/tokens';
+import { ToastData } from '../components/ui/Toast';
 
 export type RoutePath =
   | '/'
@@ -37,6 +38,9 @@ export interface AppContextType {
   reportComposerInitialSegment: SectionKey | null;
   openReportComposer: (segment?: SectionKey | null) => void;
   closeReportComposer: () => void;
+  toast: ToastData | null;
+  showToast: (toast: Omit<ToastData, 'id'> & { id?: string }) => void;
+  hideToast: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,6 +56,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Global Report Composer Modal State
   const [isReportComposerOpen, setIsReportComposerOpen] = useState<boolean>(false);
   const [reportComposerInitialSegment, setReportComposerInitialSegment] = useState<SectionKey | null>(null);
+
+  // Global Toast State
+  const [toast, setToast] = useState<ToastData | null>(null);
+
+  const showToast = useCallback((toastData: Omit<ToastData, 'id'> & { id?: string }) => {
+    const id = toastData.id || `toast_${Date.now()}`;
+    const newToast: ToastData = {
+      ...toastData,
+      id,
+    };
+    setToast(newToast);
+
+    // Auto-dismiss only if duration is explicitly a positive number
+    if (typeof toastData.duration === 'number' && toastData.duration > 0) {
+      setTimeout(() => {
+        setToast((current) => (current?.id === id ? null : current));
+      }, toastData.duration);
+    }
+  }, []);
+
+  const hideToast = useCallback(() => {
+    setToast(null);
+  }, []);
 
   // Sync document language attribute with active state
   useEffect(() => {
@@ -147,6 +174,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportComposerInitialSegment,
       openReportComposer,
       closeReportComposer,
+      toast,
+      showToast,
+      hideToast,
     }),
     [
       currentRoute,
@@ -163,6 +193,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportComposerInitialSegment,
       openReportComposer,
       closeReportComposer,
+      toast,
+      showToast,
+      hideToast,
     ]
   );
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { HeartHandshake, PlusCircle, PhoneCall, RefreshCw, AlertCircle } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
-import { SUBCATEGORIES } from '../data/categories';
 import { PublicReportService } from '../services/publicReportService';
+import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
@@ -15,7 +15,8 @@ import { useApp } from '../context/AppContext';
 
 export const HarassmentPage: React.FC = () => {
   const { language, navigateTo } = useApp();
-  const config = SECTIONS.harassment;
+  const { getFeedSubcategories, getSegment } = useTaxonomy();
+  const config = getSegment('harassment') || SECTIONS.harassment;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -24,7 +25,7 @@ export const HarassmentPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const subcategories = SUBCATEGORIES.harassment;
+  const subcategories = getFeedSubcategories('harassment');
 
   const loadData = useCallback(async () => {
     setIsLoading(true);

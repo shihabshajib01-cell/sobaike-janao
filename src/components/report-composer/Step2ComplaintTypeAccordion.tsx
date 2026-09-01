@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
-import { SEGMENT_SUBCATEGORIES, SubcategoryOption } from '../../data/reportOptions';
+import { SubcategoryOption } from '../../data/reportOptions';
+import { useTaxonomy } from '../../services/taxonomyService';
 
 export interface Step2ComplaintTypeAccordionProps {
   segment: SectionKey;
@@ -17,9 +18,11 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
   onSelectSubcategory,
   language,
 }) => {
-  const allSubcategories = useMemo(() => SEGMENT_SUBCATEGORIES[segment] || [], [segment]);
+  const { getSubcategories, getSegment } = useTaxonomy();
+  const allSubcategories = useMemo(() => getSubcategories(segment), [segment, getSubcategories]);
+  const segmentInfo = getSegment(segment);
 
-  const headerTitle = language === 'bn' ? SECTIONS[segment].nameBn : SECTIONS[segment].nameEn;
+  const headerTitle = language === 'bn' ? (segmentInfo?.nameBn || SECTIONS[segment].nameBn) : (segmentInfo?.nameEn || SECTIONS[segment].nameEn);
   const helperText =
     language === 'bn'
       ? 'আপনার সমস্যার সাথে মিল আছে এমন ধরন নির্বাচন করুন।'

@@ -9,6 +9,7 @@ import { BottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
 import { ViewportDebugger } from '../debug/ViewportDebugger';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
+import { Toast } from '../ui/Toast';
 import { HomePage } from '../../pages/HomePage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
 import { RickshawPage } from '../../pages/RickshawPage';
@@ -44,6 +45,8 @@ export const AppShell: React.FC = () => {
     reportComposerInitialSegment,
     closeReportComposer,
     navigateTo,
+    toast,
+    hideToast,
   } = useApp();
 
   return (
@@ -131,7 +134,10 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      {/* 8. Dev-only Viewport Sizing Debugger */}
+      {/* 8. Persistent Global Toast Notification */}
+      <Toast toast={toast} onDismiss={hideToast} language={language} />
+
+      {/* 9. Dev-only Viewport Sizing Debugger */}
       {import.meta.env.DEV && <ViewportDebugger />}
     </div>
   );
