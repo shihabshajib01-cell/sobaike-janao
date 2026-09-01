@@ -1,4 +1,5 @@
 import React from 'react';
+import { Keyboard } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
@@ -7,7 +8,14 @@ import { BrandLogo } from '../branding/BrandLogo';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
 
 export const DesktopLeftRail: React.FC = () => {
-  const { currentRoute, navigateTo, language, toggleLanguage, openReportComposer } = useApp();
+  const {
+    currentRoute,
+    navigateTo,
+    language,
+    toggleLanguage,
+    openReportComposer,
+    setIsShortcutsModalOpen,
+  } = useApp();
 
   const navItems: Array<{
     id: string;
@@ -15,6 +23,7 @@ export const DesktopLeftRail: React.FC = () => {
     nameBn: string;
     nameEn: string;
     iconName: AppIconName;
+    shortcutKey?: string;
     sectionKey?: SectionKey;
   }> = [
     {
@@ -23,6 +32,7 @@ export const DesktopLeftRail: React.FC = () => {
       nameBn: 'মূলপাতা',
       nameEn: 'Home',
       iconName: 'home',
+      shortcutKey: 'H',
     },
     {
       id: 'rail-harassment',
@@ -30,6 +40,7 @@ export const DesktopLeftRail: React.FC = () => {
       nameBn: SECTIONS.harassment.shortNameBn,
       nameEn: SECTIONS.harassment.shortNameEn,
       iconName: 'harassment',
+      shortcutKey: '1',
       sectionKey: 'harassment',
     },
     {
@@ -38,6 +49,7 @@ export const DesktopLeftRail: React.FC = () => {
       nameBn: SECTIONS.rickshaw.shortNameBn,
       nameEn: SECTIONS.rickshaw.shortNameEn,
       iconName: 'rickshaw',
+      shortcutKey: '2',
       sectionKey: 'rickshaw',
     },
     {
@@ -46,6 +58,7 @@ export const DesktopLeftRail: React.FC = () => {
       nameBn: SECTIONS.extortion.shortNameBn,
       nameEn: SECTIONS.extortion.shortNameEn,
       iconName: 'extortion',
+      shortcutKey: '3',
       sectionKey: 'extortion',
     },
     {
@@ -54,6 +67,7 @@ export const DesktopLeftRail: React.FC = () => {
       nameBn: 'এক্সপ্লোর',
       nameEn: 'Explore',
       iconName: 'compass',
+      shortcutKey: 'E',
     },
     {
       id: 'rail-search',
@@ -61,6 +75,7 @@ export const DesktopLeftRail: React.FC = () => {
       nameBn: 'অনুসন্ধান',
       nameEn: 'Search',
       iconName: 'search',
+      shortcutKey: 'S',
     },
     {
       id: 'rail-more',
@@ -68,6 +83,7 @@ export const DesktopLeftRail: React.FC = () => {
       nameBn: 'তথ্য ও নীতিমালা',
       nameEn: 'Info & Guidelines',
       iconName: 'info',
+      shortcutKey: 'M',
     },
   ];
 
@@ -110,9 +126,12 @@ export const DesktopLeftRail: React.FC = () => {
             fullWidth
             leftIcon={<AppIcon name="plus-circle" size="lg" className="text-inverse" />}
             onClick={() => openReportComposer()}
-            className="shadow-2xs font-semibold py-2.5 min-h-[44px] text-[16px]"
+            className="shadow-2xs font-semibold py-2.5 min-h-[44px] text-[16px] relative"
           >
-            {language === 'bn' ? 'ঘটনা জানান' : 'Report Incident'}
+            <span className="flex-1 text-left">{language === 'bn' ? 'ঘটনা জানান' : 'Report Incident'}</span>
+            <kbd className="hidden min-[1536px]:inline-block px-1.5 py-0.5 text-[11px] font-mono font-bold bg-white/20 text-inverse rounded">
+              C
+            </kbd>
           </Button>
         </div>
 
@@ -148,14 +167,21 @@ export const DesktopLeftRail: React.FC = () => {
                   <span className="truncate">{language === 'bn' ? item.nameBn : item.nameEn}</span>
                 </div>
 
-                {item.sectionKey && (
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full shrink-0 transition-opacity ${
-                      isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'
-                    }`}
-                    style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
-                  />
-                )}
+                <div className="flex items-center gap-2">
+                  {item.shortcutKey && (
+                    <kbd className="hidden min-[1536px]:inline-block px-1.5 py-0.5 text-[11px] font-mono font-medium text-muted bg-surface-subtle border border-subtle rounded group-hover:text-secondary group-hover:border-theme transition-colors">
+                      {item.shortcutKey}
+                    </kbd>
+                  )}
+                  {item.sectionKey && (
+                    <span
+                      className={`w-2.5 h-2.5 rounded-full shrink-0 transition-opacity ${
+                        isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'
+                      }`}
+                      style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
+                    />
+                  )}
+                </div>
               </button>
             );
           })}
@@ -166,6 +192,22 @@ export const DesktopLeftRail: React.FC = () => {
       <div className="pt-4 border-t border-subtle space-y-2.5">
         {/* Desktop Theme Control */}
         <ThemeSelector variant="compact" />
+
+        {/* Shortcuts Guide Button */}
+        <button
+          id="rail-shortcuts-toggle"
+          onClick={() => setIsShortcutsModalOpen(true)}
+          aria-label={language === 'bn' ? 'কীবোর্ড শর্টকাট দেখুন' : 'View Keyboard Shortcuts'}
+          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-subtle hover:bg-surface-subtle transition-colors cursor-pointer text-secondary hover:text-primary min-h-[44px] bg-surface"
+        >
+          <div className="flex items-center gap-2">
+            <Keyboard className="w-4 h-4 text-muted" />
+            <span className="font-medium">{language === 'bn' ? 'কীবোর্ড শর্টকাট' : 'Shortcuts'}</span>
+          </div>
+          <kbd className="px-1.5 py-0.5 text-[11px] font-mono font-bold bg-surface-subtle border border-subtle rounded shadow-2xs">
+            ?
+          </kbd>
+        </button>
 
         {/* Language Switcher Pill */}
         <button
