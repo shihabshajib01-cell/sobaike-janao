@@ -58,7 +58,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Jump section tracking for Step 3
   const [step3JumpSection, setStep3JumpSection] = useState<
-    'identity' | 'narrative' | 'parties' | 'location' | 'attachments' | undefined
+    'narrative' | 'location' | 'identity' | 'attachments' | undefined
   >(undefined);
 
   // Submission state

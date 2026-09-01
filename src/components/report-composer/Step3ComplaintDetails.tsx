@@ -2,27 +2,22 @@ import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'rea
 import {
   Shield,
   FileText,
-  Users,
   MapPin,
   Paperclip,
   ChevronDown,
-  Trash2,
   Lock,
   Info,
   Calendar,
   Clock,
   Repeat,
-  Plus,
   Edit2,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { DraftReport, ReportLocationData } from '../../services/types';
-import { MentionedParty } from '../../services/types';
 import {
   SEGMENT_SUBCATEGORIES,
   INTIMATE_WHAT_HAPPENED_OPTIONS,
   INTIMATE_PLATFORMS,
-  EVIDENCE_TYPES,
 } from '../../data/reportOptions';
 import {
   DIVISIONS,
@@ -47,7 +42,7 @@ export interface Step3ComplaintDetailsProps {
   onUpdateFormData: (updates: Partial<DraftReport>) => void;
   onBack?: () => void;
   onNext?: () => void;
-  initialOpenSection?: 'identity' | 'narrative' | 'parties' | 'location' | 'attachments';
+  initialOpenSection?: 'narrative' | 'location' | 'identity' | 'attachments';
   language: 'bn' | 'en';
 }
 
@@ -80,34 +75,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       currentSubcategoryOption?.nameBn ||
       '';
 
-    // Accordion visibility states
-    const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
-      if (initialOpenSection) {
-        return {
-          identity: initialOpenSection === 'identity',
-          narrative: initialOpenSection === 'narrative',
-          parties: initialOpenSection === 'parties',
-          location: initialOpenSection === 'location',
-          attachments: initialOpenSection === 'attachments',
-        };
-      }
-      if (segment === 'rickshaw') {
-        return {
-          location: true,
-          narrative: false,
-          identity: false,
-          parties: false,
-          attachments: false,
-        };
-      }
-      return {
-        identity: false,
-        narrative: true,
-        parties: false,
-        location: false,
-        attachments: false,
-      };
-    });
+    // Accordion visibility states - Narrative, Location and Identity start open across all segments
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => ({
+      narrative: true,
+      location: true,
+      identity: true,
+      attachments: initialOpenSection === 'attachments',
+    }));
 
     // Auto-open specific accordion if requested (e.g. from Review edit link)
     useEffect(() => {
@@ -116,88 +90,24 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           ...prev,
           [initialOpenSection]: true,
         }));
+        const elem = document.getElementById(`composer-section-${initialOpenSection}`);
+        if (elem) {
+          elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
     }, [initialOpenSection]);
 
     // Validation errors state
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    // Toggle specific accordion
+    // Toggle specific accordion - Narrative and Location are mandatory sections that remain expanded
     const toggleSection = (secKey: string) => {
+      if (secKey === 'narrative' || secKey === 'location') {
+        return;
+      }
       setOpenSections((prev) => ({
         ...prev,
         [secKey]: !prev[secKey],
-      }));
-    };
-
-    // Parties List State
-    const parties: MentionedParty[] = formData.mentionedParties && formData.mentionedParties.length > 0
-      ? formData.mentionedParties
-      : [
-          {
-            id: `party-1`,
-            type: 'individual',
-            name: formData.reportedSubject || '',
-            roleOrDesignation: formData.roleOrDesignation || '',
-            organization: formData.organization || '',
-            phoneOrContact: '',
-            publicProfileHandle: formData.publicProfileHandle || '',
-            address: '',
-            identifyingDescription: formData.identifyingDescription || '',
-          },
-        ];
-
-    const [expandedPartyDetails, setExpandedPartyDetails] = useState<Record<string, boolean>>({});
-
-    const handleAddParty = () => {
-      const newPartyId =
-        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-          ? `party-${crypto.randomUUID()}`
-          : `party-${Date.now()}`;
-      const newParty: MentionedParty = {
-        id: newPartyId,
-        type: 'individual',
-        name: '',
-        roleOrDesignation: '',
-        organization: '',
-        phoneOrContact: '',
-        publicProfileHandle: '',
-        address: '',
-        identifyingDescription: '',
-      };
-      const updated = [...parties, newParty];
-      onUpdateFormData({ mentionedParties: updated });
-      setExpandedPartyDetails((prev) => ({ ...prev, [newPartyId]: false }));
-    };
-
-    const handleRemoveParty = (index: number) => {
-      if (parties.length <= 1) return;
-      const updated = parties.filter((_, idx) => idx !== index);
-      onUpdateFormData({ mentionedParties: updated });
-    };
-
-    const handleUpdateParty = (index: number, updates: Partial<MentionedParty>) => {
-      const updated = [...parties];
-      updated[index] = { ...updated[index], ...updates };
-      onUpdateFormData({ mentionedParties: updated });
-
-      // Mirror first party to legacy fields for backward compatibility
-      if (index === 0) {
-        onUpdateFormData({
-          reportedSubject: updated[0].name || '',
-          subjectType: updated[0].type || 'individual',
-          roleOrDesignation: updated[0].roleOrDesignation || '',
-          organization: updated[0].organization || '',
-          publicProfileHandle: updated[0].publicProfileHandle || '',
-          identifyingDescription: updated[0].identifyingDescription || '',
-        });
-      }
-    };
-
-    const togglePartyDetails = (partyId: string) => {
-      setExpandedPartyDetails((prev) => ({
-        ...prev,
-        [partyId]: !prev[partyId],
       }));
     };
 
@@ -345,13 +255,26 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
 
-        // Auto-open relevant accordions where errors exist
+        // Keep all required sections open when errors exist
         setOpenSections((prev) => ({
           ...prev,
-          identity: Boolean(newErrors.adminContact || newErrors.adminName),
-          narrative: Boolean(newErrors.title || newErrors.description || newErrors.incidentDate),
-          location: Boolean(newErrors.division || newErrors.district),
+          narrative: true,
+          location: true,
+          identity: true,
+          attachments: prev.attachments || false,
         }));
+
+        if (newErrors.title || newErrors.description || newErrors.incidentDate) {
+          const elem = document.getElementById('composer-section-narrative');
+          if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (newErrors.division || newErrors.district) {
+          const elem = document.getElementById('composer-section-location');
+          if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (newErrors.adminContact || newErrors.adminName) {
+          const elem = document.getElementById('composer-section-identity');
+          if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
         return false;
       }
 
@@ -377,153 +300,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </p>
         </div>
 
-        {/* SECTION 1: Identity & Privacy (পরিচয় ও গোপনীয়তা) - DEFAULT OPEN */}
-        <Accordion
-          id="composer-section-identity"
-          isOpen={Boolean(openSections.identity)}
-          onToggle={() => toggleSection('identity')}
-          title={language === 'bn' ? '১. পরিচয় ও গোপনীয়তা' : '1. Identity & Privacy'}
-          summary={
-            formData.privacyChoice === 'anonymous'
-              ? language === 'bn'
-                ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
-                : 'Anonymous (Default)'
-              : formData.privacyChoice === 'admin_only'
-              ? language === 'bn'
-                ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
-                : 'Admin Only'
-              : language === 'bn'
-              ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
-              : 'Public Identity (If Approved)'
-          }
-          hasError={Boolean(errors.adminContact || errors.adminName)}
-          icon={<Shield className="w-5 h-5" />}
-        >
-          <div className="space-y-4 pt-2 text-left">
-            {/* Primary Toggle: Keep Identity Private (Default ON) */}
-            <div className="p-4 rounded-2xl bg-surface-subtle border border-subtle space-y-3">
-              <Toggle
-                id="toggle-keep-identity-private"
-                checked={isIdentityPrivate}
-                onChange={(checked) => handlePrimaryPrivacyToggle(checked)}
-                label={
-                  language === 'bn'
-                    ? 'আমার পরিচয় ও যোগাযোগের তথ্য গোপন রাখুন'
-                    : 'Keep my identity and contact information private'
-                }
-                description={
-                  language === 'bn'
-                    ? 'ডিফল্টভাবে আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশ করা হবে না।'
-                    : 'Your identity and contact information are private by default.'
-                }
-                className="w-full"
-              />
-
-              {/* When Private is OFF -> Reveal Contact Fields */}
-              {!isIdentityPrivate && (
-                <div className="pt-3 border-t border-subtle/70 space-y-3">
-                  <div className="flex items-center gap-2 text-[14px] font-semibold text-primary">
-                    <Lock className="w-4 h-4 text-primary" />
-                    <span>
-                      {language === 'bn'
-                        ? 'মডারেটরের সাথে যোগাযোগের তথ্য'
-                        : 'Moderator Follow-up Contact Information'}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label
-                        htmlFor="reporter-admin-name"
-                        className="block text-[14px] font-semibold text-primary mb-1"
-                      >
-                        {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
-                      </label>
-                      <input
-                        id="reporter-admin-name"
-                        type="text"
-                        value={formData.adminName || ''}
-                        onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
-                        placeholder={language === 'bn' ? 'নাম' : 'Name'}
-                        className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                      />
-                      {errors.adminName && (
-                        <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminName}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="reporter-admin-contact"
-                        className="block text-[14px] font-semibold text-primary mb-1"
-                      >
-                        {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone Number or Email *'}
-                      </label>
-                      <input
-                        id="reporter-admin-contact"
-                        type="text"
-                        value={formData.adminContact || ''}
-                        onChange={(e) => {
-                          onUpdateFormData({ adminContact: e.target.value });
-                          if (errors.adminContact)
-                            setErrors((prev) => ({ ...prev, adminContact: '' }));
-                        }}
-                        placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
-                        className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
-                          errors.adminContact ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                        }`}
-                      />
-                      {errors.adminContact && (
-                        <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminContact}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Secondary Optional Toggle: Request Public Identity */}
-                  <div className="pt-2">
-                    <Toggle
-                      id="toggle-request-public-identity"
-                      checked={isPublicIdentityRequested}
-                      onChange={(checked) => handlePublicIdentityToggle(checked)}
-                      label={
-                        language === 'bn'
-                          ? 'অনুমোদিত হলে আমার পরিচয় প্রকাশের অনুরোধ করছি'
-                          : 'Request public identity if approved'
-                      }
-                      description={
-                        language === 'bn'
-                          ? 'অনুমোদিত হলে প্রকাশযোগ্য সংস্করণে আপনার নাম দেখানো হতে পারে।'
-                          : 'If approved for public display, your name may appear in the public version.'
-                      }
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Workflow Notice */}
-            <div className="p-3.5 rounded-xl bg-surface border border-subtle flex items-start gap-2.5 text-[14px] text-secondary">
-              <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <p className="leading-relaxed">
-                {isIdentityPrivate
-                  ? language === 'bn'
-                    ? 'আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশযোগ্য সংস্করণে অন্তর্ভুক্ত হবে না।'
-                    : 'Your identity and contact information will not be included in the public version.'
-                  : language === 'bn'
-                  ? 'আপনার যোগাযোগের তথ্য ব্যক্তিগত মডারেশন প্রক্রিয়ার মধ্যে থাকবে এবং স্বয়ংক্রিয়ভাবে প্রকাশ করা হবে না।'
-                  : 'Your contact details remain within the private moderation workflow and are not automatically shown publicly.'}
-              </p>
-            </div>
-          </div>
-        </Accordion>
-
-        {/* SECTION 2: What Happened & Timeline (ঘটনার বিবরণ ও সময়কাল) */}
+        {/* SECTION 1: What Happened & Timeline (ঘটনার বিবরণ ও সময়কাল) - ALWAYS OPEN */}
         <Accordion
           id="composer-section-narrative"
           isOpen={Boolean(openSections.narrative)}
           onToggle={() => toggleSection('narrative')}
-          title={language === 'bn' ? '২. ঘটনার বিবরণ ও সময়কাল' : '2. What Happened & Timeline'}
+          title={language === 'bn' ? '১. ঘটনার বিবরণ ও সময়কাল' : '1. What Happened & Timeline'}
           summary={
             formData.description
               ? formData.description.slice(0, 45) + (formData.description.length > 45 ? '...' : '')
@@ -610,8 +392,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 }}
                 placeholder={
                   language === 'bn'
-                    ? 'কী ঘটেছিল, কীভাবে ঘটনাটি ঘটেছে, কারা জড়িত ছিল এবং কী প্রভাব পড়েছে স্পষ্ট করে লিখুন...'
-                    : 'Explain what happened, how it took place, who was involved, and the impact of the incident...'
+                    ? 'কী ঘটেছিল, কীভাবে ঘটনাটি ঘটেছে এবং এর প্রভাব কী ছিল তা স্পষ্ট করে লিখুন...'
+                    : 'Explain what happened, how the incident occurred, and its impact...'
                 }
                 className={`w-full px-4 py-3 bg-surface border rounded-xl text-[16px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed ${
                   errors.description ? 'border-red-500 bg-red-500/5' : 'border-subtle'
@@ -756,295 +538,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </div>
         </Accordion>
 
-        {/* SECTION 3: People / Entities Mentioned (সংশ্লিষ্ট ব্যক্তি বা প্রতিষ্ঠান) */}
-        <Accordion
-          id="composer-section-parties"
-          isOpen={Boolean(openSections.parties)}
-          onToggle={() => toggleSection('parties')}
-          title={language === 'bn' ? '৩. সংশ্লিষ্ট ব্যক্তি বা প্রতিষ্ঠান' : '3. People / Entities Mentioned'}
-          summary={
-            parties.filter((p) => p.name?.trim()).length > 0
-              ? `${parties.filter((p) => p.name?.trim()).length} ${
-                  language === 'bn' ? 'টি সত্ত্বা উল্লেখিত' : 'entities mentioned'
-                }`
-              : language === 'bn'
-              ? 'সংশ্লিষ্ট ব্যক্তি, দোকান বা প্রতিষ্ঠান'
-              : 'Mentioned person, group, or organization'
-          }
-          icon={<Users className="w-5 h-5" />}
-        >
-          <div className="space-y-4 pt-2 text-left">
-            <p className="text-[14px] text-secondary">
-              {language === 'bn'
-                ? 'অভিযোগে যাদের সম্পৃক্ততা রয়েছে তাদের নাম ও প্রাসঙ্গিক তথ্য উল্লেখ করুন। একাধিক সত্ত্বা থাকলে নিচের বাটন দিয়ে যোগ করুন।'
-                : 'Add names and details for each person or organization involved in this complaint.'}
-            </p>
-
-            <div className="space-y-3.5">
-              {parties.map((party, index) => {
-                const isDetailsOpen = Boolean(expandedPartyDetails[party.id]);
-
-                return (
-                  <div
-                    key={party.id}
-                    className="p-4 rounded-xl bg-surface border border-subtle space-y-3 relative"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-surface-subtle text-primary font-bold text-[14px] flex items-center justify-center border border-subtle">
-                          {index + 1}
-                        </span>
-                        <span className="text-[16px] font-bold text-primary">
-                          {party.name
-                            ? party.name
-                            : `${
-                                segment === 'rickshaw'
-                                  ? language === 'bn'
-                                    ? 'গ্যারেজ / উল্লেখিত পক্ষ'
-                                    : 'Garage / Mentioned entity'
-                                  : language === 'bn'
-                                  ? 'প্রতিবেদনে উল্লেখিত পক্ষ'
-                                  : 'Mentioned party / entity'
-                              } #${index + 1}`}
-                        </span>
-                      </div>
-
-                      {parties.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveParty(index)}
-                          aria-label="Remove entity"
-                          className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Primary Field: Name / Identifying Name */}
-                    <div>
-                      <label
-                        htmlFor={`party-name-${party.id}`}
-                        className="block text-[14px] font-semibold text-primary mb-1"
-                      >
-                        {segment === 'rickshaw'
-                          ? language === 'bn'
-                            ? 'গ্যারেজ বা পরিচালকের নাম / পরিচিতি নাম'
-                            : 'Garage / Manager Name / Identifying Name'
-                          : language === 'bn'
-                          ? 'নাম / পরিচিতি নাম'
-                          : 'Name / Identifying Name'}
-                      </label>
-                      <input
-                        id={`party-name-${party.id}`}
-                        type="text"
-                        value={party.name || ''}
-                        onChange={(e) => handleUpdateParty(index, { name: e.target.value })}
-                        placeholder={
-                          segment === 'rickshaw'
-                            ? language === 'bn'
-                              ? 'যেমন: ভাই ভাই ব্যাটারি গ্যারেজ, রফিক'
-                              : 'e.g., Bhai Bhai Garage, Rafiq'
-                            : language === 'bn'
-                            ? 'ব্যক্তি, দোকান, গ্যারেজ বা সিন্ডিকেটের নাম'
-                            : 'Name of person, shop, garage or group'
-                        }
-                        className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                      />
-                    </div>
-
-                    {/* Progressive disclosure toggle for extra details */}
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => togglePartyDetails(party.id)}
-                        className="inline-flex items-center gap-1.5 text-[16px] font-semibold text-primary hover:underline cursor-pointer py-1.5 min-h-[44px]"
-                      >
-                        <ChevronDown
-                          className={`w-4 h-4 transition-transform ${
-                            isDetailsOpen ? 'rotate-180' : ''
-                          }`}
-                        />
-                        <span>
-                          {isDetailsOpen
-                            ? language === 'bn'
-                              ? 'অতিরিক্ত তথ্য লুকান'
-                              : 'Hide extra details'
-                            : language === 'bn'
-                            ? '+ আরও বিস্তারিত যোগ করুন'
-                            : '+ Add more details'}
-                        </span>
-                      </button>
-
-                      {isDetailsOpen && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-subtle/60 mt-2">
-                          <div>
-                            <label
-                              htmlFor={`party-type-${party.id}`}
-                              className="block text-[14px] font-semibold text-secondary mb-1"
-                            >
-                              {language === 'bn' ? 'সত্ত্বার ধরন' : 'Entity Type'}
-                            </label>
-                            <select
-                              id={`party-type-${party.id}`}
-                              value={party.type || 'individual'}
-                              onChange={(e) =>
-                                handleUpdateParty(index, {
-                                  type: e.target.value as MentionedParty['type'],
-                                })
-                              }
-                              className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[44px]"
-                            >
-                              <option value="individual">{language === 'bn' ? 'ব্যক্তি (Individual)' : 'Individual'}</option>
-                              <option value="business">{language === 'bn' ? 'ব্যবসা / দোকান (Business / Shop)' : 'Business / Shop'}</option>
-                              <option value="group">{language === 'bn' ? 'দল / সিন্ডিকেট (Group / Syndicate)' : 'Group / Syndicate'}</option>
-                              <option value="organization">{language === 'bn' ? 'প্রতিষ্ঠান / সংস্থা (Organization)' : 'Organization'}</option>
-                              <option value="unknown">{language === 'bn' ? 'অজ্ঞাত সত্ত্বা (Unknown)' : 'Unknown Entity'}</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label
-                              htmlFor={`party-role-${party.id}`}
-                              className="block text-[14px] font-semibold text-secondary mb-1"
-                            >
-                              {language === 'bn' ? 'পদবী বা ভূমিকা (ঐচ্ছিক)' : 'Role / Designation (Opt)'}
-                            </label>
-                            <input
-                              id={`party-role-${party.id}`}
-                              type="text"
-                              value={party.roleOrDesignation || ''}
-                              onChange={(e) =>
-                                handleUpdateParty(index, { roleOrDesignation: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'যেমন: লাইনম্যান / ম্যানেজার' : 'e.g., Lineman, Manager'}
-                              className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                            />
-                          </div>
-
-                          <div>
-                            <label
-                              htmlFor={`party-org-${party.id}`}
-                              className="block text-[14px] font-semibold text-secondary mb-1"
-                            >
-                              {language === 'bn' ? 'প্রতিষ্ঠান বা সমিতি (ঐচ্ছিক)' : 'Organization / Affiliation (Opt)'}
-                            </label>
-                            <input
-                              id={`party-org-${party.id}`}
-                              type="text"
-                              value={party.organization || ''}
-                              onChange={(e) =>
-                                handleUpdateParty(index, { organization: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'প্রতিষ্ঠান বা মালিকের নাম' : 'Organization name'}
-                              className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                            />
-                          </div>
-
-                          <div>
-                            <label
-                              htmlFor={`party-contact-${party.id}`}
-                              className="block text-[14px] font-semibold text-secondary mb-1"
-                            >
-                              {language === 'bn' ? 'ফোন বা যোগাযোগের সূত্র (ঐচ্ছিক)' : 'Phone / Contact (Opt)'}
-                            </label>
-                            <input
-                              id={`party-contact-${party.id}`}
-                              type="text"
-                              value={party.phoneOrContact || ''}
-                              onChange={(e) =>
-                                handleUpdateParty(index, { phoneOrContact: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'মোবাইল বা যোগাযোগের সূত্র' : 'Phone or contact'}
-                              className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                            />
-                          </div>
-
-                          <div>
-                            <label
-                              htmlFor={`party-handle-${party.id}`}
-                              className="block text-[14px] font-semibold text-secondary mb-1"
-                            >
-                              {language === 'bn' ? 'অনলাইন প্রোফাইল / সামাজিক যোগাযোগ লিংক' : 'Online Handle / Profile Link'}
-                            </label>
-                            <input
-                              id={`party-handle-${party.id}`}
-                              type="text"
-                              value={party.publicProfileHandle || ''}
-                              onChange={(e) =>
-                                handleUpdateParty(index, { publicProfileHandle: e.target.value })
-                              }
-                              placeholder="fb.com/profile or @username"
-                              className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                            />
-                          </div>
-
-                          <div>
-                            <label
-                              htmlFor={`party-address-${party.id}`}
-                              className="block text-[14px] font-semibold text-secondary mb-1"
-                            >
-                              {language === 'bn' ? 'ঠিকানা (ঐচ্ছিক)' : 'Address (Optional)'}
-                            </label>
-                            <input
-                              id={`party-address-${party.id}`}
-                              type="text"
-                              value={party.address || ''}
-                              onChange={(e) =>
-                                handleUpdateParty(index, { address: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'দোকান বা অবস্থানের ঠিকানা' : 'Address or location info'}
-                              className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                            />
-                          </div>
-
-                          <div className="md:col-span-2">
-                            <label
-                              htmlFor={`party-desc-${party.id}`}
-                              className="block text-[14px] font-semibold text-secondary mb-1"
-                            >
-                              {language === 'bn' ? 'শনাক্তকারী বিবরণ বা বিশেষ বৈশিষ্ট্য' : 'Other Identifying Description'}
-                            </label>
-                            <input
-                              id={`party-desc-${party.id}`}
-                              type="text"
-                              value={party.identifyingDescription || ''}
-                              onChange={(e) =>
-                                handleUpdateParty(index, {
-                                  identifyingDescription: e.target.value,
-                                })
-                              }
-                              placeholder={language === 'bn' ? 'শারীরিক বিবরণ, গাড়ির নম্বর বা অবস্থান' : 'Physical traits, vehicle num, location'}
-                              className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <button
-              type="button"
-              onClick={handleAddParty}
-              className="inline-flex items-center gap-1.5 text-[16px] font-semibold text-primary hover:underline cursor-pointer py-2 min-h-[44px]"
-            >
-              <Plus className="w-4 h-4" />
-              <span>
-                {language === 'bn' ? '+ আরও একজন ব্যক্তি বা সত্ত্বা যোগ করুন' : '+ Add another person / entity'}
-              </span>
-            </button>
-          </div>
-        </Accordion>
-
-        {/* SECTION 4: Location (ঘটনাস্থল / এলাকা) */}
+        {/* SECTION 2: Location (লোকেশন) - ALWAYS OPEN */}
         <Accordion
           id="composer-section-location"
           isOpen={Boolean(openSections.location)}
           onToggle={() => toggleSection('location')}
-          title={language === 'bn' ? '৪. ঘটনাস্থল / এলাকা' : '4. Incident Location'}
+          title={language === 'bn' ? '২. লোকেশন' : '2. Location'}
           summary={
             formData.location?.district && formData.location?.area
               ? `${formData.location.district}, ${formData.location.area}`
@@ -1270,12 +769,153 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </div>
         </Accordion>
 
-        {/* SECTION 5: Attachments (সংযুক্তি - ঐচ্ছিক) */}
+        {/* SECTION 3: Identity & Privacy (পরিচয় ও গোপনীয়তা) */}
+        <Accordion
+          id="composer-section-identity"
+          isOpen={Boolean(openSections.identity)}
+          onToggle={() => toggleSection('identity')}
+          title={language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}
+          summary={
+            formData.privacyChoice === 'anonymous'
+              ? language === 'bn'
+                ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
+                : 'Anonymous (Default)'
+              : formData.privacyChoice === 'admin_only'
+              ? language === 'bn'
+                ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
+                : 'Admin Only'
+              : language === 'bn'
+              ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
+              : 'Public Identity (If Approved)'
+          }
+          hasError={Boolean(errors.adminContact || errors.adminName)}
+          icon={<Shield className="w-5 h-5" />}
+        >
+          <div className="space-y-4 pt-2 text-left">
+            {/* Primary Toggle: Keep Identity Private (Default ON) */}
+            <div className="p-4 rounded-2xl bg-surface-subtle border border-subtle space-y-3">
+              <Toggle
+                id="toggle-keep-identity-private"
+                checked={isIdentityPrivate}
+                onChange={(checked) => handlePrimaryPrivacyToggle(checked)}
+                label={
+                  language === 'bn'
+                    ? 'আমার পরিচয় ও যোগাযোগের তথ্য গোপন রাখুন'
+                    : 'Keep my identity and contact information private'
+                }
+                description={
+                  language === 'bn'
+                    ? 'ডিফল্টভাবে আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশ করা হবে না।'
+                    : 'Your identity and contact information are private by default.'
+                }
+                className="w-full"
+              />
+
+              {/* When Private is OFF -> Reveal Contact Fields */}
+              {!isIdentityPrivate && (
+                <div className="pt-3 border-t border-subtle/70 space-y-3">
+                  <div className="flex items-center gap-2 text-[14px] font-semibold text-primary">
+                    <Lock className="w-4 h-4 text-primary" />
+                    <span>
+                      {language === 'bn'
+                        ? 'মডারেটরের সাথে যোগাযোগের তথ্য'
+                        : 'Moderator Follow-up Contact Information'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label
+                        htmlFor="reporter-admin-name"
+                        className="block text-[14px] font-semibold text-primary mb-1"
+                      >
+                        {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
+                      </label>
+                      <input
+                        id="reporter-admin-name"
+                        type="text"
+                        value={formData.adminName || ''}
+                        onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
+                        placeholder={language === 'bn' ? 'নাম' : 'Name'}
+                        className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                      />
+                      {errors.adminName && (
+                        <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminName}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="reporter-admin-contact"
+                        className="block text-[14px] font-semibold text-primary mb-1"
+                      >
+                        {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone Number or Email *'}
+                      </label>
+                      <input
+                        id="reporter-admin-contact"
+                        type="text"
+                        value={formData.adminContact || ''}
+                        onChange={(e) => {
+                          onUpdateFormData({ adminContact: e.target.value });
+                          if (errors.adminContact)
+                            setErrors((prev) => ({ ...prev, adminContact: '' }));
+                        }}
+                        placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
+                        className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[16px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
+                          errors.adminContact ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      />
+                      {errors.adminContact && (
+                        <p className="text-[14px] text-red-500 mt-1 font-semibold">{errors.adminContact}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Secondary Optional Toggle: Request Public Identity */}
+                  <div className="pt-2">
+                    <Toggle
+                      id="toggle-request-public-identity"
+                      checked={isPublicIdentityRequested}
+                      onChange={(checked) => handlePublicIdentityToggle(checked)}
+                      label={
+                        language === 'bn'
+                          ? 'অনুমোদিত হলে আমার পরিচয় প্রকাশের অনুরোধ করছি'
+                          : 'Request public identity if approved'
+                      }
+                      description={
+                        language === 'bn'
+                          ? 'অনুমোদিত হলে প্রকাশযোগ্য সংস্করণে আপনার নাম দেখানো হতে পারে।'
+                          : 'If approved for public display, your name may appear in the public version.'
+                      }
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Workflow Notice */}
+            <div className="p-3.5 rounded-xl bg-surface border border-subtle flex items-start gap-2.5 text-[14px] text-secondary">
+              <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                {isIdentityPrivate
+                  ? language === 'bn'
+                    ? 'আপনার পরিচয় ও যোগাযোগের তথ্য প্রকাশযোগ্য সংস্করণে অন্তর্ভুক্ত হবে না।'
+                    : 'Your identity and contact information will not be included in the public version.'
+                  : language === 'bn'
+                  ? 'আপনার যোগাযোগের তথ্য ব্যক্তিগত মডারেশন প্রক্রিয়ার মধ্যে থাকবে এবং স্বয়ংক্রিয়ভাবে প্রকাশ করা হবে না।'
+                  : 'Your contact details remain within the private moderation workflow and are not automatically shown publicly.'}
+              </p>
+            </div>
+          </div>
+        </Accordion>
+
+        {/* SECTION 4: Attachments (সংযুক্তি - ঐচ্ছিক) */}
         <Accordion
           id="composer-section-attachments"
           isOpen={Boolean(openSections.attachments)}
           onToggle={() => toggleSection('attachments')}
-          title={language === 'bn' ? '৫. সংযুক্তি (ঐচ্ছিক)' : '5. Attachments (Optional)'}
+          title={language === 'bn' ? '৪. সংযুক্তি' : '4. Attachments'}
           summary={
             pendingImages.length > 0
               ? `${pendingImages.length} ${language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}`

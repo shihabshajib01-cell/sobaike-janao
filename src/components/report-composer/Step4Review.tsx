@@ -3,13 +3,10 @@ import {
   Edit2,
   Shield,
   FileText,
-  Users,
   MapPin,
   Paperclip,
-  CheckCircle2,
   Lock,
   Calendar,
-  AlertTriangle,
 } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { DraftReport } from '../../services/types';
@@ -20,7 +17,7 @@ export interface Step4ReviewProps {
   segment: SectionKey;
   formData: DraftReport;
   pendingImages: AttachedImagePreview[];
-  onEditStep: (step: number, sectionKey?: string) => void;
+  onEditStep: (step: number, sectionKey?: 'narrative' | 'location' | 'identity' | 'attachments') => void;
   onBack?: () => void;
   onSubmit?: () => void;
   isSubmitting?: boolean;
@@ -39,24 +36,6 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
     (s) => s.id === formData.subcategoryId
   );
-
-  const parties = formData.mentionedParties && formData.mentionedParties.length > 0
-    ? formData.mentionedParties
-    : formData.reportedSubject
-    ? [
-        {
-          id: '1',
-          name: formData.reportedSubject,
-          type: formData.subjectType || 'individual',
-          roleOrDesignation: formData.roleOrDesignation,
-          organization: formData.organization,
-          phoneOrContact: '',
-          publicProfileHandle: formData.publicProfileHandle,
-          address: '',
-          identifyingDescription: formData.identifyingDescription,
-        },
-      ]
-    : [];
 
   return (
     <div className="space-y-6 text-left">
@@ -125,57 +104,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           </div>
         </div>
 
-        {/* Card 2: Identity & Privacy */}
-        <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-              <Shield className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '১. পরিচয় ও গোপনীয়তা পছন্দ' : '1. Identity & Privacy Choice'}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onEditStep(3, 'identity')}
-              className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline cursor-pointer min-h-[44px] py-1"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-            </button>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle text-[14px] space-y-1">
-            <div className="flex items-center gap-2 font-bold text-primary">
-              <Lock className="w-4 h-4" />
-              <span>
-                {formData.privacyChoice === 'anonymous'
-                  ? language === 'bn'
-                    ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
-                    : 'Completely Anonymous'
-                  : formData.privacyChoice === 'admin_only'
-                  ? language === 'bn'
-                    ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
-                    : 'Admin Follow-up Only'
-                  : language === 'bn'
-                  ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
-                  : 'Public Identity (If Approved)'}
-              </span>
-            </div>
-
-            {formData.privacyChoice !== 'anonymous' && formData.adminContact && (
-              <p className="text-secondary pt-1">
-                {language === 'bn' ? 'যোগাযোগের তথ্য: ' : 'Contact: '}
-                <span className="font-mono">{formData.adminContact}</span>
-                {formData.adminName && ` (${formData.adminName})`}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Card 3: Narrative & Timeline */}
+        {/* Card 2: What Happened & Timeline */}
         <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
               <FileText className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '২. ঘটনার বিবরণ ও সময়কাল' : '2. Incident Description & Date'}</span>
+              <span>{language === 'bn' ? '১. ঘটনার বিবরণ ও সময়কাল' : '1. What Happened & Timeline'}</span>
             </div>
             <button
               type="button"
@@ -236,55 +170,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           </div>
         </div>
 
-        {/* Card 4: Entities Mentioned */}
-        <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
-              <Users className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '৩. সংশ্লিষ্ট ব্যক্তি বা প্রতিষ্ঠান' : '3. People / Entities Mentioned'}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => onEditStep(3, 'parties')}
-              className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline cursor-pointer min-h-[44px] py-1"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
-            </button>
-          </div>
-
-          <div className="space-y-2">
-            {parties.map((p, idx) => (
-              <div
-                key={idx}
-                className="p-3 rounded-xl bg-surface-subtle border border-subtle flex items-start justify-between gap-3 text-[14px]"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-primary text-[15px]">{p.name || (language === 'bn' ? 'নাম উল্লেখ নেই' : 'Unspecified')}</span>
-                    <span className="text-[14px] px-2 py-0.5 rounded bg-surface border border-subtle text-muted">
-                      {p.type || 'individual'}
-                    </span>
-                  </div>
-                  {(p.organization || p.roleOrDesignation || p.address || p.phoneOrContact) && (
-                    <p className="text-secondary text-[14px] mt-0.5">
-                      {[p.roleOrDesignation, p.organization, p.address, p.phoneOrContact]
-                        .filter(Boolean)
-                        .join(' • ')}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Card 5: Location */}
+        {/* Card 3: Location */}
         <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
               <MapPin className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '৪. ঘটনাস্থল / এলাকা' : '4. Location'}</span>
+              <span>{language === 'bn' ? '২. লোকেশন' : '2. Location'}</span>
             </div>
             <button
               type="button"
@@ -317,12 +208,57 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           </div>
         </div>
 
-        {/* Card 6: Attachments */}
+        {/* Card 4: Identity & Privacy */}
+        <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
+              <Shield className="w-4 h-4 text-primary" />
+              <span>{language === 'bn' ? '৩. পরিচয় ও গোপনীয়তা' : '3. Identity & Privacy'}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => onEditStep(3, 'identity')}
+              className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline cursor-pointer min-h-[44px] py-1"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+              <span>{language === 'bn' ? 'সম্পাদনা' : 'Edit'}</span>
+            </button>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle text-[14px] space-y-1">
+            <div className="flex items-center gap-2 font-bold text-primary">
+              <Lock className="w-4 h-4" />
+              <span>
+                {formData.privacyChoice === 'anonymous'
+                  ? language === 'bn'
+                    ? 'সম্পূর্ণ অজ্ঞাতনামা (Anonymous)'
+                    : 'Completely Anonymous'
+                  : formData.privacyChoice === 'admin_only'
+                  ? language === 'bn'
+                    ? 'মডারেটরের জন্য সংরক্ষিত (Admin Only)'
+                    : 'Admin Follow-up Only'
+                  : language === 'bn'
+                  ? 'অনুমোদিত হলে প্রকাশ্য পরিচয় (Public)'
+                  : 'Public Identity (If Approved)'}
+              </span>
+            </div>
+
+            {formData.privacyChoice !== 'anonymous' && formData.adminContact && (
+              <p className="text-secondary pt-1">
+                {language === 'bn' ? 'যোগাযোগের তথ্য: ' : 'Contact: '}
+                <span className="font-mono">{formData.adminContact}</span>
+                {formData.adminName && ` (${formData.adminName})`}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Card 5: Attachments */}
         <div className="p-4 md:p-5 rounded-2xl bg-surface border border-subtle space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[14px] font-bold text-primary">
               <Paperclip className="w-4 h-4 text-primary" />
-              <span>{language === 'bn' ? '৫. সংযুক্তি' : '5. Attachments'}</span>
+              <span>{language === 'bn' ? '৪. সংযুক্তি' : '4. Attachments'}</span>
             </div>
             <button
               type="button"
