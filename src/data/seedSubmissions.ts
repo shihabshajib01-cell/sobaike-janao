@@ -3,7 +3,6 @@ import { SubmittedReport, SubjectResponseRequest } from '../services/types';
 export const SEED_SUBMITTED_REPORTS: SubmittedReport[] = [
   {
     id: 'SJ-2026-849201',
-    pin: '739102',
     segment: 'harassment',
     subcategoryId: 'public-transport',
     subcategoryBn: 'গণপরিবহনে হয়রানি',
@@ -94,7 +93,6 @@ export const SEED_SUBMITTED_REPORTS: SubmittedReport[] = [
   },
   {
     id: 'SJ-2026-918234',
-    pin: '482019',
     segment: 'rickshaw',
     subcategoryId: 'unsafe-charging',
     subcategoryBn: 'ঝুঁকিপূর্ণ ব্যাটারি চার্জিং',
@@ -193,7 +191,6 @@ export const SEED_SUBMITTED_REPORTS: SubmittedReport[] = [
   },
   {
     id: 'SJ-2026-302911',
-    pin: '619284',
     segment: 'extortion',
     subcategoryId: 'market-shop',
     subcategoryBn: 'দোকান ও বাজার কালেকশন',

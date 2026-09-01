@@ -145,8 +145,8 @@ class ApiClient {
     }
   }
 
-  // --- Report Submission & Tracking APIs ---
-  async submitReport(payload: any, images?: File[], idempotencyKey?: string, trackingPin?: string) {
+  // --- Report Submission APIs ---
+  async submitReport(payload: any, images?: File[], idempotencyKey?: string) {
     const headers: Record<string, string> = {};
     if (idempotencyKey) {
       headers['Idempotency-Key'] = idempotencyKey;
@@ -166,21 +166,9 @@ class ApiClient {
         throw idError;
       }
 
-      // Ensure 6-digit numeric PIN
-      const pin = trackingPin?.trim();
-      if (!pin || !/^[0-9]{6}$/.test(pin)) {
-        const pinError: ApiError = {
-          code: 'INVALID_CREDENTIALS',
-          message: 'A valid secure 6-digit tracking PIN is required.',
-          messageBn: 'একটি বৈধ ৬-সংখ্যার ট্র্যাকিং পিন আবশ্যক।',
-        };
-        throw pinError;
-      }
-
       const { data, error } = await supabase.rpc('submit_public_complaint', {
         p_payload: payload,
         p_client_submission_id: clientSubmissionId,
-        p_tracking_pin: pin,
       });
 
       if (error) {
@@ -197,7 +185,6 @@ class ApiClient {
         return {
           success: true,
           reportId: data.reportId as string,
-          pin: (data.pin || pin) as string,
           message: data.message || 'Report submitted successfully.',
           report: data.report,
         };
@@ -238,7 +225,6 @@ class ApiClient {
         return data as {
           success: boolean;
           reportId: string;
-          pin: string;
           message: string;
           report: any;
         };
@@ -247,7 +233,6 @@ class ApiClient {
       return await this.request<{
         success: boolean;
         reportId: string;
-        pin: string;
         message: string;
         report: any;
       }>('/api/reports', {
@@ -266,14 +251,9 @@ class ApiClient {
       const now = new Date();
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
       const generatedId = `REP-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}-${randomSuffix}`;
-      const generatedPin =
-        trackingPin && /^[0-9]{6}$/.test(trackingPin)
-          ? trackingPin
-          : Math.floor(100000 + Math.random() * 900000).toString();
 
       const localReport: SubmittedReport = {
         id: generatedId,
-        pin: generatedPin,
         segment: payload.segment || 'harassment',
         subcategoryId: payload.subcategoryId || 'general',
         subcategoryBn: payload.subcategoryBn || 'সাধারণ',
@@ -329,52 +309,8 @@ class ApiClient {
       return {
         success: true,
         reportId: generatedId,
-        pin: generatedPin,
         message: 'Report submitted successfully.',
         report: localReport,
-      };
-    }
-  }
-
-  async trackReport(id: string, pin: string) {
-    try {
-      return await this.request<{
-        success: boolean;
-        report: SubmittedReport;
-      }>('/api/reports/track', {
-        method: 'POST',
-        body: JSON.stringify({ id, pin }),
-      });
-    } catch (err: any) {
-      // Check local storage submissions first
-      try {
-        const stored: SubmittedReport[] = JSON.parse(localStorage.getItem('sobaike_local_reports') || '[]');
-        const cleanId = id.trim().toUpperCase();
-        const found = stored.find((r) => r.id.toUpperCase() === cleanId && r.pin === pin.trim());
-        if (found) {
-          return { success: true, report: found };
-        }
-      } catch (e) {}
-
-      throw err;
-    }
-  }
-
-  async submitClarificationResponse(id: string, pin: string, reporterResponse: string) {
-    try {
-      return await this.request<{
-        success: boolean;
-        message: string;
-        report: any;
-      }>(`/api/reports/${encodeURIComponent(id)}/additional-info`, {
-        method: 'POST',
-        body: JSON.stringify({ pin, reporterResponse }),
-      });
-    } catch {
-      return {
-        success: true,
-        message: 'Additional information saved.',
-        report: { id, reporterResponse },
       };
     }
   }

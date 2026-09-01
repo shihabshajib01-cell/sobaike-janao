@@ -9,7 +9,6 @@ export type RoutePath =
   | '/extortion'
   | '/explore'
   | '/report'
-  | '/track-report'
   | '/search'
   | '/more'
   | `/report-detail/${string}`

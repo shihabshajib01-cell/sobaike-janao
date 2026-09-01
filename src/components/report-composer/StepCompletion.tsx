@@ -3,16 +3,12 @@ import {
   CheckCircle2,
   Copy,
   Check,
-  ShieldCheck,
   PlusCircle,
-  AlertCircle,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 export interface StepCompletionProps {
   reportId: string;
-  pin: string;
-  onTrackReport?: (reportId: string) => void;
   onSubmitAnother: () => void;
   onClose: () => void;
   language: 'bn' | 'en';
@@ -20,24 +16,16 @@ export interface StepCompletionProps {
 
 export const StepCompletion: React.FC<StepCompletionProps> = ({
   reportId,
-  pin,
   onSubmitAnother,
   onClose,
   language,
 }) => {
   const [copiedId, setCopiedId] = useState(false);
-  const [copiedPin, setCopiedPin] = useState(false);
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(reportId);
     setCopiedId(true);
     setTimeout(() => setCopiedId(false), 2000);
-  };
-
-  const handleCopyPin = () => {
-    navigator.clipboard.writeText(pin);
-    setCopiedPin(true);
-    setTimeout(() => setCopiedPin(false), 2000);
   };
 
   return (
@@ -78,41 +66,6 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
           >
             {copiedId ? (language === 'bn' ? 'কপি হয়েছে' : 'Copied') : language === 'bn' ? 'কপি' : 'Copy'}
           </Button>
-        </div>
-
-        {/* 6-Digit Private PIN */}
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-amber-700 font-bold text-[14px]">
-              <ShieldCheck className="w-4 h-4" />
-              <span>{language === 'bn' ? 'গোপন সিকিউরিটি পিন (Private PIN)' : 'Private Security PIN'}</span>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleCopyPin}
-              leftIcon={copiedPin ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              className="bg-surface text-primary min-h-[40px] text-[14px]"
-            >
-              {copiedPin ? (language === 'bn' ? 'কপি হয়েছে' : 'Copied') : language === 'bn' ? 'পিন কপি' : 'Copy PIN'}
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-center py-2">
-            <div className="font-mono text-[28px] md:text-[32px] tracking-[0.25em] font-black text-amber-900 bg-amber-500/20 px-6 py-1.5 rounded-xl border border-amber-500/40">
-              {pin}
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2 pt-1 text-[14px] text-secondary leading-snug">
-            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p>
-              {language === 'bn'
-                ? 'এই পিন নম্বরটি কোথাও নিরাপদ স্থানে সংরক্ষণ করুন। এটি আপনার গোপনীয় রেফারেন্স প্রমাণ।'
-                : 'Save this 6-digit PIN securely. It serves as your confidential submission reference.'}
-            </p>
-          </div>
         </div>
       </div>
 

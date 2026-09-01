@@ -32,7 +32,6 @@ export interface ReportComposerModalProps {
   onClose: () => void;
   initialSegment?: SectionKey | null;
   language: 'bn' | 'en';
-  onTrackReport?: (reportId: string) => void;
 }
 
 export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
@@ -40,7 +39,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   onClose,
   initialSegment = null,
   language,
-  onTrackReport,
 }) => {
   // Saved draft available for explicit recovery prompt
   const [savedDraftAvailable, setSavedDraftAvailable] = useState<DraftReport | null>(null);
@@ -68,7 +66,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submissionResult, setSubmissionResult] = useState<{
     reportId: string;
-    pin: string;
   } | null>(null);
 
   // Close Confirmation state
@@ -77,7 +74,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Scroll container reference to reset scroll on step change
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   // Active retry submission credentials (reused across retries until success, reset, or change)
-  const retryCredentialsRef = useRef<{ clientSubmissionId: string; pin: string } | null>(null);
+  const retryCredentialsRef = useRef<{ clientSubmissionId: string } | null>(null);
 
   // Check for saved draft whenever the modal is opened
   useEffect(() => {
@@ -329,45 +326,25 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         website: (formData as any).website || '', // Honeypot anti-bot
       };
 
-      // Ensure stable idempotency key and PIN across submission retries
+      // Ensure stable idempotency key across submission retries
       if (!retryCredentialsRef.current) {
-        let securePin: string | null = null;
-        if (typeof window !== 'undefined' && window.crypto && typeof window.crypto.getRandomValues === 'function') {
-          const array = new Uint32Array(1);
-          window.crypto.getRandomValues(array);
-          securePin = (100000 + (array[0] % 900000)).toString();
-        }
-
-        const isSupabaseSubmission = isSupabaseConfigured() && pendingImages.length === 0;
-        if (isSupabaseSubmission && !securePin) {
-          throw new Error(
-            language === 'bn'
-              ? 'নিরাপদ ট্র্যাকিং পিন তৈরি করা সম্ভব হয়নি। অনুগ্রহ করে একটি সমর্থিত ব্রাউজারে চেষ্টা করুন।'
-              : 'Secure tracking PIN generation is unavailable. Please use a modern supported browser.'
-          );
-        }
-
-        const generatedPin = securePin || Math.floor(100000 + Math.random() * 900000).toString();
-
         retryCredentialsRef.current = {
           clientSubmissionId: generateSecureIdempotencyKey(),
-          pin: generatedPin,
         };
       }
 
-      const { clientSubmissionId, pin } = retryCredentialsRef.current;
+      const { clientSubmissionId } = retryCredentialsRef.current;
       const filesToUpload = pendingImages.map((img) => img.file);
 
-      const response = await apiClient.submitReport(payload, filesToUpload, clientSubmissionId, pin);
+      const response = await apiClient.submitReport(payload, filesToUpload, clientSubmissionId);
 
-      if (response && response.reportId && response.pin) {
+      if (response && response.reportId) {
         // Reset retry credentials on success
         retryCredentialsRef.current = null;
         // Clear saved draft on success
         DraftRepository.clearDraft();
         setSubmissionResult({
           reportId: response.reportId,
-          pin: response.pin,
         });
       } else {
         throw new Error(
@@ -610,7 +587,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               {submissionResult ? (
                 <StepCompletion
                   reportId={submissionResult.reportId}
-                  pin={submissionResult.pin}
                   onSubmitAnother={handleStartAnother}
                   onClose={onClose}
                   language={language}

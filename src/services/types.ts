@@ -100,7 +100,6 @@ export interface PendingReportImage {
 
 export interface SubmittedReport {
   id: string;
-  pin: string;
   segment: SectionKey;
   subcategoryId: string;
   subcategoryBn: string;

@@ -15,7 +15,6 @@ import { RickshawPage } from '../../pages/RickshawPage';
 import { ExtortionPage } from '../../pages/ExtortionPage';
 import { ReportDetailPage } from '../../pages/ReportDetailPage';
 import { ReportPage } from '../../pages/ReportPage';
-import { TrackReportPage } from '../../pages/TrackReportPage';
 import { ExplorePage } from '../../pages/ExplorePage';
 import { SearchPage } from '../../pages/SearchPage';
 import { MorePage } from '../../pages/MorePage';
@@ -76,7 +75,6 @@ export const AppShell: React.FC = () => {
               <Route path="/rickshaw" element={<RickshawPage />} />
               <Route path="/extortion" element={<ExtortionPage />} />
               <Route path="/report" element={<ReportPage />} />
-              <Route path="/track-report" element={<TrackReportPage />} />
               <Route path="/explore" element={<ExplorePage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/more" element={<MorePage />} />
@@ -124,10 +122,6 @@ export const AppShell: React.FC = () => {
           onClose={closeReportComposer}
           initialSegment={reportComposerInitialSegment}
           language={language}
-          onTrackReport={(rId) => {
-            closeReportComposer();
-            navigateTo(`/track-report?id=${encodeURIComponent(rId)}`);
-          }}
         />
       </ErrorBoundary>
 

@@ -803,7 +803,7 @@ export function initSchemaAndSeed(db: IDatabase): void {
 
       // 2. Seed Queue Submissions
       SEED_SUBMITTED_REPORTS.forEach((sub, idx) => {
-        const pinHash = sub.pin ? bcrypt.hashSync(sub.pin, 4) : DEFAULT_PIN_HASH;
+        const pinHash = DEFAULT_PIN_HASH;
         insertSub.run({
           id: sub.id,
           internal_id: `sub-int-${idx + 1}-${sub.id}`,
