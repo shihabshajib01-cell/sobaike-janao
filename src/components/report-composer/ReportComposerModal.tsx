@@ -75,6 +75,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Scroll container reference to reset scroll on step change
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // Active retry submission credentials (reused across retries until success, reset, or change)
+  const retryCredentialsRef = useRef<{ clientSubmissionId: string; pin: string } | null>(null);
 
   // Check for saved draft whenever the modal is opened
   useEffect(() => {
@@ -111,6 +113,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, [savedDraftAvailable]);
 
   const handleStartNewComplaint = useCallback(() => {
+    retryCredentialsRef.current = null;
     setFormData({
       ...INITIAL_DRAFT,
       segment: null,
@@ -121,6 +124,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const handleDeleteSavedDraft = useCallback(() => {
+    retryCredentialsRef.current = null;
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -133,6 +137,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Helper to update form data
   const handleUpdateFormData = useCallback((updates: Partial<DraftReport>) => {
+    // Reset retry credentials if form data changes materially after an error
+    retryCredentialsRef.current = null;
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
 
@@ -293,6 +299,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         intimatePlatform: formData.intimatePlatform || undefined,
         location: loc,
         privacyChoice: formData.privacyChoice || 'anonymous',
+        publicationPreferences: formData.publicationPreferences || {
+          showSubjectName: false,
+          showOrganization: false,
+          showGeneralLocation: true,
+          showDescription: true,
+        },
         adminContact:
           formData.adminName || formData.adminContact
             ? {
@@ -307,12 +319,31 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         website: (formData as any).website || '', // Honeypot anti-bot
       };
 
-      const idempotencyKey = generateSecureIdempotencyKey();
+      // Ensure stable idempotency key and PIN across submission retries
+      if (!retryCredentialsRef.current) {
+        let generatedPin = '';
+        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+          const array = new Uint32Array(1);
+          window.crypto.getRandomValues(array);
+          generatedPin = (100000 + (array[0] % 900000)).toString();
+        } else {
+          generatedPin = Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        retryCredentialsRef.current = {
+          clientSubmissionId: generateSecureIdempotencyKey(),
+          pin: generatedPin,
+        };
+      }
+
+      const { clientSubmissionId, pin } = retryCredentialsRef.current;
       const filesToUpload = pendingImages.map((img) => img.file);
 
-      const response = await apiClient.submitReport(payload, filesToUpload, idempotencyKey);
+      const response = await apiClient.submitReport(payload, filesToUpload, clientSubmissionId, pin);
 
       if (response && response.reportId && response.pin) {
+        // Reset retry credentials on success
+        retryCredentialsRef.current = null;
         // Clear saved draft on success
         DraftRepository.clearDraft();
         setSubmissionResult({
@@ -340,6 +371,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, [formData, pendingImages, language]);
 
   const handleStartAnother = useCallback(() => {
+    retryCredentialsRef.current = null;
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -353,6 +385,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Discard draft action
   const handleDiscardDraft = useCallback(() => {
+    retryCredentialsRef.current = null;
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,

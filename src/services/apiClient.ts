@@ -1,6 +1,7 @@
 import { ReportItem } from '../types/report';
 import { SectionKey } from '../theme/tokens';
 import { SubmittedReport } from './types';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export interface ApiError {
   code: string;
@@ -145,14 +146,71 @@ class ApiClient {
   }
 
   // --- Report Submission & Tracking APIs ---
-  async submitReport(payload: any, images?: File[], idempotencyKey?: string) {
+  async submitReport(payload: any, images?: File[], idempotencyKey?: string, trackingPin?: string) {
     const headers: Record<string, string> = {};
     if (idempotencyKey) {
       headers['Idempotency-Key'] = idempotencyKey;
     }
 
+    const hasImages = Array.isArray(images) && images.length > 0;
+
+    // When no images are attached AND Supabase is configured, use the secure Supabase RPC
+    if (!hasImages && isSupabaseConfigured() && supabase) {
+      const clientSubmissionId =
+        idempotencyKey?.trim() ||
+        (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `idem_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`);
+
+      // Ensure 6-digit numeric PIN
+      let pin = trackingPin?.trim();
+      if (!pin || !/^[0-9]{6}$/.test(pin)) {
+        if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+          const array = new Uint32Array(1);
+          window.crypto.getRandomValues(array);
+          pin = (100000 + (array[0] % 900000)).toString();
+        } else {
+          pin = Math.floor(100000 + Math.random() * 900000).toString();
+        }
+      }
+
+      const { data, error } = await supabase.rpc('submit_public_complaint', {
+        p_payload: payload,
+        p_client_submission_id: clientSubmissionId,
+        p_tracking_pin: pin,
+      });
+
+      if (error) {
+        const errorMsg = error.message || 'Supabase submission failed.';
+        const apiError: ApiError = {
+          code: error.code || 'RPC_ERROR',
+          message: errorMsg,
+          messageBn: 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
+        };
+        throw apiError;
+      }
+
+      if (data && data.success) {
+        return {
+          success: true,
+          reportId: data.reportId as string,
+          pin: (data.pin || pin) as string,
+          message: data.message || 'Report submitted successfully.',
+          report: data.report,
+        };
+      }
+
+      const failureMsg = data?.message || 'Submission was rejected by the server.';
+      const apiError: ApiError = {
+        code: data?.code || 'SUBMISSION_REJECTED',
+        message: failureMsg,
+        messageBn: 'প্রতিবেদনটি গ্রহণ করা যায়নি।',
+      };
+      throw apiError;
+    }
+
     try {
-      if (images && images.length > 0) {
+      if (hasImages) {
         const formData = new FormData();
         formData.append('payload', JSON.stringify(payload));
         images.forEach((file) => {
@@ -197,12 +255,18 @@ class ApiClient {
         },
         body: JSON.stringify(payload),
       });
-    } catch {
+    } catch (err: any) {
+      if (err && err.code && err.code !== 'NETWORK_UNAVAILABLE' && !err.code.startsWith('HTTP_')) {
+        throw err;
+      }
       // Backend offline or static host (GitHub Pages) fallback
       const now = new Date();
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
       const generatedId = `REP-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}-${randomSuffix}`;
-      const generatedPin = Math.floor(100000 + Math.random() * 900000).toString();
+      const generatedPin =
+        trackingPin && /^[0-9]{6}$/.test(trackingPin)
+          ? trackingPin
+          : Math.floor(100000 + Math.random() * 900000).toString();
 
       const localReport: SubmittedReport = {
         id: generatedId,
@@ -232,8 +296,8 @@ class ApiClient {
         evidenceDescription: payload.evidenceDescription || '',
         privacyChoice: payload.privacyChoice || 'anonymous',
         publicationPreferences: payload.publicationPreferences || {
-          showSubjectName: true,
-          showOrganization: true,
+          showSubjectName: false,
+          showOrganization: false,
           showGeneralLocation: true,
           showDescription: true,
         },
