@@ -2,6 +2,11 @@ import { apiClient } from './apiClient';
 import { ReportItem } from '../types/report';
 import { SectionKey } from '../theme/tokens';
 import { MOCK_REPORTS } from '../data/mockReports';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import {
+  mapSupabasePublicReportToItem,
+  SupabasePublicReportRPC,
+} from './supabasePublicReportMapper';
 
 export interface PublicReportFilters {
   segment?: SectionKey | 'all';
@@ -14,19 +19,78 @@ export interface PublicReportFilters {
 
 export const PublicReportService = {
   /**
-   * Fetch all published reports matching optional criteria from SQLite backend (with mock fallback).
+   * Fetch all published reports matching optional criteria.
+   * When Supabase is configured, queries the sanitized RPC `get_public_published_reports`.
+   * When Supabase is not configured, uses local MOCK_REPORTS.
    */
   async getAll(filters?: PublicReportFilters): Promise<ReportItem[]> {
-    try {
-      const res = await apiClient.getPublicReports(filters);
-      if (res && res.reports && res.reports.length > 0) {
-        return res.reports;
+    if (isSupabaseConfigured()) {
+      if (!supabase) {
+        throw new Error('Supabase client is not available');
       }
-    } catch {
-      // Backend unavailable (static host / GitHub pages fallback)
+
+      const { data, error } = await supabase.rpc('get_public_published_reports');
+      if (error) {
+        console.error('[PublicReportService.getAll] Supabase RPC error:', error);
+        throw error;
+      }
+
+      if (!data || !Array.isArray(data)) {
+        return [];
+      }
+
+      let list: ReportItem[] = data.map((raw: SupabasePublicReportRPC) =>
+        mapSupabasePublicReportToItem(raw)
+      );
+
+      if (filters?.segment && filters.segment !== 'all') {
+        list = list.filter((r) => r.segment === filters.segment);
+      }
+      if (filters?.subcategory && filters.subcategory !== 'all') {
+        list = list.filter((r) => r.subcategoryId === filters.subcategory);
+      }
+      if (filters?.district && filters.district !== 'all') {
+        const dist = filters.district.toLowerCase().trim();
+        list = list.filter((r) => {
+          const dEn = (r.districtEn || '').toLowerCase();
+          const dBn = (r.districtBn || '').toLowerCase();
+          return dEn.includes(dist) || dBn.includes(dist);
+        });
+      }
+      if (filters?.search) {
+        const q = filters.search.toLowerCase().trim();
+        list = list.filter((r) => {
+          const titleEn = (r.titleEn || '').toLowerCase();
+          const titleBn = (r.titleBn || '').toLowerCase();
+          const descEn = (r.shortDescriptionEn || r.fullDescriptionEn || '').toLowerCase();
+          const descBn = (r.shortDescriptionBn || r.fullDescriptionBn || '').toLowerCase();
+          const locEn = (r.locationEn || '').toLowerCase();
+          const locBn = (r.locationBn || '').toLowerCase();
+          const subjEn = (r.reportedSubjectEn || r.reportedSubject || '').toLowerCase();
+          const subjBn = (r.reportedSubjectBn || r.reportedSubject || '').toLowerCase();
+          const org = (r.organization || '').toLowerCase();
+          return (
+            titleEn.includes(q) ||
+            titleBn.includes(q) ||
+            descEn.includes(q) ||
+            descBn.includes(q) ||
+            locEn.includes(q) ||
+            locBn.includes(q) ||
+            subjEn.includes(q) ||
+            subjBn.includes(q) ||
+            org.includes(q)
+          );
+        });
+      }
+
+      if (filters?.limit && filters.limit > 0) {
+        list = list.slice(0, filters.limit);
+      }
+
+      return list;
     }
 
-    // Client-side fallback with MOCK_REPORTS
+    // Local / Dev Fallback with MOCK_REPORTS when Supabase is not configured
     let list = [...MOCK_REPORTS];
     if (filters?.segment && filters.segment !== 'all') {
       list = list.filter((r) => r.segment === filters.segment);
@@ -75,9 +139,37 @@ export const PublicReportService = {
 
   /**
    * Fetch a single published report and any published subject responses by ID.
+   * When Supabase is configured, queries the sanitized RPC `get_public_published_report`.
    */
   async getById(id: string): Promise<{ report: ReportItem; responses: any[] } | null> {
     const cleanId = id.trim().toUpperCase();
+
+    if (isSupabaseConfigured()) {
+      if (!supabase) {
+        throw new Error('Supabase client is not available');
+      }
+
+      const { data, error } = await supabase.rpc('get_public_published_report', {
+        p_report_id: cleanId,
+      });
+
+      if (error) {
+        console.error('[PublicReportService.getById] Supabase RPC error:', error);
+        throw error;
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+      return {
+        report,
+        responses: [],
+      };
+    }
+
+    // Local / Dev Fallback when Supabase is not configured
     try {
       const res = await apiClient.getPublicReportById(cleanId);
       if (res && res.success && res.report) {
@@ -117,32 +209,10 @@ export const PublicReportService = {
     filters?: { segment?: SectionKey | 'all'; district?: string }
   ): Promise<ReportItem[]> {
     const trimmed = query.trim();
-    if (!trimmed) {
-      return this.getAll({ segment: filters?.segment, district: filters?.district });
-    }
-
-    try {
-      const res = await apiClient.searchPublic(trimmed, filters?.segment);
-      if (res && res.reports && res.reports.length > 0) {
-        let reports = res.reports;
-        if (filters?.district && filters.district !== 'all') {
-          const cleanDist = filters.district.toLowerCase().trim();
-          reports = reports.filter((r) => {
-            const dEn = (r.districtEn || '').toLowerCase();
-            const dBn = (r.districtBn || '').toLowerCase();
-            return dEn.includes(cleanDist) || dBn.includes(cleanDist);
-          });
-        }
-        return reports;
-      }
-    } catch {
-      // Fallback
-    }
-
     return this.getAll({
       segment: filters?.segment,
       district: filters?.district,
-      search: trimmed,
+      search: trimmed || undefined,
     });
   },
 
@@ -206,6 +276,7 @@ export const PublicReportService = {
 
       // Guard: withheld location reports must never appear in named location feeds
       if (
+        !r.districtEn ||
         distEn.includes('withheld') ||
         distBn.includes('গোপন') ||
         locEn.includes('withheld') ||

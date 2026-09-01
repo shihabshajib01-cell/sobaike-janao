@@ -78,6 +78,7 @@ export interface ReportItem {
   incidentDateEn: string;
   publishedDateBn: string;
   publishedDateEn: string;
+  publishedAt?: string;
   evidenceSummaryBn: string[];
   evidenceSummaryEn: string[];
   relatedReportCount?: number;

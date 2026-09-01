@@ -71,6 +71,9 @@ export const HomePage: React.FC = () => {
     if (feedFilter === 'latest') {
       // Sort newest published date
       list = [...list].sort((a, b) => {
+        if (a.publishedAt && b.publishedAt) {
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+        }
         const idA = parseInt(a.id, 10) || 0;
         const idB = parseInt(b.id, 10) || 0;
         return idB - idA;
@@ -81,6 +84,9 @@ export const HomePage: React.FC = () => {
         const relA = a.relatedReportIds?.length || 0;
         const relB = b.relatedReportIds?.length || 0;
         if (relB !== relA) return relB - relA;
+        if (a.publishedAt && b.publishedAt) {
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+        }
         const idA = parseInt(a.id, 10) || 0;
         const idB = parseInt(b.id, 10) || 0;
         return idB - idA;
@@ -88,6 +94,9 @@ export const HomePage: React.FC = () => {
     } else if (feedFilter === 'most_shared') {
       // UI ready without fake mock metrics
       list = [...list].sort((a, b) => {
+        if (a.publishedAt && b.publishedAt) {
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+        }
         const idA = parseInt(a.id, 10) || 0;
         const idB = parseInt(b.id, 10) || 0;
         return idB - idA;
