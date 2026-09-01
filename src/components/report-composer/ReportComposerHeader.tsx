@@ -126,7 +126,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
       </div>
 
       {/* Interactive Step Indicator Chips (clickable for previous/accessible steps) */}
-      <div className="px-3 sm:px-4 md:px-8 pb-3 pt-0.5 flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
+      <div className="px-3 sm:px-4 md:px-8 pb-3 pt-0.5 grid grid-cols-4 gap-1.5 sm:gap-2 md:gap-3 w-full">
         {stepTitles.map((st) => {
           const isCompleted = st.step < currentStep;
           const isCurrent = st.step === currentStep;
@@ -138,7 +138,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               type="button"
               disabled={!isAccessible}
               onClick={() => isAccessible && onSelectStep && onSelectStep(st.step)}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-3.5 py-1.5 rounded-xl text-[12px] sm:text-[13px] md:text-[14px] font-medium transition-all whitespace-nowrap cursor-pointer min-h-[36px] ${
+              className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-1.5 rounded-xl text-[12px] sm:text-[13px] md:text-[14px] font-medium transition-all whitespace-nowrap cursor-pointer min-h-[36px] ${
                 isCurrent
                   ? 'bg-accent text-inverse font-bold shadow-2xs'
                   : isCompleted
@@ -147,7 +147,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               }`}
             >
               <span
-                className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] font-bold ${
+                className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] font-bold ${
                   isCurrent
                     ? 'bg-white/25 text-white'
                     : isCompleted
@@ -157,8 +157,8 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               >
                 {isCompleted ? <Check className="w-3 h-3 text-white" /> : st.step}
               </span>
-              <span className="sm:hidden">{language === 'bn' ? st.shortBn : st.shortEn}</span>
-              <span className="hidden sm:inline">{language === 'bn' ? st.titleBn : st.titleEn}</span>
+              <span className="sm:hidden truncate">{language === 'bn' ? st.shortBn : st.shortEn}</span>
+              <span className="hidden sm:inline truncate">{language === 'bn' ? st.titleBn : st.titleEn}</span>
             </button>
           );
         })}
