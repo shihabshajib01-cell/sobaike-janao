@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { UploadCloud, X, ArrowLeft, ArrowRight, AlertCircle, ShieldAlert, Loader2, Sparkles } from 'lucide-react';
+import { UploadCloud, X, ArrowLeft, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 import { MEDIA_UPLOAD_CONFIG } from '../../config/mediaConfig';
 import { compressImageToWebP, generateStableImageId } from '../../services/imageCompressionService';
 
@@ -52,13 +52,6 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
       });
     };
   }, []);
-
-  const formatFileSize = (bytes: number) => {
-    if (!bytes || bytes <= 0) return '0 B';
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
 
   const validateAndAddFiles = async (incomingFiles: FileList | File[]) => {
     setErrorMessage(null);
@@ -187,8 +180,8 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
           err && err.bn && err.en
             ? err
             : {
-                bn: `"${item.file.name}" কমপ্রেস করা সম্ভব হয়নি।`,
-                en: `Failed to compress "${item.file.name}".`,
+                bn: 'এই ছবিটি প্রস্তুত করা যায়নি। ছবিটি সরিয়ে অন্য একটি ছবি চেষ্টা করুন।',
+                en: 'This image could not be prepared. Please remove it and try another image.',
               };
 
         const currentList = imagesRef.current;
@@ -246,11 +239,6 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
     onChange(reordered);
   };
 
-  const totalCompressedBytes = images.reduce(
-    (sum, img) => sum + (img.compressedSize || img.originalSize),
-    0
-  );
-  const totalOriginalBytes = images.reduce((sum, img) => sum + img.originalSize, 0);
   const hasAnyCompressing = images.some((img) => img.isCompressing);
 
   return (
@@ -314,16 +302,6 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
         </div>
       )}
 
-      {/* In-Browser Privacy & Local WebP Compression Indicator */}
-      <div className="flex items-start gap-2 text-[13px] leading-[20px] text-muted">
-        <ShieldAlert className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0 mt-0.5" />
-        <span>
-          {language === 'bn'
-            ? 'ছবি ব্রাউজারেই স্বয়ংক্রিয়ভাবে অপ্টিমাইজড WebP ফরম্যাটে কমপ্রেস হয় এবং অবস্থান ও মেটাডাটা সম্পূর্ণ মুছে ফেলা হয়।'
-            : 'Images are automatically compressed to WebP and stripped of private metadata locally in your browser before upload.'}
-        </span>
-      </div>
-
       {/* Image Previews Grid */}
       {images.length > 0 && (
         <div className="space-y-3">
@@ -337,15 +315,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
               {hasAnyCompressing && (
                 <span className="flex items-center gap-1 text-[12px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                   <Loader2 className="w-3 h-3 animate-spin" />
-                  {language === 'bn' ? 'কমপ্রেস হচ্ছে…' : 'Optimizing…'}
-                </span>
-              )}
-            </span>
-            <span className="text-[13px] text-secondary font-normal flex items-center gap-1.5">
-              <span>{formatFileSize(totalCompressedBytes)}</span>
-              {totalOriginalBytes > totalCompressedBytes && totalCompressedBytes > 0 && (
-                <span className="text-muted line-through text-[12px]">
-                  {formatFileSize(totalOriginalBytes)}
+                  {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing…'}
                 </span>
               )}
             </span>
@@ -353,13 +323,6 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {images.map((img, index) => {
-              const hasCompressionSaved =
-                img.compressedSize > 0 && img.compressedSize < img.originalSize;
-              const ratio =
-                img.compressedSize > 0
-                  ? Math.round(((img.originalSize - img.compressedSize) / img.originalSize) * 100)
-                  : 0;
-
               return (
                 <div
                   key={img.id}
@@ -392,14 +355,13 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                       #{index + 1}
                     </div>
 
-                    {/* Compression Spinner Overlay */}
+                    {/* Preparing Spinner Overlay */}
                     {img.isCompressing && (
                       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-white text-center p-3">
-                        <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+                        <Loader2 className="w-6 h-6 animate-spin text-white" />
                         <span className="text-[13px] font-semibold">
-                          {language === 'bn' ? 'ছবি কমপ্রেস করা হচ্ছে…' : 'Compressing image…'}
+                          {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing image…'}
                         </span>
-                        <span className="text-[11px] text-white/80">WebP · &le; 256 KB</span>
                       </div>
                     )}
 
@@ -433,28 +395,6 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                       <p className="truncate font-medium" title={img.file.name}>
                         {img.originalName || img.file.name}
                       </p>
-                      <div className="flex items-center gap-1.5 text-secondary text-[12px]">
-                        {img.compressedSize > 0 ? (
-                          <>
-                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                              {formatFileSize(img.compressedSize)}
-                            </span>
-                            {hasCompressionSaved && (
-                              <>
-                                <span className="text-muted">·</span>
-                                <span className="text-muted line-through">
-                                  {formatFileSize(img.originalSize)}
-                                </span>
-                                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                                  (-{ratio}%)
-                                </span>
-                              </>
-                            )}
-                          </>
-                        ) : (
-                          <span>{formatFileSize(img.originalSize)}</span>
-                        )}
-                      </div>
                     </div>
 
                     {/* Reorder Buttons */}

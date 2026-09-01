@@ -265,8 +265,8 @@ export async function compressImageToWebP(
     // Step 4: Final validation against hard limit
     if (!bestBlob || bestBlob.size > MEDIA_UPLOAD_CONFIG.hardCompressedBytes) {
       const error: CompressionError = {
-        bn: `"${originalFile.name}" ফাইলের আকার ২৫৬ KB এর নিচে নামানো সম্ভব হয়নি। অনুগ্রহ করে অন্য ছবি নির্বাচন করুন।`,
-        en: `"${originalFile.name}" could not be compressed under the 256 KB storage limit. Please choose a different photo.`,
+        bn: 'এই ছবিটি প্রস্তুত করা যায়নি। ছবিটি সরিয়ে অন্য একটি ছবি চেষ্টা করুন।',
+        en: 'This image could not be prepared. Please remove it and try another image.',
       };
       throw error;
     }
@@ -327,8 +327,8 @@ export async function compressMultipleImages(
           err && err.bn && err.en
             ? err
             : {
-                bn: `"${file.name}" প্রক্রিয়াকরণ ব্যর্থ হয়েছে।`,
-                en: `Failed to compress "${file.name}".`,
+                bn: 'এই ছবিটি প্রস্তুত করা যায়নি। ছবিটি সরিয়ে অন্য একটি ছবি চেষ্টা করুন।',
+                en: 'This image could not be prepared. Please remove it and try another image.',
               };
         if (onItemError) {
           onItemError(errorObj, file, index);
