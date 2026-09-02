@@ -176,7 +176,7 @@ export const Header: React.FC = () => {
             })}
           </div>
 
-          {/* Secondary Utilities / Search & Tracking */}
+          {/* Secondary Utilities */}
           <div className="pt-3 border-t border-subtle space-y-1">
             <button
               onClick={() => {

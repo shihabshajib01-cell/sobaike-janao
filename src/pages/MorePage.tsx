@@ -302,8 +302,8 @@ export const MorePage: React.FC = () => {
               </h3>
               <p className="text-secondary text-[16px] leading-[26px]">
                 {language === 'bn'
-                  ? 'প্রতিবেদন জমা দেওয়ার পর আপনাকে একটি ইউনিক রিপোর্ট আইডি এবং গোপনীয় সিকিউরিটি পিন দেওয়া হয়। মডারেশন টিম তথ্য যাচাই শেষে উপযুক্ত ব্যবস্থা গ্রহণ করে।'
-                  : 'After submission, you receive a unique Report ID and confidential security PIN as reference while our team reviews the report.'}
+                  ? 'প্রতিবেদন জমা দেওয়ার পর আপনাকে একটি ইউনিক রিপোর্ট আইডি প্রদান করা হয়। মডারেশন টিম তথ্য যাচাই শেষে উপযুক্ত ব্যবস্থা গ্রহণ করে।'
+                  : 'After submission, you receive a unique Report ID as reference while our team reviews the report.'}
               </p>
             </div>
           </div>

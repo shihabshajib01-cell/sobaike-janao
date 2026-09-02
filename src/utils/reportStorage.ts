@@ -9,10 +9,8 @@ export { INITIAL_DRAFT };
 
 /**
  * Draft-only storage utility.
- * In accordance with Phase 8 architecture, localStorage is strictly permitted ONLY
- * for unsaved client-side report drafts and harmless UI preferences.
- * All submitted reports, status checks, responses, and moderation states reside
- * strictly in the backend SQLite database.
+ * LocalStorage is used ONLY for unsaved client-side report drafts and harmless UI preferences.
+ * Submitted reports and complaints are transmitted directly via Supabase.
  */
 export const getDraft = (): DraftReport | null => {
   return DraftRepository.getDraft();

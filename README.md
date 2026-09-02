@@ -1,96 +1,70 @@
 # Sobaike Janao (সবাইকে জানাও)
 
-**Sobaike Janao (সবাইকে জানাও)** is a civic reporting and public awareness platform for Bangladesh covering harassment, extortion, and transportation irregularities. The platform enables citizens to securely submit incident reports, track editorial progress via Report ID and 6-digit PIN, and review verified public incident feeds, district registries, and interactive maps.
+**Sobaike Janao (সবাইকে জানাও)** is a civic reporting and public awareness platform for Bangladesh covering harassment, extortion, and transportation irregularities. The platform enables citizens to securely submit incident complaints with supporting evidence, view published and moderated public reports, and explore incident data across districts and interactive maps.
 
 ---
 
-## 🏛️ Architecture Overview (Phase 8 Backend Integration)
+## 🏛️ Architecture Overview
 
-The application operates as a **full-stack Express + React application** where the backend SQLite database is the **sole source of truth** for all submitted, moderated, published, and response records.
+The public application is built as a high-performance modern web application utilizing **React, TypeScript, Vite, and Supabase**:
 
-* **Backend**: Node.js + Express with TypeScript, Cookie-Only JWT authentication, bcrypt PIN & password hashing, and rate limiting.
-* **Database**: Persistent relational JSON storage in `./.data/sobaike_store.json` (pure TypeScript storage engine).
-* **Frontend**: React 18 with Vite, Tailwind CSS, Lucide Icons, and React Router.
-* **Privacy & Isolation**: Strict server-side separation between private citizen submissions (`report_submissions`) and sanitized public versions (`public_versions`).
-* **Zero Client-Side Mock Runtime**: All public feeds, segment pages, exploration maps, search queries, location views, subject entity profiles, and report details are served directly by `GET /api/public/*` backend endpoints.
-
----
-
-## 🔒 Security & Privacy Guarantees
-
-1. **Zero Dual-Data System**:
-   * All reports, statuses, moderation events, clarifications, public versions, and responses are persisted directly in SQLite.
-   * `localStorage` is strictly restricted to unsaved report drafts and user UI preferences (language/theme).
-   * Frontend public screens use `PublicReportService` to asynchronously consume backend SQLite data with bilingual loading, error-recovery, and empty states.
-
-2. **Server-Enforced Public / Private Separation**:
-   * Private fields (reporter contact info, private coordinates, raw private incident details, admin-only identifiers) are strictly filtered out by backend controllers.
-   * Public endpoints query `public_versions` joined with safe submission attributes only when `status = 'published'`.
-   * If a reporter selected `anonymous` or `admin_only`, the server rejects any attempt to expose reporter identity publicly.
-
-3. **Report Tracking Security**:
-   * Report IDs (`SJ-YYYY-XXXXXX`) are paired with random 6-digit PINs.
-   * PINs are hashed using bcrypt with salt rounds before database persistence. Plaintext PINs are never stored in the database or returned in tracking endpoints.
-   * Track Report endpoints and Admin Login endpoints are protected by memory-backed rate limiters.
-
-4. **Cookie-Only Admin Authentication**:
-   * Admin routes require valid HTTP-Only cookies (`admin_token`).
-   * No JWT tokens are returned in login response bodies or persisted in frontend `localStorage`.
-   * Passwords use salted bcrypt verification.
+* **Frontend**: React 18 with TypeScript, Tailwind CSS, Lucide Icons, and responsive design for mobile, tablet, and desktop.
+* **Backend & Database**: Supabase PostgreSQL database with Row-Level Security (RLS) and stored PostgreSQL functions (RPCs).
+* **Complaint Submission Pipeline**:
+  - Secure intake via `submit_public_complaint` RPC.
+  - Client-side idempotency keys ensuring duplicate-safe submissions.
+  - Client-side WebP image compression before upload.
+  - Private evidence storage in Supabase Storage (`complaint-evidence` bucket) registered via `register_public_complaint_evidence` RPC.
+* **Public Incident Feeds & Exploration**:
+  - `PublicReportService` loads published and editorial-reviewed incident reports directly from Supabase with fallback capability.
+  - Interactive Leaflet-powered incident map with district clustering and geolocation filtering.
+  - Search by incident details, division, district, and subject.
+* **Bilingual Support**: Comprehensive Bengali (বাংলা) and English interface switching.
+* **Theming**: System, light, and dark theme support.
+* **Visitor Location Consent**: Optional privacy-preserving browser geolocation to surface relevant local area reports.
+* **Deployment**: Optimized for static hosting and GitHub Pages with subpath-aware asset routing.
 
 ---
 
-## 🗄️ Database Schema & Relational Tables
+## 📋 Reporting Segments
 
-The SQLite database defines the following relational tables with foreign key constraints enabled:
-
-* `admin_users`: Credentials and role-based access for editorial administrators.
-* `report_submissions`: Complete intake record of submitted reports with bcrypt-hashed PIN.
-* `public_versions`: Sanitized editorial version for public search, feed, and mapping.
-* `clarification_requests`: Thread of info requests from admins to reporters and reporter responses.
-* `moderation_events`: Immutable audit trail of every moderation lifecycle transition and editorial action.
-* `subject_responses`: Official institutional statements from named subjects or organizations.
-* `related_reports`: Bi-directional links between connected incident reports.
-* `schema_migrations`: Version tracking table for schema migrations.
+1. **Harassment (হয়রানি)**: Public transport, street, workplace, institutional, and digital harassment.
+2. **Rickshaw Fare & Battery Safety (অটো-রিকশা ও রিকশা)**: Arbitrary overcharging, meter refusal, battery-charging fire hazards, and reckless driving.
+3. **Extortion (চাঁদাবাজি)**: Street-level extortion, merchant extortion, transport syndicate collections, and neighborhood intimidation.
 
 ---
 
-## 🚀 Environment Variables
+## 🚀 Environment Configuration
 
 Create a `.env` file based on `.env.example`:
 
 ```env
-# Server Configuration
-PORT=3000
-NODE_ENV=development
-ALLOWED_ORIGIN=
+# Supabase Configuration
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key
 
-# Authentication & Security Secrets
-JWT_SECRET=your_secure_jwt_secret_key_here
-ADMIN_EMAIL=admin@sobaikejanao.org
-ADMIN_INITIAL_PASSWORD=your_initial_admin_password_here
-
-# Database & Storage
-SQLITE_DB_PATH=./data/sobaike_janao.db
-PRIVATE_UPLOAD_DIR=./data/private-uploads
-
-# Optional Client Environment Variables
+# Optional Google Maps API Key for location picker
 VITE_GOOGLE_MAPS_API_KEY=
 ```
 
 ---
 
-## 🛠️ Running the Application
+## 🛠️ Development & Build
 
 ### Development
 ```bash
 npm run dev
 ```
-Starts the Express server on port `3000` with integrated Vite middleware and SQLite database auto-initialization.
+Starts the Vite local development server.
+
+### Code Validation & Linting
+```bash
+npm run lint
+```
+Runs TypeScript validation and checks for errors.
 
 ### Production Build
 ```bash
 npm run build
-npm start
 ```
-Compiles client assets via Vite and bundles `server.ts` into a CommonJS server in `dist/server.cjs`.
+Generates production static assets in the `dist/` directory ready for deployment.
