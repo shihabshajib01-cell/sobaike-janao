@@ -40,7 +40,11 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       return;
     }
 
-    setIsSubmitted(true);
+    setError(
+      language === 'bn'
+        ? 'তথ্য জমা দেওয়ার সেবা বর্তমানে সংযুক্ত নয়। অনুগ্রহ করে পরে আবার চেষ্টা করুন।'
+        : 'Information submission is temporarily unavailable. Please try again later.'
+    );
   };
 
   const handleResetAndClose = () => {
@@ -103,7 +107,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               </h4>
               <p className="text-[16px] leading-[24px] text-secondary max-w-sm mx-auto">
                 {language === 'bn'
-                  ? 'আপনার প্রদত্ত বিবরণটি প্রোটোটাইপে জমা হয়েছে এবং মডারেশন টিম পর্যালোচনা সম্পন্ন করে মূল প্রতিবেদনে সহায়ক আপডেট হিসেবে সংযুক্ত করবে।'
+                  ? 'আপনার প্রদত্ত বিবরণটি জমা হয়েছে এবং মডারেশন টিম পর্যালোচনা সম্পন্ন করে মূল প্রতিবেদনে সহায়ক আপডেট হিসেবে সংযুক্ত করবে।'
                   : 'Your information has been submitted for moderation review.'}
               </p>
             </div>

@@ -23,7 +23,6 @@ import { useApp } from '../context/AppContext';
 import { CitizenActionModal } from '../components/report-detail/CitizenActionModal';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
 import { PublicReportService } from '../services/publicReportService';
-import { apiClient } from '../services/apiClient';
 import { ReportMediaGrid } from '../components/media/ReportMediaGrid';
 import { ReportItem } from '../types/report';
 import { ReportDetailSkeleton } from '../components/ui/LoadingSkeleton';

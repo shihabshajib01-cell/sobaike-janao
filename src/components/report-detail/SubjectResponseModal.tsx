@@ -59,7 +59,11 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       });
       setIsSubmitted(true);
     } catch (err: any) {
-      setError(err?.message || (language === 'bn' ? 'প্রতিউত্তর জমা দেওয়া ব্যর্থ হয়েছে।' : 'Failed to submit response.'));
+      const errorMessage =
+        language === 'bn'
+          ? err?.messageBn || err?.message || 'প্রতিউত্তর জমা দেওয়ার সেবা বর্তমানে উপলভ্য নয়।'
+          : err?.message || 'Response submission is temporarily unavailable.';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
