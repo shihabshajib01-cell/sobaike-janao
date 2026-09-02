@@ -14,7 +14,12 @@ export interface ModalProps {
   showHeader?: boolean;
   keepMounted?: boolean;
   containerClassName?: string;
+  zIndexClass?: string;
 }
+
+// Global reference counter for nested modal scroll locks
+let openModalsCount = 0;
+let savedBodyOverflow: string | null = null;
 
 export const Modal: React.FC<ModalProps> = ({
   id = 'app-modal',
@@ -28,6 +33,7 @@ export const Modal: React.FC<ModalProps> = ({
   showHeader = true,
   keepMounted = false,
   containerClassName = '',
+  zIndexClass = 'z-50',
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
@@ -38,8 +44,12 @@ export const Modal: React.FC<ModalProps> = ({
     if (!isOpen) return;
 
     previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+
+    if (openModalsCount === 0) {
+      savedBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
+    openModalsCount++;
 
     // Focus modal or first focusable element asynchronously without triggering synchronous loop
     const timeoutId = setTimeout(() => {
@@ -90,7 +100,11 @@ export const Modal: React.FC<ModalProps> = ({
 
     return () => {
       clearTimeout(timeoutId);
-      document.body.style.overflow = originalOverflow;
+      openModalsCount = Math.max(0, openModalsCount - 1);
+      if (openModalsCount === 0) {
+        document.body.style.overflow = savedBodyOverflow || '';
+        savedBodyOverflow = null;
+      }
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
@@ -98,11 +112,11 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen && !keepMounted) return null;
 
   const maxWidthClasses: Record<string, string> = {
-    sm: 'max-w-sm',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-3xl',
-    '2xl': 'max-w-5xl',
+    sm: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-sm max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    md: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-lg max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    lg: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-2xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    xl: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-3xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    '2xl': 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-5xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
     composer: 'w-full max-w-full h-[100dvh] max-h-[100dvh] rounded-none md:w-[calc(100vw-48px)] md:max-w-[1040px] md:h-auto md:max-h-[90vh] md:rounded-3xl',
     full: 'w-full max-w-full h-full',
   };
@@ -115,7 +129,7 @@ export const Modal: React.FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? `${id}-title` : undefined}
-      className={`fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 overflow-y-auto transition-opacity duration-200 ${
+      className={`fixed inset-0 ${zIndexClass} flex items-center justify-center p-0 md:p-6 overflow-y-auto transition-opacity duration-200 ${
         isHidden ? 'opacity-0 pointer-events-none invisible' : 'opacity-100 visible'
       }`}
     >

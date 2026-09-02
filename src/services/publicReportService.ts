@@ -6,6 +6,7 @@ import {
   SupabasePublicReportRPC,
 } from './supabasePublicReportMapper';
 import { PublicEvidenceService } from './publicEvidenceService';
+import { SEED_SUBMITTED_REPORTS } from '../data/seedSubmissions';
 
 export interface PublicReportFilters {
   segment?: SectionKey | 'all';
@@ -16,29 +17,93 @@ export interface PublicReportFilters {
   limit?: number;
 }
 
+const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportItem => {
+  const pv = seed.publicVersion;
+  return {
+    id: seed.id,
+    segment: seed.segment,
+    subcategoryId: seed.subcategoryId,
+    subcategoryBn: seed.subcategoryBn || seed.subcategoryId,
+    subcategoryEn: seed.subcategoryEn || seed.subcategoryId,
+    titleBn: pv?.titleBn || seed.title || seed.id,
+    titleEn: pv?.titleEn || seed.title || seed.id,
+    shortDescriptionBn: pv?.shortDescriptionBn || seed.description || '',
+    shortDescriptionEn: pv?.shortDescriptionEn || seed.description || '',
+    fullDescriptionBn: pv?.fullDescriptionBn || seed.description || '',
+    fullDescriptionEn: pv?.fullDescriptionEn || seed.description || '',
+    reportedSubject: pv?.reportedSubjectBn || seed.reportedSubject || undefined,
+    reportedSubjectBn: pv?.reportedSubjectBn || seed.reportedSubject || undefined,
+    reportedSubjectEn: pv?.reportedSubjectEn || seed.reportedSubject || undefined,
+    subjectType:
+      seed.subjectType === 'business' || seed.subjectType === 'group'
+        ? seed.subjectType
+        : 'individual',
+    organization: pv?.organization || seed.organization || undefined,
+    locationBn: pv?.locationBn || seed.location?.formattedAddress || 'অবস্থান গোপন',
+    locationEn: pv?.locationEn || seed.location?.formattedAddress || 'Location withheld',
+    districtBn: pv?.districtBn || seed.location?.district || '',
+    districtEn: pv?.districtEn || seed.location?.district || '',
+    areaBn: pv?.areaBn || seed.location?.area || '',
+    areaEn: pv?.areaEn || seed.location?.area || '',
+    incidentDateBn: pv?.incidentDateBn || seed.incidentDate || '',
+    incidentDateEn: pv?.incidentDateEn || seed.incidentDate || '',
+    publishedDateBn: '২৩ ফেব্রুয়ারি ২০২৬',
+    publishedDateEn: '23 Feb 2026',
+    publishedAt: seed.createdAt,
+    evidenceSummaryBn: pv?.evidenceSummaryBn || [],
+    evidenceSummaryEn: pv?.evidenceSummaryEn || [],
+    status: 'published',
+    statusBn: 'প্রকাশিত',
+    statusEn: 'Published',
+    isHighUrgency: Boolean(pv?.isHighUrgency),
+    coordinates:
+      seed.location?.lat && seed.location?.lng
+        ? { lat: seed.location.lat, lng: seed.location.lng }
+        : undefined,
+    images: [],
+    media: {
+      type: 'none',
+      images: [],
+    },
+    trustIndicators: {
+      evidenceSubmitted: Boolean(seed.hasSupportingInfo),
+      multipleReports: false,
+      updateAvailable: false,
+      responseReceived: false,
+      evidenceCount: seed.evidenceTypes?.length || 0,
+      hasOfficialResponse: false,
+      hasRelatedReports: false,
+    },
+    relatedReportIds: [],
+    updates: [],
+  };
+};
+
 export const PublicReportService = {
   /**
    * Fetch all published reports matching optional criteria.
-   * Queries the sanitized RPC `get_public_published_reports`.
+   * Queries the sanitized RPC `get_public_published_reports`, falling back to seed reports if offline.
    */
   async getAll(filters?: PublicReportFilters): Promise<ReportItem[]> {
-    if (!isSupabaseConfigured() || !supabase) {
-      return [];
+    let list: ReportItem[] = [];
+
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const { data, error } = await supabase.rpc('get_public_published_reports');
+        if (error) {
+          console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
+        } else if (data && Array.isArray(data) && data.length > 0) {
+          list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
+        }
+      } catch (err) {
+        console.warn('[PublicReportService.getAll] Supabase fetch exception:', err);
+      }
     }
 
-    const { data, error } = await supabase.rpc('get_public_published_reports');
-    if (error) {
-      console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
-      throw error;
+    // If Supabase returned empty or is not configured, fall back to seed reports
+    if (list.length === 0) {
+      list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
     }
-
-    if (!data || !Array.isArray(data)) {
-      return [];
-    }
-
-    let list: ReportItem[] = data.map((raw: SupabasePublicReportRPC) =>
-      mapSupabasePublicReportToItem(raw)
-    );
 
     if (filters?.segment && filters.segment !== 'all') {
       list = list.filter((r) => r.segment === filters.segment);
@@ -85,29 +150,31 @@ export const PublicReportService = {
     }
 
     // Batch enrich published reports with evidence images (single RPC call for all visible items)
-    const reportIds = list.map((r) => r.id);
-    if (reportIds.length > 0) {
-      try {
-        const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(reportIds);
-        for (const report of list) {
-          const reportImages =
-            evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-          report.images = reportImages;
-          report.media = {
-            type:
-              reportImages.length === 0
-                ? 'none'
-                : reportImages.length === 1
-                ? 'single'
-                : 'gallery',
-            images: reportImages,
-          };
-          if (reportImages.length > 0) {
-            report.trustIndicators.evidenceCount = reportImages.length;
+    if (isSupabaseConfigured() && supabase) {
+      const reportIds = list.map((r) => r.id);
+      if (reportIds.length > 0) {
+        try {
+          const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(reportIds);
+          for (const report of list) {
+            const reportImages =
+              evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+            report.images = reportImages;
+            report.media = {
+              type:
+                reportImages.length === 0
+                  ? 'none'
+                  : reportImages.length === 1
+                  ? 'single'
+                  : 'gallery',
+              images: reportImages,
+            };
+            if (reportImages.length > 0) {
+              report.trustIndicators.evidenceCount = reportImages.length;
+            }
           }
+        } catch (evErr) {
+          console.warn('[PublicReportService.getAll] Evidence enrichment error:', evErr);
         }
-      } catch (evErr) {
-        console.warn('[PublicReportService.getAll] Evidence enrichment error:', evErr);
       }
     }
 
@@ -121,50 +188,58 @@ export const PublicReportService = {
   async getById(id: string): Promise<{ report: ReportItem; responses: any[] } | null> {
     const cleanId = id.trim().toUpperCase();
 
-    if (!isSupabaseConfigured() || !supabase) {
-      return null;
-    }
+    if (isSupabaseConfigured() && supabase) {
+      try {
+        const { data, error } = await supabase.rpc('get_public_published_report', {
+          p_report_id: cleanId,
+        });
 
-    const { data, error } = await supabase.rpc('get_public_published_report', {
-      p_report_id: cleanId,
-    });
+        if (error) {
+          console.warn('[PublicReportService.getById] Supabase RPC error:', error);
+        } else if (data) {
+          const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
 
-    if (error) {
-      console.warn('[PublicReportService.getById] Supabase RPC error:', error);
-      throw error;
-    }
+          try {
+            const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
+            const reportImages =
+              evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+            report.images = reportImages;
+            report.media = {
+              type:
+                reportImages.length === 0
+                  ? 'none'
+                  : reportImages.length === 1
+                  ? 'single'
+                  : 'gallery',
+              images: reportImages,
+            };
+            if (reportImages.length > 0) {
+              report.trustIndicators.evidenceCount = reportImages.length;
+            }
+          } catch (evErr) {
+            console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
+          }
 
-    if (!data) {
-      return null;
-    }
-
-    const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
-
-    try {
-      const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
-      const reportImages =
-        evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-      report.images = reportImages;
-      report.media = {
-        type:
-          reportImages.length === 0
-            ? 'none'
-            : reportImages.length === 1
-            ? 'single'
-            : 'gallery',
-        images: reportImages,
-      };
-      if (reportImages.length > 0) {
-        report.trustIndicators.evidenceCount = reportImages.length;
+          return {
+            report,
+            responses: [],
+          };
+        }
+      } catch (err) {
+        console.warn('[PublicReportService.getById] Supabase fetch exception:', err);
       }
-    } catch (evErr) {
-      console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
     }
 
-    return {
-      report,
-      responses: [],
-    };
+    // Fallback: search in seed reports
+    const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
+    if (seed) {
+      return {
+        report: mapSeedToReportItem(seed),
+        responses: [],
+      };
+    }
+
+    return null;
   },
 
   /**

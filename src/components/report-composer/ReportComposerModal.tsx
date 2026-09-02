@@ -83,6 +83,19 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Active retry submission credentials (reused across retries until success, reset, or change)
   const retryCredentialsRef = useRef<{ clientSubmissionId: string } | null>(null);
 
+  // Derived state for rape publishing consent requirements
+  const requiresRapeConsent = formData.subcategoryId === 'rape-sexual-violence';
+  const rapeConsentMissing = requiresRapeConsent && !rapePublishingConsentAccepted;
+
+  // Defensive guard: if formData ever targets Step 3/4 with rape subcategory without consent, open disclaimer and hold step
+  useEffect(() => {
+    if (isOpen && formData.currentStep >= 3 && rapeConsentMissing && !isRapeConsentModalOpen) {
+      pendingTargetStepRef.current = { step: formData.currentStep };
+      setRapeConsentCheckbox(false);
+      setIsRapeConsentModalOpen(true);
+    }
+  }, [isOpen, formData.currentStep, rapeConsentMissing, isRapeConsentModalOpen]);
+
   // Check for saved draft whenever the modal is opened
   useEffect(() => {
     if (isOpen) {
@@ -580,6 +593,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const canContinueStep1 = Boolean(formData.segment);
   const canContinueStep2 = Boolean(formData.subcategoryId);
 
+  // Render-level defense guard: ensure Step 3/4 is NEVER rendered if rape consent is missing
+  const effectiveCurrentStep =
+    rapeConsentMissing && formData.currentStep >= 3 ? 2 : formData.currentStep;
+
   return (
     <>
       <Modal
@@ -721,7 +738,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             {/* Step Header */}
             {!submissionResult && (
               <ReportComposerHeader
-                currentStep={formData.currentStep}
+                currentStep={effectiveCurrentStep}
                 totalSteps={4}
                 segment={formData.segment}
                 language={language}
@@ -763,7 +780,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 />
               ) : (
                 <>
-                  {formData.currentStep === 1 && (
+                  {effectiveCurrentStep === 1 && (
                     <Step1ServiceSelect
                       selectedSegment={formData.segment}
                       onSelectSegment={handleSelectService}
@@ -771,7 +788,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     />
                   )}
 
-                  {formData.currentStep === 2 && formData.segment && (
+                  {effectiveCurrentStep === 2 && formData.segment && (
                     <Step2ComplaintTypeAccordion
                       segment={formData.segment}
                       selectedSubcategoryId={formData.subcategoryId}
@@ -780,7 +797,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     />
                   )}
 
-                  {formData.currentStep === 3 && formData.segment && (
+                  {effectiveCurrentStep === 3 && formData.segment && (
                     <Step3ComplaintDetails
                       ref={step3Ref}
                       segment={formData.segment}
@@ -794,7 +811,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     />
                   )}
 
-                  {formData.currentStep === 4 && formData.segment && (
+                  {effectiveCurrentStep === 4 && formData.segment && (
                     <Step4Review
                       segment={formData.segment}
                       formData={formData}
@@ -812,16 +829,16 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             {/* Centralized Sticky Footer */}
             {!submissionResult && (
               <ReportComposerFooter
-                currentStep={formData.currentStep}
+                currentStep={effectiveCurrentStep}
                 language={language}
                 onClose={handleRequestClose}
                 onBack={handleFooterBack}
                 onNext={handleFooterNext}
                 onSubmit={handleSubmitReport}
                 canContinue={
-                  formData.currentStep === 1
+                  effectiveCurrentStep === 1
                     ? canContinueStep1
-                    : formData.currentStep === 2
+                    : effectiveCurrentStep === 2
                     ? canContinueStep2
                     : true
                 }
@@ -839,9 +856,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         isOpen={isRapeConsentModalOpen}
         onClose={handleCancelRapeConsent}
         maxWidth="md"
+        zIndexClass="z-[60]"
         showHeader={false}
       >
-        <div className="p-6 md:p-8 space-y-5 text-left">
+        <div className="p-5 sm:p-6 md:p-8 space-y-4 sm:space-y-5 text-left">
           <div className="flex items-start gap-3.5">
             <div className="w-10 h-10 rounded-2xl bg-accent-soft text-accent flex items-center justify-center shrink-0 border border-accent/20 mt-0.5">
               <Shield className="w-5 h-5" />
@@ -853,7 +871,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             </div>
           </div>
 
-          <div className="space-y-3 text-[13.5px] sm:text-[14px] leading-relaxed text-secondary bg-surface-subtle p-4 rounded-2xl border border-subtle">
+          <div className="space-y-3 text-[13.5px] sm:text-[14px] leading-relaxed text-secondary bg-surface-subtle p-3.5 sm:p-4 rounded-2xl border border-subtle max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
             <p>
               {language === 'bn'
                 ? 'এই প্ল্যাটফর্ম কোনো আইনগত বা বিচারিক সেবা নয়। এখানে প্রতিবেদন প্রকাশের উদ্দেশ্য জনস্বার্থে ঘটনা তুলে ধরা—কারও অপরাধ প্রমাণ করা নয়।'
@@ -869,7 +887,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           <div className="pt-1">
             <label
               htmlFor="rape-consent-checkbox"
-              className="flex items-start gap-3 cursor-pointer select-none group min-h-[44px]"
+              className="flex items-start gap-3 cursor-pointer select-none group min-h-[44px] py-1"
             >
               <input
                 id="rape-consent-checkbox"
@@ -917,6 +935,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         isOpen={isConfirmCloseOpen}
         onClose={handleContinueEditing}
         maxWidth="md"
+        zIndexClass="z-[60]"
         showHeader={false}
       >
         <div className="p-6 md:p-8 space-y-5 text-left">
