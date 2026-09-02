@@ -38,7 +38,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
       const data = await PublicReportService.getByLocation(locationId);
       setReports(data);
     } catch (err) {
-      console.error('[LocationPage load error]', err);
+      console.warn('[LocationPage load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);

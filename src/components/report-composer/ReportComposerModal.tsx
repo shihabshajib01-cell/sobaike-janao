@@ -521,13 +521,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         );
       }
     } catch (err: any) {
-      console.error('Submission failed:', err);
-      setSubmitError(
-        err.message ||
-          (language === 'bn'
-            ? 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।'
-            : 'Failed to submit complaint. Please check your connection and try again.')
-      );
+      console.warn('Submission failed:', err);
+      const displayMsg =
+        language === 'bn'
+          ? err?.messageBn || err?.message || 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।'
+          : err?.message || 'Failed to submit complaint. Please check your connection and try again.';
+      setSubmitError(displayMsg);
     } finally {
       setIsSubmitting(false);
     }

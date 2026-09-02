@@ -23,12 +23,12 @@ export const PublicReportService = {
    */
   async getAll(filters?: PublicReportFilters): Promise<ReportItem[]> {
     if (!isSupabaseConfigured() || !supabase) {
-      throw new Error('Supabase client is not configured or available');
+      return [];
     }
 
     const { data, error } = await supabase.rpc('get_public_published_reports');
     if (error) {
-      console.error('[PublicReportService.getAll] Supabase RPC error:', error);
+      console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
       throw error;
     }
 
@@ -107,7 +107,7 @@ export const PublicReportService = {
           }
         }
       } catch (evErr) {
-        console.error('[PublicReportService.getAll] Evidence enrichment error:', evErr);
+        console.warn('[PublicReportService.getAll] Evidence enrichment error:', evErr);
       }
     }
 
@@ -122,7 +122,7 @@ export const PublicReportService = {
     const cleanId = id.trim().toUpperCase();
 
     if (!isSupabaseConfigured() || !supabase) {
-      throw new Error('Supabase client is not configured or available');
+      return null;
     }
 
     const { data, error } = await supabase.rpc('get_public_published_report', {
@@ -130,7 +130,7 @@ export const PublicReportService = {
     });
 
     if (error) {
-      console.error('[PublicReportService.getById] Supabase RPC error:', error);
+      console.warn('[PublicReportService.getById] Supabase RPC error:', error);
       throw error;
     }
 
@@ -158,7 +158,7 @@ export const PublicReportService = {
         report.trustIndicators.evidenceCount = reportImages.length;
       }
     } catch (evErr) {
-      console.error('[PublicReportService.getById] Evidence enrichment error:', evErr);
+      console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
     }
 
     return {

@@ -30,7 +30,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       const data = await PublicReportService.getBySubject(decodedSubject);
       setReports(data);
     } catch (err) {
-      console.error('[SubjectPage load error]', err);
+      console.warn('[SubjectPage load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);

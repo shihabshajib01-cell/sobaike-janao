@@ -31,7 +31,7 @@ export const RickshawPage: React.FC = () => {
       const data = await PublicReportService.getBySegment('rickshaw');
       setReports(data);
     } catch (err) {
-      console.error('[RickshawPage load error]', err);
+      console.warn('[RickshawPage load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);

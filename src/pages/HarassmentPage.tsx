@@ -34,7 +34,7 @@ export const HarassmentPage: React.FC = () => {
       const data = await PublicReportService.getBySegment('harassment');
       setReports(data);
     } catch (err) {
-      console.error('[HarassmentPage load error]', err);
+      console.warn('[HarassmentPage load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);

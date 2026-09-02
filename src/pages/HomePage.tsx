@@ -37,7 +37,7 @@ export const HomePage: React.FC = () => {
       const reports = await PublicReportService.getAll();
       setAllReports(reports);
     } catch (err) {
-      console.error('[HomePage data load error]', err);
+      console.warn('[HomePage data load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);

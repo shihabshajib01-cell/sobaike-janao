@@ -25,7 +25,7 @@ export const SearchPage: React.FC = () => {
       const data = await PublicReportService.getAll();
       setAllReports(data);
     } catch (err) {
-      console.error('[SearchPage load error]', err);
+      console.warn('[SearchPage load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);

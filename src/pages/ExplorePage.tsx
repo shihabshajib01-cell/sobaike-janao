@@ -35,7 +35,7 @@ export const ExplorePage: React.FC = () => {
       const data = await PublicReportService.getAll();
       setAllReports(data);
     } catch (err) {
-      console.error('[ExplorePage load error]', err);
+      console.warn('[ExplorePage load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);

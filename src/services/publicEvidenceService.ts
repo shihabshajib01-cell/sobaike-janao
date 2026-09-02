@@ -50,7 +50,7 @@ export const PublicEvidenceService = {
       });
 
       if (error) {
-        console.error('[PublicEvidenceService] RPC error fetching published evidence:', error);
+        console.warn('[PublicEvidenceService] RPC error fetching published evidence:', error);
         return result;
       }
 
@@ -93,7 +93,7 @@ export const PublicEvidenceService = {
             .createSignedUrls(pathsToSign, SIGNED_URL_EXPIRY_SECONDS);
 
           if (signError) {
-            console.error('[PublicEvidenceService] Storage signed URL batch error:', signError);
+            console.warn('[PublicEvidenceService] Storage signed URL batch error:', signError);
           } else if (signData && Array.isArray(signData)) {
             for (const item of signData) {
               if (item && item.path && item.signedUrl && !item.error) {
@@ -106,7 +106,7 @@ export const PublicEvidenceService = {
             }
           }
         } catch (storageErr) {
-          console.error('[PublicEvidenceService] Exception generating signed URLs:', storageErr);
+          console.warn('[PublicEvidenceService] Exception generating signed URLs:', storageErr);
         }
       }
 
@@ -145,7 +145,7 @@ export const PublicEvidenceService = {
 
       return result;
     } catch (err) {
-      console.error('[PublicEvidenceService] Unexpected error in getPublishedEvidenceForReports:', err);
+      console.warn('[PublicEvidenceService] Unexpected error in getPublishedEvidenceForReports:', err);
       return result;
     }
   },

@@ -34,7 +34,7 @@ export const ExtortionPage: React.FC = () => {
       const data = await PublicReportService.getBySegment('extortion');
       setReports(data);
     } catch (err) {
-      console.error('[ExtortionPage load error]', err);
+      console.warn('[ExtortionPage load error]', err);
       setFetchError('LOAD_ERROR');
     } finally {
       setIsLoading(false);
