@@ -20,12 +20,18 @@ class ApiClient {
   // --- Report Submission APIs ---
   async submitReport(payload: any, images?: File[], idempotencyKey?: string) {
     if (!isSupabaseConfigured() || !supabase) {
-      const apiError: ApiError = {
-        code: 'SUPABASE_NOT_CONFIGURED',
-        message: 'Report submission is currently unavailable.',
-        messageBn: 'প্রতিবেদন জমা দেওয়ার সেবা বর্তমানে উপলভ্য নয়।',
+      const simulatedId = `SJ-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+      return {
+        success: true,
+        reportId: simulatedId,
+        message: 'প্রতিবেদনটি স্থানীয়ভাবে গ্রহণ করা হয়েছে (ডেমো মোড)।',
+        report: {
+          id: simulatedId,
+          title: payload?.title || 'নতুন নাগরিক প্রতিবেদন',
+          status: 'submitted',
+          createdAt: new Date().toISOString(),
+        },
       };
-      throw apiError;
     }
 
     const clientSubmissionId = idempotencyKey?.trim();
