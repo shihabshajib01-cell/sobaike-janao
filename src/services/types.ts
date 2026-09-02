@@ -28,6 +28,14 @@ export interface ReportLocationData {
   placeId?: string;
 }
 
+export function isValidIncidentCoordinates(lat?: number | null, lng?: number | null): boolean {
+  if (typeof lat !== 'number' || typeof lng !== 'number') return false;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return false;
+  if (lat === 0 && lng === 0) return false;
+  return true;
+}
+
 export type ReportStatus =
   | 'submitted'
   | 'under_review'

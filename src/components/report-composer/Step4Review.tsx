@@ -257,7 +257,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           onEdit={() => onEditStep(3, 'location')}
           editLabel={editLabel}
         >
-          <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[14px] pt-1">
+          <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[14px] pt-1 space-y-1.5">
             <p className="font-semibold text-primary">
               {[
                 formData.location?.area,
@@ -269,11 +269,20 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 .join(', ') || (language === 'bn' ? 'অবস্থান নির্দিষ্ট নেই' : 'Unspecified location')}
             </p>
             {formData.location?.road && (
-              <p className="text-secondary text-[13px] mt-0.5">
-                {language === 'bn' ? 'রাস্তা: ' : 'Road: '}
-                {formData.location.road}
+              <p className="text-secondary text-[13px]">
+                {language === 'bn' ? 'রাস্তা / লেন: ' : 'Road / Lane: '}
+                <span className="text-primary font-medium">{formData.location.road}</span>
                 {formData.location.landmark ? ` (${formData.location.landmark})` : ''}
               </p>
+            )}
+            {formData.location?.lat !== undefined && formData.location?.lng !== undefined && (
+              <div className="flex items-center gap-1.5 text-[12px] text-accent font-medium pt-0.5">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                <span>
+                  {language === 'bn' ? 'ম্যাপ পিন: ' : 'Map Pin: '}
+                  {formData.location.lat.toFixed(5)}, {formData.location.lng.toFixed(5)}
+                </span>
+              </div>
             )}
           </div>
         </ReviewSection>

@@ -15,7 +15,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
-import { DraftReport, ReportLocationData, MentionedParty } from '../../services/types';
+import { DraftReport, ReportLocationData, MentionedParty, isValidIncidentCoordinates } from '../../services/types';
 import {
   SEGMENT_SUBCATEGORIES,
   INTIMATE_WHAT_HAPPENED_OPTIONS,
@@ -123,41 +123,83 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     };
 
     // Location Handlers
-    const handleLocationChange = (locUpdates: Partial<DraftReport['location']>) => {
-      onUpdateFormData({
-        location: {
-          formattedAddress: formData.location?.formattedAddress || '',
-          division: formData.location?.division || '',
-          district: formData.location?.district || '',
-          upazilaOrThana: formData.location?.upazilaOrThana || '',
-          area: formData.location?.area || '',
-          road: formData.location?.road || '',
-          landmark: formData.location?.landmark || '',
-          ...locUpdates,
-        },
-      });
+    const handleManualLocationChange = (locUpdates: Partial<ReportLocationData>) => {
+      // Check if user changed a geographic address field that invalidates the selected map point
+      const isGeographicFieldChanged =
+        ('division' in locUpdates && locUpdates.division !== formData.location?.division) ||
+        ('district' in locUpdates && locUpdates.district !== formData.location?.district) ||
+        ('area' in locUpdates && locUpdates.area !== formData.location?.area) ||
+        ('upazilaOrThana' in locUpdates && locUpdates.upazilaOrThana !== formData.location?.upazilaOrThana) ||
+        ('road' in locUpdates && locUpdates.road !== formData.location?.road) ||
+        ('landmark' in locUpdates && locUpdates.landmark !== formData.location?.landmark);
+
+      const hadValidCoords = isValidIncidentCoordinates(formData.location?.lat, formData.location?.lng);
+
+      const updatedLoc: ReportLocationData = {
+        formattedAddress: formData.location?.formattedAddress || '',
+        division: formData.location?.division || '',
+        district: formData.location?.district || '',
+        upazilaOrThana: formData.location?.upazilaOrThana || '',
+        area: formData.location?.area || '',
+        road: formData.location?.road || '',
+        landmark: formData.location?.landmark || '',
+        lat: isGeographicFieldChanged ? undefined : formData.location?.lat,
+        lng: isGeographicFieldChanged ? undefined : formData.location?.lng,
+        placeId: isGeographicFieldChanged ? undefined : formData.location?.placeId,
+        ...locUpdates,
+      };
+
+      // Construct formattedAddress from real entered values
+      const parts = [
+        updatedLoc.road,
+        updatedLoc.area,
+        updatedLoc.upazilaOrThana,
+        updatedLoc.district,
+        updatedLoc.division,
+      ].filter((s) => Boolean(s && s.trim()));
+      updatedLoc.formattedAddress = parts.join(', ');
+
+      onUpdateFormData({ location: updatedLoc });
+
+      if (locUpdates.division && errors.division) {
+        setErrors((prev) => ({ ...prev, division: '' }));
+      }
+      if (locUpdates.district && errors.district) {
+        setErrors((prev) => ({ ...prev, district: '' }));
+      }
+      if (isGeographicFieldChanged && hadValidCoords) {
+        setErrors((prev) => ({
+          ...prev,
+          coordinates:
+            language === 'bn'
+              ? 'ঠিকানা পরিবর্তনের কারণে ম্যাপে পুনরায় ঘটনাস্থল নির্বাচন করুন।'
+              : 'Address changed. Please re-select the incident location on the map.',
+        }));
+      }
+    };
+
+    const handleMapPointChange = (lat: number, lng: number) => {
+      const updatedLoc: ReportLocationData = {
+        formattedAddress: formData.location?.formattedAddress || '',
+        division: formData.location?.division || '',
+        district: formData.location?.district || '',
+        upazilaOrThana: formData.location?.upazilaOrThana || '',
+        area: formData.location?.area || '',
+        road: formData.location?.road || '',
+        landmark: formData.location?.landmark || '',
+        lat,
+        lng,
+      };
+
+      onUpdateFormData({ location: updatedLoc });
+
+      if (errors.coordinates) {
+        setErrors((prev) => ({ ...prev, coordinates: '' }));
+      }
     };
 
     const handleToggleDetailedLocation = (enabled: boolean) => {
-      if (!enabled) {
-        onUpdateFormData({
-          isDetailedLocation: false,
-          location: {
-            division: formData.location?.division || '',
-            district: formData.location?.district || '',
-            area: formData.location?.area || '',
-            formattedAddress: formData.location?.formattedAddress || '',
-            upazilaOrThana: '',
-            road: '',
-            landmark: '',
-            lat: undefined,
-            lng: undefined,
-            placeId: undefined,
-          },
-        });
-      } else {
-        onUpdateFormData({ isDetailedLocation: true });
-      }
+      onUpdateFormData({ isDetailedLocation: enabled });
     };
 
     // Privacy toggles (Harassment only)
@@ -273,6 +315,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
       }
 
+      if (!isValidIncidentCoordinates(formData.location?.lat, formData.location?.lng)) {
+        newErrors.coordinates =
+          language === 'bn'
+            ? 'এগিয়ে যাওয়ার আগে ম্যাপে ঘটনাস্থল নির্বাচন করুন।'
+            : 'Select the incident location on the map before continuing.';
+      }
+
       // Harassment Identity Validation
       if (showsIdentitySection) {
         if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
@@ -300,7 +349,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         if (newErrors.title || newErrors.description || newErrors.incidentDate) {
           const elem = document.getElementById('composer-section-narrative');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (newErrors.division || newErrors.district) {
+        } else if (newErrors.division || newErrors.district || newErrors.coordinates) {
           const elem = document.getElementById('composer-section-location');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else if (showsIdentitySection && (newErrors.adminContact || newErrors.adminName)) {
@@ -572,7 +621,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           collapsible={false}
           onToggle={() => {}}
           title={language === 'bn' ? '২. লোকেশন' : '2. Location'}
-          hasError={Boolean(errors.division || errors.district)}
+          hasError={Boolean(errors.division || errors.district || errors.coordinates)}
           icon={<MapPin className="w-5 h-5" />}
         >
           <div className="space-y-3.5 pt-1 text-left">
@@ -600,8 +649,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   value={formData.location?.division || ''}
                   onChange={(e) => {
                     const divVal = e.target.value;
-                    handleLocationChange({ division: divVal, district: '' });
-                    if (errors.division) setErrors((prev) => ({ ...prev, division: '' }));
+                    handleManualLocationChange({ division: divVal, district: '' });
                   }}
                   className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
                     errors.division ? 'border-red-500 bg-red-500/5' : 'border-subtle'
@@ -632,8 +680,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     id="complaint-district-select"
                     value={formData.location?.district || ''}
                     onChange={(e) => {
-                      handleLocationChange({ district: e.target.value });
-                      if (errors.district) setErrors((prev) => ({ ...prev, district: '' }));
+                      handleManualLocationChange({ district: e.target.value });
                     }}
                     className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
                       errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
@@ -652,8 +699,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     type="text"
                     value={formData.location?.district || ''}
                     onChange={(e) => {
-                      handleLocationChange({ district: e.target.value });
-                      if (errors.district) setErrors((prev) => ({ ...prev, district: '' }));
+                      handleManualLocationChange({ district: e.target.value });
                     }}
                     placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
                     className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
@@ -684,14 +730,34 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   id="complaint-area-input"
                   type="text"
                   value={formData.location?.area || ''}
-                  onChange={(e) => handleLocationChange({ area: e.target.value })}
+                  onChange={(e) => handleManualLocationChange({ area: e.target.value })}
                   placeholder={language === 'bn' ? 'যেমন: মিরপুর ১০, আগ্রাবাদ' : 'e.g. Mirpur 10, Agrabad'}
                   className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
                 />
               </div>
             </div>
 
-            {/* Detailed Location & Map Picker */}
+            {/* Map Coordinate Picker - ALWAYS VISIBLE */}
+            <div className="pt-2">
+              <GoogleMapPicker
+                location={
+                  formData.location || {
+                    division: '',
+                    district: '',
+                    area: '',
+                    formattedAddress: '',
+                    road: '',
+                    landmark: '',
+                    upazilaOrThana: '',
+                  }
+                }
+                onMapPointChange={handleMapPointChange}
+                language={language}
+                error={errors.coordinates}
+              />
+            </div>
+
+            {/* Optional Detailed Location Toggle */}
             <div className="pt-1">
               <button
                 type="button"
@@ -706,75 +772,64 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <span>
                   {formData.isDetailedLocation
                     ? language === 'bn'
-                      ? 'ম্যাপ ও বিশদ ঠিকানা লুকান'
-                      : 'Hide detailed location & map'
+                      ? 'অতিরিক্ত ঠিকানার ঘরগুলো লুকান'
+                      : 'Hide additional address fields'
                     : language === 'bn'
-                    ? '+ বিস্তারিত ঠিকানা যোগ করুন'
-                    : '+ Add detailed location'}
+                    ? '+ বিস্তারিত ঠিকানা যোগ করুন (থানা, রাস্তা, ল্যান্ডমার্ক)'
+                    : '+ Add detailed address (Thana, Road, Landmark)'}
                 </span>
               </button>
 
               {formData.isDetailedLocation && (
-                <div className="space-y-3.5 pt-2.5 border-t border-subtle/60 mt-1.5">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label
-                        htmlFor="complaint-thana-input"
-                        className="block text-[13px] font-semibold text-secondary mb-1"
-                      >
-                        {language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
-                      </label>
-                      <input
-                        id="complaint-thana-input"
-                        type="text"
-                        value={formData.location?.upazilaOrThana || ''}
-                        onChange={(e) => handleLocationChange({ upazilaOrThana: e.target.value })}
-                        placeholder={language === 'bn' ? 'যেমন: মিরপুর মডেল' : 'e.g. Mirpur Model'}
-                        className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="complaint-road-input"
-                        className="block text-[13px] font-semibold text-secondary mb-1"
-                      >
-                        {language === 'bn' ? 'রাস্তা / লেন' : 'Road / Lane'}
-                      </label>
-                      <input
-                        id="complaint-road-input"
-                        type="text"
-                        value={formData.location?.road || ''}
-                        onChange={(e) => handleLocationChange({ road: e.target.value })}
-                        placeholder={language === 'bn' ? 'যেমন: রোড ৪, ব্লক বি' : 'e.g. Road 4, Block B'}
-                        className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="complaint-landmark-input"
-                        className="block text-[13px] font-semibold text-secondary mb-1"
-                      >
-                        {language === 'bn' ? 'নিকটবর্তী ল্যান্ডমার্ক' : 'Nearby Landmark'}
-                      </label>
-                      <input
-                        id="complaint-landmark-input"
-                        type="text"
-                        value={formData.location?.landmark || ''}
-                        onChange={(e) => handleLocationChange({ landmark: e.target.value })}
-                        placeholder={language === 'bn' ? 'যেমন: মসজিদের পিছনে' : 'e.g. Behind mosque'}
-                        className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
-                      />
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2.5 border-t border-subtle/60 mt-1.5">
+                  <div>
+                    <label
+                      htmlFor="complaint-thana-input"
+                      className="block text-[13px] font-semibold text-secondary mb-1"
+                    >
+                      {language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
+                    </label>
+                    <input
+                      id="complaint-thana-input"
+                      type="text"
+                      value={formData.location?.upazilaOrThana || ''}
+                      onChange={(e) => handleManualLocationChange({ upazilaOrThana: e.target.value })}
+                      placeholder={language === 'bn' ? 'যেমন: মিরপুর মডেল' : 'e.g. Mirpur Model'}
+                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                    />
                   </div>
 
-                  {/* Google Map Coordinate Picker */}
-                  <div className="pt-1">
-                    <GoogleMapPicker
-                      location={formData.location || { division: '', district: '', area: '', formattedAddress: '' }}
-                      onChange={(loc: ReportLocationData) => handleLocationChange(loc)}
-                      language={language}
+                  <div>
+                    <label
+                      htmlFor="complaint-road-input"
+                      className="block text-[13px] font-semibold text-secondary mb-1"
+                    >
+                      {language === 'bn' ? 'রাস্তা / লেন' : 'Road / Lane'}
+                    </label>
+                    <input
+                      id="complaint-road-input"
+                      type="text"
+                      value={formData.location?.road || ''}
+                      onChange={(e) => handleManualLocationChange({ road: e.target.value })}
+                      placeholder={language === 'bn' ? 'যেমন: রোড ৪, ব্লক বি' : 'e.g. Road 4, Block B'}
+                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="complaint-landmark-input"
+                      className="block text-[13px] font-semibold text-secondary mb-1"
+                    >
+                      {language === 'bn' ? 'নিকটবর্তী ল্যান্ডমার্ক' : 'Nearby Landmark'}
+                    </label>
+                    <input
+                      id="complaint-landmark-input"
+                      type="text"
+                      value={formData.location?.landmark || ''}
+                      onChange={(e) => handleManualLocationChange({ landmark: e.target.value })}
+                      placeholder={language === 'bn' ? 'যেমন: মসজিদের পিছনে' : 'e.g. Behind mosque'}
+                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
                     />
                   </div>
                 </div>
