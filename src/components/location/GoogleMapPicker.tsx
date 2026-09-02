@@ -48,6 +48,12 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
     [location, onMapPointChange, onChange]
   );
 
+  // Keep ref to latest point selection handler to prevent stale closures in Leaflet event listeners
+  const latestSelectPointRef = useRef(handleSelectPoint);
+  useEffect(() => {
+    latestSelectPointRef.current = handleSelectPoint;
+  }, [handleSelectPoint]);
+
   // Initialize Leaflet Map
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -108,7 +114,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
 
     // Map click event to select incident point
     map.on('click', (e: L.LeafletMouseEvent) => {
-      handleSelectPoint(e.latlng.lat, e.latlng.lng);
+      latestSelectPointRef.current(e.latlng.lat, e.latlng.lng);
     });
 
     mapInstanceRef.current = map;
@@ -240,7 +246,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
   const handleSetPointAtCenter = () => {
     if (!mapInstanceRef.current) return;
     const center = mapInstanceRef.current.getCenter();
-    handleSelectPoint(center.lat, center.lng);
+    latestSelectPointRef.current(center.lat, center.lng);
   };
 
   return (
