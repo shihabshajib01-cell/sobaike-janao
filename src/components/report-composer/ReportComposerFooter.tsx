@@ -13,7 +13,6 @@ export interface ReportComposerFooterProps {
   canContinue: boolean;
   canSubmit?: boolean;
   isSubmitting?: boolean;
-  submittingText?: string;
 }
 
 export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
@@ -26,7 +25,6 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   canContinue,
   canSubmit = true,
   isSubmitting = false,
-  submittingText,
 }) => {
 
   return (
@@ -122,8 +120,9 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           className="min-h-[44px] text-[16px] px-6"
         >
           {isSubmitting
-            ? submittingText ||
-              (language === 'bn' ? 'প্রতিবেদন জমা হচ্ছে...' : 'Submitting...')
+            ? language === 'bn'
+              ? 'প্রতিবেদন জমা হচ্ছে...'
+              : 'Submitting...'
             : language === 'bn'
             ? 'প্রতিবেদন জমা দিন'
             : 'Submit Complaint'}

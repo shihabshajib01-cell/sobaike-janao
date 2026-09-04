@@ -74,7 +74,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isLocationError, setIsLocationError] = useState(false);
-  const [submittingStage, setSubmittingStage] = useState<'verifying_location' | 'submitting' | null>(null);
   const [submissionResult, setSubmissionResult] = useState<{
     reportId: string;
   } | null>(null);
@@ -182,7 +181,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setRapeConsentCheckbox(false);
       setSubmitError(null);
       setIsLocationError(false);
-      setSubmittingStage(null);
 
       setIsRestoringEvidence(true);
       let restoredImages: AttachedImagePreview[] = [];
@@ -266,7 +264,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     pendingTargetStepRef.current = null;
     setSubmitError(null);
     setIsLocationError(false);
-    setSubmittingStage(null);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -294,7 +291,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     pendingTargetStepRef.current = null;
     setSubmitError(null);
     setIsLocationError(false);
-    setSubmittingStage(null);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -728,7 +724,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setIsSubmitting(true);
     setSubmitError(null);
     setIsLocationError(false);
-    setSubmittingStage('verifying_location');
 
     try {
       // Step 0: Capture required reporter device GPS location immediately before submission (FAIL CLOSED)
@@ -745,11 +740,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setIsLocationError(true);
         setSubmitError(errorMsg);
         setIsSubmitting(false);
-        setSubmittingStage(null);
         return;
       }
-
-      setSubmittingStage('submitting');
 
       const loc = formData.location || {
         division: '',
@@ -955,7 +947,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setSubmitError(displayMsg);
     } finally {
       setIsSubmitting(false);
-      setSubmittingStage(null);
     }
 
   }, [formData, pendingImages, language, rapePublishingConsentAccepted]);
@@ -1395,13 +1386,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   )
                 }
                 isSubmitting={isSubmitting}
-                submittingText={
-                  submittingStage === 'verifying_location'
-                    ? language === 'bn'
-                      ? 'ডিভাইসের অবস্থান যাচাই হচ্ছে...'
-                      : 'Verifying device location...'
-                    : undefined
-                }
               />
 
             )}
