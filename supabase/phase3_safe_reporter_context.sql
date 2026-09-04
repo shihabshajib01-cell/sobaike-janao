@@ -1,19 +1,49 @@
 -- =============================================================================
--- Migration: Phase 3 - Link Safe Reporter Context to Each Complaint
--- Description:
---   1. Creates private `public.complaint_submission_contexts` table to securely
---      store reporter device submission context (GPS, visitor/session IDs, device info).
---   2. Enforces strict Row Level Security (RLS) so reporter context is NEVER
---      accessible by public/anon/authenticated users.
---   3. Updates `submit_public_complaint` RPC with server-side fail-closed validation:
---      - Validates reporter device coordinates (numeric, not 0,0, lat -90..90, lng -180..180, accuracy > 0)
---      - Validates visitor_id and session_id
---      - Atomically links reporter context record to the complaint
---      - Preserves idempotency on retry with client_submission_id
---      - Never compares reporter location with incident location
+-- AUTHORITATIVE MIGRATION: Phase 3 - Link Safe Reporter Context to Each Complaint
+-- File: supabase/phase3_safe_reporter_context.sql
+-- 
+-- NOTICE:
+-- This is the FINAL and AUTHORITATIVE public complaint submission migration.
+-- It supersedes and replaces:
+--   - supabase/phase2_public_submission.sql (ARCHIVED)
+--   - supabase/remove_public_tracking.sql (ARCHIVED)
+-- Older migrations must NOT be rerun after this migration.
+--
+-- Requirements Enforced:
+--   1. Private `public.complaint_submission_contexts` table stores reporter GPS,
+--      visitor/session IDs, and device info.
+--   2. Strict Row Level Security (RLS) ensures reporter context is NEVER accessible
+--      by public, anon, or authenticated users (service_role only).
+--   3. Authoritative 3-argument signature:
+--        submit_public_complaint(jsonb, text, jsonb)
+--      All obsolete 2-argument and PIN signatures are permanently dropped.
+--   4. Reporter device location is mandatory and validated server-side.
+--   5. Reporter device location is strictly private and NEVER exposed in public feeds/RPCs.
+--   6. Admin contact payload mismatch resolved: reads adminContact.name,
+--      adminContact.contact, and adminContact.consentPublic safely.
+--   7. Idempotency on retry via client_submission_id remains safe and duplicate-free.
+--   8. Anonymous complaint submission, evidence flow, and moderation remain intact.
 -- =============================================================================
 
--- Step 1: Create private complaint_submission_contexts table
+-- Step 1: Schema alignment on public.complaints
+ALTER TABLE public.complaints 
+  ALTER COLUMN pin_hash DROP NOT NULL;
+
+ALTER TABLE public.complaints
+  ADD COLUMN IF NOT EXISTS relationship_context text,
+  ADD COLUMN IF NOT EXISTS has_supporting_info boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS place_id text,
+  ADD COLUMN IF NOT EXISTS client_submission_id text,
+  ADD COLUMN IF NOT EXISTS reporter_name text,
+  ADD COLUMN IF NOT EXISTS reporter_contact text,
+  ADD COLUMN IF NOT EXISTS confirm_public_identity boolean DEFAULT false;
+
+-- Ensure idempotency index exists
+CREATE UNIQUE INDEX IF NOT EXISTS complaints_client_submission_id_idx
+  ON public.complaints (client_submission_id)
+  WHERE client_submission_id IS NOT NULL;
+
+-- Step 2: Create private complaint_submission_contexts table
 CREATE TABLE IF NOT EXISTS public.complaint_submission_contexts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   complaint_id text NOT NULL REFERENCES public.complaints(id) ON DELETE CASCADE,
@@ -52,7 +82,7 @@ ALTER TABLE public.complaint_submission_contexts
   ADD CONSTRAINT chk_reporter_not_zero_zero CHECK (NOT (reporter_latitude = 0.0 AND reporter_longitude = 0.0)),
   ADD CONSTRAINT chk_reporter_accuracy_positive CHECK (accuracy_meters > 0.0);
 
--- Indexes for future admin abuse investigation & moderation tooling
+-- Indexes for admin moderation and abuse investigation tooling
 CREATE INDEX IF NOT EXISTS idx_submission_contexts_visitor_id ON public.complaint_submission_contexts(visitor_id);
 CREATE INDEX IF NOT EXISTS idx_submission_contexts_session_id ON public.complaint_submission_contexts(session_id);
 CREATE INDEX IF NOT EXISTS idx_submission_contexts_captured_at ON public.complaint_submission_contexts(captured_at);
@@ -62,15 +92,16 @@ ALTER TABLE public.complaint_submission_contexts ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.complaint_submission_contexts FROM PUBLIC, anon, authenticated;
 GRANT ALL ON TABLE public.complaint_submission_contexts TO service_role;
 
--- Step 2: Drop existing function signatures if necessary to allow signature replacement
+-- Step 3: Drop all obsolete function signatures
 DROP FUNCTION IF EXISTS public.submit_public_complaint(jsonb, text);
+DROP FUNCTION IF EXISTS public.submit_public_complaint(jsonb, text, text);
 DROP FUNCTION IF EXISTS public.submit_public_complaint(jsonb, text, jsonb);
 
--- Step 3: Create authoritative submit_public_complaint RPC
+-- Step 4: Create authoritative submit_public_complaint RPC (3 arguments)
 CREATE OR REPLACE FUNCTION public.submit_public_complaint(
   p_payload jsonb,
   p_client_submission_id text,
-  p_reporter_context jsonb DEFAULT NULL
+  p_reporter_context jsonb
 )
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -81,9 +112,10 @@ DECLARE
   v_client_sub_id text;
   v_existing record;
   v_report_id text;
-  v_year int;
-  v_seq_val int;
-  v_seq_str text;
+  v_year text;
+  v_attempts int := 0;
+  v_random_suffix int;
+  v_collision_check boolean;
   v_segment text;
   v_subcategory text;
   v_title text;
@@ -91,26 +123,32 @@ DECLARE
   v_incident_date date;
   v_incident_time text;
   v_frequency text;
-  v_subject_type text;
-  v_reported_subject text;
-  v_org text;
-  v_role text;
   v_location jsonb;
   v_lat double precision;
   v_lng double precision;
-  v_area text;
-  v_district text;
   v_division text;
+  v_district text;
+  v_upazila text;
+  v_area text;
+  v_road text;
+  v_landmark text;
   v_address text;
+  v_place_id text;
   v_privacy_choice text;
-  v_admin_name text;
-  v_admin_contact text;
+  v_rel_context text;
+  v_intimate_what text;
+  v_intimate_platform text;
+  v_reporter_name text;
+  v_reporter_contact text;
+  v_confirm_public_identity boolean;
   v_pub_prefs jsonb;
   v_parties jsonb;
   v_party jsonb;
-  v_response jsonb;
+  v_party_type text;
   v_evidence_types jsonb;
   v_evidence_desc text;
+  v_has_supporting_info boolean;
+  v_response jsonb;
 
   -- Reporter Submission Context variables
   v_rep_ctx jsonb;
@@ -123,7 +161,7 @@ DECLARE
   v_rep_session_id text;
 BEGIN
   -- -------------------------------------------------------------------------
-  -- Step 1: Honeypot & Anti-Bot Protection
+  -- Step 1: Honeypot Anti-Bot Protection
   -- -------------------------------------------------------------------------
   IF (p_payload->>'website') IS NOT NULL AND trim(p_payload->>'website') <> '' THEN
     RAISE EXCEPTION 'VALIDATION_FAILED: Invalid submission parameters.';
@@ -317,20 +355,19 @@ BEGIN
     v_frequency := 'one-time';
   END IF;
 
-  v_subject_type := coalesce(p_payload->>'subjectType', 'individual');
-  v_reported_subject := nullif(trim(coalesce(p_payload->>'reportedSubject', '')), '');
-  v_org := nullif(trim(coalesce(p_payload->>'organization', '')), '');
-  v_role := nullif(trim(coalesce(p_payload->>'roleOrDesignation', '')), '');
-
-  -- Incident Location Coordinates (Distinct from reporter device coordinates)
+  -- Incident Location (Distinct from reporter device location)
   v_location := p_payload->'location';
   IF v_location IS NOT NULL THEN
-    v_lat := (v_location->>'lat')::double precision;
-    v_lng := (v_location->>'lng')::double precision;
-    v_area := nullif(trim(coalesce(v_location->>'area', '')), '');
-    v_district := nullif(trim(coalesce(v_location->>'district', '')), '');
+    v_lat := coalesce((v_location->>'lat')::double precision, (v_location->>'latitude')::double precision);
+    v_lng := coalesce((v_location->>'lng')::double precision, (v_location->>'longitude')::double precision);
     v_division := nullif(trim(coalesce(v_location->>'division', '')), '');
-    v_address := nullif(trim(coalesce(v_location->>'formattedAddress', '')), '');
+    v_district := nullif(trim(coalesce(v_location->>'district', '')), '');
+    v_upazila := nullif(trim(coalesce(v_location->>'upazilaOrThana', v_location->>'upazila_or_thana', '')), '');
+    v_area := nullif(trim(coalesce(v_location->>'area', '')), '');
+    v_road := nullif(trim(coalesce(v_location->>'road', '')), '');
+    v_landmark := nullif(trim(coalesce(v_location->>'landmark', '')), '');
+    v_address := nullif(trim(coalesce(v_location->>'formattedAddress', v_location->>'formatted_address', '')), '');
+    v_place_id := nullif(trim(coalesce(v_location->>'placeId', v_location->>'place_id', '')), '');
   END IF;
 
   IF v_lat IS NULL OR v_lng IS NULL THEN
@@ -350,26 +387,71 @@ BEGIN
     v_privacy_choice := 'anonymous';
   END IF;
 
-  v_admin_name := nullif(trim(coalesce(p_payload->>'adminName', '')), '');
-  v_admin_contact := nullif(trim(coalesce(p_payload->>'adminContact', '')), '');
+  v_rel_context := nullif(trim(coalesce(p_payload->>'relationshipContext', '')), '');
+  v_intimate_what := nullif(trim(coalesce(p_payload->>'intimateWhatHappened', '')), '');
+  v_intimate_platform := nullif(trim(coalesce(p_payload->>'intimatePlatform', '')), '');
+
+  -- -------------------------------------------------------------------------
+  -- Step 6: Extract Admin Contact (harassment reporter details)
+  -- Preferred shape from frontend:
+  --   adminContact.name
+  --   adminContact.contact
+  --   adminContact.consentPublic
+  -- Private and admin-only unless approved public identity consent applies.
+  -- -------------------------------------------------------------------------
+  v_reporter_name := nullif(trim(coalesce(
+    p_payload->'adminContact'->>'name',
+    p_payload->>'adminName',
+    p_payload->>'reporterName',
+    ''
+  )), '');
+
+  v_reporter_contact := nullif(trim(coalesce(
+    p_payload->'adminContact'->>'contact',
+    p_payload->>'adminContact',
+    p_payload->>'reporterContact',
+    ''
+  )), '');
+
+  v_confirm_public_identity := coalesce(
+    (p_payload->'adminContact'->>'consentPublic')::boolean,
+    (p_payload->>'confirmPublicIdentity')::boolean,
+    false
+  );
+
   v_pub_prefs := coalesce(p_payload->'publicationPreferences', '{}'::jsonb);
+  v_has_supporting_info := coalesce((p_payload->>'hasSupportingInfo')::boolean, false);
   v_evidence_types := coalesce(p_payload->'evidenceTypes', '[]'::jsonb);
   v_evidence_desc := nullif(trim(coalesce(p_payload->>'evidenceDescription', '')), '');
 
   -- -------------------------------------------------------------------------
-  -- Step 6: Generate Sequential Report ID (SJ-YYYY-XXXXXX)
+  -- Step 7: Generate Unique Report ID (SJ-{YEAR}-{6 DIGIT RANDOM NUMBER})
   -- -------------------------------------------------------------------------
-  v_year := EXTRACT(YEAR FROM CURRENT_DATE)::int;
-  v_seq_val := nextval('public.complaint_id_seq');
-  v_seq_str := lpad(v_seq_val::text, 6, '0');
-  v_report_id := 'SJ-' || v_year::text || '-' || v_seq_str;
+  v_year := to_char(now(), 'YYYY');
+  LOOP
+    v_attempts := v_attempts + 1;
+    v_random_suffix := floor(100000 + random() * 900000)::int;
+    v_report_id := 'SJ-' || v_year || '-' || v_random_suffix::text;
+
+    SELECT EXISTS (SELECT 1 FROM public.complaints WHERE id = v_report_id)
+    INTO v_collision_check;
+
+    IF NOT v_collision_check THEN
+      EXIT;
+    END IF;
+
+    IF v_attempts >= 50 THEN
+      RAISE EXCEPTION 'REPORT_ID_GENERATION_FAILED: Unable to generate a unique report ID after multiple attempts. Please try again.';
+    END IF;
+  END LOOP;
 
   -- -------------------------------------------------------------------------
-  -- Step 7: Insert into Complaints Table (Public incident coordinates)
+  -- Step 8: Insert Complaint Record into public.complaints
   -- -------------------------------------------------------------------------
   INSERT INTO public.complaints (
     id,
     client_submission_id,
+    pin_hash,
     segment_id,
     subcategory_id,
     title,
@@ -377,28 +459,34 @@ BEGIN
     incident_date,
     incident_time,
     frequency,
-    subject_type,
-    reported_subject,
-    organization,
-    role_or_designation,
+    privacy_choice,
+    relationship_context,
+    intimate_what_happened,
+    intimate_platform,
+    division,
+    district,
+    upazila_or_thana,
+    area,
+    road,
+    landmark,
+    formatted_address,
     latitude,
     longitude,
-    area,
-    district,
-    division,
-    formatted_address,
-    privacy_choice,
-    admin_name,
-    admin_contact,
-    publication_preferences,
+    place_id,
+    has_supporting_info,
     evidence_types,
     evidence_description,
+    publication_preferences,
+    reporter_name,
+    reporter_contact,
+    confirm_public_identity,
     status,
     created_at,
     updated_at
   ) VALUES (
     v_report_id,
     v_client_sub_id,
+    NULL,
     v_segment,
     v_subcategory,
     v_title,
@@ -406,29 +494,34 @@ BEGIN
     v_incident_date,
     v_incident_time,
     v_frequency,
-    v_subject_type,
-    v_reported_subject,
-    v_org,
-    v_role,
+    v_privacy_choice,
+    v_rel_context,
+    v_intimate_what,
+    v_intimate_platform,
+    v_division,
+    v_district,
+    v_upazila,
+    v_area,
+    v_road,
+    v_landmark,
+    v_address,
     v_lat,
     v_lng,
-    v_area,
-    v_district,
-    v_division,
-    v_address,
-    v_privacy_choice,
-    v_admin_name,
-    v_admin_contact,
-    v_pub_prefs,
+    v_place_id,
+    v_has_supporting_info,
     v_evidence_types,
     v_evidence_desc,
+    v_pub_prefs,
+    v_reporter_name,
+    v_reporter_contact,
+    v_confirm_public_identity,
     'submitted',
     now(),
     now()
   );
 
   -- -------------------------------------------------------------------------
-  -- Step 8: Insert Reporter Device Submission Context (Private admin data)
+  -- Step 9: Insert Reporter Device Submission Context (Private admin data)
   -- -------------------------------------------------------------------------
   INSERT INTO public.complaint_submission_contexts (
     complaint_id,
@@ -473,59 +566,94 @@ BEGIN
   );
 
   -- -------------------------------------------------------------------------
-  -- Step 9: Insert Mentioned Parties if Provided
+  -- Step 10: Insert Parties into public.complaint_parties
   -- -------------------------------------------------------------------------
   v_parties := p_payload->'mentionedParties';
-  IF v_parties IS NOT NULL AND jsonb_typeof(v_parties) = 'array' THEN
+  IF v_parties IS NOT NULL AND jsonb_typeof(v_parties) = 'array' AND jsonb_array_length(v_parties) > 0 THEN
     FOR v_party IN SELECT * FROM jsonb_array_elements(v_parties)
     LOOP
-      IF trim(coalesce(v_party->>'name', '')) <> '' THEN
+      IF v_party->>'name' IS NOT NULL AND trim(v_party->>'name') <> '' THEN
+        v_party_type := trim(coalesce(v_party->>'type', 'unknown'));
+        IF v_party_type NOT IN ('individual', 'business', 'group', 'organization', 'unknown') THEN
+          v_party_type := 'unknown';
+        END IF;
+
         INSERT INTO public.complaint_parties (
           complaint_id,
           name,
+          party_type,
           role_or_designation,
           organization,
           phone_or_contact,
           public_profile_handle,
-          party_type,
+          address,
+          identifying_description,
           created_at
         ) VALUES (
           v_report_id,
           trim(v_party->>'name'),
+          v_party_type,
           nullif(trim(coalesce(v_party->>'roleOrDesignation', '')), ''),
           nullif(trim(coalesce(v_party->>'organization', '')), ''),
           nullif(trim(coalesce(v_party->>'phoneOrContact', '')), ''),
           nullif(trim(coalesce(v_party->>'publicProfileHandle', '')), ''),
-          coalesce(v_party->>'type', 'individual'),
+          nullif(trim(coalesce(v_party->>'address', '')), ''),
+          nullif(trim(coalesce(v_party->>'identifyingDescription', '')), ''),
           now()
         );
       END IF;
     END LOOP;
+  ELSIF p_payload->>'reportedSubject' IS NOT NULL AND trim(p_payload->>'reportedSubject') <> '' THEN
+    v_party_type := trim(coalesce(p_payload->>'subjectType', 'unknown'));
+    IF v_party_type NOT IN ('individual', 'business', 'group', 'organization', 'unknown') THEN
+      v_party_type := 'unknown';
+    END IF;
+
+    INSERT INTO public.complaint_parties (
+      complaint_id,
+      name,
+      party_type,
+      role_or_designation,
+      organization,
+      phone_or_contact,
+      public_profile_handle,
+      address,
+      identifying_description,
+      created_at
+    ) VALUES (
+      v_report_id,
+      trim(p_payload->>'reportedSubject'),
+      v_party_type,
+      nullif(trim(coalesce(p_payload->>'roleOrDesignation', '')), ''),
+      nullif(trim(coalesce(p_payload->>'organization', '')), ''),
+      nullif(trim(coalesce(p_payload->>'phoneOrContact', '')), ''),
+      nullif(trim(coalesce(p_payload->>'publicProfileHandle', '')), ''),
+      nullif(trim(coalesce(p_payload->>'address', '')), ''),
+      nullif(trim(coalesce(p_payload->>'identifyingDescription', '')), ''),
+      now()
+    );
   END IF;
 
   -- -------------------------------------------------------------------------
-  -- Step 10: Insert Initial Status History
+  -- Step 11: Insert Initial Status History
   -- -------------------------------------------------------------------------
   INSERT INTO public.complaint_updates (
     complaint_id,
-    previous_status,
-    new_status,
-    note_en,
-    note_bn,
-    actor,
+    update_type,
+    note,
+    is_public,
     created_at
   ) VALUES (
     v_report_id,
-    NULL,
     'submitted',
-    'Complaint received and queued for review.',
-    'অভিযোগ জমা হয়েছে এবং পর্যালোচনার জন্য অপেক্ষমাণ রয়েছে।',
-    'system',
+    'Report received and queued for moderation review.',
+    false,
     now()
   );
 
   -- -------------------------------------------------------------------------
-  -- Step 11: Return Standardized Client Response Payload
+  -- Step 12: Return Standardized Client Response Payload
+  -- (Never exposes private reporter coordinates or contact info)
   -- -------------------------------------------------------------------------
   v_response := jsonb_build_object(
     'success', true,
@@ -548,3 +676,7 @@ $$;
 -- Revoke all permissions from public, then grant execute to anon and authenticated
 REVOKE ALL ON FUNCTION public.submit_public_complaint(jsonb, text, jsonb) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.submit_public_complaint(jsonb, text, jsonb) TO anon, authenticated;
+
+-- =============================================================================
+-- End of Phase 3 Authoritative Migration File
+-- =============================================================================

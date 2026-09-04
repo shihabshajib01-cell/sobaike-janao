@@ -11,12 +11,12 @@ export interface ApiError {
 
 class ApiClient {
   async submitSubjectResponse(_reportId: string, _payload: any): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
-    return {
-      success: true,
-      message: 'Your formal response has been submitted for editorial review.',
-      messageBn: 'আপনার আনুষ্ঠানিক প্রতিউত্তরটি পর্যালোচনার জন্য জমা নেওয়া হয়েছে।',
-      responseId: `RESP-${Date.now()}`,
+    const error: ApiError = {
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'Subject response submission is temporarily unavailable. Please contact the administration directly.',
+      messageBn: 'প্রতিউত্তর জমা দেওয়ার সেবা বর্তমানে সাময়িকভাবে অনুপলব্ধ। অনুগ্রহ করে সরাসরি কর্তৃপক্ষের সাথে যোগাযোগ করুন।',
     };
+    throw error;
   }
 
   // --- Report Submission APIs ---
@@ -46,19 +46,31 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      console.warn('[ApiClient] Supabase not configured — operating in local preview fallback mode');
-      const randomNum = Math.floor(100000 + Math.random() * 900000);
-      const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
-      return {
-        success: true,
-        reportId: mockReportId,
-        message: 'Report submitted successfully (local preview mode).',
-        report: {
-          id: mockReportId,
-          ...payload,
-          createdAt: new Date().toISOString(),
-        },
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
+      if (isMockAllowed) {
+        console.warn('[ApiClient] Supabase not configured — operating in explicit local dev mock mode');
+        const randomNum = Math.floor(100000 + Math.random() * 900000);
+        const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
+        return {
+          success: true,
+          reportId: mockReportId,
+          message: 'Report submitted successfully (local mock dev mode).',
+          report: {
+            id: mockReportId,
+            ...payload,
+            createdAt: new Date().toISOString(),
+          },
+        };
+      }
+
+      const unavailableError: ApiError = {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Submission service is currently unavailable. Your draft is preserved. Please try again later.',
+        messageBn: 'অভিযোগ জমা দেওয়ার সেবা এই মুহূর্তে সাময়িকভাবে অনুপলব্ধ। আপনার খসড়াটি সংরক্ষিত রয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
       };
+      throw unavailableError;
     }
 
     const clientSubmissionId = idempotencyKey?.trim();
@@ -73,40 +85,33 @@ class ApiClient {
 
     const hasImages = Array.isArray(images) && images.length > 0;
 
-    // Step 1: Submit complaint via RPC with safe reporter context
+    // Step 1: Submit complaint via authoritative 3-argument RPC with safe reporter context
     const enrichedPayload = {
       ...payload,
       reporterContext,
     };
 
-    let result = await supabase.rpc('submit_public_complaint', {
+    const result = await supabase.rpc('submit_public_complaint', {
       p_payload: enrichedPayload,
       p_client_submission_id: clientSubmissionId,
       p_reporter_context: reporterContext,
     });
 
-    // Fallback if older RPC signature is cached/deployed
-    if (
-      result.error &&
-      (result.error.message?.includes('schema cache') ||
-        result.error.message?.includes('function') ||
-        result.error.code === 'PGRST202')
-    ) {
-      result = await supabase.rpc('submit_public_complaint', {
-        p_payload: enrichedPayload,
-        p_client_submission_id: clientSubmissionId,
-      });
-    }
-
     const { data, error } = result;
 
-
     if (error) {
-      const errorMsg = error.message || 'Supabase submission failed.';
+      const isOutdatedSchema =
+        error.code === 'PGRST202' ||
+        error.message?.includes('function') ||
+        error.message?.includes('schema cache');
       const apiError: ApiError = {
-        code: error.code || 'RPC_ERROR',
-        message: errorMsg,
-        messageBn: 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
+        code: isOutdatedSchema ? 'OUTDATED_SERVER_SCHEMA' : (error.code || 'RPC_ERROR'),
+        message: isOutdatedSchema
+          ? 'Submission service is undergoing updates. Your draft is preserved, please try again in a few moments.'
+          : (error.message || 'Supabase submission failed.'),
+        messageBn: isOutdatedSchema
+          ? 'সার্ভার হালনাগাদ হচ্ছে। আপনার খসড়াটি সংরক্ষিত রয়েছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।'
+          : 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
       };
       throw apiError;
     }

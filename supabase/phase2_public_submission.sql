@@ -1,5 +1,11 @@
 -- ============================================================================
--- Sobaike Janao - Phase 2 Public Complaint Submission Migration & RPC
+-- HISTORICAL MIGRATION NOTICE: DO NOT RUN THIS FILE IN PRODUCTION!
+-- This migration has been SUPERSEDED by:
+--   supabase/phase3_safe_reporter_context.sql
+-- Rerunning this migration will overwrite the authoritative Phase 3 submission
+-- RPC and restore obsolete signatures and tracking PIN logic.
+-- ============================================================================
+-- Sobaike Janao - Phase 2 Public Complaint Submission Migration & RPC (ARCHIVED)
 -- File: supabase/phase2_public_submission.sql
 -- 
 -- IMPORTANT:

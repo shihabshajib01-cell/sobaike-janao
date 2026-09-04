@@ -1,5 +1,11 @@
 -- ============================================================================
--- Sobaike Janao - Remove Public Tracking Migration & Updated RPC
+-- HISTORICAL MIGRATION NOTICE: DO NOT RUN THIS FILE IN PRODUCTION!
+-- This migration has been SUPERSEDED by:
+--   supabase/phase3_safe_reporter_context.sql
+-- Rerunning this migration will restore obsolete 2-argument signatures and
+-- remove mandatory reporter device submission context requirements.
+-- ============================================================================
+-- Sobaike Janao - Remove Public Tracking Migration & Updated RPC (ARCHIVED)
 -- File: supabase/remove_public_tracking.sql
 -- 
 -- IMPORTANT:
