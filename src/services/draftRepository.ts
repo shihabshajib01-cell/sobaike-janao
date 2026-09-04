@@ -134,12 +134,19 @@ export const DraftRepository = {
     }
   },
 
+  getSubmissionId(): string | undefined {
+    return this.getDraft()?.clientSubmissionId;
+  },
+
   /**
    * Evaluates whether a draft has meaningful user input
    * Based on segment, step > 1, subcategory, subject, description, location, evidence, privacy
    */
   hasMeaningfulDraft(draft: DraftReport | null): boolean {
     if (!draft) return false;
+
+    // Check if an existing submission attempt is already attached
+    if (Boolean(draft.clientSubmissionId?.trim())) return true;
 
     // Check step progress
     if (draft.currentStep > 1) return true;

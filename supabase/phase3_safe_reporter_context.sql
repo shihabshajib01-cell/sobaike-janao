@@ -26,8 +26,19 @@
 -- =============================================================================
 
 -- Step 1: Schema alignment on public.complaints
-ALTER TABLE public.complaints 
-  ALTER COLUMN pin_hash DROP NOT NULL;
+DO $$
+BEGIN
+  -- If legacy pin_hash column exists from older installations, ensure it is nullable
+  IF EXISTS (
+    SELECT 1 
+    FROM information_schema.columns 
+    WHERE table_schema = 'public' 
+      AND table_name = 'complaints' 
+      AND column_name = 'pin_hash'
+  ) THEN
+    ALTER TABLE public.complaints ALTER COLUMN pin_hash DROP NOT NULL;
+  END IF;
+END $$;
 
 ALTER TABLE public.complaints
   ADD COLUMN IF NOT EXISTS relationship_context text,
@@ -451,7 +462,6 @@ BEGIN
   INSERT INTO public.complaints (
     id,
     client_submission_id,
-    pin_hash,
     segment_id,
     subcategory_id,
     title,
@@ -486,7 +496,6 @@ BEGIN
   ) VALUES (
     v_report_id,
     v_client_sub_id,
-    NULL,
     v_segment,
     v_subcategory,
     v_title,

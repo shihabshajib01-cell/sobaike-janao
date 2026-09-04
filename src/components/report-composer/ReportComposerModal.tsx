@@ -113,8 +113,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const saved = DraftRepository.getDraft();
       if (saved && DraftRepository.hasMeaningfulDraft(saved)) {
         setSavedDraftAvailable(saved);
+        if (saved.clientSubmissionId) {
+          retryCredentialsRef.current = {
+            clientSubmissionId: saved.clientSubmissionId,
+          };
+        }
       } else {
         setSavedDraftAvailable(null);
+        retryCredentialsRef.current = null;
         setFormData({
           ...INITIAL_DRAFT,
           segment: initialSegment,
@@ -133,14 +139,22 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Persist draft to local storage on state change once actively editing
   useEffect(() => {
     if (isOpen && !submissionResult && !savedDraftAvailable && DraftRepository.hasMeaningfulDraft(formData)) {
-      DraftRepository.saveDraft(formData);
+      const idToSave = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+      DraftRepository.saveDraft({
+        ...formData,
+        ...(idToSave && { clientSubmissionId: idToSave }),
+      });
     }
   }, [formData, isOpen, submissionResult, savedDraftAvailable]);
 
   // Draft Recovery Handlers
   const handleContinueSavedDraft = useCallback(() => {
     if (savedDraftAvailable) {
-      retryCredentialsRef.current = null;
+      if (savedDraftAvailable.clientSubmissionId) {
+        retryCredentialsRef.current = {
+          clientSubmissionId: savedDraftAvailable.clientSubmissionId,
+        };
+      }
       setRapePublishingConsentAccepted(false);
       setRapeConsentCheckbox(false);
       setSubmitError(null);
@@ -172,6 +186,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setSubmitError(null);
     setIsLocationError(false);
     setSubmittingStage(null);
+    DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
       segment: null,
@@ -203,13 +218,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Helper to update form data
   const handleUpdateFormData = useCallback((updates: Partial<DraftReport>) => {
-    retryCredentialsRef.current = null;
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
 
   // Attached images update handler
   const handlePendingImagesChange = useCallback((images: AttachedImagePreview[]) => {
-    retryCredentialsRef.current = null;
     setPendingImages(images);
   }, []);
 
@@ -277,10 +290,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const handleSelectSubcategory = useCallback((subcategoryId: string, option: SubcategoryOption) => {
-    retryCredentialsRef.current = null;
     // Reset rape consent if switching subcategories
     setFormData((prev) => {
-      if (prev.subcategoryId !== subcategoryId) {
+      const isDifferentSubcat = prev.subcategoryId !== subcategoryId;
+      if (isDifferentSubcat) {
+        retryCredentialsRef.current = null;
         setRapePublishingConsentAccepted(false);
       }
 
@@ -291,14 +305,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         ? option.nameBn
         : option.nameEn;
 
-      const isDifferentSubcat = prev.subcategoryId !== subcategoryId;
-
       return {
         ...prev,
         subcategoryId,
         title: updatedTitle,
         ...(isDifferentSubcat && {
           subjectType: 'unknown',
+          clientSubmissionId: undefined,
         }),
       };
     });
@@ -558,14 +571,28 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         website: (formData as any).website || '', // Honeypot anti-bot
       };
 
-      // Ensure stable idempotency key across submission retries
-      if (!retryCredentialsRef.current) {
-        retryCredentialsRef.current = {
-          clientSubmissionId: generateSecureIdempotencyKey(),
-        };
+      // Ensure stable idempotency key across submission retries and persist before server submission
+      let clientSubmissionId =
+        retryCredentialsRef.current?.clientSubmissionId ||
+        formData.clientSubmissionId ||
+        DraftRepository.getSubmissionId();
+
+      if (!clientSubmissionId) {
+        clientSubmissionId = generateSecureIdempotencyKey();
       }
 
-      const { clientSubmissionId } = retryCredentialsRef.current;
+      // Update ref and in-memory formData
+      retryCredentialsRef.current = { clientSubmissionId };
+      if (formData.clientSubmissionId !== clientSubmissionId) {
+        setFormData((prev) => ({ ...prev, clientSubmissionId }));
+      }
+
+      // Immediately persist draft with clientSubmissionId BEFORE making server submission
+      DraftRepository.saveDraft({
+        ...formData,
+        clientSubmissionId,
+      });
+
       const filesToUpload = pendingImages.map((img) => img.file);
 
       // Safely build private reporter context to link to complaint
@@ -652,7 +679,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Save & exit modal action
   const handleSaveAndExit = useCallback(() => {
-    DraftRepository.saveDraft(formData);
+    const idToSave = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+    DraftRepository.saveDraft({
+      ...formData,
+      ...(idToSave && { clientSubmissionId: idToSave }),
+    });
     setIsConfirmCloseOpen(false);
     onClose();
   }, [formData, onClose]);
