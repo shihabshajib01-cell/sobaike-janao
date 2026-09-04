@@ -8,7 +8,9 @@ import { RoutePath } from '../../context/AppContext';
 
 export interface Step1ServiceSelectProps {
   selectedSegment: SectionKey | null;
-  onSelectSegment: (segment: SectionKey | null) => void;
+  onSelectSegment: (segment: SectionKey) => void;
+  selectedComingSoon?: ComingSoonServiceKey | null;
+  onSelectComingSoon?: (key: ComingSoonServiceKey | null) => void;
   onNavigateToComingSoon?: (path: RoutePath) => void;
   onNext?: () => void;
   language: 'bn' | 'en';
@@ -17,11 +19,16 @@ export interface Step1ServiceSelectProps {
 export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   selectedSegment,
   onSelectSegment,
+  selectedComingSoon: controlledComingSoon,
+  onSelectComingSoon,
   onNavigateToComingSoon,
   language,
 }) => {
   const { segments } = useTaxonomy();
-  const [selectedComingSoon, setSelectedComingSoon] = useState<ComingSoonServiceKey | null>(null);
+  const [internalComingSoon, setInternalComingSoon] = useState<ComingSoonServiceKey | null>(null);
+
+  const selectedComingSoon =
+    controlledComingSoon !== undefined ? controlledComingSoon : internalComingSoon;
 
   const activeServices: Array<{
     key: SectionKey;
@@ -72,13 +79,14 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   const comingSoonList = Object.values(COMING_SOON_SERVICES);
 
   const handleActiveSelect = (key: SectionKey) => {
-    setSelectedComingSoon(null);
+    setInternalComingSoon(null);
+    onSelectComingSoon?.(null);
     onSelectSegment(key);
   };
 
   const handleComingSoonSelect = (key: ComingSoonServiceKey) => {
-    setSelectedComingSoon(key);
-    onSelectSegment(null);
+    setInternalComingSoon(key);
+    onSelectComingSoon?.(key);
   };
 
   const activeComingSoonData = selectedComingSoon ? COMING_SOON_SERVICES[selectedComingSoon] : null;
@@ -95,7 +103,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       {/* Active Service Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {activeServices.map((srv) => {
-          const isSelected = selectedSegment === srv.key;
+          const isSelected = selectedSegment === srv.key && !selectedComingSoon;
 
           return (
             <button

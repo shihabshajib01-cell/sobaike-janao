@@ -49,19 +49,21 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
             id={`coming-soon-description-${serviceKey}`}
             className="text-[16px] leading-[1.6] text-secondary max-w-[480px] mx-auto"
           >
-            {language === 'bn' ? service.descriptionBn : service.descriptionEn}
+            {language === 'bn'
+              ? 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি।'
+              : 'This reporting service is being prepared and is not available yet.'}
           </p>
         </div>
 
         {/* Informative Notice Box */}
         <div className="bg-surface border border-subtle rounded-2xl p-4 sm:p-5 text-left max-w-[520px] mx-auto shadow-2xs space-y-2">
           <p className="text-[14px] font-semibold text-primary">
-            {language === 'bn' ? 'সেবা প্রস্তুতি সংক্রান্ত তথ্য' : 'Service Status Information'}
+            {language === 'bn' ? 'সেবার অবস্থা' : 'Service Status'}
           </p>
           <p className="text-[13.5px] leading-relaxed text-secondary">
             {language === 'bn'
-              ? 'নাগরিক সুরক্ষা ও সঠিক যাচাইকরণ নিশ্চিত করতে এই বিভাগের কাঠামো উন্নয়ন পর্যায়ে রয়েছে। প্ল্যাটফর্মে উন্মুক্ত হলে নিয়মিত অভিযোগ দাখিল ও সার্বজনীন সতর্কতা প্রদর্শন সক্রিয় হবে।'
-              : 'The verification framework for this category is currently under development. Structured civilian documentation and public safety alerts will be available upon launch.'}
+              ? 'সেবাটি চালু হলে এখানে প্রয়োজনীয় তথ্য যোগ করা হবে।'
+              : 'More information will be added when this service becomes available.'}
           </p>
         </div>
 

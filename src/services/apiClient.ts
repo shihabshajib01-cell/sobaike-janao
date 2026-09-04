@@ -1,6 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
-import { PublicReportService } from './publicReportService';
 
 
 export interface ApiError {
@@ -48,24 +47,21 @@ class ApiClient {
 
     if (!isSupabaseConfigured() || !supabase) {
       const isMockAllowed = Boolean(
-        import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false' &&
-        (!isSupabaseConfigured() || import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCK_MODE === 'true')
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
       );
       if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in local dev mock mode');
+        console.warn('[ApiClient] Supabase not configured — operating in explicit local dev mock mode');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
-        const newReport = {
-          id: mockReportId,
-          ...payload,
-          createdAt: new Date().toISOString(),
-        };
-        PublicReportService.addLocalMockReport(newReport);
         return {
           success: true,
           reportId: mockReportId,
           message: 'Report submitted successfully (local mock dev mode).',
-          report: newReport,
+          report: {
+            id: mockReportId,
+            ...payload,
+            createdAt: new Date().toISOString(),
+          },
         };
       }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { SectionKey } from '../../theme/tokens';
+import { SectionKey, ComingSoonServiceKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
 import { DraftReport, isValidIncidentCoordinates } from '../../services/types';
 import { DraftRepository, INITIAL_DRAFT, generateSecureIdempotencyKey } from '../../services/draftRepository';
@@ -89,6 +89,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Close Confirmation state
   const [isConfirmCloseOpen, setIsConfirmCloseOpen] = useState(false);
 
+  // Coming Soon local selection tracking for Step 1
+  const [selectedComingSoon, setSelectedComingSoon] = useState<ComingSoonServiceKey | null>(null);
+
   // Scroll container reference to reset scroll on step change
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   // Active retry submission credentials (reused across retries until success, reset, or change)
@@ -110,6 +113,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Check for saved draft whenever the modal is opened
   useEffect(() => {
     if (isOpen) {
+      setSelectedComingSoon(null);
       setRapePublishingConsentAccepted(false);
       setRapeConsentCheckbox(false);
       setIsRapeConsentModalOpen(false);
@@ -133,6 +137,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         });
       }
     } else {
+      setSelectedComingSoon(null);
       setSubmitError(null);
       setRapePublishingConsentAccepted(false);
       setRapeConsentCheckbox(false);
@@ -381,6 +386,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   // Step Navigation Handlers
   const handleGoToStep = useCallback((step: number, jumpSection?: string) => {
+    setSelectedComingSoon(null);
     // If attempting to go to step 3 or 4 with rape subcategory without consent
     if (
       step >= 3 &&
@@ -420,16 +426,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const handleSelectService = useCallback(
-    async (segment: SectionKey | null) => {
-      if (!segment) {
-        setFormData((prev) => ({
-          ...prev,
-          segment: null,
-          subcategoryId: '',
-          title: '',
-        }));
-        return;
-      }
+    async (segment: SectionKey) => {
+      if (!segment) return;
 
       if (formData.segment === segment) return;
 
@@ -1054,7 +1052,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   if (!isOpen) return null;
 
-  const canContinueStep1 = Boolean(formData.segment);
+  const canContinueStep1 = Boolean(formData.segment) && !selectedComingSoon;
   const canContinueStep2 = Boolean(formData.subcategoryId);
 
   // Render-level defense guard: ensure Step 3/4 is NEVER rendered if rape consent is missing
@@ -1305,7 +1303,29 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     <Step1ServiceSelect
                       selectedSegment={formData.segment}
                       onSelectSegment={handleSelectService}
+                      selectedComingSoon={selectedComingSoon}
+                      onSelectComingSoon={setSelectedComingSoon}
                       onNavigateToComingSoon={(path) => {
+                        if (DraftRepository.hasMeaningfulDraft(formData)) {
+                          const idToSave =
+                            retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+                          const pendingRecovery =
+                            formData.pendingEvidenceRecovery ||
+                            (pendingImages.length > 0
+                              ? {
+                                  expectedCount: pendingImages.length,
+                                  fileNames: pendingImages.map((i) => i.originalName || i.file.name),
+                                  status: 'pending' as const,
+                                  lastUpdated: new Date().toISOString(),
+                                }
+                              : undefined);
+
+                          DraftRepository.saveDraft({
+                            ...formData,
+                            ...(idToSave && { clientSubmissionId: idToSave }),
+                            ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
+                          });
+                        }
                         onClose();
                         navigateTo(path);
                       }}
