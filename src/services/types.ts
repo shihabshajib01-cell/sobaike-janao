@@ -163,6 +163,7 @@ export const CURRENT_REPORT_FLOW_VERSION = 3;
 export interface DraftReport {
   flowVersion?: number;
   clientSubmissionId?: string;
+  serverSubmissionState?: 'not_attempted' | 'attempted';
   pendingEvidenceRecovery?: {
     expectedCount: number;
     fileNames: string[];

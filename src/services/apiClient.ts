@@ -46,19 +46,31 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
-      const randomNum = Math.floor(100000 + Math.random() * 900000);
-      const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
-      return {
-        success: true,
-        reportId: mockReportId,
-        message: 'Report submitted successfully (local mock mode).',
-        report: {
-          id: mockReportId,
-          ...payload,
-          createdAt: new Date().toISOString(),
-        },
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
+      if (isMockAllowed) {
+        console.warn('[ApiClient] Supabase not configured — operating in explicit local dev mock mode');
+        const randomNum = Math.floor(100000 + Math.random() * 900000);
+        const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
+        return {
+          success: true,
+          reportId: mockReportId,
+          message: 'Report submitted successfully (local mock dev mode).',
+          report: {
+            id: mockReportId,
+            ...payload,
+            createdAt: new Date().toISOString(),
+          },
+        };
+      }
+
+      const unavailableError: ApiError = {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Submission service is currently unavailable. Your draft is preserved. Please try again later.',
+        messageBn: 'অভিযোগ জমা দেওয়ার সেবা এই মুহূর্তে সাময়িকভাবে অনুপলব্ধ। আপনার খসড়াটি সংরক্ষিত রয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
       };
+      throw unavailableError;
     }
 
     const clientSubmissionId = idempotencyKey?.trim();

@@ -80,7 +80,7 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
 };
 
 const isMockModeAllowed = (): boolean => {
-  return !isSupabaseConfigured() || import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
+  return Boolean(import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true');
 };
 
 export const PublicReportService = {
@@ -94,19 +94,22 @@ export const PublicReportService = {
     let list: ReportItem[] = [];
 
     if (!isSupabaseConfigured() || !supabase) {
-      list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
-    } else {
-      try {
-        const { data, error } = await supabase.rpc('get_public_published_reports');
-        if (error) {
-          console.warn('[PublicReportService.getAll] Supabase RPC error, falling back to seed data:', error);
-          list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
-        } else if (data && Array.isArray(data)) {
-          list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
-        }
-      } catch (e) {
-        console.warn('[PublicReportService.getAll] Supabase exception, falling back to seed data:', e);
+      if (isMockModeAllowed()) {
         list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+      } else {
+        throw new Error('Public reports service is currently unavailable.');
+      }
+    } else {
+      const { data, error } = await supabase.rpc('get_public_published_reports');
+      if (error) {
+        console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
+        if (isMockModeAllowed()) {
+          list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+        } else {
+          throw new Error(error.message || 'Failed to load public reports from server.');
+        }
+      } else if (data && Array.isArray(data)) {
+        list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
       }
     }
 
@@ -194,23 +197,7 @@ export const PublicReportService = {
     const cleanId = id.trim().toUpperCase();
 
     if (!isSupabaseConfigured() || !supabase) {
-      const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
-      if (seed) {
-        return {
-          report: mapSeedToReportItem(seed),
-          responses: [],
-        };
-      }
-      return null;
-    }
-
-    try {
-      const { data, error } = await supabase.rpc('get_public_published_report', {
-        p_report_id: cleanId,
-      });
-
-      if (error) {
-        console.warn('[PublicReportService.getById] Supabase RPC error, checking seed:', error);
+      if (isMockModeAllowed()) {
         const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
         if (seed) {
           return {
@@ -220,46 +207,66 @@ export const PublicReportService = {
         }
         return null;
       }
+      throw new Error('Public reports service is currently unavailable.');
+    }
 
-      if (data) {
-        const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+    const { data, error } = await supabase.rpc('get_public_published_report', {
+      p_report_id: cleanId,
+    });
 
-        try {
-          const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
-          const reportImages =
-            evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-          report.images = reportImages;
-          report.media = {
-            type:
-              reportImages.length === 0
-                ? 'none'
-                : reportImages.length === 1
-                ? 'single'
-                : 'gallery',
-            images: reportImages,
+    if (error) {
+      console.warn('[PublicReportService.getById] Supabase RPC error:', error);
+      if (isMockModeAllowed()) {
+        const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
+        if (seed) {
+          return {
+            report: mapSeedToReportItem(seed),
+            responses: [],
           };
-          if (reportImages.length > 0) {
-            report.trustIndicators.evidenceCount = reportImages.length;
-          }
-        } catch (evErr) {
-          console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
         }
+      }
+      throw new Error(error.message || 'Failed to fetch report from server.');
+    }
 
+    if (data) {
+      const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+
+      try {
+        const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
+        const reportImages =
+          evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+        report.images = reportImages;
+        report.media = {
+          type:
+            reportImages.length === 0
+              ? 'none'
+              : reportImages.length === 1
+              ? 'single'
+              : 'gallery',
+          images: reportImages,
+        };
+        if (reportImages.length > 0) {
+          report.trustIndicators.evidenceCount = reportImages.length;
+        }
+      } catch (evErr) {
+        console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
+      }
+
+      return {
+        report,
+        responses: [],
+      };
+    }
+
+    // Not found in database: only check seed in mock mode
+    if (isMockModeAllowed()) {
+      const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
+      if (seed) {
         return {
-          report,
+          report: mapSeedToReportItem(seed),
           responses: [],
         };
       }
-    } catch (e) {
-      console.warn('[PublicReportService.getById] Supabase exception, checking seed:', e);
-    }
-
-    const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
-    if (seed) {
-      return {
-        report: mapSeedToReportItem(seed),
-        responses: [],
-      };
     }
 
     return null;

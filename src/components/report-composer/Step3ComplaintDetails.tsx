@@ -1554,26 +1554,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       </p>
                       <p className="text-[12.5px] opacity-90 leading-relaxed">
                         {language === 'bn'
-                          ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery.expectedCount}টি ছবি সংযুক্ত ছিল। জমা সম্পন্ন করতে ছবিগুলো পুনরায় নির্বাচন করুন অথবা সংযুক্তি বাদ দিয়ে চালিয়ে যান।`
-                          : `Your saved draft had ${formData.pendingEvidenceRecovery.expectedCount} image(s) attached. Please reattach the files to complete your submission, or proceed without attachments.`}
+                          ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery.expectedCount}টি ছবি সংযুক্ত ছিল। জমা সম্পন্ন করতে নিচের ফাইল পিকার থেকে ছবিগুলো পুনরায় নির্বাচন করুন। আপনি চাইলে খসড়া বাতিল করে নতুন অভিযোগও শুরু করতে পারেন।`
+                          : `Your saved draft had ${formData.pendingEvidenceRecovery.expectedCount} image(s) attached. Please reattach the files below to complete your submission, or discard the draft to start a new complaint.`}
                       </p>
                     </div>
-                  </div>
-                  <div className="flex justify-end pt-1">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onUpdateFormData({
-                          pendingEvidenceRecovery: undefined,
-                          hasSupportingInfo: false,
-                        })
-                      }
-                      className="text-[12px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
-                    >
-                      {language === 'bn'
-                        ? 'সংযুক্তি ছাড়াই অভিযোগ সম্পন্ন করতে চাই'
-                        : 'Proceed without attachments'}
-                    </button>
                   </div>
                 </div>
               )}

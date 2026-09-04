@@ -4,6 +4,7 @@ const DRAFT_KEY = 'sobaike_janao_draft_report';
 
 export const INITIAL_DRAFT: DraftReport = {
   flowVersion: CURRENT_REPORT_FLOW_VERSION,
+  serverSubmissionState: 'not_attempted',
   segment: null,
   currentStep: 1,
   subcategoryId: '',

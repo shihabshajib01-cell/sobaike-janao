@@ -190,6 +190,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const expectedCount = savedDraftAvailable.pendingEvidenceRecovery?.expectedCount || 0;
       let updatedDraft: DraftReport = { ...savedDraftAvailable };
 
+      if (
+        savedDraftAvailable.serverSubmissionState === 'attempted' ||
+        savedDraftAvailable.pendingEvidenceRecovery?.status === 'failed'
+      ) {
+        updatedDraft.serverSubmissionState = 'attempted';
+      }
+
       if (restoredImages.length > 0) {
         setPendingImages(restoredImages);
         if (savedDraftAvailable.pendingEvidenceRecovery) {
@@ -409,13 +416,44 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     }
   }, []);
 
-  const handleSelectService = useCallback((segment: SectionKey) => {
-    setRapePublishingConsentAccepted(false);
-    setFormData((prev) => {
-      if (prev.segment === segment) return prev;
-      return {
+  const handleSelectService = useCallback(
+    async (segment: SectionKey) => {
+      if (formData.segment === segment) return;
+
+      if (formData.serverSubmissionState === 'attempted') {
+        setSubmitError(
+          language === 'bn'
+            ? 'পূর্ববর্তী জমা প্রচেষ্টার কারণে বিভাগ পরিবর্তন করা সম্ভব নয়। অন্য অভিযোগ করতে খসড়াটি মুছুন অথবা নতুন অভিযোগ শুরু করুন।'
+            : 'Cannot change category after submission attempt. Please discard this draft or start a new complaint.'
+        );
+        return;
+      }
+
+      setRapePublishingConsentAccepted(false);
+
+      // State A: pre-submit category switch
+      // Cleanly discard old local evidence attachments and old clientSubmissionId
+      const oldSubId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+      if (oldSubId) {
+        try {
+          await EvidenceDraftStorage.deletePendingEvidence(oldSubId);
+        } catch {
+          // ignore
+        }
+      }
+      EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+      setPendingImages([]);
+      retryCredentialsRef.current = null;
+
+      setFormData((prev) => ({
         ...prev,
         segment,
+        clientSubmissionId: undefined,
+        serverSubmissionState: 'not_attempted',
+        pendingEvidenceRecovery: undefined,
+        hasSupportingInfo: false,
+        evidenceTypes: [],
+        evidenceDescription: '',
         subcategoryId: '',
         title: '',
         subjectType: 'unknown',
@@ -427,35 +465,63 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         mentionedParties: [],
         intimateWhatHappened: '',
         intimatePlatform: '',
-      };
-    });
-  }, []);
+      }));
+    },
+    [formData.segment, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
+  );
 
-  const handleSelectSubcategory = useCallback((subcategoryId: string, option: SubcategoryOption) => {
-    // Reset rape consent if switching subcategories
-    setFormData((prev) => {
-      const isDifferentSubcat = prev.subcategoryId !== subcategoryId;
-      if (isDifferentSubcat) {
-        setRapePublishingConsentAccepted(false);
+  const handleSelectSubcategory = useCallback(
+    async (subcategoryId: string, option: SubcategoryOption) => {
+      if (formData.subcategoryId === subcategoryId) return;
+
+      if (formData.serverSubmissionState === 'attempted') {
+        setSubmitError(
+          language === 'bn'
+            ? 'পূর্ববর্তী জমা প্রচেষ্টার কারণে উপবিভাগ পরিবর্তন করা সম্ভব নয়। অন্য অভিযোগ করতে খসড়াটি মুছুন অথবা নতুন অভিযোগ শুরু করুন।'
+            : 'Cannot change subcategory after submission attempt. Please discard this draft or start a new complaint.'
+        );
+        return;
       }
 
-      // Auto-populate title if empty
-      const updatedTitle = prev.title?.trim()
-        ? prev.title
-        : language === 'bn'
-        ? option.nameBn
-        : option.nameEn;
+      setRapePublishingConsentAccepted(false);
 
-      return {
-        ...prev,
-        subcategoryId,
-        title: updatedTitle,
-        ...(isDifferentSubcat && {
+      // State A: pre-submit subcategory switch
+      // Cleanly discard old local evidence attachments and reset idempotency key
+      const oldSubId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+      if (oldSubId) {
+        try {
+          await EvidenceDraftStorage.deletePendingEvidence(oldSubId);
+        } catch {
+          // ignore
+        }
+      }
+      EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+      setPendingImages([]);
+      retryCredentialsRef.current = null;
+
+      setFormData((prev) => {
+        const updatedTitle = prev.title?.trim()
+          ? prev.title
+          : language === 'bn'
+          ? option.nameBn
+          : option.nameEn;
+
+        return {
+          ...prev,
+          subcategoryId,
+          clientSubmissionId: undefined,
+          serverSubmissionState: 'not_attempted',
+          pendingEvidenceRecovery: undefined,
+          hasSupportingInfo: false,
+          evidenceTypes: [],
+          evidenceDescription: '',
+          title: updatedTitle,
           subjectType: 'unknown',
-        }),
-      };
-    });
-  }, [language]);
+        };
+      });
+    },
+    [formData.subcategoryId, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
+  );
 
   const handleNextFromStep2 = useCallback(() => {
     if (!formData.subcategoryId) return;
@@ -742,9 +808,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       // Update ref and in-memory formData
       retryCredentialsRef.current = { clientSubmissionId };
-      if (formData.clientSubmissionId !== clientSubmissionId) {
-        setFormData((prev) => ({ ...prev, clientSubmissionId }));
-      }
+      setFormData((prev) => ({
+        ...prev,
+        clientSubmissionId,
+        serverSubmissionState: 'attempted',
+      }));
 
       // Persist evidence to IndexedDB before server call if any images exist
       if (pendingImages.length > 0) {
@@ -761,10 +829,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             }
           : formData.pendingEvidenceRecovery;
 
-      // Immediately persist draft with clientSubmissionId BEFORE making server submission
+      // Immediately persist draft with clientSubmissionId and serverSubmissionState BEFORE making server submission
       DraftRepository.saveDraft({
         ...formData,
         clientSubmissionId,
+        serverSubmissionState: 'attempted',
         hasSupportingInfo: Boolean(formData.hasSupportingInfo || pendingImages.length > 0),
         ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
       });
@@ -799,6 +868,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setRapePublishingConsentAccepted(false);
         // Clear saved draft on success
         DraftRepository.clearDraft();
+        setFormData({
+          ...INITIAL_DRAFT,
+          segment: initialSegment,
+          currentStep: 1,
+        });
         setSubmissionResult({
           reportId: response.reportId,
         });
@@ -849,6 +923,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setFormData((prev) => ({
           ...prev,
           ...(subId && { clientSubmissionId: subId }),
+          serverSubmissionState: 'attempted',
           hasSupportingInfo: true,
           pendingEvidenceRecovery: failedRecovery,
         }));
@@ -856,6 +931,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         DraftRepository.saveDraft({
           ...formData,
           ...(subId && { clientSubmissionId: subId }),
+          serverSubmissionState: 'attempted',
           hasSupportingInfo: true,
           pendingEvidenceRecovery: failedRecovery,
         });
