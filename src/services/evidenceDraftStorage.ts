@@ -56,6 +56,14 @@ function openDb(): Promise<IDBDatabase> {
   });
 }
 
+let opQueue: Promise<any> = Promise.resolve();
+
+function enqueue<T>(task: () => Promise<T>): Promise<T> {
+  const next = opQueue.then(task, task);
+  opQueue = next.catch(() => {});
+  return next;
+}
+
 export const EvidenceDraftStorage = {
   /**
    * Persists pending evidence images for a specific complaint submission ID.
@@ -66,58 +74,66 @@ export const EvidenceDraftStorage = {
   ): Promise<void> {
     if (!clientSubmissionId || !isIndexedDbSupported()) return;
 
-    try {
-      const db = await openDb();
-      return new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const index = store.index('by_submission_id');
+    return enqueue(async () => {
+      try {
+        const db = await openDb();
+        return new Promise<void>((resolve, reject) => {
+          const transaction = db.transaction([STORE_NAME], 'readwrite');
+          const store = transaction.objectStore(STORE_NAME);
+          const index = store.index('by_submission_id');
 
-        // First remove any existing stored items for this clientSubmissionId that are no longer in items
-        const currentItemIds = new Set(items.map((it) => it.id));
-        const range = IDBKeyRange.only(clientSubmissionId);
-        const cursorRequest = index.openCursor(range);
+          // First remove any existing stored items for this clientSubmissionId that are no longer in items
+          const currentItemIds = new Set(items.map((it) => it.id));
+          const range = IDBKeyRange.only(clientSubmissionId);
+          const cursorRequest = index.openCursor(range);
 
-        cursorRequest.onsuccess = (e) => {
-          const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
-          if (cursor) {
-            const record = cursor.value as StoredEvidenceRecord;
-            if (!currentItemIds.has(record.imageId)) {
-              cursor.delete();
+          cursorRequest.onsuccess = (e) => {
+            const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
+            if (cursor) {
+              const record = cursor.value as StoredEvidenceRecord;
+              if (!currentItemIds.has(record.imageId)) {
+                cursor.delete();
+              }
+              cursor.continue();
+            } else {
+              // After cleanup, save all current items
+              items.forEach((item, order) => {
+                if (item.isCompressing || item.compressionError) return;
+
+                const record: StoredEvidenceRecord = {
+                  id: `${clientSubmissionId}::${item.id}`,
+                  clientSubmissionId,
+                  imageId: item.id,
+                  blob: item.file,
+                  fileName: item.file.name,
+                  originalName: item.originalName,
+                  originalSize: item.originalSize,
+                  compressedSize: item.compressedSize || item.file.size,
+                  width: item.width || 0,
+                  height: item.height || 0,
+                  mimeType: item.file.type || 'image/webp',
+                  order,
+                  createdAt: Date.now(),
+                };
+
+                store.put(record);
+              });
             }
-            cursor.continue();
-          } else {
-            // After cleanup, save all current items
-            items.forEach((item, order) => {
-              if (item.isCompressing || item.compressionError) return;
+          };
 
-              const record: StoredEvidenceRecord = {
-                id: `${clientSubmissionId}::${item.id}`,
-                clientSubmissionId,
-                imageId: item.id,
-                blob: item.file,
-                fileName: item.file.name,
-                originalName: item.originalName,
-                originalSize: item.originalSize,
-                compressedSize: item.compressedSize || item.file.size,
-                width: item.width || 0,
-                height: item.height || 0,
-                mimeType: item.file.type || 'image/webp',
-                order,
-                createdAt: Date.now(),
-              };
-
-              store.put(record);
-            });
-          }
-        };
-
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error || new Error('Transaction error'));
-      });
-    } catch (err) {
-      console.warn('EvidenceDraftStorage: Failed to persist evidence in IndexedDB:', err);
-    }
+          transaction.oncomplete = () => {
+            try { db.close(); } catch {}
+            resolve();
+          };
+          transaction.onerror = () => {
+            try { db.close(); } catch {}
+            reject(transaction.error || new Error('Transaction error'));
+          };
+        });
+      } catch (err) {
+        console.warn('EvidenceDraftStorage: Failed to persist evidence in IndexedDB:', err);
+      }
+    });
   },
 
   /**
@@ -126,49 +142,63 @@ export const EvidenceDraftStorage = {
   async getPendingEvidence(clientSubmissionId: string): Promise<AttachedImagePreview[]> {
     if (!clientSubmissionId || !isIndexedDbSupported()) return [];
 
-    try {
-      const db = await openDb();
-      return new Promise<AttachedImagePreview[]>((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const index = store.index('by_submission_id');
-        const range = IDBKeyRange.only(clientSubmissionId);
-        const request = index.getAll(range);
+    return enqueue(async () => {
+      try {
+        const db = await openDb();
+        return new Promise<AttachedImagePreview[]>((resolve, reject) => {
+          const transaction = db.transaction([STORE_NAME], 'readonly');
+          const store = transaction.objectStore(STORE_NAME);
+          const index = store.index('by_submission_id');
+          const range = IDBKeyRange.only(clientSubmissionId);
+          const request = index.getAll(range);
 
-        request.onsuccess = () => {
-          const records: StoredEvidenceRecord[] = request.result || [];
-          // Sort records by preserved order
-          records.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+          request.onsuccess = () => {
+            const records: StoredEvidenceRecord[] = request.result || [];
+            // Sort records by preserved order
+            records.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-          const restored: AttachedImagePreview[] = records.map((rec) => {
-            const file = new File([rec.blob], rec.fileName || rec.originalName, {
-              type: rec.mimeType || 'image/webp',
-            });
-            const previewUrl = URL.createObjectURL(file);
+            const restored: AttachedImagePreview[] = [];
+            for (const rec of records) {
+              if (!rec.blob) continue;
+              try {
+                const file = new File([rec.blob], rec.fileName || rec.originalName, {
+                  type: rec.mimeType || 'image/webp',
+                });
+                const previewUrl = URL.createObjectURL(file);
 
-            return {
-              file,
-              previewUrl,
-              id: rec.imageId,
-              originalName: rec.originalName,
-              originalSize: rec.originalSize,
-              compressedSize: rec.compressedSize,
-              width: rec.width,
-              height: rec.height,
-              isCompressing: false,
-              compressionError: null,
-            };
-          });
+                restored.push({
+                  file,
+                  previewUrl,
+                  id: rec.imageId,
+                  originalName: rec.originalName,
+                  originalSize: rec.originalSize,
+                  compressedSize: rec.compressedSize,
+                  width: rec.width,
+                  height: rec.height,
+                  isCompressing: false,
+                  compressionError: null,
+                });
+              } catch (err) {
+                console.warn('Failed to reconstruct file from record:', err);
+              }
+            }
 
-          resolve(restored);
-        };
+            resolve(restored);
+          };
 
-        request.onerror = () => reject(request.error || new Error('Failed to retrieve evidence'));
-      });
-    } catch (err) {
-      console.warn('EvidenceDraftStorage: Failed to retrieve evidence from IndexedDB:', err);
-      return [];
-    }
+          transaction.oncomplete = () => {
+            try { db.close(); } catch {}
+          };
+          request.onerror = () => {
+            try { db.close(); } catch {}
+            reject(request.error || new Error('Failed to retrieve evidence'));
+          };
+        });
+      } catch (err) {
+        console.warn('EvidenceDraftStorage: Failed to retrieve evidence from IndexedDB:', err);
+        return [];
+      }
+    });
   },
 
   /**
@@ -177,29 +207,37 @@ export const EvidenceDraftStorage = {
   async deletePendingEvidence(clientSubmissionId: string): Promise<void> {
     if (!clientSubmissionId || !isIndexedDbSupported()) return;
 
-    try {
-      const db = await openDb();
-      return new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const index = store.index('by_submission_id');
-        const range = IDBKeyRange.only(clientSubmissionId);
-        const cursorRequest = index.openCursor(range);
+    return enqueue(async () => {
+      try {
+        const db = await openDb();
+        return new Promise<void>((resolve, reject) => {
+          const transaction = db.transaction([STORE_NAME], 'readwrite');
+          const store = transaction.objectStore(STORE_NAME);
+          const index = store.index('by_submission_id');
+          const range = IDBKeyRange.only(clientSubmissionId);
+          const cursorRequest = index.openCursor(range);
 
-        cursorRequest.onsuccess = (e) => {
-          const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
-          if (cursor) {
-            cursor.delete();
-            cursor.continue();
-          }
-        };
+          cursorRequest.onsuccess = (e) => {
+            const cursor = (e.target as IDBRequest<IDBCursorWithValue>).result;
+            if (cursor) {
+              cursor.delete();
+              cursor.continue();
+            }
+          };
 
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error || new Error('Delete transaction error'));
-      });
-    } catch (err) {
-      console.warn('EvidenceDraftStorage: Failed to delete evidence from IndexedDB:', err);
-    }
+          transaction.oncomplete = () => {
+            try { db.close(); } catch {}
+            resolve();
+          };
+          transaction.onerror = () => {
+            try { db.close(); } catch {}
+            reject(transaction.error || new Error('Delete transaction error'));
+          };
+        });
+      } catch (err) {
+        console.warn('EvidenceDraftStorage: Failed to delete evidence from IndexedDB:', err);
+      }
+    });
   },
 
   /**
@@ -208,19 +246,27 @@ export const EvidenceDraftStorage = {
   async clearAllEvidence(): Promise<void> {
     if (!isIndexedDbSupported()) return;
 
-    try {
-      const db = await openDb();
-      return new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.clear();
+    return enqueue(async () => {
+      try {
+        const db = await openDb();
+        return new Promise<void>((resolve, reject) => {
+          const transaction = db.transaction([STORE_NAME], 'readwrite');
+          const store = transaction.objectStore(STORE_NAME);
+          const request = store.clear();
 
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
-    } catch (err) {
-      console.warn('EvidenceDraftStorage: Failed to clear IndexedDB:', err);
-    }
+          request.onsuccess = () => {
+            try { db.close(); } catch {}
+            resolve();
+          };
+          request.onerror = () => {
+            try { db.close(); } catch {}
+            reject(request.error);
+          };
+        });
+      } catch (err) {
+        console.warn('EvidenceDraftStorage: Failed to clear IndexedDB:', err);
+      }
+    });
   },
 
   /**

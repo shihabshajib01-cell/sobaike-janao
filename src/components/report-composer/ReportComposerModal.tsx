@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionKey } from '../../theme/tokens';
 import { DraftReport, isValidIncidentCoordinates } from '../../services/types';
-import { DraftRepository, INITIAL_DRAFT } from '../../services/draftRepository';
+import { DraftRepository, INITIAL_DRAFT, generateSecureIdempotencyKey } from '../../services/draftRepository';
 import { apiClient } from '../../services/apiClient';
 import { VisitorSessionService } from '../../services/visitorSessionService';
+import { EvidenceDraftStorage } from '../../services/evidenceDraftStorage';
 import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { ReportComposerHeader } from './ReportComposerHeader';
 import { ReportComposerFooter } from './ReportComposerFooter';
@@ -25,6 +26,7 @@ import {
   Save,
   Shield,
   RotateCcw,
+  Paperclip,
 } from 'lucide-react';
 
 import { Modal } from '../ui/Modal';
@@ -73,7 +75,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const [submissionResult, setSubmissionResult] = useState<{
     reportId: string;
   } | null>(null);
-
+  const [isRestoringEvidence, setIsRestoringEvidence] = useState(false);
 
   // Rape Pre-Report Publishing & Privacy Consent (session-level only - not stored in draft, storage or db)
   const [rapePublishingConsentAccepted, setRapePublishingConsentAccepted] = useState(false);
@@ -140,19 +142,32 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   useEffect(() => {
     if (isOpen && !submissionResult && !savedDraftAvailable && DraftRepository.hasMeaningfulDraft(formData)) {
       const idToSave = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+      const pendingRecovery =
+        formData.pendingEvidenceRecovery ||
+        (pendingImages.length > 0
+          ? {
+              expectedCount: pendingImages.length,
+              fileNames: pendingImages.map((i) => i.originalName || i.file.name),
+              status: 'pending' as const,
+              lastUpdated: new Date().toISOString(),
+            }
+          : undefined);
+
       DraftRepository.saveDraft({
         ...formData,
         ...(idToSave && { clientSubmissionId: idToSave }),
+        ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
       });
     }
-  }, [formData, isOpen, submissionResult, savedDraftAvailable]);
+  }, [formData, isOpen, submissionResult, savedDraftAvailable, pendingImages]);
 
   // Draft Recovery Handlers
-  const handleContinueSavedDraft = useCallback(() => {
+  const handleContinueSavedDraft = useCallback(async () => {
     if (savedDraftAvailable) {
-      if (savedDraftAvailable.clientSubmissionId) {
+      const subId = savedDraftAvailable.clientSubmissionId;
+      if (subId) {
         retryCredentialsRef.current = {
-          clientSubmissionId: savedDraftAvailable.clientSubmissionId,
+          clientSubmissionId: subId,
         };
       }
       setRapePublishingConsentAccepted(false);
@@ -161,23 +176,74 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setIsLocationError(false);
       setSubmittingStage(null);
 
+      setIsRestoringEvidence(true);
+      let restoredImages: AttachedImagePreview[] = [];
+      if (subId) {
+        try {
+          restoredImages = await EvidenceDraftStorage.getPendingEvidence(subId);
+        } catch (e) {
+          console.warn('Failed to restore evidence from storage:', e);
+        }
+      }
+      setIsRestoringEvidence(false);
+
+      const expectedCount = savedDraftAvailable.pendingEvidenceRecovery?.expectedCount || 0;
+      let updatedDraft: DraftReport = { ...savedDraftAvailable };
+
+      if (restoredImages.length > 0) {
+        setPendingImages(restoredImages);
+        if (savedDraftAvailable.pendingEvidenceRecovery) {
+          updatedDraft = {
+            ...updatedDraft,
+            hasSupportingInfo: true,
+            pendingEvidenceRecovery: {
+              ...savedDraftAvailable.pendingEvidenceRecovery,
+              status: 'pending',
+              lastUpdated: new Date().toISOString(),
+            },
+          };
+        }
+      } else if (expectedCount > 0) {
+        setPendingImages([]);
+        updatedDraft = {
+          ...updatedDraft,
+          pendingEvidenceRecovery: {
+            expectedCount,
+            fileNames: savedDraftAvailable.pendingEvidenceRecovery?.fileNames || [],
+            status: 'failed',
+            lastUpdated: new Date().toISOString(),
+          },
+        };
+      } else {
+        setPendingImages([]);
+      }
+
       // If draft was saved on rape subcategory at step 3 or 4, require consent before displaying step 3/4
       if (
         savedDraftAvailable.subcategoryId === 'rape-sexual-violence' &&
         savedDraftAvailable.currentStep >= 3
       ) {
-        setFormData(savedDraftAvailable);
+        setFormData(updatedDraft);
         setSavedDraftAvailable(null);
         pendingTargetStepRef.current = { step: savedDraftAvailable.currentStep };
         setIsRapeConsentModalOpen(true);
       } else {
-        setFormData(savedDraftAvailable);
+        setFormData(updatedDraft);
         setSavedDraftAvailable(null);
       }
     }
   }, [savedDraftAvailable]);
 
-  const handleStartNewComplaint = useCallback(() => {
+  const handleStartNewComplaint = useCallback(async () => {
+    const subId = savedDraftAvailable?.clientSubmissionId || retryCredentialsRef.current?.clientSubmissionId;
+    if (subId) {
+      try {
+        await EvidenceDraftStorage.deletePendingEvidence(subId);
+      } catch {
+        // ignore
+      }
+    }
+    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
     retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
@@ -194,9 +260,18 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     });
     setPendingImages([]);
     setSavedDraftAvailable(null);
-  }, []);
+  }, [pendingImages, savedDraftAvailable]);
 
-  const handleDeleteSavedDraft = useCallback(() => {
+  const handleDeleteSavedDraft = useCallback(async () => {
+    const subId = savedDraftAvailable?.clientSubmissionId || retryCredentialsRef.current?.clientSubmissionId;
+    if (subId) {
+      try {
+        await EvidenceDraftStorage.deletePendingEvidence(subId);
+      } catch {
+        // ignore
+      }
+    }
+    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
     retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
@@ -213,18 +288,86 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     });
     setPendingImages([]);
     setSavedDraftAvailable(null);
-  }, []);
-
+  }, [pendingImages, savedDraftAvailable]);
 
   // Helper to update form data
   const handleUpdateFormData = useCallback((updates: Partial<DraftReport>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  // Attached images update handler
-  const handlePendingImagesChange = useCallback((images: AttachedImagePreview[]) => {
-    setPendingImages(images);
-  }, []);
+  // Attached images update handler: persists to IndexedDB and synchronizes pendingEvidenceRecovery
+  const handlePendingImagesChange = useCallback(
+    async (images: AttachedImagePreview[]) => {
+      // Revoke any removed object URLs to prevent browser memory leaks
+      const nextUrls = new Set(images.map((i) => i.previewUrl));
+      pendingImages.forEach((old) => {
+        if (old.previewUrl && !nextUrls.has(old.previewUrl) && old.previewUrl.startsWith('blob:')) {
+          try {
+            URL.revokeObjectURL(old.previewUrl);
+          } catch {
+            // ignore
+          }
+        }
+      });
+
+      setPendingImages(images);
+
+      let subId =
+        retryCredentialsRef.current?.clientSubmissionId ||
+        formData.clientSubmissionId ||
+        DraftRepository.getSubmissionId();
+
+      if (!subId) {
+        subId = generateSecureIdempotencyKey();
+        retryCredentialsRef.current = { clientSubmissionId: subId };
+        setFormData((prev) => ({ ...prev, clientSubmissionId: subId }));
+      }
+
+      if (images.length > 0) {
+        await EvidenceDraftStorage.savePendingEvidence(subId, images);
+
+        const recovery = {
+          expectedCount: images.length,
+          fileNames: images.map((i) => i.originalName || i.file.name),
+          status: 'pending' as const,
+          lastUpdated: new Date().toISOString(),
+        };
+
+        setFormData((prev) => ({
+          ...prev,
+          clientSubmissionId: subId,
+          hasSupportingInfo: true,
+          pendingEvidenceRecovery: recovery,
+        }));
+
+        DraftRepository.saveDraft({
+          ...formData,
+          clientSubmissionId: subId,
+          hasSupportingInfo: true,
+          pendingEvidenceRecovery: recovery,
+        });
+      } else {
+        await EvidenceDraftStorage.savePendingEvidence(subId, []);
+
+        const wasFailed = formData.pendingEvidenceRecovery?.status === 'failed';
+
+        setFormData((prev) => ({
+          ...prev,
+          clientSubmissionId: subId,
+          hasSupportingInfo: wasFailed ? prev.hasSupportingInfo : false,
+          pendingEvidenceRecovery: wasFailed ? prev.pendingEvidenceRecovery : undefined,
+        }));
+
+        DraftRepository.saveDraft({
+          ...formData,
+          clientSubmissionId: subId,
+          hasSupportingInfo: wasFailed ? formData.hasSupportingInfo : false,
+          pendingEvidenceRecovery: wasFailed ? formData.pendingEvidenceRecovery : undefined,
+        });
+      }
+    },
+    [formData, pendingImages]
+  );
 
   // Step Navigation Handlers
   const handleGoToStep = useCallback((step: number, jumpSection?: string) => {
@@ -267,7 +410,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const handleSelectService = useCallback((segment: SectionKey) => {
-    retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setFormData((prev) => {
       if (prev.segment === segment) return prev;
@@ -294,7 +436,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setFormData((prev) => {
       const isDifferentSubcat = prev.subcategoryId !== subcategoryId;
       if (isDifferentSubcat) {
-        retryCredentialsRef.current = null;
         setRapePublishingConsentAccepted(false);
       }
 
@@ -311,7 +452,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         title: updatedTitle,
         ...(isDifferentSubcat && {
           subjectType: 'unknown',
-          clientSubmissionId: undefined,
         }),
       };
     });
@@ -425,6 +565,25 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Submission handler
   const handleSubmitReport = useCallback(async () => {
     if (!formData.segment || !formData.subcategoryId) return;
+
+    // Guard against attempting to complete a complaint with missing required evidence
+    const isMissingExpectedEvidence =
+      pendingImages.length === 0 &&
+      Boolean(formData.pendingEvidenceRecovery && formData.pendingEvidenceRecovery.expectedCount > 0);
+
+    if (isMissingExpectedEvidence) {
+      setFormData((prev) => ({ ...prev, currentStep: 3 }));
+      setSubmitError(
+        language === 'bn'
+          ? 'পূর্বে সংযুক্ত প্রমাণাদি আপলোড করা আবশ্যক। জমা সম্পন্ন করতে ৩ নং ধাপে ছবিগুলো পুনরায় সংযুক্ত করুন।'
+          : 'Previously attached evidence is required to complete submission. Please reattach the images in Step 3.'
+      );
+      setTimeout(() => {
+        const elem = document.getElementById('composer-section-attachments');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+      return;
+    }
 
     // Rape pre-report consent defense guard
     if (
@@ -587,10 +746,27 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setFormData((prev) => ({ ...prev, clientSubmissionId }));
       }
 
+      // Persist evidence to IndexedDB before server call if any images exist
+      if (pendingImages.length > 0) {
+        await EvidenceDraftStorage.savePendingEvidence(clientSubmissionId, pendingImages);
+      }
+
+      const pendingRecovery =
+        pendingImages.length > 0
+          ? {
+              expectedCount: pendingImages.length,
+              fileNames: pendingImages.map((img) => img.originalName || img.file.name),
+              status: 'pending' as const,
+              lastUpdated: new Date().toISOString(),
+            }
+          : formData.pendingEvidenceRecovery;
+
       // Immediately persist draft with clientSubmissionId BEFORE making server submission
       DraftRepository.saveDraft({
         ...formData,
         clientSubmissionId,
+        hasSupportingInfo: Boolean(formData.hasSupportingInfo || pendingImages.length > 0),
+        ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
       });
 
       const filesToUpload = pendingImages.map((img) => img.file);
@@ -609,8 +785,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       );
 
       if (response && response.reportId) {
+        // FULL SUCCESS: Both complaint row AND required evidence uploads/registration succeeded
+        try {
+          await EvidenceDraftStorage.deletePendingEvidence(clientSubmissionId);
+        } catch {
+          // ignore
+        }
+        EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+
         // Reset retry credentials on success
         retryCredentialsRef.current = null;
+        setPendingImages([]);
         setRapePublishingConsentAccepted(false);
         // Clear saved draft on success
         DraftRepository.clearDraft();
@@ -629,6 +814,53 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       if (err?.code === 'REPORTER_LOCATION_REQUIRED') {
         setIsLocationError(true);
       }
+
+      // If evidence upload/registration failed OR if complaint was created but evidence threw:
+      // We must mark recovery status as 'failed' and preserve draft + submission ID!
+      const isEvidenceError =
+        err?.code === 'EVIDENCE_UPLOAD_FAILED' ||
+        err?.code === 'EVIDENCE_REGISTRATION_FAILED';
+
+      const expectedCount =
+        pendingImages.length > 0
+          ? pendingImages.length
+          : formData.pendingEvidenceRecovery?.expectedCount || 0;
+
+      if (isEvidenceError || expectedCount > 0) {
+        const subId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+        const failedRecovery = {
+          expectedCount,
+          fileNames:
+            pendingImages.length > 0
+              ? pendingImages.map((img) => img.originalName || img.file.name)
+              : formData.pendingEvidenceRecovery?.fileNames || [],
+          status: 'failed' as const,
+          lastUpdated: new Date().toISOString(),
+        };
+
+        if (subId && pendingImages.length > 0) {
+          try {
+            await EvidenceDraftStorage.savePendingEvidence(subId, pendingImages);
+          } catch {
+            // ignore
+          }
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          ...(subId && { clientSubmissionId: subId }),
+          hasSupportingInfo: true,
+          pendingEvidenceRecovery: failedRecovery,
+        }));
+
+        DraftRepository.saveDraft({
+          ...formData,
+          ...(subId && { clientSubmissionId: subId }),
+          hasSupportingInfo: true,
+          pendingEvidenceRecovery: failedRecovery,
+        });
+      }
+
       const displayMsg =
         language === 'bn'
           ? err?.messageBn || err?.message || 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।'
@@ -641,36 +873,54 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   }, [formData, pendingImages, language, rapePublishingConsentAccepted]);
 
-  const handleStartAnother = useCallback(() => {
+  const handleStartAnother = useCallback(async () => {
+    const subId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+    if (subId) {
+      try {
+        await EvidenceDraftStorage.deletePendingEvidence(subId);
+      } catch {
+        // ignore
+      }
+    }
+    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
     retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
-      segment: null,
-      currentStep: 1,
+      segment: initialSegment,
+      currentStep: initialSegment ? 2 : 1,
     });
     setPendingImages([]);
     setSubmissionResult(null);
     setSubmitError(null);
-  }, []);
+  }, [formData.clientSubmissionId, initialSegment, pendingImages]);
 
   // Discard draft action
-  const handleDiscardDraft = useCallback(() => {
+  const handleDiscardDraft = useCallback(async () => {
+    const subId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+    if (subId) {
+      try {
+        await EvidenceDraftStorage.deletePendingEvidence(subId);
+      } catch {
+        // ignore
+      }
+    }
+    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
     retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
-      segment: null,
+      segment: initialSegment,
       currentStep: 1,
     });
     setPendingImages([]);
     setIsConfirmCloseOpen(false);
     onClose();
-  }, [onClose]);
+  }, [formData.clientSubmissionId, initialSegment, onClose, pendingImages]);
 
   // Continue editing action
   const handleContinueEditing = useCallback(() => {
@@ -678,15 +928,40 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   // Save & exit modal action
-  const handleSaveAndExit = useCallback(() => {
-    const idToSave = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+  const handleSaveAndExit = useCallback(async () => {
+    let idToSave = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+    if (!idToSave) {
+      idToSave = generateSecureIdempotencyKey();
+      retryCredentialsRef.current = { clientSubmissionId: idToSave };
+    }
+
+    if (pendingImages.length > 0) {
+      try {
+        await EvidenceDraftStorage.savePendingEvidence(idToSave, pendingImages);
+      } catch {
+        // ignore
+      }
+    }
+
+    const pendingRecovery =
+      formData.pendingEvidenceRecovery ||
+      (pendingImages.length > 0
+        ? {
+            expectedCount: pendingImages.length,
+            fileNames: pendingImages.map((i) => i.originalName || i.file.name),
+            status: 'pending' as const,
+            lastUpdated: new Date().toISOString(),
+          }
+        : undefined);
+
     DraftRepository.saveDraft({
       ...formData,
-      ...(idToSave && { clientSubmissionId: idToSave }),
+      clientSubmissionId: idToSave,
+      ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
     });
     setIsConfirmCloseOpen(false);
     onClose();
-  }, [formData, onClose]);
+  }, [formData, onClose, pendingImages]);
 
   if (!isOpen) return null;
 
@@ -786,6 +1061,16 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     </span>
                   </div>
                 )}
+                {savedDraftAvailable.pendingEvidenceRecovery && savedDraftAvailable.pendingEvidenceRecovery.expectedCount > 0 && (
+                  <div className="flex items-center gap-1.5 text-[13px] text-muted">
+                    <Paperclip className="w-3.5 h-3.5 shrink-0" />
+                    <span>
+                      {language === 'bn'
+                        ? `${savedDraftAvailable.pendingEvidenceRecovery.expectedCount}টি প্রমাণ সংযুক্ত রয়েছে`
+                        : `${savedDraftAvailable.pendingEvidenceRecovery.expectedCount} evidence item(s) attached`}
+                    </span>
+                  </div>
+                )}
                 {savedDraftAvailable.description && (
                   <p className="text-[14px] text-secondary line-clamp-2 italic pt-1">
                     "{savedDraftAvailable.description}"
@@ -824,9 +1109,20 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   id="draft-recovery-continue-btn"
                   type="button"
                   onClick={handleContinueSavedDraft}
-                  className="btn-primary-action px-5 py-2.5 rounded-xl font-bold text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center gap-2"
+                  disabled={isRestoringEvidence}
+                  className={`btn-primary-action px-5 py-2.5 rounded-xl font-bold text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center gap-2 ${
+                    isRestoringEvidence ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
                 >
-                  <span>{language === 'bn' ? 'খসড়া থেকে শুরু করুন' : 'Continue Draft'}</span>
+                  <span>
+                    {isRestoringEvidence
+                      ? language === 'bn'
+                        ? 'লোড হচ্ছে...'
+                        : 'Loading...'
+                      : language === 'bn'
+                      ? 'খসড়া থেকে শুরু করুন'
+                      : 'Continue Draft'}
+                  </span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -978,7 +1274,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     ? canContinueStep2
                     : true
                 }
-                canSubmit={!isSubmitting}
+                canSubmit={
+                  !isSubmitting &&
+                  !(
+                    pendingImages.length === 0 &&
+                    Boolean(formData.pendingEvidenceRecovery && formData.pendingEvidenceRecovery.expectedCount > 0)
+                  )
+                }
                 isSubmitting={isSubmitting}
                 submittingText={
                   submittingStage === 'verifying_location'
