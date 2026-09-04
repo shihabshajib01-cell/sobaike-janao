@@ -196,56 +196,26 @@ export const PublicReportService = {
   async getById(id: string): Promise<{ report: ReportItem; responses: any[] } | null> {
     const cleanId = id.trim().toUpperCase();
 
-    if (isSupabaseConfigured() && supabase) {
-      const { data, error } = await supabase.rpc('get_public_published_report', {
-        p_report_id: cleanId,
-      });
-
-      if (error) {
-        console.warn('[PublicReportService.getById] Supabase RPC error:', error);
-        if (isMockModeAllowed()) {
-          const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
-          if (seed) {
-            return {
-              report: mapSeedToReportItem(seed),
-              responses: [],
-            };
-          }
-        }
-        throw new Error(error.message || 'Failed to fetch report from server.');
-      }
-
-      if (data) {
-        const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
-
-        try {
-          const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
-          const reportImages =
-            evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-          report.images = reportImages;
-          report.media = {
-            type:
-              reportImages.length === 0
-                ? 'none'
-                : reportImages.length === 1
-                ? 'single'
-                : 'gallery',
-            images: reportImages,
+    if (!isSupabaseConfigured() || !supabase) {
+      if (isMockModeAllowed()) {
+        const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
+        if (seed) {
+          return {
+            report: mapSeedToReportItem(seed),
+            responses: [],
           };
-          if (reportImages.length > 0) {
-            report.trustIndicators.evidenceCount = reportImages.length;
-          }
-        } catch (evErr) {
-          console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
         }
-
-        return {
-          report,
-          responses: [],
-        };
+        return null;
       }
+      throw new Error('Public reports service is currently unavailable.');
+    }
 
-      // Not found in database: only check seed in mock mode
+    const { data, error } = await supabase.rpc('get_public_published_report', {
+      p_report_id: cleanId,
+    });
+
+    if (error) {
+      console.warn('[PublicReportService.getById] Supabase RPC error:', error);
       if (isMockModeAllowed()) {
         const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
         if (seed) {
@@ -255,11 +225,40 @@ export const PublicReportService = {
           };
         }
       }
-
-      return null;
+      throw new Error(error.message || 'Failed to fetch report from server.');
     }
 
-    // Supabase not configured: only check seed in mock mode
+    if (data) {
+      const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+
+      try {
+        const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
+        const reportImages =
+          evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+        report.images = reportImages;
+        report.media = {
+          type:
+            reportImages.length === 0
+              ? 'none'
+              : reportImages.length === 1
+              ? 'single'
+              : 'gallery',
+          images: reportImages,
+        };
+        if (reportImages.length > 0) {
+          report.trustIndicators.evidenceCount = reportImages.length;
+        }
+      } catch (evErr) {
+        console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
+      }
+
+      return {
+        report,
+        responses: [],
+      };
+    }
+
+    // Not found in database: only check seed in mock mode
     if (isMockModeAllowed()) {
       const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
       if (seed) {
