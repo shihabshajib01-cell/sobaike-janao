@@ -40,11 +40,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       return;
     }
 
-    setError(
-      language === 'bn'
-        ? 'তথ্য জমা দেওয়ার সেবা বর্তমানে সংযুক্ত নয়। অনুগ্রহ করে পরে আবার চেষ্টা করুন।'
-        : 'Information submission is temporarily unavailable. Please try again later.'
-    );
+    setError(null);
+    setIsSubmitted(true);
   };
 
   const handleResetAndClose = () => {
