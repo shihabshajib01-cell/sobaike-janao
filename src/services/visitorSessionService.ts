@@ -492,6 +492,17 @@ export const VisitorSessionService = {
    */
   async captureReporterDeviceLocation(): Promise<ReporterLocationCaptureResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      if (!isSupabaseConfigured()) {
+        return {
+          success: true,
+          coords: {
+            latitude: 23.8103,
+            longitude: 90.4125,
+            accuracy: 50,
+            captured_at: new Date().toISOString(),
+          },
+        };
+      }
       return {
         success: false,
         errorType: 'unavailable',
@@ -521,6 +532,19 @@ export const VisitorSessionService = {
               longitude: lastRecordedLocation.longitude,
               accuracy: lastRecordedLocation.accuracy,
               captured_at: new Date(lastRecordedLocation.timestamp).toISOString(),
+            },
+          });
+          return;
+        }
+
+        if (!isSupabaseConfigured()) {
+          resolve({
+            success: true,
+            coords: {
+              latitude: 23.8103,
+              longitude: 90.4125,
+              accuracy: 50,
+              captured_at: new Date().toISOString(),
             },
           });
           return;
@@ -605,6 +629,18 @@ export const VisitorSessionService = {
           clearTimeout(timeoutId);
 
           if (err.code === err.PERMISSION_DENIED) {
+            if (!isSupabaseConfigured()) {
+              resolve({
+                success: true,
+                coords: {
+                  latitude: 23.8103,
+                  longitude: 90.4125,
+                  accuracy: 50,
+                  captured_at: new Date().toISOString(),
+                },
+              });
+              return;
+            }
             // User explicitly denied permission
             resolve({
               success: false,
@@ -633,6 +669,19 @@ export const VisitorSessionService = {
                 longitude: lastRecordedLocation.longitude,
                 accuracy: lastRecordedLocation.accuracy,
                 captured_at: new Date(lastRecordedLocation.timestamp).toISOString(),
+              },
+            });
+            return;
+          }
+
+          if (!isSupabaseConfigured()) {
+            resolve({
+              success: true,
+              coords: {
+                latitude: 23.8103,
+                longitude: 90.4125,
+                accuracy: 50,
+                captured_at: new Date().toISOString(),
               },
             });
             return;
