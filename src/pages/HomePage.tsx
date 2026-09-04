@@ -118,11 +118,11 @@ export const HomePage: React.FC = () => {
 
   return (
     <PublicPageContainer id="home-page-container">
-      {/* 1. Service Hero Carousel (Desktop / Tablet only) */}
+      {/* 1. Service Hero Carousel */}
       <ServiceHeroCarousel
         id="home-service-carousel"
         reportCounts={reportCounts}
-        className="hidden md:block"
+        className="mb-2"
       />
 
       {/* 2. Combined Public Feed */}

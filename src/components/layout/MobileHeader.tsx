@@ -1,11 +1,11 @@
 import React from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Menu } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
 import { BrandLogo } from '../branding/BrandLogo';
 
 export const MobileHeader: React.FC = () => {
-  const { navigateTo, language, toggleLanguage, openReportComposer } = useApp();
+  const { navigateTo, language, toggleLanguage, openReportComposer, setIsTabletMenuOpen } = useApp();
   const { resolvedTheme, setThemePreference } = useTheme();
 
   const handleToggleTheme = () => {
@@ -27,9 +27,20 @@ export const MobileHeader: React.FC = () => {
           />
         </div>
 
-        {/* Right utility actions: EN | Theme Toggle | + অভিযোগ */}
+        {/* Right utility actions: Menu | EN | Theme Toggle | + অভিযোগ */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          {/* 1. Language Toggle */}
+          {/* 1. Menu Button to open navigation drawer */}
+          <button
+            id="mobile-header-menu-btn"
+            type="button"
+            onClick={() => setIsTabletMenuOpen(true)}
+            aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
+            className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-subtle bg-surface text-secondary hover:text-primary hover:bg-surface-subtle min-w-[34px] sm:min-w-[38px] flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+          >
+            <Menu className="w-4 h-4 text-secondary" />
+          </button>
+
+          {/* 2. Language Toggle */}
           <button
             id="mobile-header-lang-btn"
             onClick={toggleLanguage}
@@ -39,7 +50,7 @@ export const MobileHeader: React.FC = () => {
             {language === 'bn' ? 'EN' : 'বাং'}
           </button>
 
-          {/* 2. Theme Toggle (Moon in light mode, Sun in dark mode) */}
+          {/* 3. Theme Toggle (Moon in light mode, Sun in dark mode) */}
           <button
             id="mobile-header-theme-toggle"
             type="button"
@@ -62,7 +73,7 @@ export const MobileHeader: React.FC = () => {
             )}
           </button>
 
-          {/* 3. Primary Complaint Button */}
+          {/* 4. Primary Complaint Button */}
           <button
             id="mobile-header-add-report-btn"
             onClick={() => openReportComposer()}

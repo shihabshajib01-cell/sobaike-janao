@@ -27,6 +27,8 @@ import {
   FileText,
   HeartHandshake,
   Zap,
+  ZapOff,
+  Building,
   ShieldAlert,
   HelpCircle,
   Home,
@@ -72,7 +74,11 @@ export type AppIconName =
   | 'help'
   | 'harassment'
   | 'rickshaw'
-  | 'extortion';
+  | 'extortion'
+  | 'zap-off'
+  | 'building'
+  | 'load-shedding'
+  | 'illegal-occupation';
 
 export type AppIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -120,6 +126,10 @@ const ICON_REGISTRY: Record<AppIconName, LucideIcon> = {
   harassment: HeartHandshake,
   rickshaw: Zap,
   extortion: ShieldAlert,
+  'zap-off': ZapOff,
+  building: Building,
+  'load-shedding': ZapOff,
+  'illegal-occupation': Building,
 };
 
 const SIZE_MAP: Record<AppIconSize, string> = {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Search, Menu, PlusCircle, Home, HeartHandshake, Zap, ShieldAlert, Compass, PhoneCall, Globe } from 'lucide-react';
+import { Search, Menu, PlusCircle, Home, HeartHandshake, Zap, ZapOff, Building, ShieldAlert, Compass, PhoneCall, Globe } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SECTIONS, SectionKey, COMING_SOON_SERVICES } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { IconButton } from '../ui/IconButton';
 import { Drawer } from '../ui/Drawer';
@@ -26,6 +26,9 @@ export const Header: React.FC = () => {
     nameEn: string;
     sectionKey?: SectionKey;
     icon: React.ReactNode;
+    isComingSoon?: boolean;
+    badgeBn?: string;
+    badgeEn?: string;
   }> = [
     {
       path: '/',
@@ -55,6 +58,24 @@ export const Header: React.FC = () => {
       icon: <ShieldAlert className="w-4 h-4" />,
     },
     {
+      path: '/load-shedding',
+      nameBn: COMING_SOON_SERVICES.load_shedding.shortNameBn,
+      nameEn: COMING_SOON_SERVICES.load_shedding.shortNameEn,
+      icon: <ZapOff className="w-4 h-4" />,
+      isComingSoon: true,
+      badgeBn: COMING_SOON_SERVICES.load_shedding.badgeBn,
+      badgeEn: COMING_SOON_SERVICES.load_shedding.badgeEn,
+    },
+    {
+      path: '/illegal-occupation',
+      nameBn: COMING_SOON_SERVICES.illegal_occupation.shortNameBn,
+      nameEn: COMING_SOON_SERVICES.illegal_occupation.shortNameEn,
+      icon: <Building className="w-4 h-4" />,
+      isComingSoon: true,
+      badgeBn: COMING_SOON_SERVICES.illegal_occupation.badgeBn,
+      badgeEn: COMING_SOON_SERVICES.illegal_occupation.badgeEn,
+    },
+    {
       path: '/explore',
       nameBn: 'এক্সপ্লোর',
       nameEn: 'Explore',
@@ -77,48 +98,50 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header
-      id="tablet-compact-header"
-      className="hidden md:block min-[1440px]:hidden sticky top-0 z-40 w-full bg-surface border-b border-subtle"
-    >
-      <div className="w-full max-w-[900px] mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
-          {/* Brand Logo */}
-          <BrandLogo
-            id="tablet-brand-logo"
-            size="sm"
-            onClick={() => navigateTo('/')}
-            englishClassName="hidden min-[900px]:block text-[14px] leading-tight text-secondary font-medium"
-          />
-
-          {/* Right Action Cluster for Tablet: ONLY Report CTA + Menu */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Primary Action Button: Contextual Report CTA */}
-            <Button
-              id="tablet-report-cta"
-              variant="primary"
-              size="md"
-              leftIcon={<PlusCircle className="w-4 h-4 text-inverse" />}
-              onClick={() => openReportComposer()}
-              className="shadow-2xs font-semibold text-[16px] min-h-[44px]"
-            >
-              {language === 'bn' ? 'ঘটনা জানান' : 'Report Incident'}
-            </Button>
-
-            {/* Menu Drawer Button */}
-            <IconButton
-              id="tablet-menu-button"
-              icon={<Menu className="w-5 h-5 text-primary" />}
-              aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
-              size="md"
-              onClick={() => setIsTabletMenuOpen(true)}
-              className="border border-subtle rounded-xl bg-surface-subtle hover:bg-surface min-h-[44px] min-w-[44px]"
+    <>
+      <header
+        id="tablet-compact-header"
+        className="hidden md:block min-[1440px]:hidden sticky top-0 z-40 w-full bg-surface border-b border-subtle"
+      >
+        <div className="w-full max-w-[900px] mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 gap-4">
+            {/* Brand Logo */}
+            <BrandLogo
+              id="tablet-brand-logo"
+              size="sm"
+              onClick={() => navigateTo('/')}
+              englishClassName="hidden min-[900px]:block text-[14px] leading-tight text-secondary font-medium"
             />
+
+            {/* Right Action Cluster for Tablet: ONLY Report CTA + Menu */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {/* Primary Action Button: Contextual Report CTA */}
+              <Button
+                id="tablet-report-cta"
+                variant="primary"
+                size="md"
+                leftIcon={<PlusCircle className="w-4 h-4 text-inverse" />}
+                onClick={() => openReportComposer()}
+                className="shadow-2xs font-semibold text-[16px] min-h-[44px]"
+              >
+                {language === 'bn' ? 'ঘটনা জানান' : 'Report Incident'}
+              </Button>
+
+              {/* Menu Drawer Button */}
+              <IconButton
+                id="tablet-menu-button"
+                icon={<Menu className="w-5 h-5 text-primary" />}
+                aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
+                size="md"
+                onClick={() => setIsTabletMenuOpen(true)}
+                className="border border-subtle rounded-xl bg-surface-subtle hover:bg-surface min-h-[44px] min-w-[44px]"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Slide-over Drawer for Tablet Menu */}
+      {/* Slide-over Drawer for Tablet and Mobile Menu */}
       <Drawer
         id="tablet-drawer"
         isOpen={isTabletMenuOpen}
@@ -170,6 +193,11 @@ export const Header: React.FC = () => {
                       className="w-2.5 h-2.5 rounded-full"
                       style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
                     />
+                  )}
+                  {item.isComingSoon && (
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-surface-subtle border border-subtle text-muted shrink-0 leading-tight">
+                      {language === 'bn' ? item.badgeBn : item.badgeEn}
+                    </span>
                   )}
                 </button>
               );
@@ -252,6 +280,6 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </Drawer>
-    </header>
+    </>
   );
 };

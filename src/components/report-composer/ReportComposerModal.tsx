@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionKey } from '../../theme/tokens';
+import { useApp } from '../../context/AppContext';
 import { DraftReport, isValidIncidentCoordinates } from '../../services/types';
 import { DraftRepository, INITIAL_DRAFT, generateSecureIdempotencyKey } from '../../services/draftRepository';
 import { apiClient } from '../../services/apiClient';
@@ -46,6 +47,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   initialSegment = null,
   language,
 }) => {
+  const { navigateTo } = useApp();
+
   // Saved draft available for explicit recovery prompt
   const [savedDraftAvailable, setSavedDraftAvailable] = useState<DraftReport | null>(null);
 
@@ -417,7 +420,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const handleSelectService = useCallback(
-    async (segment: SectionKey) => {
+    async (segment: SectionKey | null) => {
+      if (!segment) {
+        setFormData((prev) => ({
+          ...prev,
+          segment: null,
+          subcategoryId: '',
+          title: '',
+        }));
+        return;
+      }
+
       if (formData.segment === segment) return;
 
       if (formData.serverSubmissionState === 'attempted') {
@@ -1292,6 +1305,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     <Step1ServiceSelect
                       selectedSegment={formData.segment}
                       onSelectSegment={handleSelectService}
+                      onNavigateToComingSoon={(path) => {
+                        onClose();
+                        navigateTo(path);
+                      }}
                       language={language}
                     />
                   )}

@@ -7,6 +7,8 @@ export type RoutePath =
   | '/harassment'
   | '/rickshaw'
   | '/extortion'
+  | '/load-shedding'
+  | '/illegal-occupation'
   | '/explore'
   | '/report'
   | '/search'

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SECTIONS, SectionKey, COMING_SOON_SERVICES } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { BrandLogo } from '../branding/BrandLogo';
@@ -16,6 +16,9 @@ export const DesktopLeftRail: React.FC = () => {
     nameEn: string;
     iconName: AppIconName;
     sectionKey?: SectionKey;
+    isComingSoon?: boolean;
+    badgeBn?: string;
+    badgeEn?: string;
   }> = [
     {
       id: 'rail-home',
@@ -47,6 +50,26 @@ export const DesktopLeftRail: React.FC = () => {
       nameEn: SECTIONS.extortion.shortNameEn,
       iconName: 'extortion',
       sectionKey: 'extortion',
+    },
+    {
+      id: 'rail-load-shedding',
+      path: '/load-shedding',
+      nameBn: COMING_SOON_SERVICES.load_shedding.shortNameBn,
+      nameEn: COMING_SOON_SERVICES.load_shedding.shortNameEn,
+      iconName: 'zap-off',
+      isComingSoon: true,
+      badgeBn: COMING_SOON_SERVICES.load_shedding.badgeBn,
+      badgeEn: COMING_SOON_SERVICES.load_shedding.badgeEn,
+    },
+    {
+      id: 'rail-illegal-occupation',
+      path: '/illegal-occupation',
+      nameBn: COMING_SOON_SERVICES.illegal_occupation.shortNameBn,
+      nameEn: COMING_SOON_SERVICES.illegal_occupation.shortNameEn,
+      iconName: 'building',
+      isComingSoon: true,
+      badgeBn: COMING_SOON_SERVICES.illegal_occupation.badgeBn,
+      badgeEn: COMING_SOON_SERVICES.illegal_occupation.badgeEn,
     },
     {
       id: 'rail-explore',
@@ -155,6 +178,15 @@ export const DesktopLeftRail: React.FC = () => {
                     }`}
                     style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
                   />
+                )}
+
+                {item.isComingSoon && (
+                  <span
+                    id={`${item.id}-badge`}
+                    className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-surface-subtle border border-subtle text-muted shrink-0 leading-tight"
+                  >
+                    {language === 'bn' ? item.badgeBn : item.badgeEn}
+                  </span>
                 )}
               </button>
             );

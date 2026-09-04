@@ -80,6 +80,63 @@ export const SECTIONS = {
 
 export type SectionKey = keyof typeof SECTIONS;
 
+export interface ComingSoonServiceConfig {
+  key: 'load_shedding' | 'illegal_occupation';
+  slug: '/load-shedding' | '/illegal-occupation';
+  nameBn: string;
+  nameEn: string;
+  shortNameBn: string;
+  shortNameEn: string;
+  badgeBn: string;
+  badgeEn: string;
+  descriptionBn: string;
+  descriptionEn: string;
+  primaryColor: string;
+  bgColor: string;
+  borderColor: string;
+  textColor: string;
+  iconName: 'zap-off' | 'building';
+}
+
+export const COMING_SOON_SERVICES: Record<'load_shedding' | 'illegal_occupation', ComingSoonServiceConfig> = {
+  load_shedding: {
+    key: 'load_shedding',
+    slug: '/load-shedding',
+    nameBn: 'লোডশেডিং রিপোর্টিং',
+    nameEn: 'Load Shedding Reporting',
+    shortNameBn: 'লোডশেডিং',
+    shortNameEn: 'Load Shedding',
+    badgeBn: 'শীঘ্রই আসছে',
+    badgeEn: 'Coming Soon',
+    descriptionBn: 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি।',
+    descriptionEn: 'This reporting service is being prepared and is not available yet.',
+    primaryColor: '#6B7280',
+    bgColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
+    textColor: '#374151',
+    iconName: 'zap-off',
+  },
+  illegal_occupation: {
+    key: 'illegal_occupation',
+    slug: '/illegal-occupation',
+    nameBn: 'অবৈধ দখল রিপোর্টিং',
+    nameEn: 'Illegal Occupation Reporting',
+    shortNameBn: 'অবৈধ দখল',
+    shortNameEn: 'Illegal Occupation',
+    badgeBn: 'শীঘ্রই আসছে',
+    badgeEn: 'Coming Soon',
+    descriptionBn: 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি।',
+    descriptionEn: 'This reporting service is being prepared and is not available yet.',
+    primaryColor: '#6B7280',
+    bgColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
+    textColor: '#374151',
+    iconName: 'building',
+  },
+};
+
+export type ComingSoonServiceKey = keyof typeof COMING_SOON_SERVICES;
+
 export const THEME_PALETTE = {
   light: {
     page: '#F0F2F5',

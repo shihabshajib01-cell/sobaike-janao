@@ -15,6 +15,7 @@ import { HomePage } from '../../pages/HomePage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
 import { RickshawPage } from '../../pages/RickshawPage';
 import { ExtortionPage } from '../../pages/ExtortionPage';
+import { ComingSoonPage } from '../../pages/ComingSoonPage';
 import { ReportDetailPage } from '../../pages/ReportDetailPage';
 import { ReportPage } from '../../pages/ReportPage';
 import { ExplorePage } from '../../pages/ExplorePage';
@@ -93,6 +94,8 @@ export const AppShell: React.FC = () => {
               <Route path="/harassment" element={<HarassmentPage />} />
               <Route path="/rickshaw" element={<RickshawPage />} />
               <Route path="/extortion" element={<ExtortionPage />} />
+              <Route path="/load-shedding" element={<ComingSoonPage serviceKey="load_shedding" />} />
+              <Route path="/illegal-occupation" element={<ComingSoonPage serviceKey="illegal_occupation" />} />
               <Route path="/report" element={<ReportPage />} />
               <Route path="/explore" element={<ExplorePage />} />
               <Route path="/search" element={<SearchPage />} />
