@@ -1537,6 +1537,47 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 : 'Attach images or screenshots if they help explain the complaint. This is completely optional.'}
             </p>
 
+            {formData.pendingEvidenceRecovery &&
+              formData.pendingEvidenceRecovery.expectedCount > 0 &&
+              pendingImages.length === 0 && (
+                <div
+                  id="pending-evidence-recovery-warning"
+                  className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="font-semibold">
+                        {language === 'bn'
+                          ? 'পূর্বে সংযুক্ত প্রমাণাদি পুনরায় নির্বাচন করুন'
+                          : 'Please reattach your previous evidence images'}
+                      </p>
+                      <p className="text-[12.5px] opacity-90 leading-relaxed">
+                        {language === 'bn'
+                          ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery.expectedCount}টি ছবি সংযুক্ত ছিল। জমা সম্পন্ন করতে ছবিগুলো পুনরায় নির্বাচন করুন অথবা সংযুক্তি বাদ দিয়ে চালিয়ে যান।`
+                          : `Your saved draft had ${formData.pendingEvidenceRecovery.expectedCount} image(s) attached. Please reattach the files to complete your submission, or proceed without attachments.`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-1">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onUpdateFormData({
+                          pendingEvidenceRecovery: undefined,
+                          hasSupportingInfo: false,
+                        })
+                      }
+                      className="text-[12px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
+                    >
+                      {language === 'bn'
+                        ? 'সংযুক্তি ছাড়াই অভিযোগ সম্পন্ন করতে চাই'
+                        : 'Proceed without attachments'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
             {/* Image Attachment Picker - max 6 images */}
             <ImageAttachmentPicker
               images={pendingImages}

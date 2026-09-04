@@ -120,14 +120,21 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         : 'Unknown / Not specified'
       : getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language));
 
-  const attachmentsSummary =
-    pendingImages.length > 0
-      ? language === 'bn'
-        ? `${pendingImages.length} টি ছবি সংযুক্ত`
-        : `${pendingImages.length} images attached`
-      : language === 'bn'
-      ? 'কোনো ছবি সংযুক্ত নেই'
-      : 'No attachments';
+  const hasMissingEvidence =
+    pendingImages.length === 0 &&
+    Boolean(formData.pendingEvidenceRecovery && formData.pendingEvidenceRecovery.expectedCount > 0);
+
+  const attachmentsSummary = hasMissingEvidence
+    ? language === 'bn'
+      ? 'পুনরায় সংযুক্তি আবশ্যক'
+      : 'Reattachment required'
+    : pendingImages.length > 0
+    ? language === 'bn'
+      ? `${pendingImages.length} টি ছবি সংযুক্ত`
+      : `${pendingImages.length} images attached`
+    : language === 'bn'
+    ? 'কোনো ছবি সংযুক্ত নেই'
+    : 'No attachments';
 
   return (
     <div className="space-y-4 md:space-y-5 text-left">
@@ -432,7 +439,39 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           editLabel={editLabel}
         >
           <div className="text-[13px] text-secondary pt-1">
-            {pendingImages.length > 0 ? (
+            {hasMissingEvidence ? (
+              <div
+                id="review-missing-evidence-alert"
+                className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
+              >
+                <div className="flex items-start gap-2.5">
+                  <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-semibold">
+                      {language === 'bn'
+                        ? 'পূর্বে সংযুক্ত ছবিগুলো পুনরায় যুক্ত করা প্রয়োজন'
+                        : 'Previously attached images must be reattached'}
+                    </p>
+                    <p className="text-[12.5px] opacity-90 leading-relaxed">
+                      {language === 'bn'
+                        ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery?.expectedCount}টি ছবি সংযুক্ত ছিল। ব্রাউজার রিফ্রেশের কারণে ফাইলগুলো পুনরায় নির্বাচন করতে ৩ নং ধাপে ফিরে যান।`
+                        : `Your saved draft included ${formData.pendingEvidenceRecovery?.expectedCount} image(s). Please return to Step 3 to reattach your files before submitting.`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-end pt-1">
+                  <button
+                    type="button"
+                    onClick={() => onEditStep(3, 'attachments')}
+                    className="text-[12.5px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
+                  >
+                    {language === 'bn'
+                      ? '৩ নং ধাপে সংযুক্তি যোগ করুন →'
+                      : 'Reattach in Step 3 →'}
+                  </button>
+                </div>
+              </div>
+            ) : pendingImages.length > 0 ? (
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="font-bold text-primary">
                   {pendingImages.length} {language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}

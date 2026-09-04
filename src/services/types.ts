@@ -163,6 +163,12 @@ export const CURRENT_REPORT_FLOW_VERSION = 3;
 export interface DraftReport {
   flowVersion?: number;
   clientSubmissionId?: string;
+  pendingEvidenceRecovery?: {
+    expectedCount: number;
+    fileNames: string[];
+    status?: 'pending' | 'failed' | 'completed';
+    lastUpdated?: string;
+  };
   segment: SectionKey | null;
   currentStep: number;
   subcategoryId: string;

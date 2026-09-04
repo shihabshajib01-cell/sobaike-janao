@@ -48,6 +48,17 @@ export const INITIAL_DRAFT: DraftReport = {
   lastSavedAt: '',
 };
 
+export function generateSecureIdempotencyKey(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+  } catch {
+    // fallback
+  }
+  return `idem_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+}
+
 export const DraftRepository = {
   getDraft(): DraftReport | null {
     try {
@@ -147,6 +158,9 @@ export const DraftRepository = {
 
     // Check if an existing submission attempt is already attached
     if (Boolean(draft.clientSubmissionId?.trim())) return true;
+
+    // Check if pending evidence recovery is attached
+    if (draft.pendingEvidenceRecovery && draft.pendingEvidenceRecovery.expectedCount > 0) return true;
 
     // Check step progress
     if (draft.currentStep > 1) return true;
