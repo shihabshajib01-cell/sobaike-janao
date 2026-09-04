@@ -80,10 +80,77 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
 };
 
 const isMockModeAllowed = (): boolean => {
-  return Boolean(import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true');
+  if (import.meta.env.VITE_ENABLE_MOCK_MODE === 'false') {
+    return false;
+  }
+  return !isSupabaseConfigured() || Boolean(import.meta.env.DEV) || import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
 };
 
+const localMockReports: ReportItem[] = [];
+
 export const PublicReportService = {
+  /**
+   * Add a locally submitted mock report into memory so it appears in feeds immediately.
+   */
+  addLocalMockReport(report: any): void {
+    const item: ReportItem = {
+      id: report.id,
+      segment: report.segment,
+      subcategoryId: report.subcategoryId,
+      subcategoryBn: report.subcategoryBn || report.subcategoryId,
+      subcategoryEn: report.subcategoryEn || report.subcategoryId,
+      titleBn: report.title || report.id,
+      titleEn: report.title || report.id,
+      shortDescriptionBn: report.description ? report.description.slice(0, 120) : '',
+      shortDescriptionEn: report.description ? report.description.slice(0, 120) : '',
+      fullDescriptionBn: report.description || '',
+      fullDescriptionEn: report.description || '',
+      reportedSubject: report.reportedSubject,
+      reportedSubjectBn: report.reportedSubject,
+      reportedSubjectEn: report.reportedSubject,
+      subjectType: report.subjectType || 'individual',
+      organization: report.organization,
+      locationBn: report.location?.formattedAddress || report.location?.area || 'ঢাকা',
+      locationEn: report.location?.formattedAddress || report.location?.area || 'Dhaka',
+      districtBn: report.location?.district || 'ঢাকা',
+      districtEn: report.location?.district || 'Dhaka',
+      areaBn: report.location?.area || '',
+      areaEn: report.location?.area || '',
+      incidentDateBn: report.incidentDate || 'আজ',
+      incidentDateEn: report.incidentDate || 'Today',
+      publishedDateBn: 'আজ',
+      publishedDateEn: 'Today',
+      publishedAt: report.createdAt || new Date().toISOString(),
+      evidenceSummaryBn: report.evidenceTypes || [],
+      evidenceSummaryEn: report.evidenceTypes || [],
+      status: 'published',
+      statusBn: 'প্রকাশিত',
+      statusEn: 'Published',
+      isHighUrgency: false,
+      coordinates:
+        report.location?.lat && report.location?.lng
+          ? { lat: report.location.lat, lng: report.location.lng }
+          : undefined,
+      images: [],
+      media: {
+        type: 'none',
+        images: [],
+      },
+      trustIndicators: {
+        evidenceSubmitted: Boolean(report.hasSupportingInfo),
+        multipleReports: false,
+        updateAvailable: false,
+        responseReceived: false,
+        evidenceCount: report.evidenceTypes?.length || 0,
+        hasOfficialResponse: false,
+        hasRelatedReports: false,
+      },
+      relatedReportIds: [],
+      updates: [],
+    };
+    localMockReports.unshift(item);
+  },
+
   /**
    * Fetch all published reports matching optional criteria.
    * Queries the sanitized RPC `get_public_published_reports`.
@@ -95,7 +162,7 @@ export const PublicReportService = {
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
-        list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+        list = [...localMockReports, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
       } else {
         throw new Error('Public reports service is currently unavailable.');
       }
@@ -104,12 +171,12 @@ export const PublicReportService = {
       if (error) {
         console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
         if (isMockModeAllowed()) {
-          list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+          list = [...localMockReports, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
         } else {
           throw new Error(error.message || 'Failed to load public reports from server.');
         }
       } else if (data && Array.isArray(data)) {
-        list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
+        list = [...localMockReports, ...data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw))];
       }
     }
 
@@ -195,6 +262,14 @@ export const PublicReportService = {
    */
   async getById(id: string): Promise<{ report: ReportItem; responses: any[] } | null> {
     const cleanId = id.trim().toUpperCase();
+
+    const localFound = localMockReports.find((r) => r.id.toUpperCase() === cleanId);
+    if (localFound) {
+      return {
+        report: localFound,
+        responses: [],
+      };
+    }
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
