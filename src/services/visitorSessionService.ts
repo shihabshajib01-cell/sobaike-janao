@@ -1,4 +1,10 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import {
+  ReporterSubmissionContext,
+  ReporterLocationCaptureResult,
+  isValidReporterCoordinates,
+} from './types';
+
 
 const VISITOR_ID_KEY = 'sobaike_visitor_id_v1';
 const SESSION_ID_KEY = 'sobaike_session_id_v1';
@@ -463,4 +469,234 @@ export const VisitorSessionService = {
       activeWatchId = null;
     }
   },
+
+  /**
+   * Get the last known valid device location recorded during the session, if any.
+   */
+  getLastRecordedLocation(): StoredLocation | null {
+    return lastRecordedLocation;
+  },
+
+  /**
+   * Captures the reporter's device GPS location immediately associated with complaint submission.
+   * Required for complaint submission for platform safety and spam prevention.
+   *
+   * Behavior:
+   * 1. Checks for geolocation availability in browser.
+   * 2. Attempts fresh capture via navigator.geolocation.getCurrentPosition with high accuracy.
+   * 3. Validates coordinates (numeric, not 0,0, lat -90..90, lng -180..180, accuracy > 0).
+   * 4. If fresh capture succeeds, updates `lastRecordedLocation` and returns coordinates.
+   * 5. If fresh capture times out or fails (e.g. temporary weak signal), but a previously valid
+   *    `lastRecordedLocation` is available, uses it.
+   * 6. If permission was denied or no valid position could be captured, returns clear fail result (fails closed).
+   */
+  async captureReporterDeviceLocation(): Promise<ReporterLocationCaptureResult> {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      return {
+        success: false,
+        errorType: 'unavailable',
+        messageEn:
+          'Location services are not supported or available on this device/browser. Device location is required to submit a complaint for platform safety and spam prevention.',
+        messageBn:
+          'এই ডিভাইস বা ব্রাউজারে লোকেশন সেবা সমর্থিত নয়। প্ল্যাটফর্মের নিরাপত্তা ও স্প্যাম প্রতিরোধের স্বার্থে অভিযোগ জমা দিতে ডিভাইসের অবস্থান আবশ্যক।',
+      };
+    }
+
+    return new Promise<ReporterLocationCaptureResult>((resolve) => {
+      // 10-second timeout for fresh capture
+      const timeoutId = setTimeout(() => {
+        // If fresh capture timed out, check if we have a valid lastRecordedLocation to use
+        if (
+          lastRecordedLocation &&
+          isValidReporterCoordinates(
+            lastRecordedLocation.latitude,
+            lastRecordedLocation.longitude,
+            lastRecordedLocation.accuracy
+          )
+        ) {
+          resolve({
+            success: true,
+            coords: {
+              latitude: lastRecordedLocation.latitude,
+              longitude: lastRecordedLocation.longitude,
+              accuracy: lastRecordedLocation.accuracy,
+              captured_at: new Date(lastRecordedLocation.timestamp).toISOString(),
+            },
+          });
+          return;
+        }
+
+        resolve({
+          success: false,
+          errorType: 'timeout',
+          messageEn:
+            'Location request timed out. Device location is required to submit a complaint for platform safety and spam prevention. Please ensure device GPS is turned on and try again.',
+          messageBn:
+            'অবস্থান নির্ণয়ের সময় শেষ হয়ে গেছে। প্ল্যাটফর্মের নিরাপত্তা ও স্প্যাম প্রতিরোধের স্বার্থে অভিযোগ জমা দিতে ডিভাইসের অবস্থান আবশ্যক। অনুগ্রহ করে ডিভাইসের জিপিএস চালু করে পুনরায় চেষ্টা করুন।',
+        });
+      }, 10000);
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          clearTimeout(timeoutId);
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const accuracy = pos.coords.accuracy;
+          const captured_at = new Date(pos.timestamp || Date.now()).toISOString();
+
+          if (!isValidReporterCoordinates(lat, lng, accuracy)) {
+            // Check if valid stored location exists as fallback
+            if (
+              lastRecordedLocation &&
+              isValidReporterCoordinates(
+                lastRecordedLocation.latitude,
+                lastRecordedLocation.longitude,
+                lastRecordedLocation.accuracy
+              )
+            ) {
+              resolve({
+                success: true,
+                coords: {
+                  latitude: lastRecordedLocation.latitude,
+                  longitude: lastRecordedLocation.longitude,
+                  accuracy: lastRecordedLocation.accuracy,
+                  captured_at: new Date(lastRecordedLocation.timestamp).toISOString(),
+                },
+              });
+              return;
+            }
+
+            resolve({
+              success: false,
+              errorType: 'invalid_coordinates',
+              messageEn:
+                'Invalid GPS coordinates captured from device. Valid device location is required to submit a complaint for platform safety and spam prevention.',
+              messageBn:
+                'ডিভাইস থেকে প্রাপ্ত জিপিএস স্থানাঙ্ক সঠিক নয়। প্ল্যাটফর্মের নিরাপত্তা ও স্প্যাম প্রতিরোধের স্বার্থে অভিযোগ জমা দিতে সঠিক অবস্থান আবশ্যক।',
+            });
+            return;
+          }
+
+          // Successfully captured fresh location!
+          lastRecordedLocation = {
+            latitude: lat,
+            longitude: lng,
+            accuracy,
+            timestamp: Date.now(),
+          };
+
+          this.setLocationChoice('granted');
+          this.startLocationWatch();
+
+          // Also record session asynchronously in background
+          this.recordSession('granted', { latitude: lat, longitude: lng, accuracy }).catch(() => {});
+
+          resolve({
+            success: true,
+            coords: {
+              latitude: lat,
+              longitude: lng,
+              accuracy,
+              captured_at,
+            },
+          });
+        },
+        (err) => {
+          clearTimeout(timeoutId);
+
+          if (err.code === err.PERMISSION_DENIED) {
+            // User explicitly denied permission
+            resolve({
+              success: false,
+              errorType: 'denied',
+              messageEn:
+                'Location access was denied. Device location is required to submit a complaint for platform safety and spam prevention. Please allow location permissions in your browser or device settings and try again.',
+              messageBn:
+                'লোকেশন ব্যবহারের অনুমতি দেওয়া হয়নি। প্ল্যাটফর্মের নিরাপত্তা ও স্প্যাম প্রতিরোধের স্বার্থে অভিযোগ জমা দিতে আপনার ডিভাইসের অবস্থান আবশ্যক। অনুগ্রহ করে ব্রাউজার বা ডিভাইসের সেটিংসে লোকেশন অনুমতি সক্রিয় করে পুনরায় চেষ্টা করুন।',
+            });
+            return;
+          }
+
+          // For other errors (POSITION_UNAVAILABLE, TIMEOUT), fallback if valid location exists
+          if (
+            lastRecordedLocation &&
+            isValidReporterCoordinates(
+              lastRecordedLocation.latitude,
+              lastRecordedLocation.longitude,
+              lastRecordedLocation.accuracy
+            )
+          ) {
+            resolve({
+              success: true,
+              coords: {
+                latitude: lastRecordedLocation.latitude,
+                longitude: lastRecordedLocation.longitude,
+                accuracy: lastRecordedLocation.accuracy,
+                captured_at: new Date(lastRecordedLocation.timestamp).toISOString(),
+              },
+            });
+            return;
+          }
+
+          resolve({
+            success: false,
+            errorType: 'unavailable',
+            messageEn:
+              'Unable to detect your device location. Device location is required to submit a complaint for platform safety and spam prevention. Please ensure device GPS is turned on and try again.',
+            messageBn:
+              'আপনার ডিভাইসের অবস্থান শনাক্ত করা যায়নি। প্ল্যাটফর্মের নিরাপত্তা ও স্প্যাম প্রতিরোধের স্বার্থে অভিযোগ জমা দিতে অবস্থান আবশ্যক। অনুগ্রহ করে ডিভাইসের জিপিএস চালু করে পুনরায় চেষ্টা করুন।',
+          });
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 9500,
+          maximumAge: 0, // Request fresh position
+        }
+      );
+    });
+  },
+
+  /**
+   * Get parsed visitor metadata (browser, OS, screen dimensions)
+   */
+  getVisitorMetadata(): VisitorMetadata {
+    return getVisitorMetadata();
+  },
+
+  /**
+   * Constructs the safe private reporter context record to link to the complaint.
+   * Strictly standard browser/device metadata and GPS coordinates without invasive tracking.
+   */
+  buildReporterSubmissionContext(
+    clientSubmissionId: string,
+    coords: {
+      latitude: number;
+      longitude: number;
+      accuracy: number;
+      captured_at: string;
+    }
+  ): ReporterSubmissionContext {
+    const meta = getVisitorMetadata();
+    return {
+      client_submission_id: clientSubmissionId,
+      visitor_id: this.getVisitorId(),
+      session_id: this.getSessionId(),
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      accuracy_meters: coords.accuracy,
+      captured_at: coords.captured_at,
+      browser_name: meta.browser_name,
+      browser_version: meta.browser_version,
+      os_name: meta.os_name,
+      device_category: meta.device_category,
+      platform: meta.platform,
+      language: meta.language,
+      timezone: meta.timezone,
+      screen_width: meta.screen_width,
+      screen_height: meta.screen_height,
+      user_agent: meta.user_agent,
+    };
+  },
+
 };
+

@@ -242,3 +242,75 @@ export interface ModerationAuditLog {
   note?: string;
   actor: string;
 }
+
+/**
+ * Safe private reporter submission context.
+ * Attached privately to each complaint at submission for abuse investigation / moderation tooling.
+ * Never exposed through public report RPCs, feeds, cards, or maps.
+ */
+export interface ReporterSubmissionContext {
+  complaint_id?: string;
+  client_submission_id: string;
+  visitor_id: string;
+  session_id: string;
+  latitude: number;
+  longitude: number;
+  accuracy_meters: number;
+  captured_at: string;
+  browser_name?: string;
+  browser_version?: string;
+  os_name?: string;
+  device_category?: 'mobile' | 'tablet' | 'desktop' | 'unknown';
+  platform?: string;
+  language?: string;
+  timezone?: string;
+  screen_width?: number;
+  screen_height?: number;
+  user_agent?: string;
+  created_at?: string;
+}
+
+/**
+ * Result of capturing reporter device geolocation prior to submission.
+ */
+export interface ReporterLocationCaptureResult {
+  success: boolean;
+  coords?: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    captured_at: string;
+  };
+  errorType?: 'denied' | 'unavailable' | 'timeout' | 'invalid_coordinates';
+  messageEn?: string;
+  messageBn?: string;
+}
+
+/**
+ * Validates reporter device coordinates and accuracy.
+ * Must be numeric, not 0,0, within standard latitude/longitude bounds, with positive accuracy.
+ * Distinct from incident location coordinates.
+ */
+export function isValidReporterCoordinates(
+  lat?: number | null,
+  lng?: number | null,
+  accuracy?: number | null
+): boolean {
+  if (typeof lat !== 'number' || typeof lng !== 'number' || typeof accuracy !== 'number') {
+    return false;
+  }
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(accuracy)) {
+    return false;
+  }
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    return false;
+  }
+  if (lat === 0 && lng === 0) {
+    return false;
+  }
+  if (accuracy <= 0) {
+    return false;
+  }
+  return true;
+}
+

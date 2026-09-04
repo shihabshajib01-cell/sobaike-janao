@@ -3,6 +3,7 @@ import { SectionKey } from '../../theme/tokens';
 import { DraftReport, isValidIncidentCoordinates } from '../../services/types';
 import { DraftRepository, INITIAL_DRAFT } from '../../services/draftRepository';
 import { apiClient } from '../../services/apiClient';
+import { VisitorSessionService } from '../../services/visitorSessionService';
 import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { ReportComposerHeader } from './ReportComposerHeader';
 import { ReportComposerFooter } from './ReportComposerFooter';
@@ -23,7 +24,9 @@ import {
   X,
   Save,
   Shield,
+  RotateCcw,
 } from 'lucide-react';
+
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { CategoryBadge } from '../ui/CategoryBadge';
@@ -65,9 +68,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isLocationError, setIsLocationError] = useState(false);
+  const [submittingStage, setSubmittingStage] = useState<'verifying_location' | 'submitting' | null>(null);
   const [submissionResult, setSubmissionResult] = useState<{
     reportId: string;
   } | null>(null);
+
 
   // Rape Pre-Report Publishing & Privacy Consent (session-level only - not stored in draft, storage or db)
   const [rapePublishingConsentAccepted, setRapePublishingConsentAccepted] = useState(false);
@@ -137,6 +143,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       retryCredentialsRef.current = null;
       setRapePublishingConsentAccepted(false);
       setRapeConsentCheckbox(false);
+      setSubmitError(null);
+      setIsLocationError(false);
+      setSubmittingStage(null);
 
       // If draft was saved on rape subcategory at step 3 or 4, require consent before displaying step 3/4
       if (
@@ -160,6 +169,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setRapeConsentCheckbox(false);
     setIsRapeConsentModalOpen(false);
     pendingTargetStepRef.current = null;
+    setSubmitError(null);
+    setIsLocationError(false);
+    setSubmittingStage(null);
     setFormData({
       ...INITIAL_DRAFT,
       segment: null,
@@ -175,6 +187,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setRapeConsentCheckbox(false);
     setIsRapeConsentModalOpen(false);
     pendingTargetStepRef.current = null;
+    setSubmitError(null);
+    setIsLocationError(false);
+    setSubmittingStage(null);
     DraftRepository.clearDraft();
     setFormData({
       ...INITIAL_DRAFT,
@@ -184,6 +199,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setPendingImages([]);
     setSavedDraftAvailable(null);
   }, []);
+
 
   // Helper to update form data
   const handleUpdateFormData = useCallback((updates: Partial<DraftReport>) => {
@@ -462,8 +478,30 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
     setIsSubmitting(true);
     setSubmitError(null);
+    setIsLocationError(false);
+    setSubmittingStage('verifying_location');
 
     try {
+      // Step 0: Capture required reporter device GPS location immediately before submission (FAIL CLOSED)
+      const locationResult = await VisitorSessionService.captureReporterDeviceLocation();
+
+      if (!locationResult.success || !locationResult.coords) {
+        const errorMsg =
+          language === 'bn'
+            ? locationResult.messageBn ||
+              'প্ল্যাটফর্মের নিরাপত্তা ও স্প্যাম প্রতিরোধের স্বার্থে অভিযোগ জমা দিতে আপনার ডিভাইসের অবস্থান আবশ্যক।'
+            : locationResult.messageEn ||
+              'Location access is required for complaint submission for platform safety and spam prevention.';
+
+        setIsLocationError(true);
+        setSubmitError(errorMsg);
+        setIsSubmitting(false);
+        setSubmittingStage(null);
+        return;
+      }
+
+      setSubmittingStage('submitting');
+
       const loc = formData.location || {
         division: '',
         district: '',
@@ -530,7 +568,18 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const { clientSubmissionId } = retryCredentialsRef.current;
       const filesToUpload = pendingImages.map((img) => img.file);
 
-      const response = await apiClient.submitReport(payload, filesToUpload, clientSubmissionId);
+      // Safely build private reporter context to link to complaint
+      const reporterContext = VisitorSessionService.buildReporterSubmissionContext(
+        clientSubmissionId,
+        locationResult.coords
+      );
+
+      const response = await apiClient.submitReport(
+        payload,
+        filesToUpload,
+        clientSubmissionId,
+        reporterContext
+      );
 
       if (response && response.reportId) {
         // Reset retry credentials on success
@@ -550,6 +599,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       }
     } catch (err: any) {
       console.warn('Submission failed:', err);
+      if (err?.code === 'REPORTER_LOCATION_REQUIRED') {
+        setIsLocationError(true);
+      }
       const displayMsg =
         language === 'bn'
           ? err?.messageBn || err?.message || 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।'
@@ -557,7 +609,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setSubmitError(displayMsg);
     } finally {
       setIsSubmitting(false);
+      setSubmittingStage(null);
     }
+
   }, [formData, pendingImages, language, rapePublishingConsentAccepted]);
 
   const handleStartAnother = useCallback(() => {
@@ -769,22 +823,58 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             >
               {submitError && (
                 <div
-                  className="p-4 rounded-2xl border flex items-start gap-3 text-[14px]"
+                  id="composer-submit-error-banner"
+                  className="p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-start justify-between gap-4 text-[14px]"
                   style={{
                     backgroundColor: 'var(--ui-error-bg)',
                     borderColor: 'var(--ui-error-border)',
                     color: 'var(--ui-error-text)',
                   }}
                 >
-                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-bold">
-                      {language === 'bn' ? 'জমা ব্যর্থ হয়েছে' : 'Submission Error'}
-                    </p>
-                    <p className="mt-0.5">{submitError}</p>
+                  <div className="flex items-start gap-3">
+                    {isLocationError ? (
+                      <MapPin className="w-5 h-5 shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                    )}
+                    <div>
+                      <p className="font-bold">
+                        {isLocationError
+                          ? language === 'bn'
+                            ? 'ডিভাইসের অবস্থান আবশ্যক'
+                            : 'Device Location Required'
+                          : language === 'bn'
+                          ? 'জমা ব্যর্থ হয়েছে'
+                          : 'Submission Error'}
+                      </p>
+                      <p className="mt-1 leading-relaxed">{submitError}</p>
+                      {isLocationError && (
+                        <p className="mt-2 text-[12.5px] opacity-90">
+                          {language === 'bn'
+                            ? 'ব্রাউজারে লোকেশন অনুমতি বন্ধ থাকলে অ্যাড্রেস বারের তালার আইকন বা সেটিংসে গিয়ে অনুমতি চালু করুন, তারপর পুনরায় চেষ্টা করুন। আপনার সম্পূর্ণ খসড়াটি সংরক্ষিত রয়েছে।'
+                            : 'If permission is blocked, please click the lock/settings icon in your browser address bar to allow location access, then retry. Your completed draft is safely preserved.'}
+                        </p>
+                      )}
+                    </div>
                   </div>
+
+                  {isLocationError && (
+                    <Button
+                      id="composer-retry-location-btn"
+                      type="button"
+                      variant="primary"
+                      size="md"
+                      disabled={isSubmitting}
+                      onClick={handleSubmitReport}
+                      leftIcon={<RotateCcw className="w-4 h-4" />}
+                      className="shrink-0 min-h-[44px] text-[14px] px-4 self-stretch sm:self-auto justify-center"
+                    >
+                      {language === 'bn' ? 'অবস্থান যাচাই ও পুনরায় জমা' : 'Retry Location & Submit'}
+                    </Button>
+                  )}
                 </div>
               )}
+
 
               {submissionResult ? (
                 <StepCompletion
@@ -859,7 +949,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 }
                 canSubmit={!isSubmitting}
                 isSubmitting={isSubmitting}
+                submittingText={
+                  submittingStage === 'verifying_location'
+                    ? language === 'bn'
+                      ? 'ডিভাইসের অবস্থান যাচাই হচ্ছে...'
+                      : 'Verifying device location...'
+                    : undefined
+                }
               />
+
             )}
           </>
         )}

@@ -13,6 +13,7 @@ export interface ReportComposerFooterProps {
   canContinue: boolean;
   canSubmit?: boolean;
   isSubmitting?: boolean;
+  submittingText?: string;
 }
 
 export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
@@ -25,7 +26,9 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   canContinue,
   canSubmit = true,
   isSubmitting = false,
+  submittingText,
 }) => {
+
   return (
     <div className="sticky bottom-0 z-20 bg-surface border-t border-subtle px-4 md:px-8 py-3.5 flex items-center justify-between gap-3 shrink-0 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
       {/* Left-side action (Cancel or Back) */}
@@ -119,12 +122,12 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           className="min-h-[44px] text-[16px] px-6"
         >
           {isSubmitting
-            ? language === 'bn'
-              ? 'প্রতিবেদন জমা হচ্ছে...'
-              : 'Submitting...'
+            ? submittingText ||
+              (language === 'bn' ? 'প্রতিবেদন জমা হচ্ছে...' : 'Submitting...')
             : language === 'bn'
             ? 'প্রতিবেদন জমা দিন'
             : 'Submit Complaint'}
+
         </Button>
       )}
     </div>

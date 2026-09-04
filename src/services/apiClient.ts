@@ -1,4 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
+
 
 export interface ApiError {
   code: string;
@@ -18,7 +20,31 @@ class ApiClient {
   }
 
   // --- Report Submission APIs ---
-  async submitReport(payload: any, images?: File[], idempotencyKey?: string) {
+  async submitReport(
+    payload: any,
+    images?: File[],
+    idempotencyKey?: string,
+    reporterContext?: ReporterSubmissionContext
+  ) {
+    // Fail-closed validation: ensure valid reporter device location context exists
+    if (
+      !reporterContext ||
+      !isValidReporterCoordinates(
+        reporterContext.latitude,
+        reporterContext.longitude,
+        reporterContext.accuracy_meters
+      )
+    ) {
+      const locError: ApiError = {
+        code: 'REPORTER_LOCATION_REQUIRED',
+        message:
+          'Valid device location is required for complaint submission for platform safety and spam prevention.',
+        messageBn:
+          'প্ল্যাটফর্মের নিরাপত্তা ও স্প্যাম প্রতিরোধের স্বার্থে অভিযোগ জমা দিতে ডিভাইসের অবস্থান আবশ্যক।',
+      };
+      throw locError;
+    }
+
     if (!isSupabaseConfigured() || !supabase) {
       console.warn('[ApiClient] Supabase not configured — operating in local preview fallback mode');
       const randomNum = Math.floor(100000 + Math.random() * 900000);
@@ -47,11 +73,33 @@ class ApiClient {
 
     const hasImages = Array.isArray(images) && images.length > 0;
 
-    // Step 1: Submit complaint via RPC
-    const { data, error } = await supabase.rpc('submit_public_complaint', {
-      p_payload: payload,
+    // Step 1: Submit complaint via RPC with safe reporter context
+    const enrichedPayload = {
+      ...payload,
+      reporterContext,
+    };
+
+    let result = await supabase.rpc('submit_public_complaint', {
+      p_payload: enrichedPayload,
       p_client_submission_id: clientSubmissionId,
+      p_reporter_context: reporterContext,
     });
+
+    // Fallback if older RPC signature is cached/deployed
+    if (
+      result.error &&
+      (result.error.message?.includes('schema cache') ||
+        result.error.message?.includes('function') ||
+        result.error.code === 'PGRST202')
+    ) {
+      result = await supabase.rpc('submit_public_complaint', {
+        p_payload: enrichedPayload,
+        p_client_submission_id: clientSubmissionId,
+      });
+    }
+
+    const { data, error } = result;
+
 
     if (error) {
       const errorMsg = error.message || 'Supabase submission failed.';
