@@ -57,7 +57,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           </div>
           <div className="flex-1">
             <h2 id="location-consent-title" className="text-lg font-bold tracking-tight">
-              {isBn ? 'আপনার অবস্থান শেয়ার করুন' : 'Share your location'}
+              {isBn ? 'আপনার এলাকার পোস্ট দেখুন' : 'See more posts from your area'}
             </h2>
             <div className="flex items-center gap-1.5 text-xs text-muted mt-0.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
@@ -67,16 +67,11 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <div id="location-consent-desc" className="flex flex-col gap-3 text-sm text-secondary leading-relaxed">
+        <div id="location-consent-desc" className="text-sm text-secondary leading-relaxed">
           <p>
             {isBn
-              ? 'আপনার অবস্থান আমাদের বুঝতে সাহায্য করে কোন এলাকা থেকে জনসাধারণের প্রতিবেদন ও প্ল্যাটফর্ম কার্যক্রম আসছে। আপনার অবস্থান শুধুমাত্র অনুমোদিত অ্যাডমিনরা দেখতে পারবেন।'
-              : 'Your location helps us understand where public reports and platform activity are coming from. Your location is visible only to authorized administrators.'}
-          </p>
-          <p className="text-xs text-muted bg-surface-muted/60 p-3 rounded-lg border border-subtle">
-            {isBn
-              ? 'আপনি অবস্থান ব্যবহারের অনুমতি দিলে, এই ওয়েবসাইট খোলা থাকা অবস্থায় অবস্থানের তথ্য হালনাগাদ হতে পারে। অবস্থান শেয়ার না করেও আপনি ওয়েবসাইট ব্যবহার করতে পারবেন।'
-              : 'If you allow location access, it may be updated while this website remains open. You can still use the website without sharing your location.'}
+              ? 'লোকেশন চালু করলে আপনার আশপাশের অভিযোগ, রিপোর্ট ও পোস্টগুলো ফিডে বেশি প্রাধান্য পাবে। এতে আপনার এলাকার আপডেট সহজে দেখতে পারবেন।'
+              : 'Turn on location to see more complaints, reports, and posts from places near you. It helps keep your feed more relevant to where you are.'}
           </p>
         </div>
 
@@ -94,7 +89,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
                 <span>{isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...'}</span>
               </>
             ) : (
-              <span>{isBn ? 'অবস্থান শেয়ার করুন' : 'Share Location'}</span>
+              <span>{isBn ? 'লোকেশন চালু করুন' : 'Turn on location'}</span>
             )}
           </button>
           <button
@@ -103,7 +98,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             disabled={isLoading}
             className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-surface-muted hover:bg-surface-muted/80 text-secondary border border-subtle transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50"
           >
-            <span>{isBn ? 'এখন নয়' : 'Not Now'}</span>
+            <span>{isBn ? 'এখন নয়' : 'Not now'}</span>
           </button>
         </div>
       </div>
