@@ -132,7 +132,7 @@ DECLARE
   v_title text;
   v_description text;
   v_incident_date date;
-  v_incident_time text;
+  v_incident_time time without time zone;
   v_frequency text;
   v_location jsonb;
   v_lat double precision;
@@ -147,8 +147,8 @@ DECLARE
   v_place_id text;
   v_privacy_choice text;
   v_rel_context text;
-  v_intimate_what text;
-  v_intimate_platform text;
+  v_intimate_what jsonb;
+  v_intimate_platform jsonb;
   v_reporter_name text;
   v_reporter_contact text;
   v_confirm_public_identity boolean;
@@ -360,7 +360,14 @@ BEGIN
     v_incident_date := CURRENT_DATE;
   END IF;
 
-  v_incident_time := nullif(trim(coalesce(p_payload->>'incidentTime', '')), '');
+  v_incident_time := NULL;
+  IF nullif(trim(coalesce(p_payload->>'incidentTime', '')), '') IS NOT NULL THEN
+    BEGIN
+      v_incident_time := (trim(p_payload->>'incidentTime'))::time without time zone;
+    EXCEPTION WHEN OTHERS THEN
+      v_incident_time := NULL;
+    END;
+  END IF;
   v_frequency := coalesce(p_payload->>'frequency', 'one-time');
   IF v_frequency NOT IN ('one-time', 'repeated') THEN
     v_frequency := 'one-time';
@@ -399,8 +406,21 @@ BEGIN
   END IF;
 
   v_rel_context := nullif(trim(coalesce(p_payload->>'relationshipContext', '')), '');
-  v_intimate_what := nullif(trim(coalesce(p_payload->>'intimateWhatHappened', '')), '');
-  v_intimate_platform := nullif(trim(coalesce(p_payload->>'intimatePlatform', '')), '');
+  v_intimate_what :=
+    CASE
+      WHEN p_payload ? 'intimateWhatHappened'
+           AND p_payload->'intimateWhatHappened' <> 'null'::jsonb
+      THEN p_payload->'intimateWhatHappened'
+      ELSE NULL
+    END;
+
+  v_intimate_platform :=
+    CASE
+      WHEN p_payload ? 'intimatePlatform'
+           AND p_payload->'intimatePlatform' <> 'null'::jsonb
+      THEN p_payload->'intimatePlatform'
+      ELSE NULL
+    END;
 
   -- -------------------------------------------------------------------------
   -- Step 6: Extract Admin Contact (harassment reporter details)
