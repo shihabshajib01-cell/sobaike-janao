@@ -967,16 +967,16 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <span>{language === 'bn' ? 'ডিভাইস লোকেশন চালু আছে' : 'Device location is on'}</span>
               </div>
             ) : reporterGateState === 'denied' ? (
-              <div className="p-3.5 rounded-xl border border-red-500/30 bg-red-500/5 space-y-2.5">
+              <div className="p-3.5 rounded-xl border border-red-500/30 bg-red-500/5 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                   <div className="flex-1 text-[13px] text-primary leading-relaxed">
                     {language === 'bn'
-                      ? 'লোকেশন অনুমতি ছাড়া অভিযোগের স্থান নির্বাচন করা যাবে না। ব্রাউজার বা ডিভাইস সেটিংস থেকে লোকেশন অনুমতি চালু করে আবার চেষ্টা করুন।'
-                      : 'Incident location cannot be selected without location permission. Allow location access in your browser or device settings, then try again.'}
+                      ? 'লোকেশন অনুমতি পাওয়া যায়নি। ব্রাউজার বা ডিভাইসে লোকেশন চালু করে আবার চেষ্টা করুন।'
+                      : 'Location permission was not granted. Please enable location in your browser or device settings and try again.'}
                   </div>
                 </div>
-                <div className="flex justify-end pt-0.5">
+                <div className="flex justify-start pt-0.5">
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
@@ -988,16 +988,16 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
               </div>
             ) : reporterGateState === 'unavailable' ? (
-              <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/5 space-y-2.5">
+              <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/5 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                   <div className="flex-1 text-[13px] text-primary leading-relaxed">
                     {language === 'bn'
-                      ? 'আপনার ডিভাইসের লোকেশন পাওয়া যাচ্ছে না। জিপিএস চালু আছে কিনা দেখে আবার চেষ্টা করুন।'
-                      : 'Your device location could not be detected. Make sure location services are enabled and try again.'}
+                      ? 'লোকেশন পাওয়া যাচ্ছে না। জিপিএস বা ডিভাইস লোকেশন চালু করে আবার চেষ্টা করুন।'
+                      : 'Device location could not be detected. Make sure GPS or location services are enabled and try again.'}
                   </div>
                 </div>
-                <div className="flex justify-end pt-0.5">
+                <div className="flex justify-start pt-0.5">
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
@@ -1008,9 +1008,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   </button>
                 </div>
               </div>
-            ) : (
-              /* 'required' or 'requesting' or 'checking' */
-              <div className="p-3.5 rounded-xl border border-subtle bg-surface-subtle/70 space-y-2.5">
+            ) : reporterGateState === 'requesting' || reporterGateState === 'checking' ? (
+              <div className="p-3.5 rounded-xl border border-subtle bg-surface-subtle/70 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <div className="flex-1 text-[13px] text-primary leading-relaxed">
@@ -1019,24 +1018,30 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       : 'Turn on device location before selecting the incident location.'}
                   </div>
                 </div>
-                <div className="flex justify-end pt-0.5">
+                <div className="flex items-center gap-2 pt-0.5 text-[13px] text-accent font-medium">
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  <span>{language === 'bn' ? 'লোকেশন যাচাই হচ্ছে...' : 'Checking location...'}</span>
+                </div>
+              </div>
+            ) : (
+              /* 'required' or idle */
+              <div className="p-3.5 rounded-xl border border-subtle bg-surface-subtle/70 space-y-2.5 text-left">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                    {language === 'bn'
+                      ? 'অভিযোগের স্থান নির্বাচন করতে আপনার ডিভাইসের লোকেশন চালু করুন।'
+                      : 'Turn on device location before selecting the incident location.'}
+                  </div>
+                </div>
+                <div className="flex justify-start pt-0.5">
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    disabled={reporterGateState === 'requesting'}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent hover:bg-accent-hover text-white text-[13px] font-semibold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent hover:bg-accent-hover text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
                   >
-                    {reporterGateState === 'requesting' ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin shrink-0" />
-                        <span>{language === 'bn' ? 'লোকেশন যাচাই হচ্ছে...' : 'Checking location...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <MapPin className="w-4 h-4 shrink-0" />
-                        <span>{language === 'bn' ? 'লোকেশন চালু করুন' : 'Turn on location'}</span>
-                      </>
-                    )}
+                    <MapPin className="w-4 h-4 shrink-0" />
+                    <span>{language === 'bn' ? 'লোকেশন চালু করুন' : 'Allow location'}</span>
                   </button>
                 </div>
               </div>
