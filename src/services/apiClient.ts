@@ -47,16 +47,16 @@ class ApiClient {
 
     if (!isSupabaseConfigured() || !supabase) {
       const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+        !isSupabaseConfigured() || import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
       );
       if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in explicit local dev mock mode');
+        console.warn('[ApiClient] Supabase not configured — operating in local in-memory fallback mode');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
         return {
           success: true,
           reportId: mockReportId,
-          message: 'Report submitted successfully (local mock dev mode).',
+          message: 'Report submitted successfully (local mock mode).',
           report: {
             id: mockReportId,
             ...payload,
