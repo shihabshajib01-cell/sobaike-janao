@@ -672,7 +672,7 @@ BEGIN
       created_at
     ) VALUES (
       v_report_id,
-      nullif(trim(coalesce(p_payload->>'reportedSubject', '')), ''),
+      coalesce(nullif(trim(coalesce(p_payload->>'reportedSubject', '')), ''), nullif(trim(coalesce(p_payload->>'organization', '')), '')),
       v_party_type,
       nullif(trim(coalesce(p_payload->>'roleOrDesignation', '')), ''),
       nullif(trim(coalesce(p_payload->>'organization', '')), ''),
