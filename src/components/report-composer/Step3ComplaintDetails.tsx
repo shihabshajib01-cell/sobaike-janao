@@ -13,9 +13,13 @@ import {
   Users,
   Plus,
   Trash2,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { DraftReport, ReportLocationData, MentionedParty, isValidIncidentCoordinates, isMeaningfulMentionedParty } from '../../services/types';
+import { VisitorSessionService } from '../../services/visitorSessionService';
 import {
   SEGMENT_SUBCATEGORIES,
   INTIMATE_WHAT_HAPPENED_OPTIONS,
@@ -45,6 +49,14 @@ import {
 export interface Step3Handle {
   validateAndProceed: () => boolean;
 }
+
+export type ReporterLocationGateState =
+  | 'checking'
+  | 'required'
+  | 'requesting'
+  | 'verified'
+  | 'denied'
+  | 'unavailable';
 
 export interface Step3ComplaintDetailsProps {
   segment: SectionKey;
@@ -225,6 +237,85 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Validation errors state
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    // Reporter device location gate state
+    const [reporterGateState, setReporterGateState] = useState<ReporterLocationGateState>(() => {
+      if (VisitorSessionService.hasValidCurrentReporterLocation()) {
+        return 'verified';
+      }
+      return 'checking';
+    });
+
+    useEffect(() => {
+      let isMounted = true;
+
+      // If valid session reporter location already exists, unlock immediately
+      if (VisitorSessionService.hasValidCurrentReporterLocation()) {
+        setReporterGateState('verified');
+        return;
+      }
+
+      // Check browser permission status if supported
+      const checkInitialPermission = async () => {
+        try {
+          const status = await VisitorSessionService.queryPermissionStatus();
+          if (!isMounted) return;
+
+          if (status === 'granted') {
+            // Browser permission already granted, attempt capture automatically without prompt
+            setReporterGateState('requesting');
+            const res = await VisitorSessionService.captureReporterDeviceLocation();
+            if (!isMounted) return;
+            if (res.success && res.coords) {
+              setReporterGateState('verified');
+            } else if (res.errorType === 'denied') {
+              setReporterGateState('denied');
+            } else {
+              setReporterGateState('unavailable');
+            }
+          } else if (status === 'denied') {
+            setReporterGateState('denied');
+          } else {
+            // 'prompt' or 'unavailable' (Permissions API not supported)
+            setReporterGateState('required');
+          }
+        } catch {
+          if (isMounted) {
+            setReporterGateState('required');
+          }
+        }
+      };
+
+      checkInitialPermission();
+
+      return () => {
+        isMounted = false;
+      };
+    }, []);
+
+    const handleRequestDeviceLocation = async () => {
+      setReporterGateState('requesting');
+      try {
+        const res = await VisitorSessionService.captureReporterDeviceLocation();
+        if (res.success && res.coords) {
+          setReporterGateState('verified');
+          setErrors((prev) => {
+            if (!prev.reporterLocation) return prev;
+            const updated = { ...prev };
+            delete updated.reporterLocation;
+            return updated;
+          });
+        } else if (res.errorType === 'denied') {
+          setReporterGateState('denied');
+        } else {
+          setReporterGateState('unavailable');
+        }
+      } catch {
+        setReporterGateState('unavailable');
+      }
+    };
+
+    const isLocationLocked = reporterGateState !== 'verified';
+
     // Progressive disclosure states
     const [showTitleField, setShowTitleField] = useState<boolean>(false);
     const [showIdentifyingDetails, setShowIdentifyingDetails] = useState<boolean>(false);
@@ -242,6 +333,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
     // Location Handlers
     const handleManualLocationChange = (locUpdates: Partial<ReportLocationData>) => {
+      if (isLocationLocked) return;
+
       // Check if user changed a geographic address field that invalidates the selected map point
       const isGeographicFieldChanged =
         ('division' in locUpdates && locUpdates.division !== formData.location?.division) ||
@@ -297,6 +390,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     };
 
     const handleMapPointChange = (lat: number, lng: number) => {
+      if (isLocationLocked) return;
+
       const updatedLoc: ReportLocationData = {
         formattedAddress: formData.location?.formattedAddress || '',
         division: formData.location?.division || '',
@@ -369,6 +464,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
     // Dedicated coherent update path for Google Places search resolution
     const handleSearchResultSelected = (place: ResolvedPlaceResult) => {
+      if (isLocationLocked) return;
+
       const currentLoc = formData.location || {
         formattedAddress: '',
         division: '',
@@ -402,6 +499,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     };
 
     const handleToggleDetailedLocation = (enabled: boolean) => {
+      if (isLocationLocked) return;
       onUpdateFormData({ isDetailedLocation: enabled });
     };
 
@@ -513,6 +611,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             : 'Future dates are not allowed';
       }
 
+      if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
+        newErrors.reporterLocation =
+          language === 'bn'
+            ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
+            : 'Turn on device location before continuing.';
+      }
+
       if (!formData.location?.division) {
         newErrors.division =
           language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
@@ -557,7 +662,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         if (newErrors.title || newErrors.description || newErrors.incidentDate) {
           const elem = document.getElementById('composer-section-narrative');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (newErrors.division || newErrors.district || newErrors.coordinates) {
+        } else if (newErrors.reporterLocation || newErrors.division || newErrors.district || newErrors.coordinates) {
           const elem = document.getElementById('composer-section-location');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else if (showsIdentitySection && (newErrors.adminContact || newErrors.adminName)) {
@@ -842,7 +947,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           collapsible={false}
           onToggle={() => {}}
           title={language === 'bn' ? '২. লোকেশন' : '2. Location'}
-          hasError={Boolean(errors.division || errors.district || errors.coordinates)}
+          hasError={Boolean(errors.division || errors.district || errors.coordinates || errors.reporterLocation)}
           icon={<MapPin className="w-5 h-5" />}
         >
           <div className="space-y-3.5 pt-1 text-left">
@@ -853,6 +958,96 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   ? 'অনলাইন বা ডিজিটাল ঘটনার ক্ষেত্রে প্রাসঙ্গিক এলাকা বা জেলা নির্বাচন করুন।'
                   : 'For online incidents, select the most relevant area or district.'}
               </p>
+            )}
+
+            {/* Reporter Device Location Gate */}
+            {reporterGateState === 'verified' ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[12.5px] font-semibold">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{language === 'bn' ? 'ডিভাইস লোকেশন চালু আছে' : 'Device location is on'}</span>
+              </div>
+            ) : reporterGateState === 'denied' ? (
+              <div className="p-3.5 rounded-xl border border-red-500/30 bg-red-500/5 space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                    {language === 'bn'
+                      ? 'লোকেশন অনুমতি ছাড়া অভিযোগের স্থান নির্বাচন করা যাবে না। ব্রাউজার বা ডিভাইস সেটিংস থেকে লোকেশন অনুমতি চালু করে আবার চেষ্টা করুন।'
+                      : 'Incident location cannot be selected without location permission. Allow location access in your browser or device settings, then try again.'}
+                  </div>
+                </div>
+                <div className="flex justify-end pt-0.5">
+                  <button
+                    type="button"
+                    onClick={handleRequestDeviceLocation}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
+                  >
+                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try again'}</span>
+                  </button>
+                </div>
+              </div>
+            ) : reporterGateState === 'unavailable' ? (
+              <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/5 space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                    {language === 'bn'
+                      ? 'আপনার ডিভাইসের লোকেশন পাওয়া যাচ্ছে না। জিপিএস চালু আছে কিনা দেখে আবার চেষ্টা করুন।'
+                      : 'Your device location could not be detected. Make sure location services are enabled and try again.'}
+                  </div>
+                </div>
+                <div className="flex justify-end pt-0.5">
+                  <button
+                    type="button"
+                    onClick={handleRequestDeviceLocation}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
+                  >
+                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try again'}</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* 'required' or 'requesting' or 'checking' */
+              <div className="p-3.5 rounded-xl border border-subtle bg-surface-subtle/70 space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                    {language === 'bn'
+                      ? 'অভিযোগের স্থান নির্বাচন করতে আপনার ডিভাইসের লোকেশন চালু করুন।'
+                      : 'Turn on device location before selecting the incident location.'}
+                  </div>
+                </div>
+                <div className="flex justify-end pt-0.5">
+                  <button
+                    type="button"
+                    onClick={handleRequestDeviceLocation}
+                    disabled={reporterGateState === 'requesting'}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent hover:bg-accent-hover text-white text-[13px] font-semibold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed shadow-xs"
+                  >
+                    {reporterGateState === 'requesting' ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                        <span>{language === 'bn' ? 'লোকেশন যাচাই হচ্ছে...' : 'Checking location...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <MapPin className="w-4 h-4 shrink-0" />
+                        <span>{language === 'bn' ? 'লোকেশন চালু করুন' : 'Turn on location'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Prerequisite validation error message */}
+            {errors.reporterLocation && (
+              <div className="text-[12.5px] text-red-500 font-semibold flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+                <span>{errors.reporterLocation}</span>
+              </div>
             )}
 
             {/* State A: When Google Places is available */}
@@ -870,12 +1065,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </label>
                     <select
                       id="complaint-division-select"
+                      disabled={isLocationLocked}
                       value={formData.location?.division || ''}
                       onChange={(e) => {
                         const divVal = e.target.value;
                         handleManualLocationChange({ division: divVal, district: '' });
                       }}
-                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                        isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                      } ${
                         errors.division ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                       }`}
                     >
@@ -902,11 +1100,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     {availableDistricts.length > 0 ? (
                       <select
                         id="complaint-district-select"
+                        disabled={isLocationLocked}
                         value={formData.location?.district || ''}
                         onChange={(e) => {
                           handleManualLocationChange({ district: e.target.value });
                         }}
-                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                        } ${
                           errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                         }`}
                       >
@@ -921,12 +1122,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       <input
                         id="complaint-district-input"
                         type="text"
+                        disabled={isLocationLocked}
                         value={formData.location?.district || ''}
                         onChange={(e) => {
                           handleManualLocationChange({ district: e.target.value });
                         }}
                         placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
                         className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                        } ${
                           errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                         }`}
                       />
@@ -940,6 +1144,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 {/* Single Search Control After Division + District */}
                 <div className="pt-0.5">
                   <AddressSearchInput
+                    disabled={isLocationLocked}
                     language={language}
                     onPlaceSelected={handleSearchResultSelected}
                     biasCoords={searchBiasCoords}
@@ -950,6 +1155,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 {/* Map Coordinate Picker */}
                 <div className="pt-2">
                   <GoogleMapPicker
+                    disabled={isLocationLocked}
                     location={
                       formData.location || {
                         division: '',
@@ -994,12 +1200,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </label>
                     <select
                       id="complaint-division-select"
+                      disabled={isLocationLocked}
                       value={formData.location?.division || ''}
                       onChange={(e) => {
                         const divVal = e.target.value;
                         handleManualLocationChange({ division: divVal, district: '' });
                       }}
-                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                        isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                      } ${
                         errors.division ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                       }`}
                     >
@@ -1026,11 +1235,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     {availableDistricts.length > 0 ? (
                       <select
                         id="complaint-district-select"
+                        disabled={isLocationLocked}
                         value={formData.location?.district || ''}
                         onChange={(e) => {
                           handleManualLocationChange({ district: e.target.value });
                         }}
-                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                        } ${
                           errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                         }`}
                       >
@@ -1045,12 +1257,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       <input
                         id="complaint-district-input"
                         type="text"
+                        disabled={isLocationLocked}
                         value={formData.location?.district || ''}
                         onChange={(e) => {
                           handleManualLocationChange({ district: e.target.value });
                         }}
                         placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
                         className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                        } ${
                           errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                         }`}
                       />
@@ -1077,10 +1292,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <input
                       id="complaint-area-input"
                       type="text"
+                      disabled={isLocationLocked}
                       value={formData.location?.area || ''}
                       onChange={(e) => handleManualLocationChange({ area: e.target.value })}
                       placeholder={language === 'bn' ? 'এলাকা বা মহল্লার নাম' : 'Area or neighborhood'}
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                      className={`w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                        isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                      }`}
                     />
                   </div>
                 </div>
@@ -1088,6 +1306,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 {/* Map Coordinate Picker */}
                 <div className="pt-2">
                   <GoogleMapPicker
+                    disabled={isLocationLocked}
                     location={
                       formData.location || {
                         division: '',
@@ -1110,8 +1329,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div className="pt-1">
                   <button
                     type="button"
+                    disabled={isLocationLocked}
                     onClick={() => handleToggleDetailedLocation(!formData.isDetailedLocation)}
-                    className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-primary hover:underline cursor-pointer py-1"
+                    className={`inline-flex items-center gap-1.5 text-[14px] font-semibold text-primary hover:underline py-1 ${
+                      isLocationLocked ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'
+                    }`}
                   >
                     <ChevronDown
                       className={`w-4 h-4 transition-transform ${
@@ -1141,10 +1363,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         <input
                           id="complaint-thana-input"
                           type="text"
+                          disabled={isLocationLocked}
                           value={formData.location?.upazilaOrThana || ''}
                           onChange={(e) => handleManualLocationChange({ upazilaOrThana: e.target.value })}
                           placeholder={language === 'bn' ? 'যেমন: মিরপুর মডেল' : 'e.g. Mirpur Model'}
-                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                          className={`w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                            isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                          }`}
                         />
                       </div>
 
@@ -1158,10 +1383,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         <input
                           id="complaint-road-input"
                           type="text"
+                          disabled={isLocationLocked}
                           value={formData.location?.road || ''}
                           onChange={(e) => handleManualLocationChange({ road: e.target.value })}
                           placeholder={language === 'bn' ? 'যেমন: রোড ৪, ব্লক বি' : 'e.g. Road 4, Block B'}
-                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                          className={`w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                            isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                          }`}
                         />
                       </div>
 
@@ -1175,10 +1403,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         <input
                           id="complaint-landmark-input"
                           type="text"
+                          disabled={isLocationLocked}
                           value={formData.location?.landmark || ''}
                           onChange={(e) => handleManualLocationChange({ landmark: e.target.value })}
                           placeholder={language === 'bn' ? 'যেমন: মসজিদের পিছনে' : 'e.g. Behind mosque'}
-                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                          className={`w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                            isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                          }`}
                         />
                       </div>
                     </div>

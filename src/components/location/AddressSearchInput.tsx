@@ -208,7 +208,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
               ? 'এলাকা, রাস্তা, প্রতিষ্ঠান বা পরিচিত জায়গার নাম লিখুন'
               : 'Type an area, road, place, or landmark'
           }
-          className="w-full pl-10 pr-10 py-2.5 bg-surface border border-subtle rounded-xl text-[14px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] transition-colors"
+          className="w-full pl-10 pr-10 py-2.5 bg-surface border border-subtle rounded-xl text-[14px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface-subtle"
         />
 
         {/* Clear Button */}

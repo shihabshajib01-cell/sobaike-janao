@@ -478,6 +478,40 @@ export const VisitorSessionService = {
   },
 
   /**
+   * Check if a valid reporter device location is currently available in session memory.
+   */
+  hasValidCurrentReporterLocation(): boolean {
+    return Boolean(
+      lastRecordedLocation &&
+        isValidReporterCoordinates(
+          lastRecordedLocation.latitude,
+          lastRecordedLocation.longitude,
+          lastRecordedLocation.accuracy
+        )
+    );
+  },
+
+  /**
+   * Safely query browser geolocation permission status if supported.
+   * Returns 'granted', 'denied', 'prompt', or 'unavailable'.
+   */
+  async queryPermissionStatus(): Promise<PermissionStatus> {
+    if (
+      typeof navigator === 'undefined' ||
+      !navigator.permissions ||
+      typeof navigator.permissions.query !== 'function'
+    ) {
+      return 'unavailable';
+    }
+    try {
+      const status = await navigator.permissions.query({ name: 'geolocation' });
+      return status.state as PermissionStatus;
+    } catch {
+      return 'unavailable';
+    }
+  },
+
+  /**
    * Captures the reporter's device GPS location immediately associated with complaint submission.
    * Required for complaint submission for platform safety and spam prevention.
    *

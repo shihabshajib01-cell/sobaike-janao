@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { MapPin, CheckCircle2, AlertCircle, Crosshair } from 'lucide-react';
+import { MapPin, CheckCircle2, AlertCircle, Crosshair, Lock } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ReportLocationData, isValidIncidentCoordinates } from '../../services/types';
@@ -12,6 +12,7 @@ export interface GoogleMapPickerProps {
   language: 'bn' | 'en';
   error?: string;
   centerTarget?: { lat: number; lng: number; zoom?: number; timestamp: number };
+  disabled?: boolean;
 }
 
 export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
@@ -21,6 +22,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
   language,
   error,
   centerTarget,
+  disabled = false,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -28,6 +30,8 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
   const haloMarkerRef = useRef<L.CircleMarker | null>(null);
   const lastCenteredDistrictOrDivisionRef = useRef<string>('');
   const lastHandledCenterTimestampRef = useRef<number>(0);
+  const disabledRef = useRef<boolean>(disabled);
+  disabledRef.current = disabled;
 
   const hasValidCoordinates = isValidIncidentCoordinates(location.lat, location.lng);
 
@@ -123,6 +127,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
 
     // Map click event to select incident point
     map.on('click', (e: L.LeafletMouseEvent) => {
+      if (disabledRef.current) return;
       latestSelectPointRef.current(e.latlng.lat, e.latlng.lng);
     });
 
@@ -269,7 +274,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
 
   // Accessible center-pin selector
   const handleSetPointAtCenter = () => {
-    if (!mapInstanceRef.current) return;
+    if (disabled || !mapInstanceRef.current) return;
     const center = mapInstanceRef.current.getCenter();
     latestSelectPointRef.current(center.lat, center.lng);
   };
@@ -315,6 +320,23 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
         }`}
       >
         <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+        {/* Disabled / Interaction-Locked Overlay */}
+        {disabled && (
+          <div
+            className="absolute inset-0 z-10 bg-surface/50 backdrop-blur-[1px] flex items-center justify-center p-3 text-center cursor-not-allowed select-none pointer-events-auto"
+            aria-hidden="true"
+          >
+            <div className="bg-surface/95 border border-subtle shadow-sm px-3.5 py-2 rounded-xl flex items-center gap-2 text-[12.5px] text-secondary font-medium">
+              <Lock className="w-4 h-4 text-muted shrink-0" />
+              <span>
+                {language === 'bn'
+                  ? 'ম্যাপে স্থান নির্বাচন করতে ডিভাইসের লোকেশন চালু করুন'
+                  : 'Turn on device location to select incident point'}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Accessible Action & Coordinate Info */}
@@ -322,7 +344,12 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
         <button
           type="button"
           onClick={handleSetPointAtCenter}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-subtle hover:border-accent hover:bg-surface-subtle text-[12.5px] font-medium text-primary rounded-lg shadow-2xs transition-colors cursor-pointer min-h-[36px]"
+          disabled={disabled}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-subtle text-[12.5px] font-medium text-primary rounded-lg shadow-2xs transition-colors min-h-[36px] ${
+            disabled
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:border-accent hover:bg-surface-subtle cursor-pointer'
+          }`}
           title={
             language === 'bn'
               ? 'ম্যাপের কেন্দ্রকে ঘটনাস্থল হিসেবে নির্বাচন করুন'
