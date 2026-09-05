@@ -52,6 +52,15 @@ export interface Step3ComplaintDetailsProps {
   language: 'bn' | 'en';
 }
 
+const getLocalToday = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
 export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetailsProps>(
   (
     {
@@ -65,6 +74,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     },
     ref
   ) => {
+    const todayLocal = getLocalToday();
+
     // Segment structure conditions
     const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
     const showsIdentitySection = segment === 'harassment';
@@ -307,6 +318,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       if (!formData.incidentDate) {
         newErrors.incidentDate =
           language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন' : 'Incident date is required';
+      } else if (formData.incidentDate > todayLocal) {
+        newErrors.incidentDate =
+          language === 'bn'
+            ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+            : 'Future dates are not allowed';
       }
 
       if (!formData.location?.division) {
@@ -499,10 +515,21 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <input
                   id="complaint-date-input"
                   type="date"
-                  max={new Date().toISOString().split('T')[0]}
+                  max={todayLocal}
                   value={formData.incidentDate || ''}
                   onChange={(e) => {
-                    onUpdateFormData({ incidentDate: e.target.value });
+                    const selectedDate = e.target.value;
+                    if (selectedDate && selectedDate > todayLocal) {
+                      setErrors((prev) => ({
+                        ...prev,
+                        incidentDate:
+                          language === 'bn'
+                            ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                            : 'Future dates are not allowed',
+                      }));
+                      return;
+                    }
+                    onUpdateFormData({ incidentDate: selectedDate });
                     if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
                   }}
                   className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
