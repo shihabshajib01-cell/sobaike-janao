@@ -6,7 +6,6 @@ interface CitizenActionModalProps {
   onClose: () => void;
   reportId: string;
   reportTitle: string;
-  type: 'witness_information' | 'experienced_similar';
   language: 'bn' | 'en';
 }
 
@@ -15,7 +14,6 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   onClose,
   reportId,
   reportTitle,
-  type,
   language,
 }) => {
   const [description, setDescription] = useState('');
@@ -26,8 +24,6 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
-
-  const isWitness = type === 'witness_information';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,18 +61,14 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between gap-3 border-b border-subtle pb-3.5">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[14px] font-semibold bg-surface-subtle text-secondary border border-subtle">
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[13px] font-semibold bg-surface-subtle text-secondary border border-subtle">
               <FileText className="w-3.5 h-3.5 text-secondary" />
-              <span>{isWitness ? (language === 'bn' ? 'অতিরিক্ত তথ্য ও প্রমাণ' : 'Witness Supplementary Info') : (language === 'bn' ? 'অনুরূপ ঘটনার প্রমাণ' : 'Corroborating Experience')}</span>
+              <span>{language === 'bn' ? 'তথ্য ও অভিজ্ঞতা' : 'Information & Experience'}</span>
             </div>
             <h3 id="citizen-modal-title" className="text-[20px] leading-[28px] font-bold text-primary">
-              {isWitness
-                ? language === 'bn'
-                  ? 'এই প্রতিবেদন সম্পর্কে আপনার জানা তথ্য যোগ করুন'
-                  : 'Submit Supplementary Information'
-                : language === 'bn'
-                ? 'আপনিও কি একই ধরনের ঘটনার শিকার?'
-                : 'Report a Similar Experience'}
+              {language === 'bn'
+                ? 'তথ্য বা অভিজ্ঞতা যোগ করুন'
+                : 'Add Information or Experience'}
             </h3>
             <p className="text-[14px] text-muted font-mono">
               {language === 'bn' ? 'প্রতিবেদন আইডি:' : 'Referenced Report:'} {reportId}
@@ -126,13 +118,9 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
 
             <div className="space-y-1.5">
               <label className="block text-[16px] font-medium text-primary">
-                {isWitness
-                  ? language === 'bn'
-                    ? 'আপনার কাছে থাকা তথ্য বা প্রত্যক্ষদর্শীর বিবরণ *'
-                    : 'Your Account / Eyewitness Details *'
-                  : language === 'bn'
-                  ? 'আপনার অভিজ্ঞতা সংক্ষেপে লিখুন *'
-                  : 'Describe What You Experienced *'}
+                {language === 'bn'
+                  ? 'আপনার তথ্য বা অভিজ্ঞতা লিখুন *'
+                  : 'Describe your information or experience *'}
               </label>
               <textarea
                 rows={4}

@@ -35,7 +35,7 @@ export interface ReportDetailPageProps {
 export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
-  const [citizenModalType, setCitizenModalType] = useState<'witness_information' | 'experienced_similar' | null>(null);
+  const [isCitizenModalOpen, setIsCitizenModalOpen] = useState(false);
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
   const [report, setReport] = useState<ReportItem | null>(null);
   const [storedResponses, setStoredResponses] = useState<any[]>([]);
@@ -441,35 +441,25 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       {/* 3. Citizen Participation Action Box */}
       <div className="bg-surface border border-subtle rounded-2xl p-5 md:p-6 space-y-3 shadow-2xs">
         <h3 className="text-[18px] leading-[28px] font-bold text-primary">
-          {language === 'bn' ? 'আরও প্রাসঙ্গিক তথ্য আছে?' : 'Can you add context?'}
+          {language === 'bn' ? 'এই প্রতিবেদন সম্পর্কে কিছু জানেন?' : 'Do you know something about this report?'}
         </h3>
-        <p className="text-[16px] leading-[26px] text-secondary">
-          {language === 'bn'
-            ? 'আপনার কাছে কি এই ঘটনা সম্পর্কিত অতিরিক্ত তথ্য আছে, কিংবা আপনিও কি একই অভিজ্ঞতার সম্মুখীন হয়েছেন?'
-            : 'Do you have additional information or have you experienced a similar situation?'}
-        </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
           <button
             type="button"
-            onClick={() => setCitizenModalType('witness_information')}
+            onClick={() => setIsCitizenModalOpen(true)}
             className="px-3.5 py-2.5 rounded-xl border border-subtle bg-surface-subtle hover:bg-surface text-secondary hover:text-primary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
           >
-            {language === 'bn' ? 'আমার কাছে তথ্য আছে' : 'I have information'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setCitizenModalType('experienced_similar')}
-            className="px-3.5 py-2.5 rounded-xl border border-subtle bg-surface-subtle hover:bg-surface text-secondary hover:text-primary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
-          >
-            {language === 'bn' ? 'আমিও ভুক্তভোগী' : 'Experienced similar'}
+            {language === 'bn'
+              ? 'আমার কাছে তথ্য আছে / আমিও ভুক্তভোগী'
+              : 'I have information / I experienced this too'}
           </button>
           <button
             type="button"
             onClick={() => setIsSubjectModalOpen(true)}
             className="px-3.5 py-2.5 rounded-xl border border-subtle bg-surface-subtle hover:bg-surface text-secondary hover:text-primary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
           >
-            {language === 'bn' ? 'আমি উল্লেখিত পক্ষ' : 'I am mentioned party'}
+            {language === 'bn' ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ' : 'I’m the person or party mentioned'}
           </button>
         </div>
       </div>
@@ -510,16 +500,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       )}
 
       {/* Citizen Action Modal */}
-      {citizenModalType && (
-        <CitizenActionModal
-          isOpen={true}
-          onClose={() => setCitizenModalType(null)}
-          reportId={report.id}
-          reportTitle={title}
-          type={citizenModalType}
-          language={language}
-        />
-      )}
+      <CitizenActionModal
+        isOpen={isCitizenModalOpen}
+        onClose={() => setIsCitizenModalOpen(false)}
+        reportId={report.id}
+        reportTitle={title}
+        language={language}
+      />
 
       {/* Subject Response Modal */}
       <SubjectResponseModal
