@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionKey, ComingSoonServiceKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
-import { DraftReport, isValidIncidentCoordinates } from '../../services/types';
+import { DraftReport, isValidIncidentCoordinates, isMeaningfulMentionedParty } from '../../services/types';
 import { DraftRepository, INITIAL_DRAFT, generateSecureIdempotencyKey } from '../../services/draftRepository';
 import { apiClient } from '../../services/apiClient';
 import { VisitorSessionService } from '../../services/visitorSessionService';
@@ -780,10 +780,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         publicProfileHandle: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
         phoneOrContact: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
         identifyingDescription: isPartySegment ? (formData.identifyingDescription?.trim() || undefined) : undefined,
-        mentionedParties:
-          isPartySegment && formData.mentionedParties && formData.mentionedParties.length > 0
-            ? formData.mentionedParties.filter((p) => p.name?.trim() || p.organization?.trim())
-            : undefined,
+        mentionedParties: (() => {
+          if (!isPartySegment || !formData.mentionedParties || formData.mentionedParties.length === 0) {
+            return undefined;
+          }
+          const meaningful = formData.mentionedParties.filter(isMeaningfulMentionedParty);
+          return meaningful.length > 0 ? meaningful : undefined;
+        })(),
         relationshipContext: isPartySegment ? (formData.relationshipContext?.trim() || undefined) : undefined,
         intimateWhatHappened: isHarassment ? (formData.intimateWhatHappened || undefined) : undefined,
         intimatePlatform: isHarassment ? (formData.intimatePlatform || undefined) : undefined,

@@ -15,6 +15,19 @@ export interface MentionedParty {
   identifyingDescription?: string;
 }
 
+export function isMeaningfulMentionedParty(party?: Partial<MentionedParty> | null): boolean {
+  if (!party) return false;
+  return Boolean(
+    party.name?.trim() ||
+    party.roleOrDesignation?.trim() ||
+    party.organization?.trim() ||
+    party.phoneOrContact?.trim() ||
+    party.publicProfileHandle?.trim() ||
+    party.address?.trim() ||
+    party.identifyingDescription?.trim()
+  );
+}
+
 export interface ReportLocationData {
   formattedAddress: string;
   division: string;

@@ -1,45 +1,22 @@
 -- =============================================================================
--- AUTHORITATIVE MIGRATION: Phase 3 - Link Safe Reporter Context to Each Complaint
--- File: supabase/phase3_safe_reporter_context.sql
--- 
--- NOTICE:
--- This is the FINAL and AUTHORITATIVE public complaint submission migration.
--- It supersedes and replaces:
---   - supabase/phase2_public_submission.sql (ARCHIVED)
---   - supabase/remove_public_tracking.sql (ARCHIVED)
--- Older migrations must NOT be rerun after this migration.
+-- Migration: Fix Extortion Multi-Party Persistence
+-- File: supabase/fix_extortion_multi_party_persistence.sql
 --
--- Requirements Enforced:
---   1. Private `public.complaint_submission_contexts` table stores reporter GPS,
---      visitor/session IDs, and device info.
---   2. Strict Row Level Security (RLS) ensures reporter context is NEVER accessible
---      by public, anon, or authenticated users (service_role only).
---   3. Authoritative 3-argument signature:
---        submit_public_complaint(jsonb, text, jsonb)
---      All obsolete 2-argument and PIN signatures are permanently dropped.
---   4. Reporter device location is mandatory and validated server-side.
---   5. Reporter device location is strictly private and NEVER exposed in public feeds/RPCs.
---   6. Admin contact payload mismatch resolved: reads adminContact.name,
---      adminContact.contact, and adminContact.consentPublic safely.
---   7. Idempotency on retry via client_submission_id remains safe and duplicate-free.
---   8. Anonymous complaint submission, evidence flow, and moderation remain intact.
+-- Description:
+--   1. Ensures public.complaint_parties.name is nullable idempotently so meaningful
+--      party data (role, organization, contact, details) is stored even if name is absent.
+--   2. Updates public.submit_public_complaint(jsonb, text, jsonb) so primary party
+--      and additional mentioned parties are handled INDEPENDENTLY (not mutually exclusive with ELSIF).
+--   3. When primary party has meaningful information, it is stored cleanly with NULL for name
+--      if no person name is given (does not copy organization into name).
+--   4. When mentioned parties array has meaningful records, each record is persisted even if name is NULL.
+--   5. Strictly preserves 3-argument signature, fail-closed reporter GPS context,
+--      idempotency, RLS, status history, and evidence handling.
 -- =============================================================================
 
--- Step 1: Schema alignment on public.complaints
+-- Step 1: Ensure name in public.complaint_parties is nullable (idempotent)
 DO $$
 BEGIN
-  -- If legacy pin_hash column exists from older installations, ensure it is nullable
-  IF EXISTS (
-    SELECT 1 
-    FROM information_schema.columns 
-    WHERE table_schema = 'public' 
-      AND table_name = 'complaints' 
-      AND column_name = 'pin_hash'
-  ) THEN
-    ALTER TABLE public.complaints ALTER COLUMN pin_hash DROP NOT NULL;
-  END IF;
-
-  -- Ensure complaint_parties.name is nullable when table exists
   IF EXISTS (
     SELECT 1 
     FROM information_schema.columns 
@@ -52,75 +29,7 @@ BEGIN
   END IF;
 END $$;
 
-ALTER TABLE public.complaints
-  ADD COLUMN IF NOT EXISTS relationship_context text,
-  ADD COLUMN IF NOT EXISTS has_supporting_info boolean NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS place_id text,
-  ADD COLUMN IF NOT EXISTS client_submission_id text,
-  ADD COLUMN IF NOT EXISTS reporter_name text,
-  ADD COLUMN IF NOT EXISTS reporter_contact text,
-  ADD COLUMN IF NOT EXISTS confirm_public_identity boolean DEFAULT false;
-
--- Ensure idempotency index exists
-CREATE UNIQUE INDEX IF NOT EXISTS complaints_client_submission_id_idx
-  ON public.complaints (client_submission_id)
-  WHERE client_submission_id IS NOT NULL;
-
--- Step 2: Create private complaint_submission_contexts table
-CREATE TABLE IF NOT EXISTS public.complaint_submission_contexts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  complaint_id text NOT NULL REFERENCES public.complaints(id) ON DELETE CASCADE,
-  client_submission_id text NOT NULL,
-  visitor_id text NOT NULL,
-  session_id text NOT NULL,
-  reporter_latitude double precision NOT NULL,
-  reporter_longitude double precision NOT NULL,
-  accuracy_meters double precision NOT NULL,
-  captured_at timestamptz NOT NULL,
-  browser_name text,
-  browser_version text,
-  os_name text,
-  device_category text,
-  platform text,
-  language text,
-  timezone text,
-  screen_width integer,
-  screen_height integer,
-  user_agent text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT complaint_submission_contexts_complaint_id_key UNIQUE (complaint_id),
-  CONSTRAINT complaint_submission_contexts_client_sub_id_key UNIQUE (client_submission_id)
-);
-
--- Coordinate and accuracy constraints
-ALTER TABLE public.complaint_submission_contexts
-  DROP CONSTRAINT IF EXISTS chk_reporter_lat_range,
-  DROP CONSTRAINT IF EXISTS chk_reporter_lng_range,
-  DROP CONSTRAINT IF EXISTS chk_reporter_not_zero_zero,
-  DROP CONSTRAINT IF EXISTS chk_reporter_accuracy_positive;
-
-ALTER TABLE public.complaint_submission_contexts
-  ADD CONSTRAINT chk_reporter_lat_range CHECK (reporter_latitude >= -90.0 AND reporter_latitude <= 90.0),
-  ADD CONSTRAINT chk_reporter_lng_range CHECK (reporter_longitude >= -180.0 AND reporter_longitude <= 180.0),
-  ADD CONSTRAINT chk_reporter_not_zero_zero CHECK (NOT (reporter_latitude = 0.0 AND reporter_longitude = 0.0)),
-  ADD CONSTRAINT chk_reporter_accuracy_positive CHECK (accuracy_meters > 0.0);
-
--- Indexes for admin moderation and abuse investigation tooling
-CREATE INDEX IF NOT EXISTS idx_submission_contexts_visitor_id ON public.complaint_submission_contexts(visitor_id);
-CREATE INDEX IF NOT EXISTS idx_submission_contexts_session_id ON public.complaint_submission_contexts(session_id);
-CREATE INDEX IF NOT EXISTS idx_submission_contexts_captured_at ON public.complaint_submission_contexts(captured_at);
-
--- Privacy & Security: Revoke all public direct access. RLS enabled.
-ALTER TABLE public.complaint_submission_contexts ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON TABLE public.complaint_submission_contexts FROM PUBLIC, anon, authenticated;
-GRANT ALL ON TABLE public.complaint_submission_contexts TO service_role;
-
--- Step 3: Drop all obsolete function signatures
-DROP FUNCTION IF EXISTS public.submit_public_complaint(jsonb, text);
-DROP FUNCTION IF EXISTS public.submit_public_complaint(jsonb, text, text);
-DROP FUNCTION IF EXISTS public.submit_public_complaint(jsonb, text, jsonb);
-
--- Step 4: Create authoritative submit_public_complaint RPC (3 arguments)
+-- Step 2: Update submit_public_complaint RPC with independent primary & multi-party persistence logic
 CREATE OR REPLACE FUNCTION public.submit_public_complaint(
   p_payload jsonb,
   p_client_submission_id text,
@@ -436,11 +345,6 @@ BEGIN
 
   -- -------------------------------------------------------------------------
   -- Step 6: Extract Admin Contact (harassment reporter details)
-  -- Preferred shape from frontend:
-  --   adminContact.name
-  --   adminContact.contact
-  --   adminContact.consentPublic
-  -- Private and admin-only unless approved public identity consent applies.
   -- -------------------------------------------------------------------------
   v_reporter_name := nullif(trim(coalesce(
     p_payload->'adminContact'->>'name',
@@ -723,7 +627,6 @@ BEGIN
 
   -- -------------------------------------------------------------------------
   -- Step 12: Return Standardized Client Response Payload
-  -- (Never exposes private reporter coordinates or contact info)
   -- -------------------------------------------------------------------------
   v_response := jsonb_build_object(
     'success', true,
@@ -746,7 +649,3 @@ $$;
 -- Revoke all permissions from public, then grant execute to anon and authenticated
 REVOKE ALL ON FUNCTION public.submit_public_complaint(jsonb, text, jsonb) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.submit_public_complaint(jsonb, text, jsonb) TO anon, authenticated;
-
--- =============================================================================
--- End of Phase 3 Authoritative Migration File
--- =============================================================================

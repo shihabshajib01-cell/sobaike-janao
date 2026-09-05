@@ -11,7 +11,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
-import { DraftReport } from '../../services/types';
+import { DraftReport, isMeaningfulMentionedParty } from '../../services/types';
 import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { SEGMENT_SUBCATEGORIES } from '../../data/reportOptions';
 import {
@@ -53,8 +53,21 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     formData.identifyingDescription?.trim()
   );
 
+  const hasExtortionPrimaryPartyData = Boolean(
+    formData.reportedSubject?.trim() ||
+    formData.roleOrDesignation?.trim() ||
+    formData.organization?.trim() ||
+    formData.publicProfileHandle?.trim() ||
+    formData.identifyingDescription?.trim()
+  );
+
+  const meaningfulMentionedParties = (formData.mentionedParties || []).filter(isMeaningfulMentionedParty);
+
+  const hasExtortionPartyData =
+    hasExtortionPrimaryPartyData || meaningfulMentionedParties.length > 0;
+
   const showsPartySection =
-    segment === 'extortion' ||
+    (segment === 'extortion' && hasExtortionPartyData) ||
     (segment === 'rickshaw' && hasRickshawOperatorData);
   const showsIdentitySection = segment === 'harassment';
 
@@ -138,6 +151,18 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         formData.roleOrDesignation?.trim() ||
         formData.publicProfileHandle?.trim() ||
         (language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added')
+      )
+    : segment === 'extortion'
+    ? (
+        formData.reportedSubject?.trim() ||
+        formData.organization?.trim() ||
+        formData.roleOrDesignation?.trim() ||
+        formData.publicProfileHandle?.trim() ||
+        (meaningfulMentionedParties.length > 0
+          ? (language === 'bn'
+              ? `${meaningfulMentionedParties.length === 1 ? '১টি' : meaningfulMentionedParties.length} অতিরিক্ত পক্ষের তথ্য`
+              : `${meaningfulMentionedParties.length} additional ${meaningfulMentionedParties.length === 1 ? 'party' : 'parties'} added`)
+          : (language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added'))
       )
     : (
         formData.reportedSubject ||
@@ -381,9 +406,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               language === 'bn'
                 ? isRickshawChargingStation
                   ? '৩. চার্জিং স্টেশন / পরিচালনাকারীর তথ্য (ঐচ্ছিক)'
+                  : segment === 'extortion'
+                  ? '৩. চাঁদা দাবিকারীর তথ্য (ঐচ্ছিক)'
                   : subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষ'
                 : isRickshawChargingStation
                   ? '3. Charging Station / Operator Information (Optional)'
+                  : segment === 'extortion'
+                  ? '3. Extortion Party Information (Optional)'
                   : subjectConfig?.sectionTitleEn || '3. Target Details'
             }
             summary={targetSummary}
@@ -438,6 +467,122 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     <p className="text-primary italic whitespace-pre-wrap">
                       {formData.identifyingDescription.trim()}
                     </p>
+                  </div>
+                )}
+              </div>
+            ) : segment === 'extortion' ? (
+              <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-2.5 pt-1">
+                {/* Primary Extortion Party (only if primary data exists) */}
+                {hasExtortionPrimaryPartyData && (
+                  <div className="space-y-1.5">
+                    {/* Name / Known Identity */}
+                    {formData.reportedSubject?.trim() && (
+                      <div>
+                        <span className="text-secondary font-medium">
+                          {language === 'bn' ? 'নাম / পরিচিতি: ' : 'Name / Known Identity: '}
+                        </span>
+                        <span className="text-primary font-bold">
+                          {formData.reportedSubject.trim()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Role / Designation */}
+                    {formData.roleOrDesignation?.trim() && (
+                      <div className="pt-0.5">
+                        <span className="text-secondary font-medium">
+                          {language === 'bn' ? 'ভূমিকা / পদবি: ' : 'Role / Designation: '}
+                        </span>
+                        <span className="text-primary font-medium">
+                          {formData.roleOrDesignation.trim()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Group / Organization / Association */}
+                    {formData.organization?.trim() && (
+                      <div className="pt-0.5">
+                        <span className="text-secondary font-medium">
+                          {language === 'bn' ? 'দল / সংগঠন / সমিতি: ' : 'Group / Organization / Association: '}
+                        </span>
+                        <span className="text-primary font-medium">
+                          {formData.organization.trim()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Phone / Contact */}
+                    {formData.publicProfileHandle?.trim() && (
+                      <div className="pt-0.5">
+                        <span className="text-secondary font-medium">
+                          {language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Phone / Contact: '}
+                        </span>
+                        <span className="text-primary font-mono font-medium">
+                          {formData.publicProfileHandle.trim()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Other Identifying Details */}
+                    {formData.identifyingDescription?.trim() && (
+                      <div className="pt-1 border-t border-subtle/50">
+                        <span className="text-secondary font-medium block mb-0.5">
+                          {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য: ' : 'Other Identifying Details: '}
+                        </span>
+                        <p className="text-primary italic whitespace-pre-wrap">
+                          {formData.identifyingDescription.trim()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Additional Mentioned Parties */}
+                {meaningfulMentionedParties.length > 0 && (
+                  <div className={`space-y-2 text-[13px] ${hasExtortionPrimaryPartyData ? 'pt-2 border-t border-subtle/50' : ''}`}>
+                    <span className="font-bold text-primary block">
+                      {language === 'bn'
+                        ? `অতিরিক্ত পক্ষ (${meaningfulMentionedParties.length}টি):`
+                        : `Additional Parties (${meaningfulMentionedParties.length}):`}
+                    </span>
+                    <div className="space-y-2">
+                      {meaningfulMentionedParties.map((p, idx) => (
+                        <div
+                          key={p.id || idx}
+                          className="p-2.5 rounded-lg bg-surface border border-subtle text-secondary space-y-1"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-primary">
+                              {p.name?.trim() || (language === 'bn' ? `পক্ষ #${idx + 2}` : `Party #${idx + 2}`)}
+                            </span>
+                          </div>
+                          {p.roleOrDesignation?.trim() && (
+                            <p>
+                              <span className="font-medium text-secondary">{language === 'bn' ? 'ভূমিকা / পদবি: ' : 'Role: '}</span>
+                              <span className="text-primary font-medium">{p.roleOrDesignation.trim()}</span>
+                            </p>
+                          )}
+                          {p.organization?.trim() && (
+                            <p>
+                              <span className="font-medium text-secondary">{language === 'bn' ? 'দল / সমিতি: ' : 'Group / Org: '}</span>
+                              <span className="text-primary font-medium">{p.organization.trim()}</span>
+                            </p>
+                          )}
+                          {(p.phoneOrContact?.trim() || p.publicProfileHandle?.trim()) && (
+                            <p>
+                              <span className="font-medium text-secondary">{language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Contact: '}</span>
+                              <span className="text-primary font-mono font-medium">{(p.phoneOrContact || p.publicProfileHandle || '').trim()}</span>
+                            </p>
+                          )}
+                          {p.identifyingDescription?.trim() && (
+                            <div className="pt-0.5">
+                              <span className="font-medium text-secondary block mb-0.5">{language === 'bn' ? 'অন্যান্য বিবরণ: ' : 'Other Details: '}</span>
+                              <p className="text-primary italic whitespace-pre-wrap">{p.identifyingDescription.trim()}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
