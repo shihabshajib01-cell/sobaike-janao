@@ -130,22 +130,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       segment === 'rickshaw' &&
       (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
-    const handleOperatorTypeChange = (newType: SubjectTypeValue) => {
-      const currentName = (formData.reportedSubject || formData.organization || '').trim();
-      if (newType === 'organization') {
-        onUpdateFormData({
-          subjectType: 'organization',
-          reportedSubject: currentName,
-          organization: currentName,
-        });
-      } else {
-        onUpdateFormData({
-          subjectType: newType,
-          reportedSubject: currentName,
-          organization: undefined,
-        });
-      }
-    };
+    const hasChargingStationOperatorData = Boolean(
+      formData.reportedSubject?.trim() ||
+      formData.roleOrDesignation?.trim() ||
+      formData.publicProfileHandle?.trim() ||
+      formData.identifyingDescription?.trim() ||
+      formData.organization?.trim()
+    );
 
     const handleOperatorNameChange = (val: string) => {
       if (formData.subjectType === 'organization') {
@@ -178,9 +169,20 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       narrative: true,
       location: true,
       identity: showsIdentitySection,
-      parties: showsPartySection,
+      parties: isChargingStationOperator
+        ? (hasChargingStationOperatorData || initialOpenSection === 'parties')
+        : showsPartySection,
       attachments: initialOpenSection === 'attachments',
     }));
+
+    // Auto-expand parties if operator data is loaded/restored asynchronously
+    const prevHasOperatorDataRef = React.useRef(hasChargingStationOperatorData);
+    useEffect(() => {
+      if (isChargingStationOperator && !prevHasOperatorDataRef.current && hasChargingStationOperatorData) {
+        setOpenSections((prev) => ({ ...prev, parties: true }));
+      }
+      prevHasOperatorDataRef.current = hasChargingStationOperatorData;
+    }, [isChargingStationOperator, hasChargingStationOperatorData]);
 
     // Auto-open specific accordion if requested (e.g. from Review edit link)
     useEffect(() => {
@@ -203,10 +205,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const [showTitleField, setShowTitleField] = useState<boolean>(false);
     const [showIdentifyingDetails, setShowIdentifyingDetails] = useState<boolean>(false);
 
-    // Toggle specific accordion (Only attachments is collapsible)
+    // Toggle specific accordion
     const toggleSection = (secKey: string) => {
       if (secKey === 'narrative' || secKey === 'location') return;
-      if (showsPartySection && secKey === 'parties') return;
+      if (showsPartySection && secKey === 'parties' && !isChargingStationOperator) return;
       if (showsIdentitySection && secKey === 'identity') return;
       setOpenSections((prev) => ({
         ...prev,
@@ -1295,7 +1297,130 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         )}
 
         {/* SECTION 3 (RICKSHAW & EXTORTION): Contextual Target / Party Info - NON-COLLAPSIBLE */}
-        {showsPartySection && subjectConfig && (
+        {/* SECTION 3 (RICKSHAW): Contextual Target / Operator Info - COLLAPSIBLE (DEFAULT: COLLAPSED UNLESS DATA EXISTS) */}
+        {showsPartySection && isChargingStationOperator && (
+          <Accordion
+            id="composer-section-parties"
+            isOpen={Boolean(openSections.parties)}
+            collapsible={true}
+            onToggle={() => toggleSection('parties')}
+            title={
+              language === 'bn'
+                ? '৩. চার্জিং স্টেশন / পরিচালনাকারীর তথ্য (ঐচ্ছিক)'
+                : '3. Charging Station / Operator Information (Optional)'
+            }
+            summary={
+              hasChargingStationOperatorData ? (
+                <span className="inline-flex items-center gap-1.5 text-accent font-medium text-[13px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                  {language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added'}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-secondary text-[13px]">
+                  <Plus className="w-3.5 h-3.5 text-secondary" />
+                  <span>{language === 'bn' ? 'তথ্য যোগ করুন' : 'Add information'}</span>
+                </span>
+              )
+            }
+            icon={<Users className="w-5 h-5" />}
+          >
+            <div className="space-y-4 pt-1 text-left">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-surface-subtle border border-subtle space-y-3 sm:space-y-3.5">
+                {/* Row 1: Name / Known Identity (col 1) + Phone / Contact (col 2) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      htmlFor="operator-subject-name"
+                      className="block text-[13px] font-bold text-primary mb-1"
+                    >
+                      {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
+                    </label>
+                    <input
+                      id="operator-subject-name"
+                      type="text"
+                      value={formData.reportedSubject || formData.organization || ''}
+                      onChange={(e) => handleOperatorNameChange(e.target.value)}
+                      placeholder={
+                        language === 'bn'
+                          ? 'স্টেশন, গ্যারেজ, ব্যক্তি বা প্রতিষ্ঠানের নাম জানা থাকলে লিখুন'
+                          : 'Enter the station, garage, person, or organization name if known'
+                      }
+                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="operator-contact"
+                      className="block text-[13px] font-semibold text-secondary mb-1"
+                    >
+                      {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
+                    </label>
+                    <input
+                      id="operator-contact"
+                      type="text"
+                      value={formData.publicProfileHandle || ''}
+                      onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
+                      placeholder={
+                        language === 'bn'
+                          ? 'ফোন নম্বর বা জানা যোগাযোগের তথ্য'
+                          : 'Phone number or known contact information'
+                      }
+                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 2: Role / Responsibility */}
+                <div>
+                  <label
+                    htmlFor="operator-role"
+                    className="block text-[13px] font-semibold text-secondary mb-1"
+                  >
+                    {language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / Responsibility'}
+                  </label>
+                  <input
+                    id="operator-role"
+                    type="text"
+                    value={formData.roleOrDesignation || ''}
+                    onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? 'যেমন: মালিক, ম্যানেজার, পরিচালনাকারী'
+                        : 'e.g. Owner, Manager, Operator'
+                    }
+                    className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                  />
+                </div>
+
+                {/* Row 3: Other Identifying Details */}
+                <div>
+                  <label
+                    htmlFor="operator-identifying-desc"
+                    className="block text-[13px] font-semibold text-secondary mb-1"
+                  >
+                    {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
+                  </label>
+                  <textarea
+                    id="operator-identifying-desc"
+                    rows={2}
+                    value={formData.identifyingDescription || ''}
+                    onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? 'সাইনবোর্ড, চেহারা, অবস্থান সূত্র বা অন্য কোনো পরিচিত তথ্য'
+                        : 'Signage, appearance, location clues, or any other known identifying information'
+                    }
+                    className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed min-h-[44px]"
+                  />
+                </div>
+              </div>
+            </div>
+          </Accordion>
+        )}
+
+        {/* SECTION 3 (EXTORTION): Contextual Target / Party Info - NON-COLLAPSIBLE */}
+        {showsPartySection && !isChargingStationOperator && subjectConfig && (
           <Accordion
             id="composer-section-parties"
             isOpen={true}
@@ -1305,123 +1430,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             icon={<Users className="w-5 h-5" />}
           >
             <div className="space-y-4 pt-1 text-left">
-              {isChargingStationOperator ? (
-                <div className="p-3.5 sm:p-4 rounded-2xl bg-surface-subtle border border-subtle space-y-3 sm:space-y-3.5">
-                  {/* Row 1: Type + Name */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label
-                        htmlFor="operator-subject-type"
-                        className="block text-[13px] font-bold text-primary mb-1"
-                      >
-                        {language === 'bn' ? 'ধরন (ঐচ্ছিক)' : 'Type (Optional)'}
-                      </label>
-                      <select
-                        id="operator-subject-type"
-                        value={formData.subjectType || 'unknown'}
-                        onChange={(e) => handleOperatorTypeChange(e.target.value as SubjectTypeValue)}
-                        className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] cursor-pointer"
-                      >
-                        {RICKSHAW_OPERATOR_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value} className="bg-surface text-primary">
-                            {language === 'bn' ? opt.labelBn : opt.labelEn}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="operator-subject-name"
-                        className="block text-[13px] font-bold text-primary mb-1"
-                      >
-                        {language === 'bn' ? 'নাম / পরিচিতি (ঐচ্ছিক)' : 'Name / Known Identity (Optional)'}
-                      </label>
-                      <input
-                        id="operator-subject-name"
-                        type="text"
-                        value={formData.reportedSubject || formData.organization || ''}
-                        onChange={(e) => handleOperatorNameChange(e.target.value)}
-                        placeholder={
-                          language === 'bn'
-                            ? 'স্টেশন, গ্যারেজ, ব্যক্তি বা প্রতিষ্ঠানের নাম জানা থাকলে লিখুন'
-                            : 'Enter the station, garage, person, or organization name if known'
-                        }
-                        className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Row 2: Role + Contact */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label
-                        htmlFor="operator-role"
-                        className="block text-[13px] font-semibold text-secondary mb-1"
-                      >
-                        {language === 'bn' ? 'পদবি / ভূমিকা (ঐচ্ছিক)' : 'Role / Designation (Optional)'}
-                      </label>
-                      <input
-                        id="operator-role"
-                        type="text"
-                        value={formData.roleOrDesignation || ''}
-                        onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
-                        placeholder={
-                          language === 'bn'
-                            ? 'যেমন: ম্যানেজার, মালিক, পরিচালনাকারী'
-                            : 'e.g. Manager, Owner, Operator'
-                        }
-                        className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="operator-contact"
-                        className="block text-[13px] font-semibold text-secondary mb-1"
-                      >
-                        {language === 'bn' ? 'ফোন / যোগাযোগ (ঐচ্ছিক)' : 'Phone / Contact (Optional)'}
-                      </label>
-                      <input
-                        id="operator-contact"
-                        type="text"
-                        value={formData.publicProfileHandle || ''}
-                        onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
-                        placeholder={
-                          language === 'bn'
-                            ? 'ফোন নম্বর বা জানা যোগাযোগের তথ্য'
-                            : 'Phone number or known contact information'
-                        }
-                        className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Row 3: Other Identifying Details */}
-                  <div>
-                    <label
-                      htmlFor="operator-identifying-desc"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
-                    >
-                      {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য (ঐচ্ছিক)' : 'Other Identifying Details (Optional)'}
-                    </label>
-                    <textarea
-                      id="operator-identifying-desc"
-                      rows={2}
-                      value={formData.identifyingDescription || ''}
-                      onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? 'সাইনবোর্ড, শারীরিক বৈশিষ্ট্য, অবস্থান সূত্র বা অন্য কোনো শনাক্তকারী তথ্য'
-                          : 'Signage, appearance, location clues, or any other identifying information'
-                      }
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed min-h-[44px]"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* Contextual Target Question & Choices */}
+              {/* Contextual Target Question & Choices */}
                   <div>
                 <label className="block text-[14px] font-bold text-primary mb-2">
                   {language === 'bn' ? subjectConfig.questionBn : subjectConfig.questionEn}
@@ -1865,8 +1874,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   </div>
                 )}
               </div>
-            </>
-          )}
 
               {/* Additional Mentioned Parties: Only for Extortion when primary party has data or parties exist */}
               {segment === 'extortion' && (

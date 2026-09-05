@@ -41,7 +41,21 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   onEditStep,
   language,
 }) => {
-  const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
+  const isRickshawChargingStation =
+    segment === 'rickshaw' &&
+    (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
+
+  const hasRickshawOperatorData = Boolean(
+    formData.reportedSubject?.trim() ||
+    formData.organization?.trim() ||
+    formData.roleOrDesignation?.trim() ||
+    formData.publicProfileHandle?.trim() ||
+    formData.identifyingDescription?.trim()
+  );
+
+  const showsPartySection =
+    segment === 'extortion' ||
+    (segment === 'rickshaw' && hasRickshawOperatorData);
   const showsIdentitySection = segment === 'harassment';
 
   const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
@@ -117,14 +131,23 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       ? 'অনুমোদিত হলে প্রকাশ্য পরিচয়'
       : 'Public Identity';
 
-  const targetSummary =
-    formData.reportedSubject ||
-    formData.organization ||
-    (formData.subjectType === 'unknown'
-      ? language === 'bn'
-        ? 'অজ্ঞাত / নির্দিষ্ট নেই'
-        : 'Unknown / Not specified'
-      : getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language));
+  const targetSummary = isRickshawChargingStation
+    ? (
+        formData.reportedSubject?.trim() ||
+        formData.organization?.trim() ||
+        formData.roleOrDesignation?.trim() ||
+        formData.publicProfileHandle?.trim() ||
+        (language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added')
+      )
+    : (
+        formData.reportedSubject ||
+        formData.organization ||
+        (formData.subjectType === 'unknown'
+          ? language === 'bn'
+            ? 'অজ্ঞাত / নির্দিষ্ট নেই'
+            : 'Unknown / Not specified'
+          : getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language))
+      );
 
   const hasMissingEvidence =
     pendingImages.length === 0 &&
@@ -356,8 +379,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
             onToggle={() => toggleSection('identity_target')}
             title={
               language === 'bn'
-                ? subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষ'
-                : subjectConfig?.sectionTitleEn || '3. Target Details'
+                ? isRickshawChargingStation
+                  ? '৩. চার্জিং স্টেশন / পরিচালনাকারীর তথ্য (ঐচ্ছিক)'
+                  : subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষ'
+                : isRickshawChargingStation
+                  ? '3. Charging Station / Operator Information (Optional)'
+                  : subjectConfig?.sectionTitleEn || '3. Target Details'
             }
             summary={targetSummary}
             icon={<Users className="w-4 h-4" />}
@@ -366,21 +393,9 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           >
             {segment === 'rickshaw' ? (
               <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-2 pt-1">
-                {/* Type */}
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div>
-                    <span className="text-muted block text-[12px]">
-                      {language === 'bn' ? 'ধরন:' : 'Type:'}
-                    </span>
-                    <p className="font-bold text-primary text-[14px]">
-                      {getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language)}
-                    </p>
-                  </div>
-                </div>
-
                 {/* Name / Known Identity (ONLY when value exists) */}
                 {(formData.reportedSubject?.trim() || formData.organization?.trim()) && (
-                  <div className="pt-0.5 border-t border-subtle/40">
+                  <div>
                     <span className="text-secondary font-medium">
                       {language === 'bn' ? 'নাম / পরিচিতি: ' : 'Name / Known Identity: '}
                     </span>
@@ -390,11 +405,11 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   </div>
                 )}
 
-                {/* Role / Designation (ONLY when value exists) */}
+                {/* Role / Responsibility (ONLY when value exists) */}
                 {formData.roleOrDesignation?.trim() && (
                   <div className="pt-0.5">
                     <span className="text-secondary font-medium">
-                      {language === 'bn' ? 'পদবি / ভূমিকা: ' : 'Role / Designation: '}
+                      {language === 'bn' ? 'ভূমিকা / দায়িত্ব: ' : 'Role / Responsibility: '}
                     </span>
                     <span className="text-primary font-medium">
                       {formData.roleOrDesignation.trim()}
