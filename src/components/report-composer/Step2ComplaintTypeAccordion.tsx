@@ -22,6 +22,8 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
   const allSubcategories = useMemo(() => getSubcategories(segment), [segment, getSubcategories]);
   const segmentInfo = getSegment(segment);
 
+  const isSingleOption = allSubcategories.length === 1;
+
   const headerTitle = language === 'bn' ? (segmentInfo?.nameBn || SECTIONS[segment].nameBn) : (segmentInfo?.nameEn || SECTIONS[segment].nameEn);
   const helperText =
     language === 'bn'
@@ -41,7 +43,11 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
       </div>
 
       {/* 2. Direct Compact Complaint Category Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+      <div
+        className={`grid gap-2.5 sm:gap-3 ${
+          isSingleOption ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+        }`}
+      >
         {allSubcategories.map((item) => {
           const isSelected = selectedSubcategoryId === item.id;
           const itemName = language === 'bn' ? item.nameBn : item.nameEn;
@@ -62,7 +68,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
                 }
               }}
               className={`p-3 sm:p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] select-none ${
-                allSubcategories.length === 1 ? 'sm:col-span-2' : ''
+                isSingleOption ? 'col-span-full w-full' : ''
               } ${
                 isSelected
                   ? 'border-2 border-accent bg-accent-soft shadow-2xs'
