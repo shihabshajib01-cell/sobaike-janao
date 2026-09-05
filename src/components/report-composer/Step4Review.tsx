@@ -124,7 +124,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const locationSummary =
     [
-      formData.location?.area || (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : ''),
+      formData.location?.upazilaOrThana || formData.location?.area || (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : ''),
       formData.location?.district,
       formData.location?.division,
     ]
