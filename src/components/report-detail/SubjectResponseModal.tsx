@@ -28,12 +28,15 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   const [correctionDetails, setCorrectionDetails] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     if (!responderName.trim() || !contactEmailOrPhone.trim() || !officialStatement.trim()) {
       setError(
         language === 'bn'
@@ -46,7 +49,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     setIsSubmitting(true);
     setError(null);
     try {
-      await apiClient.submitSubjectResponse(reportId, {
+      const res = await apiClient.submitSubjectResponse(reportId, {
         responderType,
         responderName: responderName.trim(),
         designation: designation.trim() || undefined,
@@ -57,6 +60,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
         requestCorrectionOrRemoval,
         correctionDetails: requestCorrectionOrRemoval ? correctionDetails.trim() : undefined,
       });
+      setResponseId(res.responseId || null);
       setIsSubmitted(true);
     } catch (err: any) {
       const errorMessage =
@@ -79,6 +83,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     setRequestCorrectionOrRemoval(false);
     setCorrectionDetails('');
     setIsSubmitted(false);
+    setIsSubmitting(false);
+    setResponseId(null);
     setError(null);
     onClose();
   };
@@ -136,17 +142,29 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               </h4>
               <p className="text-[16px] leading-[24px] text-secondary max-w-md mx-auto">
                 {language === 'bn'
-                  ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হবে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
+                  ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হয়েছে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
                   : 'Your response will be submitted for moderation. Any public display is handled through the publication workflow.'}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleResetAndClose}
-              className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] text-inverse text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px]"
-            >
-              {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-            </button>
+            {responseId && (
+              <div className="p-3 bg-surface-subtle rounded-xl border border-subtle text-center inline-block max-w-xs mx-auto">
+                <span className="text-[13px] text-muted block">
+                  {language === 'bn' ? 'রেসপন্স আইডি' : 'Response ID'}
+                </span>
+                <span className="font-mono text-[15px] font-bold text-primary">
+                  {responseId}
+                </span>
+              </div>
+            )}
+            <div>
+              <button
+                type="button"
+                onClick={handleResetAndClose}
+                className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] text-inverse text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px]"
+              >
+                {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -323,17 +341,28 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="px-4 py-2.5 border border-subtle hover:bg-surface-subtle text-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-surface"
+                disabled={isSubmitting}
+                className="px-4 py-2.5 border border-subtle hover:bg-surface-subtle disabled:opacity-50 text-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-surface"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
               </button>
 
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] text-inverse text-[16px] font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px]"
+                disabled={isSubmitting}
+                className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] disabled:opacity-50 disabled:cursor-not-allowed text-inverse text-[16px] font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px]"
               >
-                <Send className="w-4 h-4" />
-                <span>{language === 'bn' ? 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন' : 'Submit Response'}</span>
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <span>{language === 'bn' ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>{language === 'bn' ? 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন' : 'Submit Response'}</span>
+                  </>
+                )}
               </button>
             </div>
           </form>

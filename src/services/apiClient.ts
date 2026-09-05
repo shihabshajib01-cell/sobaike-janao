@@ -10,13 +10,131 @@ export interface ApiError {
 }
 
 class ApiClient {
-  async submitSubjectResponse(_reportId: string, _payload: any): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
-    const error: ApiError = {
-      code: 'SERVICE_UNAVAILABLE',
-      message: 'Subject response submission is temporarily unavailable. Please contact the administration directly.',
-      messageBn: 'প্রতিউত্তর জমা দেওয়ার সেবা বর্তমানে সাময়িকভাবে অনুপলব্ধ। অনুগ্রহ করে সরাসরি কর্তৃপক্ষের সাথে যোগাযোগ করুন।',
+  // --- Public Response APIs ---
+  async submitCitizenResponse(
+    reportId: string,
+    payload: {
+      description: string;
+      incidentDate?: string;
+      contactConsent: boolean;
+      contactInfo?: string;
+    }
+  ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
+    if (!isSupabaseConfigured() || !supabase) {
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
+      if (!isMockAllowed) {
+        const error: ApiError = {
+          code: 'SUPABASE_NOT_CONFIGURED',
+          message: 'Supabase client is not configured.',
+          messageBn: 'ডাটাবেজ সংযোগ কনফিগার করা নেই।',
+        };
+        throw error;
+      }
+      return {
+        success: true,
+        responseId: `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
+        message: 'Mock response submitted successfully.',
+        messageBn: 'আপনার তথ্য সফলভাবে জমা হয়েছে (মক মোড)।',
+      };
+    }
+
+    const { data, error } = await supabase.rpc('submit_public_response', {
+      p_report_id: reportId,
+      p_response_type: 'citizen_information',
+      p_payload: {
+        description: payload.description,
+        incidentDate: payload.incidentDate,
+        contactConsent: payload.contactConsent,
+        contactInfo: payload.contactConsent ? payload.contactInfo : undefined,
+      },
+    });
+
+    if (error) {
+      const isNotPublished = error.message?.includes('INVALID_REPORT_STATUS');
+      const isNotFound = error.message?.includes('REPORT_NOT_FOUND');
+      const apiError: ApiError = {
+        code: error.code || 'RPC_ERROR',
+        message: error.message || 'Response submission failed.',
+        messageBn: isNotPublished
+          ? 'শুধুমাত্র প্রকাশিত প্রতিবেদনের বিপরীতে তথ্য বা প্রতিক্রিয়া জমা দেওয়া যায়।'
+          : isNotFound
+          ? 'রেফারেন্স করা প্রতিবেদনটি খুঁজে পাওয়া যায়নি।'
+          : 'তথ্য জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
+      };
+      throw apiError;
+    }
+
+    return {
+      success: true,
+      responseId: data?.responseId || '',
+      message: data?.message || 'Response submitted successfully.',
+      messageBn: 'আপনার তথ্য সফলভাবে জমা হয়েছে এবং পর্যালোচনার জন্য অপেক্ষমাণ।',
     };
-    throw error;
+  }
+
+  async submitSubjectResponse(
+    reportId: string,
+    payload: {
+      responderType: 'mentioned_person' | 'organization_rep' | 'legal_rep';
+      responderName: string;
+      designation?: string;
+      organizationName?: string;
+      contactEmailOrPhone: string;
+      officialStatement: string;
+      supportingDocumentsNote?: string;
+      requestCorrectionOrRemoval?: boolean;
+      correctionDetails?: string;
+    }
+  ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
+    if (!isSupabaseConfigured() || !supabase) {
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
+      if (!isMockAllowed) {
+        const error: ApiError = {
+          code: 'SUPABASE_NOT_CONFIGURED',
+          message: 'Supabase client is not configured.',
+          messageBn: 'ডাটাবেজ সংযোগ কনফিগার করা নেই।',
+        };
+        throw error;
+      }
+      return {
+        success: true,
+        responseId: `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
+        message: 'Mock subject response submitted successfully.',
+        messageBn: 'প্রতিউত্তর সফলভাবে জমা হয়েছে (মক মোড)।',
+      };
+    }
+
+    const { data, error } = await supabase.rpc('submit_public_response', {
+      p_report_id: reportId,
+      p_response_type: 'subject_response',
+      p_payload: payload,
+    });
+
+    if (error) {
+      const isNotPublished = error.message?.includes('INVALID_REPORT_STATUS');
+      const isNotFound = error.message?.includes('REPORT_NOT_FOUND');
+      const apiError: ApiError = {
+        code: error.code || 'RPC_ERROR',
+        message: error.message || 'Subject response submission failed.',
+        messageBn: isNotPublished
+          ? 'শুধুমাত্র প্রকাশিত প্রতিবেদনের বিপরীতে প্রতিউত্তর জমা দেওয়া যায়।'
+          : isNotFound
+          ? 'রেফারেন্স করা প্রতিবেদনটি খুঁজে পাওয়া যায়নি।'
+          : 'প্রতিউত্তর জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
+      };
+      throw apiError;
+    }
+
+    return {
+      success: true,
+      responseId: data?.responseId || '',
+      message: data?.message || 'Subject response submitted successfully.',
+      messageBn: 'আপনার প্রতিউত্তর সফলভাবে জমা হয়েছে এবং পর্যালোচনার জন্য অপেক্ষমাণ।',
+    };
   }
 
   // --- Report Submission APIs ---

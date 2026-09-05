@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, ShieldAlert, Send, FileText, Lock } from 'lucide-react';
+import { X, CheckCircle2, Send, FileText } from 'lucide-react';
+import { apiClient } from '../../services/apiClient';
 
 interface CitizenActionModalProps {
   isOpen: boolean;
@@ -20,13 +21,17 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   const [witnessDate, setWitnessDate] = useState('');
   const [contactConsent, setContactConsent] = useState(false);
   const [contactInfo, setContactInfo] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     if (!description.trim() || description.trim().length < 10) {
       setError(
         language === 'bn'
@@ -36,8 +41,28 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       return;
     }
 
+    setIsSubmitting(true);
     setError(null);
-    setIsSubmitted(true);
+
+    try {
+      const res = await apiClient.submitCitizenResponse(reportId, {
+        description: description.trim(),
+        incidentDate: witnessDate.trim() || undefined,
+        contactConsent,
+        contactInfo: contactConsent && contactInfo.trim() ? contactInfo.trim() : undefined,
+      });
+
+      setResponseId(res.responseId || null);
+      setIsSubmitted(true);
+    } catch (err: any) {
+      const msg =
+        language === 'bn'
+          ? err?.messageBn || err?.message || 'তথ্য জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
+          : err?.message || 'Failed to submit information. Please try again.';
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleResetAndClose = () => {
@@ -46,6 +71,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     setContactConsent(false);
     setContactInfo('');
     setIsSubmitted(false);
+    setIsSubmitting(false);
+    setResponseId(null);
     setError(null);
     onClose();
   };
@@ -100,13 +127,25 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   : 'Your information has been submitted for moderation review.'}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleResetAndClose}
-              className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] text-inverse text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px]"
-            >
-              {language === 'bn' ? 'সম্পন্ন করুন' : 'Done'}
-            </button>
+            {responseId && (
+              <div className="p-3 bg-surface-subtle rounded-xl border border-subtle text-center inline-block max-w-xs mx-auto">
+                <span className="text-[13px] text-muted block">
+                  {language === 'bn' ? 'রেসপন্স আইডি' : 'Response ID'}
+                </span>
+                <span className="font-mono text-[15px] font-bold text-primary">
+                  {responseId}
+                </span>
+              </div>
+            )}
+            <div>
+              <button
+                type="button"
+                onClick={handleResetAndClose}
+                className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] text-inverse text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px]"
+              >
+                {language === 'bn' ? 'সম্পন্ন করুন' : 'Done'}
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -178,17 +217,28 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="px-4 py-2.5 border border-subtle hover:bg-surface-subtle text-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-surface"
+                disabled={isSubmitting}
+                className="px-4 py-2.5 border border-subtle hover:bg-surface-subtle disabled:opacity-50 text-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-surface"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
               </button>
 
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] text-inverse text-[16px] font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px]"
+                disabled={isSubmitting}
+                className="px-5 py-2.5 bg-[var(--ui-primary-action-bg)] hover:bg-[var(--ui-primary-action-hover)] disabled:opacity-50 disabled:cursor-not-allowed text-inverse text-[16px] font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px]"
               >
-                <Send className="w-4 h-4" />
-                <span>{language === 'bn' ? 'তথ্য জমা দিন' : 'Submit Information'}</span>
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <span>{language === 'bn' ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>{language === 'bn' ? 'তথ্য জমা দিন' : 'Submit Information'}</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
