@@ -82,50 +82,55 @@ export const AppShell: React.FC = () => {
         <MobileHeader />
       </ErrorBoundary>
 
-      {/* 4. Independently Viewport-Centered Main Public Content */}
-      <main
-        id="public-main-workspace"
-        className="w-full mx-auto max-w-[900px] min-[1440px]:max-w-[880px] min-[1536px]:max-w-[900px] min-[1920px]:max-w-[920px] flex-1 flex flex-col justify-between pb-20 pb-safe md:pb-0"
+      {/* 4. Desktop-Workspace-Centered Main Public Content */}
+      <div
+        id="public-desktop-workspace"
+        className="w-full flex-1 flex flex-col min-[1440px]:pl-[240px] min-[1536px]:pl-[250px] min-[1920px]:pl-[260px]"
       >
-        <div className="w-full">
-          <ErrorBoundary componentName="MainRoutes">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/harassment" element={<HarassmentPage />} />
-              <Route path="/rickshaw" element={<RickshawPage />} />
-              <Route path="/extortion" element={<ExtortionPage />} />
-              <Route path="/load-shedding" element={<ComingSoonPage serviceKey="load_shedding" />} />
-              <Route path="/illegal-occupation" element={<ComingSoonPage serviceKey="illegal_occupation" />} />
-              <Route path="/report" element={<ReportPage />} />
-              <Route path="/explore" element={<ExplorePage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/more" element={<MorePage />} />
-              <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
-              <Route path="/location/:id" element={<LocationRouteWrapper />} />
-              <Route path="/subject/:id" element={<SubjectRouteWrapper />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </ErrorBoundary>
-        </div>
-
-        {/* Minimal Informational Trust Footer */}
-        <footer className="pt-8 pb-6 border-t border-subtle mt-10 text-[14px] text-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-primary">সবাইকে জানাও</span>
-              <span>•</span>
-              <span>
-                {language === 'bn'
-                  ? 'মডারেটেড নাগরিক অভিযোগ ও তথ্য প্ল্যাটফর্ম'
-                  : 'Moderated Citizen Public Platform'}
-              </span>
-            </div>
-            <div className="text-[14px] text-muted">
-              <span>{language === 'bn' ? 'মুক্ত জনস্বার্থ রেকর্ড' : 'Public Interest Record'}</span>
-            </div>
+        <main
+          id="public-main-workspace"
+          className="w-full mx-auto max-w-[900px] min-[1440px]:max-w-[880px] min-[1536px]:max-w-[900px] min-[1920px]:max-w-[920px] flex-1 flex flex-col justify-between pb-20 pb-safe md:pb-0"
+        >
+          <div className="w-full">
+            <ErrorBoundary componentName="MainRoutes">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/harassment" element={<HarassmentPage />} />
+                <Route path="/rickshaw" element={<RickshawPage />} />
+                <Route path="/extortion" element={<ExtortionPage />} />
+                <Route path="/load-shedding" element={<ComingSoonPage serviceKey="load_shedding" />} />
+                <Route path="/illegal-occupation" element={<ComingSoonPage serviceKey="illegal_occupation" />} />
+                <Route path="/report" element={<ReportPage />} />
+                <Route path="/explore" element={<ExplorePage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/more" element={<MorePage />} />
+                <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
+                <Route path="/location/:id" element={<LocationRouteWrapper />} />
+                <Route path="/subject/:id" element={<SubjectRouteWrapper />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </ErrorBoundary>
           </div>
-        </footer>
-      </main>
+
+          {/* Minimal Informational Trust Footer */}
+          <footer className="pt-8 pb-6 border-t border-subtle mt-10 text-[14px] text-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-primary">সবাইকে জানাও</span>
+                <span>•</span>
+                <span>
+                  {language === 'bn'
+                    ? 'মডারেটেড নাগরিক অভিযোগ ও তথ্য প্ল্যাটফর্ম'
+                    : 'Moderated Citizen Public Platform'}
+                </span>
+              </div>
+              <div className="text-[14px] text-muted">
+                <span>{language === 'bn' ? 'মুক্ত জনস্বার্থ রেকর্ড' : 'Public Interest Record'}</span>
+              </div>
+            </div>
+          </footer>
+        </main>
+      </div>
 
       {/* 5. Mobile Fixed Bottom Navigation (< 768px) */}
       <ErrorBoundary componentName="BottomNav" fallback={null}>
