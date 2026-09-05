@@ -81,6 +81,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Contextual subject configuration for Rickshaw & Extortion
     const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
 
+    // Conditional: hide frequency for Illegal Charging Station reports
+    const hideFrequency =
+      segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location';
+
     // Accordion visibility states - Core sections are open/non-collapsible
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => ({
       narrative: true,
@@ -481,7 +485,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             </div>
 
             {/* Incident Date, Time & Frequency */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className={`grid grid-cols-1 ${hideFrequency ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3`}>
               <div>
                 <label
                   htmlFor="complaint-date-input"
@@ -529,32 +533,34 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="complaint-frequency-select"
-                  className="block text-[13px] font-bold text-primary mb-1"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Repeat className="w-3.5 h-3.5 text-secondary" />
-                    <span>{language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}</span>
-                  </div>
-                </label>
-                <select
-                  id="complaint-frequency-select"
-                  value={formData.frequency || 'one-time'}
-                  onChange={(e) =>
-                    onUpdateFormData({ frequency: e.target.value as 'one-time' | 'repeated' })
-                  }
-                  className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px]"
-                >
-                  <option value="one-time">
-                    {language === 'bn' ? 'এককালীন (One-time)' : 'One-time'}
-                  </option>
-                  <option value="repeated">
-                    {language === 'bn' ? 'নিয়মিত / একাধিকবার' : 'Repeated / Ongoing'}
-                  </option>
-                </select>
-              </div>
+              {!hideFrequency && (
+                <div>
+                  <label
+                    htmlFor="complaint-frequency-select"
+                    className="block text-[13px] font-bold text-primary mb-1"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Repeat className="w-3.5 h-3.5 text-secondary" />
+                      <span>{language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}</span>
+                    </div>
+                  </label>
+                  <select
+                    id="complaint-frequency-select"
+                    value={formData.frequency || 'one-time'}
+                    onChange={(e) =>
+                      onUpdateFormData({ frequency: e.target.value as 'one-time' | 'repeated' })
+                    }
+                    className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px]"
+                  >
+                    <option value="one-time">
+                      {language === 'bn' ? 'এককালীন (One-time)' : 'One-time'}
+                    </option>
+                    <option value="repeated">
+                      {language === 'bn' ? 'নিয়মিত / একাধিকবার' : 'Repeated / Ongoing'}
+                    </option>
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Conditional Digital Threat Questions ONLY for Digital Harassment */}

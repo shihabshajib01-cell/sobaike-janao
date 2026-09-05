@@ -50,6 +50,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
 
+  // Conditional: hide frequency for Illegal Charging Station reports
+  const hideFrequency =
+    segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location';
+
   // Independent Collapsible State - What Happened (incident) is expanded by default
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     service_type: false,
@@ -79,15 +83,17 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       : formData.subcategoryId
   }`;
 
-  const incidentSummary = `${formData.incidentDate || '-'} · ${
-    formData.frequency === 'repeated'
-      ? language === 'bn'
-        ? 'নিয়মিত'
-        : 'Repeated'
-      : language === 'bn'
-      ? 'এককালীন'
-      : 'One-time'
-  }`;
+  const incidentSummary = hideFrequency
+    ? `${formData.incidentDate || '-'}`
+    : `${formData.incidentDate || '-'} · ${
+        formData.frequency === 'repeated'
+          ? language === 'bn'
+            ? 'নিয়মিত'
+            : 'Repeated'
+          : language === 'bn'
+          ? 'এককালীন'
+          : 'One-time'
+      }`;
 
   const locationSummary =
     [
@@ -235,20 +241,22 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 </div>
               )}
 
-              <div>
-                <span>
-                  {language === 'bn' ? 'পুনরাবৃত্তি: ' : 'Frequency: '}
-                  <strong>
-                    {formData.frequency === 'repeated'
-                      ? language === 'bn'
-                        ? 'নিয়মিত / একাধিকবার'
-                        : 'Repeated'
-                      : language === 'bn'
-                      ? 'এককালীন'
-                      : 'One-time'}
-                  </strong>
-                </span>
-              </div>
+              {!hideFrequency && (
+                <div>
+                  <span>
+                    {language === 'bn' ? 'পুনরাবৃত্তি: ' : 'Frequency: '}
+                    <strong>
+                      {formData.frequency === 'repeated'
+                        ? language === 'bn'
+                          ? 'নিয়মিত / একাধিকবার'
+                          : 'Repeated'
+                        : language === 'bn'
+                        ? 'এককালীন'
+                        : 'One-time'}
+                    </strong>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </ReviewSection>
