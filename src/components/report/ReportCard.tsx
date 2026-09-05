@@ -16,9 +16,14 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
-  const subcategory = language === 'bn' ? report.subcategoryBn : report.subcategoryEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const publishedDate = language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
+
+  const normalizedTitle = (title || '').trim();
+  const normalizedDesc = (shortDesc || '').trim();
+  const shouldShowDescription =
+    normalizedDesc.length > 0 &&
+    normalizedDesc !== normalizedTitle;
 
   const handleCardClick = () => {
     navigateTo(`/report-detail/${report.id}`);
@@ -52,7 +57,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       onKeyDown={handleKeyDown}
       className={`group relative bg-surface border border-subtle hover:border-theme focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] focus-visible:outline-none rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none ${className}`}
     >
-      {/* 1. Top Context Line: Service Badge · Subcategory */}
+      {/* 1. Top Context Line: Service Badge */}
       <div className="flex items-center justify-between gap-2 text-[12px] sm:text-[13px] md:text-[14px]">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
           <CategoryBadge
@@ -61,10 +66,6 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             size="sm"
             className="shrink-0 text-[11.5px] sm:text-[12px] md:text-[13px] py-0.5 sm:py-1 px-2 sm:px-2.5 min-h-[22px] sm:min-h-[26px]"
           />
-          <span className="text-muted text-[11px] sm:text-[12px] md:text-[13px]">•</span>
-          <span className="text-secondary font-medium truncate max-w-[170px] sm:max-w-[240px] md:max-w-md">
-            {subcategory}
-          </span>
         </div>
       </div>
 
@@ -86,9 +87,11 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       )}
 
       {/* 4. Description Preview (Lightened visual weight, 2 lines mobile / 3 lines desktop) */}
-      <p className="text-[13px] sm:text-[14px] md:text-[16px] leading-[1.5] sm:leading-[1.55] md:leading-[26px] text-secondary line-clamp-2 md:line-clamp-3 font-normal break-words">
-        {shortDesc}
-      </p>
+      {shouldShowDescription && (
+        <p className="text-[13px] sm:text-[14px] md:text-[16px] leading-[1.5] sm:leading-[1.55] md:leading-[26px] text-secondary line-clamp-2 md:line-clamp-3 font-normal break-words">
+          {shortDesc}
+        </p>
+      )}
 
       {/* 4.5 Supporting Media Preview (Rendered when approved public images exist, supports single and gallery) */}
       {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
