@@ -11,6 +11,7 @@ export interface GoogleMapPickerProps {
   onMapPointChange?: (lat: number, lng: number) => void;
   language: 'bn' | 'en';
   error?: string;
+  centerTarget?: { lat: number; lng: number; zoom?: number; timestamp: number };
 }
 
 export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
@@ -19,12 +20,14 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
   onMapPointChange,
   language,
   error,
+  centerTarget,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const pinMarkerRef = useRef<L.CircleMarker | null>(null);
   const haloMarkerRef = useRef<L.CircleMarker | null>(null);
   const lastCenteredDistrictOrDivisionRef = useRef<string>('');
+  const lastHandledCenterTimestampRef = useRef<number>(0);
 
   const hasValidCoordinates = isValidIncidentCoordinates(location.lat, location.lng);
 
@@ -248,6 +251,22 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
     return () => observer.disconnect();
   }, []);
 
+  // Handle programmatic map centering when target is updated (e.g. from address search)
+  useEffect(() => {
+    if (!centerTarget || !mapInstanceRef.current) return;
+    if (
+      centerTarget.timestamp &&
+      centerTarget.timestamp !== lastHandledCenterTimestampRef.current
+    ) {
+      lastHandledCenterTimestampRef.current = centerTarget.timestamp;
+      mapInstanceRef.current.flyTo(
+        [centerTarget.lat, centerTarget.lng],
+        centerTarget.zoom || 16,
+        { animate: true }
+      );
+    }
+  }, [centerTarget]);
+
   // Accessible center-pin selector
   const handleSetPointAtCenter = () => {
     if (!mapInstanceRef.current) return;
@@ -270,10 +289,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-[12px] font-semibold">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span>
-              {language === 'bn' ? 'ঘটনাস্থলের পয়েন্ট নির্বাচন করা হয়েছে' : 'Incident point selected'}
-            </span>
-            <span className="text-secondary text-[11px] font-normal">
-              ({location.lat?.toFixed(4)}, {location.lng?.toFixed(4)})
+              {language === 'bn' ? 'ঘটনাস্থলের পয়েন্ট নির্বাচন করা হয়েছে' : 'Incident point selected'}
             </span>
           </div>
         ) : (
@@ -320,12 +336,6 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
               : 'Set point at map center'}
           </span>
         </button>
-
-        {hasValidCoordinates && (
-          <span className="text-[11.5px] text-muted">
-            Lat: {location.lat} | Lng: {location.lng}
-          </span>
-        )}
       </div>
 
       {/* Error Message */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react';
 import {
   Shield,
   FileText,
@@ -35,6 +35,12 @@ import { Accordion } from '../ui/Accordion';
 import { Toggle } from '../ui/Toggle';
 import { ImageAttachmentPicker, AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { GoogleMapPicker } from '../location/GoogleMapPicker';
+import { AddressSearchInput } from '../location/AddressSearchInput';
+import {
+  loadGooglePlacesScript,
+  ResolvedPlaceResult,
+  buildResolvedLocationData,
+} from '../../services/googlePlacesService';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -211,6 +217,91 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       if (errors.coordinates) {
         setErrors((prev) => ({ ...prev, coordinates: '' }));
       }
+    };
+
+    // Google Places availability state
+    const [isPlacesAvailable, setIsPlacesAvailable] = useState<boolean>(false);
+    const [placesCheckDone, setPlacesCheckDone] = useState<boolean>(false);
+    const [mapCenterTarget, setMapCenterTarget] = useState<{
+      lat: number;
+      lng: number;
+      zoom?: number;
+      timestamp: number;
+    } | undefined>(undefined);
+
+    useEffect(() => {
+      let isMounted = true;
+      loadGooglePlacesScript()
+        .then((available) => {
+          if (isMounted) {
+            setIsPlacesAvailable(available);
+            setPlacesCheckDone(true);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setIsPlacesAvailable(false);
+            setPlacesCheckDone(true);
+          }
+        });
+      return () => {
+        isMounted = false;
+      };
+    }, []);
+
+    // Bias Google Places search towards selected district or division if available
+    const searchBiasCoords = useMemo(() => {
+      if (formData.location?.district) {
+        const matched = BANGLADESH_DISTRICTS.find(
+          (d) => d.nameEn === formData.location?.district || d.nameBn === formData.location?.district
+        );
+        if (matched) {
+          return { lat: matched.lat, lng: matched.lng };
+        }
+      }
+      if (formData.location?.division) {
+        const matchedDiv = DIVISIONS.find(
+          (d) => d.nameEn === formData.location?.division || d.nameBn === formData.location?.division
+        );
+        if (matchedDiv) {
+          return { lat: matchedDiv.lat, lng: matchedDiv.lng };
+        }
+      }
+      return undefined;
+    }, [formData.location?.district, formData.location?.division]);
+
+    // Dedicated coherent update path for Google Places search resolution
+    const handleSearchResultSelected = (place: ResolvedPlaceResult) => {
+      const currentLoc = formData.location || {
+        formattedAddress: '',
+        division: '',
+        district: '',
+        upazilaOrThana: '',
+        area: '',
+        road: '',
+        landmark: '',
+      };
+
+      const updatedLoc: ReportLocationData = buildResolvedLocationData(currentLoc, place);
+
+      // Single intentional atomic location update
+      onUpdateFormData({ location: updatedLoc });
+
+      // Clear errors for resolved fields
+      setErrors((prev) => ({
+        ...prev,
+        ...(updatedLoc.division ? { division: '' } : {}),
+        ...(updatedLoc.district ? { district: '' } : {}),
+        coordinates: '',
+      }));
+
+      // Move Leaflet map and update marker
+      setMapCenterTarget({
+        lat: place.lat,
+        lng: place.lng,
+        zoom: 16,
+        timestamp: Date.now(),
+      });
     };
 
     const handleToggleDetailedLocation = (enabled: boolean) => {
@@ -667,207 +758,337 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               </p>
             )}
 
-            {/* Simple Location Fields (Division, District, Area) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Division */}
-              <div>
-                <label
-                  htmlFor="complaint-division-select"
-                  className="block text-[13px] font-bold text-primary mb-1"
-                >
-                  {language === 'bn' ? 'বিভাগ *' : 'Division *'}
-                </label>
-                <select
-                  id="complaint-division-select"
-                  value={formData.location?.division || ''}
-                  onChange={(e) => {
-                    const divVal = e.target.value;
-                    handleManualLocationChange({ division: divVal, district: '' });
-                  }}
-                  className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
-                    errors.division ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                  }`}
-                >
-                  <option value="">{language === 'bn' ? '-- বিভাগ বেছে নিন --' : '-- Select Division --'}</option>
-                  {DIVISIONS.map((div: DivisionInfo) => (
-                    <option key={div.id} value={div.nameEn}>
-                      {language === 'bn' ? div.nameBn : div.nameEn}
-                    </option>
-                  ))}
-                </select>
-                {errors.division && (
-                  <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.division}</p>
-                )}
-              </div>
+            {/* State A: When Google Places is available */}
+            {isPlacesAvailable ? (
+              <>
+                {/* Division & District (2 Columns) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Division */}
+                  <div>
+                    <label
+                      htmlFor="complaint-division-select"
+                      className="block text-[13px] font-bold text-primary mb-1"
+                    >
+                      {language === 'bn' ? 'বিভাগ *' : 'Division *'}
+                    </label>
+                    <select
+                      id="complaint-division-select"
+                      value={formData.location?.division || ''}
+                      onChange={(e) => {
+                        const divVal = e.target.value;
+                        handleManualLocationChange({ division: divVal, district: '' });
+                      }}
+                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                        errors.division ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      }`}
+                    >
+                      <option value="">{language === 'bn' ? '-- বিভাগ বেছে নিন --' : '-- Select Division --'}</option>
+                      {DIVISIONS.map((div: DivisionInfo) => (
+                        <option key={div.id} value={div.nameEn}>
+                          {language === 'bn' ? div.nameBn : div.nameEn}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.division && (
+                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.division}</p>
+                    )}
+                  </div>
 
-              {/* District */}
-              <div>
-                <label
-                  htmlFor="complaint-district-select"
-                  className="block text-[13px] font-bold text-primary mb-1"
-                >
-                  {language === 'bn' ? 'জেলা *' : 'District *'}
-                </label>
-                {availableDistricts.length > 0 ? (
-                  <select
-                    id="complaint-district-select"
-                    value={formData.location?.district || ''}
-                    onChange={(e) => {
-                      handleManualLocationChange({ district: e.target.value });
-                    }}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
-                      errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                    }`}
-                  >
-                    <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
-                    {availableDistricts.map((dst: DistrictInfo) => (
-                      <option key={dst.id} value={dst.nameEn}>
-                        {language === 'bn' ? dst.nameBn : dst.nameEn}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    id="complaint-district-input"
-                    type="text"
-                    value={formData.location?.district || ''}
-                    onChange={(e) => {
-                      handleManualLocationChange({ district: e.target.value });
-                    }}
-                    placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                      errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                    }`}
+                  {/* District */}
+                  <div>
+                    <label
+                      htmlFor="complaint-district-select"
+                      className="block text-[13px] font-bold text-primary mb-1"
+                    >
+                      {language === 'bn' ? 'জেলা *' : 'District *'}
+                    </label>
+                    {availableDistricts.length > 0 ? (
+                      <select
+                        id="complaint-district-select"
+                        value={formData.location?.district || ''}
+                        onChange={(e) => {
+                          handleManualLocationChange({ district: e.target.value });
+                        }}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                          errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      >
+                        <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
+                        {availableDistricts.map((dst: DistrictInfo) => (
+                          <option key={dst.id} value={dst.nameEn}>
+                            {language === 'bn' ? dst.nameBn : dst.nameEn}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        id="complaint-district-input"
+                        type="text"
+                        value={formData.location?.district || ''}
+                        onChange={(e) => {
+                          handleManualLocationChange({ district: e.target.value });
+                        }}
+                        placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      />
+                    )}
+                    {errors.district && (
+                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.district}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Single Search Control After Division + District */}
+                <div className="pt-0.5">
+                  <AddressSearchInput
+                    language={language}
+                    onPlaceSelected={handleSearchResultSelected}
+                    biasCoords={searchBiasCoords}
+                    initialValue={formData.location?.formattedAddress || ''}
                   />
+                </div>
+
+                {/* Map Coordinate Picker */}
+                <div className="pt-2">
+                  <GoogleMapPicker
+                    location={
+                      formData.location || {
+                        division: '',
+                        district: '',
+                        area: '',
+                        formattedAddress: '',
+                        road: '',
+                        landmark: '',
+                        upazilaOrThana: '',
+                      }
+                    }
+                    onMapPointChange={handleMapPointChange}
+                    language={language}
+                    error={errors.coordinates}
+                    centerTarget={mapCenterTarget}
+                  />
+                </div>
+              </>
+            ) : (
+              /* State B: When Places is unavailable (missing key, load error, or network failure) */
+              <>
+                {/* Fallback subtle notice */}
+                {placesCheckDone && (
+                  <div className="text-[12px] text-secondary bg-surface-subtle border border-subtle/80 rounded-lg px-3 py-2 flex items-center gap-1.5">
+                    <span>
+                      {language === 'bn'
+                        ? 'ঠিকানা অনুসন্ধান এখন পাওয়া যাচ্ছে না। ঠিকানা লিখে ম্যাপে স্থান নির্বাচন করুন।'
+                        : 'Address search is unavailable. Enter the location manually and select the point on the map.'}
+                    </span>
+                  </div>
                 )}
-                {errors.district && (
-                  <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.district}</p>
-                )}
-              </div>
 
-              {/* Area / Neighborhood */}
-              <div>
-                <label
-                  htmlFor="complaint-area-input"
-                  className="block text-[13px] font-bold text-primary mb-1"
-                >
-                  {isDigitalHarassment
-                    ? language === 'bn'
-                      ? 'এলাকা / প্রাসঙ্গিক স্থান'
-                      : 'Area / Relevant location'
-                    : language === 'bn'
-                    ? 'এলাকা / মহল্লা'
-                    : 'Area / Neighborhood'}
-                </label>
-                <input
-                  id="complaint-area-input"
-                  type="text"
-                  value={formData.location?.area || ''}
-                  onChange={(e) => handleManualLocationChange({ area: e.target.value })}
-                  placeholder={language === 'bn' ? 'এলাকা বা মহল্লার নাম' : 'Area or neighborhood'}
-                  className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
-                />
-              </div>
-            </div>
-
-            {/* Map Coordinate Picker - ALWAYS VISIBLE */}
-            <div className="pt-2">
-              <GoogleMapPicker
-                location={
-                  formData.location || {
-                    division: '',
-                    district: '',
-                    area: '',
-                    formattedAddress: '',
-                    road: '',
-                    landmark: '',
-                    upazilaOrThana: '',
-                  }
-                }
-                onMapPointChange={handleMapPointChange}
-                language={language}
-                error={errors.coordinates}
-              />
-            </div>
-
-            {/* Optional Detailed Location Toggle */}
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={() => handleToggleDetailedLocation(!formData.isDetailedLocation)}
-                className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-primary hover:underline cursor-pointer py-1"
-              >
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    formData.isDetailedLocation ? 'rotate-180' : ''
-                  }`}
-                />
-                <span>
-                  {formData.isDetailedLocation
-                    ? language === 'bn'
-                      ? 'অতিরিক্ত ঠিকানার ঘরগুলো লুকান'
-                      : 'Hide additional address fields'
-                    : language === 'bn'
-                    ? '+ বিস্তারিত ঠিকানা যোগ করুন (থানা, রাস্তা, ল্যান্ডমার্ক)'
-                    : '+ Add detailed address (Thana, Road, Landmark)'}
-                </span>
-              </button>
-
-              {formData.isDetailedLocation && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2.5 border-t border-subtle/60 mt-1.5">
+                {/* Manual Location Fields (Division, District, Area) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Division */}
                   <div>
                     <label
-                      htmlFor="complaint-thana-input"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      htmlFor="complaint-division-select"
+                      className="block text-[13px] font-bold text-primary mb-1"
                     >
-                      {language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
+                      {language === 'bn' ? 'বিভাগ *' : 'Division *'}
                     </label>
-                    <input
-                      id="complaint-thana-input"
-                      type="text"
-                      value={formData.location?.upazilaOrThana || ''}
-                      onChange={(e) => handleManualLocationChange({ upazilaOrThana: e.target.value })}
-                      placeholder={language === 'bn' ? 'যেমন: মিরপুর মডেল' : 'e.g. Mirpur Model'}
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
-                    />
+                    <select
+                      id="complaint-division-select"
+                      value={formData.location?.division || ''}
+                      onChange={(e) => {
+                        const divVal = e.target.value;
+                        handleManualLocationChange({ division: divVal, district: '' });
+                      }}
+                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                        errors.division ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      }`}
+                    >
+                      <option value="">{language === 'bn' ? '-- বিভাগ বেছে নিন --' : '-- Select Division --'}</option>
+                      {DIVISIONS.map((div: DivisionInfo) => (
+                        <option key={div.id} value={div.nameEn}>
+                          {language === 'bn' ? div.nameBn : div.nameEn}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.division && (
+                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.division}</p>
+                    )}
                   </div>
 
+                  {/* District */}
                   <div>
                     <label
-                      htmlFor="complaint-road-input"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      htmlFor="complaint-district-select"
+                      className="block text-[13px] font-bold text-primary mb-1"
                     >
-                      {language === 'bn' ? 'রাস্তা / লেন' : 'Road / Lane'}
+                      {language === 'bn' ? 'জেলা *' : 'District *'}
                     </label>
-                    <input
-                      id="complaint-road-input"
-                      type="text"
-                      value={formData.location?.road || ''}
-                      onChange={(e) => handleManualLocationChange({ road: e.target.value })}
-                      placeholder={language === 'bn' ? 'যেমন: রোড ৪, ব্লক বি' : 'e.g. Road 4, Block B'}
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
-                    />
+                    {availableDistricts.length > 0 ? (
+                      <select
+                        id="complaint-district-select"
+                        value={formData.location?.district || ''}
+                        onChange={(e) => {
+                          handleManualLocationChange({ district: e.target.value });
+                        }}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px] ${
+                          errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      >
+                        <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
+                        {availableDistricts.map((dst: DistrictInfo) => (
+                          <option key={dst.id} value={dst.nameEn}>
+                            {language === 'bn' ? dst.nameBn : dst.nameEn}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        id="complaint-district-input"
+                        type="text"
+                        value={formData.location?.district || ''}
+                        onChange={(e) => {
+                          handleManualLocationChange({ district: e.target.value });
+                        }}
+                        placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      />
+                    )}
+                    {errors.district && (
+                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.district}</p>
+                    )}
                   </div>
 
+                  {/* Area / Neighborhood */}
                   <div>
                     <label
-                      htmlFor="complaint-landmark-input"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      htmlFor="complaint-area-input"
+                      className="block text-[13px] font-bold text-primary mb-1"
                     >
-                      {language === 'bn' ? 'নিকটবর্তী ল্যান্ডমার্ক' : 'Nearby Landmark'}
+                      {isDigitalHarassment
+                        ? language === 'bn'
+                          ? 'এলাকা / প্রাসঙ্গিক স্থান'
+                          : 'Area / Relevant location'
+                        : language === 'bn'
+                        ? 'এলাকা / মহল্লা'
+                        : 'Area / Neighborhood'}
                     </label>
                     <input
-                      id="complaint-landmark-input"
+                      id="complaint-area-input"
                       type="text"
-                      value={formData.location?.landmark || ''}
-                      onChange={(e) => handleManualLocationChange({ landmark: e.target.value })}
-                      placeholder={language === 'bn' ? 'যেমন: মসজিদের পিছনে' : 'e.g. Behind mosque'}
+                      value={formData.location?.area || ''}
+                      onChange={(e) => handleManualLocationChange({ area: e.target.value })}
+                      placeholder={language === 'bn' ? 'এলাকা বা মহল্লার নাম' : 'Area or neighborhood'}
                       className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
                     />
                   </div>
                 </div>
-              )}
-            </div>
+
+                {/* Map Coordinate Picker */}
+                <div className="pt-2">
+                  <GoogleMapPicker
+                    location={
+                      formData.location || {
+                        division: '',
+                        district: '',
+                        area: '',
+                        formattedAddress: '',
+                        road: '',
+                        landmark: '',
+                        upazilaOrThana: '',
+                      }
+                    }
+                    onMapPointChange={handleMapPointChange}
+                    language={language}
+                    error={errors.coordinates}
+                    centerTarget={mapCenterTarget}
+                  />
+                </div>
+
+                {/* Optional Detailed Location Toggle */}
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleDetailedLocation(!formData.isDetailedLocation)}
+                    className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-primary hover:underline cursor-pointer py-1"
+                  >
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${
+                        formData.isDetailedLocation ? 'rotate-180' : ''
+                      }`}
+                    />
+                    <span>
+                      {formData.isDetailedLocation
+                        ? language === 'bn'
+                          ? 'অতিরিক্ত ঠিকানার ঘরগুলো লুকান'
+                          : 'Hide additional address fields'
+                        : language === 'bn'
+                        ? '+ বিস্তারিত ঠিকানা যোগ করুন (থানা, রাস্তা, ল্যান্ডমার্ক)'
+                        : '+ Add detailed address (Thana, Road, Landmark)'}
+                    </span>
+                  </button>
+
+                  {formData.isDetailedLocation && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2.5 border-t border-subtle/60 mt-1.5">
+                      <div>
+                        <label
+                          htmlFor="complaint-thana-input"
+                          className="block text-[13px] font-semibold text-secondary mb-1"
+                        >
+                          {language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
+                        </label>
+                        <input
+                          id="complaint-thana-input"
+                          type="text"
+                          value={formData.location?.upazilaOrThana || ''}
+                          onChange={(e) => handleManualLocationChange({ upazilaOrThana: e.target.value })}
+                          placeholder={language === 'bn' ? 'যেমন: মিরপুর মডেল' : 'e.g. Mirpur Model'}
+                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="complaint-road-input"
+                          className="block text-[13px] font-semibold text-secondary mb-1"
+                        >
+                          {language === 'bn' ? 'রাস্তা / লেন' : 'Road / Lane'}
+                        </label>
+                        <input
+                          id="complaint-road-input"
+                          type="text"
+                          value={formData.location?.road || ''}
+                          onChange={(e) => handleManualLocationChange({ road: e.target.value })}
+                          placeholder={language === 'bn' ? 'যেমন: রোড ৪, ব্লক বি' : 'e.g. Road 4, Block B'}
+                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="complaint-landmark-input"
+                          className="block text-[13px] font-semibold text-secondary mb-1"
+                        >
+                          {language === 'bn' ? 'নিকটবর্তী ল্যান্ডমার্ক' : 'Nearby Landmark'}
+                        </label>
+                        <input
+                          id="complaint-landmark-input"
+                          type="text"
+                          value={formData.location?.landmark || ''}
+                          onChange={(e) => handleManualLocationChange({ landmark: e.target.value })}
+                          placeholder={language === 'bn' ? 'যেমন: মসজিদের পিছনে' : 'e.g. Behind mosque'}
+                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </Accordion>
 

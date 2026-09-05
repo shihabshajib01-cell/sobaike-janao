@@ -97,7 +97,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const locationSummary =
     [
-      formData.location?.area,
+      formData.location?.area || (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : ''),
       formData.location?.district,
       formData.location?.division,
     ]
@@ -283,6 +283,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 .filter(Boolean)
                 .join(', ') || (language === 'bn' ? 'অবস্থান নির্দিষ্ট নেই' : 'Unspecified location')}
             </p>
+            {formData.location?.formattedAddress && (
+              <p className="text-secondary text-[13px]">
+                {language === 'bn' ? 'ঠিকানা: ' : 'Address: '}
+                <span className="text-primary font-medium">{formData.location.formattedAddress}</span>
+              </p>
+            )}
             {formData.location?.road && (
               <p className="text-secondary text-[13px]">
                 {language === 'bn' ? 'রাস্তা / লেন: ' : 'Road / Lane: '}
@@ -294,8 +300,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               <div className="flex items-center gap-1.5 text-[12px] text-accent font-medium pt-0.5">
                 <MapPin className="w-3.5 h-3.5 shrink-0" />
                 <span>
-                  {language === 'bn' ? 'ম্যাপ পিন: ' : 'Map Pin: '}
-                  {formData.location.lat.toFixed(5)}, {formData.location.lng.toFixed(5)}
+                  {language === 'bn' ? 'ম্যাপে স্থান চিহ্নিত' : 'Location pinned on map'}
                 </span>
               </div>
             )}
