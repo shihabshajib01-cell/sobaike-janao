@@ -46,11 +46,9 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-      );
+      const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
       if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in local mock mode (DEV only)');
+        console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
         return {
