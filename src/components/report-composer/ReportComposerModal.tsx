@@ -769,6 +769,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         roleOrDesignation: isPartySegment ? (formData.roleOrDesignation?.trim() || undefined) : undefined,
         organization: isPartySegment ? (formData.organization?.trim() || undefined) : undefined,
         publicProfileHandle: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
+        phoneOrContact: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
         identifyingDescription: isPartySegment ? (formData.identifyingDescription?.trim() || undefined) : undefined,
         mentionedParties:
           isPartySegment && formData.mentionedParties && formData.mentionedParties.length > 0
