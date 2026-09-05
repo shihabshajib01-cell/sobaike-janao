@@ -161,6 +161,18 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       }
     };
 
+    // Normalize old draft for charging station operator where only organization was set
+    useEffect(() => {
+      if (isChargingStationOperator) {
+        if (!formData.reportedSubject?.trim() && formData.organization?.trim()) {
+          onUpdateFormData({
+            reportedSubject: formData.organization.trim(),
+            organization: formData.subjectType === 'organization' ? formData.organization.trim() : undefined,
+          });
+        }
+      }
+    }, [isChargingStationOperator, formData.reportedSubject, formData.organization, formData.subjectType, onUpdateFormData]);
+
     // Accordion visibility states - Core sections are open/non-collapsible
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => ({
       narrative: true,

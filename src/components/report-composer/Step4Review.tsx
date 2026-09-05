@@ -364,79 +364,143 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
             onEdit={() => onEditStep(3, 'parties')}
             editLabel={editLabel}
           >
-            <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-2 pt-1">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div>
-                  <span className="text-muted block text-[12px]">
-                    {language === 'bn' ? 'ধরন ও নাম:' : 'Type & Name:'}
-                  </span>
-                  <p className="font-bold text-primary text-[14.5px]">
-                    {formData.reportedSubject ||
-                      formData.organization ||
-                      (formData.subjectType === 'unknown'
-                        ? language === 'bn'
-                          ? 'অজ্ঞাত / নির্দিষ্ট নেই'
-                          : 'Unknown / Not specified'
-                        : language === 'bn'
-                        ? 'নির্দিষ্ট নাম উল্লেখ নেই'
-                        : 'Unspecified name')}
-                  </p>
-                </div>
-                <span className="px-2.5 py-1 rounded-lg bg-surface border border-subtle text-[12px] font-semibold text-secondary">
-                  {getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language)}
-                </span>
-              </div>
-
-              {(formData.roleOrDesignation || (formData.organization && formData.organization !== formData.reportedSubject)) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-subtle/50 text-[13px] text-secondary">
-                  {formData.roleOrDesignation && (
-                    <p>
-                      <strong>{language === 'bn' ? 'ভূমিকা/পদবি: ' : 'Role/Designation: '}</strong>
-                      {formData.roleOrDesignation}
+            {segment === 'rickshaw' ? (
+              <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-2 pt-1">
+                {/* Type */}
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <span className="text-muted block text-[12px]">
+                      {language === 'bn' ? 'ধরন:' : 'Type:'}
+                    </span>
+                    <p className="font-bold text-primary text-[14px]">
+                      {getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language)}
                     </p>
-                  )}
-                  {formData.organization && formData.organization !== formData.reportedSubject && (
-                    <p>
-                      <strong>{language === 'bn' ? 'প্রতিষ্ঠান/সমিতি: ' : 'Organization: '}</strong>
-                      {formData.organization}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {formData.publicProfileHandle && (
-                <p className="text-[13px] text-secondary pt-0.5">
-                  <strong>{language === 'bn' ? 'যোগাযোগ: ' : 'Contact: '}</strong>
-                  <span className="font-mono">{formData.publicProfileHandle}</span>
-                </p>
-              )}
-
-              {formData.identifyingDescription && (
-                <div className="pt-1 text-[13px] text-secondary">
-                  <strong>{language === 'bn' ? 'শনাক্তকরণ বিবরণ: ' : 'Identifying Description: '}</strong>
-                  <p className="italic text-muted">{formData.identifyingDescription}</p>
-                </div>
-              )}
-
-              {formData.mentionedParties && formData.mentionedParties.length > 0 && (
-                <div className="pt-2 border-t border-subtle/50 text-[13px]">
-                  <span className="font-bold text-primary block mb-1">
-                    {language === 'bn'
-                      ? `অতিরিক্ত পক্ষ (${formData.mentionedParties.length} জন):`
-                      : `Additional Parties (${formData.mentionedParties.length}):`}
-                  </span>
-                  <div className="space-y-1">
-                    {formData.mentionedParties.map((p, idx) => (
-                      <p key={p.id || idx} className="text-secondary">
-                        • {p.name || (language === 'bn' ? 'পক্ষ' : 'Party')}
-                        {p.roleOrDesignation ? ` (${p.roleOrDesignation})` : ''}
-                        {p.organization ? ` - ${p.organization}` : ''}
-                      </p>
-                    ))}
                   </div>
                 </div>
-              )}
-            </div>
+
+                {/* Name / Known Identity (ONLY when value exists) */}
+                {(formData.reportedSubject?.trim() || formData.organization?.trim()) && (
+                  <div className="pt-0.5 border-t border-subtle/40">
+                    <span className="text-secondary font-medium">
+                      {language === 'bn' ? 'নাম / পরিচিতি: ' : 'Name / Known Identity: '}
+                    </span>
+                    <span className="text-primary font-bold">
+                      {formData.reportedSubject?.trim() || formData.organization?.trim()}
+                    </span>
+                  </div>
+                )}
+
+                {/* Role / Designation (ONLY when value exists) */}
+                {formData.roleOrDesignation?.trim() && (
+                  <div className="pt-0.5">
+                    <span className="text-secondary font-medium">
+                      {language === 'bn' ? 'পদবি / ভূমিকা: ' : 'Role / Designation: '}
+                    </span>
+                    <span className="text-primary font-medium">
+                      {formData.roleOrDesignation.trim()}
+                    </span>
+                  </div>
+                )}
+
+                {/* Phone / Contact (ONLY when value exists) */}
+                {formData.publicProfileHandle?.trim() && (
+                  <div className="pt-0.5">
+                    <span className="text-secondary font-medium">
+                      {language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Phone / Contact: '}
+                    </span>
+                    <span className="text-primary font-mono font-medium">
+                      {formData.publicProfileHandle.trim()}
+                    </span>
+                  </div>
+                )}
+
+                {/* Other Identifying Details (ONLY when value exists) */}
+                {formData.identifyingDescription?.trim() && (
+                  <div className="pt-1 border-t border-subtle/50">
+                    <span className="text-secondary font-medium block mb-0.5">
+                      {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য: ' : 'Other Identifying Details: '}
+                    </span>
+                    <p className="text-primary italic whitespace-pre-wrap">
+                      {formData.identifyingDescription.trim()}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[13px] space-y-2 pt-1">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <span className="text-muted block text-[12px]">
+                      {language === 'bn' ? 'ধরন ও নাম:' : 'Type & Name:'}
+                    </span>
+                    <p className="font-bold text-primary text-[14.5px]">
+                      {formData.reportedSubject ||
+                        formData.organization ||
+                        (formData.subjectType === 'unknown'
+                          ? language === 'bn'
+                            ? 'অজ্ঞাত / নির্দিষ্ট নেই'
+                            : 'Unknown / Not specified'
+                          : language === 'bn'
+                          ? 'নির্দিষ্ট নাম উল্লেখ নেই'
+                          : 'Unspecified name')}
+                    </p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-lg bg-surface border border-subtle text-[12px] font-semibold text-secondary">
+                    {getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language)}
+                  </span>
+                </div>
+
+                {(formData.roleOrDesignation || (formData.organization && formData.organization !== formData.reportedSubject)) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-subtle/50 text-[13px] text-secondary">
+                    {formData.roleOrDesignation && (
+                      <p>
+                        <strong>{language === 'bn' ? 'ভূমিকা/পদবি: ' : 'Role/Designation: '}</strong>
+                        {formData.roleOrDesignation}
+                      </p>
+                    )}
+                    {formData.organization && formData.organization !== formData.reportedSubject && (
+                      <p>
+                        <strong>{language === 'bn' ? 'প্রতিষ্ঠান/সমিতি: ' : 'Organization: '}</strong>
+                        {formData.organization}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {formData.publicProfileHandle && (
+                  <p className="text-[13px] text-secondary pt-0.5">
+                    <strong>{language === 'bn' ? 'যোগাযোগ: ' : 'Contact: '}</strong>
+                    <span className="font-mono">{formData.publicProfileHandle}</span>
+                  </p>
+                )}
+
+                {formData.identifyingDescription && (
+                  <div className="pt-1 text-[13px] text-secondary">
+                    <strong>{language === 'bn' ? 'শনাক্তকরণ বিবরণ: ' : 'Identifying Description: '}</strong>
+                    <p className="italic text-muted">{formData.identifyingDescription}</p>
+                  </div>
+                )}
+
+                {formData.mentionedParties && formData.mentionedParties.length > 0 && (
+                  <div className="pt-2 border-t border-subtle/50 text-[13px]">
+                    <span className="font-bold text-primary block mb-1">
+                      {language === 'bn'
+                        ? `অতিরিক্ত পক্ষ (${formData.mentionedParties.length} জন):`
+                        : `Additional Parties (${formData.mentionedParties.length}):`}
+                    </span>
+                    <div className="space-y-1">
+                      {formData.mentionedParties.map((p, idx) => (
+                        <p key={p.id || idx} className="text-secondary">
+                          • {p.name || (language === 'bn' ? 'পক্ষ' : 'Party')}
+                          {p.roleOrDesignation ? ` (${p.roleOrDesignation})` : ''}
+                          {p.organization ? ` - ${p.organization}` : ''}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </ReviewSection>
         )}
 

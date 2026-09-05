@@ -755,6 +755,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       const isHarassment = formData.segment === 'harassment';
       const isPartySegment = formData.segment === 'rickshaw' || formData.segment === 'extortion';
+      const isChargingStation = isPartySegment && formData.segment === 'rickshaw' && (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
+
+      const resolvedReportedSubject = isChargingStation
+        ? ((formData.reportedSubject || formData.organization)?.trim() || undefined)
+        : (formData.reportedSubject?.trim() || undefined);
+
+      const resolvedOrganization = isChargingStation
+        ? (formData.subjectType === 'organization' ? ((formData.organization || formData.reportedSubject)?.trim() || undefined) : undefined)
+        : (formData.organization?.trim() || undefined);
 
       const payload = {
         segment: formData.segment,
@@ -765,9 +774,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         incidentTime: formData.incidentTime || undefined,
         frequency: formData.frequency || 'one-time',
         subjectType: isPartySegment ? (formData.subjectType || 'unknown') : undefined,
-        reportedSubject: isPartySegment ? (formData.reportedSubject?.trim() || undefined) : undefined,
+        reportedSubject: isPartySegment ? resolvedReportedSubject : undefined,
         roleOrDesignation: isPartySegment ? (formData.roleOrDesignation?.trim() || undefined) : undefined,
-        organization: isPartySegment ? (formData.organization?.trim() || undefined) : undefined,
+        organization: isPartySegment ? resolvedOrganization : undefined,
         publicProfileHandle: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
         phoneOrContact: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
         identifyingDescription: isPartySegment ? (formData.identifyingDescription?.trim() || undefined) : undefined,
