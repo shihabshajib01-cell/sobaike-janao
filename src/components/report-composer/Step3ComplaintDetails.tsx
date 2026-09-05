@@ -764,7 +764,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   type="text"
                   value={formData.location?.area || ''}
                   onChange={(e) => handleManualLocationChange({ area: e.target.value })}
-                  placeholder={language === 'bn' ? 'যেমন: মিরপুর ১০, আগ্রাবাদ' : 'e.g. Mirpur 10, Agrabad'}
+                  placeholder={language === 'bn' ? 'এলাকা বা মহল্লার নাম' : 'Area or neighborhood'}
                   className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
                 />
               </div>

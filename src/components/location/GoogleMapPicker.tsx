@@ -94,12 +94,18 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
       }
     }
 
+    // Enable wheel / trackpad zoom for desktop fine-pointer devices while protecting mobile page scroll
+    const isFinePointer =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
     const map = L.map(mapContainerRef.current, {
       center: [initialLat, initialLng],
       zoom: initialZoom,
       minZoom: 6,
       maxZoom: 18,
-      scrollWheelZoom: false,
+      scrollWheelZoom: isFinePointer,
       keyboard: true,
       maxBounds: L.latLngBounds([19.5, 87.0], [27.5, 93.5]),
       maxBoundsViscosity: 0.5,
