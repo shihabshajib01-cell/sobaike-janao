@@ -58,8 +58,8 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
   rickshaw: [
     {
       id: 'charging-station-location',
-      nameBn: 'অবৈধ বা অনিরাপদ চার্জিং স্টেশন',
-      nameEn: 'Illegal / Hazardous Charging Station',
+      nameBn: 'অবৈধ চার্জিং স্টেশন',
+      nameEn: 'Illegal Charging Station',
       descriptionBn: 'অবৈধ বিদ্যুৎ সংযোগ বা অগ্নিঝুঁকিপূর্ণ ব্যাটারি চার্জিং স্পট',
       descriptionEn: 'Report illegal power connections or hazardous battery charging points',
     },
