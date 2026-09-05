@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionKey, ComingSoonServiceKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
-import { DraftReport, isValidIncidentCoordinates, isMeaningfulMentionedParty } from '../../services/types';
+import { DraftReport, isMeaningfulMentionedParty } from '../../services/types';
 import { DraftRepository, INITIAL_DRAFT, generateSecureIdempotencyKey } from '../../services/draftRepository';
 import { apiClient } from '../../services/apiClient';
 import { VisitorSessionService } from '../../services/visitorSessionService';
@@ -671,21 +671,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           ? 'রিপোর্ট শুরুর আগের নীতিমালায় সম্মতি নিশ্চিত করুন।'
           : 'Please confirm the pre-report policy acknowledgement.'
       );
-      return;
-    }
-
-    // Incident coordinate validity defense guard
-    if (!isValidIncidentCoordinates(formData.location?.lat, formData.location?.lng)) {
-      setFormData((prev) => ({ ...prev, currentStep: 3 }));
-      setSubmitError(
-        language === 'bn'
-          ? 'রিপোর্ট জমা দেওয়ার আগে ম্যাপে ঘটনাস্থল নির্বাচন করুন।'
-          : 'Select the incident location on the map before submitting.'
-      );
-      setTimeout(() => {
-        const elem = document.getElementById('composer-section-location');
-        if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
       return;
     }
 
