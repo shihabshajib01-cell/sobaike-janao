@@ -62,6 +62,8 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
                 }
               }}
               className={`p-3 sm:p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] select-none ${
+                allSubcategories.length === 1 ? 'sm:col-span-2' : ''
+              } ${
                 isSelected
                   ? 'border-2 border-accent bg-accent-soft shadow-2xs'
                   : 'border-subtle bg-surface hover:bg-surface-elevated hover:border-strong'
