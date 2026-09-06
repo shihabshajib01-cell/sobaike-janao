@@ -79,8 +79,17 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
   };
 };
 
+const localMockReports: ReportItem[] = [];
+
+export const registerLocalMockReport = (report: ReportItem): void => {
+  localMockReports.unshift(report);
+};
+
 const isMockModeAllowed = (): boolean => {
-  return Boolean(import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true');
+  if (isSupabaseConfigured()) {
+    return import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
+  }
+  return import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
 };
 
 export const PublicReportService = {
@@ -95,7 +104,8 @@ export const PublicReportService = {
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
-        list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+        const seedItems = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+        list = [...localMockReports, ...seedItems];
       } else {
         throw new Error('Public reports service is currently unavailable.');
       }
@@ -104,7 +114,8 @@ export const PublicReportService = {
       if (error) {
         console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
         if (isMockModeAllowed()) {
-          list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+          const seedItems = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+          list = [...localMockReports, ...seedItems];
         } else {
           throw new Error(error.message || 'Failed to load public reports from server.');
         }
@@ -198,6 +209,10 @@ export const PublicReportService = {
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
+        const local = localMockReports.find((r) => r.id.toUpperCase() === cleanId);
+        if (local) {
+          return { report: local, responses: [] };
+        }
         const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
         if (seed) {
           return {
@@ -217,6 +232,10 @@ export const PublicReportService = {
     if (error) {
       console.warn('[PublicReportService.getById] Supabase RPC error:', error);
       if (isMockModeAllowed()) {
+        const local = localMockReports.find((r) => r.id.toUpperCase() === cleanId);
+        if (local) {
+          return { report: local, responses: [] };
+        }
         const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
         if (seed) {
           return {
