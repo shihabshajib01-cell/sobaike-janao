@@ -36,7 +36,7 @@ class ApiClient {
         success: true,
         responseId: `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
         message: 'Mock response submitted successfully.',
-        messageBn: 'আপনার তথ্য সফলভাবে জমা হয়েছে (মক ম���ড)।',
+        messageBn: 'আপনার তথ্য সফলভাবে জমা হয়েছে (মক ম�����ড)।',
       };
     }
 
