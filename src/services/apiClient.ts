@@ -1,7 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
-import { registerLocalMockReport } from './publicReportService';
-import { ReportItem } from '../types/report';
 
 
 export interface ApiError {
@@ -23,7 +21,9 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
       if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
@@ -89,7 +89,9 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
       if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
@@ -162,82 +164,22 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
       if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
+        console.warn('[ApiClient] Supabase not configured — operating in local mock mode (DEV only)');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
-        const mockReport = {
-          id: mockReportId,
-          ...payload,
-          createdAt: new Date().toISOString(),
-        };
-
-        try {
-          const reportItem: ReportItem = {
-            id: mockReportId,
-            segment: payload.segment || 'harassment',
-            subcategoryId: payload.subcategoryId || 'general',
-            subcategoryBn: payload.subcategoryBn || payload.subcategoryId || 'অভিযোগ',
-            subcategoryEn: payload.subcategoryEn || payload.subcategoryId || 'Incident',
-            titleBn: payload.title || mockReportId,
-            titleEn: payload.title || mockReportId,
-            shortDescriptionBn: payload.description || '',
-            shortDescriptionEn: payload.description || '',
-            fullDescriptionBn: payload.description || '',
-            fullDescriptionEn: payload.description || '',
-            reportedSubject: payload.reportedSubject,
-            reportedSubjectBn: payload.reportedSubject,
-            reportedSubjectEn: payload.reportedSubject,
-            subjectType: payload.subjectType || 'individual',
-            organization: payload.organization,
-            locationBn: payload.location?.formattedAddress || payload.location?.district || 'অবস্থান গোপন',
-            locationEn: payload.location?.formattedAddress || payload.location?.district || 'Location withheld',
-            districtBn: payload.location?.district || '',
-            districtEn: payload.location?.district || '',
-            areaBn: payload.location?.area || '',
-            areaEn: payload.location?.area || '',
-            incidentDateBn: payload.incidentDate || '',
-            incidentDateEn: payload.incidentDate || '',
-            publishedDateBn: 'এখনই',
-            publishedDateEn: 'Just now',
-            publishedAt: new Date().toISOString(),
-            evidenceSummaryBn: payload.evidenceTypes || [],
-            evidenceSummaryEn: payload.evidenceTypes || [],
-            status: 'published',
-            statusBn: 'প্রকাশিত (মক)',
-            statusEn: 'Published (Mock)',
-            isHighUrgency: false,
-            coordinates: payload.location?.lat && payload.location?.lng
-              ? { lat: payload.location.lat, lng: payload.location.lng }
-              : undefined,
-            images: [],
-            media: {
-              type: 'none',
-              images: [],
-            },
-            trustIndicators: {
-              evidenceSubmitted: Boolean(payload.hasSupportingInfo),
-              multipleReports: false,
-              updateAvailable: false,
-              responseReceived: false,
-              evidenceCount: (images?.length || 0),
-              hasOfficialResponse: false,
-              hasRelatedReports: false,
-            },
-            relatedReportIds: [],
-            updates: [],
-          };
-          registerLocalMockReport(reportItem);
-        } catch (e) {
-          console.warn('[ApiClient] Failed to register mock report item:', e);
-        }
-
         return {
           success: true,
           reportId: mockReportId,
           message: 'Report submitted successfully (local mock mode).',
-          report: mockReport,
+          report: {
+            id: mockReportId,
+            ...payload,
+            createdAt: new Date().toISOString(),
+          },
         };
       }
 

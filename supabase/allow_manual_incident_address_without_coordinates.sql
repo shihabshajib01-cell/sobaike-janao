@@ -646,17 +646,17 @@ BEGIN
   -- -------------------------------------------------------------------------
   -- Step 11: Create Initial Status History Record
   -- -------------------------------------------------------------------------
-  INSERT INTO public.complaint_status_history (
+  INSERT INTO public.complaint_updates (
     complaint_id,
-    status,
-    note_bn,
-    note_en,
+    update_type,
+    note,
+    is_public,
     created_at
   ) VALUES (
     v_report_id,
     'submitted',
-    'অভিযোগটি সফলভাবে জমা হয়েছে এবং মডারেশনের জন্য অপেক্ষমাণ।',
-    'Complaint submitted successfully and pending moderation review.',
+    'Report received and queued for moderation review.',
+    false,
     now()
   );
 
