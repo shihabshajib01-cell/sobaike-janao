@@ -167,13 +167,16 @@ BEGIN
     END IF;
 
     -- E. Primary Key on id
-    SELECT array_agg(attname::text ORDER BY attnum) INTO v_pk_cols
-    FROM pg_attribute
-    WHERE attrelid = 'public.complaint_responses'::regclass
-      AND attnum = ANY(
-        SELECT conkey FROM pg_constraint
-        WHERE conrelid = 'public.complaint_responses'::regclass AND contype = 'p'
-      );
+    SELECT array_agg(a.attname::text ORDER BY k.ord)
+    INTO v_pk_cols
+    FROM pg_constraint c
+    CROSS JOIN LATERAL
+      unnest(c.conkey) WITH ORDINALITY AS k(attnum, ord)
+    JOIN pg_attribute a
+      ON a.attrelid = c.conrelid
+     AND a.attnum = k.attnum
+    WHERE c.conrelid = 'public.complaint_responses'::regclass
+      AND c.contype = 'p';
 
     IF v_pk_cols IS NULL OR v_pk_cols <> ARRAY['id'] THEN
       RAISE EXCEPTION 'INCOMPATIBLE_PRIMARY_KEY: public.complaint_responses must have primary key exactly on id. Found: %', v_pk_cols;
@@ -182,12 +185,20 @@ BEGIN
     -- F. Foreign Key complaint_id -> complaints(id) ON DELETE CASCADE
     SELECT EXISTS (
       SELECT 1 FROM pg_constraint c
-      JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+      JOIN pg_attribute child_a
+        ON child_a.attrelid = c.conrelid
+       AND child_a.attnum = c.conkey[1]
+      JOIN pg_attribute parent_a
+        ON parent_a.attrelid = c.confrelid
+       AND parent_a.attnum = c.confkey[1]
       WHERE c.conrelid = 'public.complaint_responses'::regclass
         AND c.confrelid = 'public.complaints'::regclass
         AND c.contype = 'f'
         AND c.confdeltype = 'c'
-        AND a.attname = 'complaint_id'
+        AND array_length(c.conkey, 1) = 1
+        AND array_length(c.confkey, 1) = 1
+        AND child_a.attname = 'complaint_id'
+        AND parent_a.attname = 'id'
     ) INTO v_has_fk;
 
     IF NOT v_has_fk THEN
@@ -238,10 +249,13 @@ BEGIN
   SELECT pg_get_constraintdef(oid) INTO v_def
   FROM pg_constraint
   WHERE conname = 'chk_complaint_responses_response_type'
-    AND conrelid = 'public.complaint_responses'::regclass;
+    AND conrelid = 'public.complaint_responses'::regclass
+    AND contype = 'c';
 
   IF v_def IS NOT NULL THEN
-    IF v_def NOT LIKE '%citizen_information%' OR v_def NOT LIKE '%subject_response%' THEN
+    IF v_def NOT LIKE '%response_type%'
+       OR v_def NOT LIKE '%citizen_information%'
+       OR v_def NOT LIKE '%subject_response%' THEN
       RAISE EXCEPTION 'INCOMPATIBLE_CONSTRAINT: chk_complaint_responses_response_type has unexpected definition: %', v_def;
     END IF;
   ELSE
@@ -254,10 +268,15 @@ BEGIN
   SELECT pg_get_constraintdef(oid) INTO v_def
   FROM pg_constraint
   WHERE conname = 'chk_complaint_responses_status'
-    AND conrelid = 'public.complaint_responses'::regclass;
+    AND conrelid = 'public.complaint_responses'::regclass
+    AND contype = 'c';
 
   IF v_def IS NOT NULL THEN
-    IF v_def NOT LIKE '%pending_review%' OR v_def NOT LIKE '%published%' OR v_def NOT LIKE '%rejected%' OR v_def NOT LIKE '%unpublished%' THEN
+    IF v_def NOT LIKE '%status%'
+       OR v_def NOT LIKE '%pending_review%'
+       OR v_def NOT LIKE '%published%'
+       OR v_def NOT LIKE '%rejected%'
+       OR v_def NOT LIKE '%unpublished%' THEN
       RAISE EXCEPTION 'INCOMPATIBLE_CONSTRAINT: chk_complaint_responses_status has unexpected definition: %', v_def;
     END IF;
   ELSE
@@ -270,10 +289,14 @@ BEGIN
   SELECT pg_get_constraintdef(oid) INTO v_def
   FROM pg_constraint
   WHERE conname = 'chk_complaint_responses_responder_type'
-    AND conrelid = 'public.complaint_responses'::regclass;
+    AND conrelid = 'public.complaint_responses'::regclass
+    AND contype = 'c';
 
   IF v_def IS NOT NULL THEN
-    IF v_def NOT LIKE '%mentioned_person%' OR v_def NOT LIKE '%organization_rep%' OR v_def NOT LIKE '%legal_rep%' THEN
+    IF v_def NOT LIKE '%responder_type%'
+       OR v_def NOT LIKE '%mentioned_person%'
+       OR v_def NOT LIKE '%organization_rep%'
+       OR v_def NOT LIKE '%legal_rep%' THEN
       RAISE EXCEPTION 'INCOMPATIBLE_CONSTRAINT: chk_complaint_responses_responder_type has unexpected definition: %', v_def;
     END IF;
   ELSE
@@ -289,18 +312,35 @@ END $$;
 -- -----------------------------------------------------------------------------
 DO $$
 DECLARE
-  v_idxdef text;
+  v_cols text[];
+  v_is_table boolean;
+  v_no_expr boolean;
+  v_no_pred boolean;
 BEGIN
   -- 1. idx_complaint_responses_complaint_id
-  SELECT pg_get_indexdef(indexrelid) INTO v_idxdef
+  v_cols := NULL;
+  v_is_table := NULL;
+  v_no_expr := NULL;
+  v_no_pred := NULL;
+  SELECT
+    (SELECT array_agg(a.attname::text ORDER BY k.ord)
+     FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+     JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum),
+    i.indrelid = 'public.complaint_responses'::regclass,
+    i.indexprs IS NULL,
+    i.indpred IS NULL
+  INTO v_cols, v_is_table, v_no_expr, v_no_pred
   FROM pg_index i
   JOIN pg_class c ON c.oid = i.indexrelid
   JOIN pg_namespace n ON n.oid = c.relnamespace
   WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_complaint_id';
 
-  IF v_idxdef IS NOT NULL THEN
-    IF v_idxdef NOT LIKE '%(complaint_id)%' THEN
-      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_complaint_id exists with unexpected definition: %', v_idxdef;
+  IF v_cols IS NOT NULL OR v_is_table IS NOT NULL THEN
+    IF NOT coalesce(v_is_table, false)
+       OR NOT coalesce(v_no_expr, false)
+       OR NOT coalesce(v_no_pred, false)
+       OR v_cols <> ARRAY['complaint_id'] THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_complaint_id exists with incompatible definition.';
     END IF;
   ELSE
     CREATE INDEX idx_complaint_responses_complaint_id
@@ -308,15 +348,29 @@ BEGIN
   END IF;
 
   -- 2. idx_complaint_responses_status
-  SELECT pg_get_indexdef(indexrelid) INTO v_idxdef
+  v_cols := NULL;
+  v_is_table := NULL;
+  v_no_expr := NULL;
+  v_no_pred := NULL;
+  SELECT
+    (SELECT array_agg(a.attname::text ORDER BY k.ord)
+     FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+     JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum),
+    i.indrelid = 'public.complaint_responses'::regclass,
+    i.indexprs IS NULL,
+    i.indpred IS NULL
+  INTO v_cols, v_is_table, v_no_expr, v_no_pred
   FROM pg_index i
   JOIN pg_class c ON c.oid = i.indexrelid
   JOIN pg_namespace n ON n.oid = c.relnamespace
   WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_status';
 
-  IF v_idxdef IS NOT NULL THEN
-    IF v_idxdef NOT LIKE '%(status)%' THEN
-      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_status exists with unexpected definition: %', v_idxdef;
+  IF v_cols IS NOT NULL OR v_is_table IS NOT NULL THEN
+    IF NOT coalesce(v_is_table, false)
+       OR NOT coalesce(v_no_expr, false)
+       OR NOT coalesce(v_no_pred, false)
+       OR v_cols <> ARRAY['status'] THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_status exists with incompatible definition.';
     END IF;
   ELSE
     CREATE INDEX idx_complaint_responses_status
@@ -324,15 +378,29 @@ BEGIN
   END IF;
 
   -- 3. idx_complaint_responses_type_status
-  SELECT pg_get_indexdef(indexrelid) INTO v_idxdef
+  v_cols := NULL;
+  v_is_table := NULL;
+  v_no_expr := NULL;
+  v_no_pred := NULL;
+  SELECT
+    (SELECT array_agg(a.attname::text ORDER BY k.ord)
+     FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+     JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum),
+    i.indrelid = 'public.complaint_responses'::regclass,
+    i.indexprs IS NULL,
+    i.indpred IS NULL
+  INTO v_cols, v_is_table, v_no_expr, v_no_pred
   FROM pg_index i
   JOIN pg_class c ON c.oid = i.indexrelid
   JOIN pg_namespace n ON n.oid = c.relnamespace
   WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_type_status';
 
-  IF v_idxdef IS NOT NULL THEN
-    IF v_idxdef NOT LIKE '%(response_type, status)%' THEN
-      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_type_status exists with unexpected definition: %', v_idxdef;
+  IF v_cols IS NOT NULL OR v_is_table IS NOT NULL THEN
+    IF NOT coalesce(v_is_table, false)
+       OR NOT coalesce(v_no_expr, false)
+       OR NOT coalesce(v_no_pred, false)
+       OR v_cols <> ARRAY['response_type', 'status'] THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_type_status exists with incompatible definition.';
     END IF;
   ELSE
     CREATE INDEX idx_complaint_responses_type_status
@@ -769,13 +837,17 @@ BEGIN
   END IF;
 
   -- 6. Primary key exactly on id
-  SELECT array_agg(attname::text ORDER BY attnum) INTO v_pk_cols
-  FROM pg_attribute
-  WHERE attrelid = 'public.complaint_responses'::regclass
-    AND attnum = ANY(
-      SELECT conkey FROM pg_constraint
-      WHERE conrelid = 'public.complaint_responses'::regclass AND contype = 'p'
-    );
+  SELECT array_agg(a.attname::text ORDER BY k.ord)
+  INTO v_pk_cols
+  FROM pg_constraint c
+  CROSS JOIN LATERAL
+    unnest(c.conkey) WITH ORDINALITY AS k(attnum, ord)
+  JOIN pg_attribute a
+    ON a.attrelid = c.conrelid
+   AND a.attnum = k.attnum
+  WHERE c.conrelid = 'public.complaint_responses'::regclass
+    AND c.contype = 'p';
+
   IF v_pk_cols IS NULL OR v_pk_cols <> ARRAY['id'] THEN
     RAISE EXCEPTION 'VERIFICATION_FAILED: Primary key must be exactly on id. Found: %', v_pk_cols;
   END IF;
@@ -783,12 +855,20 @@ BEGIN
   -- 7. Foreign key on complaint_id -> complaints(id) ON DELETE CASCADE
   SELECT EXISTS (
     SELECT 1 FROM pg_constraint c
-    JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+    JOIN pg_attribute child_a
+      ON child_a.attrelid = c.conrelid
+     AND child_a.attnum = c.conkey[1]
+    JOIN pg_attribute parent_a
+      ON parent_a.attrelid = c.confrelid
+     AND parent_a.attnum = c.confkey[1]
     WHERE c.conrelid = 'public.complaint_responses'::regclass
       AND c.confrelid = 'public.complaints'::regclass
       AND c.contype = 'f'
       AND c.confdeltype = 'c'
-      AND a.attname = 'complaint_id'
+      AND array_length(c.conkey, 1) = 1
+      AND array_length(c.confkey, 1) = 1
+      AND child_a.attname = 'complaint_id'
+      AND parent_a.attname = 'id'
   ) INTO v_has_fk;
   IF NOT v_has_fk THEN
     RAISE EXCEPTION 'VERIFICATION_FAILED: Foreign key to public.complaints(id) with ON DELETE CASCADE is missing.';
@@ -837,10 +917,28 @@ BEGIN
   END IF;
 
   -- 12. PUBLIC EXECUTE blocked
-  SELECT has_function_privilege('public', 'public.submit_public_response(text, text, jsonb)', 'EXECUTE')
+  SELECT EXISTS (
+    SELECT 1
+    FROM pg_proc p
+    JOIN pg_namespace n
+      ON n.oid = p.pronamespace
+    CROSS JOIN LATERAL aclexplode(
+      COALESCE(
+        p.proacl,
+        acldefault('f', p.proowner)
+      )
+    ) acl
+    WHERE n.nspname = 'public'
+      AND p.proname = 'submit_public_response'
+      AND oidvectortypes(p.proargtypes) = 'text, text, jsonb'
+      AND acl.grantee = 0
+      AND acl.privilege_type = 'EXECUTE'
+  )
   INTO v_public_execute;
-  IF coalesce(v_public_execute, true) THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: PUBLIC retains EXECUTE on submit_public_response.';
+
+  IF v_public_execute THEN
+    RAISE EXCEPTION
+      'VERIFICATION_FAILED: PUBLIC retains EXECUTE on submit_public_response.';
   END IF;
 
   -- 13 & 14. Anon and authenticated EXECUTE (if roles exist in environment)
@@ -875,6 +973,8 @@ BEGIN
     SELECT 1 FROM pg_constraint
     WHERE conname = 'chk_complaint_responses_response_type'
       AND conrelid = 'public.complaint_responses'::regclass
+      AND contype = 'c'
+      AND pg_get_constraintdef(oid) LIKE '%response_type%'
       AND pg_get_constraintdef(oid) LIKE '%citizen_information%'
       AND pg_get_constraintdef(oid) LIKE '%subject_response%'
   ) INTO v_type_chk;
@@ -886,8 +986,12 @@ BEGIN
     SELECT 1 FROM pg_constraint
     WHERE conname = 'chk_complaint_responses_status'
       AND conrelid = 'public.complaint_responses'::regclass
+      AND contype = 'c'
+      AND pg_get_constraintdef(oid) LIKE '%status%'
       AND pg_get_constraintdef(oid) LIKE '%pending_review%'
       AND pg_get_constraintdef(oid) LIKE '%published%'
+      AND pg_get_constraintdef(oid) LIKE '%rejected%'
+      AND pg_get_constraintdef(oid) LIKE '%unpublished%'
   ) INTO v_status_chk;
   IF NOT v_status_chk THEN
     RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_status constraint missing or invalid.';
@@ -897,7 +1001,11 @@ BEGIN
     SELECT 1 FROM pg_constraint
     WHERE conname = 'chk_complaint_responses_responder_type'
       AND conrelid = 'public.complaint_responses'::regclass
+      AND contype = 'c'
+      AND pg_get_constraintdef(oid) LIKE '%responder_type%'
       AND pg_get_constraintdef(oid) LIKE '%mentioned_person%'
+      AND pg_get_constraintdef(oid) LIKE '%organization_rep%'
+      AND pg_get_constraintdef(oid) LIKE '%legal_rep%'
   ) INTO v_responder_chk;
   IF NOT v_responder_chk THEN
     RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_responder_type constraint missing or invalid.';
@@ -909,7 +1017,14 @@ BEGIN
     JOIN pg_class c ON c.oid = i.indexrelid
     JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_complaint_id'
-      AND pg_get_indexdef(i.indexrelid) LIKE '%(complaint_id)%'
+      AND i.indrelid = 'public.complaint_responses'::regclass
+      AND i.indexprs IS NULL
+      AND i.indpred IS NULL
+      AND (
+        SELECT array_agg(a.attname::text ORDER BY k.ord)
+        FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+        JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+      ) = ARRAY['complaint_id']
   ) INTO v_idx_comp;
   IF NOT v_idx_comp THEN
     RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_complaint_id index missing or invalid.';
@@ -920,7 +1035,14 @@ BEGIN
     JOIN pg_class c ON c.oid = i.indexrelid
     JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_status'
-      AND pg_get_indexdef(i.indexrelid) LIKE '%(status)%'
+      AND i.indrelid = 'public.complaint_responses'::regclass
+      AND i.indexprs IS NULL
+      AND i.indpred IS NULL
+      AND (
+        SELECT array_agg(a.attname::text ORDER BY k.ord)
+        FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+        JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+      ) = ARRAY['status']
   ) INTO v_idx_status;
   IF NOT v_idx_status THEN
     RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_status index missing or invalid.';
@@ -931,7 +1053,14 @@ BEGIN
     JOIN pg_class c ON c.oid = i.indexrelid
     JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_type_status'
-      AND pg_get_indexdef(i.indexrelid) LIKE '%(response_type, status)%'
+      AND i.indrelid = 'public.complaint_responses'::regclass
+      AND i.indexprs IS NULL
+      AND i.indpred IS NULL
+      AND (
+        SELECT array_agg(a.attname::text ORDER BY k.ord)
+        FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+        JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+      ) = ARRAY['response_type', 'status']
   ) INTO v_idx_type_status;
   IF NOT v_idx_type_status THEN
     RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_type_status index missing or invalid.';
@@ -1017,25 +1146,35 @@ FROM (
     (
       'response_primary_key',
       CASE WHEN (
-        SELECT array_agg(attname::text ORDER BY attnum)
-        FROM pg_attribute
-        WHERE attrelid = 'public.complaint_responses'::regclass
-          AND attnum = ANY(
-            SELECT conkey FROM pg_constraint
-            WHERE conrelid = 'public.complaint_responses'::regclass AND contype = 'p'
-          )
+        SELECT array_agg(a.attname::text ORDER BY k.ord)
+        FROM pg_constraint c
+        CROSS JOIN LATERAL
+          unnest(c.conkey) WITH ORDINALITY AS k(attnum, ord)
+        JOIN pg_attribute a
+          ON a.attrelid = c.conrelid
+         AND a.attnum = k.attnum
+        WHERE c.conrelid = 'public.complaint_responses'::regclass
+          AND c.contype = 'p'
       ) = ARRAY['id'] THEN 'PASS' ELSE 'FAIL' END
     ),
     (
       'response_complaint_fk',
       CASE WHEN EXISTS (
         SELECT 1 FROM pg_constraint c
-        JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+        JOIN pg_attribute child_a
+          ON child_a.attrelid = c.conrelid
+         AND child_a.attnum = c.conkey[1]
+        JOIN pg_attribute parent_a
+          ON parent_a.attrelid = c.confrelid
+         AND parent_a.attnum = c.confkey[1]
         WHERE c.conrelid = 'public.complaint_responses'::regclass
           AND c.confrelid = 'public.complaints'::regclass
           AND c.contype = 'f'
           AND c.confdeltype = 'c'
-          AND a.attname = 'complaint_id'
+          AND array_length(c.conkey, 1) = 1
+          AND array_length(c.confkey, 1) = 1
+          AND child_a.attname = 'complaint_id'
+          AND parent_a.attname = 'id'
       ) THEN 'PASS' ELSE 'FAIL' END
     ),
     (
@@ -1077,8 +1216,23 @@ FROM (
     ),
     (
       'public_rpc_execute_blocked',
-      CASE WHEN NOT has_function_privilege('public', 'public.submit_public_response(text, text, jsonb)', 'EXECUTE')
-      THEN 'PASS' ELSE 'FAIL' END
+      CASE WHEN NOT EXISTS (
+        SELECT 1
+        FROM pg_proc p
+        JOIN pg_namespace n
+          ON n.oid = p.pronamespace
+        CROSS JOIN LATERAL aclexplode(
+          COALESCE(
+            p.proacl,
+            acldefault('f', p.proowner)
+          )
+        ) acl
+        WHERE n.nspname = 'public'
+          AND p.proname = 'submit_public_response'
+          AND oidvectortypes(p.proargtypes) = 'text, text, jsonb'
+          AND acl.grantee = 0
+          AND acl.privilege_type = 'EXECUTE'
+      ) THEN 'PASS' ELSE 'FAIL' END
     ),
     (
       'anon_rpc_execute',
@@ -1118,6 +1272,8 @@ FROM (
         SELECT 1 FROM pg_constraint
         WHERE conname = 'chk_complaint_responses_response_type'
           AND conrelid = 'public.complaint_responses'::regclass
+          AND contype = 'c'
+          AND pg_get_constraintdef(oid) LIKE '%response_type%'
           AND pg_get_constraintdef(oid) LIKE '%citizen_information%'
           AND pg_get_constraintdef(oid) LIKE '%subject_response%'
       ) THEN 'PASS' ELSE 'FAIL' END
@@ -1128,8 +1284,12 @@ FROM (
         SELECT 1 FROM pg_constraint
         WHERE conname = 'chk_complaint_responses_status'
           AND conrelid = 'public.complaint_responses'::regclass
+          AND contype = 'c'
+          AND pg_get_constraintdef(oid) LIKE '%status%'
           AND pg_get_constraintdef(oid) LIKE '%pending_review%'
           AND pg_get_constraintdef(oid) LIKE '%published%'
+          AND pg_get_constraintdef(oid) LIKE '%rejected%'
+          AND pg_get_constraintdef(oid) LIKE '%unpublished%'
       ) THEN 'PASS' ELSE 'FAIL' END
     ),
     (
@@ -1138,7 +1298,11 @@ FROM (
         SELECT 1 FROM pg_constraint
         WHERE conname = 'chk_complaint_responses_responder_type'
           AND conrelid = 'public.complaint_responses'::regclass
+          AND contype = 'c'
+          AND pg_get_constraintdef(oid) LIKE '%responder_type%'
           AND pg_get_constraintdef(oid) LIKE '%mentioned_person%'
+          AND pg_get_constraintdef(oid) LIKE '%organization_rep%'
+          AND pg_get_constraintdef(oid) LIKE '%legal_rep%'
       ) THEN 'PASS' ELSE 'FAIL' END
     ),
     (
@@ -1148,7 +1312,26 @@ FROM (
         JOIN pg_class c ON c.oid = i.indexrelid
         JOIN pg_namespace n ON n.oid = c.relnamespace
         WHERE n.nspname = 'public'
-          AND c.relname IN ('idx_complaint_responses_complaint_id', 'idx_complaint_responses_status', 'idx_complaint_responses_type_status')
+          AND i.indrelid = 'public.complaint_responses'::regclass
+          AND i.indexprs IS NULL
+          AND i.indpred IS NULL
+          AND (
+            (c.relname = 'idx_complaint_responses_complaint_id' AND (
+              SELECT array_agg(a.attname::text ORDER BY k.ord)
+              FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+              JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+            ) = ARRAY['complaint_id'])
+            OR (c.relname = 'idx_complaint_responses_status' AND (
+              SELECT array_agg(a.attname::text ORDER BY k.ord)
+              FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+              JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+            ) = ARRAY['status'])
+            OR (c.relname = 'idx_complaint_responses_type_status' AND (
+              SELECT array_agg(a.attname::text ORDER BY k.ord)
+              FROM unnest(i.indkey) WITH ORDINALITY AS k(attnum, ord)
+              JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+            ) = ARRAY['response_type', 'status'])
+          )
       ) = 3 THEN 'PASS' ELSE 'FAIL' END
     )
 ) AS t(check_name, result);
