@@ -1,28 +1,31 @@
 -- =============================================================================
--- MIGRATION: Phase 2 - Production Response Hardening
+-- MIGRATION: Phase 2 - Production Response Hardening & Schema Verification
 -- File: supabase/create_public_complaint_responses.sql
 --
 -- Requirements Enforced:
 --   1. Transaction-safe migration (BEGIN / COMMIT with pre-commit fail-closed assertions).
 --   2. Validates prerequisite complaint infrastructure (public.complaints exists with id, status).
 --   3. Idempotent & non-destructive: safe to re-run, protects existing response records.
---   4. Public table `public.complaint_responses` stores both citizen and subject responses.
---   5. Strict Row Level Security (RLS) and revoked raw permissions block direct table access
+--   4. Deep schema validation on existing tables:
+--        - Required columns presence (all 20 columns)
+--        - Column data types matching canonical schema
+--        - Column nullability (NOT NULL on required columns)
+--        - Critical defaults (pending_review, now(), false)
+--        - Primary key exactly on id
+--        - Foreign key on complaint_id -> public.complaints(id) ON DELETE CASCADE
+--   5. Constraint definition validation (validates actual expression, not just name).
+--   6. Index definition validation (validates indexed columns, not just name).
+--   7. Strict Row Level Security (RLS) and revoked raw permissions block direct table access
 --      from anon and authenticated users (fail-closed privacy).
---   6. Authoritative RPC:
+--   8. Authoritative RPC:
 --        submit_public_response(text, text, jsonb)
---   7. Validates that referenced complaint exists AND status = 'published'.
---   8. Accepts exactly two canonical response types:
---        'citizen_information' and 'subject_response'
---   9. Strict server-side field validation:
---        - Incident date validated (no invalid dates, no future dates).
---        - Contact info cleared to NULL if contact_consent is false.
---        - Subject response required fields and official statement validated.
---        - Correction details cleared to NULL if request_correction_or_removal is false.
---  10. Generates canonical Response IDs: SR-{YEAR}-{6 DIGIT RANDOM NUMBER} with collision retry loop.
---  11. Inserts new responses with status = 'pending_review' and published_at = NULL.
---  12. SECURITY DEFINER with safe fixed search_path = public, pg_temp.
---  13. Comprehensive catalog-based self-verification output.
+--      SECURITY DEFINER with safe fixed search_path = public, pg_temp.
+--   9. PUBLIC EXECUTE privilege revoked and verified in database catalog.
+--  10. Exact 2 canonical response types: 'citizen_information', 'subject_response'.
+--  11. Strict server-side field validation and error handling.
+--  12. Generates canonical Response IDs: SR-{YEAR}-{6 DIGIT RANDOM NUMBER}.
+--  13. Inserts with status = 'pending_review' and published_at = NULL.
+--  14. Expanded catalog-based self-verification output covering all 20 required checks.
 -- =============================================================================
 
 BEGIN;
@@ -56,12 +59,17 @@ BEGIN
 END $$;
 
 -- -----------------------------------------------------------------------------
--- Step 2: Safe Existing-Table Schema Validation
--- If public.complaint_responses already exists, ensure it is structurally compatible.
+-- Step 2: Safe Existing-Table Schema Validation (if table exists)
+-- Deep validation of columns, types, nullability, defaults, PK, FK
 -- -----------------------------------------------------------------------------
 DO $$
 DECLARE
   v_missing_col text;
+  v_bad_type_col record;
+  v_bad_null_col text;
+  v_bad_default_col text;
+  v_pk_cols text[];
+  v_has_fk boolean;
   v_required_cols text[] := ARRAY[
     'id', 'complaint_id', 'response_type', 'status', 'content',
     'incident_date', 'created_at', 'updated_at', 'published_at',
@@ -75,6 +83,7 @@ BEGIN
     SELECT 1 FROM information_schema.tables
     WHERE table_schema = 'public' AND table_name = 'complaint_responses'
   ) THEN
+    -- A. Column presence
     SELECT col INTO v_missing_col
     FROM unnest(v_required_cols) AS col
     WHERE col NOT IN (
@@ -86,6 +95,103 @@ BEGIN
 
     IF v_missing_col IS NOT NULL THEN
       RAISE EXCEPTION 'INCOMPATIBLE_EXISTING_TABLE: public.complaint_responses exists but is missing required column "%". Manual review required.', v_missing_col;
+    END IF;
+
+    -- B. Column types
+    SELECT column_name, udt_name INTO v_bad_type_col
+    FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      AND (
+        (column_name IN ('id', 'complaint_id', 'response_type', 'status', 'content', 'contact_info', 'responder_type', 'responder_name', 'designation', 'organization_name', 'contact_email_or_phone', 'official_statement', 'supporting_documents_note', 'correction_details') AND udt_name <> 'text')
+        OR (column_name = 'incident_date' AND udt_name <> 'date')
+        OR (column_name IN ('created_at', 'updated_at', 'published_at') AND udt_name <> 'timestamptz')
+        OR (column_name IN ('contact_consent', 'request_correction_or_removal') AND udt_name <> 'bool')
+      )
+    LIMIT 1;
+
+    IF v_bad_type_col.column_name IS NOT NULL THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_COLUMN_TYPE: Column "%" has incompatible type "%". Expected canonical type.', v_bad_type_col.column_name, v_bad_type_col.udt_name;
+    END IF;
+
+    -- C. Nullability
+    SELECT column_name INTO v_bad_null_col
+    FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      AND column_name IN ('id', 'complaint_id', 'response_type', 'status', 'content', 'created_at', 'updated_at', 'contact_consent', 'request_correction_or_removal')
+      AND is_nullable <> 'NO'
+    LIMIT 1;
+
+    IF v_bad_null_col IS NOT NULL THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_NULLABILITY: Column "%" must be NOT NULL.', v_bad_null_col;
+    END IF;
+
+    -- D. Critical Defaults
+    IF NOT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+        AND column_name = 'status' AND column_default ILIKE '%pending_review%'
+    ) THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_DEFAULT: Column "status" must default to "pending_review".';
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+        AND column_name = 'created_at' AND column_default ILIKE '%now%'
+    ) THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_DEFAULT: Column "created_at" must default to now().';
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+        AND column_name = 'updated_at' AND column_default ILIKE '%now%'
+    ) THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_DEFAULT: Column "updated_at" must default to now().';
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+        AND column_name = 'contact_consent' AND column_default ILIKE '%false%'
+    ) THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_DEFAULT: Column "contact_consent" must default to false.';
+    END IF;
+
+    IF NOT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+        AND column_name = 'request_correction_or_removal' AND column_default ILIKE '%false%'
+    ) THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_DEFAULT: Column "request_correction_or_removal" must default to false.';
+    END IF;
+
+    -- E. Primary Key on id
+    SELECT array_agg(attname::text ORDER BY attnum) INTO v_pk_cols
+    FROM pg_attribute
+    WHERE attrelid = 'public.complaint_responses'::regclass
+      AND attnum = ANY(
+        SELECT conkey FROM pg_constraint
+        WHERE conrelid = 'public.complaint_responses'::regclass AND contype = 'p'
+      );
+
+    IF v_pk_cols IS NULL OR v_pk_cols <> ARRAY['id'] THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_PRIMARY_KEY: public.complaint_responses must have primary key exactly on id. Found: %', v_pk_cols;
+    END IF;
+
+    -- F. Foreign Key complaint_id -> complaints(id) ON DELETE CASCADE
+    SELECT EXISTS (
+      SELECT 1 FROM pg_constraint c
+      JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+      WHERE c.conrelid = 'public.complaint_responses'::regclass
+        AND c.confrelid = 'public.complaints'::regclass
+        AND c.contype = 'f'
+        AND c.confdeltype = 'c'
+        AND a.attname = 'complaint_id'
+    ) INTO v_has_fk;
+
+    IF NOT v_has_fk THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_FOREIGN_KEY: Foreign key on complaint_id with ON DELETE CASCADE to public.complaints(id) is missing or incompatible.';
     END IF;
   END IF;
 END $$;
@@ -121,39 +227,56 @@ CREATE TABLE IF NOT EXISTS public.complaint_responses (
 );
 
 -- -----------------------------------------------------------------------------
--- Step 4: Ensure Named Database Constraints
--- Idempotently attach constraints with stable explicit names.
+-- Step 4: Ensure Named Database Constraints with Valid Definitions
+-- Validates actual constraint expressions rather than relying only on names.
 -- -----------------------------------------------------------------------------
 DO $$
+DECLARE
+  v_def text;
 BEGIN
-  -- Constraint: response_type must be one of two canonical types
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
-    WHERE conname = 'chk_complaint_responses_response_type'
-      AND conrelid = 'public.complaint_responses'::regclass
-  ) THEN
+  -- 1. chk_complaint_responses_response_type
+  SELECT pg_get_constraintdef(oid) INTO v_def
+  FROM pg_constraint
+  WHERE conname = 'chk_complaint_responses_response_type'
+    AND conrelid = 'public.complaint_responses'::regclass;
+
+  IF v_def IS NOT NULL THEN
+    IF v_def NOT LIKE '%citizen_information%' OR v_def NOT LIKE '%subject_response%' THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_CONSTRAINT: chk_complaint_responses_response_type has unexpected definition: %', v_def;
+    END IF;
+  ELSE
     ALTER TABLE public.complaint_responses
       ADD CONSTRAINT chk_complaint_responses_response_type
       CHECK (response_type IN ('citizen_information', 'subject_response'));
   END IF;
 
-  -- Constraint: status lifecycle values
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
-    WHERE conname = 'chk_complaint_responses_status'
-      AND conrelid = 'public.complaint_responses'::regclass
-  ) THEN
+  -- 2. chk_complaint_responses_status
+  SELECT pg_get_constraintdef(oid) INTO v_def
+  FROM pg_constraint
+  WHERE conname = 'chk_complaint_responses_status'
+    AND conrelid = 'public.complaint_responses'::regclass;
+
+  IF v_def IS NOT NULL THEN
+    IF v_def NOT LIKE '%pending_review%' OR v_def NOT LIKE '%published%' OR v_def NOT LIKE '%rejected%' OR v_def NOT LIKE '%unpublished%' THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_CONSTRAINT: chk_complaint_responses_status has unexpected definition: %', v_def;
+    END IF;
+  ELSE
     ALTER TABLE public.complaint_responses
       ADD CONSTRAINT chk_complaint_responses_status
       CHECK (status IN ('pending_review', 'published', 'rejected', 'unpublished'));
   END IF;
 
-  -- Constraint: responder_type values for subject responses
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
-    WHERE conname = 'chk_complaint_responses_responder_type'
-      AND conrelid = 'public.complaint_responses'::regclass
-  ) THEN
+  -- 3. chk_complaint_responses_responder_type
+  SELECT pg_get_constraintdef(oid) INTO v_def
+  FROM pg_constraint
+  WHERE conname = 'chk_complaint_responses_responder_type'
+    AND conrelid = 'public.complaint_responses'::regclass;
+
+  IF v_def IS NOT NULL THEN
+    IF v_def NOT LIKE '%mentioned_person%' OR v_def NOT LIKE '%organization_rep%' OR v_def NOT LIKE '%legal_rep%' THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_CONSTRAINT: chk_complaint_responses_responder_type has unexpected definition: %', v_def;
+    END IF;
+  ELSE
     ALTER TABLE public.complaint_responses
       ADD CONSTRAINT chk_complaint_responses_responder_type
       CHECK (responder_type IS NULL OR responder_type IN ('mentioned_person', 'organization_rep', 'legal_rep'));
@@ -161,16 +284,61 @@ BEGIN
 END $$;
 
 -- -----------------------------------------------------------------------------
--- Step 5: Create Indexes for Query Performance
+-- Step 5: Create and Validate Indexes
+-- Validates actual indexed columns and order; raises exception if incompatible.
 -- -----------------------------------------------------------------------------
-CREATE INDEX IF NOT EXISTS idx_complaint_responses_complaint_id
-  ON public.complaint_responses(complaint_id);
+DO $$
+DECLARE
+  v_idxdef text;
+BEGIN
+  -- 1. idx_complaint_responses_complaint_id
+  SELECT pg_get_indexdef(indexrelid) INTO v_idxdef
+  FROM pg_index i
+  JOIN pg_class c ON c.oid = i.indexrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_complaint_id';
 
-CREATE INDEX IF NOT EXISTS idx_complaint_responses_status
-  ON public.complaint_responses(status);
+  IF v_idxdef IS NOT NULL THEN
+    IF v_idxdef NOT LIKE '%(complaint_id)%' THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_complaint_id exists with unexpected definition: %', v_idxdef;
+    END IF;
+  ELSE
+    CREATE INDEX idx_complaint_responses_complaint_id
+      ON public.complaint_responses(complaint_id);
+  END IF;
 
-CREATE INDEX IF NOT EXISTS idx_complaint_responses_type_status
-  ON public.complaint_responses(response_type, status);
+  -- 2. idx_complaint_responses_status
+  SELECT pg_get_indexdef(indexrelid) INTO v_idxdef
+  FROM pg_index i
+  JOIN pg_class c ON c.oid = i.indexrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_status';
+
+  IF v_idxdef IS NOT NULL THEN
+    IF v_idxdef NOT LIKE '%(status)%' THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_status exists with unexpected definition: %', v_idxdef;
+    END IF;
+  ELSE
+    CREATE INDEX idx_complaint_responses_status
+      ON public.complaint_responses(status);
+  END IF;
+
+  -- 3. idx_complaint_responses_type_status
+  SELECT pg_get_indexdef(indexrelid) INTO v_idxdef
+  FROM pg_index i
+  JOIN pg_class c ON c.oid = i.indexrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_type_status';
+
+  IF v_idxdef IS NOT NULL THEN
+    IF v_idxdef NOT LIKE '%(response_type, status)%' THEN
+      RAISE EXCEPTION 'INCOMPATIBLE_INDEX: idx_complaint_responses_type_status exists with unexpected definition: %', v_idxdef;
+    END IF;
+  ELSE
+    CREATE INDEX idx_complaint_responses_type_status
+      ON public.complaint_responses(response_type, status);
+  END IF;
+END $$;
 
 -- -----------------------------------------------------------------------------
 -- Step 6: Enable Row Level Security (RLS) & Configure Privacy Privileges
@@ -482,9 +650,16 @@ DO $$
 DECLARE
   v_has_table boolean;
   v_rls_enabled boolean;
+  v_missing_col text;
+  v_bad_type_col record;
+  v_bad_null_col text;
+  v_bad_default_col text;
+  v_pk_cols text[];
+  v_has_fk boolean;
   v_has_rpc boolean;
   v_is_secdef boolean;
   v_search_path text;
+  v_public_execute boolean;
   v_anon_execute boolean;
   v_auth_execute boolean;
   v_anon_select boolean;
@@ -495,6 +670,14 @@ DECLARE
   v_idx_comp boolean;
   v_idx_status boolean;
   v_idx_type_status boolean;
+  v_required_cols text[] := ARRAY[
+    'id', 'complaint_id', 'response_type', 'status', 'content',
+    'incident_date', 'created_at', 'updated_at', 'published_at',
+    'contact_consent', 'contact_info', 'responder_type', 'responder_name',
+    'designation', 'organization_name', 'contact_email_or_phone',
+    'official_statement', 'supporting_documents_note',
+    'request_correction_or_removal', 'correction_details'
+  ];
 BEGIN
   -- 1. Table exists
   SELECT EXISTS (
@@ -505,7 +688,113 @@ BEGIN
     RAISE EXCEPTION 'VERIFICATION_FAILED: public.complaint_responses table does not exist.';
   END IF;
 
-  -- 2. RLS enabled
+  -- 2. Required columns exist
+  SELECT col INTO v_missing_col
+  FROM unnest(v_required_cols) AS col
+  WHERE col NOT IN (
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+  )
+  LIMIT 1;
+  IF v_missing_col IS NOT NULL THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "%" is missing from public.complaint_responses.', v_missing_col;
+  END IF;
+
+  -- 3. Column types
+  SELECT column_name, udt_name INTO v_bad_type_col
+  FROM information_schema.columns
+  WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+    AND (
+      (column_name IN ('id', 'complaint_id', 'response_type', 'status', 'content', 'contact_info', 'responder_type', 'responder_name', 'designation', 'organization_name', 'contact_email_or_phone', 'official_statement', 'supporting_documents_note', 'correction_details') AND udt_name <> 'text')
+      OR (column_name = 'incident_date' AND udt_name <> 'date')
+      OR (column_name IN ('created_at', 'updated_at', 'published_at') AND udt_name <> 'timestamptz')
+      OR (column_name IN ('contact_consent', 'request_correction_or_removal') AND udt_name <> 'bool')
+    )
+  LIMIT 1;
+  IF v_bad_type_col.column_name IS NOT NULL THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "%" has incompatible type "%".', v_bad_type_col.column_name, v_bad_type_col.udt_name;
+  END IF;
+
+  -- 4. Nullability
+  SELECT column_name INTO v_bad_null_col
+  FROM information_schema.columns
+  WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+    AND column_name IN ('id', 'complaint_id', 'response_type', 'status', 'content', 'created_at', 'updated_at', 'contact_consent', 'request_correction_or_removal')
+    AND is_nullable <> 'NO'
+  LIMIT 1;
+  IF v_bad_null_col IS NOT NULL THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "%" must be NOT NULL.', v_bad_null_col;
+  END IF;
+
+  -- 5. Critical defaults
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      AND column_name = 'status' AND column_default ILIKE '%pending_review%'
+  ) THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "status" default is not pending_review.';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      AND column_name = 'created_at' AND column_default ILIKE '%now%'
+  ) THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "created_at" default is not now().';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      AND column_name = 'updated_at' AND column_default ILIKE '%now%'
+  ) THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "updated_at" default is not now().';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      AND column_name = 'contact_consent' AND column_default ILIKE '%false%'
+  ) THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "contact_consent" default is not false.';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      AND column_name = 'request_correction_or_removal' AND column_default ILIKE '%false%'
+  ) THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Column "request_correction_or_removal" default is not false.';
+  END IF;
+
+  -- 6. Primary key exactly on id
+  SELECT array_agg(attname::text ORDER BY attnum) INTO v_pk_cols
+  FROM pg_attribute
+  WHERE attrelid = 'public.complaint_responses'::regclass
+    AND attnum = ANY(
+      SELECT conkey FROM pg_constraint
+      WHERE conrelid = 'public.complaint_responses'::regclass AND contype = 'p'
+    );
+  IF v_pk_cols IS NULL OR v_pk_cols <> ARRAY['id'] THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Primary key must be exactly on id. Found: %', v_pk_cols;
+  END IF;
+
+  -- 7. Foreign key on complaint_id -> complaints(id) ON DELETE CASCADE
+  SELECT EXISTS (
+    SELECT 1 FROM pg_constraint c
+    JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+    WHERE c.conrelid = 'public.complaint_responses'::regclass
+      AND c.confrelid = 'public.complaints'::regclass
+      AND c.contype = 'f'
+      AND c.confdeltype = 'c'
+      AND a.attname = 'complaint_id'
+  ) INTO v_has_fk;
+  IF NOT v_has_fk THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: Foreign key to public.complaints(id) with ON DELETE CASCADE is missing.';
+  END IF;
+
+  -- 8. RLS enabled
   SELECT coalesce(relrowsecurity, false) FROM pg_class
   WHERE oid = 'public.complaint_responses'::regclass
   INTO v_rls_enabled;
@@ -513,24 +802,7 @@ BEGIN
     RAISE EXCEPTION 'VERIFICATION_FAILED: RLS is not enabled on public.complaint_responses.';
   END IF;
 
-  -- 3. Required columns exist
-  IF EXISTS (
-    SELECT unnest(ARRAY[
-      'id', 'complaint_id', 'response_type', 'status', 'content',
-      'incident_date', 'created_at', 'updated_at', 'published_at',
-      'contact_consent', 'contact_info', 'responder_type', 'responder_name',
-      'designation', 'organization_name', 'contact_email_or_phone',
-      'official_statement', 'supporting_documents_note',
-      'request_correction_or_removal', 'correction_details'
-    ])
-    EXCEPT
-    SELECT column_name::text FROM information_schema.columns
-    WHERE table_schema = 'public' AND table_name = 'complaint_responses'
-  ) THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: public.complaint_responses is missing one or more required columns.';
-  END IF;
-
-  -- 4. RPC exists with exact signature
+  -- 9. RPC exists with exact signature
   SELECT EXISTS (
     SELECT 1 FROM pg_proc p
     JOIN pg_namespace n ON p.pronamespace = n.oid
@@ -542,7 +814,7 @@ BEGIN
     RAISE EXCEPTION 'VERIFICATION_FAILED: public.submit_public_response(text, text, jsonb) function does not exist.';
   END IF;
 
-  -- 5. RPC is SECURITY DEFINER
+  -- 10. RPC is SECURITY DEFINER
   SELECT coalesce(p.prosecdef, false) FROM pg_proc p
   JOIN pg_namespace n ON p.pronamespace = n.oid
   WHERE n.nspname = 'public'
@@ -553,7 +825,7 @@ BEGIN
     RAISE EXCEPTION 'VERIFICATION_FAILED: submit_public_response is not SECURITY DEFINER.';
   END IF;
 
-  -- 6. Safe search_path (public, pg_temp)
+  -- 11. Safe search_path (public, pg_temp)
   SELECT coalesce(proconfig::text, '') FROM pg_proc p
   JOIN pg_namespace n ON p.pronamespace = n.oid
   WHERE n.nspname = 'public'
@@ -564,7 +836,14 @@ BEGIN
     RAISE EXCEPTION 'VERIFICATION_FAILED: submit_public_response does not have safe search_path (public, pg_temp). Actual: %', v_search_path;
   END IF;
 
-  -- 7 & 8. Anon and authenticated have EXECUTE (if roles exist in environment)
+  -- 12. PUBLIC EXECUTE blocked
+  SELECT has_function_privilege('public', 'public.submit_public_response(text, text, jsonb)', 'EXECUTE')
+  INTO v_public_execute;
+  IF coalesce(v_public_execute, true) THEN
+    RAISE EXCEPTION 'VERIFICATION_FAILED: PUBLIC retains EXECUTE on submit_public_response.';
+  END IF;
+
+  -- 13 & 14. Anon and authenticated EXECUTE (if roles exist in environment)
   IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
     SELECT has_function_privilege('anon', 'public.submit_public_response(text, text, jsonb)', 'EXECUTE')
     INTO v_anon_execute;
@@ -591,57 +870,71 @@ BEGIN
     END IF;
   END IF;
 
-  -- 9. Constraints exist
+  -- 15. Constraints exist and definitions valid
   SELECT EXISTS (
     SELECT 1 FROM pg_constraint
     WHERE conname = 'chk_complaint_responses_response_type'
       AND conrelid = 'public.complaint_responses'::regclass
+      AND pg_get_constraintdef(oid) LIKE '%citizen_information%'
+      AND pg_get_constraintdef(oid) LIKE '%subject_response%'
   ) INTO v_type_chk;
   IF NOT v_type_chk THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_response_type constraint missing.';
+    RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_response_type constraint missing or invalid.';
   END IF;
 
   SELECT EXISTS (
     SELECT 1 FROM pg_constraint
     WHERE conname = 'chk_complaint_responses_status'
       AND conrelid = 'public.complaint_responses'::regclass
+      AND pg_get_constraintdef(oid) LIKE '%pending_review%'
+      AND pg_get_constraintdef(oid) LIKE '%published%'
   ) INTO v_status_chk;
   IF NOT v_status_chk THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_status constraint missing.';
+    RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_status constraint missing or invalid.';
   END IF;
 
   SELECT EXISTS (
     SELECT 1 FROM pg_constraint
     WHERE conname = 'chk_complaint_responses_responder_type'
       AND conrelid = 'public.complaint_responses'::regclass
+      AND pg_get_constraintdef(oid) LIKE '%mentioned_person%'
   ) INTO v_responder_chk;
   IF NOT v_responder_chk THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_responder_type constraint missing.';
+    RAISE EXCEPTION 'VERIFICATION_FAILED: chk_complaint_responses_responder_type constraint missing or invalid.';
   END IF;
 
-  -- 10. Required indexes exist
+  -- 16. Required indexes exist and match canonical column definitions
   SELECT EXISTS (
-    SELECT 1 FROM pg_indexes
-    WHERE schemaname = 'public' AND tablename = 'complaint_responses' AND indexname = 'idx_complaint_responses_complaint_id'
+    SELECT 1 FROM pg_index i
+    JOIN pg_class c ON c.oid = i.indexrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_complaint_id'
+      AND pg_get_indexdef(i.indexrelid) LIKE '%(complaint_id)%'
   ) INTO v_idx_comp;
   IF NOT v_idx_comp THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_complaint_id index missing.';
+    RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_complaint_id index missing or invalid.';
   END IF;
 
   SELECT EXISTS (
-    SELECT 1 FROM pg_indexes
-    WHERE schemaname = 'public' AND tablename = 'complaint_responses' AND indexname = 'idx_complaint_responses_status'
+    SELECT 1 FROM pg_index i
+    JOIN pg_class c ON c.oid = i.indexrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_status'
+      AND pg_get_indexdef(i.indexrelid) LIKE '%(status)%'
   ) INTO v_idx_status;
   IF NOT v_idx_status THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_status index missing.';
+    RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_status index missing or invalid.';
   END IF;
 
   SELECT EXISTS (
-    SELECT 1 FROM pg_indexes
-    WHERE schemaname = 'public' AND tablename = 'complaint_responses' AND indexname = 'idx_complaint_responses_type_status'
+    SELECT 1 FROM pg_index i
+    JOIN pg_class c ON c.oid = i.indexrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'idx_complaint_responses_type_status'
+      AND pg_get_indexdef(i.indexrelid) LIKE '%(response_type, status)%'
   ) INTO v_idx_type_status;
   IF NOT v_idx_type_status THEN
-    RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_type_status index missing.';
+    RAISE EXCEPTION 'VERIFICATION_FAILED: idx_complaint_responses_type_status index missing or invalid.';
   END IF;
 END $$;
 
@@ -650,6 +943,7 @@ COMMIT;
 -- =============================================================================
 -- Final Verification Output: Catalog-Based Health Check
 -- Copy and run directly in Supabase SQL Editor to verify complete status.
+-- Returns exactly 20 required health checks verified from PostgreSQL catalogs.
 -- =============================================================================
 SELECT
   check_name,
@@ -661,6 +955,87 @@ FROM (
       CASE WHEN EXISTS (
         SELECT 1 FROM information_schema.tables
         WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+      ) THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
+      'response_columns',
+      CASE WHEN (
+        SELECT count(*)
+        FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+          AND column_name IN (
+            'id', 'complaint_id', 'response_type', 'status', 'content',
+            'incident_date', 'created_at', 'updated_at', 'published_at',
+            'contact_consent', 'contact_info', 'responder_type', 'responder_name',
+            'designation', 'organization_name', 'contact_email_or_phone',
+            'official_statement', 'supporting_documents_note',
+            'request_correction_or_removal', 'correction_details'
+          )
+      ) = 20 THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
+      'response_column_types',
+      CASE WHEN NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+          AND (
+            (column_name IN ('id', 'complaint_id', 'response_type', 'status', 'content', 'contact_info', 'responder_type', 'responder_name', 'designation', 'organization_name', 'contact_email_or_phone', 'official_statement', 'supporting_documents_note', 'correction_details') AND udt_name <> 'text')
+            OR (column_name = 'incident_date' AND udt_name <> 'date')
+            OR (column_name IN ('created_at', 'updated_at', 'published_at') AND udt_name <> 'timestamptz')
+            OR (column_name IN ('contact_consent', 'request_correction_or_removal') AND udt_name <> 'bool')
+          )
+      ) THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
+      'response_required_not_null',
+      CASE WHEN (
+        SELECT count(*) FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses'
+          AND column_name IN ('id', 'complaint_id', 'response_type', 'status', 'content', 'created_at', 'updated_at', 'contact_consent', 'request_correction_or_removal')
+          AND is_nullable = 'NO'
+      ) = 9 THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
+      'response_defaults',
+      CASE WHEN EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses' AND column_name = 'status' AND column_default ILIKE '%pending_review%'
+      ) AND EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses' AND column_name = 'created_at' AND column_default ILIKE '%now%'
+      ) AND EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses' AND column_name = 'updated_at' AND column_default ILIKE '%now%'
+      ) AND EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses' AND column_name = 'contact_consent' AND column_default ILIKE '%false%'
+      ) AND EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'complaint_responses' AND column_name = 'request_correction_or_removal' AND column_default ILIKE '%false%'
+      ) THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
+      'response_primary_key',
+      CASE WHEN (
+        SELECT array_agg(attname::text ORDER BY attnum)
+        FROM pg_attribute
+        WHERE attrelid = 'public.complaint_responses'::regclass
+          AND attnum = ANY(
+            SELECT conkey FROM pg_constraint
+            WHERE conrelid = 'public.complaint_responses'::regclass AND contype = 'p'
+          )
+      ) = ARRAY['id'] THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
+      'response_complaint_fk',
+      CASE WHEN EXISTS (
+        SELECT 1 FROM pg_constraint c
+        JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+        WHERE c.conrelid = 'public.complaint_responses'::regclass
+          AND c.confrelid = 'public.complaints'::regclass
+          AND c.contype = 'f'
+          AND c.confdeltype = 'c'
+          AND a.attname = 'complaint_id'
       ) THEN 'PASS' ELSE 'FAIL' END
     ),
     (
@@ -701,6 +1076,11 @@ FROM (
       ), '') LIKE '%search_path=public, pg_temp%' THEN 'PASS' ELSE 'FAIL' END
     ),
     (
+      'public_rpc_execute_blocked',
+      CASE WHEN NOT has_function_privilege('public', 'public.submit_public_response(text, text, jsonb)', 'EXECUTE')
+      THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
       'anon_rpc_execute',
       CASE
         WHEN NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN 'PASS (role not in environment)'
@@ -738,6 +1118,8 @@ FROM (
         SELECT 1 FROM pg_constraint
         WHERE conname = 'chk_complaint_responses_response_type'
           AND conrelid = 'public.complaint_responses'::regclass
+          AND pg_get_constraintdef(oid) LIKE '%citizen_information%'
+          AND pg_get_constraintdef(oid) LIKE '%subject_response%'
       ) THEN 'PASS' ELSE 'FAIL' END
     ),
     (
@@ -746,18 +1128,27 @@ FROM (
         SELECT 1 FROM pg_constraint
         WHERE conname = 'chk_complaint_responses_status'
           AND conrelid = 'public.complaint_responses'::regclass
+          AND pg_get_constraintdef(oid) LIKE '%pending_review%'
+          AND pg_get_constraintdef(oid) LIKE '%published%'
+      ) THEN 'PASS' ELSE 'FAIL' END
+    ),
+    (
+      'responder_type_constraint',
+      CASE WHEN EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'chk_complaint_responses_responder_type'
+          AND conrelid = 'public.complaint_responses'::regclass
+          AND pg_get_constraintdef(oid) LIKE '%mentioned_person%'
       ) THEN 'PASS' ELSE 'FAIL' END
     ),
     (
       'response_indexes',
       CASE WHEN (
-        SELECT count(*) FROM pg_indexes
-        WHERE schemaname = 'public' AND tablename = 'complaint_responses'
-          AND indexname IN (
-            'idx_complaint_responses_complaint_id',
-            'idx_complaint_responses_status',
-            'idx_complaint_responses_type_status'
-          )
+        SELECT count(*) FROM pg_index i
+        JOIN pg_class c ON c.oid = i.indexrelid
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'public'
+          AND c.relname IN ('idx_complaint_responses_complaint_id', 'idx_complaint_responses_status', 'idx_complaint_responses_type_status')
       ) = 3 THEN 'PASS' ELSE 'FAIL' END
     )
 ) AS t(check_name, result);
