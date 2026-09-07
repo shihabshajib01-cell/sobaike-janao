@@ -3,10 +3,9 @@ import { PublicPublishedResponse, PublicResponseType, PublicSubjectResponderType
 
 /**
  * Feature gate: Controls whether the frontend connects to the public published response RPC.
- * CRITICAL: Must remain strictly `false` during this phase until Production SQL is applied
- * and verified in Supabase.
+ * Production connection enabled following verified backend deployment.
  */
-export const PUBLIC_RESPONSE_DISPLAY_CONNECTED = false;
+export const PUBLIC_RESPONSE_DISPLAY_CONNECTED = true;
 
 export const PublicResponseService = {
   /**
