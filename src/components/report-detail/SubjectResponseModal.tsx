@@ -365,45 +365,49 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             </div>
 
             {/* Request Correction / Removal checkbox */}
-            <div className="p-3.5 bg-surface-subtle rounded-xl border border-subtle space-y-2">
-              <label className="flex items-start gap-2 cursor-pointer text-[14px] text-primary">
-                <input
-                  type="checkbox"
-                  checked={requestCorrectionOrRemoval}
-                  onChange={(e) => setRequestCorrectionOrRemoval(e.target.checked)}
-                  className="mt-1 rounded border-subtle text-[var(--ui-accent)] focus:ring-[var(--ui-focus)] accent-[var(--ui-accent)] min-h-[16px] min-w-[16px]"
-                />
-                <span className="font-semibold">
-                  {language === 'bn'
-                    ? 'আমি প্রতিবেদনে অনিচ্ছাকৃত ভুল তথ্যের সংশোধন বা পুনঃনিরীক্ষণের আবেদন করছি'
-                    : 'I request formal factual correction or editorial review of this report.'}
-                </span>
-              </label>
+            {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
+              <div className="p-3.5 bg-surface-subtle rounded-xl border border-subtle space-y-2">
+                <label className="flex items-start gap-2 cursor-pointer text-[14px] text-primary">
+                  <input
+                    type="checkbox"
+                    checked={requestCorrectionOrRemoval}
+                    onChange={(e) => setRequestCorrectionOrRemoval(e.target.checked)}
+                    className="mt-1 rounded border-subtle text-[var(--ui-accent)] focus:ring-[var(--ui-focus)] accent-[var(--ui-accent)] min-h-[16px] min-w-[16px]"
+                  />
+                  <span className="font-semibold">
+                    {language === 'bn'
+                      ? 'আমি প্রতিবেদনে অনিচ্ছাকৃত ভুল তথ্যের সংশোধন বা পুনঃনিরীক্ষণের আবেদন করছি'
+                      : 'I request formal factual correction or editorial review of this report.'}
+                  </span>
+                </label>
 
-              {requestCorrectionOrRemoval && (
-                <input
-                  type="text"
-                  value={correctionDetails}
-                  onChange={(e) => setCorrectionDetails(e.target.value)}
-                  placeholder={
-                    language === 'bn'
-                      ? 'কোন অংশটি ভুল এবং সঠিক তথ্য কী, তা সংক্ষেপে উল্লেখ করুন'
-                      : 'Specify what fact is inaccurate and provide correct verifiable info'
-                  }
-                  className="w-full px-3.5 py-2.5 bg-surface border border-subtle focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)] rounded-xl text-[16px] text-primary min-h-[44px]"
-                />
-              )}
-            </div>
+                {requestCorrectionOrRemoval && (
+                  <input
+                    type="text"
+                    value={correctionDetails}
+                    onChange={(e) => setCorrectionDetails(e.target.value)}
+                    placeholder={
+                      language === 'bn'
+                        ? 'কোন অংশটি ভুল এবং সঠিক তথ্য কী, তা সংক্ষেপে উল্লেখ করুন'
+                        : 'Specify what fact is inaccurate and provide correct verifiable info'
+                    }
+                    className="w-full px-3.5 py-2.5 bg-surface border border-subtle focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)] rounded-xl text-[16px] text-primary min-h-[44px]"
+                  />
+                )}
+              </div>
+            )}
 
             {/* Moderation Workflow Notice */}
-            <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle text-[14px] text-secondary leading-relaxed flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-secondary" />
-              <span>
-                {language === 'bn'
-                  ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হবে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
-                  : 'Your response will be submitted for moderation. Any public display is handled through the publication workflow.'}
-              </span>
-            </div>
+            {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
+              <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle text-[14px] text-secondary leading-relaxed flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-secondary" />
+                <span>
+                  {language === 'bn'
+                    ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হবে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
+                    : 'Your response will be submitted for moderation. Any public display is handled through the publication workflow.'}
+                </span>
+              </div>
+            )}
 
             {/* Footer Buttons */}
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-subtle">
