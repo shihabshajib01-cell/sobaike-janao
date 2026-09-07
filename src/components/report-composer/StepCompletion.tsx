@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   CheckCircle2,
-  Copy,
-  Check,
   PlusCircle,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -15,19 +13,10 @@ export interface StepCompletionProps {
 }
 
 export const StepCompletion: React.FC<StepCompletionProps> = ({
-  reportId,
   onSubmitAnother,
   onClose,
   language,
 }) => {
-  const [copiedId, setCopiedId] = useState(false);
-
-  const handleCopyId = () => {
-    navigator.clipboard.writeText(reportId);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
-  };
-
   return (
     <div className="space-y-6 text-center py-2 text-primary">
       {/* Success Badge */}
@@ -44,29 +33,6 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
             ? 'আপনার অভিযোগ মডারেশন পর্যালোচনার জন্য জমা হয়েছে। দায়িত্বশীল পর্যালোচনার পর পরবর্তী পদক্ষেপ গ্রহণ করা হবে।'
             : 'Your complaint has been submitted for moderation review. Further steps will follow standard moderation review.'}
         </p>
-      </div>
-
-      {/* Security Credentials Card */}
-      <div className="p-5 md:p-6 rounded-2xl bg-surface border border-subtle max-w-lg mx-auto space-y-4 text-left shadow-2xs">
-        {/* Report ID */}
-        <div className="flex items-center justify-between p-3.5 rounded-xl bg-surface-subtle border border-subtle">
-          <div>
-            <span className="text-[14px] font-bold uppercase tracking-wider text-muted">
-              {language === 'bn' ? 'প্রতিবেদন আইডি (Report ID)' : 'Report ID'}
-            </span>
-            <p className="text-[18px] font-mono font-bold text-primary mt-0.5">{reportId}</p>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleCopyId}
-            leftIcon={copiedId ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-            className="min-h-[44px] text-[14px]"
-          >
-            {copiedId ? (language === 'bn' ? 'কপি হয়েছে' : 'Copied') : language === 'bn' ? 'কপি' : 'Copy'}
-          </Button>
-        </div>
       </div>
 
       {/* Action Buttons */}

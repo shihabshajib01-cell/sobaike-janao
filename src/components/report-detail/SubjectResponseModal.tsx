@@ -155,20 +155,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     : 'Submit Official Response or Clarification')}
             </h3>
             <p className="text-[14px] text-secondary">
-              {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? (
-                <>
-                  {language === 'bn' ? 'প্রতিবেদন আইডি:' : 'Report ID:'}{' '}
-                  <span className="font-mono font-semibold text-primary">{reportId}</span>
-                  {' • '}
-                  {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned Subject:'}{' '}
-                  <span className="font-semibold text-primary">{subjectName}</span>
-                </>
-              ) : (
-                <>
-                  {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned Subject:'}{' '}
-                  <span className="font-semibold text-primary">{subjectName}</span> (ID: {reportId})
-                </>
-              )}
+              {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned Subject:'}{' '}
+              <span className="font-semibold text-primary">{subjectName}</span>
             </p>
           </div>
 

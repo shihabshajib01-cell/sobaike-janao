@@ -78,17 +78,13 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                 className="bg-surface border border-subtle hover:border-theme rounded-2xl p-4 transition-all duration-150 flex flex-col justify-between space-y-3 shadow-2xs hover:shadow-xs group text-left"
               >
                 <div className="space-y-2">
-                  {/* Category Badge & Report ID */}
+                  {/* Category Badge */}
                   <div className="flex items-center justify-between gap-2">
                     <CategoryBadge
                       section={report.segment}
                       language={language}
                       size="sm"
                     />
-
-                    <span className="text-[12px] font-mono text-muted">
-                      #{report.id}
-                    </span>
                   </div>
 
                   {/* Title */}

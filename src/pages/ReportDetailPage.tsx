@@ -157,8 +157,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </h1>
           <p className="text-[16px] leading-[26px] text-secondary max-w-md mx-auto">
             {language === 'bn'
-              ? `অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি অনুমোদিত হয়নি, এখনও পর্যালোচনায় রয়েছে অথবা আইডিটি সঠিক নয়।`
-              : `The requested report could not be found. It may not be published, is currently under review, or the ID is incorrect.`}
+              ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
+              : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
           </p>
         </div>
 
@@ -308,12 +308,6 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <Clock className="w-4 h-4 text-muted shrink-0" />
             <span>
               {language === 'bn' ? `প্রকাশ: ${publishedDate}` : `Published: ${publishedDate}`}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 text-muted font-mono text-[14px]">
-            <span>{language === 'bn' ? 'আইডি:' : 'ID:'}</span>
-            <span className="font-semibold text-primary bg-surface-subtle border border-subtle px-2 py-0.5 rounded">
-              {report.id}
             </span>
           </div>
         </div>

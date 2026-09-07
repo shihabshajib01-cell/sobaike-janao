@@ -97,8 +97,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                 ? 'তথ্য বা অভিজ্ঞতা যোগ করুন'
                 : 'Add Information or Experience'}
             </h3>
-            <p className="text-[14px] text-muted font-mono">
-              {language === 'bn' ? 'প্রতিবেদন আইডি:' : 'Referenced Report:'} {reportId}
+            <p className="text-[14px] text-muted">
+              {language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `About: ${reportTitle}`}
             </p>
           </div>
 
