@@ -1,5 +1,5 @@
 import React from 'react';
-import { HeartHandshake, Zap, ShieldAlert, LucideIcon } from 'lucide-react';
+import { HeartHandshake, Zap, ShieldAlert, ZapOff, LucideIcon } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 
 export type FeatureIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -18,6 +18,7 @@ const ICON_MAP: Record<SectionKey, LucideIcon> = {
   harassment: HeartHandshake,
   rickshaw: Zap,
   extortion: ShieldAlert,
+  load_shedding: ZapOff,
 };
 
 const SIZE_CLASSES: Record<FeatureIconSize, string> = {

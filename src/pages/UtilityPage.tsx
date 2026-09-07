@@ -1,0 +1,219 @@
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { ZapOff, PlusCircle, AlertCircle, RefreshCw, Info } from 'lucide-react';
+import { SECTIONS } from '../theme/tokens';
+import { PublicReportService } from '../services/publicReportService';
+import { useTaxonomy } from '../services/taxonomyService';
+import { ReportItem } from '../types/report';
+import { ReportCard } from '../components/report/ReportCard';
+import { LocationSelector } from '../components/feed/LocationSelector';
+import { FilterChip } from '../components/ui/FilterChip';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
+import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { useApp } from '../context/AppContext';
+
+export const UtilityPage: React.FC = () => {
+  const { language, openReportComposer } = useApp();
+  const { getFeedSubcategories, getSegment } = useTaxonomy();
+  const config = getSegment('load_shedding') || SECTIONS.load_shedding;
+
+  const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+
+  const [reports, setReports] = useState<ReportItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const subcategories = getFeedSubcategories('load_shedding');
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    setFetchError(null);
+    try {
+      const data = await PublicReportService.getBySegment('load_shedding');
+      setReports(data);
+    } catch (err) {
+      console.warn('[UtilityPage load error]', err);
+      setFetchError('LOAD_ERROR');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const filteredReports = useMemo(() => {
+    return reports.filter((r) => {
+      if (r.segment !== 'load_shedding') return false;
+      const matchesSubcat = selectedSubcat === 'all' || r.subcategoryId === selectedSubcat;
+      const matchesDistrict =
+        selectedDistrict === 'all' ||
+        (r.districtBn && r.districtBn.includes(selectedDistrict)) ||
+        (r.districtEn && r.districtEn.toLowerCase().includes(selectedDistrict.toLowerCase()));
+      return matchesSubcat && matchesDistrict;
+    });
+  }, [reports, selectedSubcat, selectedDistrict]);
+
+  return (
+    <PublicPageContainer id="utility-page-container">
+      {/* 1. Standard Type A Section Header */}
+      <section
+        id="utility-header-banner"
+        className="bg-surface border border-subtle rounded-2xl p-4 sm:p-5 md:p-7 space-y-3.5 md:space-y-4 shadow-2xs"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="space-y-2 text-left flex-1">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                style={{
+                  backgroundColor: 'var(--sec-load_shedding-bg)',
+                  color: 'var(--sec-load_shedding-primary)',
+                }}
+              >
+                <ZapOff className="w-4 h-4" />
+              </div>
+              <span
+                className="text-[13px] sm:text-[14px] font-semibold"
+                style={{ color: 'var(--sec-load_shedding-text)' }}
+              >
+                {language === 'bn' ? config.shortNameBn : config.shortNameEn}
+              </span>
+            </div>
+
+            <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-primary tracking-tight">
+              {language === 'bn' ? config.nameBn : config.nameEn}
+            </h1>
+
+            <p className="text-[16px] leading-[1.6] md:leading-[26px] text-secondary">
+              {language === 'bn' ? config.descriptionBn : config.descriptionEn}
+            </p>
+          </div>
+
+          <div className="shrink-0 pt-1">
+            <Button
+              id="utility-header-file-report-btn"
+              variant="primary"
+              size="md"
+              leftIcon={<PlusCircle className="w-4 h-4" />}
+              onClick={() => openReportComposer('load_shedding')}
+              className="w-full sm:w-auto"
+            >
+              {language === 'bn' ? 'অভিযোগ জানান' : 'File Report'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Quiet Information Strip */}
+        <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-secondary bg-surface-subtle border border-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
+          <Info className="w-4 h-4 text-muted shrink-0" />
+          <span>
+            {language === 'bn'
+              ? 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ জানান।'
+              : 'Report load shedding, gas shortages, or excess electricity bills responsibly.'}
+          </span>
+        </div>
+      </section>
+
+      {/* 2. Subcategory & Location Filter Controls */}
+      <section id="utility-filter-section" className="space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-subtle pb-3">
+          <div>
+            <h2 className="text-[16px] font-bold text-primary">
+              {language === 'bn' ? 'অভিযোগের ধরন অনুসারে ফিল্টার' : 'Filter by Complaint Type'}
+            </h2>
+            <p className="text-[14px] text-muted">
+              {language === 'bn'
+                ? `${filteredReports.length}টি প্রকাশিত অভিযোগ পাওয়া গেছে`
+                : `${filteredReports.length} published reports found`}
+            </p>
+          </div>
+
+          <div className="shrink-0">
+            <LocationSelector
+              selectedDistrict={selectedDistrict}
+              onSelectDistrict={setSelectedDistrict}
+            />
+          </div>
+        </div>
+
+        {/* Horizontally scrollable subcategory chips */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {subcategories.map((subcat) => {
+            const count = reports.filter((r) => {
+              if (r.segment !== 'load_shedding') return false;
+              const matchesSub = subcat.id === 'all' || r.subcategoryId === subcat.id;
+              const matchesDist =
+                selectedDistrict === 'all' || (r.districtBn && r.districtBn.includes(selectedDistrict));
+              return matchesSub && matchesDist;
+            }).length;
+
+            return (
+              <FilterChip
+                key={subcat.id}
+                id={`filter-subcat-${subcat.id}`}
+                label={language === 'bn' ? subcat.nameBn : subcat.nameEn}
+                section="load_shedding"
+                selected={selectedSubcat === subcat.id}
+                count={isLoading ? undefined : count}
+                onClick={() => setSelectedSubcat(subcat.id)}
+              />
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 3. Loading State Skeleton Screen */}
+      {isLoading && (
+        <ReportFeedSkeleton
+          count={3}
+          id="utility-feed-skeleton"
+          ariaLabel={language === 'bn' ? 'অভিযোগ লোড হচ্ছে...' : 'Loading reports...'}
+        />
+      )}
+
+      {/* 4. Error State */}
+      {!isLoading && fetchError && (
+        <div className="bg-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
+          <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" />
+          <p className="text-[16px] font-semibold text-rose-500">
+            {language === 'bn'
+              ? 'তথ্য লোড করতে ত্রুটি হয়েছে।'
+              : 'Failed to load utility reports. Please try again.'}
+          </p>
+          <button
+            onClick={loadData}
+            className="btn-primary-action px-4 py-2 text-[16px] font-semibold rounded-xl min-h-[44px]"
+          >
+            {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
+          </button>
+        </div>
+      )}
+
+      {/* 5. Reports Feed */}
+      {!isLoading && !fetchError && (
+        <div className="space-y-3">
+          {filteredReports.length > 0 ? (
+            filteredReports.map((report) => (
+              <ReportCard key={report.id} report={report} />
+            ))
+          ) : (
+            <EmptyState
+              title={language === 'bn' ? 'কোনো অভিযোগ পাওয়া যায়নি' : 'No Reports Found'}
+              description={
+                language === 'bn'
+                  ? 'এই মুহূর্তে ইউটিলিটি সেবা সংক্রান্ত কোনো প্রকাশিত অভিযোগ নেই। নতুন অভিযোগ জানাতে নিচের বোতামে চাপ দিন।'
+                  : 'No utility complaints published yet. Click below to file a report.'
+              }
+              actionLabel={language === 'bn' ? 'অভিযোগ জানান' : 'File Report'}
+              onAction={() => openReportComposer('load_shedding')}
+            />
+          )}
+        </div>
+      )}
+    </PublicPageContainer>
+  );
+};

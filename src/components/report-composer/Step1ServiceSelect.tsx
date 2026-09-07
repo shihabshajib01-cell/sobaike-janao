@@ -74,6 +74,17 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       borderVar: 'var(--sec-extortion-border)',
       primaryVar: 'var(--sec-extortion-primary)',
     },
+    {
+      key: 'load_shedding',
+      titleBn: segments.load_shedding?.nameBn || SECTIONS.load_shedding.nameBn,
+      titleEn: segments.load_shedding?.nameEn || SECTIONS.load_shedding.nameEn,
+      descBn: 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ।',
+      descEn: 'Report load shedding, gas shortages, or excess electricity bill issues.',
+      bgVar: 'var(--sec-load_shedding-bg)',
+      textVar: 'var(--sec-load_shedding-text)',
+      borderVar: 'var(--sec-load_shedding-border)',
+      primaryVar: 'var(--sec-load_shedding-primary)',
+    },
   ];
 
   const comingSoonList = Object.values(COMING_SOON_SERVICES);
@@ -101,7 +112,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       </div>
 
       {/* Active Service Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {activeServices.map((srv) => {
           const isSelected = selectedSegment === srv.key && !selectedComingSoon;
 

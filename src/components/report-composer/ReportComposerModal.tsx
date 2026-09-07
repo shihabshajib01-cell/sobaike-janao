@@ -532,6 +532,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleNextFromStep2 = useCallback(() => {
     if (!formData.subcategoryId) return;
+    if (formData.segment === 'load_shedding') return;
 
     // Check Rape pre-report consent requirement
     if (
@@ -1042,7 +1043,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   if (!isOpen) return null;
 
   const canContinueStep1 = Boolean(formData.segment) && !selectedComingSoon;
-  const canContinueStep2 = Boolean(formData.subcategoryId);
+  const canContinueStep2 = Boolean(formData.subcategoryId) && formData.segment !== 'load_shedding';
 
   // Render-level defense guard: ensure Step 3/4 is NEVER rendered if rape consent is missing
   const effectiveCurrentStep =

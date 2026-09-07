@@ -27,6 +27,12 @@ export const SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
     { id: 'threat-money-demand', nameBn: 'হুমকি দিয়ে টাকা দাবি', nameEn: 'Threats & Demands' },
     { id: 'extortion-other', nameBn: 'অন্যান্য চাঁদাবাজি', nameEn: 'Other Extortion' },
   ],
+  load_shedding: [
+    { id: 'all', nameBn: 'সকল রিপোর্ট', nameEn: 'All Reports' },
+    { id: 'load-shedding-outage', nameBn: 'লোডশেডিং', nameEn: 'Load Shedding' },
+    { id: 'gas-shortage', nameBn: 'গ্যাস সংকট', nameEn: 'Gas Shortage' },
+    { id: 'excess-electricity-bill', nameBn: 'অতিরিক্ত বিদ্যুৎ বিল', nameEn: 'Excess Electricity Bill' },
+  ],
 };
 
 export const POPULAR_DISTRICTS = [

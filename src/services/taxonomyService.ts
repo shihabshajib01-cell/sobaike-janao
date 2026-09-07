@@ -51,12 +51,14 @@ let cachedSegments: Record<string, SegmentTaxonomyItem> = {
   harassment: { ...SECTIONS.harassment, id: 'harassment' },
   rickshaw: { ...SECTIONS.rickshaw, id: 'rickshaw' },
   extortion: { ...SECTIONS.extortion, id: 'extortion' },
+  load_shedding: { ...SECTIONS.load_shedding, id: 'load_shedding' },
 };
 
 let cachedSubcategories: Record<string, SubcategoryOption[]> = {
   harassment: [...SEGMENT_SUBCATEGORIES.harassment],
   rickshaw: [...SEGMENT_SUBCATEGORIES.rickshaw],
   extortion: [...SEGMENT_SUBCATEGORIES.extortion],
+  load_shedding: [...SEGMENT_SUBCATEGORIES.load_shedding],
 };
 
 let isFetched = false;
@@ -167,7 +169,7 @@ export const TaxonomyService = {
         const nextSubcategories: Record<string, SubcategoryOption[]> = {};
 
         // Initialize with empty arrays for known keys
-        (['harassment', 'rickshaw', 'extortion'] as SectionKey[]).forEach((sec) => {
+        (['harassment', 'rickshaw', 'extortion', 'load_shedding'] as SectionKey[]).forEach((sec) => {
           nextSubcategories[sec] = [];
         });
 
@@ -194,7 +196,7 @@ export const TaxonomyService = {
         });
 
         // Ensure each known segment has at least fallback items if none returned from query
-        (['harassment', 'rickshaw', 'extortion'] as SectionKey[]).forEach((sec) => {
+        (['harassment', 'rickshaw', 'extortion', 'load_shedding'] as SectionKey[]).forEach((sec) => {
           if (!nextSubcategories[sec] || nextSubcategories[sec].length === 0) {
             nextSubcategories[sec] = [...SEGMENT_SUBCATEGORIES[sec]];
           }

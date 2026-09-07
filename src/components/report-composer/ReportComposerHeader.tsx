@@ -74,6 +74,12 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
           color: 'var(--sec-extortion-text)',
           border: 'var(--sec-extortion-border)',
         };
+      case 'load_shedding':
+        return {
+          bg: 'var(--sec-load_shedding-bg)',
+          color: 'var(--sec-load_shedding-text)',
+          border: 'var(--sec-load_shedding-border)',
+        };
     }
   };
 

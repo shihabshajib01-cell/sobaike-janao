@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Info } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { SubcategoryOption } from '../../data/reportOptions';
 import { useTaxonomy } from '../../services/taxonomyService';
@@ -103,6 +104,30 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
           );
         })}
       </div>
+
+      {/* Phase 1 Stopping Notice for Utility Service Complaints */}
+      {segment === 'load_shedding' && selectedSubcategoryId && (
+        <div
+          id="utility-phase1-notice"
+          role="status"
+          aria-live="polite"
+          className="p-4 rounded-xl bg-surface-subtle border border-subtle flex items-start gap-3 text-left"
+        >
+          <Info className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-[14px] font-semibold text-primary">
+              {language === 'bn'
+                ? 'ইউটিলিটি অভিযোগের বিস্তারিত ফর্ম পরবর্তী ধাপে চালু হবে'
+                : 'Utility Detailed Complaint Form Available in Next Phase'}
+            </p>
+            <p className="text-[13px] text-secondary leading-relaxed">
+              {language === 'bn'
+                ? 'প্রথম ধাপে অভিযোগের ধরন সফলভাবে নির্বাচন করা হয়েছে। বিস্তারিত তথ্য প্রদান ও জমাদানের ফর্ম পরবর্তী আপডেটে উন্মুক্ত করা হবে।'
+                : 'The complaint type has been successfully selected for Phase 1. Detailed input fields and submission form will be available in the next release.'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

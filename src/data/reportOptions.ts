@@ -101,6 +101,29 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       descriptionEn: 'Any other extortion or coercive money collection',
     },
   ],
+  load_shedding: [
+    {
+      id: 'load-shedding-outage',
+      nameBn: 'লোডশেডিং',
+      nameEn: 'Load Shedding',
+      descriptionBn: 'ঘন ঘন বা দীর্ঘ সময় বিদ্যুৎ বিভ্রাট ও লোডশেডিং',
+      descriptionEn: 'Frequent or prolonged power outages and load shedding',
+    },
+    {
+      id: 'gas-shortage',
+      nameBn: 'গ্যাস সংকট',
+      nameEn: 'Gas Shortage',
+      descriptionBn: 'লাইনের গ্যাস সংকট, স্বল্প চাপ বা সরবরাহ বন্ধ থাকা',
+      descriptionEn: 'Piped gas shortage, low pressure, or supply interruption',
+    },
+    {
+      id: 'excess-electricity-bill',
+      nameBn: 'অতিরিক্ত বিদ্যুৎ বিল',
+      nameEn: 'Excess Electricity Bill',
+      descriptionBn: 'অস্বাভাবিক বা অসঙ্গতিপূর্ণ ভুতুড়ে বিদ্যুৎ বিলের অভিযোগ',
+      descriptionEn: 'Abnormal, inflated or unexplained electricity bill charges',
+    },
+  ],
 };
 
 export const EVIDENCE_TYPES = [
