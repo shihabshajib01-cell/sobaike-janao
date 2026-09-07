@@ -7,7 +7,7 @@ import { apiClient } from '../../services/apiClient';
  * CRITICAL: Must remain strictly `false` during this phase until the backend SQL change
  * (supabase/allow_subject_response_without_responder_type.sql) is manually applied and verified.
  */
-const SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED = false;
+const SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED = true;
 
 interface SubjectResponseModalProps {
   isOpen: boolean;
