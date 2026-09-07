@@ -190,6 +190,9 @@ export const DraftRepository = {
     if (Boolean(draft.publicProfileHandle?.trim())) return true;
     if (Boolean(draft.roleOrDesignation?.trim())) return true;
     if (Boolean(draft.description?.trim())) return true;
+    if (Boolean(draft.incidentDate?.trim())) return true;
+    if (Boolean(draft.incidentTime?.trim())) return true;
+    if (Boolean(draft.utilityEndTime?.trim())) return true;
     if (Boolean(draft.intimateWhatHappened?.trim())) return true;
     if (Boolean(draft.relationshipContext?.trim())) return true;
 

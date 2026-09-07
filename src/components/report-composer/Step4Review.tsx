@@ -46,6 +46,8 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
   const isUtilityReport = (segment as string) === 'utility' || segment === 'load_shedding';
+  const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
+  const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -113,7 +115,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       : formData.subcategoryId
   }`;
 
-  const incidentSummary = hideFrequency
+  const incidentSummary = isUtilityReport
+    ? `${formData.incidentDate || '-'} · ${language === 'bn' ? 'শুরু: ' : 'Start: '}${formData.incidentTime || '-'}${
+        formData.utilityEndTime
+          ? ` · ${language === 'bn' ? 'শেষ: ' : 'End: '}${formData.utilityEndTime}`
+          : ''
+      }`
+    : hideFrequency
     ? `${formData.incidentDate || '-'}`
     : `${formData.incidentDate || '-'} · ${
         formData.frequency === 'repeated'
@@ -255,7 +263,19 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           id="review-section-incident"
           isOpen={openSections.incident}
           onToggle={() => toggleSection('incident')}
-          title={language === 'bn' ? '১. ঘটনার বিবরণ ও সময়কাল' : '1. What Happened & Timeline'}
+          title={
+            isUtilityReport
+              ? isLoadShedding
+                ? language === 'bn'
+                  ? '১. লোডশেডিংয়ের সময় ও বিবরণ'
+                  : '1. Load Shedding Timing & Details'
+                : language === 'bn'
+                ? '১. গ্যাস সংকটের সময় ও বিবরণ'
+                : '1. Gas Shortage Timing & Details'
+              : language === 'bn'
+              ? '১. ঘটনার বিবরণ ও সময়কাল'
+              : '1. What Happened & Timeline'
+          }
           summary={incidentSummary}
           icon={<FileText className="w-4 h-4" />}
           onEdit={() => onEditStep(3, 'narrative')}
@@ -286,8 +306,23 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               {formData.incidentTime && (
                 <div>
                   <span>
-                    {language === 'bn' ? 'সময়: ' : 'Time: '}
+                    {isUtilityReport
+                      ? language === 'bn'
+                        ? 'শুরুর সময়: '
+                        : 'Start Time: '
+                      : language === 'bn'
+                      ? 'সময়: '
+                      : 'Time: '}
                     <strong>{formData.incidentTime}</strong>
+                  </span>
+                </div>
+              )}
+
+              {isUtilityReport && formData.utilityEndTime && (
+                <div>
+                  <span>
+                    {language === 'bn' ? 'শেষ সময়: ' : 'End Time: '}
+                    <strong>{formData.utilityEndTime}</strong>
                   </span>
                 </div>
               )}
@@ -667,78 +702,80 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           </ReviewSection>
         )}
 
-        {/* Section 5: 4. Attachments */}
-        <ReviewSection
-          id="review-section-attachments"
-          isOpen={openSections.attachments}
-          onToggle={() => toggleSection('attachments')}
-          title={language === 'bn' ? '৪. সংযুক্তি' : '4. Attachments'}
-          summary={attachmentsSummary}
-          icon={<Paperclip className="w-4 h-4" />}
-          onEdit={() => onEditStep(3, 'attachments')}
-          editLabel={editLabel}
-        >
-          <div className="text-[13px] text-secondary pt-1">
-            {hasMissingEvidence ? (
-              <div
-                id="review-missing-evidence-alert"
-                className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
-              >
-                <div className="flex items-start gap-2.5">
-                  <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="font-semibold">
+        {/* Section 5: 4. Attachments (Hidden for Utility reports) */}
+        {!isUtilityReport && (
+          <ReviewSection
+            id="review-section-attachments"
+            isOpen={openSections.attachments}
+            onToggle={() => toggleSection('attachments')}
+            title={language === 'bn' ? '৪. সংযুক্তি' : '4. Attachments'}
+            summary={attachmentsSummary}
+            icon={<Paperclip className="w-4 h-4" />}
+            onEdit={() => onEditStep(3, 'attachments')}
+            editLabel={editLabel}
+          >
+            <div className="text-[13px] text-secondary pt-1">
+              {hasMissingEvidence ? (
+                <div
+                  id="review-missing-evidence-alert"
+                  className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="font-semibold">
+                        {language === 'bn'
+                          ? 'পূর্বে সংযুক্ত ছবিগুলো পুনরায় যুক্ত করা প্রয়োজন'
+                          : 'Previously attached images must be reattached'}
+                      </p>
+                      <p className="text-[12.5px] opacity-90 leading-relaxed">
+                        {language === 'bn'
+                          ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery?.expectedCount}টি ছবি সংযুক্ত ছিল। ব্রাউজার রিফ্রেশের কারণে ফাইলগুলো পুনরায় নির্বাচন করতে ৩ নং ধাপে ফিরে যান।`
+                          : `Your saved draft included ${formData.pendingEvidenceRecovery?.expectedCount} image(s). Please return to Step 3 to reattach your files before submitting.`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-1">
+                    <button
+                      type="button"
+                      onClick={() => onEditStep(3, 'attachments')}
+                      className="text-[12.5px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
+                    >
                       {language === 'bn'
-                        ? 'পূর্বে সংযুক্ত ছবিগুলো পুনরায় যুক্ত করা প্রয়োজন'
-                        : 'Previously attached images must be reattached'}
-                    </p>
-                    <p className="text-[12.5px] opacity-90 leading-relaxed">
-                      {language === 'bn'
-                        ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery?.expectedCount}টি ছবি সংযুক্ত ছিল। ব্রাউজার রিফ্রেশের কারণে ফাইলগুলো পুনরায় নির্বাচন করতে ৩ নং ধাপে ফিরে যান।`
-                        : `Your saved draft included ${formData.pendingEvidenceRecovery?.expectedCount} image(s). Please return to Step 3 to reattach your files before submitting.`}
-                    </p>
+                        ? '৩ নং ধাপে সংযুক্তি যোগ করুন →'
+                        : 'Reattach in Step 3 →'}
+                    </button>
                   </div>
                 </div>
-                <div className="flex justify-end pt-1">
-                  <button
-                    type="button"
-                    onClick={() => onEditStep(3, 'attachments')}
-                    className="text-[12.5px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
-                  >
-                    {language === 'bn'
-                      ? '৩ নং ধাপে সংযুক্তি যোগ করুন →'
-                      : 'Reattach in Step 3 →'}
-                  </button>
+              ) : pendingImages.length > 0 ? (
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="font-bold text-primary">
+                    {pendingImages.length} {language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}
+                  </span>
+                  <div className="flex gap-1.5">
+                    {pendingImages.slice(0, 4).map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img.previewUrl}
+                        alt="attachment preview"
+                        loading="lazy"
+                        decoding="async"
+                        className="w-9 h-9 rounded-lg object-cover border border-subtle"
+                      />
+                    ))}
+                    {pendingImages.length > 4 && (
+                      <div className="w-9 h-9 rounded-lg bg-surface-subtle border border-subtle flex items-center justify-center font-bold text-primary text-[13px]">
+                        +{pendingImages.length - 4}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ) : pendingImages.length > 0 ? (
-              <div className="flex items-center gap-3 flex-wrap">
-                <span className="font-bold text-primary">
-                  {pendingImages.length} {language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}
-                </span>
-                <div className="flex gap-1.5">
-                  {pendingImages.slice(0, 4).map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img.previewUrl}
-                      alt="attachment preview"
-                      loading="lazy"
-                      decoding="async"
-                      className="w-9 h-9 rounded-lg object-cover border border-subtle"
-                    />
-                  ))}
-                  {pendingImages.length > 4 && (
-                    <div className="w-9 h-9 rounded-lg bg-surface-subtle border border-subtle flex items-center justify-center font-bold text-primary text-[13px]">
-                      +{pendingImages.length - 4}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <p>{language === 'bn' ? 'কোনো ছবি সংযুক্ত নেই।' : 'No attachments.'}</p>
-            )}
-          </div>
-        </ReviewSection>
+              ) : (
+                <p>{language === 'bn' ? 'কোনো ছবি সংযুক্ত নেই।' : 'No attachments.'}</p>
+              )}
+            </div>
+          </ReviewSection>
+        )}
       </div>
 
       {/* Responsible Moderation Notice for All Reports */}
