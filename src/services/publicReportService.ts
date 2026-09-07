@@ -1,4 +1,4 @@
-import { ReportItem } from '../types/report';
+import { ReportItem, PublicPublishedResponse } from '../types/report';
 import { SectionKey } from '../theme/tokens';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import {
@@ -6,6 +6,7 @@ import {
   SupabasePublicReportRPC,
 } from './supabasePublicReportMapper';
 import { PublicEvidenceService } from './publicEvidenceService';
+import { PublicResponseService } from './publicResponseService';
 import { SEED_SUBMITTED_REPORTS } from '../data/seedSubmissions';
 
 export interface PublicReportFilters {
@@ -193,7 +194,13 @@ export const PublicReportService = {
    * Fetch a single published report and any published subject responses by ID.
    * Queries the sanitized RPC `get_public_published_report`.
    */
-  async getById(id: string): Promise<{ report: ReportItem; responses: any[] } | null> {
+  async getById(
+    id: string
+  ): Promise<{
+    report: ReportItem;
+    responses: PublicPublishedResponse[];
+    responseLoadError: boolean;
+  } | null> {
     const cleanId = id.trim().toUpperCase();
 
     if (!isSupabaseConfigured() || !supabase) {
@@ -203,6 +210,7 @@ export const PublicReportService = {
           return {
             report: mapSeedToReportItem(seed),
             responses: [],
+            responseLoadError: false,
           };
         }
         return null;
@@ -222,6 +230,7 @@ export const PublicReportService = {
           return {
             report: mapSeedToReportItem(seed),
             responses: [],
+            responseLoadError: false,
           };
         }
       }
@@ -252,9 +261,21 @@ export const PublicReportService = {
         console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
       }
 
+      let responses: PublicPublishedResponse[] = [];
+      let responseLoadError = false;
+
+      try {
+        responses = await PublicResponseService.getPublishedForReport(cleanId);
+      } catch (respErr) {
+        console.warn('[PublicReportService.getById] Published responses load error:', respErr);
+        responseLoadError = true;
+        responses = [];
+      }
+
       return {
         report,
-        responses: [],
+        responses,
+        responseLoadError,
       };
     }
 
@@ -265,6 +286,7 @@ export const PublicReportService = {
         return {
           report: mapSeedToReportItem(seed),
           responses: [],
+          responseLoadError: false,
         };
       }
     }

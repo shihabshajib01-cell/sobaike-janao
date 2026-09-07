@@ -94,3 +94,24 @@ export interface ReportItem {
   response?: ReportResponse;
   relatedReportIds?: string[];
 }
+
+export type PublicResponseType =
+  | 'citizen_information'
+  | 'subject_response';
+
+export type PublicSubjectResponderType =
+  | 'mentioned_person'
+  | 'organization_rep'
+  | 'legal_rep';
+
+export interface PublicPublishedResponse {
+  id: string;
+  responseType: PublicResponseType;
+  content: string;
+  incidentDate: string | null;
+  publishedAt: string | null;
+  responderType: PublicSubjectResponderType | null;
+  responderName: string | null;
+  designation: string | null;
+  organizationName: string | null;
+}

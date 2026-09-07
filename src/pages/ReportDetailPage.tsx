@@ -23,8 +23,9 @@ import { useApp } from '../context/AppContext';
 import { CitizenActionModal } from '../components/report-detail/CitizenActionModal';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
 import { PublicReportService } from '../services/publicReportService';
+import { PUBLIC_RESPONSE_DISPLAY_CONNECTED } from '../services/publicResponseService';
 import { ReportMediaGrid } from '../components/media/ReportMediaGrid';
-import { ReportItem } from '../types/report';
+import { ReportItem, PublicPublishedResponse } from '../types/report';
 import { ReportDetailSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 
@@ -38,7 +39,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const [isCitizenModalOpen, setIsCitizenModalOpen] = useState(false);
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
   const [report, setReport] = useState<ReportItem | null>(null);
-  const [storedResponses, setStoredResponses] = useState<any[]>([]);
+  const [storedResponses, setStoredResponses] = useState<PublicPublishedResponse[]>([]);
+  const [responseLoadError, setResponseLoadError] = useState<boolean>(false);
   const [relatedReports, setRelatedReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<boolean>(false);
@@ -46,14 +48,15 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const fetchReport = () => {
     setIsLoading(true);
     setFetchError(false);
+    setStoredResponses([]);
+    setResponseLoadError(false);
 
     PublicReportService.getById(reportId)
       .then(async (res) => {
         if (res && res.report) {
           setReport(res.report);
-          if (res.responses) {
-            setStoredResponses(res.responses);
-          }
+          setStoredResponses(res.responses || []);
+          setResponseLoadError(Boolean(res.responseLoadError));
 
           // Fetch related reports from backend service ONLY if explicit relatedReportIds exist
           if (res.report.relatedReportIds && Array.isArray(res.report.relatedReportIds) && res.report.relatedReportIds.length > 0) {
@@ -213,6 +216,21 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   };
 
   const subjectTargetName = report.reportedSubjectEn || report.reportedSubjectBn || report.reportedSubject || '';
+
+  const formatResponseDate = (dateStr: string | null | undefined, lang: 'bn' | 'en'): string => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
 
   return (
     <PublicPageContainer id="report-detail-page-container">
@@ -401,13 +419,33 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </div>
         )}
 
-        {/* Published Response from Mentioned Party */}
-        {(report.response || storedResponses.length > 0) && (
+        {/* Published Responses Section */}
+        {((report.response || storedResponses.length > 0) || (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError)) && (
           <div className="pt-4 border-t border-subtle space-y-3">
             <h3 className="text-[18px] leading-[28px] font-bold text-primary flex items-center gap-2">
               <Scale className="w-4 h-4 text-secondary" />
-              <span>{language === 'bn' ? 'সংশ্লিষ্ট পক্ষের প্রকাশিত বক্তব্য' : 'Published response from the mentioned party'}</span>
+              <span>{language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}</span>
             </h3>
+
+            {/* Error UI when responses failed to load and connection gate is active */}
+            {PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError && (
+              <div className="p-3.5 bg-surface-subtle rounded-xl border border-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[14px]">
+                <span className="text-secondary">
+                  {language === 'bn'
+                    ? 'প্রকাশিত প্রতিক্রিয়াগুলো লোড করা যায়নি।'
+                    : 'Published responses could not be loaded.'}
+                </span>
+                <button
+                  type="button"
+                  onClick={fetchReport}
+                  className="min-h-[44px] px-3.5 py-2 text-[14px] font-semibold text-primary bg-surface border border-subtle rounded-lg hover:bg-surface-subtle transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus:ring-2 focus:ring-[var(--ui-border-strong)]"
+                >
+                  {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
+                </button>
+              </div>
+            )}
+
+            {/* Legacy report.response Card */}
             {report.response && (
               <div className="p-4 bg-surface-subtle rounded-xl border border-subtle space-y-2">
                 <div className="flex items-center justify-between text-[14px] text-primary font-semibold">
@@ -418,22 +456,85 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     {language === 'bn' ? report.response.dateBn : report.response.dateEn}
                   </span>
                 </div>
-                <blockquote className="text-[16px] leading-[26px] text-secondary italic border-l-2 border-subtle pl-3">
+                <blockquote className="text-[16px] leading-[26px] text-secondary italic border-l-2 border-subtle pl-3 break-words">
                   "{language === 'bn' ? report.response.statementBn : report.response.statementEn}"
                 </blockquote>
               </div>
             )}
-            {storedResponses.map((resp: any) => (
-              <div key={resp.id || resp.internalId} className="p-4 bg-surface-subtle rounded-xl border border-subtle space-y-2">
-                <div className="flex items-center justify-between text-[14px] text-primary font-semibold">
-                  <span>{resp.responderName} {resp.designation ? `(${resp.designation})` : ''}</span>
-                  <span className="text-muted">{new Date(resp.createdAt).toLocaleDateString()}</span>
+
+            {/* Canonical Published Responses Cards */}
+            {storedResponses.map((resp) => {
+              if (resp.responseType === 'citizen_information') {
+                return (
+                  <div key={resp.id} className="p-4 bg-surface-subtle rounded-xl border border-subtle space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[14px]">
+                      <span className="font-semibold text-primary">
+                        {language === 'bn' ? 'তথ্য / অভিজ্ঞতা' : 'Information / Experience'}
+                      </span>
+                      <div className="flex flex-wrap items-center gap-3 text-muted text-[13px]">
+                        {resp.incidentDate && (
+                          <span>
+                            {language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}
+                            {formatResponseDate(resp.incidentDate, language)}
+                          </span>
+                        )}
+                        {resp.publishedAt && (
+                          <span>
+                            {language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}
+                            {formatResponseDate(resp.publishedAt, language)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <blockquote className="text-[16px] leading-[26px] text-secondary italic border-l-2 border-subtle pl-3 break-words whitespace-pre-line">
+                      "{resp.content}"
+                    </blockquote>
+                  </div>
+                );
+              }
+
+              // Canonical Subject Response Card
+              const subtitleParts: string[] = [];
+              if (resp.designation) subtitleParts.push(resp.designation);
+              if (resp.organizationName) subtitleParts.push(resp.organizationName);
+
+              return (
+                <div key={resp.id} className="p-4 bg-surface-subtle rounded-xl border border-subtle space-y-2.5">
+                  <div className="flex flex-wrap items-start justify-between gap-2 text-[14px]">
+                    <div className="space-y-0.5">
+                      <div className="font-semibold text-primary">
+                        {language === 'bn' ? 'উল্লেখিত ব্যক্তি / পক্ষ' : 'Mentioned Person / Party'}
+                      </div>
+                      {resp.responderName && (
+                        <div className="text-[14px] font-medium text-secondary break-words">
+                          {resp.responderName}
+                          {subtitleParts.length > 0 && (
+                            <span className="text-muted font-normal"> ({subtitleParts.join(', ')})</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 text-muted text-[13px]">
+                      {resp.incidentDate && (
+                        <span>
+                          {language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}
+                          {formatResponseDate(resp.incidentDate, language)}
+                        </span>
+                      )}
+                      {resp.publishedAt && (
+                        <span>
+                          {language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}
+                          {formatResponseDate(resp.publishedAt, language)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <blockquote className="text-[16px] leading-[26px] text-secondary italic border-l-2 border-subtle pl-3 break-words whitespace-pre-line">
+                    "{resp.content}"
+                  </blockquote>
                 </div>
-                <blockquote className="text-[16px] leading-[26px] text-secondary italic border-l-2 border-subtle pl-3">
-                  "{resp.officialStatement}"
-                </blockquote>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </article>
