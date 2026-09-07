@@ -45,7 +45,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     segment === 'rickshaw' &&
     (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
-  const isUtilityReport = segment === 'utility';
+  const isUtilityReport = (segment as string) === 'utility' || segment === 'load_shedding';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
