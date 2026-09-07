@@ -48,10 +48,10 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       setError(
         language === 'bn'
           ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'অনুগ্রহ করে আপনার পূর্ণ নাম, ইমেইল বা ফোন এবং বক্তব্য পূরণ করুন।'
+              ? 'আপনার পূর্ণ নাম, ইমেইল বা ফোন এবং জবাব লিখুন।'
               : 'অনুগ্রহ করে আপনার নাম, যোগাযোগের মাধ্যম এবং আনুষ্ঠানিক বক্তব্য পূরণ করুন।')
           : (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'Please provide your full name, email or phone, and response.'
+              ? 'Please enter your full name, email or phone, and response.'
               : 'Please provide your full name, contact information, and formal statement.')
       );
       return;
@@ -60,8 +60,12 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     if (officialStatement.trim().length < 10) {
       setError(
         language === 'bn'
-          ? 'বক্তব্য কমপক্ষে ১০ অক্ষরের হতে হবে।'
-          : 'Response must be at least 10 characters.'
+          ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              ? 'জবাব কমপক্ষে ১০ অক্ষরের হতে হবে।'
+              : 'বক্তব্য কমপক্ষে ১০ অক্ষরের হতে হবে।')
+          : (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              ? 'Response must be at least 10 characters.'
+              : 'Statement must be at least 10 characters.')
       );
       return;
     }
@@ -69,20 +73,25 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     setIsSubmitting(true);
     setError(null);
     try {
-      const payload: Parameters<typeof apiClient.submitSubjectResponse>[1] = {
-        responderName: responderName.trim(),
-        designation: designation.trim() || undefined,
-        organizationName: organizationName.trim() || undefined,
-        contactEmailOrPhone: contactEmailOrPhone.trim(),
-        officialStatement: officialStatement.trim(),
-        supportingDocumentsNote: supportingDocumentsNote.trim() || undefined,
-        requestCorrectionOrRemoval,
-        correctionDetails: requestCorrectionOrRemoval ? correctionDetails.trim() : undefined,
-      };
-
-      if (!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED) {
-        payload.responderType = responderType;
-      }
+      const payload: Parameters<typeof apiClient.submitSubjectResponse>[1] = SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+        ? {
+            responderName: responderName.trim(),
+            contactEmailOrPhone: contactEmailOrPhone.trim(),
+            designation: designation.trim() || undefined,
+            organizationName: organizationName.trim() || undefined,
+            officialStatement: officialStatement.trim(),
+          }
+        : {
+            responderType,
+            responderName: responderName.trim(),
+            designation: designation.trim() || undefined,
+            organizationName: organizationName.trim() || undefined,
+            contactEmailOrPhone: contactEmailOrPhone.trim(),
+            officialStatement: officialStatement.trim(),
+            supportingDocumentsNote: supportingDocumentsNote.trim() || undefined,
+            requestCorrectionOrRemoval,
+            correctionDetails: requestCorrectionOrRemoval ? correctionDetails.trim() : undefined,
+          };
 
       const res = await apiClient.submitSubjectResponse(reportId, payload);
       setResponseId(res.responseId || null);
