@@ -45,6 +45,8 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     segment === 'rickshaw' &&
     (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
+  const isUtilityReport = segment === 'utility';
+
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
     formData.organization?.trim() ||
@@ -77,9 +79,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
 
-  // Conditional: hide frequency for Illegal Charging Station reports
+  // Conditional: hide frequency for Illegal Charging Station reports & Utility complaints
   const hideFrequency =
-    segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location';
+    (segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location') ||
+    isUtilityReport;
 
   // Independent Collapsible State - What Happened (incident) is expanded by default
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({

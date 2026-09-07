@@ -105,10 +105,10 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
         })}
       </div>
 
-      {/* Phase 1 Stopping Notice for Utility Service Complaints */}
-      {segment === 'load_shedding' && selectedSubcategoryId && (
+      {/* Phase 2 Stopping Notice for Excess Electricity Bill */}
+      {segment === 'load_shedding' && selectedSubcategoryId === 'excess-electricity-bill' && (
         <div
-          id="utility-phase1-notice"
+          id="utility-phase2-notice"
           role="status"
           aria-live="polite"
           className="p-4 rounded-xl bg-surface-subtle border border-subtle flex items-start gap-3 text-left"
@@ -117,13 +117,13 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
           <div className="space-y-1">
             <p className="text-[14px] font-semibold text-primary">
               {language === 'bn'
-                ? 'ইউটিলিটি অভিযোগের বিস্তারিত ফর্ম পরবর্তী ধাপে চালু হবে'
-                : 'Utility Detailed Complaint Form Available in Next Phase'}
+                ? 'অতিরিক্ত বিদ্যুৎ বিলের বিস্তারিত ফর্ম পরবর্তী ধাপে চালু হবে'
+                : 'Excess Electricity Bill Detailed Form Available in Next Phase'}
             </p>
             <p className="text-[13px] text-secondary leading-relaxed">
               {language === 'bn'
-                ? 'প্রথম ধাপে অভিযোগের ধরন সফলভাবে নির্বাচন করা হয়েছে। বিস্তারিত তথ্য প্রদান ও জমাদানের ফর্ম পরবর্তী আপডেটে উন্মুক্ত করা হবে।'
-                : 'The complaint type has been successfully selected for Phase 1. Detailed input fields and submission form will be available in the next release.'}
+                ? 'অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগের বিস্তারিত তথ্য প্রদান ও জমাদানের ফর্ম পরবর্তী আপডেটে উন্মুক্ত করা হবে।'
+                : 'Detailed input fields and bill complaint submission will be available in the next release.'}
             </p>
           </div>
         </div>

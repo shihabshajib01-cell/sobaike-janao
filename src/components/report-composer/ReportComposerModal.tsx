@@ -383,8 +383,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Step Navigation Handlers
   const handleGoToStep = useCallback((step: number, jumpSection?: string) => {
     setSelectedComingSoon(null);
-    // Phase 1 guard: Utility complaints stop at step 2
-    if (formData.segment === 'load_shedding' && step > 2) {
+    // Phase 2 guard: Excess electricity bill stops at step 2
+    if (
+      formData.segment === 'load_shedding' &&
+      formData.subcategoryId === 'excess-electricity-bill' &&
+      step > 2
+    ) {
       return;
     }
 
@@ -512,11 +516,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       retryCredentialsRef.current = null;
 
       setFormData((prev) => {
-        const updatedTitle = prev.title?.trim()
-          ? prev.title
-          : language === 'bn'
-          ? option.nameBn
-          : option.nameEn;
+        const isUtilitySwitch =
+          prev.segment === 'load_shedding' &&
+          Boolean(prev.subcategoryId) &&
+          prev.subcategoryId !== subcategoryId;
+
+        const updatedTitle =
+          isUtilitySwitch || !prev.title?.trim()
+            ? language === 'bn'
+              ? option.nameBn
+              : option.nameEn
+            : prev.title;
 
         return {
           ...prev,
@@ -529,6 +539,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           evidenceDescription: '',
           title: updatedTitle,
           subjectType: 'unknown',
+          ...(isUtilitySwitch
+            ? {
+                description: '',
+                incidentTime: '',
+                utilityEndTime: '',
+              }
+            : {}),
         };
       });
     },
@@ -537,7 +554,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleNextFromStep2 = useCallback(() => {
     if (!formData.subcategoryId) return;
-    if (formData.segment === 'load_shedding') return;
+    if (formData.segment === 'load_shedding' && formData.subcategoryId === 'excess-electricity-bill') return;
 
     // Check Rape pre-report consent requirement
     if (
@@ -763,6 +780,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         description: formData.description || '',
         incidentDate: formData.incidentDate || undefined,
         incidentTime: formData.incidentTime || undefined,
+        utilityEndTime: formData.utilityEndTime || undefined,
         frequency: formData.frequency || 'one-time',
         subjectType: isPartySegment ? (formData.subjectType || 'unknown') : undefined,
         reportedSubject: isPartySegment ? resolvedReportedSubject : undefined,
@@ -1048,7 +1066,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   if (!isOpen) return null;
 
   const canContinueStep1 = Boolean(formData.segment) && !selectedComingSoon;
-  const canContinueStep2 = Boolean(formData.subcategoryId) && formData.segment !== 'load_shedding';
+  const canContinueStep2 =
+    Boolean(formData.subcategoryId) &&
+    !(formData.segment === 'load_shedding' && formData.subcategoryId === 'excess-electricity-bill');
 
   // Render-level defense guard: ensure Step 3/4 is NEVER rendered if rape consent is missing
   const effectiveCurrentStep =

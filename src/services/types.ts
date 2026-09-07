@@ -135,6 +135,7 @@ export interface SubmittedReport {
   identifyingDescription?: string;
   incidentDate: string;
   incidentTime?: string;
+  utilityEndTime?: string;
   frequency: 'one-time' | 'repeated';
   relationshipContext?: string;
   intimateWhatHappened?: string;
@@ -196,6 +197,7 @@ export interface DraftReport {
   identifyingDescription: string;
   incidentDate: string;
   incidentTime: string;
+  utilityEndTime?: string;
   frequency: 'one-time' | 'repeated';
   relationshipContext: string;
   intimateWhatHappened: string;

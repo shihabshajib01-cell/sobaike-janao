@@ -113,6 +113,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Segment structure conditions
     const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
     const showsIdentitySection = segment === 'harassment';
+    const isUtilityReport = segment === 'load_shedding';
+    const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
+    const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
 
     // Determine active subcategory option & context
     const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
@@ -192,7 +195,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         : segment === 'extortion'
         ? (hasExtortionPartyData || initialOpenSection === 'parties')
         : showsPartySection,
-      attachments: initialOpenSection === 'attachments',
+      attachments: isUtilityReport ? false : initialOpenSection === 'attachments',
     }));
 
     // Auto-expand parties if operator data is loaded/restored asynchronously
@@ -448,98 +451,196 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const validateAndProceed = (): boolean => {
       const newErrors: Record<string, string> = {};
 
-      // Auto-populate title if empty before validating
-      let effectiveTitle = formData.title?.trim();
-      if (!effectiveTitle && currentSubcategoryOption) {
-        effectiveTitle = language === 'bn' ? currentSubcategoryOption.nameBn : currentSubcategoryOption.nameEn;
-        onUpdateFormData({ title: effectiveTitle });
-      }
-
-      if (!effectiveTitle) {
-        newErrors.title =
-          language === 'bn' ? 'শিরোনাম দেওয়া আবশ্যক' : 'A report headline is required';
-      }
-
-      if (!formData.description?.trim()) {
-        newErrors.description =
-          language === 'bn' ? 'ঘটনার বিবরণ দেওয়া আবশ্যক' : 'Incident description is required';
-      } else if (formData.description.trim().length < 20) {
-        newErrors.description =
-          language === 'bn'
-            ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
-            : 'Description must be at least 20 characters';
-      } else if (formData.description.length > 2000) {
-        newErrors.description =
-          language === 'bn'
-            ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
-            : 'Please shorten the description to 2,000 characters.';
-      }
-
-      if (!formData.incidentDate) {
-        newErrors.incidentDate =
-          language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন' : 'Incident date is required';
-      } else if (formData.incidentDate > todayLocal) {
-        newErrors.incidentDate =
-          language === 'bn'
-            ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
-            : 'Future dates are not allowed';
-      }
-
-      if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
-        newErrors.reporterLocation =
-          language === 'bn'
-            ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
-            : 'Turn on device location before continuing.';
-      }
-
-      if (!formData.location?.division?.trim()) {
-        newErrors.division =
-          language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
-      }
-
-      if (!formData.location?.district?.trim()) {
-        newErrors.district =
-          language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
-      }
-
-      if (!formData.location?.upazilaOrThana?.trim()) {
-        newErrors.upazilaOrThana =
-          language === 'bn' ? 'থানা বা উপজেলার নাম লিখুন' : 'Thana or upazila is required';
-      }
-
-      const detailedAddr = formData.location?.formattedAddress?.trim() || '';
-      if (!detailedAddr) {
-        newErrors.formattedAddress =
-          language === 'bn' ? 'বিস্তারিত ঠিকানা লিখুন' : 'Detailed address is required';
-      } else if (detailedAddr.length < 5) {
-        newErrors.formattedAddress =
-          language === 'bn'
-            ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
-            : 'Detailed address must be at least 5 characters';
-      } else if (detailedAddr.length > 500) {
-        newErrors.formattedAddress =
-          language === 'bn'
-            ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
-            : 'Detailed address must not exceed 500 characters';
-      }
-
-      // Harassment Identity Validation
-      if (showsIdentitySection) {
-        if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
-          newErrors.adminContact =
-            language === 'bn'
-              ? 'মডারেটরের সাথে যোগাযোগের নম্বর বা ইমেইল দিন'
-              : 'Contact info is required for admin follow-up';
+      if (isUtilityReport) {
+        // Auto-populate title if empty before validating
+        let effectiveTitle = formData.title?.trim();
+        if (!effectiveTitle && currentSubcategoryOption) {
+          effectiveTitle = language === 'bn' ? currentSubcategoryOption.nameBn : currentSubcategoryOption.nameEn;
+          onUpdateFormData({ title: effectiveTitle });
+        }
+        if (!effectiveTitle) {
+          effectiveTitle = isLoadShedding
+            ? (language === 'bn' ? 'লোডশেডিং' : 'Load Shedding')
+            : (language === 'bn' ? 'গ্যাস সংকট' : 'Gas Shortage');
+          onUpdateFormData({ title: effectiveTitle });
         }
 
-        if (formData.privacyChoice === 'public_identity') {
-          if (!formData.adminName?.trim()) {
-            newErrors.adminName =
-              language === 'bn' ? 'আপনার নাম উল্লেখ করুন' : 'Your name is required';
+        // 1. Validate Date (Required)
+        if (!formData.incidentDate) {
+          newErrors.incidentDate = isLoadShedding
+            ? (language === 'bn' ? 'লোডশেডিংয়ের তারিখ নির্বাচন করুন' : 'Load shedding date is required')
+            : (language === 'bn' ? 'গ্যাস সংকটের তারিখ নির্বাচন করুন' : 'Gas shortage date is required');
+        } else if (formData.incidentDate > todayLocal) {
+          newErrors.incidentDate =
+            language === 'bn'
+              ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+              : 'Future dates are not allowed';
+        }
+
+        // 2. Validate Start Time (Required)
+        if (!formData.incidentTime?.trim()) {
+          newErrors.incidentTime =
+            language === 'bn' ? 'শুরুর সময় নির্বাচন করুন' : 'Start time is required';
+        }
+
+        // 3. Validate End Time (Optional, but if both provided, validate end time > start time)
+        if (formData.incidentTime?.trim() && formData.utilityEndTime?.trim()) {
+          if (formData.utilityEndTime.trim() <= formData.incidentTime.trim()) {
+            newErrors.utilityEndTime =
+              language === 'bn'
+                ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে'
+                : 'End time must be after start time';
           }
-          if (!formData.adminContact?.trim()) {
+        }
+
+        // 4. Validate Description (Required, 20 - 2000 chars)
+        if (!formData.description?.trim()) {
+          newErrors.description =
+            language === 'bn' ? 'বিবরণ দেওয়া আবশ্যক' : 'Description is required';
+        } else if (formData.description.trim().length < 20) {
+          newErrors.description =
+            language === 'bn'
+              ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
+              : 'Description must be at least 20 characters';
+        } else if (formData.description.length > 2000) {
+          newErrors.description =
+            language === 'bn'
+              ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+              : 'Please shorten the description to 2,000 characters.';
+        }
+
+        // 5. Validate Location (Required)
+        if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
+          newErrors.reporterLocation =
+            language === 'bn'
+              ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
+              : 'Turn on device location before continuing.';
+        }
+
+        if (!formData.location?.division?.trim()) {
+          newErrors.division =
+            language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
+        }
+
+        if (!formData.location?.district?.trim()) {
+          newErrors.district =
+            language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
+        }
+
+        if (!formData.location?.upazilaOrThana?.trim()) {
+          newErrors.upazilaOrThana =
+            language === 'bn' ? 'থানা বা উপজেলার নাম লিখুন' : 'Thana or upazila is required';
+        }
+
+        const detailedAddr = formData.location?.formattedAddress?.trim() || '';
+        if (!detailedAddr) {
+          newErrors.formattedAddress =
+            language === 'bn' ? 'বিস্তারিত ঠিকানা লিখুন' : 'Detailed address is required';
+        } else if (detailedAddr.length < 5) {
+          newErrors.formattedAddress =
+            language === 'bn'
+              ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
+              : 'Detailed address must be at least 5 characters';
+        } else if (detailedAddr.length > 500) {
+          newErrors.formattedAddress =
+            language === 'bn'
+              ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
+              : 'Detailed address must not exceed 500 characters';
+        }
+      } else {
+        // Auto-populate title if empty before validating
+        let effectiveTitle = formData.title?.trim();
+        if (!effectiveTitle && currentSubcategoryOption) {
+          effectiveTitle = language === 'bn' ? currentSubcategoryOption.nameBn : currentSubcategoryOption.nameEn;
+          onUpdateFormData({ title: effectiveTitle });
+        }
+
+        if (!effectiveTitle) {
+          newErrors.title =
+            language === 'bn' ? 'শিরোনাম দেওয়া আবশ্যক' : 'A report headline is required';
+        }
+
+        if (!formData.description?.trim()) {
+          newErrors.description =
+            language === 'bn' ? 'ঘটনার বিবরণ দেওয়া আবশ্যক' : 'Incident description is required';
+        } else if (formData.description.trim().length < 20) {
+          newErrors.description =
+            language === 'bn'
+              ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
+              : 'Description must be at least 20 characters';
+        } else if (formData.description.length > 2000) {
+          newErrors.description =
+            language === 'bn'
+              ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+              : 'Please shorten the description to 2,000 characters.';
+        }
+
+        if (!formData.incidentDate) {
+          newErrors.incidentDate =
+            language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন' : 'Incident date is required';
+        } else if (formData.incidentDate > todayLocal) {
+          newErrors.incidentDate =
+            language === 'bn'
+              ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+              : 'Future dates are not allowed';
+        }
+
+        if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
+          newErrors.reporterLocation =
+            language === 'bn'
+              ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
+              : 'Turn on device location before continuing.';
+        }
+
+        if (!formData.location?.division?.trim()) {
+          newErrors.division =
+            language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
+        }
+
+        if (!formData.location?.district?.trim()) {
+          newErrors.district =
+            language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
+        }
+
+        if (!formData.location?.upazilaOrThana?.trim()) {
+          newErrors.upazilaOrThana =
+            language === 'bn' ? 'থানা বা উপজেলার নাম লিখুন' : 'Thana or upazila is required';
+        }
+
+        const detailedAddr = formData.location?.formattedAddress?.trim() || '';
+        if (!detailedAddr) {
+          newErrors.formattedAddress =
+            language === 'bn' ? 'বিস্তারিত ঠিকানা লিখুন' : 'Detailed address is required';
+        } else if (detailedAddr.length < 5) {
+          newErrors.formattedAddress =
+            language === 'bn'
+              ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
+              : 'Detailed address must be at least 5 characters';
+        } else if (detailedAddr.length > 500) {
+          newErrors.formattedAddress =
+            language === 'bn'
+              ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
+              : 'Detailed address must not exceed 500 characters';
+        }
+
+        // Harassment Identity Validation
+        if (showsIdentitySection) {
+          if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
             newErrors.adminContact =
-              language === 'bn' ? 'যোগাযোগের তথ্য দিন' : 'Contact info is required';
+              language === 'bn'
+                ? 'মডারেটরের সাথে যোগাযোগের নম্বর বা ইমেইল দিন'
+                : 'Contact info is required for admin follow-up';
+          }
+
+          if (formData.privacyChoice === 'public_identity') {
+            if (!formData.adminName?.trim()) {
+              newErrors.adminName =
+                language === 'bn' ? 'আপনার নাম উল্লেখ করুন' : 'Your name is required';
+            }
+            if (!formData.adminContact?.trim()) {
+              newErrors.adminContact =
+                language === 'bn' ? 'যোগাযোগের তথ্য দিন' : 'Contact info is required';
+            }
           }
         }
       }
@@ -547,7 +648,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
 
-        if (newErrors.title || newErrors.description || newErrors.incidentDate) {
+        if (
+          newErrors.title ||
+          newErrors.description ||
+          newErrors.incidentDate ||
+          newErrors.incidentTime ||
+          newErrors.utilityEndTime
+        ) {
           const elem = document.getElementById('composer-section-narrative');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else if (
@@ -591,10 +698,235 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           isOpen={true}
           collapsible={false}
           onToggle={() => {}}
-          title={language === 'bn' ? '১. ঘটনার বিবরণ ও সময়কাল' : '1. What Happened & Timeline'}
-          hasError={Boolean(errors.title || errors.description || errors.incidentDate)}
+          title={
+            isUtilityReport
+              ? isLoadShedding
+                ? language === 'bn'
+                  ? '১. লোডশেডিংয়ের সময় ও বিবরণ'
+                  : '1. Load Shedding Timing & Details'
+                : language === 'bn'
+                ? '১. গ্যাস সংকটের সময় ও বিবরণ'
+                : '1. Gas Shortage Timing & Details'
+              : language === 'bn'
+              ? '১. ঘটনার বিবরণ ও সময়কাল'
+              : '1. What Happened & Timeline'
+          }
+          hasError={Boolean(
+            errors.title ||
+            errors.description ||
+            errors.incidentDate ||
+            errors.incidentTime ||
+            errors.utilityEndTime
+          )}
           icon={<FileText className="w-5 h-5" />}
         >
+          {isUtilityReport ? (
+            <div className="space-y-4 pt-1 text-left">
+              {/* Title / Headline: Compact with secondary action */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[13px] text-secondary">
+                  <span className="font-semibold text-primary truncate max-w-[70%]">
+                    {formData.title ||
+                      (isLoadShedding
+                        ? language === 'bn'
+                          ? 'লোডশেডিং'
+                          : 'Load Shedding'
+                        : language === 'bn'
+                        ? 'গ্যাস সংকট'
+                        : 'Gas Shortage')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowTitleField(!showTitleField)}
+                    className="text-primary hover:underline cursor-pointer py-0.5 font-medium shrink-0 ml-2"
+                  >
+                    {showTitleField
+                      ? language === 'bn'
+                        ? 'বাতিল'
+                        : 'Cancel'
+                      : language === 'bn'
+                      ? 'শিরোনাম পরিবর্তন'
+                      : 'Change title'}
+                  </button>
+                </div>
+
+                {showTitleField && (
+                  <div className="space-y-1 pt-1">
+                    <input
+                      id="complaint-title-input"
+                      type="text"
+                      value={formData.title || ''}
+                      onChange={(e) => {
+                        onUpdateFormData({ title: e.target.value });
+                        if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
+                      }}
+                      placeholder={
+                        language === 'bn' ? 'সংক্ষিপ্ত শিরোনাম' : 'Short headline'
+                      }
+                      className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[15px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
+                        errors.title ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      }`}
+                    />
+                    {errors.title && (
+                      <p className="text-[13px] text-red-500 font-semibold">{errors.title}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Date, Start Time & End Time in 3 columns on sm+ screens */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Incident Date */}
+                <div>
+                  <label
+                    htmlFor="complaint-date-input"
+                    className="block text-[13px] font-bold text-primary mb-1"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-primary" />
+                      <span>{language === 'bn' ? 'তারিখ *' : 'Date *'}</span>
+                    </div>
+                  </label>
+                  <input
+                    id="complaint-date-input"
+                    type="date"
+                    max={todayLocal}
+                    value={formData.incidentDate || ''}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      if (selectedDate && selectedDate > todayLocal) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          incidentDate:
+                            language === 'bn'
+                              ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                              : 'Future dates are not allowed',
+                        }));
+                        return;
+                      }
+                      onUpdateFormData({ incidentDate: selectedDate });
+                      if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
+                    }}
+                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                      errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                    }`}
+                  />
+                  {errors.incidentDate && (
+                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentDate}</p>
+                  )}
+                </div>
+
+                {/* Start Time (Required) */}
+                <div>
+                  <label
+                    htmlFor="utility-start-time-input"
+                    className="block text-[13px] font-bold text-primary mb-1"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-primary" />
+                      <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start Time *'}</span>
+                    </div>
+                  </label>
+                  <input
+                    id="utility-start-time-input"
+                    type="time"
+                    value={formData.incidentTime || ''}
+                    onChange={(e) => {
+                      onUpdateFormData({ incidentTime: e.target.value });
+                      if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
+                      if (errors.utilityEndTime && formData.utilityEndTime && e.target.value < formData.utilityEndTime) {
+                        setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                      }
+                    }}
+                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                      errors.incidentTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                    }`}
+                  />
+                  {errors.incidentTime && (
+                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentTime}</p>
+                  )}
+                </div>
+
+                {/* End Time (Optional) */}
+                <div>
+                  <label
+                    htmlFor="utility-end-time-input"
+                    className="block text-[13px] font-bold text-primary mb-1"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-secondary" />
+                      <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End Time (Optional)'}</span>
+                    </div>
+                  </label>
+                  <input
+                    id="utility-end-time-input"
+                    type="time"
+                    value={formData.utilityEndTime || ''}
+                    onChange={(e) => {
+                      onUpdateFormData({ utilityEndTime: e.target.value });
+                      if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                    }}
+                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                      errors.utilityEndTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                    }`}
+                  />
+                  {errors.utilityEndTime && (
+                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.utilityEndTime}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Incident Description */}
+              <div className="space-y-1">
+                <label
+                  htmlFor="complaint-desc-input"
+                  className="block text-[14px] font-bold text-primary"
+                >
+                  {language === 'bn' ? 'বিবরণ *' : 'Description *'}
+                </label>
+                <textarea
+                  id="complaint-desc-input"
+                  rows={4}
+                  maxLength={2000}
+                  value={formData.description || ''}
+                  onChange={(e) => {
+                    onUpdateFormData({ description: e.target.value });
+                    if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
+                  }}
+                  placeholder={
+                    isLoadShedding
+                      ? language === 'bn'
+                        ? 'লোডশেডিংয়ের প্রভাব, এলাকা বা সময়কাল সম্পর্কিত বিবরণ লিখুন...'
+                        : 'Describe the load shedding outage, area affected, or duration details...'
+                      : language === 'bn'
+                      ? 'গ্যাস সংকট, চাপ কম বা সম্পূর্ণ সরবরাহ বন্ধ থাকার বিবরণ লিখুন...'
+                      : 'Describe the gas shortage, low pressure, or outage details...'
+                  }
+                  className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[15px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed ${
+                    errors.description ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                  }`}
+                />
+                <div className="flex items-center justify-between gap-2">
+                  {errors.description ? (
+                    <p className="text-[13px] text-red-500 font-semibold">{errors.description}</p>
+                  ) : (
+                    <span />
+                  )}
+                  {(formData.description?.length || 0) >= 1600 && (
+                    <span
+                      className={`text-[12px] font-mono shrink-0 ml-auto ${
+                        (formData.description?.length || 0) > 2000
+                          ? 'text-red-500 font-bold'
+                          : 'text-muted'
+                      }`}
+                    >
+                      {formData.description?.length || 0} / 2000
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
           <div className="space-y-4 pt-1 text-left">
             {/* Title / Headline: Compact with secondary action */}
             <div className="space-y-1.5">
@@ -832,6 +1164,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               </div>
             )}
           </div>
+        )}
         </Accordion>
 
         {/* SECTION 2: Location (লোকেশন) - NON-COLLAPSIBLE */}
@@ -1638,75 +1971,77 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </Accordion>
         )}
 
-        {/* SECTION 4: Attachments (সংযুক্তি - ঐচ্ছিক) - COLLAPSIBLE */}
-        <Accordion
-          id="composer-section-attachments"
-          isOpen={Boolean(openSections.attachments)}
-          collapsible={true}
-          onToggle={() => toggleSection('attachments')}
-          title={language === 'bn' ? '৪. সংযুক্তি (ঐচ্ছিক)' : '4. Attachments (Optional)'}
-          summary={
-            pendingImages.length > 0
-              ? `${pendingImages.length} ${language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}`
-              : language === 'bn'
-              ? 'কোনো ছবি সংযুক্ত নেই'
-              : 'No images attached'
-          }
-          badge={
-            pendingImages.length > 0 ? (
-              <span className="px-2 py-0.5 rounded-full bg-accent-soft text-accent text-[13px] font-bold">
-                {pendingImages.length}
-              </span>
-            ) : undefined
-          }
-          icon={<Paperclip className="w-5 h-5" />}
-        >
-          <div className="space-y-3.5 pt-1 text-left">
-            <p className="text-[13px] text-secondary">
-              {language === 'bn'
-                ? 'অভিযোগ বুঝতে সহায়ক ছবি বা স্ক্রিনশট থাকলে সংযুক্ত করুন। এটি সম্পূর্ণ ঐচ্ছিক।'
-                : 'Attach images or screenshots if they help explain the complaint. This is completely optional.'}
-            </p>
+        {/* SECTION 4: Attachments (সংযুক্তি - ঐচ্ছিক) - COLLAPSIBLE - Hidden for Utility reports */}
+        {!isUtilityReport && (
+          <Accordion
+            id="composer-section-attachments"
+            isOpen={Boolean(openSections.attachments)}
+            collapsible={true}
+            onToggle={() => toggleSection('attachments')}
+            title={language === 'bn' ? '৪. সংযুক্তি (ঐচ্ছিক)' : '4. Attachments (Optional)'}
+            summary={
+              pendingImages.length > 0
+                ? `${pendingImages.length} ${language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}`
+                : language === 'bn'
+                ? 'কোনো ছবি সংযুক্ত নেই'
+                : 'No images attached'
+            }
+            badge={
+              pendingImages.length > 0 ? (
+                <span className="px-2 py-0.5 rounded-full bg-accent-soft text-accent text-[13px] font-bold">
+                  {pendingImages.length}
+                </span>
+              ) : undefined
+            }
+            icon={<Paperclip className="w-5 h-5" />}
+          >
+            <div className="space-y-3.5 pt-1 text-left">
+              <p className="text-[13px] text-secondary">
+                {language === 'bn'
+                  ? 'অভিযোগ বুঝতে সহায়ক ছবি বা স্ক্রিনশট থাকলে সংযুক্ত করুন। এটি সম্পূর্ণ ঐচ্ছিক।'
+                  : 'Attach images or screenshots if they help explain the complaint. This is completely optional.'}
+              </p>
 
-            {formData.pendingEvidenceRecovery &&
-              formData.pendingEvidenceRecovery.expectedCount > 0 &&
-              pendingImages.length === 0 && (
-                <div
-                  id="pending-evidence-recovery-warning"
-                  className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
-                >
-                  <div className="flex items-start gap-2.5">
-                    <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                    <div className="space-y-1">
-                      <p className="font-semibold">
-                        {language === 'bn'
-                          ? 'পূর্বে সংযুক্ত প্রমাণাদি পুনরায় নির্বাচন করুন'
-                          : 'Please reattach your previous evidence images'}
-                      </p>
-                      <p className="text-[12.5px] opacity-90 leading-relaxed">
-                        {language === 'bn'
-                          ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery.expectedCount}টি ছবি সংযুক্ত ছিল। জমা সম্পন্ন করতে নিচের ফাইল পিকার থেকে ছবিগুলো পুনরায় নির্বাচন করুন। আপনি চাইলে খসড়া বাতিল করে নতুন অভিযোগও শুরু করতে পারেন।`
-                          : `Your saved draft had ${formData.pendingEvidenceRecovery.expectedCount} image(s) attached. Please reattach the files below to complete your submission, or discard the draft to start a new complaint.`}
-                      </p>
+              {formData.pendingEvidenceRecovery &&
+                formData.pendingEvidenceRecovery.expectedCount > 0 &&
+                pendingImages.length === 0 && (
+                  <div
+                    id="pending-evidence-recovery-warning"
+                    className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-semibold">
+                          {language === 'bn'
+                            ? 'পূর্বে সংযুক্ত প্রমাণাদি পুনরায় নির্বাচন করুন'
+                            : 'Please reattach your previous evidence images'}
+                        </p>
+                        <p className="text-[12.5px] opacity-90 leading-relaxed">
+                          {language === 'bn'
+                            ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery.expectedCount}টি ছবি সংযুক্ত ছিল। জমা সম্পন্ন করতে নিচের ফাইল পিকার থেকে ছবিগুলো পুনরায় নির্বাচন করুন। আপনি চাইলে খসড়া বাতিল করে নতুন অভিযোগও শুরু করতে পারেন।`
+                            : `Your saved draft had ${formData.pendingEvidenceRecovery.expectedCount} image(s) attached. Please reattach the files below to complete your submission, or discard the draft to start a new complaint.`}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-            {/* Image Attachment Picker - max 6 images */}
-            <ImageAttachmentPicker
-              images={pendingImages}
-              onChange={(imgs) => {
-                onPendingImagesChange(imgs);
-                onUpdateFormData({
-                  hasSupportingInfo: imgs.length > 0,
-                });
-              }}
-              maxImages={6}
-              language={language}
-            />
-          </div>
-        </Accordion>
+              {/* Image Attachment Picker - max 6 images */}
+              <ImageAttachmentPicker
+                images={pendingImages}
+                onChange={(imgs) => {
+                  onPendingImagesChange(imgs);
+                  onUpdateFormData({
+                    hasSupportingInfo: imgs.length > 0,
+                  });
+                }}
+                maxImages={6}
+                language={language}
+              />
+            </div>
+          </Accordion>
+        )}
       </div>
     );
   }

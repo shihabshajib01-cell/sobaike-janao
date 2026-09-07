@@ -18,6 +18,7 @@ export const INITIAL_DRAFT: DraftReport = {
   identifyingDescription: '',
   incidentDate: '',
   incidentTime: '',
+  utilityEndTime: '',
   frequency: 'one-time',
   relationshipContext: '',
   intimateWhatHappened: '',
