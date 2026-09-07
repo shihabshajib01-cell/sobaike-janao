@@ -77,7 +77,7 @@ class ApiClient {
   async submitSubjectResponse(
     reportId: string,
     payload: {
-      responderType: 'mentioned_person' | 'organization_rep' | 'legal_rep';
+      responderType?: 'mentioned_person' | 'organization_rep' | 'legal_rep';
       responderName: string;
       designation?: string;
       organizationName?: string;

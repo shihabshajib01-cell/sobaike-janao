@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, ShieldCheck, Scale, Send, AlertTriangle } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
+
+/**
+ * Temporary rollout gate: Controls whether the simplified Subject Response form is enabled.
+ * CRITICAL: Must remain strictly `false` during this phase until the backend SQL change
+ * (supabase/allow_subject_response_without_responder_type.sql) is manually applied and verified.
+ */
+const SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED = false;
 
 interface SubjectResponseModalProps {
   isOpen: boolean;
@@ -40,8 +47,21 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     if (!responderName.trim() || !contactEmailOrPhone.trim() || !officialStatement.trim()) {
       setError(
         language === 'bn'
-          ? 'অনুগ্রহ করে আপনার নাম, যোগাযোগের মাধ্যম এবং আনুষ্ঠানিক বক্তব্য পূরণ করুন।'
-          : 'Please provide your full name, contact information, and formal statement.'
+          ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              ? 'অনুগ্রহ করে আপনার পূর্ণ নাম, ইমেইল বা ফোন এবং বক্তব্য পূরণ করুন।'
+              : 'অনুগ্রহ করে আপনার নাম, যোগাযোগের মাধ্যম এবং আনুষ্ঠানিক বক্তব্য পূরণ করুন।')
+          : (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              ? 'Please provide your full name, email or phone, and response.'
+              : 'Please provide your full name, contact information, and formal statement.')
+      );
+      return;
+    }
+
+    if (officialStatement.trim().length < 10) {
+      setError(
+        language === 'bn'
+          ? 'বক্তব্য কমপক্ষে ১০ অক্ষরের হতে হবে।'
+          : 'Response must be at least 10 characters.'
       );
       return;
     }
@@ -49,8 +69,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     setIsSubmitting(true);
     setError(null);
     try {
-      const res = await apiClient.submitSubjectResponse(reportId, {
-        responderType,
+      const payload: Parameters<typeof apiClient.submitSubjectResponse>[1] = {
         responderName: responderName.trim(),
         designation: designation.trim() || undefined,
         organizationName: organizationName.trim() || undefined,
@@ -59,7 +78,13 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
         supportingDocumentsNote: supportingDocumentsNote.trim() || undefined,
         requestCorrectionOrRemoval,
         correctionDetails: requestCorrectionOrRemoval ? correctionDetails.trim() : undefined,
-      });
+      };
+
+      if (!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED) {
+        payload.responderType = responderType;
+      }
+
+      const res = await apiClient.submitSubjectResponse(reportId, payload);
       setResponseId(res.responseId || null);
       setIsSubmitted(true);
     } catch (err: any) {
@@ -100,24 +125,41 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between gap-3 border-b border-subtle pb-3.5">
           <div className="space-y-1">
-            <div
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[14px] font-semibold border"
-              style={{
-                backgroundColor: 'var(--ui-info-bg)',
-                borderColor: 'var(--ui-info-border)',
-                color: 'var(--ui-info-text)',
-              }}
-            >
-              <Scale className="w-3.5 h-3.5" style={{ color: 'var(--ui-info-text)' }} />
-              <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার (Right of Response)' : 'Formal Right of Response'}</span>
-            </div>
+            {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
+              <div
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[14px] font-semibold border"
+                style={{
+                  backgroundColor: 'var(--ui-info-bg)',
+                  borderColor: 'var(--ui-info-border)',
+                  color: 'var(--ui-info-text)',
+                }}
+              >
+                <Scale className="w-3.5 h-3.5" style={{ color: 'var(--ui-info-text)' }} />
+                <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার (Right of Response)' : 'Formal Right of Response'}</span>
+              </div>
+            )}
             <h3 id="subject-modal-title" className="text-[20px] leading-[28px] font-bold text-primary">
-              {language === 'bn'
-                ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আনুষ্ঠানিক বক্তব্য জমা দিন'
-                : 'Submit Official Response or Clarification'}
+              {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                ? (language === 'bn' ? 'এই প্রতিবেদনের জবাব দিন' : 'Respond to this report')
+                : (language === 'bn'
+                    ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আনুষ্ঠানিক বক্তব্য জমা দিন'
+                    : 'Submit Official Response or Clarification')}
             </h3>
             <p className="text-[14px] text-secondary">
-              {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned Subject:'} <span className="font-semibold text-primary">{subjectName}</span> (ID: {reportId})
+              {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? (
+                <>
+                  {language === 'bn' ? 'প্রতিবেদন আইডি:' : 'Report ID:'}{' '}
+                  <span className="font-mono font-semibold text-primary">{reportId}</span>
+                  {' • '}
+                  {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned Subject:'}{' '}
+                  <span className="font-semibold text-primary">{subjectName}</span>
+                </>
+              ) : (
+                <>
+                  {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned Subject:'}{' '}
+                  <span className="font-semibold text-primary">{subjectName}</span> (ID: {reportId})
+                </>
+              )}
             </p>
           </div>
 
@@ -174,53 +216,57 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               </div>
             )}
 
-            {/* Responder Identity Category */}
-            <div className="space-y-1.5">
-              <label className="block text-[16px] font-medium text-primary">
-                {language === 'bn' ? 'আপনার পরিচয় বা ভূমিকা *' : 'Your Relationship to This Report *'}
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setResponderType('mentioned_person')}
-                  className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
-                    responderType === 'mentioned_person'
-                      ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
-                      : 'bg-surface-subtle text-secondary border-subtle hover:bg-surface'
-                  }`}
-                >
-                  {language === 'bn' ? 'আমি সরাসরি উল্লেখিত ব্যক্তি' : 'Mentioned Individual'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setResponderType('organization_rep')}
-                  className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
-                    responderType === 'organization_rep'
-                      ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
-                      : 'bg-surface-subtle text-secondary border-subtle hover:bg-surface'
-                  }`}
-                >
-                  {language === 'bn' ? 'প্রতিষ্ঠানের মুখপাত্র/প্রতিনিধি' : 'Authorized Representative'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setResponderType('legal_rep')}
-                  className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
-                    responderType === 'legal_rep'
-                      ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
-                      : 'bg-surface-subtle text-secondary border-subtle hover:bg-surface'
-                  }`}
-                >
-                  {language === 'bn' ? 'আইনি প্রতিনিধি / আইনজীবী' : 'Legal Counsel'}
-                </button>
+            {/* Responder Identity Category - only rendered in legacy form */}
+            {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
+              <div className="space-y-1.5">
+                <label className="block text-[16px] font-medium text-primary">
+                  {language === 'bn' ? 'আপনার পরিচয় বা ভূমিকা *' : 'Your Relationship to This Report *'}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setResponderType('mentioned_person')}
+                    className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
+                      responderType === 'mentioned_person'
+                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
+                        : 'bg-surface-subtle text-secondary border-subtle hover:bg-surface'
+                    }`}
+                  >
+                    {language === 'bn' ? 'আমি সরাসরি উল্লেখিত ব্যক্তি' : 'Mentioned Individual'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setResponderType('organization_rep')}
+                    className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
+                      responderType === 'organization_rep'
+                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
+                        : 'bg-surface-subtle text-secondary border-subtle hover:bg-surface'
+                    }`}
+                  >
+                    {language === 'bn' ? 'প্রতিষ্ঠানের মুখপাত্র/প্রতিনিধি' : 'Authorized Representative'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setResponderType('legal_rep')}
+                    className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
+                      responderType === 'legal_rep'
+                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
+                        : 'bg-surface-subtle text-secondary border-subtle hover:bg-surface'
+                    }`}
+                  >
+                    {language === 'bn' ? 'আইনি প্রতিনিধি / আইনজীবী' : 'Legal Counsel'}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Name and Contact */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="block text-[16px] font-medium text-secondary">
-                  {language === 'bn' ? 'আপনার পূর্ণ নাম *' : 'Full Legal Name *'}
+                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn' ? 'পূর্ণ নাম *' : 'Full name *')
+                    : (language === 'bn' ? 'আপনার পূর্ণ নাম *' : 'Full Legal Name *')}
                 </label>
                 <input
                   type="text"
@@ -234,7 +280,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
               <div className="space-y-1">
                 <label className="block text-[16px] font-medium text-secondary">
-                  {language === 'bn' ? 'যাচাইযোগ্য ইমেইল বা ফোন *' : 'Contact Email or Phone *'}
+                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn' ? 'ইমেইল বা ফোন *' : 'Email or phone *')
+                    : (language === 'bn' ? 'যাচাইযোগ্য ইমেইল বা ফোন *' : 'Contact Email or Phone *')}
                 </label>
                 <input
                   type="text"
@@ -251,7 +299,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="block text-[16px] font-medium text-secondary">
-                  {language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)'}
+                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn' ? 'পদবী / ভূমিকা' : 'Role / designation')
+                    : (language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)')}
                 </label>
                 <input
                   type="text"
@@ -264,7 +314,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
               <div className="space-y-1">
                 <label className="block text-[16px] font-medium text-secondary">
-                  {language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)'}
+                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization')
+                    : (language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)')}
                 </label>
                 <input
                   type="text"
@@ -279,7 +331,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             {/* Statement / Clarification */}
             <div className="space-y-1">
               <label className="block text-[16px] font-medium text-primary">
-                {language === 'bn' ? 'আপনার বক্তব্য বা স্পষ্টীকরণ *' : 'Statement or Clarification *'}
+                {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                  ? (language === 'bn' ? 'আপনার জবাব বা ব্যাখ্যা *' : 'Your response or clarification *')
+                  : (language === 'bn' ? 'আপনার বক্তব্য বা স্পষ্টীকরণ *' : 'Statement or Clarification *')}
               </label>
               <textarea
                 rows={4}
@@ -291,7 +345,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     ? 'প্রতিবেদনে উল্লেখিত বিষয়ে আপনার অবস্থান বা স্পষ্টীকরণ বিস্তারিত লিখুন...'
                     : 'Detail your stance, clarification, or context regarding this report...'
                 }
-                className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)]"
+                className="w-full px-3.5 py-2.5 bg-surface border border-subtle rounded-xl text-[16px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)] min-h-[44px]"
               />
             </div>
 
@@ -302,7 +356,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   type="checkbox"
                   checked={requestCorrectionOrRemoval}
                   onChange={(e) => setRequestCorrectionOrRemoval(e.target.checked)}
-                  className="mt-1 rounded border-subtle text-[var(--ui-accent)] focus:ring-[var(--ui-focus)] accent-[var(--ui-accent)]"
+                  className="mt-1 rounded border-subtle text-[var(--ui-accent)] focus:ring-[var(--ui-focus)] accent-[var(--ui-accent)] min-h-[16px] min-w-[16px]"
                 />
                 <span className="font-semibold">
                   {language === 'bn'
@@ -360,7 +414,11 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>{language === 'bn' ? 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন' : 'Submit Response'}</span>
+                    <span>
+                      {language === 'bn'
+                        ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? 'জবাব জমা দিন' : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
+                        : 'Submit Response'}
+                    </span>
                   </>
                 )}
               </button>
@@ -371,3 +429,4 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     </div>
   );
 };
+
