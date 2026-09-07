@@ -175,7 +175,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
           <button
             type="button"
             onClick={handleResetAndClose}
-            aria-label="Close"
+            aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close'}
             className="p-2 text-secondary hover:text-primary rounded-lg hover:bg-surface-subtle transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X className="w-5 h-5" />
@@ -189,12 +189,18 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             </div>
             <div className="space-y-1.5">
               <h4 className="text-[18px] leading-[26px] font-bold text-primary">
-                {language === 'bn' ? 'প্রতিউত্তর জমা সম্পন্ন হয়েছে' : 'Response Received'}
+                {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                  ? (language === 'bn' ? 'জবাব জমা হয়েছে' : 'Response submitted')
+                  : (language === 'bn' ? 'প্রতিউত্তর জমা সম্পন্ন হয়েছে' : 'Response Received')}
               </h4>
               <p className="text-[16px] leading-[24px] text-secondary max-w-md mx-auto">
-                {language === 'bn'
-                  ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হয়েছে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
-                  : 'Your response will be submitted for moderation. Any public display is handled through the publication workflow.'}
+                {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                  ? (language === 'bn'
+                      ? 'আপনার জবাব পর্যালোচনার জন্য পাঠানো হয়েছে।'
+                      : 'Your response has been sent for review.')
+                  : (language === 'bn'
+                      ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হয়েছে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
+                      : 'Your response will be submitted for moderation. Any public display is handled through the publication workflow.')}
               </p>
             </div>
             {responseId && (
