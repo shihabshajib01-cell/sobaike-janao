@@ -54,6 +54,7 @@ export const HomePage: React.FC = () => {
       harassment: allReports.filter((r) => r.segment === 'harassment').length,
       rickshaw: allReports.filter((r) => r.segment === 'rickshaw').length,
       extortion: allReports.filter((r) => r.segment === 'extortion').length,
+      load_shedding: allReports.filter((r) => r.segment === 'load_shedding').length,
     };
   }, [allReports]);
 

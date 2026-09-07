@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { SECTIONS, SectionKey, COMING_SOON_SERVICES } from '../../theme/tokens';
+import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { BrandLogo } from '../branding/BrandLogo';
@@ -58,16 +58,6 @@ export const DesktopLeftRail: React.FC = () => {
       nameEn: SECTIONS.load_shedding.shortNameEn,
       iconName: 'zap-off',
       sectionKey: 'load_shedding',
-    },
-    {
-      id: 'rail-illegal-occupation',
-      path: '/illegal-occupation',
-      nameBn: COMING_SOON_SERVICES.illegal_occupation.shortNameBn,
-      nameEn: COMING_SOON_SERVICES.illegal_occupation.shortNameEn,
-      iconName: 'building',
-      isComingSoon: true,
-      badgeBn: COMING_SOON_SERVICES.illegal_occupation.badgeBn,
-      badgeEn: COMING_SOON_SERVICES.illegal_occupation.badgeEn,
     },
     {
       id: 'rail-explore',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SectionKey, SECTIONS, COMING_SOON_SERVICES } from '../../theme/tokens';
+import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { FeatureIcon } from '../branding/FeatureIcon';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
@@ -84,20 +84,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'অভিযোগ জানান',
       primaryCtaEn: 'File Report',
       path: '/load-shedding',
-    },
-    {
-      key: 'illegal_occupation',
-      isComingSoon: true,
-      serviceLabelBn: COMING_SOON_SERVICES.illegal_occupation.nameBn,
-      serviceLabelEn: COMING_SOON_SERVICES.illegal_occupation.nameEn,
-      nameBn: 'অবৈধ দখল সংক্রান্ত রিপোর্টিং সেবা',
-      nameEn: 'Illegal Occupation Reporting Service',
-      descBn: COMING_SOON_SERVICES.illegal_occupation.descriptionBn,
-      descEn: COMING_SOON_SERVICES.illegal_occupation.descriptionEn,
-      badgeBn: COMING_SOON_SERVICES.illegal_occupation.badgeBn,
-      badgeEn: COMING_SOON_SERVICES.illegal_occupation.badgeEn,
-      path: COMING_SOON_SERVICES.illegal_occupation.slug,
-      iconName: 'building',
     },
   ];
 

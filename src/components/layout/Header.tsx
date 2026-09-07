@@ -1,7 +1,7 @@
 import React from 'react';
-import { Search, Menu, PlusCircle, Home, HeartHandshake, Zap, ZapOff, Building, ShieldAlert, Compass, PhoneCall, Globe } from 'lucide-react';
+import { Search, Menu, PlusCircle, Home, HeartHandshake, Zap, ZapOff, ShieldAlert, Compass, PhoneCall, Globe } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { SECTIONS, SectionKey, COMING_SOON_SERVICES } from '../../theme/tokens';
+import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { IconButton } from '../ui/IconButton';
 import { Drawer } from '../ui/Drawer';
@@ -63,15 +63,6 @@ export const Header: React.FC = () => {
       nameEn: SECTIONS.load_shedding.shortNameEn,
       sectionKey: 'load_shedding',
       icon: <ZapOff className="w-4 h-4" />,
-    },
-    {
-      path: '/illegal-occupation',
-      nameBn: COMING_SOON_SERVICES.illegal_occupation.shortNameBn,
-      nameEn: COMING_SOON_SERVICES.illegal_occupation.shortNameEn,
-      icon: <Building className="w-4 h-4" />,
-      isComingSoon: true,
-      badgeBn: COMING_SOON_SERVICES.illegal_occupation.badgeBn,
-      badgeEn: COMING_SOON_SERVICES.illegal_occupation.badgeEn,
     },
     {
       path: '/explore',
