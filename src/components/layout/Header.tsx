@@ -59,12 +59,10 @@ export const Header: React.FC = () => {
     },
     {
       path: '/load-shedding',
-      nameBn: COMING_SOON_SERVICES.load_shedding.shortNameBn,
-      nameEn: COMING_SOON_SERVICES.load_shedding.shortNameEn,
+      nameBn: SECTIONS.load_shedding.shortNameBn,
+      nameEn: SECTIONS.load_shedding.shortNameEn,
+      sectionKey: 'load_shedding',
       icon: <ZapOff className="w-4 h-4" />,
-      isComingSoon: true,
-      badgeBn: COMING_SOON_SERVICES.load_shedding.badgeBn,
-      badgeEn: COMING_SOON_SERVICES.load_shedding.badgeEn,
     },
     {
       path: '/illegal-occupation',
@@ -93,6 +91,9 @@ export const Header: React.FC = () => {
     }
     if (sectionKey === 'extortion') {
       return 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)] font-bold';
+    }
+    if (sectionKey === 'load_shedding') {
+      return 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border border-[var(--sec-load_shedding-border)] font-bold';
     }
     return 'bg-surface-subtle text-primary font-bold border border-subtle';
   };

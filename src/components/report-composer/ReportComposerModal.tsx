@@ -383,6 +383,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Step Navigation Handlers
   const handleGoToStep = useCallback((step: number, jumpSection?: string) => {
     setSelectedComingSoon(null);
+    // Phase 1 guard: Utility complaints stop at step 2
+    if (formData.segment === 'load_shedding' && step > 2) {
+      return;
+    }
+
     // If attempting to go to step 3 or 4 with rape subcategory without consent
     if (
       step >= 3 &&
@@ -1365,6 +1370,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             {!submissionResult && (
               <ReportComposerFooter
                 currentStep={effectiveCurrentStep}
+                totalSteps={4}
+                segment={formData.segment}
+                selectedSubcategoryId={formData.subcategoryId}
                 language={language}
                 onClose={handleRequestClose}
                 onBack={handleFooterBack}

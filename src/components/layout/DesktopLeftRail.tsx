@@ -54,12 +54,10 @@ export const DesktopLeftRail: React.FC = () => {
     {
       id: 'rail-load-shedding',
       path: '/load-shedding',
-      nameBn: COMING_SOON_SERVICES.load_shedding.shortNameBn,
-      nameEn: COMING_SOON_SERVICES.load_shedding.shortNameEn,
+      nameBn: SECTIONS.load_shedding.shortNameBn,
+      nameEn: SECTIONS.load_shedding.shortNameEn,
       iconName: 'zap-off',
-      isComingSoon: true,
-      badgeBn: COMING_SOON_SERVICES.load_shedding.badgeBn,
-      badgeEn: COMING_SOON_SERVICES.load_shedding.badgeEn,
+      sectionKey: 'load_shedding',
     },
     {
       id: 'rail-illegal-occupation',
@@ -104,6 +102,9 @@ export const DesktopLeftRail: React.FC = () => {
     }
     if (sectionKey === 'extortion') {
       return 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)] font-semibold';
+    }
+    if (sectionKey === 'load_shedding') {
+      return 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border border-[var(--sec-load_shedding-border)] font-semibold';
     }
     return 'bg-surface-elevated text-primary font-semibold border border-theme';
   };

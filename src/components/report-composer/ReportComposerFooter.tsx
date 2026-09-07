@@ -1,10 +1,13 @@
 import React from 'react';
 import { ArrowLeft, ArrowRight, Send, Loader2, X } from 'lucide-react';
+import { SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 
 export interface ReportComposerFooterProps {
   currentStep: number;
   totalSteps?: number;
+  segment?: SectionKey | null;
+  selectedSubcategoryId?: string;
   language: 'bn' | 'en';
   onClose: () => void;
   onBack: () => void;
@@ -17,6 +20,8 @@ export interface ReportComposerFooterProps {
 
 export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   currentStep,
+  segment,
+  selectedSubcategoryId,
   language,
   onClose,
   onBack,
@@ -81,10 +86,20 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           size="lg"
           disabled={!canContinue}
           onClick={onNext}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
+          rightIcon={
+            segment === 'load_shedding' && selectedSubcategoryId ? undefined : (
+              <ArrowRight className="w-4 h-4" />
+            )
+          }
           className="min-h-[44px] text-[16px] px-6"
         >
-          {language === 'bn' ? 'বিবরণ প্রদানে যান' : 'Continue to Details'}
+          {segment === 'load_shedding' && selectedSubcategoryId
+            ? language === 'bn'
+              ? 'পরবর্তী ধাপে উন্মুক্ত হবে'
+              : 'Available in Next Phase'
+            : language === 'bn'
+            ? 'বিবরণ প্রদানে যান'
+            : 'Continue to Details'}
         </Button>
       )}
 
