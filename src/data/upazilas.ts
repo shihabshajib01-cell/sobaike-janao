@@ -1,8 +1,23 @@
 /**
  * Bangladesh Administrative Thana / Upazila Dataset (Phase 1 Foundation)
  *
- * Authoritative administrative dataset covering all 64 districts of Bangladesh,
- * including rural upazilas and key metropolitan police stations (DMP, CMP, GMP).
+ * Primary Sources & Provenance:
+ * - Cabinet Division & National Implementation Committee for Administrative Reorganization (NICAR),
+ *   Government of the People's Republic of Bangladesh (official gazettes & renamings through 2021-2024,
+ *   including Shantiganj, Indurkani, Dasar, Eidgaon, Madhyanagar, Lalmai, Shayestaganj).
+ * - Bangladesh National Portal (bangladesh.gov.bd) and District Portals (*.gov.bd).
+ * - Bangladesh Bureau of Statistics (BBS) Geocode Framework.
+ * - Metropolitan Police jurisdictions: Dhaka Metropolitan Police (DMP - 50 police stations),
+ *   Chattogram Metropolitan Police (CMP - 16 police stations), and Gazipur Metropolitan Police (GMP).
+ *
+ * Source Type: Official Administrative & Police Station Framework
+ * Verification Note: Reflects current official renamings and standardizations as of 2024.
+ *
+ * Structure & Field Convention:
+ * - Rural Upazilas and Metropolitan Thanas (police stations) are combined into this single
+ *   dataset to power the product's unified "Thana / Upazila" field.
+ * - English labels reflect current official government spellings (e.g., Cumilla, Jashore,
+ *   Barishal, Bogura).
  */
 
 export interface UpazilaInfo {
@@ -213,7 +228,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'cumilla-burichang', nameBn: 'বুড়িচং', nameEn: 'Burichang', districtId: 'cumilla' }, 
   { id: 'cumilla-chandina', nameBn: 'চান্দিনা', nameEn: 'Chandina', districtId: 'cumilla' }, 
   { id: 'cumilla-chauddagram', nameBn: 'চৌদ্দগ্রাম', nameEn: 'Chauddagram', districtId: 'cumilla' }, 
-  { id: 'cumilla-comilla-sadar', nameBn: 'কুমিল্লা সদর', nameEn: 'Comilla Sadar', districtId: 'cumilla' }, 
+  { id: 'cumilla-cumilla-sadar', nameBn: 'কুমিল্লা সদর', nameEn: 'Cumilla Sadar', districtId: 'cumilla' }, 
   { id: 'cumilla-daudkandi', nameBn: 'দাউদকান্দি', nameEn: 'Daudkandi', districtId: 'cumilla' }, 
   { id: 'cumilla-debidwar', nameBn: 'দেবিদ্বার', nameEn: 'Debidwar', districtId: 'cumilla' }, 
   { id: 'cumilla-homna', nameBn: 'হোমনা', nameEn: 'Homna', districtId: 'cumilla' }, 
@@ -223,7 +238,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'cumilla-monohargonj', nameBn: 'মনোহরগঞ্জ', nameEn: 'Monohargonj', districtId: 'cumilla' }, 
   { id: 'cumilla-muradnagar', nameBn: 'মুরাদনগর', nameEn: 'Muradnagar', districtId: 'cumilla' }, 
   { id: 'cumilla-nangalkot', nameBn: 'নাঙ্গলকোট', nameEn: 'Nangalkot', districtId: 'cumilla' }, 
-  { id: 'cumilla-sadarsouth', nameBn: 'সদর দক্ষিণ', nameEn: 'Sadarsouth', districtId: 'cumilla' }, 
+  { id: 'cumilla-cumilla-sadar-south', nameBn: 'কুমিল্লা সদর দক্ষিণ', nameEn: 'Cumilla Sadar South', districtId: 'cumilla' }, 
   { id: 'cumilla-titas', nameBn: 'তিতাস', nameEn: 'Titas', districtId: 'cumilla' }, 
   // District: feni
   { id: 'feni-chhagalnaiya', nameBn: 'ছাগলনাইয়া', nameEn: 'Chhagalnaiya', districtId: 'feni' }, 
@@ -308,7 +323,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'rajshahi-tanore', nameBn: 'তানোর', nameEn: 'Tanore', districtId: 'rajshahi' }, 
   // District: bogra
   { id: 'bogra-adamdighi', nameBn: 'আদমদিঘি', nameEn: 'Adamdighi', districtId: 'bogra' }, 
-  { id: 'bogra-bogra-sadar', nameBn: 'বগুড়া সদর', nameEn: 'Bogra Sadar', districtId: 'bogra' }, 
+  { id: 'bogra-bogura-sadar', nameBn: 'বগুড়া সদর', nameEn: 'Bogura Sadar', districtId: 'bogra' }, 
   { id: 'bogra-dhunot', nameBn: 'ধুনট', nameEn: 'Dhunot', districtId: 'bogra' }, 
   { id: 'bogra-dupchanchia', nameBn: 'দুপচাচিঁয়া', nameEn: 'Dupchanchia', districtId: 'bogra' }, 
   { id: 'bogra-gabtali', nameBn: 'গাবতলী', nameEn: 'Gabtali', districtId: 'bogra' }, 
@@ -385,7 +400,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'jashore-abhaynagar', nameBn: 'অভয়নগর', nameEn: 'Abhaynagar', districtId: 'jashore' }, 
   { id: 'jashore-bagherpara', nameBn: 'বাঘারপাড়া', nameEn: 'Bagherpara', districtId: 'jashore' }, 
   { id: 'jashore-chougachha', nameBn: 'চৌগাছা', nameEn: 'Chougachha', districtId: 'jashore' }, 
-  { id: 'jashore-jessore-sadar', nameBn: 'যশোর সদর', nameEn: 'Jessore Sadar', districtId: 'jashore' }, 
+  { id: 'jashore-jashore-sadar', nameBn: 'যশোর সদর', nameEn: 'Jashore Sadar', districtId: 'jashore' }, 
   { id: 'jashore-jhikargacha', nameBn: 'ঝিকরগাছা', nameEn: 'Jhikargacha', districtId: 'jashore' }, 
   { id: 'jashore-keshabpur', nameBn: 'কেশবপুর', nameEn: 'Keshabpur', districtId: 'jashore' }, 
   { id: 'jashore-manirampur', nameBn: 'মণিরামপুর', nameEn: 'Manirampur', districtId: 'jashore' }, 
@@ -445,7 +460,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'barishal-babuganj', nameBn: 'বাবুগঞ্জ', nameEn: 'Babuganj', districtId: 'barishal' }, 
   { id: 'barishal-bakerganj', nameBn: 'বাকেরগঞ্জ', nameEn: 'Bakerganj', districtId: 'barishal' }, 
   { id: 'barishal-banaripara', nameBn: 'বানারীপাড়া', nameEn: 'Banaripara', districtId: 'barishal' }, 
-  { id: 'barishal-barisal-sadar', nameBn: 'বরিশাল সদর', nameEn: 'Barisal Sadar', districtId: 'barishal' }, 
+  { id: 'barishal-barishal-sadar', nameBn: 'বরিশাল সদর', nameEn: 'Barishal Sadar', districtId: 'barishal' }, 
   { id: 'barishal-gournadi', nameBn: 'গৌরনদী', nameEn: 'Gournadi', districtId: 'barishal' }, 
   { id: 'barishal-hizla', nameBn: 'হিজলা', nameEn: 'Hizla', districtId: 'barishal' }, 
   { id: 'barishal-mehendiganj', nameBn: 'মেহেন্দিগঞ্জ', nameEn: 'Mehendiganj', districtId: 'barishal' }, 
@@ -453,7 +468,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'barishal-wazirpur', nameBn: 'উজিরপুর', nameEn: 'Wazirpur', districtId: 'barishal' }, 
   // District: bhola
   { id: 'bhola-bhola-sadar', nameBn: 'ভোলা সদর', nameEn: 'Bhola Sadar', districtId: 'bhola' }, 
-  { id: 'bhola-borhan-sddin', nameBn: 'বোরহান উদ্দিন', nameEn: 'Borhan Sddin', districtId: 'bhola' }, 
+  { id: 'bhola-borhanuddin', nameBn: 'বোরহানউদ্দিন', nameEn: 'Borhanuddin', districtId: 'bhola' }, 
   { id: 'bhola-charfesson', nameBn: 'চরফ্যাশন', nameEn: 'Charfesson', districtId: 'bhola' }, 
   { id: 'bhola-doulatkhan', nameBn: 'দৌলতখান', nameEn: 'Doulatkhan', districtId: 'bhola' }, 
   { id: 'bhola-lalmohan', nameBn: 'লালমোহন', nameEn: 'Lalmohan', districtId: 'bhola' }, 
@@ -475,7 +490,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'pirojpur-nazirpur', nameBn: 'নাজিরপুর', nameEn: 'Nazirpur', districtId: 'pirojpur' }, 
   { id: 'pirojpur-nesarabad', nameBn: 'নেছারাবাদ', nameEn: 'Nesarabad', districtId: 'pirojpur' }, 
   { id: 'pirojpur-pirojpur-sadar', nameBn: 'পিরোজপুর সদর', nameEn: 'Pirojpur Sadar', districtId: 'pirojpur' }, 
-  { id: 'pirojpur-zianagar', nameBn: 'জিয়ানগর', nameEn: 'Zianagar', districtId: 'pirojpur' }, 
+  { id: 'pirojpur-indurkani', nameBn: 'ইন্দুরকানী', nameEn: 'Indurkani', districtId: 'pirojpur' }, 
   // District: barguna
   { id: 'barguna-amtali', nameBn: 'আমতলী', nameEn: 'Amtali', districtId: 'barguna' }, 
   { id: 'barguna-bamna', nameBn: 'বামনা', nameEn: 'Bamna', districtId: 'barguna' }, 
@@ -519,6 +534,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'habiganj-lakhai', nameBn: 'লাখাই', nameEn: 'Lakhai', districtId: 'habiganj' }, 
   { id: 'habiganj-madhabpur', nameBn: 'মাধবপুর', nameEn: 'Madhabpur', districtId: 'habiganj' }, 
   { id: 'habiganj-nabiganj', nameBn: 'নবীগঞ্জ', nameEn: 'Nabiganj', districtId: 'habiganj' }, 
+  { id: 'habiganj-shayestaganj', nameBn: 'শায়েস্তাগঞ্জ', nameEn: 'Shayestaganj', districtId: 'habiganj' }, 
   // District: sunamganj
   { id: 'sunamganj-bishwambarpur', nameBn: 'বিশ্বম্ভরপুর', nameEn: 'Bishwambarpur', districtId: 'sunamganj' }, 
   { id: 'sunamganj-chhatak', nameBn: 'ছাতক', nameEn: 'Chhatak', districtId: 'sunamganj' }, 
@@ -529,7 +545,7 @@ export const BANGLADESH_UPAZILAS: UpazilaInfo[] = [
   { id: 'sunamganj-jamalganj', nameBn: 'জামালগঞ্জ', nameEn: 'Jamalganj', districtId: 'sunamganj' }, 
   { id: 'sunamganj-madhyanagar', nameBn: 'মধ্যনগর', nameEn: 'Madhyanagar', districtId: 'sunamganj' }, 
   { id: 'sunamganj-shalla', nameBn: 'শাল্লা', nameEn: 'Shalla', districtId: 'sunamganj' }, 
-  { id: 'sunamganj-south-sunamganj', nameBn: 'দক্ষিণ সুনামগঞ্জ', nameEn: 'South Sunamganj', districtId: 'sunamganj' }, 
+  { id: 'sunamganj-shantiganj', nameBn: 'শান্তিগঞ্জ', nameEn: 'Shantiganj', districtId: 'sunamganj' }, 
   { id: 'sunamganj-sunamganj-sadar', nameBn: 'সুনামগঞ্জ সদর', nameEn: 'Sunamganj Sadar', districtId: 'sunamganj' }, 
   { id: 'sunamganj-tahirpur', nameBn: 'তাহিরপুর', nameEn: 'Tahirpur', districtId: 'sunamganj' }, 
   // District: rangpur
@@ -649,8 +665,32 @@ export function getUpazilasByDistrict(districtId: string): UpazilaInfo[] {
 }
 
 /**
+ * Known former or historical names mapped to their canonical IDs for backward compatibility.
+ */
+const FORMER_UPAZILA_ALIASES: Record<string, string> = {
+  'south sunamganj': 'sunamganj-shantiganj',
+  'দক্ষিণ সুনামগঞ্জ': 'sunamganj-shantiganj',
+  'sunamganj-south-sunamganj': 'sunamganj-shantiganj',
+  'zianagar': 'pirojpur-indurkani',
+  'জিয়ানগর': 'pirojpur-indurkani',
+  'pirojpur-zianagar': 'pirojpur-indurkani',
+  'comilla sadar': 'cumilla-cumilla-sadar',
+  'cumilla-comilla-sadar': 'cumilla-cumilla-sadar',
+  'sadarsouth': 'cumilla-cumilla-sadar-south',
+  'cumilla-sadarsouth': 'cumilla-cumilla-sadar-south',
+  'bogra sadar': 'bogra-bogura-sadar',
+  'bogra-bogra-sadar': 'bogra-bogura-sadar',
+  'jessore sadar': 'jashore-jashore-sadar',
+  'jashore-jessore-sadar': 'jashore-jashore-sadar',
+  'barisal sadar': 'barishal-barishal-sadar',
+  'barishal-barisal-sadar': 'barishal-barishal-sadar',
+  'borhan sddin': 'bhola-borhanuddin',
+  'bhola-borhan-sddin': 'bhola-borhanuddin',
+};
+
+/**
  * Finds an upazila/thana by its stored value (English name, Bangla name, or ID),
- * optionally filtered by district.
+ * optionally filtered by district. Also supports former administrative names.
  */
 export function getUpazilaByStoredName(
   nameOrId?: string | null,
@@ -660,10 +700,19 @@ export function getUpazilaByStoredName(
   const trimmed = nameOrId.trim();
   const lower = trimmed.toLowerCase();
   const pool = districtId ? getUpazilasByDistrict(districtId) : BANGLADESH_UPAZILAS;
-  return pool.find(
+
+  const directMatch = pool.find(
     (u) =>
       u.id.toLowerCase() === lower ||
       u.nameEn.toLowerCase() === lower ||
       u.nameBn === trimmed
   );
+  if (directMatch) return directMatch;
+
+  const aliasId = FORMER_UPAZILA_ALIASES[lower] || FORMER_UPAZILA_ALIASES[trimmed];
+  if (aliasId) {
+    return pool.find((u) => u.id === aliasId);
+  }
+
+  return undefined;
 }
