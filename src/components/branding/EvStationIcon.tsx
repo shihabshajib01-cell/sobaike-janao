@@ -1,31 +1,86 @@
 import React from 'react';
 
-export interface EvStationIconProps extends React.SVGProps<SVGSVGElement> {
+export interface EvStationIconProps extends React.HTMLAttributes<HTMLSpanElement> {
+  className?: string;
   size?: number | string;
-  strokeWidth?: number;
+  strokeWidth?: number | string;
+  'aria-label'?: string;
+  'aria-hidden'?: boolean | 'true' | 'false';
 }
 
 /**
  * Google Material Symbols Outlined icon: `ev_station`
  * Authoritative icon for Illegal Charging Stations / Rickshaw category.
+ * Renders the Material Symbols font glyph instead of a custom SVG path.
  */
-export const EvStationIcon = React.forwardRef<SVGSVGElement, EvStationIconProps>(
-  ({ className = '', size, strokeWidth: _strokeWidth, ...props }, ref) => {
+export const EvStationIcon = React.forwardRef<HTMLSpanElement, EvStationIconProps>(
+  (
+    {
+      className = '',
+      size,
+      strokeWidth: _strokeWidth,
+      style,
+      'aria-hidden': ariaHidden,
+      'aria-label': ariaLabel,
+      role,
+      ...props
+    },
+    ref
+  ) => {
+    let resolvedFontSize: string;
+
+    if (typeof size === 'number') {
+      resolvedFontSize = `${size}px`;
+    } else if (typeof size === 'string' && size) {
+      const sizeMap: Record<string, string> = {
+        xs: '12px',
+        sm: '14px',
+        md: '16px',
+        lg: '20px',
+        xl: '24px',
+      };
+      resolvedFontSize = sizeMap[size] || (size.match(/^[0-9]+$/) ? `${size}px` : size);
+    } else {
+      // Resolve optical font size from Tailwind dimensions in className if present
+      if (/\b(?:w|h)-3\b/.test(className)) resolvedFontSize = '12px';
+      else if (/\b(?:w|h)-3\.5\b/.test(className)) resolvedFontSize = '14px';
+      else if (/\b(?:w|h)-4\b/.test(className)) resolvedFontSize = '16px';
+      else if (/\b(?:w|h)-5\b/.test(className)) resolvedFontSize = '20px';
+      else if (/\b(?:w|h)-6\b/.test(className)) resolvedFontSize = '24px';
+      else if (/\b(?:w|h)-7\b/.test(className)) resolvedFontSize = '28px';
+      else if (/\b(?:w|h)-8\b/.test(className)) resolvedFontSize = '32px';
+      else resolvedFontSize = '20px';
+    }
+
+    const isAccessible = Boolean(ariaLabel);
+
     return (
-      <svg
+      <span
         ref={ref}
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 -960 960 960"
-        fill="currentColor"
-        className={className}
-        width={size}
-        height={size}
+        className={`material-symbols-outlined shrink-0 ${className}`.trim()}
+        style={{
+          fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24",
+          fontSize: resolvedFontSize,
+          lineHeight: 1,
+          color: 'currentColor',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          userSelect: 'none',
+          ...(size ? { width: resolvedFontSize, height: resolvedFontSize } : {}),
+          ...style,
+        }}
+        aria-hidden={isAccessible ? undefined : (ariaHidden !== undefined ? ariaHidden : 'true')}
+        aria-label={ariaLabel}
+        role={role || (isAccessible ? 'img' : undefined)}
         {...props}
       >
-        <path d="m340-200 100-160h-60v-120L280-320h60v120ZM240-560h240v-200H240v200Zm0 360h240v-280H240v280Zm-80 80v-640q0-33 23.5-56.5T240-840h240q33 0 56.5 23.5T560-760v280h50q29 0 49.5 20.5T680-410v185q0 17 14 31t31 14q18 0 31.5-14t13.5-31v-375h-10q-17 0-28.5-11.5T720-640v-80h20v-60h40v60h40v-60h40v60h20v80q0 17-11.5 28.5T840-600h-10v375q0 42-30.5 73.5T725-120q-43 0-74-31.5T620-225v-185q0-5-2.5-7.5T610-420h-50v300H160Zm320-80H240h240Z" />
-      </svg>
+        ev_station
+      </span>
     );
   }
 );
 
 EvStationIcon.displayName = 'EvStationIcon';
+
+export default EvStationIcon;

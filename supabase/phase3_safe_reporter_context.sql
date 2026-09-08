@@ -382,30 +382,52 @@ BEGIN
     v_incident_date := CURRENT_DATE;
   END IF;
 
-  v_incident_time := NULL;
-  IF nullif(trim(coalesce(p_payload->>'incidentTime', '')), '') IS NOT NULL THEN
-    BEGIN
-      v_incident_time := (trim(p_payload->>'incidentTime'))::time without time zone;
-    EXCEPTION WHEN OTHERS THEN
-      v_incident_time := NULL;
-    END;
-  END IF;
-
-  v_utility_end_time := NULL;
-  IF nullif(trim(coalesce(p_payload->>'utilityEndTime', p_payload->>'utility_end_time', '')), '') IS NOT NULL THEN
-    BEGIN
-      v_utility_end_time := (trim(coalesce(p_payload->>'utilityEndTime', p_payload->>'utility_end_time')))::time without time zone;
-    EXCEPTION WHEN OTHERS THEN
-      v_utility_end_time := NULL;
-    END;
-  END IF;
+  -- Frequency
   v_frequency := coalesce(p_payload->>'frequency', 'one-time');
   IF v_frequency NOT IN ('one-time', 'repeated') THEN
     v_frequency := 'one-time';
   END IF;
 
-  -- Subcategory-specific validation and extraction for Excess Electricity Bill
-  IF v_subcategory = 'excess-electricity-bill' THEN
+  -- Timing & Subcategory-specific validation
+  v_incident_time := NULL;
+  v_utility_end_time := NULL;
+  v_recent_bill_month := NULL;
+  v_recent_bill_amount := NULL;
+  v_previous_bill_month := NULL;
+  v_previous_bill_amount := NULL;
+
+  IF v_segment = 'load_shedding' AND v_subcategory IN ('load-shedding-outage', 'gas-shortage') THEN
+    -- incident_time is REQUIRED Start Time
+    IF nullif(trim(coalesce(p_payload->>'incidentTime', '')), '') IS NULL THEN
+      RAISE EXCEPTION 'VALIDATION_FAILED: Start Time is required for utility outage reports.';
+    END IF;
+
+    BEGIN
+      v_incident_time := (trim(p_payload->>'incidentTime'))::time without time zone;
+    EXCEPTION WHEN OTHERS THEN
+      RAISE EXCEPTION 'VALIDATION_FAILED: Invalid Start Time format.';
+    END;
+
+    -- utility_end_time is OPTIONAL End Time
+    IF nullif(trim(coalesce(p_payload->>'utilityEndTime', p_payload->>'utility_end_time', '')), '') IS NOT NULL THEN
+      BEGIN
+        v_utility_end_time := (trim(coalesce(p_payload->>'utilityEndTime', p_payload->>'utility_end_time')))::time without time zone;
+      EXCEPTION WHEN OTHERS THEN
+        RAISE EXCEPTION 'VALIDATION_FAILED: Invalid Utility End Time format.';
+      END;
+
+      IF v_utility_end_time <= v_incident_time THEN
+        RAISE EXCEPTION 'VALIDATION_FAILED: Utility End Time must be after Start Time.';
+      END IF;
+    ELSE
+      v_utility_end_time := NULL;
+    END IF;
+
+  ELSIF v_segment = 'load_shedding' AND v_subcategory = 'excess-electricity-bill' THEN
+    -- For excess electricity bill, incident_time and utility_end_time must remain NULL
+    v_incident_time := NULL;
+    v_utility_end_time := NULL;
+
     v_recent_bill_month := nullif(trim(coalesce(p_payload->>'recentBillMonth', p_payload->>'recent_bill_month', '')), '');
     v_previous_bill_month := nullif(trim(coalesce(p_payload->>'previousBillMonth', p_payload->>'previous_bill_month', '')), '');
     
@@ -462,14 +484,18 @@ BEGIN
       END;
     END IF;
 
-    -- For excess electricity bill, incident_time and utility_end_time must remain NULL
-    v_incident_time := NULL;
-    v_utility_end_time := NULL;
   ELSE
-    v_recent_bill_month := NULL;
-    v_recent_bill_amount := NULL;
-    v_previous_bill_month := NULL;
-    v_previous_bill_amount := NULL;
+    -- Non-utility complaints (harassment, rickshaw, extortion) or unknown subtypes
+    -- utility_end_time strictly forced to NULL
+    v_utility_end_time := NULL;
+
+    IF nullif(trim(coalesce(p_payload->>'incidentTime', '')), '') IS NOT NULL THEN
+      BEGIN
+        v_incident_time := (trim(p_payload->>'incidentTime'))::time without time zone;
+      EXCEPTION WHEN OTHERS THEN
+        v_incident_time := NULL;
+      END;
+    END IF;
   END IF;
 
   -- Incident Location (Distinct from reporter device location)
