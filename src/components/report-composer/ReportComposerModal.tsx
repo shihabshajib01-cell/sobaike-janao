@@ -784,8 +784,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           formData.subcategoryId === 'excess-electricity-bill'
             ? formData.incidentDate || (formData.recentBillMonth ? `${formData.recentBillMonth}-01` : new Date().toISOString().split('T')[0])
             : formData.incidentDate || undefined,
-        incidentTime: formData.incidentTime || undefined,
-        utilityEndTime: formData.utilityEndTime || undefined,
+        incidentTime:
+          formData.subcategoryId === 'excess-electricity-bill'
+            ? undefined
+            : formData.incidentTime || undefined,
+        utilityEndTime:
+          formData.subcategoryId === 'excess-electricity-bill'
+            ? undefined
+            : formData.utilityEndTime || undefined,
         recentBillMonth: formData.subcategoryId === 'excess-electricity-bill' ? formData.recentBillMonth || undefined : undefined,
         recentBillAmount:
           formData.subcategoryId === 'excess-electricity-bill' && formData.recentBillAmount !== undefined && formData.recentBillAmount !== null && String(formData.recentBillAmount).trim() !== ''

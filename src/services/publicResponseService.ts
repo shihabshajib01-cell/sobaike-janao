@@ -28,7 +28,7 @@ export const PublicResponseService = {
 
     // C. Supabase configuration check
     if (!isSupabaseConfigured() || !supabase) {
-      return [];
+      throw new Error('Supabase client is not configured.');
     }
 
     // D. Call authoritative public read RPC

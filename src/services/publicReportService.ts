@@ -81,8 +81,8 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
 };
 
 const isMockModeAllowed = (): boolean => {
-  return (
-    !isSupabaseConfigured() ||
+  return Boolean(
+    import.meta.env.DEV &&
     import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
   );
 };

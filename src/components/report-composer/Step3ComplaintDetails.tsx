@@ -114,7 +114,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Segment structure conditions
     const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
     const showsIdentitySection = segment === 'harassment';
-    const isUtilityReport = segment === 'load_shedding';
+    const isUtilityReport = (segment as string) === 'utility' || segment === 'load_shedding';
     const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
     const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
     const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
