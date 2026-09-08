@@ -85,24 +85,35 @@ BEGIN
   FROM public.complaints c
   LEFT JOIN LATERAL (
     SELECT
-      sub.name,
-      sub.organization
-    FROM (
-      SELECT
-        nullif(trim(cp.name), '') AS name,
-        nullif(trim(cp.organization), '') AS organization,
-        count(*) OVER () AS party_count
-      FROM public.complaint_parties cp
-      WHERE cp.complaint_id = c.id
-        AND (
-          nullif(trim(cp.name), '') IS NOT NULL OR
-          nullif(trim(cp.organization), '') IS NOT NULL OR
-          nullif(trim(cp.role_or_designation), '') IS NOT NULL OR
-          (nullif(trim(cp.party_type), '') IS NOT NULL AND trim(cp.party_type) <> 'unknown')
+      CASE
+        WHEN count(*) = 1
+        THEN max(nullif(trim(cp.name), ''))
+        ELSE NULL
+      END AS name,
+
+      CASE
+        WHEN count(*) = 1
+        THEN max(nullif(trim(cp.organization), ''))
+        ELSE NULL
+      END AS organization
+
+    FROM public.complaint_parties cp
+    WHERE cp.complaint_id = c.id
+      AND (
+        nullif(trim(cp.name), '') IS NOT NULL
+        OR nullif(trim(cp.organization), '') IS NOT NULL
+        OR nullif(trim(cp.role_or_designation), '') IS NOT NULL
+        OR nullif(trim(cp.phone_or_contact), '') IS NOT NULL
+        OR nullif(trim(cp.public_profile_handle), '') IS NOT NULL
+        OR nullif(trim(cp.identifying_description), '') IS NOT NULL
+        OR nullif(trim(cp.address), '') IS NOT NULL
+        OR trim(coalesce(cp.party_type, '')) IN (
+          'individual',
+          'business',
+          'group',
+          'organization'
         )
-    ) sub
-    WHERE sub.party_count = 1
-    LIMIT 1
+      )
   ) party ON true
   WHERE c.status = 'published';
 
@@ -163,24 +174,35 @@ BEGIN
   FROM public.complaints c
   LEFT JOIN LATERAL (
     SELECT
-      sub.name,
-      sub.organization
-    FROM (
-      SELECT
-        nullif(trim(cp.name), '') AS name,
-        nullif(trim(cp.organization), '') AS organization,
-        count(*) OVER () AS party_count
-      FROM public.complaint_parties cp
-      WHERE cp.complaint_id = c.id
-        AND (
-          nullif(trim(cp.name), '') IS NOT NULL OR
-          nullif(trim(cp.organization), '') IS NOT NULL OR
-          nullif(trim(cp.role_or_designation), '') IS NOT NULL OR
-          (nullif(trim(cp.party_type), '') IS NOT NULL AND trim(cp.party_type) <> 'unknown')
+      CASE
+        WHEN count(*) = 1
+        THEN max(nullif(trim(cp.name), ''))
+        ELSE NULL
+      END AS name,
+
+      CASE
+        WHEN count(*) = 1
+        THEN max(nullif(trim(cp.organization), ''))
+        ELSE NULL
+      END AS organization
+
+    FROM public.complaint_parties cp
+    WHERE cp.complaint_id = c.id
+      AND (
+        nullif(trim(cp.name), '') IS NOT NULL
+        OR nullif(trim(cp.organization), '') IS NOT NULL
+        OR nullif(trim(cp.role_or_designation), '') IS NOT NULL
+        OR nullif(trim(cp.phone_or_contact), '') IS NOT NULL
+        OR nullif(trim(cp.public_profile_handle), '') IS NOT NULL
+        OR nullif(trim(cp.identifying_description), '') IS NOT NULL
+        OR nullif(trim(cp.address), '') IS NOT NULL
+        OR trim(coalesce(cp.party_type, '')) IN (
+          'individual',
+          'business',
+          'group',
+          'organization'
         )
-    ) sub
-    WHERE sub.party_count = 1
-    LIMIT 1
+      )
   ) party ON true
   WHERE upper(c.id) = v_clean_id
     AND c.status = 'published';
