@@ -109,3 +109,42 @@ export const BANGLADESH_DISTRICTS: DistrictInfo[] = [
   { id: 'netrokona', nameBn: 'নেত্রকোণা', nameEn: 'Netrokona', divisionId: 'mymensingh', divisionBn: 'ময়মনসিংহ', divisionEn: 'Mymensingh', lat: 24.8709, lng: 90.7279 },
   { id: 'sherpur', nameBn: 'শেরপুর', nameEn: 'Sherpur', divisionId: 'mymensingh', divisionBn: 'ময়মনসিংহ', divisionEn: 'Mymensingh', lat: 25.0205, lng: 90.0153 },
 ];
+
+/**
+ * Returns all districts belonging to a division by division ID.
+ */
+export function getDistrictsByDivision(divisionId: string): DistrictInfo[] {
+  if (!divisionId) return [];
+  const normalized = divisionId.trim().toLowerCase();
+  return BANGLADESH_DISTRICTS.filter((d) => d.divisionId.toLowerCase() === normalized);
+}
+
+/**
+ * Finds a division by its stored value (English name, Bangla name, or ID).
+ */
+export function getDivisionByStoredName(nameOrId?: string | null): DivisionInfo | undefined {
+  if (!nameOrId) return undefined;
+  const trimmed = nameOrId.trim();
+  const lower = trimmed.toLowerCase();
+  return DIVISIONS.find(
+    (d) =>
+      d.id.toLowerCase() === lower ||
+      d.nameEn.toLowerCase() === lower ||
+      d.nameBn === trimmed
+  );
+}
+
+/**
+ * Finds a district by its stored value (English name, Bangla name, or ID).
+ */
+export function getDistrictByStoredName(nameOrId?: string | null): DistrictInfo | undefined {
+  if (!nameOrId) return undefined;
+  const trimmed = nameOrId.trim();
+  const lower = trimmed.toLowerCase();
+  return BANGLADESH_DISTRICTS.find(
+    (d) =>
+      d.id.toLowerCase() === lower ||
+      d.nameEn.toLowerCase() === lower ||
+      d.nameBn === trimmed
+  );
+}
