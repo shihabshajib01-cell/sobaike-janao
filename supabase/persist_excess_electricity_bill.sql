@@ -37,6 +37,7 @@ ALTER TABLE public.complaints
 -- -----------------------------------------------------------------------------
 -- Derives reportedSubject and organization strictly from public.complaint_parties.
 -- Never exposes reporter_name, reporter_contact, or private reporter context.
+-- Uses strict single-party matching; returns NULL if 0 or multiple parties exist.
 CREATE OR REPLACE FUNCTION public.get_public_published_reports()
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -74,9 +75,7 @@ BEGIN
         'recent_bill_month', c.recent_bill_month,
         'recent_bill_amount', c.recent_bill_amount,
         'previous_bill_month', c.previous_bill_month,
-        'previous_bill_amount', c.previous_bill_amount,
-        'utilityEndTime', to_char(c.utility_end_time, 'HH24:MI'),
-        'utility_end_time', to_char(c.utility_end_time, 'HH24:MI')
+        'previous_bill_amount', c.previous_bill_amount
       )
       ORDER BY c.created_at DESC
     ),
@@ -85,10 +84,24 @@ BEGIN
   INTO v_result
   FROM public.complaints c
   LEFT JOIN LATERAL (
-    SELECT cp.name, cp.organization
-    FROM public.complaint_parties cp
-    WHERE cp.complaint_id = c.id
-    ORDER BY cp.created_at ASC, cp.ctid ASC
+    SELECT
+      sub.name,
+      sub.organization
+    FROM (
+      SELECT
+        nullif(trim(cp.name), '') AS name,
+        nullif(trim(cp.organization), '') AS organization,
+        count(*) OVER () AS party_count
+      FROM public.complaint_parties cp
+      WHERE cp.complaint_id = c.id
+        AND (
+          nullif(trim(cp.name), '') IS NOT NULL OR
+          nullif(trim(cp.organization), '') IS NOT NULL OR
+          nullif(trim(cp.role_or_designation), '') IS NOT NULL OR
+          (nullif(trim(cp.party_type), '') IS NOT NULL AND trim(cp.party_type) <> 'unknown')
+        )
+    ) sub
+    WHERE sub.party_count = 1
     LIMIT 1
   ) party ON true
   WHERE c.status = 'published';
@@ -144,17 +157,29 @@ BEGIN
     'recent_bill_month', c.recent_bill_month,
     'recent_bill_amount', c.recent_bill_amount,
     'previous_bill_month', c.previous_bill_month,
-    'previous_bill_amount', c.previous_bill_amount,
-    'utilityEndTime', to_char(c.utility_end_time, 'HH24:MI'),
-    'utility_end_time', to_char(c.utility_end_time, 'HH24:MI')
+    'previous_bill_amount', c.previous_bill_amount
   )
   INTO v_result
   FROM public.complaints c
   LEFT JOIN LATERAL (
-    SELECT cp.name, cp.organization
-    FROM public.complaint_parties cp
-    WHERE cp.complaint_id = c.id
-    ORDER BY cp.created_at ASC, cp.ctid ASC
+    SELECT
+      sub.name,
+      sub.organization
+    FROM (
+      SELECT
+        nullif(trim(cp.name), '') AS name,
+        nullif(trim(cp.organization), '') AS organization,
+        count(*) OVER () AS party_count
+      FROM public.complaint_parties cp
+      WHERE cp.complaint_id = c.id
+        AND (
+          nullif(trim(cp.name), '') IS NOT NULL OR
+          nullif(trim(cp.organization), '') IS NOT NULL OR
+          nullif(trim(cp.role_or_designation), '') IS NOT NULL OR
+          (nullif(trim(cp.party_type), '') IS NOT NULL AND trim(cp.party_type) <> 'unknown')
+        )
+    ) sub
+    WHERE sub.party_count = 1
     LIMIT 1
   ) party ON true
   WHERE upper(c.id) = v_clean_id
