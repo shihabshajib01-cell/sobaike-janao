@@ -30,6 +30,8 @@ export interface SupabasePublicReportRPC {
   recent_bill_amount?: number | null;
   previous_bill_month?: string | null;
   previous_bill_amount?: number | null;
+  utilityEndTime?: string | null;
+  utility_end_time?: string | null;
 }
 
 const BANGLA_MONTHS = [
@@ -157,6 +159,7 @@ export const mapSupabasePublicReportToItem = (
         : rpc.previous_bill_amount !== undefined && rpc.previous_bill_amount !== null
         ? Number(rpc.previous_bill_amount)
         : undefined,
+    utilityEndTime: rpc.utilityEndTime || rpc.utility_end_time || undefined,
     publishedDateBn,
     publishedDateEn,
     publishedAt: rpc.publishedAt || undefined,

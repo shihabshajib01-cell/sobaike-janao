@@ -63,7 +63,8 @@ ALTER TABLE public.complaints
   ADD COLUMN IF NOT EXISTS recent_bill_month text,
   ADD COLUMN IF NOT EXISTS recent_bill_amount numeric,
   ADD COLUMN IF NOT EXISTS previous_bill_month text,
-  ADD COLUMN IF NOT EXISTS previous_bill_amount numeric;
+  ADD COLUMN IF NOT EXISTS previous_bill_amount numeric,
+  ADD COLUMN IF NOT EXISTS utility_end_time time without time zone;
 
 -- Ensure idempotency index exists
 CREATE UNIQUE INDEX IF NOT EXISTS complaints_client_submission_id_idx
@@ -149,6 +150,7 @@ DECLARE
   v_description text;
   v_incident_date date;
   v_incident_time time without time zone;
+  v_utility_end_time time without time zone;
   v_frequency text;
   v_location jsonb;
   v_lat double precision;
@@ -388,6 +390,15 @@ BEGIN
       v_incident_time := NULL;
     END;
   END IF;
+
+  v_utility_end_time := NULL;
+  IF nullif(trim(coalesce(p_payload->>'utilityEndTime', p_payload->>'utility_end_time', '')), '') IS NOT NULL THEN
+    BEGIN
+      v_utility_end_time := (trim(coalesce(p_payload->>'utilityEndTime', p_payload->>'utility_end_time')))::time without time zone;
+    EXCEPTION WHEN OTHERS THEN
+      v_utility_end_time := NULL;
+    END;
+  END IF;
   v_frequency := coalesce(p_payload->>'frequency', 'one-time');
   IF v_frequency NOT IN ('one-time', 'repeated') THEN
     v_frequency := 'one-time';
@@ -451,8 +462,9 @@ BEGIN
       END;
     END IF;
 
-    -- For excess electricity bill, incident_time must remain NULL
+    -- For excess electricity bill, incident_time and utility_end_time must remain NULL
     v_incident_time := NULL;
+    v_utility_end_time := NULL;
   ELSE
     v_recent_bill_month := NULL;
     v_recent_bill_amount := NULL;
@@ -596,6 +608,7 @@ BEGIN
     description,
     incident_date,
     incident_time,
+    utility_end_time,
     frequency,
     privacy_choice,
     relationship_context,
@@ -634,6 +647,7 @@ BEGIN
     v_description,
     v_incident_date,
     v_incident_time,
+    v_utility_end_time,
     v_frequency,
     v_privacy_choice,
     v_rel_context,
@@ -843,7 +857,8 @@ BEGIN
       'recentBillMonth', v_recent_bill_month,
       'recentBillAmount', v_recent_bill_amount,
       'previousBillMonth', v_previous_bill_month,
-      'previousBillAmount', v_previous_bill_amount
+      'previousBillAmount', v_previous_bill_amount,
+      'utilityEndTime', v_utility_end_time
     )
   );
 

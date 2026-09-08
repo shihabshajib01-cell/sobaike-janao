@@ -38,6 +38,7 @@ import {
   CheckCircle,
   LucideIcon,
 } from 'lucide-react';
+import { EvStationIcon } from '../branding/EvStationIcon';
 import { SectionKey } from '../../theme/tokens';
 
 export type AppIconName =
@@ -91,7 +92,7 @@ export interface AppIconProps {
   ariaHidden?: boolean;
 }
 
-const ICON_REGISTRY: Record<AppIconName, LucideIcon> = {
+const ICON_REGISTRY: Record<AppIconName, LucideIcon | React.ComponentType<any>> = {
   home: Home,
   globe: Globe,
   'plus-circle': PlusCircle,
@@ -124,7 +125,7 @@ const ICON_REGISTRY: Record<AppIconName, LucideIcon> = {
   'file-text': FileText,
   help: HelpCircle,
   harassment: HeartHandshake,
-  rickshaw: Zap,
+  rickshaw: EvStationIcon,
   extortion: ShieldAlert,
   'zap-off': ZapOff,
   building: Building,

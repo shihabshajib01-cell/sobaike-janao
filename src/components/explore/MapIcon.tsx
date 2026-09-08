@@ -27,10 +27,10 @@ import {
   AlertCircle,
   LucideIcon,
   HeartHandshake,
-  Zap,
   ShieldAlert,
   Building2,
 } from 'lucide-react';
+import { EvStationIcon } from '../branding/EvStationIcon';
 import { SectionKey } from '../../theme/tokens';
 
 export type MapIconName =
@@ -78,7 +78,7 @@ export interface MapIconProps {
   ariaHidden?: boolean;
 }
 
-const MAP_ICON_REGISTRY: Record<MapIconName, LucideIcon> = {
+const MAP_ICON_REGISTRY: Record<MapIconName, LucideIcon | React.ComponentType<any>> = {
   'map-pin': MapPin,
   pin: MapPin,
   compass: Compass,
@@ -109,7 +109,7 @@ const MAP_ICON_REGISTRY: Record<MapIconName, LucideIcon> = {
   'alert-circle': AlertCircle,
   building: Building2,
   harassment: HeartHandshake,
-  rickshaw: Zap,
+  rickshaw: EvStationIcon,
   extortion: ShieldAlert,
 };
 

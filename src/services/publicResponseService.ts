@@ -28,7 +28,7 @@ export const PublicResponseService = {
 
     // C. Supabase configuration check
     if (!isSupabaseConfigured() || !supabase) {
-      return [];
+      throw new Error('Supabase client is not configured.');
     }
 
     // D. Call authoritative public read RPC
@@ -36,10 +36,9 @@ export const PublicResponseService = {
       p_report_id: cleanId,
     });
 
-    // E. On RPC error, return empty array in fallback
+    // E. On RPC error, throw real error
     if (error) {
-      console.warn('[PublicResponseService] RPC error:', error);
-      return [];
+      throw new Error(error.message || 'Failed to fetch published responses from server.');
     }
 
     // F. Validate data contract

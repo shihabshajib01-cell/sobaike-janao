@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Zap, PlusCircle, AlertCircle, RefreshCw, Info } from 'lucide-react';
+import { PlusCircle, AlertCircle, RefreshCw, Info } from 'lucide-react';
+import { EvStationIcon } from '../components/branding/EvStationIcon';
 import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
@@ -69,7 +70,7 @@ export const RickshawPage: React.FC = () => {
                 color: 'var(--sec-rickshaw-primary)',
               }}
             >
-              <Zap className="w-4 h-4" />
+              <EvStationIcon className="w-4 h-4" />
             </div>
             <span
               className="text-[13px] sm:text-[14px] font-semibold"

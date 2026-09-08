@@ -1,5 +1,6 @@
 import React from 'react';
-import { Search, Menu, PlusCircle, Home, HeartHandshake, Zap, ZapOff, ShieldAlert, Compass, PhoneCall, Globe } from 'lucide-react';
+import { Search, Menu, PlusCircle, Home, HeartHandshake, ZapOff, ShieldAlert, Compass, PhoneCall, Globe } from 'lucide-react';
+import { EvStationIcon } from '../branding/EvStationIcon';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
@@ -48,7 +49,7 @@ export const Header: React.FC = () => {
       nameBn: SECTIONS.rickshaw.shortNameBn,
       nameEn: SECTIONS.rickshaw.shortNameEn,
       sectionKey: 'rickshaw',
-      icon: <Zap className="w-4 h-4" />,
+      icon: <EvStationIcon className="w-4 h-4" />,
     },
     {
       path: '/extortion',

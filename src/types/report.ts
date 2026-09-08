@@ -80,6 +80,7 @@ export interface ReportItem {
   recentBillAmount?: number;
   previousBillMonth?: string;
   previousBillAmount?: number;
+  utilityEndTime?: string;
   publishedDateBn: string;
   publishedDateEn: string;
   publishedAt?: string;
