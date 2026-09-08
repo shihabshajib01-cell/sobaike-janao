@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
+  Coins,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { DraftReport, ReportLocationData, MentionedParty, isMeaningfulMentionedParty } from '../../services/types';
@@ -116,6 +117,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const isUtilityReport = segment === 'load_shedding';
     const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
     const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
+    const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
 
     // Determine active subcategory option & context
     const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
@@ -195,7 +197,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         : segment === 'extortion'
         ? (hasExtortionPartyData || initialOpenSection === 'parties')
         : showsPartySection,
-      attachments: isUtilityReport ? false : initialOpenSection === 'attachments',
+      attachments: isUtilityReport && !isExcessElectricityBill ? false : initialOpenSection === 'attachments',
     }));
 
     // Auto-expand parties if operator data is loaded/restored asynchronously
@@ -459,37 +461,75 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           onUpdateFormData({ title: effectiveTitle });
         }
         if (!effectiveTitle) {
-          effectiveTitle = isLoadShedding
+          effectiveTitle = isExcessElectricityBill
+            ? (language === 'bn' ? 'অতিরিক্ত বিদ্যুৎ বিল' : 'Excess Electricity Bill')
+            : isLoadShedding
             ? (language === 'bn' ? 'লোডশেডিং' : 'Load Shedding')
             : (language === 'bn' ? 'গ্যাস সংকট' : 'Gas Shortage');
           onUpdateFormData({ title: effectiveTitle });
         }
 
-        // 1. Validate Date (Required)
-        if (!formData.incidentDate) {
-          newErrors.incidentDate = isLoadShedding
-            ? (language === 'bn' ? 'লোডশেডিংয়ের তারিখ নির্বাচন করুন' : 'Load shedding date is required')
-            : (language === 'bn' ? 'গ্যাস সংকটের তারিখ নির্বাচন করুন' : 'Gas shortage date is required');
-        } else if (formData.incidentDate > todayLocal) {
-          newErrors.incidentDate =
-            language === 'bn'
-              ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
-              : 'Future dates are not allowed';
-        }
+        if (isExcessElectricityBill) {
+          // 1. Validate Recent Bill Month (Required)
+          if (!formData.recentBillMonth?.trim()) {
+            newErrors.recentBillMonth =
+              language === 'bn' ? 'সাম্প্রতিক বিলের মাস নির্বাচন করুন' : 'Recent bill month is required';
+          }
 
-        // 2. Validate Start Time (Required)
-        if (!formData.incidentTime?.trim()) {
-          newErrors.incidentTime =
-            language === 'bn' ? 'শুরুর সময় নির্বাচন করুন' : 'Start time is required';
-        }
+          // 2. Validate Recent Bill Amount (Required, numeric > 0)
+          const rawRecentAmt = formData.recentBillAmount;
+          const numRecentAmt = Number(rawRecentAmt);
+          if (rawRecentAmt === undefined || rawRecentAmt === null || String(rawRecentAmt).trim() === '') {
+            newErrors.recentBillAmount =
+              language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ লিখুন' : 'Recent bill amount is required';
+          } else if (isNaN(numRecentAmt) || numRecentAmt <= 0) {
+            newErrors.recentBillAmount =
+              language === 'bn' ? 'সঠিক ধনাত্মক সংখ্যা লিখুন' : 'Enter a valid positive number';
+          }
 
-        // 3. Validate End Time (Optional, but if both provided, validate end time > start time)
-        if (formData.incidentTime?.trim() && formData.utilityEndTime?.trim()) {
-          if (formData.utilityEndTime.trim() <= formData.incidentTime.trim()) {
-            newErrors.utilityEndTime =
+          // 3. Validate Previous Bill Month (Required)
+          if (!formData.previousBillMonth?.trim()) {
+            newErrors.previousBillMonth =
+              language === 'bn' ? 'আগের বিলের মাস নির্বাচন করুন' : 'Previous bill month is required';
+          }
+
+          // 4. Validate Previous Bill Amount (Required, numeric > 0)
+          const rawPrevAmt = formData.previousBillAmount;
+          const numPrevAmt = Number(rawPrevAmt);
+          if (rawPrevAmt === undefined || rawPrevAmt === null || String(rawPrevAmt).trim() === '') {
+            newErrors.previousBillAmount =
+              language === 'bn' ? 'আগের বিলের পরিমাণ লিখুন' : 'Previous bill amount is required';
+          } else if (isNaN(numPrevAmt) || numPrevAmt <= 0) {
+            newErrors.previousBillAmount =
+              language === 'bn' ? 'সঠিক ধনাত্মক সংখ্যা লিখুন' : 'Enter a valid positive number';
+          }
+        } else {
+          // 1. Validate Date (Required)
+          if (!formData.incidentDate) {
+            newErrors.incidentDate = isLoadShedding
+              ? (language === 'bn' ? 'লোডশেডিংয়ের তারিখ নির্বাচন করুন' : 'Load shedding date is required')
+              : (language === 'bn' ? 'গ্যাস সংকটের তারিখ নির্বাচন করুন' : 'Gas shortage date is required');
+          } else if (formData.incidentDate > todayLocal) {
+            newErrors.incidentDate =
               language === 'bn'
-                ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে'
-                : 'End time must be after start time';
+                ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                : 'Future dates are not allowed';
+          }
+
+          // 2. Validate Start Time (Required)
+          if (!formData.incidentTime?.trim()) {
+            newErrors.incidentTime =
+              language === 'bn' ? 'শুরুর সময় নির্বাচন করুন' : 'Start time is required';
+          }
+
+          // 3. Validate End Time (Optional, but if both provided, validate end time > start time)
+          if (formData.incidentTime?.trim() && formData.utilityEndTime?.trim()) {
+            if (formData.utilityEndTime.trim() <= formData.incidentTime.trim()) {
+              newErrors.utilityEndTime =
+                language === 'bn'
+                  ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে'
+                  : 'End time must be after start time';
+            }
           }
         }
 
@@ -653,7 +693,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           newErrors.description ||
           newErrors.incidentDate ||
           newErrors.incidentTime ||
-          newErrors.utilityEndTime
+          newErrors.utilityEndTime ||
+          newErrors.recentBillMonth ||
+          newErrors.recentBillAmount ||
+          newErrors.previousBillMonth ||
+          newErrors.previousBillAmount
         ) {
           const elem = document.getElementById('composer-section-narrative');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -700,7 +744,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           onToggle={() => {}}
           title={
             isUtilityReport
-              ? isLoadShedding
+              ? isExcessElectricityBill
+                ? language === 'bn'
+                  ? '১. বিদ্যুৎ বিলের তথ্য ও বিবরণ'
+                  : '1. Electricity Bill Details & Narrative'
+                : isLoadShedding
                 ? language === 'bn'
                   ? '১. লোডশেডিংয়ের সময় ও বিবরণ'
                   : '1. Load Shedding Timing & Details'
@@ -716,7 +764,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             errors.description ||
             errors.incidentDate ||
             errors.incidentTime ||
-            errors.utilityEndTime
+            errors.utilityEndTime ||
+            errors.recentBillMonth ||
+            errors.recentBillAmount ||
+            errors.previousBillMonth ||
+            errors.previousBillAmount
           )}
           icon={<FileText className="w-5 h-5" />}
         >
@@ -727,7 +779,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div className="flex items-center justify-between text-[13px] text-secondary">
                   <span className="font-semibold text-primary truncate max-w-[70%]">
                     {formData.title ||
-                      (isLoadShedding
+                      (isExcessElectricityBill
+                        ? language === 'bn'
+                          ? 'অতিরিক্ত বিদ্যুৎ বিল'
+                          : 'Excess Electricity Bill'
+                        : isLoadShedding
                         ? language === 'bn'
                           ? 'লোডশেডিং'
                           : 'Load Shedding'
@@ -774,107 +830,235 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 )}
               </div>
 
-              {/* Date, Start Time & End Time in 3 columns on sm+ screens */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {/* Incident Date */}
-                <div>
-                  <label
-                    htmlFor="complaint-date-input"
-                    className="block text-[13px] font-bold text-primary mb-1"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-primary" />
-                      <span>{language === 'bn' ? 'তারিখ *' : 'Date *'}</span>
+              {isExcessElectricityBill ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Recent Bill Month */}
+                    <div>
+                      <label
+                        htmlFor="recent-bill-month-input"
+                        className="block text-[13px] font-bold text-primary mb-1"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-primary" />
+                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent Bill Month *'}</span>
+                        </div>
+                      </label>
+                      <input
+                        id="recent-bill-month-input"
+                        type="month"
+                        value={formData.recentBillMonth || ''}
+                        onChange={(e) => {
+                          onUpdateFormData({ recentBillMonth: e.target.value });
+                          if (errors.recentBillMonth) setErrors((prev) => ({ ...prev, recentBillMonth: '' }));
+                        }}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          errors.recentBillMonth ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      />
+                      {errors.recentBillMonth && (
+                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.recentBillMonth}</p>
+                      )}
                     </div>
-                  </label>
-                  <input
-                    id="complaint-date-input"
-                    type="date"
-                    max={todayLocal}
-                    value={formData.incidentDate || ''}
-                    onChange={(e) => {
-                      const selectedDate = e.target.value;
-                      if (selectedDate && selectedDate > todayLocal) {
-                        setErrors((prev) => ({
-                          ...prev,
-                          incidentDate:
-                            language === 'bn'
-                              ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
-                              : 'Future dates are not allowed',
-                        }));
-                        return;
-                      }
-                      onUpdateFormData({ incidentDate: selectedDate });
-                      if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
-                    }}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                      errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                    }`}
-                  />
-                  {errors.incidentDate && (
-                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentDate}</p>
-                  )}
-                </div>
 
-                {/* Start Time (Required) */}
-                <div>
-                  <label
-                    htmlFor="utility-start-time-input"
-                    className="block text-[13px] font-bold text-primary mb-1"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-primary" />
-                      <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start Time *'}</span>
+                    {/* Recent Bill Amount */}
+                    <div>
+                      <label
+                        htmlFor="recent-bill-amount-input"
+                        className="block text-[13px] font-bold text-primary mb-1"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Coins className="w-3.5 h-3.5 text-primary" />
+                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent Bill Amount (BDT) *'}</span>
+                        </div>
+                      </label>
+                      <input
+                        id="recent-bill-amount-input"
+                        type="number"
+                        min="1"
+                        step="any"
+                        placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
+                        value={formData.recentBillAmount !== undefined && formData.recentBillAmount !== null ? formData.recentBillAmount : ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          onUpdateFormData({ recentBillAmount: val === '' ? undefined : Number(val) });
+                          if (errors.recentBillAmount) setErrors((prev) => ({ ...prev, recentBillAmount: '' }));
+                        }}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          errors.recentBillAmount ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      />
+                      {errors.recentBillAmount && (
+                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.recentBillAmount}</p>
+                      )}
                     </div>
-                  </label>
-                  <input
-                    id="utility-start-time-input"
-                    type="time"
-                    value={formData.incidentTime || ''}
-                    onChange={(e) => {
-                      onUpdateFormData({ incidentTime: e.target.value });
-                      if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
-                      if (errors.utilityEndTime && formData.utilityEndTime && e.target.value < formData.utilityEndTime) {
-                        setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
-                      }
-                    }}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                      errors.incidentTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                    }`}
-                  />
-                  {errors.incidentTime && (
-                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentTime}</p>
-                  )}
-                </div>
+                  </div>
 
-                {/* End Time (Optional) */}
-                <div>
-                  <label
-                    htmlFor="utility-end-time-input"
-                    className="block text-[13px] font-bold text-primary mb-1"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-secondary" />
-                      <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End Time (Optional)'}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Previous Bill Month */}
+                    <div>
+                      <label
+                        htmlFor="previous-bill-month-input"
+                        className="block text-[13px] font-bold text-primary mb-1"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-secondary" />
+                          <span>{language === 'bn' ? 'আগের স্বাভাবিক বিলের মাস *' : 'Previous Regular Bill Month *'}</span>
+                        </div>
+                      </label>
+                      <input
+                        id="previous-bill-month-input"
+                        type="month"
+                        value={formData.previousBillMonth || ''}
+                        onChange={(e) => {
+                          onUpdateFormData({ previousBillMonth: e.target.value });
+                          if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
+                        }}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          errors.previousBillMonth ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      />
+                      {errors.previousBillMonth && (
+                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.previousBillMonth}</p>
+                      )}
                     </div>
-                  </label>
-                  <input
-                    id="utility-end-time-input"
-                    type="time"
-                    value={formData.utilityEndTime || ''}
-                    onChange={(e) => {
-                      onUpdateFormData({ utilityEndTime: e.target.value });
-                      if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
-                    }}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                      errors.utilityEndTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                    }`}
-                  />
-                  {errors.utilityEndTime && (
-                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.utilityEndTime}</p>
-                  )}
+
+                    {/* Previous Bill Amount */}
+                    <div>
+                      <label
+                        htmlFor="previous-bill-amount-input"
+                        className="block text-[13px] font-bold text-primary mb-1"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Coins className="w-3.5 h-3.5 text-secondary" />
+                          <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous Bill Amount (BDT) *'}</span>
+                        </div>
+                      </label>
+                      <input
+                        id="previous-bill-amount-input"
+                        type="number"
+                        min="1"
+                        step="any"
+                        placeholder={language === 'bn' ? 'যেমন: ১৫০০' : 'e.g. 1500'}
+                        value={formData.previousBillAmount !== undefined && formData.previousBillAmount !== null ? formData.previousBillAmount : ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          onUpdateFormData({ previousBillAmount: val === '' ? undefined : Number(val) });
+                          if (errors.previousBillAmount) setErrors((prev) => ({ ...prev, previousBillAmount: '' }));
+                        }}
+                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                          errors.previousBillAmount ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        }`}
+                      />
+                      {errors.previousBillAmount && (
+                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.previousBillAmount}</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* Date, Start Time & End Time in 3 columns on sm+ screens */
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Incident Date */}
+                  <div>
+                    <label
+                      htmlFor="complaint-date-input"
+                      className="block text-[13px] font-bold text-primary mb-1"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-primary" />
+                        <span>{language === 'bn' ? 'তারিখ *' : 'Date *'}</span>
+                      </div>
+                    </label>
+                    <input
+                      id="complaint-date-input"
+                      type="date"
+                      max={todayLocal}
+                      value={formData.incidentDate || ''}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        if (selectedDate && selectedDate > todayLocal) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            incidentDate:
+                              language === 'bn'
+                                ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                                : 'Future dates are not allowed',
+                          }));
+                          return;
+                        }
+                        onUpdateFormData({ incidentDate: selectedDate });
+                        if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
+                      }}
+                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                        errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      }`}
+                    />
+                    {errors.incidentDate && (
+                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentDate}</p>
+                    )}
+                  </div>
+
+                  {/* Start Time (Required) */}
+                  <div>
+                    <label
+                      htmlFor="utility-start-time-input"
+                      className="block text-[13px] font-bold text-primary mb-1"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-primary" />
+                        <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start Time *'}</span>
+                      </div>
+                    </label>
+                    <input
+                      id="utility-start-time-input"
+                      type="time"
+                      value={formData.incidentTime || ''}
+                      onChange={(e) => {
+                        onUpdateFormData({ incidentTime: e.target.value });
+                        if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
+                        if (errors.utilityEndTime && formData.utilityEndTime && e.target.value < formData.utilityEndTime) {
+                          setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                        }
+                      }}
+                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                        errors.incidentTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      }`}
+                    />
+                    {errors.incidentTime && (
+                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentTime}</p>
+                    )}
+                  </div>
+
+                  {/* End Time (Optional) */}
+                  <div>
+                    <label
+                      htmlFor="utility-end-time-input"
+                      className="block text-[13px] font-bold text-primary mb-1"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-secondary" />
+                        <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End Time (Optional)'}</span>
+                      </div>
+                    </label>
+                    <input
+                      id="utility-end-time-input"
+                      type="time"
+                      value={formData.utilityEndTime || ''}
+                      onChange={(e) => {
+                        onUpdateFormData({ utilityEndTime: e.target.value });
+                        if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                      }}
+                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                        errors.utilityEndTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      }`}
+                    />
+                    {errors.utilityEndTime && (
+                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.utilityEndTime}</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Incident Description */}
               <div className="space-y-1">
@@ -894,7 +1078,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
                   }}
                   placeholder={
-                    isLoadShedding
+                    isExcessElectricityBill
+                      ? language === 'bn'
+                        ? 'অস্বাভাবিক বিদ্যুৎ বিল, মিটারের রিডিং বা সংশ্লিষ্ট বিতরণ কোম্পানির বিবরণ লিখুন...'
+                        : 'Describe the abnormal electricity bill, meter reading discrepancies, or distribution company details...'
+                      : isLoadShedding
                       ? language === 'bn'
                         ? 'লোডশেডিংয়ের প্রভাব, এলাকা বা সময়কাল সম্পর্কিত বিবরণ লিখুন...'
                         : 'Describe the load shedding outage, area affected, or duration details...'
@@ -1971,14 +2159,22 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </Accordion>
         )}
 
-        {/* SECTION 4: Attachments (সংযুক্তি - ঐচ্ছিক) - COLLAPSIBLE - Hidden for Utility reports */}
-        {!isUtilityReport && (
+        {/* SECTION 4: Attachments (সংযুক্তি - ঐচ্ছিক) - COLLAPSIBLE - Hidden for Load Shedding & Gas Shortage, enabled for Excess Electricity Bill */}
+        {(!isUtilityReport || isExcessElectricityBill) && (
           <Accordion
             id="composer-section-attachments"
             isOpen={Boolean(openSections.attachments)}
             collapsible={true}
             onToggle={() => toggleSection('attachments')}
-            title={language === 'bn' ? '৪. সংযুক্তি (ঐচ্ছিক)' : '4. Attachments (Optional)'}
+            title={
+              isUtilityReport
+                ? language === 'bn'
+                  ? '৩. সংযুক্তি (ঐচ্ছিক)'
+                  : '3. Attachments (Optional)'
+                : language === 'bn'
+                ? '৪. সংযুক্তি (ঐচ্ছিক)'
+                : '4. Attachments (Optional)'
+            }
             summary={
               pendingImages.length > 0
                 ? `${pendingImages.length} ${language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}`
@@ -1997,7 +2193,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           >
             <div className="space-y-3.5 pt-1 text-left">
               <p className="text-[13px] text-secondary">
-                {language === 'bn'
+                {isExcessElectricityBill
+                  ? language === 'bn'
+                    ? 'বিদ্যুৎ বিলের কপি বা মিটারের ছবি থাকলে সংযুক্ত করুন। এটি সম্পূর্ণ ঐচ্ছিক।'
+                    : 'Attach copies of electricity bills or meter photos if available. This is completely optional.'
+                  : language === 'bn'
                   ? 'অভিযোগ বুঝতে সহায়ক ছবি বা স্ক্রিনশট থাকলে সংযুক্ত করুন। এটি সম্পূর্ণ ঐচ্ছিক।'
                   : 'Attach images or screenshots if they help explain the complaint. This is completely optional.'}
               </p>

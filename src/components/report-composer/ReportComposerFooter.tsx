@@ -86,20 +86,10 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           size="lg"
           disabled={!canContinue}
           onClick={onNext}
-          rightIcon={
-            segment === 'load_shedding' && selectedSubcategoryId === 'excess-electricity-bill' ? undefined : (
-              <ArrowRight className="w-4 h-4" />
-            )
-          }
+          rightIcon={<ArrowRight className="w-4 h-4" />}
           className="min-h-[44px] text-[16px] px-6"
         >
-          {segment === 'load_shedding' && selectedSubcategoryId === 'excess-electricity-bill'
-            ? language === 'bn'
-              ? 'পরবর্তী ধাপে উন্মুক্ত হবে'
-              : 'Available in Next Phase'
-            : language === 'bn'
-            ? 'বিবরণ প্রদানে যান'
-            : 'Continue to Details'}
+          {language === 'bn' ? 'বিবরণ প্রদানে যান' : 'Continue to Details'}
         </Button>
       )}
 

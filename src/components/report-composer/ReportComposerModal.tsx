@@ -383,14 +383,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Step Navigation Handlers
   const handleGoToStep = useCallback((step: number, jumpSection?: string) => {
     setSelectedComingSoon(null);
-    // Phase 2 guard: Excess electricity bill stops at step 2
-    if (
-      formData.segment === 'load_shedding' &&
-      formData.subcategoryId === 'excess-electricity-bill' &&
-      step > 2
-    ) {
-      return;
-    }
 
     // If attempting to go to step 3 or 4 with rape subcategory without consent
     if (
@@ -481,6 +473,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         mentionedParties: [],
         intimateWhatHappened: '',
         intimatePlatform: '',
+        incidentTime: '',
+        utilityEndTime: '',
+        recentBillMonth: '',
+        recentBillAmount: undefined,
+        previousBillMonth: '',
+        previousBillAmount: undefined,
       }));
     },
     [formData.segment, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
@@ -542,8 +540,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           ...(isUtilitySwitch
             ? {
                 description: '',
+                incidentDate: '',
                 incidentTime: '',
                 utilityEndTime: '',
+                recentBillMonth: '',
+                recentBillAmount: undefined,
+                previousBillMonth: '',
+                previousBillAmount: undefined,
               }
             : {}),
         };
@@ -554,7 +557,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleNextFromStep2 = useCallback(() => {
     if (!formData.subcategoryId) return;
-    if (formData.segment === 'load_shedding' && formData.subcategoryId === 'excess-electricity-bill') return;
 
     // Check Rape pre-report consent requirement
     if (
@@ -778,9 +780,22 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         subcategoryId: formData.subcategoryId,
         title: formData.title || '',
         description: formData.description || '',
-        incidentDate: formData.incidentDate || undefined,
+        incidentDate:
+          formData.subcategoryId === 'excess-electricity-bill'
+            ? formData.incidentDate || (formData.recentBillMonth ? `${formData.recentBillMonth}-01` : new Date().toISOString().split('T')[0])
+            : formData.incidentDate || undefined,
         incidentTime: formData.incidentTime || undefined,
         utilityEndTime: formData.utilityEndTime || undefined,
+        recentBillMonth: formData.subcategoryId === 'excess-electricity-bill' ? formData.recentBillMonth || undefined : undefined,
+        recentBillAmount:
+          formData.subcategoryId === 'excess-electricity-bill' && formData.recentBillAmount !== undefined && formData.recentBillAmount !== null && String(formData.recentBillAmount).trim() !== ''
+            ? Number(formData.recentBillAmount)
+            : undefined,
+        previousBillMonth: formData.subcategoryId === 'excess-electricity-bill' ? formData.previousBillMonth || undefined : undefined,
+        previousBillAmount:
+          formData.subcategoryId === 'excess-electricity-bill' && formData.previousBillAmount !== undefined && formData.previousBillAmount !== null && String(formData.previousBillAmount).trim() !== ''
+            ? Number(formData.previousBillAmount)
+            : undefined,
         frequency: formData.frequency || 'one-time',
         subjectType: isPartySegment ? (formData.subjectType || 'unknown') : undefined,
         reportedSubject: isPartySegment ? resolvedReportedSubject : undefined,
@@ -1066,9 +1081,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   if (!isOpen) return null;
 
   const canContinueStep1 = Boolean(formData.segment) && !selectedComingSoon;
-  const canContinueStep2 =
-    Boolean(formData.subcategoryId) &&
-    !(formData.segment === 'load_shedding' && formData.subcategoryId === 'excess-electricity-bill');
+  const canContinueStep2 = Boolean(formData.subcategoryId);
 
   // Render-level defense guard: ensure Step 3/4 is NEVER rendered if rape consent is missing
   const effectiveCurrentStep =

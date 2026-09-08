@@ -264,7 +264,7 @@ BEGIN
   v_title := trim(coalesce(p_payload->>'title', ''));
   v_description := trim(coalesce(p_payload->>'description', ''));
 
-  IF v_segment NOT IN ('harassment', 'rickshaw', 'extortion') THEN
+  IF v_segment NOT IN ('harassment', 'rickshaw', 'extortion', 'load_shedding') THEN
     RAISE EXCEPTION 'VALIDATION_FAILED: Invalid segment %', v_segment;
   END IF;
 

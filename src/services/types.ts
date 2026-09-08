@@ -136,6 +136,10 @@ export interface SubmittedReport {
   incidentDate: string;
   incidentTime?: string;
   utilityEndTime?: string;
+  recentBillMonth?: string;
+  recentBillAmount?: number | string;
+  previousBillMonth?: string;
+  previousBillAmount?: number | string;
   frequency: 'one-time' | 'repeated';
   relationshipContext?: string;
   intimateWhatHappened?: string;
@@ -198,6 +202,10 @@ export interface DraftReport {
   incidentDate: string;
   incidentTime: string;
   utilityEndTime?: string;
+  recentBillMonth?: string;
+  recentBillAmount?: number | string;
+  previousBillMonth?: string;
+  previousBillAmount?: number | string;
   frequency: 'one-time' | 'repeated';
   relationshipContext: string;
   intimateWhatHappened: string;

@@ -9,6 +9,7 @@ import {
   Users,
   Info,
   Layers,
+  Coins,
 } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { DraftReport, isMeaningfulMentionedParty } from '../../services/types';
@@ -19,6 +20,7 @@ import {
   getSubjectOptionLabel,
 } from '../../data/reportSubjectOptions';
 import { ReviewSection } from './ReviewSection';
+import { formatBillingMonth } from '../../utils/formatters';
 
 export interface Step4ReviewProps {
   segment: SectionKey;
@@ -48,6 +50,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const isUtilityReport = (segment as string) === 'utility' || segment === 'load_shedding';
   const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
   const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
+  const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -115,7 +118,11 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       : formData.subcategoryId
   }`;
 
-  const incidentSummary = isUtilityReport
+  const incidentSummary = isExcessElectricityBill
+    ? `${formData.recentBillMonth ? formatBillingMonth(formData.recentBillMonth, language) : ''}${
+        formData.recentBillAmount ? ` · ৳${formData.recentBillAmount}` : ''
+      }`
+    : isUtilityReport
     ? `${formData.incidentDate || '-'} · ${language === 'bn' ? 'শুরু: ' : 'Start: '}${formData.incidentTime || '-'}${
         formData.utilityEndTime
           ? ` · ${language === 'bn' ? 'শেষ: ' : 'End: '}${formData.utilityEndTime}`
@@ -265,7 +272,11 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           onToggle={() => toggleSection('incident')}
           title={
             isUtilityReport
-              ? isLoadShedding
+              ? isExcessElectricityBill
+                ? language === 'bn'
+                  ? '১. বিদ্যুৎ বিলের তথ্য ও বিবরণ'
+                  : '1. Electricity Bill Details & Narrative'
+                : isLoadShedding
                 ? language === 'bn'
                   ? '১. লোডশেডিংয়ের সময় ও বিবরণ'
                   : '1. Load Shedding Timing & Details'
@@ -294,56 +305,88 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center gap-3.5 text-secondary flex-wrap pt-0.5 text-[13px]">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-primary" />
-                <span>
-                  {language === 'bn' ? 'তারিখ: ' : 'Date: '}
-                  <strong>{formData.incidentDate || '-'}</strong>
-                </span>
+            {isExcessElectricityBill ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+                <div className="p-2.5 rounded-xl bg-surface border border-subtle">
+                  <span className="text-[12px] text-muted block mb-0.5">
+                    {language === 'bn' ? 'সাম্প্রতিক বিলের তথ্য' : 'Recent Bill Info'}
+                  </span>
+                  <div className="space-y-0.5">
+                    <p className="text-[13.5px] font-bold text-primary">
+                      {formData.recentBillMonth ? formatBillingMonth(formData.recentBillMonth, language) : '-'}
+                    </p>
+                    <p className="text-[13px] text-secondary">
+                      {formData.recentBillAmount !== undefined ? `৳${formData.recentBillAmount}` : '-'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-surface border border-subtle">
+                  <span className="text-[12px] text-muted block mb-0.5">
+                    {language === 'bn' ? 'আগের স্বাভাবিক বিলের তথ্য' : 'Previous Regular Bill Info'}
+                  </span>
+                  <div className="space-y-0.5">
+                    <p className="text-[13.5px] font-bold text-primary">
+                      {formData.previousBillMonth ? formatBillingMonth(formData.previousBillMonth, language) : '-'}
+                    </p>
+                    <p className="text-[13px] text-secondary">
+                      {formData.previousBillAmount !== undefined ? `৳${formData.previousBillAmount}` : '-'}
+                    </p>
+                  </div>
+                </div>
               </div>
-
-              {formData.incidentTime && (
-                <div>
+            ) : (
+              <div className="flex items-center gap-3.5 text-secondary flex-wrap pt-0.5 text-[13px]">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-primary" />
                   <span>
-                    {isUtilityReport
-                      ? language === 'bn'
-                        ? 'শুরুর সময়: '
-                        : 'Start Time: '
-                      : language === 'bn'
-                      ? 'সময়: '
-                      : 'Time: '}
-                    <strong>{formData.incidentTime}</strong>
+                    {language === 'bn' ? 'তারিখ: ' : 'Date: '}
+                    <strong>{formData.incidentDate || '-'}</strong>
                   </span>
                 </div>
-              )}
 
-              {isUtilityReport && formData.utilityEndTime && (
-                <div>
-                  <span>
-                    {language === 'bn' ? 'শেষ সময়: ' : 'End Time: '}
-                    <strong>{formData.utilityEndTime}</strong>
-                  </span>
-                </div>
-              )}
-
-              {!hideFrequency && (
-                <div>
-                  <span>
-                    {language === 'bn' ? 'পুনরাবৃত্তি: ' : 'Frequency: '}
-                    <strong>
-                      {formData.frequency === 'repeated'
+                {formData.incidentTime && (
+                  <div>
+                    <span>
+                      {isUtilityReport
                         ? language === 'bn'
-                          ? 'নিয়মিত / একাধিকবার'
-                          : 'Repeated'
+                          ? 'শুরুর সময়: '
+                          : 'Start Time: '
                         : language === 'bn'
-                        ? 'এককালীন'
-                        : 'One-time'}
-                    </strong>
-                  </span>
-                </div>
-              )}
-            </div>
+                        ? 'সময়: '
+                        : 'Time: '}
+                      <strong>{formData.incidentTime}</strong>
+                    </span>
+                  </div>
+                )}
+
+                {isUtilityReport && formData.utilityEndTime && (
+                  <div>
+                    <span>
+                      {language === 'bn' ? 'শেষ সময়: ' : 'End Time: '}
+                      <strong>{formData.utilityEndTime}</strong>
+                    </span>
+                  </div>
+                )}
+
+                {!hideFrequency && (
+                  <div>
+                    <span>
+                      {language === 'bn' ? 'পুনরাবৃত্তি: ' : 'Frequency: '}
+                      <strong>
+                        {formData.frequency === 'repeated'
+                          ? language === 'bn'
+                            ? 'নিয়মিত / একাধিকবার'
+                            : 'Repeated'
+                          : language === 'bn'
+                          ? 'এককালীন'
+                          : 'One-time'}
+                      </strong>
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </ReviewSection>
 
@@ -702,13 +745,21 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           </ReviewSection>
         )}
 
-        {/* Section 5: 4. Attachments (Hidden for Utility reports) */}
-        {!isUtilityReport && (
+        {/* Section 5: Attachments (Hidden for Load Shedding & Gas Shortage, enabled for Excess Electricity Bill) */}
+        {(!isUtilityReport || isExcessElectricityBill) && (
           <ReviewSection
             id="review-section-attachments"
             isOpen={openSections.attachments}
             onToggle={() => toggleSection('attachments')}
-            title={language === 'bn' ? '৪. সংযুক্তি' : '4. Attachments'}
+            title={
+              isUtilityReport
+                ? language === 'bn'
+                  ? '৩. সংযুক্তি'
+                  : '3. Attachments'
+                : language === 'bn'
+                ? '৪. সংযুক্তি'
+                : '4. Attachments'
+            }
             summary={attachmentsSummary}
             icon={<Paperclip className="w-4 h-4" />}
             onEdit={() => onEditStep(3, 'attachments')}

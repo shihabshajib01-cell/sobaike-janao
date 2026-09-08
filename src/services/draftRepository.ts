@@ -19,6 +19,10 @@ export const INITIAL_DRAFT: DraftReport = {
   incidentDate: '',
   incidentTime: '',
   utilityEndTime: '',
+  recentBillMonth: '',
+  recentBillAmount: undefined,
+  previousBillMonth: '',
+  previousBillAmount: undefined,
   frequency: 'one-time',
   relationshipContext: '',
   intimateWhatHappened: '',
@@ -193,6 +197,10 @@ export const DraftRepository = {
     if (Boolean(draft.incidentDate?.trim())) return true;
     if (Boolean(draft.incidentTime?.trim())) return true;
     if (Boolean(draft.utilityEndTime?.trim())) return true;
+    if (Boolean(draft.recentBillMonth?.trim())) return true;
+    if (draft.recentBillAmount !== undefined && draft.recentBillAmount !== '') return true;
+    if (Boolean(draft.previousBillMonth?.trim())) return true;
+    if (draft.previousBillAmount !== undefined && draft.previousBillAmount !== '') return true;
     if (Boolean(draft.intimateWhatHappened?.trim())) return true;
     if (Boolean(draft.relationshipContext?.trim())) return true;
 
