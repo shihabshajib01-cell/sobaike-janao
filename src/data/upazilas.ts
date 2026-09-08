@@ -676,7 +676,9 @@ const FORMER_UPAZILA_ALIASES: Record<string, string> = {
   'pirojpur-zianagar': 'pirojpur-indurkani',
   'comilla sadar': 'cumilla-cumilla-sadar',
   'cumilla-comilla-sadar': 'cumilla-cumilla-sadar',
+  'comilla sadar south': 'cumilla-cumilla-sadar-south',
   'sadarsouth': 'cumilla-cumilla-sadar-south',
+  'সদর দক্ষিণ': 'cumilla-cumilla-sadar-south',
   'cumilla-sadarsouth': 'cumilla-cumilla-sadar-south',
   'bogra sadar': 'bogra-bogura-sadar',
   'bogra-bogra-sadar': 'bogra-bogura-sadar',
@@ -685,6 +687,7 @@ const FORMER_UPAZILA_ALIASES: Record<string, string> = {
   'barisal sadar': 'barishal-barishal-sadar',
   'barishal-barisal-sadar': 'barishal-barishal-sadar',
   'borhan sddin': 'bhola-borhanuddin',
+  'বোরহান উদ্দিন': 'bhola-borhanuddin',
   'bhola-borhan-sddin': 'bhola-borhanuddin',
 };
 
