@@ -12,7 +12,7 @@
  *   RPMP (6 police stations), SMP (6 police stations), and BMP (4 police stations).
  *
  * Source Type: Official Administrative & Police Station Framework
- * Verification Note: Reflects current official renamings and standardizations as of 2024.
+ * Verification Note: Administrative names and metropolitan police jurisdictions reviewed against current official sources in September 2026.
  *
  * Structure & Field Convention:
  * - Rural Upazilas and Metropolitan Thanas (police stations) are combined into this single
@@ -730,9 +730,6 @@ const FORMER_UPAZILA_ALIASES: Record<string, string> = {
   'borhan sddin': 'bhola-borhanuddin',
   'বোরহান উদ্দিন': 'bhola-borhanuddin',
   'bhola-borhan-sddin': 'bhola-borhanuddin',
-  'tongi': 'gazipur-tongi-east',
-  'টঙ্গী': 'gazipur-tongi-east',
-  'gazipur-tongi': 'gazipur-tongi-east',
 };
 
 /**
