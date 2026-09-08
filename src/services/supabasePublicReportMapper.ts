@@ -22,6 +22,14 @@ export interface SupabasePublicReportRPC {
   priority?: string | null;
   hasSupportingInfo?: boolean | null;
   status?: string | null;
+  recentBillMonth?: string | null;
+  recentBillAmount?: number | null;
+  previousBillMonth?: string | null;
+  previousBillAmount?: number | null;
+  recent_bill_month?: string | null;
+  recent_bill_amount?: number | null;
+  previous_bill_month?: string | null;
+  previous_bill_amount?: number | null;
 }
 
 const BANGLA_MONTHS = [
@@ -135,6 +143,20 @@ export const mapSupabasePublicReportToItem = (
     areaEn,
     incidentDateBn,
     incidentDateEn,
+    recentBillMonth: rpc.recentBillMonth || rpc.recent_bill_month || undefined,
+    recentBillAmount:
+      rpc.recentBillAmount !== undefined && rpc.recentBillAmount !== null
+        ? Number(rpc.recentBillAmount)
+        : rpc.recent_bill_amount !== undefined && rpc.recent_bill_amount !== null
+        ? Number(rpc.recent_bill_amount)
+        : undefined,
+    previousBillMonth: rpc.previousBillMonth || rpc.previous_bill_month || undefined,
+    previousBillAmount:
+      rpc.previousBillAmount !== undefined && rpc.previousBillAmount !== null
+        ? Number(rpc.previousBillAmount)
+        : rpc.previous_bill_amount !== undefined && rpc.previous_bill_amount !== null
+        ? Number(rpc.previous_bill_amount)
+        : undefined,
     publishedDateBn,
     publishedDateEn,
     publishedAt: rpc.publishedAt || undefined,

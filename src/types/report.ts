@@ -76,6 +76,10 @@ export interface ReportItem {
   areaEn: string;
   incidentDateBn: string;
   incidentDateEn: string;
+  recentBillMonth?: string;
+  recentBillAmount?: number;
+  previousBillMonth?: string;
+  previousBillAmount?: number;
   publishedDateBn: string;
   publishedDateEn: string;
   publishedAt?: string;

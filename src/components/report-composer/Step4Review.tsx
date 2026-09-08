@@ -323,7 +323,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
                 <div className="p-2.5 rounded-xl bg-surface border border-subtle">
                   <span className="text-[12px] text-muted block mb-0.5">
-                    {language === 'bn' ? 'আগের স্বাভাবিক বিলের তথ্য' : 'Previous Regular Bill Info'}
+                    {language === 'bn' ? 'আগের বিলের তথ্য' : 'Previous Bill Info'}
                   </span>
                   <div className="space-y-0.5">
                     <p className="text-[13.5px] font-bold text-primary">

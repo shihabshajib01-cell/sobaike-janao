@@ -48,6 +48,16 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
     areaEn: pv?.areaEn || seed.location?.area || '',
     incidentDateBn: pv?.incidentDateBn || seed.incidentDate || '',
     incidentDateEn: pv?.incidentDateEn || seed.incidentDate || '',
+    recentBillMonth: seed.recentBillMonth,
+    recentBillAmount:
+      seed.recentBillAmount !== undefined && seed.recentBillAmount !== null
+        ? Number(seed.recentBillAmount)
+        : undefined,
+    previousBillMonth: seed.previousBillMonth,
+    previousBillAmount:
+      seed.previousBillAmount !== undefined && seed.previousBillAmount !== null
+        ? Number(seed.previousBillAmount)
+        : undefined,
     publishedDateBn: '২৩ ফেব্রুয়ারি ২০২৬',
     publishedDateEn: '23 Feb 2026',
     publishedAt: seed.createdAt,

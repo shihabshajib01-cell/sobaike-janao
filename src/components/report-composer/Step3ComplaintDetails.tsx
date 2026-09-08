@@ -903,7 +903,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-secondary" />
-                          <span>{language === 'bn' ? 'আগের স্বাভাবিক বিলের মাস *' : 'Previous Regular Bill Month *'}</span>
+                          <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous Bill Month *'}</span>
                         </div>
                       </label>
                       <input
@@ -1080,8 +1080,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   placeholder={
                     isExcessElectricityBill
                       ? language === 'bn'
-                        ? 'অস্বাভাবিক বিদ্যুৎ বিল, মিটারের রিডিং বা সংশ্লিষ্ট বিতরণ কোম্পানির বিবরণ লিখুন...'
-                        : 'Describe the abnormal electricity bill, meter reading discrepancies, or distribution company details...'
+                        ? 'বিদ্যুৎ বিলটি অস্বাভাবিক বেশি বা ভুল মনে হওয়ার কারণ লিখুন।'
+                        : 'Describe why you believe the electricity bill is unusually high or incorrect.'
                       : isLoadShedding
                       ? language === 'bn'
                         ? 'লোডশেডিংয়ের প্রভাব, এলাকা বা সময়কাল সম্পর্কিত বিবরণ লিখুন...'
