@@ -33,30 +33,38 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
   const disabledRef = useRef<boolean>(disabled);
   disabledRef.current = disabled;
 
+  const locationRef = useRef<ReportLocationData>(location);
+  locationRef.current = location;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const onMapPointChangeRef = useRef(onMapPointChange);
+  onMapPointChangeRef.current = onMapPointChange;
+
   const hasValidCoordinates = isValidIncidentCoordinates(location.lat, location.lng);
 
-  // Unified point selection handler
+  // Unified point selection handler that ALWAYS references the latest current incident-location state
   const handleSelectPoint = useCallback(
     (lat: number, lng: number) => {
       // Round to 6 decimal places for clean storage
       const cleanLat = Number(lat.toFixed(6));
       const cleanLng = Number(lng.toFixed(6));
 
-      if (onMapPointChange) {
-        onMapPointChange(cleanLat, cleanLng);
-      } else if (onChange) {
-        onChange({
-          ...location,
+      if (onMapPointChangeRef.current) {
+        onMapPointChangeRef.current(cleanLat, cleanLng);
+      } else if (onChangeRef.current) {
+        onChangeRef.current({
+          ...locationRef.current,
           lat: cleanLat,
           lng: cleanLng,
         });
       }
     },
-    [location, onMapPointChange, onChange]
+    []
   );
 
   // Keep ref to latest point selection handler to prevent stale closures in Leaflet event listeners
   const latestSelectPointRef = useRef(handleSelectPoint);
+  latestSelectPointRef.current = handleSelectPoint;
   useEffect(() => {
     latestSelectPointRef.current = handleSelectPoint;
   }, [handleSelectPoint]);
