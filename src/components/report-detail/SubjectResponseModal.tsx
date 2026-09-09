@@ -164,7 +164,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             type="button"
             onClick={handleResetAndClose}
             aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-            className="p-2 text-ui-content-secondary hover:text-ui-content-primary rounded-lg hover:bg-ui-surface-subtle transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-ui-content-secondary rounded-lg transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X className="w-5 h-5" />
           </button>
@@ -232,7 +232,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
                       responderType === 'mentioned_person'
                         ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
-                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle hover:bg-ui-surface'
+                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
                     }`}
                   >
                     {language === 'bn' ? 'আমি সরাসরি উল্লেখিত ব্যক্তি' : 'Mentioned Individual'}
@@ -243,7 +243,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
                       responderType === 'organization_rep'
                         ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
-                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle hover:bg-ui-surface'
+                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
                     }`}
                   >
                     {language === 'bn' ? 'প্রতিষ্ঠানের মুখপাত্র/প্রতিনিধি' : 'Authorized Representative'}
@@ -254,7 +254,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     className={`px-3 py-2.5 text-[14px] font-medium rounded-xl border text-center transition-colors min-h-[44px] cursor-pointer ${
                       responderType === 'legal_rep'
                         ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
-                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle hover:bg-ui-surface'
+                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
                     }`}
                   >
                     {language === 'bn' ? 'আইনি প্রতিনিধি / আইনজীবী' : 'Legal Counsel'}
@@ -403,7 +403,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 type="button"
                 onClick={handleResetAndClose}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 border border-ui-stroke-subtle hover:bg-ui-surface-subtle disabled:opacity-50 text-ui-content-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-ui-surface"
+                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-ui-surface"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
               </button>

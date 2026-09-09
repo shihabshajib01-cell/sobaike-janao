@@ -162,7 +162,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       {isDistrictSelected ? (
         <div className="space-y-4 animate-in fade-in duration-200">
           {/* Selected District Card */}
-          <div className="bg-ui-surface-subtle/70 border border-ui-stroke-subtle rounded-xl p-3.5 space-y-1.5">
+          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3.5 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-ui-content-muted uppercase tracking-wider">
                 {language === 'bn' ? 'নির্বাচিত এলাকা' : 'Selected Area'}
@@ -250,7 +250,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   <div
                     key={r.id}
                     onClick={() => navigateTo(`/report-detail/${r.id}`)}
-                    className="p-2.5 rounded-xl bg-ui-surface-subtle/60 hover:bg-ui-surface-subtle border border-ui-stroke-subtle/80 cursor-pointer transition-colors text-left group"
+                    className="p-2.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle cursor-pointer transition-colors text-left group"
                   >
                     <div className="text-[14px] font-bold text-ui-content-primary transition-colors line-clamp-1">
                       {language === 'bn' ? r.titleBn : r.titleEn}

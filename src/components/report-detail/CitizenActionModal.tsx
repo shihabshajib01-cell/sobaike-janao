@@ -106,7 +106,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             type="button"
             onClick={handleResetAndClose}
             aria-label="Close"
-            className="p-2 text-ui-content-secondary hover:text-ui-content-primary rounded-lg hover:bg-ui-surface-subtle transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-ui-content-secondary rounded-lg transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X className="w-5 h-5" />
           </button>
@@ -218,7 +218,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                 type="button"
                 onClick={handleResetAndClose}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 border border-ui-stroke-subtle hover:bg-ui-surface-subtle disabled:opacity-50 text-ui-content-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-ui-surface"
+                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary text-[16px] font-semibold rounded-xl cursor-pointer min-h-[44px] bg-ui-surface"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
               </button>
