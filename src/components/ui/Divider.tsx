@@ -20,12 +20,12 @@ export const Divider: React.FC<DividerProps> = ({
   if (label) {
     return (
       <div id={id} className={`flex items-center my-4 ${className}`} role="separator">
-        <div className="flex-grow border-t border-subtle" />
-        <span className="shrink-0 px-3 text-[14px] font-medium text-muted">{label}</span>
-        <div className="flex-grow border-t border-subtle" />
+        <div className="flex-grow border-t border-ui-stroke-subtle" />
+        <span className="shrink-0 px-3 text-[14px] font-medium text-ui-content-muted">{label}</span>
+        <div className="flex-grow border-t border-ui-stroke-subtle" />
       </div>
     );
   }
 
-  return <hr id={id} className={`border-0 border-t border-subtle my-4 ${className}`} />;
+  return <hr id={id} className={`border-0 border-t border-ui-stroke-subtle my-4 ${className}`} />;
 };

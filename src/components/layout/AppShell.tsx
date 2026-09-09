@@ -67,7 +67,7 @@ export const AppShell: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-page text-primary flex flex-col">
+    <div className="min-h-screen bg-ui-page text-ui-content-primary flex flex-col">
       {/* 1. Desktop Left Navigation Rail (fixed viewport left on >= 1440px) */}
       <ErrorBoundary componentName="DesktopLeftRail" silent>
         <DesktopLeftRail />
@@ -114,10 +114,10 @@ export const AppShell: React.FC = () => {
           </div>
 
           {/* Minimal Informational Trust Footer */}
-          <footer className="pt-8 pb-6 border-t border-subtle mt-10 text-[14px] text-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
+          <footer className="pt-8 pb-6 border-t border-ui-stroke-subtle mt-10 text-[14px] text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-primary">সবাইকে জানাও</span>
+                <span className="font-bold text-ui-content-primary">সবাইকে জানাও</span>
                 <span>•</span>
                 <span>
                   {language === 'bn'
@@ -125,7 +125,7 @@ export const AppShell: React.FC = () => {
                     : 'Moderated Citizen Public Platform'}
                 </span>
               </div>
-              <div className="text-[14px] text-muted">
+              <div className="text-[14px] text-ui-content-muted">
                 <span>{language === 'bn' ? 'মুক্ত জনস্বার্থ রেকর্ড' : 'Public Interest Record'}</span>
               </div>
             </div>

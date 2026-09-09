@@ -59,7 +59,7 @@ export const BottomNav: React.FC = () => {
     <nav
       id="bottom-nav"
       aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-surface border-t border-subtle pb-safe"
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-ui-surface border-t border-ui-stroke-subtle pb-safe"
     >
       <div className="flex items-center justify-around h-16 px-1">
         {navItems.map((item) => {

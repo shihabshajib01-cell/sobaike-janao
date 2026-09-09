@@ -92,11 +92,11 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const positionClasses = {
     bottom:
-      'fixed inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl border-t border-theme pb-safe',
+      'fixed inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl border-t border-ui-stroke-default pb-safe',
     right:
-      'fixed inset-y-0 right-0 w-full max-w-md border-l border-theme',
+      'fixed inset-y-0 right-0 w-full max-w-md border-l border-ui-stroke-default',
     left:
-      'fixed inset-y-0 left-0 w-full max-w-md border-r border-theme',
+      'fixed inset-y-0 left-0 w-full max-w-md border-r border-ui-stroke-default',
   };
 
   return (
@@ -119,7 +119,7 @@ export const Drawer: React.FC<DrawerProps> = ({
       <div
         ref={drawerRef}
         tabIndex={-1}
-        className={`bg-surface shadow-2xl z-10 flex flex-col outline-none ${positionClasses[position]}`}
+        className={`bg-ui-surface shadow-2xl z-10 flex flex-col outline-none ${positionClasses[position]}`}
       >
         {/* Bottom sheet pull indicator on mobile */}
         {position === 'bottom' && (
@@ -129,15 +129,15 @@ export const Drawer: React.FC<DrawerProps> = ({
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-subtle shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-ui-stroke-subtle shrink-0">
           <div>
             {title && (
-              <h2 id={`${id}-title`} className="text-[20px] font-bold text-primary leading-snug">
+              <h2 id={`${id}-title`} className="text-[20px] font-bold text-ui-content-primary leading-snug">
                 {title}
               </h2>
             )}
             {description && (
-              <p className="text-[14px] leading-[20px] text-muted mt-1">{description}</p>
+              <p className="text-[14px] leading-[20px] text-ui-content-muted mt-1">{description}</p>
             )}
           </div>
           <IconButton
@@ -151,11 +151,11 @@ export const Drawer: React.FC<DrawerProps> = ({
         </div>
 
         {/* Body Content */}
-        <div className="p-6 overflow-y-auto flex-1 text-primary text-[16px] leading-[24px]">{children}</div>
+        <div className="p-6 overflow-y-auto flex-1 text-ui-content-primary text-[16px] leading-[24px]">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="p-5 border-t border-subtle bg-surface-subtle shrink-0">
+          <div className="p-5 border-t border-ui-stroke-subtle bg-ui-surface-subtle shrink-0">
             {footer}
           </div>
         )}

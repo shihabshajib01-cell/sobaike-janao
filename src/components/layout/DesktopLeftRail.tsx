@@ -83,7 +83,7 @@ export const DesktopLeftRail: React.FC = () => {
   ];
 
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
-    if (!sectionKey) return 'bg-surface-elevated text-primary font-semibold border border-theme';
+    if (!sectionKey) return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
     if (sectionKey === 'harassment') {
       return 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)] font-semibold';
     }
@@ -96,14 +96,14 @@ export const DesktopLeftRail: React.FC = () => {
     if (sectionKey === 'load_shedding') {
       return 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border border-[var(--sec-load_shedding-border)] font-semibold';
     }
-    return 'bg-surface-elevated text-primary font-semibold border border-theme';
+    return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
   };
 
   return (
     <aside
       id="desktop-left-navigation-rail"
       aria-label="Desktop Navigation"
-      className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 h-[100dvh] overflow-y-auto w-[240px] min-[1536px]:w-[250px] min-[1920px]:w-[260px] px-4 min-[1920px]:px-5 py-5 bg-surface border-r border-subtle justify-between select-none z-30"
+      className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 h-[100dvh] overflow-y-auto w-[240px] min-[1536px]:w-[250px] min-[1920px]:w-[260px] px-4 min-[1920px]:px-5 py-5 bg-ui-surface border-r border-ui-stroke-subtle justify-between select-none z-30"
     >
       {/* Top: Brand Header & Primary Nav items */}
       <div className="space-y-5">
@@ -112,7 +112,7 @@ export const DesktopLeftRail: React.FC = () => {
           id="rail-brand-logo"
           size="md"
           onClick={() => navigateTo('/')}
-          className="hover:bg-surface-subtle transition-colors rounded-xl px-1 py-1 w-full"
+          className="hover:bg-ui-surface-subtle transition-colors rounded-xl px-1 py-1 w-full"
         />
 
         {/* Primary Action Button: Contextual Report CTA */}
@@ -122,7 +122,7 @@ export const DesktopLeftRail: React.FC = () => {
             variant="primary"
             size="md"
             fullWidth
-            leftIcon={<AppIcon name="plus-circle" size="lg" className="text-inverse" />}
+            leftIcon={<AppIcon name="plus-circle" size="lg" className="text-ui-content-inverse" />}
             onClick={() => openReportComposer()}
             className="shadow-2xs font-semibold py-2.5 min-h-[44px] text-[16px]"
           >
@@ -144,7 +144,7 @@ export const DesktopLeftRail: React.FC = () => {
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] ${
                   isActive
                     ? getSectionActiveStyles(item.sectionKey)
-                    : 'text-secondary hover:text-primary hover:bg-surface-subtle'
+                    : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
                 }`}
               >
                 <div className="flex items-center gap-3 truncate">
@@ -153,9 +153,9 @@ export const DesktopLeftRail: React.FC = () => {
                     size="lg"
                     className={`transition-colors ${
                       isActive && !secConfig
-                        ? 'text-primary'
+                        ? 'text-ui-content-primary'
                         : !isActive
-                        ? 'text-muted group-hover:text-primary'
+                        ? 'text-ui-content-muted group-hover:text-ui-content-primary'
                         : ''
                     }`}
                   />
@@ -174,7 +174,7 @@ export const DesktopLeftRail: React.FC = () => {
                 {item.isComingSoon && (
                   <span
                     id={`${item.id}-badge`}
-                    className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-surface-subtle border border-subtle text-muted shrink-0 leading-tight"
+                    className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-muted shrink-0 leading-tight"
                   >
                     {language === 'bn' ? item.badgeBn : item.badgeEn}
                   </span>
@@ -186,7 +186,7 @@ export const DesktopLeftRail: React.FC = () => {
       </div>
 
       {/* Bottom: Appearance / Theme, Language toggle & Platform Note */}
-      <div className="pt-4 border-t border-subtle space-y-2.5">
+      <div className="pt-4 border-t border-ui-stroke-subtle space-y-2.5">
         {/* Desktop Theme Control */}
         <ThemeSelector variant="compact" />
 
@@ -195,17 +195,17 @@ export const DesktopLeftRail: React.FC = () => {
           id="rail-lang-toggle"
           onClick={toggleLanguage}
           aria-label={language === 'bn' ? 'Switch to English' : 'বাংলায় দেখুন'}
-          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-subtle hover:bg-surface-subtle transition-colors cursor-pointer text-secondary hover:text-primary min-h-[44px] bg-surface"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface"
         >
           <span className="font-medium">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
-          <span className="font-semibold text-primary px-2.5 py-1 bg-surface-subtle border border-subtle rounded-lg text-[13px]">
+          <span className="font-semibold text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-lg text-[13px]">
             {language === 'bn' ? 'English' : 'বাংলা'}
           </span>
         </button>
 
         {/* Minimal Platform Signature */}
-        <div className="px-2 pt-1 text-[13px] text-muted leading-tight">
-          <p className="font-medium text-secondary">নাগরিক সেবা প্ল্যাটফর্ম</p>
+        <div className="px-2 pt-1 text-[13px] text-ui-content-muted leading-tight">
+          <p className="font-medium text-ui-content-secondary">নাগরিক সেবা প্ল্যাটফর্ম</p>
           <p className="text-[12px] opacity-80">বাংলাদেশ ২০২৬</p>
         </div>
       </div>

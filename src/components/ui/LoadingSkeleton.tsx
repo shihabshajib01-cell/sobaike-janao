@@ -29,14 +29,14 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
   return (
     <div
       id={id}
-      className={`bg-surface border border-subtle rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 space-y-2 sm:space-y-2.5 md:space-y-3.5 shadow-2xs select-none ${className}`}
+      className={`bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 space-y-2 sm:space-y-2.5 md:space-y-3.5 shadow-2xs select-none ${className}`}
       aria-hidden="true"
     >
       {/* 1. Top Context Line: Category badge placeholder + subcategory dot placeholder */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Skeleton className="w-20 sm:w-24 h-4 sm:h-5 rounded-md" />
-          <span className="text-muted text-[11px] sm:text-[12px] opacity-40">•</span>
+          <span className="text-ui-content-muted text-[11px] sm:text-[12px] opacity-40">•</span>
           <Skeleton className="w-24 sm:w-32 h-3.5 sm:h-4 rounded" />
         </div>
         <Skeleton className="w-16 sm:w-20 h-4 sm:h-5 rounded-md" />
@@ -71,10 +71,10 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
       )}
 
       {/* 5. Footer Metadata Row: Location · Date · Action Buttons */}
-      <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3.5 border-t border-subtle">
+      <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3.5 border-t border-ui-stroke-subtle">
         <div className="flex items-center gap-2 sm:gap-3">
           <Skeleton className="w-24 sm:w-32 h-3.5 sm:h-4 rounded" />
-          <span className="text-muted text-[10px] sm:text-[12px] opacity-40">•</span>
+          <span className="text-ui-content-muted text-[10px] sm:text-[12px] opacity-40">•</span>
           <Skeleton className="w-16 sm:w-24 h-3.5 sm:h-4 rounded" />
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3">
@@ -140,7 +140,7 @@ export const MapCardSkeleton: React.FC<MapCardSkeletonProps> = ({
       role="status"
       aria-busy="true"
       aria-label={ariaLabel}
-      className={`relative rounded-2xl border border-subtle bg-surface shadow-xs overflow-hidden flex flex-col select-none ${className}`}
+      className={`relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col select-none ${className}`}
       style={{ minHeight: '520px' }}
     >
       <span className="sr-only">{ariaLabel}</span>
@@ -153,7 +153,7 @@ export const MapCardSkeleton: React.FC<MapCardSkeletonProps> = ({
       </div>
 
       {/* Top-Left Mock Map Legend Skeleton */}
-      <div className="absolute top-3.5 left-3.5 z-20 bg-surface/90 backdrop-blur-xs border border-subtle rounded-xl p-3 shadow-2xs flex flex-col gap-2 w-44">
+      <div className="absolute top-3.5 left-3.5 z-20 bg-surface/90 backdrop-blur-xs border border-ui-stroke-subtle rounded-xl p-3 shadow-2xs flex flex-col gap-2 w-44">
         <Skeleton className="w-24 h-3.5 rounded" />
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
@@ -172,13 +172,13 @@ export const MapCardSkeleton: React.FC<MapCardSkeletonProps> = ({
       </div>
 
       {/* Bottom-Left Mock Marker Count Skeleton */}
-      <div className="absolute bottom-3.5 left-3.5 z-20 bg-surface/95 backdrop-blur-xs border border-subtle rounded-xl px-3 py-2 shadow-2xs flex items-center gap-2">
+      <div className="absolute bottom-3.5 left-3.5 z-20 bg-surface/95 backdrop-blur-xs border border-ui-stroke-subtle rounded-xl px-3 py-2 shadow-2xs flex items-center gap-2">
         <Skeleton className="w-4 h-4 rounded-full" />
         <Skeleton className="w-28 h-4 rounded" />
       </div>
 
       {/* Map Surface Graphic Pulsing Grid Background */}
-      <div className="w-full flex-1 flex items-center justify-center p-8 bg-surface-subtle relative overflow-hidden">
+      <div className="w-full flex-1 flex items-center justify-center p-8 bg-ui-surface-subtle relative overflow-hidden">
         {/* Abstract topographic / grid lines */}
         <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_center,var(--ui-accent)_1px,transparent_1px)] [background-size:24px_24px]" />
 
@@ -230,11 +230,11 @@ export const DistrictRankingSkeleton: React.FC<DistrictRankingSkeletonProps> = (
   return (
     <div
       id={id}
-      className={`rounded-2xl border border-subtle bg-surface shadow-xs p-4 sm:p-5 space-y-4 select-none ${className}`}
+      className={`rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs p-4 sm:p-5 space-y-4 select-none ${className}`}
       aria-hidden="true"
     >
       {/* Panel Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-subtle">
+      <div className="flex items-center justify-between pb-3 border-b border-ui-stroke-subtle">
         <div className="space-y-1">
           <Skeleton className="w-32 h-5 rounded-md" />
           <Skeleton className="w-48 h-3.5 rounded" />
@@ -254,7 +254,7 @@ export const DistrictRankingSkeleton: React.FC<DistrictRankingSkeletonProps> = (
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="p-3 rounded-xl border border-subtle bg-surface flex items-center justify-between gap-3"
+            className="p-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface flex items-center justify-between gap-3"
           >
             <div className="flex items-center gap-2.5">
               <Skeleton className="w-6 h-6 rounded-lg" />
@@ -280,7 +280,7 @@ export const RecentAreaReportsSkeleton: React.FC<{ count?: number; id?: string }
 }) => {
   return (
     <div id={id} className="space-y-3 pt-2 select-none" aria-hidden="true">
-      <div className="flex items-center justify-between border-b border-subtle pb-2.5">
+      <div className="flex items-center justify-between border-b border-ui-stroke-subtle pb-2.5">
         <div className="space-y-1">
           <Skeleton className="w-36 h-5 rounded" />
           <Skeleton className="w-52 h-3.5 rounded" />
@@ -290,14 +290,14 @@ export const RecentAreaReportsSkeleton: React.FC<{ count?: number; id?: string }
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="p-4 rounded-2xl bg-surface border border-subtle space-y-3">
+          <div key={i} className="p-4 rounded-2xl bg-ui-surface border border-ui-stroke-subtle space-y-3">
             <div className="flex items-center justify-between">
               <Skeleton className="w-20 h-4 rounded" />
               <Skeleton className="w-12 h-3 rounded" />
             </div>
             <Skeleton className="w-4/5 h-5 rounded" />
             <Skeleton className="w-full h-4 rounded" />
-            <div className="flex items-center justify-between pt-2 border-t border-subtle">
+            <div className="flex items-center justify-between pt-2 border-t border-ui-stroke-subtle">
               <Skeleton className="w-20 h-3 rounded" />
               <Skeleton className="w-14 h-4 rounded" />
             </div>
@@ -339,7 +339,7 @@ export const MapExploreSkeleton: React.FC<{ id?: string; ariaLabel?: string }> =
 
 export const StatCardSkeleton: React.FC<{ id?: string }> = ({ id }) => {
   return (
-    <div id={id} className="p-4 sm:p-5 bg-surface border border-subtle rounded-2xl space-y-2.5 shadow-2xs select-none" aria-hidden="true">
+    <div id={id} className="p-4 sm:p-5 bg-ui-surface border border-ui-stroke-subtle rounded-2xl space-y-2.5 shadow-2xs select-none" aria-hidden="true">
       <Skeleton className="w-24 h-4 rounded" />
       <Skeleton className="w-16 h-8 rounded-lg" />
       <Skeleton className="w-32 h-4 rounded" />
@@ -355,7 +355,7 @@ export const ReportDetailSkeleton: React.FC<{ id?: string }> = ({ id = 'report-d
       <Skeleton className="w-24 h-8 rounded-lg" />
 
       {/* Main card */}
-      <div className="bg-surface border border-subtle rounded-3xl p-6 md:p-8 space-y-6 shadow-2xs">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-3xl p-6 md:p-8 space-y-6 shadow-2xs">
         {/* Context bar */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">

@@ -74,7 +74,7 @@ export const Header: React.FC = () => {
   ];
 
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
-    if (!sectionKey) return 'bg-surface-subtle text-primary font-bold border border-subtle';
+    if (!sectionKey) return 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle';
     if (sectionKey === 'harassment') {
       return 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)] font-bold';
     }
@@ -87,14 +87,14 @@ export const Header: React.FC = () => {
     if (sectionKey === 'load_shedding') {
       return 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border border-[var(--sec-load_shedding-border)] font-bold';
     }
-    return 'bg-surface-subtle text-primary font-bold border border-subtle';
+    return 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle';
   };
 
   return (
     <>
       <header
         id="tablet-compact-header"
-        className="hidden md:block min-[1440px]:hidden sticky top-0 z-40 w-full bg-surface border-b border-subtle"
+        className="hidden md:block min-[1440px]:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle"
       >
         <div className="w-full max-w-[900px] mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
@@ -103,7 +103,7 @@ export const Header: React.FC = () => {
               id="tablet-brand-logo"
               size="sm"
               onClick={() => navigateTo('/')}
-              englishClassName="hidden min-[900px]:block text-[14px] leading-tight text-secondary font-medium"
+              englishClassName="hidden min-[900px]:block text-[14px] leading-tight text-ui-content-secondary font-medium"
             />
 
             {/* Right Action Cluster for Tablet: ONLY Report CTA + Menu */}
@@ -113,7 +113,7 @@ export const Header: React.FC = () => {
                 id="tablet-report-cta"
                 variant="primary"
                 size="md"
-                leftIcon={<PlusCircle className="w-4 h-4 text-inverse" />}
+                leftIcon={<PlusCircle className="w-4 h-4 text-ui-content-inverse" />}
                 onClick={() => openReportComposer()}
                 className="shadow-2xs font-semibold text-[16px] min-h-[44px]"
               >
@@ -123,11 +123,11 @@ export const Header: React.FC = () => {
               {/* Menu Drawer Button */}
               <IconButton
                 id="tablet-menu-button"
-                icon={<Menu className="w-5 h-5 text-primary" />}
+                icon={<Menu className="w-5 h-5 text-ui-content-primary" />}
                 aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
                 size="md"
                 onClick={() => setIsTabletMenuOpen(true)}
-                className="border border-subtle rounded-xl bg-surface-subtle hover:bg-surface min-h-[44px] min-w-[44px]"
+                className="border border-ui-stroke-subtle rounded-xl bg-ui-surface-subtle hover:bg-ui-surface min-h-[44px] min-w-[44px]"
               />
             </div>
           </div>
@@ -150,7 +150,7 @@ export const Header: React.FC = () => {
         <div className="space-y-4">
           {/* Navigation Section */}
           <div className="space-y-1">
-            <p className="text-[14px] font-semibold text-muted uppercase tracking-wide px-3 mb-2">
+            <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-3 mb-2">
               {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & Pages'}
             </p>
             {navItems.map((item) => {
@@ -167,7 +167,7 @@ export const Header: React.FC = () => {
                   className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-[16px] font-medium transition-colors text-left cursor-pointer min-h-[44px] ${
                     isActive
                       ? getSectionActiveStyles(item.sectionKey)
-                      : 'text-secondary hover:text-primary hover:bg-surface-subtle'
+                      : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -175,7 +175,7 @@ export const Header: React.FC = () => {
                       style={{
                         color: isActive && secConfig ? `var(--sec-${item.sectionKey}-primary)` : undefined,
                       }}
-                      className={isActive && !secConfig ? 'text-primary' : 'text-muted'}
+                      className={isActive && !secConfig ? 'text-ui-content-primary' : 'text-ui-content-muted'}
                     >
                       {item.icon}
                     </span>
@@ -188,7 +188,7 @@ export const Header: React.FC = () => {
                     />
                   )}
                   {item.isComingSoon && (
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-surface-subtle border border-subtle text-muted shrink-0 leading-tight">
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-muted shrink-0 leading-tight">
                       {language === 'bn' ? item.badgeBn : item.badgeEn}
                     </span>
                   )}
@@ -198,7 +198,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Secondary Utilities */}
-          <div className="pt-3 border-t border-subtle space-y-1">
+          <div className="pt-3 border-t border-ui-stroke-subtle space-y-1">
             <button
               onClick={() => {
                 setIsTabletMenuOpen(false);
@@ -206,11 +206,11 @@ export const Header: React.FC = () => {
               }}
               className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[16px] font-medium text-left min-h-[44px] cursor-pointer transition-colors ${
                 currentRoute === '/search'
-                  ? 'bg-surface-subtle text-primary font-bold border border-subtle'
-                  : 'text-secondary hover:text-primary hover:bg-surface-subtle'
+                  ? 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle'
+                  : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
               }`}
             >
-              <Search className="w-5 h-5 text-muted" />
+              <Search className="w-5 h-5 text-ui-content-muted" />
               <span>{language === 'bn' ? 'অনুসন্ধান' : 'Search Reports'}</span>
             </button>
 
@@ -221,24 +221,24 @@ export const Header: React.FC = () => {
               }}
               className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[16px] font-medium text-left min-h-[44px] cursor-pointer transition-colors ${
                 currentRoute === '/more'
-                  ? 'bg-surface-subtle text-primary font-bold border border-subtle'
-                  : 'text-secondary hover:text-primary hover:bg-surface-subtle'
+                  ? 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle'
+                  : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
               }`}
             >
-              <PhoneCall className="w-5 h-5 text-muted" />
+              <PhoneCall className="w-5 h-5 text-ui-content-muted" />
               <span>{language === 'bn' ? 'জরুরি সহায়তা ও তথ্য' : 'Support & Info'}</span>
             </button>
           </div>
 
           {/* Settings Section: Appearance / Theme & Language Switcher */}
-          <div className="pt-3 border-t border-subtle space-y-3">
-            <p className="text-[14px] font-semibold text-muted uppercase tracking-wide px-1">
+          <div className="pt-3 border-t border-ui-stroke-subtle space-y-3">
+            <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-1">
               {language === 'bn' ? 'সেটিংস' : 'Settings'}
             </p>
 
             {/* Appearance / Theme Selector */}
             <div className="space-y-1.5">
-              <span className="text-[14px] text-secondary font-medium px-1">
+              <span className="text-[14px] text-ui-content-secondary font-medium px-1">
                 {language === 'bn' ? 'প্রদর্শন (থিম)' : 'Appearance'}
               </span>
               <ThemeSelector variant="segmented" />
@@ -246,25 +246,25 @@ export const Header: React.FC = () => {
 
             {/* Language Switcher in Drawer */}
             <div className="space-y-1.5">
-              <span className="text-[14px] text-secondary font-medium px-1">
+              <span className="text-[14px] text-ui-content-secondary font-medium px-1">
                 {language === 'bn' ? 'ভাষা' : 'Language'}
               </span>
               <button
                 id="drawer-lang-toggle"
                 onClick={toggleLanguage}
                 aria-label={`Switch language to ${language === 'bn' ? 'English' : 'Bengali'}`}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-subtle hover:bg-surface-subtle transition-colors cursor-pointer text-secondary hover:text-primary min-h-[44px] bg-surface"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface"
               >
                 <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-muted" />
+                  <Globe className="w-4 h-4 text-ui-content-muted" />
                   <span className="font-medium">{language === 'bn' ? 'বাংলা / English' : 'English / বাংলা'}</span>
                 </div>
                 <div className="flex items-center font-semibold text-[14px]">
-                  <span className={language === 'bn' ? 'text-primary font-bold' : 'text-muted'}>
+                  <span className={language === 'bn' ? 'text-ui-content-primary font-bold' : 'text-ui-content-muted'}>
                     বাং
                   </span>
-                  <span className="mx-1 text-muted">/</span>
-                  <span className={language === 'en' ? 'text-primary font-bold' : 'text-muted'}>
+                  <span className="mx-1 text-ui-content-muted">/</span>
+                  <span className={language === 'en' ? 'text-ui-content-primary font-bold' : 'text-ui-content-muted'}>
                     EN
                   </span>
                 </div>

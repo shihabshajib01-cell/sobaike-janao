@@ -28,8 +28,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       <div className="w-14 h-14 rounded-2xl bg-red-100 dark:bg-[#3E1A1E] flex items-center justify-center text-red-600 dark:text-[#FCA5A5] mb-4 shrink-0">
         <AlertCircle className="w-7 h-7 stroke-[1.5]" />
       </div>
-      <h3 className="text-[18px] font-bold text-primary mb-1.5">{title}</h3>
-      <p className="text-[14px] leading-[22px] text-secondary max-w-xs mb-5">{message}</p>
+      <h3 className="text-[18px] font-bold text-ui-content-primary mb-1.5">{title}</h3>
+      <p className="text-[14px] leading-[22px] text-ui-content-secondary max-w-xs mb-5">{message}</p>
       {onRetry && (
         <Button
           size="md"

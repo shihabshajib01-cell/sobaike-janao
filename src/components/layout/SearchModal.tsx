@@ -49,7 +49,7 @@ export const SearchModal: React.FC = () => {
 
         {/* Quick Category Filters */}
         <div className="space-y-2.5">
-          <p className="text-[14px] font-bold text-muted uppercase tracking-wider">
+          <p className="text-[14px] font-bold text-ui-content-muted uppercase tracking-wider">
             {language === 'bn' ? 'প্রধান ৩টি বিভাগ' : 'Main 3 Categories'}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -69,8 +69,8 @@ export const SearchModal: React.FC = () => {
         </div>
 
         {/* Category guidance note */}
-        <div className="p-3.5 bg-surface-subtle rounded-xl border border-subtle text-[14px] text-secondary flex items-start gap-2.5">
-          <Layers className="w-4 h-4 text-muted shrink-0 mt-0.5" />
+        <div className="p-3.5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle text-[14px] text-ui-content-secondary flex items-start gap-2.5">
+          <Layers className="w-4 h-4 text-ui-content-muted shrink-0 mt-0.5" />
           <span>
             {language === 'bn'
               ? 'নির্দিষ্ট তথ্য ও অভিযোগ দেখতে যেকোনো একটি বিভাগে সরাসরি প্রবেশ করুন।'

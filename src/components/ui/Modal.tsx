@@ -147,19 +147,19 @@ export const Modal: React.FC<ModalProps> = ({
         tabIndex={-1}
         className={`relative ${maxWidthClasses[maxWidth] || maxWidthClasses.md} ${
           maxWidth === 'composer' ? 'rounded-none md:rounded-3xl border-0 md:border' : 'rounded-2xl border'
-        } bg-surface border-subtle shadow-2xl flex flex-col overflow-hidden z-10 text-left outline-none ${containerClassName}`}
+        } bg-ui-surface border-ui-stroke-subtle shadow-2xl flex flex-col overflow-hidden z-10 text-left outline-none ${containerClassName}`}
       >
         {/* Default Header if requested and title provided */}
         {showHeader && (title || description) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-subtle bg-surface shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-ui-stroke-subtle bg-ui-surface shrink-0">
             <div>
               {title && (
-                <h2 id={`${id}-title`} className="text-[20px] sm:text-[22px] font-bold text-primary">
+                <h2 id={`${id}-title`} className="text-[20px] sm:text-[22px] font-bold text-ui-content-primary">
                   {title}
                 </h2>
               )}
               {description && (
-                <p className="text-[14px] text-muted mt-0.5">{description}</p>
+                <p className="text-[14px] text-ui-content-muted mt-0.5">{description}</p>
               )}
             </div>
             <IconButton
@@ -174,13 +174,13 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Content */}
-        <div className={`flex-1 min-h-0 ${maxWidth === 'composer' ? 'flex flex-col overflow-hidden' : 'overflow-y-auto'} text-primary ${showHeader && (title || description) ? 'px-6 py-5' : ''}`}>
+        <div className={`flex-1 min-h-0 ${maxWidth === 'composer' ? 'flex flex-col overflow-hidden' : 'overflow-y-auto'} text-ui-content-primary ${showHeader && (title || description) ? 'px-6 py-5' : ''}`}>
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-surface-subtle border-t border-subtle shrink-0">
+          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-ui-surface-subtle border-t border-ui-stroke-subtle shrink-0">
             {footer}
           </div>
         )}
