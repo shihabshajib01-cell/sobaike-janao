@@ -365,7 +365,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       if (locUpdates.upazilaOrThana && errors.upazilaOrThana) {
         setErrors((prev) => ({ ...prev, upazilaOrThana: '' }));
       }
-      if (locUpdates.formattedAddress && errors.formattedAddress) {
+      if ('formattedAddress' in locUpdates && errors.formattedAddress) {
         setErrors((prev) => ({ ...prev, formattedAddress: '' }));
       }
     };
