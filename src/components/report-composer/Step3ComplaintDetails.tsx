@@ -32,10 +32,17 @@ import {
 } from '../../data/reportSubjectOptions';
 import {
   DIVISIONS,
-  BANGLADESH_DISTRICTS,
   DivisionInfo,
   DistrictInfo,
+  getDistrictsByDivision,
+  getDivisionByStoredName,
+  getDistrictByStoredName,
 } from '../../data/districts';
+import {
+  UpazilaInfo,
+  getUpazilasByDistrict,
+  getUpazilaByStoredName,
+} from '../../data/upazilas';
 import { Accordion } from '../ui/Accordion';
 import { Toggle } from '../ui/Toggle';
 import { ImageAttachmentPicker, AttachedImagePreview } from '../media/ImageAttachmentPicker';
@@ -441,13 +448,120 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       onUpdateFormData({ mentionedParties: updated });
     };
 
-    // Filter districts based on selected division
-    const selectedDivisionObj = DIVISIONS.find(
-      (d: DivisionInfo) => d.nameEn === formData.location?.division || d.nameBn === formData.location?.division
-    );
-    const availableDistricts = selectedDivisionObj
-      ? BANGLADESH_DISTRICTS.filter((dst: DistrictInfo) => dst.divisionId === selectedDivisionObj.id)
-      : [];
+    // Resolved administrative levels for safe dropdown binding and dependent resets
+    const resolvedDivision = useMemo(() => {
+      return getDivisionByStoredName(formData.location?.division);
+    }, [formData.location?.division]);
+
+    const availableDistricts = useMemo(() => {
+      return resolvedDivision ? getDistrictsByDivision(resolvedDivision.id) : [];
+    }, [resolvedDivision]);
+
+    const resolvedDistrict = useMemo(() => {
+      if (!resolvedDivision) return undefined;
+      const dist = getDistrictByStoredName(formData.location?.district);
+      if (dist && dist.divisionId.toLowerCase() === resolvedDivision.id.toLowerCase()) {
+        return dist;
+      }
+      return undefined;
+    }, [resolvedDivision, formData.location?.district]);
+
+    const availableUpazilas = useMemo(() => {
+      return resolvedDistrict ? getUpazilasByDistrict(resolvedDistrict.id) : [];
+    }, [resolvedDistrict]);
+
+    const resolvedUpazila = useMemo(() => {
+      if (!resolvedDistrict) return undefined;
+      return getUpazilaByStoredName(formData.location?.upazilaOrThana, resolvedDistrict.id);
+    }, [resolvedDistrict, formData.location?.upazilaOrThana]);
+
+    const handleDivisionChange = (newDivisionNameEn: string) => {
+      if (isLocationLocked) return;
+      if (!newDivisionNameEn) {
+        handleManualLocationChange({
+          division: '',
+          district: '',
+          upazilaOrThana: '',
+        });
+        return;
+      }
+
+      const newDivObj = getDivisionByStoredName(newDivisionNameEn);
+      if (!newDivObj) {
+        handleManualLocationChange({
+          division: '',
+          district: '',
+          upazilaOrThana: '',
+        });
+        return;
+      }
+
+      // Check whether the existing District belongs to the new Division
+      const currentDistObj = getDistrictByStoredName(formData.location?.district);
+      const isDistrictStillValid = Boolean(
+        currentDistObj && currentDistObj.divisionId.toLowerCase() === newDivObj.id.toLowerCase()
+      );
+
+      let newDistrict = '';
+      let newUpazila = '';
+
+      if (isDistrictStillValid && currentDistObj) {
+        newDistrict = currentDistObj.nameEn;
+        const currentUpazilaObj = getUpazilaByStoredName(
+          formData.location?.upazilaOrThana,
+          currentDistObj.id
+        );
+        if (currentUpazilaObj) {
+          newUpazila = currentUpazilaObj.nameEn;
+        }
+      }
+
+      handleManualLocationChange({
+        division: newDivObj.nameEn,
+        district: newDistrict,
+        upazilaOrThana: newUpazila,
+      });
+    };
+
+    const handleDistrictChange = (newDistrictNameEn: string) => {
+      if (isLocationLocked) return;
+      if (!newDistrictNameEn) {
+        handleManualLocationChange({
+          district: '',
+          upazilaOrThana: '',
+        });
+        return;
+      }
+
+      const distObj = getDistrictByStoredName(newDistrictNameEn);
+      if (!distObj || (resolvedDivision && distObj.divisionId.toLowerCase() !== resolvedDivision.id.toLowerCase())) {
+        handleManualLocationChange({
+          district: '',
+          upazilaOrThana: '',
+        });
+        return;
+      }
+
+      const isSameDistrict = resolvedDistrict && resolvedDistrict.id === distObj.id;
+
+      handleManualLocationChange({
+        district: distObj.nameEn,
+        upazilaOrThana: isSameDistrict && resolvedUpazila ? resolvedUpazila.nameEn : '',
+      });
+    };
+
+    const handleUpazilaChange = (newUpazilaNameEn: string) => {
+      if (isLocationLocked) return;
+      if (!newUpazilaNameEn) {
+        handleManualLocationChange({ upazilaOrThana: '' });
+        return;
+      }
+
+      const upazilaObj = getUpazilaByStoredName(newUpazilaNameEn, resolvedDistrict?.id);
+      handleManualLocationChange({
+        upazilaOrThana: upazilaObj ? upazilaObj.nameEn : newUpazilaNameEn,
+      });
+    };
 
     // Validation & Progress Logic
     const validateAndProceed = (): boolean => {
@@ -557,19 +671,41 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               : 'Turn on device location before continuing.';
         }
 
-        if (!formData.location?.division?.trim()) {
+        const utilityDivObj = getDivisionByStoredName(formData.location?.division);
+        if (!utilityDivObj) {
           newErrors.division =
             language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
         }
 
-        if (!formData.location?.district?.trim()) {
+        const utilityDistObj = utilityDivObj ? getDistrictByStoredName(formData.location?.district) : undefined;
+        if (!utilityDistObj || utilityDistObj.divisionId.toLowerCase() !== utilityDivObj?.id.toLowerCase()) {
           newErrors.district =
             language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
         }
 
-        if (!formData.location?.upazilaOrThana?.trim()) {
+        const utilityUpazilaObj = utilityDistObj
+          ? getUpazilaByStoredName(formData.location?.upazilaOrThana, utilityDistObj.id)
+          : undefined;
+        if (!utilityUpazilaObj) {
           newErrors.upazilaOrThana =
-            language === 'bn' ? 'থানা বা উপজেলার নাম লিখুন' : 'Thana or upazila is required';
+            language === 'bn' ? 'থানা বা উপজেলা নির্বাচন করুন' : 'Select a thana or upazila';
+        }
+
+        if (utilityDivObj && utilityDistObj && utilityUpazilaObj) {
+          if (
+            formData.location?.division !== utilityDivObj.nameEn ||
+            formData.location?.district !== utilityDistObj.nameEn ||
+            formData.location?.upazilaOrThana !== utilityUpazilaObj.nameEn
+          ) {
+            onUpdateFormData({
+              location: {
+                ...formData.location,
+                division: utilityDivObj.nameEn,
+                district: utilityDistObj.nameEn,
+                upazilaOrThana: utilityUpazilaObj.nameEn,
+              },
+            });
+          }
         }
 
         const detailedAddr = formData.location?.formattedAddress?.trim() || '';
@@ -632,19 +768,41 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               : 'Turn on device location before continuing.';
         }
 
-        if (!formData.location?.division?.trim()) {
+        const reportDivObj = getDivisionByStoredName(formData.location?.division);
+        if (!reportDivObj) {
           newErrors.division =
             language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
         }
 
-        if (!formData.location?.district?.trim()) {
+        const reportDistObj = reportDivObj ? getDistrictByStoredName(formData.location?.district) : undefined;
+        if (!reportDistObj || reportDistObj.divisionId.toLowerCase() !== reportDivObj?.id.toLowerCase()) {
           newErrors.district =
             language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
         }
 
-        if (!formData.location?.upazilaOrThana?.trim()) {
+        const reportUpazilaObj = reportDistObj
+          ? getUpazilaByStoredName(formData.location?.upazilaOrThana, reportDistObj.id)
+          : undefined;
+        if (!reportUpazilaObj) {
           newErrors.upazilaOrThana =
-            language === 'bn' ? 'থানা বা উপজেলার নাম লিখুন' : 'Thana or upazila is required';
+            language === 'bn' ? 'থানা বা উপজেলা নির্বাচন করুন' : 'Select a thana or upazila';
+        }
+
+        if (reportDivObj && reportDistObj && reportUpazilaObj) {
+          if (
+            formData.location?.division !== reportDivObj.nameEn ||
+            formData.location?.district !== reportDistObj.nameEn ||
+            formData.location?.upazilaOrThana !== reportUpazilaObj.nameEn
+          ) {
+            onUpdateFormData({
+              location: {
+                ...formData.location,
+                division: reportDivObj.nameEn,
+                district: reportDistObj.nameEn,
+                upazilaOrThana: reportUpazilaObj.nameEn,
+              },
+            });
+          }
         }
 
         const detailedAddr = formData.location?.formattedAddress?.trim() || '';
@@ -1491,18 +1649,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <select
                     id="complaint-division-select"
                     disabled={isLocationLocked}
-                    value={formData.location?.division || ''}
-                    onChange={(e) => {
-                      const divVal = e.target.value;
-                      const newDivObj = DIVISIONS.find((d) => d.nameEn === divVal || d.nameBn === divVal);
-                      const districtValid = newDivObj && BANGLADESH_DISTRICTS.some(
-                        (dst) => dst.divisionId === newDivObj.id && (dst.nameEn === formData.location?.district || dst.nameBn === formData.location?.district)
-                      );
-                      handleManualLocationChange({
-                        division: divVal,
-                        district: districtValid ? formData.location?.district : '',
-                      });
-                    }}
+                    value={resolvedDivision ? resolvedDivision.nameEn : ''}
+                    onChange={(e) => handleDivisionChange(e.target.value)}
                     className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
                       isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
                     } ${
@@ -1529,44 +1677,24 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   >
                     {language === 'bn' ? 'জেলা *' : 'District *'}
                   </label>
-                  {availableDistricts.length > 0 ? (
-                    <select
-                      id="complaint-district-select"
-                      disabled={isLocationLocked}
-                      value={formData.location?.district || ''}
-                      onChange={(e) => {
-                        handleManualLocationChange({ district: e.target.value });
-                      }}
-                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                        isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
-                      } ${
-                        errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                      }`}
-                    >
-                      <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
-                      {availableDistricts.map((dst: DistrictInfo) => (
-                        <option key={dst.id} value={dst.nameEn}>
-                          {language === 'bn' ? dst.nameBn : dst.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      id="complaint-district-input"
-                      type="text"
-                      disabled={isLocationLocked}
-                      value={formData.location?.district || ''}
-                      onChange={(e) => {
-                        handleManualLocationChange({ district: e.target.value });
-                      }}
-                      placeholder={language === 'bn' ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka, Chittagong'}
-                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                        isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
-                      } ${
-                        errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                      }`}
-                    />
-                  )}
+                  <select
+                    id="complaint-district-select"
+                    disabled={isLocationLocked || !resolvedDivision}
+                    value={resolvedDistrict ? resolvedDistrict.nameEn : ''}
+                    onChange={(e) => handleDistrictChange(e.target.value)}
+                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                      isLocationLocked || !resolvedDivision ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                    } ${
+                      errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                    }`}
+                  >
+                    <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
+                    {availableDistricts.map((dst: DistrictInfo) => (
+                      <option key={dst.id} value={dst.nameEn}>
+                        {language === 'bn' ? dst.nameBn : dst.nameEn}
+                      </option>
+                    ))}
+                  </select>
                   {errors.district && (
                     <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.district}</p>
                   )}
@@ -1576,24 +1704,31 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               {/* Row 2: Thana / Upazila */}
               <div>
                 <label
-                  htmlFor="complaint-thana-input"
+                  htmlFor="complaint-thana-select"
                   className="block text-[13px] font-bold text-primary mb-1"
                 >
                   {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / Upazila *'}
                 </label>
-                <input
-                  id="complaint-thana-input"
-                  type="text"
-                  disabled={isLocationLocked}
-                  value={formData.location?.upazilaOrThana || ''}
-                  onChange={(e) => handleManualLocationChange({ upazilaOrThana: e.target.value })}
-                  placeholder={language === 'bn' ? 'থানা বা উপজেলার নাম লিখুন' : 'Enter thana or upazila'}
+                <select
+                  id="complaint-thana-select"
+                  disabled={isLocationLocked || !resolvedDistrict}
+                  value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
+                  onChange={(e) => handleUpazilaChange(e.target.value)}
                   className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                    isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                    isLocationLocked || !resolvedDistrict ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
                   } ${
                     errors.upazilaOrThana ? 'border-red-500 bg-red-500/5' : 'border-subtle'
                   }`}
-                />
+                >
+                  <option value="">
+                    {language === 'bn' ? '-- থানা / উপজেলা বেছে নিন --' : '-- Select Thana / Upazila --'}
+                  </option>
+                  {availableUpazilas.map((u: UpazilaInfo) => (
+                    <option key={u.id} value={u.nameEn}>
+                      {language === 'bn' ? u.nameBn : u.nameEn}
+                    </option>
+                  ))}
+                </select>
                 {errors.upazilaOrThana && (
                   <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.upazilaOrThana}</p>
                 )}
