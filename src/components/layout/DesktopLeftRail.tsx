@@ -112,7 +112,7 @@ export const DesktopLeftRail: React.FC = () => {
           id="rail-brand-logo"
           size="md"
           onClick={() => navigateTo('/')}
-          className="hover:bg-ui-surface-subtle transition-colors rounded-xl px-1 py-1 w-full"
+          className="rounded-xl px-1 py-1 w-full"
         />
 
         {/* Primary Action Button: Contextual Report CTA */}
@@ -141,10 +141,10 @@ export const DesktopLeftRail: React.FC = () => {
                 key={item.id}
                 id={item.id}
                 onClick={() => navigateTo(item.path)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] ${
                   isActive
                     ? getSectionActiveStyles(item.sectionKey)
-                    : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
+                    : 'text-ui-content-secondary'
                 }`}
               >
                 <div className="flex items-center gap-3 truncate">
@@ -155,7 +155,7 @@ export const DesktopLeftRail: React.FC = () => {
                       isActive && !secConfig
                         ? 'text-ui-content-primary'
                         : !isActive
-                        ? 'text-ui-content-muted group-hover:text-ui-content-primary'
+                        ? 'text-ui-content-muted'
                         : ''
                     }`}
                   />
@@ -165,7 +165,7 @@ export const DesktopLeftRail: React.FC = () => {
                 {item.sectionKey && (
                   <span
                     className={`w-2.5 h-2.5 rounded-full shrink-0 transition-opacity ${
-                      isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'
+                      isActive ? 'opacity-100' : 'opacity-30'
                     }`}
                     style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
                   />
@@ -195,7 +195,7 @@ export const DesktopLeftRail: React.FC = () => {
           id="rail-lang-toggle"
           onClick={toggleLanguage}
           aria-label={language === 'bn' ? 'Switch to English' : 'বাংলায় দেখুন'}
-          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface"
         >
           <span className="font-medium">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
           <span className="font-semibold text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-lg text-[13px]">

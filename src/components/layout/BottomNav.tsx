@@ -71,7 +71,7 @@ export const BottomNav: React.FC = () => {
               id={item.id}
               onClick={() => navigateTo(item.path)}
               aria-current={isActive ? 'page' : undefined}
-              className="flex flex-col items-center justify-center flex-1 min-h-[48px] py-1 px-1 transition-colors cursor-pointer select-none rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+              className="flex flex-col items-center justify-center flex-1 min-h-[48px] py-1 px-1 transition-colors cursor-pointer select-none rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               style={{
                 color: isActive ? item.activeColor : 'var(--ui-text-muted)',
               }}

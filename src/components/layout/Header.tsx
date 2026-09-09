@@ -167,16 +167,11 @@ export const Header: React.FC = () => {
                   className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-[16px] font-medium transition-colors text-left cursor-pointer min-h-[44px] ${
                     isActive
                       ? getSectionActiveStyles(item.sectionKey)
-                      : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
+                      : 'text-ui-content-secondary'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span
-                      style={{
-                        color: isActive && secConfig ? `var(--sec-${item.sectionKey}-primary)` : undefined,
-                      }}
-                      className={isActive && !secConfig ? 'text-ui-content-primary' : 'text-ui-content-muted'}
-                    >
+                    <span className="text-ui-content-muted">
                       {item.icon}
                     </span>
                     <span>{language === 'bn' ? item.nameBn : item.nameEn}</span>
@@ -207,7 +202,7 @@ export const Header: React.FC = () => {
               className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[16px] font-medium text-left min-h-[44px] cursor-pointer transition-colors ${
                 currentRoute === '/search'
                   ? 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle'
-                  : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
+                  : 'text-ui-content-secondary'
               }`}
             >
               <Search className="w-5 h-5 text-ui-content-muted" />
@@ -222,7 +217,7 @@ export const Header: React.FC = () => {
               className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[16px] font-medium text-left min-h-[44px] cursor-pointer transition-colors ${
                 currentRoute === '/more'
                   ? 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle'
-                  : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
+                  : 'text-ui-content-secondary'
               }`}
             >
               <PhoneCall className="w-5 h-5 text-ui-content-muted" />
@@ -253,7 +248,7 @@ export const Header: React.FC = () => {
                 id="drawer-lang-toggle"
                 onClick={toggleLanguage}
                 aria-label={`Switch language to ${language === 'bn' ? 'English' : 'Bengali'}`}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface"
               >
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-ui-content-muted" />

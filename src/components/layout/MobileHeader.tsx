@@ -35,7 +35,7 @@ export const MobileHeader: React.FC = () => {
             type="button"
             onClick={() => setIsTabletMenuOpen(true)}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
-            className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle min-w-[34px] sm:min-w-[38px] flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+            className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary min-w-[34px] sm:min-w-[38px] flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <Menu className="w-4 h-4 text-ui-content-secondary" />
           </button>
@@ -45,7 +45,7 @@ export const MobileHeader: React.FC = () => {
             id="mobile-header-lang-btn"
             onClick={toggleLanguage}
             aria-label={`Switch language to ${language === 'bn' ? 'English' : 'Bengali'}`}
-            className="h-9 sm:h-10 px-2 sm:px-3 text-[13px] sm:text-[14px] font-semibold rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary hover:bg-ui-surface-subtle min-w-[34px] sm:min-w-[38px] flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+            className="h-9 sm:h-10 px-2 sm:px-3 text-[13px] sm:text-[14px] font-semibold rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary min-w-[34px] sm:min-w-[38px] flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn' ? 'EN' : 'বাং'}
           </button>
@@ -64,7 +64,7 @@ export const MobileHeader: React.FC = () => {
                 ? 'Switch to Light theme'
                 : 'Switch to Dark theme'
             }
-            className="h-9 sm:h-10 px-2 sm:px-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle min-w-[34px] sm:min-w-[38px] flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+            className="h-9 sm:h-10 px-2 sm:px-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary min-w-[34px] sm:min-w-[38px] flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {resolvedTheme === 'dark' ? (
               <Sun className="w-4 h-4 text-amber-400" />
@@ -78,7 +78,7 @@ export const MobileHeader: React.FC = () => {
             id="mobile-header-add-report-btn"
             onClick={() => openReportComposer()}
             aria-label={language === 'bn' ? 'অভিযোগ জানান' : 'Report Incident'}
-            className="btn-primary-action h-9 sm:h-10 px-2.5 sm:px-3.5 text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center cursor-pointer transition-transform active:scale-95 shadow-xs whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+            className="btn-primary-action h-9 sm:h-10 px-2.5 sm:px-3.5 text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center cursor-pointer transition-transform active:scale-95 shadow-xs whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn' ? '+ অভিযোগ' : '+ Report'}
           </button>
