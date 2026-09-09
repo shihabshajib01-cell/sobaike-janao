@@ -79,12 +79,12 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               navigateTo('/explore');
             }
           }}
-          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary"
+          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to Explore'}</span>
         </button>
-        <span>/</span>
+        <span aria-hidden="true">/</span>
         <span className="text-ui-content-primary font-semibold">{districtDisplayName}</span>
       </div>
 
@@ -143,16 +143,17 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
-          <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" />
+        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+          <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
               ? 'এলাকার তথ্য লোড করতে সমস্যা হয়েছে।'
               : 'Failed to load reports for this location. Please try again.'}
           </p>
           <button
+            type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px]"
+            className="btn-primary-action px-4 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>
@@ -164,7 +165,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
-              <FileText className="w-5 h-5 text-ui-content-secondary" />
+              <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>
                 {language === 'bn'
                   ? 'প্রকাশিত প্রতিবেদন'
@@ -181,7 +182,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
             </div>
           ) : (
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-8 text-center space-y-2">
-              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" />
+              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
               <h3 className="text-[16px] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'এই এলাকার সঙ্গে বর্তমানে কোনো প্রকাশিত প্রতিবেদন যুক্ত নেই।' : 'No published reports are currently associated with this area.'}
               </h3>

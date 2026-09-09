@@ -98,7 +98,7 @@ export const SECTIONS = {
       border: '#CCFBF1',
       text: '#115E59',
       textSafe: '#115E59',
-      filledText: '#FFFFFF',
+      filledText: '#050505',
     },
   },
 };

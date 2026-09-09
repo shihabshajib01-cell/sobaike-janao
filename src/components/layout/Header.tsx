@@ -35,41 +35,41 @@ export const Header: React.FC = () => {
       path: '/',
       nameBn: 'মূলপাতা',
       nameEn: 'Home',
-      icon: <Home className="w-4 h-4" />,
+      icon: <Home className="w-4 h-4" aria-hidden="true" />,
     },
     {
       path: '/harassment',
       nameBn: SECTIONS.harassment.shortNameBn,
       nameEn: SECTIONS.harassment.shortNameEn,
       sectionKey: 'harassment',
-      icon: <HeartHandshake className="w-4 h-4" />,
+      icon: <HeartHandshake className="w-4 h-4" aria-hidden="true" />,
     },
     {
       path: '/rickshaw',
       nameBn: SECTIONS.rickshaw.shortNameBn,
       nameEn: SECTIONS.rickshaw.shortNameEn,
       sectionKey: 'rickshaw',
-      icon: <EvStationIcon className="w-4 h-4" />,
+      icon: <EvStationIcon className="w-4 h-4" aria-hidden="true" />,
     },
     {
       path: '/extortion',
       nameBn: SECTIONS.extortion.shortNameBn,
       nameEn: SECTIONS.extortion.shortNameEn,
       sectionKey: 'extortion',
-      icon: <ShieldAlert className="w-4 h-4" />,
+      icon: <ShieldAlert className="w-4 h-4" aria-hidden="true" />,
     },
     {
       path: '/load-shedding',
       nameBn: SECTIONS.load_shedding.shortNameBn,
       nameEn: SECTIONS.load_shedding.shortNameEn,
       sectionKey: 'load_shedding',
-      icon: <ZapOff className="w-4 h-4" />,
+      icon: <ZapOff className="w-4 h-4" aria-hidden="true" />,
     },
     {
       path: '/explore',
       nameBn: 'এক্সপ্লোর',
       nameEn: 'Explore',
-      icon: <Compass className="w-4 h-4" />,
+      icon: <Compass className="w-4 h-4" aria-hidden="true" />,
     },
   ];
 
@@ -208,7 +208,7 @@ export const Header: React.FC = () => {
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
               }`}
             >
-              <Search className="w-5 h-5 text-ui-content-muted" />
+              <Search className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'অনুসন্ধান' : 'Search Reports'}</span>
             </button>
 
@@ -224,7 +224,7 @@ export const Header: React.FC = () => {
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
               }`}
             >
-              <PhoneCall className="w-5 h-5 text-ui-content-muted" />
+              <PhoneCall className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'জরুরি সহায়তা ও তথ্য' : 'Support & Info'}</span>
             </button>
           </div>
@@ -259,7 +259,7 @@ export const Header: React.FC = () => {
                 className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-ui-content-muted" />
+                  <Globe className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                   <span className="font-medium">{language === 'bn' ? 'বাংলা / English' : 'English / বাংলা'}</span>
                 </div>
                 <div className="flex items-center font-semibold text-[14px]">

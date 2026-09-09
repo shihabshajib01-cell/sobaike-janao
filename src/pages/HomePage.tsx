@@ -162,7 +162,7 @@ export const HomePage: React.FC = () => {
           <FilterChip
             id="filter-chip-all"
             label={language === 'bn' ? 'সব' : 'All'}
-            icon={<LayoutGrid className="w-3.5 h-3.5" />}
+            icon={<LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'all'}
             count={districtFilteredReports.length}
             onClick={() => setFeedFilter('all')}
@@ -170,21 +170,21 @@ export const HomePage: React.FC = () => {
           <FilterChip
             id="filter-chip-latest"
             label={language === 'bn' ? 'সর্বশেষ' : 'Latest'}
-            icon={<Sparkles className="w-3.5 h-3.5" />}
+            icon={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'latest'}
             onClick={() => setFeedFilter('latest')}
           />
           <FilterChip
             id="filter-chip-popular"
             label={language === 'bn' ? 'জনপ্রিয়' : 'Popular'}
-            icon={<Flame className="w-3.5 h-3.5" />}
+            icon={<Flame className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'popular'}
             onClick={() => setFeedFilter('popular')}
           />
           <FilterChip
             id="filter-chip-most-shared"
             label={language === 'bn' ? 'সর্বাধিক শেয়ার' : 'Most Shared'}
-            icon={<Share2 className="w-3.5 h-3.5" />}
+            icon={<Share2 className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'most_shared'}
             onClick={() => setFeedFilter('most_shared')}
           />
@@ -201,16 +201,17 @@ export const HomePage: React.FC = () => {
 
         {/* Error State */}
         {!isLoading && fetchError && (
-          <div className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
-            <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" />
+          <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
+            <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" aria-hidden="true" />
             <p className="text-[16px] font-semibold text-rose-500">
               {language === 'bn'
                 ? 'সার্ভার থেকে পাবলিক ডেটা লোড করতে সমস্যা হয়েছে।'
                 : 'Unable to load public reports from server. Please check your connection.'}
             </p>
             <button
+              type="button"
               onClick={loadReports}
-              className="btn-primary-action px-4 py-2 text-[14px] font-semibold rounded-xl min-h-[44px]"
+              className="btn-primary-action px-4 py-2 text-[14px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
             >
               {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
             </button>

@@ -135,25 +135,31 @@ export const ExplorePage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
           {/* Main Keyword Search */}
           <div className="sm:col-span-2 lg:col-span-6 relative flex items-center">
-            <MapIcon name="search" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" />
+            <MapIcon name="search" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" aria-hidden="true" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label={
+                language === 'bn'
+                  ? 'এলাকা বা প্রতিবেদন অনুসন্ধান'
+                  : 'Search by area or report'
+              }
               placeholder={
                 language === 'bn'
                   ? 'এলাকা বা প্রতিবেদন খুঁজুন...'
                   : 'Search by area or report...'
               }
-              className="w-full pl-10 pr-9 py-2 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
+              className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 text-ui-content-muted cursor-pointer p-1"
+                aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'}
+                className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
-                <MapIcon name="close" size="xs" />
+                <MapIcon name="close" size="xs" aria-hidden="true" />
               </button>
             )}
           </div>
@@ -166,7 +172,8 @@ export const ExplorePage: React.FC = () => {
                 setSelectedDivision(e.target.value);
                 setSelectedDistrict('all'); // reset district when division changes
               }}
-              className="w-full px-3.5 py-2 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[40px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ui-focus truncate"
+              aria-label={language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Select Division'}
+              className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
             >
               <option value="all">
                 {language === 'bn' ? 'সকল বিভাগ' : 'All Divisions'}
@@ -181,11 +188,12 @@ export const ExplorePage: React.FC = () => {
 
           {/* District Dropdown */}
           <div className="sm:col-span-1 lg:col-span-3 relative flex items-center">
-            <MapIcon name="map-pin" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" />
+            <MapIcon name="map-pin" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" aria-hidden="true" />
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="w-full pl-10 pr-8 py-2 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[40px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ui-focus truncate"
+              aria-label={language === 'bn' ? 'জেলা নির্বাচন করুন' : 'Select District'}
+              className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
             >
               <option value="all">
                 {language === 'bn' ? 'সকল জেলা' : 'All Districts'}
@@ -200,10 +208,11 @@ export const ExplorePage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedDistrict('all')}
+                aria-label={language === 'bn' ? 'নির্বাচিত জেলা মুছুন' : 'Clear district selection'}
                 title={language === 'bn' ? 'জেলা মুছুন' : 'Clear district'}
-                className="absolute right-3 text-ui-content-muted cursor-pointer p-1"
+                className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
-                <MapIcon name="close" size="xs" />
+                <MapIcon name="close" size="xs" aria-hidden="true" />
               </button>
             )}
           </div>
@@ -213,8 +222,9 @@ export const ExplorePage: React.FC = () => {
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           <button
             type="button"
+            aria-pressed={selectedSection === 'all'}
             onClick={() => setSelectedSection('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all min-h-[34px] ${
+            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'all'
                 ? 'bg-ui-content-primary text-white dark:text-slate-900 border-ui-content-primary shadow-xs font-bold'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
@@ -225,8 +235,9 @@ export const ExplorePage: React.FC = () => {
 
           <button
             type="button"
+            aria-pressed={selectedSection === 'harassment'}
             onClick={() => setSelectedSection('harassment')}
-            className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[34px] ${
+            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'harassment'
                 ? 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border-[var(--sec-harassment-border)] shadow-xs font-bold ring-1 ring-[var(--sec-harassment-border)]'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
@@ -238,8 +249,9 @@ export const ExplorePage: React.FC = () => {
 
           <button
             type="button"
+            aria-pressed={selectedSection === 'rickshaw'}
             onClick={() => setSelectedSection('rickshaw')}
-            className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[34px] ${
+            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'rickshaw'
                 ? 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border-[var(--sec-rickshaw-border)] shadow-xs font-bold ring-1 ring-[var(--sec-rickshaw-border)]'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
@@ -251,8 +263,9 @@ export const ExplorePage: React.FC = () => {
 
           <button
             type="button"
+            aria-pressed={selectedSection === 'extortion'}
             onClick={() => setSelectedSection('extortion')}
-            className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[34px] ${
+            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'extortion'
                 ? 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border-[var(--sec-extortion-border)] shadow-xs font-bold ring-1 ring-[var(--sec-extortion-border)]'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
@@ -266,7 +279,7 @@ export const ExplorePage: React.FC = () => {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-[12px] font-semibold text-ui-content-secondary underline ml-auto shrink-0 cursor-pointer px-2 py-1"
+              className="text-[13px] font-semibold text-ui-content-secondary underline ml-auto shrink-0 cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
             >
               {language === 'bn' ? 'রিসেট' : 'Reset'}
             </button>
@@ -292,16 +305,17 @@ export const ExplorePage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
-          <MapIcon name="alert-circle" size="xl" className="text-rose-500 mx-auto" />
+        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+          <MapIcon name="alert-circle" size="xl" className="text-rose-500 mx-auto" ariaHidden={true} />
           <p className="text-[15px] font-semibold text-rose-500">
             {language === 'bn'
               ? 'তথ্য লোড করতে সমস্যা হয়েছে।'
               : 'Unable to load explore reports. Please try again.'}
           </p>
           <button
+            type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2 rounded-xl text-[14px] font-semibold min-h-[40px]"
+            className="btn-primary-action px-4 py-2 rounded-xl text-[14px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>

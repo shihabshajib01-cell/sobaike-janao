@@ -29,6 +29,7 @@ export const SearchModal: React.FC = () => {
           : 'Search by category or keywords'
       }
       maxWidth="md"
+      language={language}
     >
       <div className="space-y-5">
         <SearchInput
@@ -36,6 +37,7 @@ export const SearchModal: React.FC = () => {
           autoFocus
           value={searchQuery}
           onChange={setSearchQuery}
+          language={language}
           placeholder={
             language === 'bn'
               ? 'কী খুঁজতে চান? (উদাঃ হয়রানি, চার্জিং, চাঁদা)'

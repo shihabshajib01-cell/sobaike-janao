@@ -31,7 +31,7 @@ export const MorePage: React.FC = () => {
         {/* Mobile-Only Appearance / Theme Setting Card (md:hidden) */}
         <div className="pt-3 border-t border-ui-stroke-subtle md:hidden space-y-2">
           <div className="flex items-center gap-2">
-            <Palette className="w-4 h-4 text-ui-content-muted" />
+            <Palette className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
             <span className="text-[14px] font-semibold text-ui-content-secondary">
               {language === 'bn' ? 'প্রদর্শন (থিম পছন্দ)' : 'Appearance'}
             </span>
@@ -40,11 +40,18 @@ export const MorePage: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 pt-2 border-t border-ui-stroke-subtle overflow-x-auto pb-1">
+        <div
+          role="tablist"
+          aria-label={language === 'bn' ? 'তথ্য ও সহায়তা ট্যাব' : 'Information and support tabs'}
+          className="flex items-center gap-2 pt-2 border-t border-ui-stroke-subtle overflow-x-auto pb-1"
+        >
           <button
+            role="tab"
+            aria-selected={activeTab === 'about'}
+            tabIndex={activeTab === 'about' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('about')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'about'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
@@ -54,9 +61,12 @@ export const MorePage: React.FC = () => {
           </button>
 
           <button
+            role="tab"
+            aria-selected={activeTab === 'helplines'}
+            tabIndex={activeTab === 'helplines' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('helplines')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'helplines'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
@@ -66,9 +76,12 @@ export const MorePage: React.FC = () => {
           </button>
 
           <button
+            role="tab"
+            aria-selected={activeTab === 'principles'}
+            tabIndex={activeTab === 'principles' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('principles')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'principles'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
@@ -78,9 +91,12 @@ export const MorePage: React.FC = () => {
           </button>
 
           <button
+            role="tab"
+            aria-selected={activeTab === 'response'}
+            tabIndex={activeTab === 'response' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('response')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'response'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
@@ -90,9 +106,12 @@ export const MorePage: React.FC = () => {
           </button>
 
           <button
+            role="tab"
+            aria-selected={activeTab === 'faq'}
+            tabIndex={activeTab === 'faq' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('faq')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'faq'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
@@ -105,7 +124,7 @@ export const MorePage: React.FC = () => {
 
       {/* Tab Content */}
       {activeTab === 'about' && (
-        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
+        <div role="tabpanel" className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
           <div className="space-y-3">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary">
               {language === 'bn' ? 'সবাইকে জানাও (Sobaike Janao) কী?' : 'What is Sobaike Janao?'}
@@ -158,10 +177,10 @@ export const MorePage: React.FC = () => {
       )}
 
       {activeTab === 'helplines' && (
-        <div className="space-y-4">
+        <div role="tabpanel" className="space-y-4">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-6 space-y-2 shadow-2xs">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
-              <Phone className="w-5 h-5 text-rose-500" />
+              <Phone className="w-5 h-5 text-rose-500" aria-hidden="true" />
               <span>{language === 'bn' ? 'জরুরি ও সহায়তা সেবা' : 'Emergency & Support Resources'}</span>
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
@@ -188,9 +207,9 @@ export const MorePage: React.FC = () => {
                 </div>
                 <a
                   href={`tel:${hl.number}`}
-                  className="btn-primary-action px-5 py-2.5 rounded-xl text-[16px] font-semibold flex items-center gap-2 shrink-0 min-h-[44px]"
+                  className="btn-primary-action px-5 py-2.5 rounded-xl text-[16px] font-semibold flex items-center gap-2 shrink-0 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
-                  <Phone className="w-4 h-4" />
+                  <Phone className="w-4 h-4" aria-hidden="true" />
                   <span>{language === 'bn' ? 'কল করুন' : 'Call'}</span>
                 </a>
               </div>
@@ -200,10 +219,10 @@ export const MorePage: React.FC = () => {
       )}
 
       {activeTab === 'principles' && (
-        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
+        <div role="tabpanel" className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
           <div className="space-y-2">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
-              <Shield className="w-5 h-5 text-ui-content-secondary" />
+              <Shield className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>{language === 'bn' ? 'সম্পাদকীয় ও মডারেশন মূলনীতি' : 'Editorial & Moderation Principles'}</span>
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
@@ -251,10 +270,10 @@ export const MorePage: React.FC = () => {
       )}
 
       {activeTab === 'response' && (
-        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
+        <div role="tabpanel" className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
           <div className="space-y-2">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
-              <Scale className="w-5 h-5 text-ui-content-secondary" />
+              <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার নীতি (Right of Response)' : 'Right of Response Standards'}</span>
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
@@ -278,9 +297,9 @@ export const MorePage: React.FC = () => {
       )}
 
       {activeTab === 'faq' && (
-        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-5 shadow-2xs">
+        <div role="tabpanel" className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-5 shadow-2xs">
           <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-ui-content-secondary" />
+            <HelpCircle className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
             <span>{language === 'bn' ? 'সাধারণ জিজ্ঞাসা ও প্রশ্নোত্তর' : 'Frequently Asked Questions'}</span>
           </h2>
 

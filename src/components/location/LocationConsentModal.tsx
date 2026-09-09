@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Loader2, ShieldCheck } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 
@@ -14,19 +14,62 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   onClose,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const shareLocationBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+
+    const savedOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const timer = setTimeout(() => {
+      shareLocationBtnRef.current?.focus();
+    }, 30);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
         onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = savedOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
+        previouslyFocusedElementRef.current.focus();
+      }
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -57,6 +100,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
 
   return (
     <div
+      ref={modalRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="location-consent-title"
@@ -67,14 +111,14 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         {/* Icon & Heading */}
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-            <MapPin className="w-6 h-6" />
+            <MapPin className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="flex-1">
             <h2 id="location-consent-title" className="text-lg font-bold tracking-tight">
               {isBn ? 'আপনার এলাকার পোস্ট দেখুন' : 'See more posts from your area'}
             </h2>
             <div className="flex items-center gap-1.5 text-xs text-ui-content-muted mt-0.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
               <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy Protected'}</span>
             </div>
           </div>
@@ -92,6 +136,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row-reverse gap-2.5 pt-2">
           <button
+            ref={shareLocationBtnRef}
             type="button"
             onClick={handleShareLocation}
             disabled={isLoading}
@@ -99,7 +144,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                 <span>{isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...'}</span>
               </>
             ) : (

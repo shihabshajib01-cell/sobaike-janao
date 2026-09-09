@@ -17,6 +17,7 @@ export interface ModalProps {
   containerClassName?: string;
   zIndexClass?: string;
   language?: 'bn' | 'en';
+  ariaLabel?: string;
 }
 
 // Global reference counter for nested modal scroll locks
@@ -37,6 +38,7 @@ export const Modal: React.FC<ModalProps> = ({
   containerClassName = '',
   zIndexClass = 'z-50',
   language: customLanguage,
+  ariaLabel,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
@@ -149,6 +151,7 @@ export const Modal: React.FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? `${id}-title` : undefined}
+      aria-label={!title && ariaLabel ? ariaLabel : undefined}
       className={`fixed inset-0 ${zIndexClass} flex items-center justify-center p-0 md:p-6 overflow-y-auto transition-opacity duration-200 ${
         isHidden ? 'opacity-0 pointer-events-none invisible' : 'opacity-100 visible'
       }`}

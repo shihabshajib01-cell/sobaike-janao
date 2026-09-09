@@ -18,10 +18,14 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
   language,
 }) => {
   return (
-    <div className="space-y-6 text-center py-2 text-ui-content-primary">
+    <div
+      role="status"
+      aria-live="polite"
+      className="space-y-6 text-center py-2 text-ui-content-primary"
+    >
       {/* Success Badge */}
       <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
-        <CheckCircle2 className="w-10 h-10" />
+        <CheckCircle2 className="w-10 h-10" aria-hidden="true" />
       </div>
 
       <div className="space-y-2">
@@ -43,8 +47,8 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
           variant="primary"
           size="lg"
           onClick={onSubmitAnother}
-          leftIcon={<PlusCircle className="w-4 h-4" />}
-          className="w-full md:w-auto min-h-[44px] text-[16px] px-6"
+          leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
+          className="w-full md:w-auto min-h-[44px] text-[16px] px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           {language === 'bn' ? 'আরেকটি অভিযোগ দিন' : 'Submit Another Complaint'}
         </Button>
@@ -55,7 +59,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
           variant="outline"
           size="lg"
           onClick={onClose}
-          className="w-full md:w-auto min-h-[44px] text-[16px] px-6"
+          className="w-full md:w-auto min-h-[44px] text-[16px] px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           {language === 'bn' ? 'হোমপেজে ফিরে যান' : 'Return to Home'}
         </Button>

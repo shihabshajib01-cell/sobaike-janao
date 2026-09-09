@@ -148,9 +148,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   // If report does not exist, show dedicated "Report Unavailable / Not Found" state
   if (!report) {
     return (
-      <div className="w-full py-12 px-4 text-center space-y-6">
+      <div role="alert" className="w-full py-12 px-4 text-center space-y-6">
         <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
-          <AlertCircle className="w-7 h-7" />
+          <AlertCircle className="w-7 h-7" aria-hidden="true" />
         </div>
 
         <div className="space-y-2">
@@ -174,18 +174,18 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 navigateTo('/');
               }
             }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             <span>{language === 'bn' ? 'পূর্ববর্তী পাতায় যান' : 'Go Back'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => navigateTo('/')}
-            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2"
+            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
-            <Home className="w-4 h-4" />
+            <Home className="w-4 h-4" aria-hidden="true" />
             <span>{language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}</span>
           </button>
         </div>
@@ -248,9 +248,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               navigateTo('/');
             }
           }}
-          className="inline-flex items-center gap-2 text-[16px] leading-[24px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px]"
+          className="inline-flex items-center gap-2 text-[16px] leading-[24px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>{language === 'bn' ? 'তালিকায় ফিরে যান' : 'Back to Reports'}</span>
         </button>
 
@@ -258,16 +258,16 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         <button
           type="button"
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 text-[16px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px]"
+          className="inline-flex items-center gap-1.5 text-[16px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           {isCopied ? (
             <>
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               <span className="text-emerald-700 dark:text-emerald-300 font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link Copied'}</span>
             </>
           ) : (
             <>
-              <Share2 className="w-4 h-4 text-ui-content-muted" />
+              <Share2 className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'শেয়ার করুন' : 'Share'}</span>
             </>
           )}
@@ -295,13 +295,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <button
             type="button"
             onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
-            className="flex items-center gap-1.5 font-medium text-ui-content-primary hover:text-ui-content-primary transition-colors cursor-pointer min-h-[36px]"
+            className="flex items-center gap-1.5 font-medium text-ui-content-primary hover:text-ui-content-primary transition-colors cursor-pointer min-h-[44px] px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
           >
-            <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" />
+            <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
             <span className="underline decoration-ui-stroke-subtle">{location}</span>
           </button>
-          <div className="flex items-center gap-1.5 text-ui-content-muted">
-            <Calendar className="w-4 h-4 text-ui-content-muted shrink-0" />
+          <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
+            <Calendar className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
             <span>
               {report.subcategoryId === 'excess-electricity-bill' && report.recentBillMonth
                 ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing Period: '}${formatBillingMonth(report.recentBillMonth, language)}`
@@ -309,8 +309,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             </span>
           </div>
           {report.utilityEndTime && (
-            <div className="flex items-center gap-1.5 text-ui-content-muted">
-              <Clock className="w-4 h-4 text-ui-content-muted shrink-0" />
+            <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
+              <Clock className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
               <span>
                 {language === 'bn'
                   ? `বিভ্রাটের সমাপ্তি: ${report.utilityEndTime}`
@@ -318,8 +318,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               </span>
             </div>
           )}
-          <div className="flex items-center gap-1.5 text-ui-content-muted">
-            <Clock className="w-4 h-4 text-ui-content-muted shrink-0" />
+          <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
+            <Clock className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
             <span>
               {language === 'bn' ? `প্রকাশ: ${publishedDate}` : `Published: ${publishedDate}`}
             </span>
@@ -331,14 +331,14 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-1.5 font-medium text-ui-content-secondary text-[14px]">
-                <UserX className="w-4 h-4 text-ui-content-muted" />
+                <UserX className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                 <span>{language === 'bn' ? 'প্রতিবেদনে উল্লেখিত পক্ষ:' : 'Mentioned party:'}</span>
               </div>
               {subjectTargetName && (
                 <button
                   type="button"
                   onClick={() => navigateTo(`/subject/${encodeURIComponent(subjectTargetName)}`)}
-                  className="text-[14px] font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[32px] flex items-center"
+                  className="text-[14px] font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[44px] flex items-center px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
                 >
                   {language === 'bn' ? 'এই নামে প্রকাশিত প্রতিবেদন দেখুন →' : 'View reports mentioning this party →'}
                 </button>
@@ -616,7 +616,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <button
             type="button"
             onClick={() => setIsCitizenModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn'
               ? 'আমার কাছে তথ্য আছে / আমিও ভুক্তভোগী'
@@ -625,7 +625,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <button
             type="button"
             onClick={() => setIsSubjectModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn' ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ' : 'I’m the person or party mentioned'}
           </button>
@@ -637,7 +637,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
             <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-1.5">
-              <Layers className="w-4 h-4 text-ui-content-muted" />
+              <Layers className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'সম্পর্কিত প্রতিবেদন' : 'Related Reports'}</span>
             </h3>
           </div>
@@ -646,8 +646,16 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             {relatedReports.map((relReport) => (
               <div
                 key={relReport.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => navigateTo(`/report-detail/${relReport.id}`)}
-                className="p-4 bg-ui-surface border border-ui-stroke-subtle hover:border-ui-stroke-strong rounded-xl space-y-2 cursor-pointer transition-colors shadow-2xs"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigateTo(`/report-detail/${relReport.id}`);
+                  }
+                }}
+                className="p-4 bg-ui-surface border border-ui-stroke-subtle hover:border-ui-stroke-strong rounded-xl space-y-2 cursor-pointer transition-colors shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <div className="flex items-center gap-2">
                   <CategoryBadge section={relReport.segment} language={language} size="sm" />

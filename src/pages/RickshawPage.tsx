@@ -70,7 +70,7 @@ export const RickshawPage: React.FC = () => {
                 color: 'var(--sec-rickshaw-primary)',
               }}
             >
-              <EvStationIcon className="w-4 h-4" />
+              <EvStationIcon className="w-4 h-4" aria-hidden="true" />
             </div>
             <span
               className="text-[13px] sm:text-[14px] font-semibold"
@@ -91,7 +91,7 @@ export const RickshawPage: React.FC = () => {
 
         {/* Quiet Information Strip */}
         <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-          <Info className="w-4 h-4 text-ui-content-muted shrink-0" />
+          <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
           <span>
             {language === 'bn'
               ? 'অবৈধ বা ঝুঁকিপূর্ণ অটোরিকশা চার্জিং স্টেশনের অবস্থান ও তথ্য জানান।'
@@ -134,16 +134,17 @@ export const RickshawPage: React.FC = () => {
 
       {/* 4. Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
-          <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" />
+        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
+          <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
               ? 'তথ্য লোড করতে ত্রুটি হয়েছে।'
               : 'Failed to load rickshaw reports. Please try again.'}
           </p>
           <button
+            type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2 text-[16px] font-semibold rounded-xl min-h-[44px]"
+            className="btn-primary-action px-4 py-2 text-[16px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>

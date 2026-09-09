@@ -74,7 +74,7 @@ export const UtilityPage: React.FC = () => {
                   color: 'var(--sec-load_shedding-primary)',
                 }}
               >
-                <ZapOff className="w-4 h-4" />
+                <ZapOff className="w-4 h-4" aria-hidden="true" />
               </div>
               <span
                 className="text-[13px] sm:text-[14px] font-semibold"
@@ -98,7 +98,7 @@ export const UtilityPage: React.FC = () => {
               id="utility-header-file-report-btn"
               variant="primary"
               size="md"
-              leftIcon={<PlusCircle className="w-4 h-4" />}
+              leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
               onClick={() => openReportComposer('load_shedding')}
               className="w-full sm:w-auto"
             >
@@ -109,7 +109,7 @@ export const UtilityPage: React.FC = () => {
 
         {/* Quiet Information Strip */}
         <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-          <Info className="w-4 h-4 text-ui-content-muted shrink-0" />
+          <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
           <span>
             {language === 'bn'
               ? 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ জানান।'
@@ -177,16 +177,17 @@ export const UtilityPage: React.FC = () => {
 
       {/* 4. Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
-          <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" />
+        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
+          <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
               ? 'তথ্য লোড করতে ত্রুটি হয়েছে।'
               : 'Failed to load utility reports. Please try again.'}
           </p>
           <button
+            type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2 text-[16px] font-semibold rounded-xl min-h-[44px]"
+            className="btn-primary-action px-4 py-2 text-[16px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>

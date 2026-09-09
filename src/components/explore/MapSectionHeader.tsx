@@ -42,27 +42,29 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
       <div className="flex items-center bg-ui-surface-subtle p-1 rounded-xl border border-ui-stroke-subtle self-start sm:self-center shrink-0 shadow-2xs">
         <button
           type="button"
+          aria-pressed={viewMode === 'feed'}
           onClick={() => onViewModeChange('feed')}
-          className={`px-3.5 py-1.5 rounded-lg text-[14px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[38px] ${
+          className={`px-3.5 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
             viewMode === 'feed'
               ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
               : 'text-ui-content-secondary hover:text-ui-content-primary'
           }`}
         >
-          <MapIcon name="list" size="md" />
+          <MapIcon name="list" size="md" aria-hidden="true" />
           <span>{language === 'bn' ? 'তালিকা' : 'List'}</span>
         </button>
 
         <button
           type="button"
+          aria-pressed={viewMode === 'map'}
           onClick={() => onViewModeChange('map')}
-          className={`px-3.5 py-1.5 rounded-lg text-[14px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[38px] ${
+          className={`px-3.5 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
             viewMode === 'map'
               ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
               : 'text-ui-content-secondary hover:text-ui-content-primary'
           }`}
         >
-          <MapIcon name="map" size="md" />
+          <MapIcon name="map" size="md" aria-hidden="true" />
           <span>{language === 'bn' ? 'মানচিত্র' : 'Map'}</span>
         </button>
       </div>

@@ -1160,6 +1160,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         showHeader={false}
         keepMounted
         containerClassName="p-0 border-0 md:border"
+        language={language}
+        ariaLabel={language === 'bn' ? 'অভিযোগ জমা দেওয়ার ফর্ম' : 'Report submission form'}
       >
         {/* Case 1: Draft Recovery Prompt Screen */}
         {savedDraftAvailable ? (
@@ -1329,6 +1331,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               {submitError && (
                 <div
                   id="composer-submit-error-banner"
+                  role="alert"
+                  aria-live="assertive"
                   className="p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-start justify-between gap-4 text-[14px]"
                   style={{
                     backgroundColor: 'var(--ui-error-bg)',
@@ -1338,9 +1342,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 >
                   <div className="flex items-start gap-3">
                     {isLocationError ? (
-                      <MapPin className="w-5 h-5 shrink-0 mt-0.5" />
+                      <MapPin className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
                     ) : (
-                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
                     )}
                     <div>
                       <p className="font-bold">
@@ -1504,6 +1508,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         maxWidth="md"
         zIndexClass="z-[60]"
         showHeader={false}
+        language={language}
+        ariaLabel={language === 'bn' ? 'রিপোর্ট প্রকাশনা নীতি সম্মতি' : 'Report publishing policy consent'}
       >
         <div className="p-5 sm:p-6 md:p-8 space-y-4 sm:space-y-5 text-left">
           <div className="flex items-start gap-3.5">
@@ -1583,6 +1589,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         maxWidth="md"
         zIndexClass="z-[60]"
         showHeader={false}
+        language={language}
+        ariaLabel={language === 'bn' ? 'খসড়া সংরক্ষণ ও বন্ধ করার বিকল্প' : 'Save draft or close options'}
       >
         <div className="p-6 md:p-8 space-y-5 text-left">
           {/* Icon + Title Header */}

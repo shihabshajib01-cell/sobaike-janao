@@ -123,11 +123,11 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
 
         <IconButton
           id="report-composer-close-btn"
-          icon={<X className="w-5 h-5" />}
+          icon={<X className="w-5 h-5" aria-hidden="true" />}
           aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close composer'}
           size="md"
           onClick={onClose}
-          className="text-ui-content-muted min-h-[44px] min-w-[44px]"
+          className="text-ui-content-muted min-h-[44px] min-w-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         />
       </div>
 
@@ -143,13 +143,14 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               key={st.step}
               type="button"
               disabled={!isAccessible}
+              aria-current={isCurrent ? 'step' : undefined}
               onClick={() => isAccessible && onSelectStep && onSelectStep(st.step)}
-              className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-1.5 rounded-xl text-[12px] sm:text-[13px] md:text-[14px] font-medium transition-all whitespace-nowrap cursor-pointer min-h-[36px] ${
+              className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-2 rounded-xl text-[12px] sm:text-[13px] md:text-[14px] font-medium transition-all whitespace-nowrap cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isCurrent
                   ? 'bg-ui-accent text-ui-content-inverse font-bold shadow-2xs'
                   : isCompleted
                   ? 'bg-ui-accent-soft text-ui-content-primary border font-semibold'
-                  : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
+                  : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
               <span
@@ -161,7 +162,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
                     : 'bg-ui-surface text-ui-content-muted border border-ui-stroke-subtle'
                 }`}
               >
-                {isCompleted ? <Check className="w-3 h-3 text-white" /> : st.step}
+                {isCompleted ? <Check className="w-3 h-3 text-white" aria-hidden="true" /> : st.step}
               </span>
               <span className="sm:hidden truncate">{language === 'bn' ? st.shortBn : st.shortEn}</span>
               <span className="hidden sm:inline truncate">{language === 'bn' ? st.titleBn : st.titleEn}</span>
@@ -171,7 +172,14 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
       </div>
 
       {/* Subtle Progress Track */}
-      <div className="h-1 w-full bg-ui-surface-subtle overflow-hidden">
+      <div
+        role="progressbar"
+        aria-valuenow={progressPercentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={language === 'bn' ? 'ফর্ম পূরণের অগ্রগতি' : 'Form completion progress'}
+        className="h-1 w-full bg-ui-surface-subtle overflow-hidden"
+      >
         <div
           className="h-full bg-ui-accent transition-all duration-300 ease-out"
           style={{ width: `${progressPercentage}%` }}

@@ -140,17 +140,22 @@ export const SearchPage: React.FC = () => {
 
       {/* Search Input Box */}
       <div className="relative flex items-center">
-        <Search className="w-4 h-4 text-ui-content-muted absolute left-3.5 pointer-events-none" />
+        <Search className="w-4 h-4 text-ui-content-muted absolute left-3.5 pointer-events-none" aria-hidden="true" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          aria-label={
+            language === 'bn'
+              ? 'প্রকাশিত প্রতিবেদন অনুসন্ধান করুন'
+              : 'Search published reports'
+          }
           placeholder={
             language === 'bn'
               ? 'বিষয়, স্থান, ব্যক্তি বা প্রতিষ্ঠানের নাম দিয়ে খুঁজুন...'
               : 'Search reports, districts, subjects, or organizations...'
           }
-          className="w-full pl-10 pr-4 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[16px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
+          className="w-full pl-10 pr-4 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[16px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
         />
       </div>
 
@@ -159,8 +164,9 @@ export const SearchPage: React.FC = () => {
         <div className="flex items-center gap-2 pb-2 border-b border-ui-stroke-subtle overflow-x-auto no-scrollbar">
           <button
             type="button"
+            aria-pressed={activeTab === 'all'}
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'all'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
@@ -170,8 +176,9 @@ export const SearchPage: React.FC = () => {
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'reports'}
             onClick={() => setActiveTab('reports')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'reports'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
@@ -181,8 +188,9 @@ export const SearchPage: React.FC = () => {
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'locations'}
             onClick={() => setActiveTab('locations')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'locations'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
@@ -192,8 +200,9 @@ export const SearchPage: React.FC = () => {
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'subjects'}
             onClick={() => setActiveTab('subjects')}
-            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
+            className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'subjects'
                 ? 'bg-ui-action-bg text-ui-action-text font-bold'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
@@ -215,16 +224,17 @@ export const SearchPage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
-          <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" />
+        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+          <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
               ? 'অনুসন্ধান ডেটা লোড করতে সমস্যা হয়েছে।'
               : 'Unable to load public data for search. Please try again.'}
           </p>
           <button
+            type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2.5 rounded-xl text-[14px] font-semibold min-h-[44px]"
+            className="btn-primary-action px-4 py-2.5 rounded-xl text-[14px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>
@@ -234,7 +244,7 @@ export const SearchPage: React.FC = () => {
       {/* Initial Empty / Instructional State (Flattened per design rules) */}
       {!isLoading && !fetchError && !query.trim() && (
         <div className="py-14 text-center space-y-3">
-          <Search className="w-8 h-8 text-ui-content-muted mx-auto" />
+          <Search className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
           <p className="text-[16px] leading-[26px] text-ui-content-secondary font-medium max-w-md mx-auto">
             {language === 'bn'
               ? 'নাম, এলাকা, বিষয় বা প্রকাশিত তথ্য দিয়ে অনুসন্ধান করুন।'
@@ -258,11 +268,11 @@ export const SearchPage: React.FC = () => {
                     key={loc.id}
                     type="button"
                     onClick={() => navigateTo(`/location/${loc.id}` as any)}
-                    className="w-full p-4.5 transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px]"
+                    className="w-full p-4.5 transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-ui-surface-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
-                        <MapPin className="w-4 h-4" />
+                        <MapPin className="w-4 h-4" aria-hidden="true" />
                       </div>
                       <div>
                         <div className="text-[16px] font-bold text-ui-content-primary">
@@ -275,7 +285,7 @@ export const SearchPage: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-2 text-[14px] font-semibold text-ui-content-secondary">
                       <span>{language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}</span>
-                      <ArrowRight className="w-4 h-4 text-ui-content-muted" />
+                      <ArrowRight className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                     </div>
                   </button>
                 ))}
@@ -295,11 +305,11 @@ export const SearchPage: React.FC = () => {
                     key={sub.nameEn || sub.nameBn}
                     type="button"
                     onClick={() => navigateTo(`/subject/${encodeURIComponent(sub.nameEn || sub.nameBn)}` as any)}
-                    className="w-full p-4.5 transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px]"
+                    className="w-full p-4.5 transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-ui-surface-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
-                        <UserX className="w-4 h-4" />
+                        <UserX className="w-4 h-4" aria-hidden="true" />
                       </div>
                       <div>
                         <div className="text-[16px] font-bold text-ui-content-primary">
@@ -314,7 +324,7 @@ export const SearchPage: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-2 text-[14px] font-semibold text-ui-content-secondary">
                       <span>{language === 'bn' ? 'রেকর্ড দেখুন' : 'View records'}</span>
-                      <ArrowRight className="w-4 h-4 text-ui-content-muted" />
+                      <ArrowRight className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                     </div>
                   </button>
                 ))}
@@ -339,7 +349,7 @@ export const SearchPage: React.FC = () => {
           {/* Empty State */}
           {totalResults === 0 && (
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3 shadow-2xs">
-              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" />
+              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
               <h3 className="text-[16px] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'কোনো ফলাফল পাওয়া যায়নি' : 'No Results Found'}
               </h3>
