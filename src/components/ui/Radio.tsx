@@ -71,7 +71,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
                   onChange={() => handleChange(opt.value)}
                   className="peer sr-only"
                 />
-                <div className="w-5 h-5 rounded-full border border-ui-stroke-default bg-ui-surface transition-colors peer-checked:border-ui-action-bg flex items-center justify-center peer-focus-visible:ring-2 peer-focus-visible:ring-ui-focus peer-focus-visible:ring-offset-1">
+                <div className="w-5 h-5 rounded-full border border-ui-stroke-default bg-ui-surface transition-colors flex items-center justify-center peer-focus-visible:ring-2 peer-focus-visible:ring-ui-focus peer-focus-visible:ring-offset-1">
                   {isChecked && <div className="w-2.5 h-2.5 rounded-full bg-ui-action-bg" />}
                 </div>
               </div>

@@ -44,7 +44,7 @@ export const Accordion: React.FC<AccordionProps> = ({
           ? 'border-red-500/50 bg-red-500/5'
           : isExpanded
           ? 'border-ui-stroke-strong bg-ui-surface'
-          : 'border-ui-stroke-subtle bg-ui-surface hover:border-ui-stroke-strong/60'
+          : 'border-ui-stroke-subtle bg-ui-surface'
       } ${className}`}
     >
       {collapsible ? (
@@ -96,7 +96,7 @@ export const Accordion: React.FC<AccordionProps> = ({
           <div className="flex items-center gap-2 shrink-0">
             <div
               className={`w-8 h-8 rounded-lg flex items-center justify-center text-ui-content-muted transition-transform duration-200 ${
-                isExpanded ? 'rotate-180 text-ui-content-primary bg-ui-surface-subtle' : 'hover:text-ui-content-primary'
+                isExpanded ? 'rotate-180 bg-ui-surface-subtle' : ''
               }`}
             >
               <ChevronDown className="w-5 h-5" />

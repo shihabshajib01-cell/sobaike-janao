@@ -47,7 +47,7 @@ export const Toggle: React.FC<ToggleProps> = ({
       >
         <span
           className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-ui-action-text shadow-xs ring-0 transition duration-200 ease-in-out ${
-            checked ? 'translate-x-5' : 'translate-x-0 bg-ui-stroke-strong'
+            checked ? 'translate-x-5' : 'translate-x-0'
           }`}
         />
       </button>
