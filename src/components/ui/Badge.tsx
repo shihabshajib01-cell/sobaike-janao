@@ -26,12 +26,12 @@ export const Badge: React.FC<BadgeProps> = ({
   };
 
   const variantClasses: Record<BadgeVariant, string> = {
-    neutral: 'bg-surface-subtle text-primary ui-border-default border-subtle',
-    outline: 'bg-surface text-primary ui-border-default border-theme',
-    success: 'bg-[var(--ui-success-bg)] text-[var(--ui-success-text)] ui-border-default border-[var(--ui-success-border)]',
-    warning: 'bg-[var(--ui-warning-bg)] text-[var(--ui-warning-text)] ui-border-default border-[var(--ui-warning-border)]',
-    error: 'bg-[var(--ui-error-bg)] text-[var(--ui-error-text)] ui-border-default border-[var(--ui-error-border)]',
-    brand: 'bg-accent text-inverse ui-border-default border-transparent',
+    neutral: 'bg-ui-surface-subtle text-ui-content-primary ui-border-default border-ui-stroke-subtle',
+    outline: 'bg-ui-surface text-ui-content-primary ui-border-default border-ui-stroke-default',
+    success: 'bg-ui-success-bg text-ui-success-text ui-border-default border-ui-success-border',
+    warning: 'bg-ui-warning-bg text-ui-warning-text ui-border-default border-ui-warning-border',
+    error: 'bg-ui-error-bg text-ui-error-text ui-border-default border-ui-error-border',
+    brand: 'bg-ui-accent text-ui-content-inverse ui-border-default border-transparent',
   };
 
   return (

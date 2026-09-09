@@ -56,7 +56,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <div className={`relative flex items-center w-full ${className}`}>
       <Search
-        className="absolute left-3.5 w-4 h-4 text-muted pointer-events-none shrink-0"
+        className="absolute left-3.5 w-4 h-4 text-ui-content-muted pointer-events-none shrink-0"
         aria-hidden="true"
       />
       <input
@@ -69,14 +69,14 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full min-h-[44px] bg-surface-subtle hover:bg-surface focus:bg-surface text-primary placeholder:text-muted ui-radius-control ui-space-search ui-border-default border-subtle hover:border-theme focus:border-[var(--ui-accent)] focus:ring-1 focus:ring-[var(--ui-focus)] transition-all outline-none"
+        className="w-full min-h-[44px] bg-ui-surface-subtle hover:bg-surface focus:bg-surface text-ui-content-primary placeholder:text-muted ui-radius-control ui-space-search ui-border-default border-ui-stroke-subtle hover:border-theme focus:border-[var(--ui-accent)] focus:ring-1 focus:ring-[var(--ui-focus)] transition-all outline-none"
       />
       {currentValue.length > 0 && (
         <button
           type="button"
           onClick={handleClear}
           aria-label="Clear search"
-          className="absolute right-2.5 p-1.5 rounded-full text-muted hover:text-primary hover:bg-surface-elevated focus:outline-none transition-colors"
+          className="absolute right-2.5 p-1.5 rounded-full text-ui-content-muted hover:text-primary hover:bg-surface-elevated focus:outline-none transition-colors"
         >
           <X className="w-4 h-4" />
         </button>

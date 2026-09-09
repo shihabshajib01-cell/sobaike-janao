@@ -31,15 +31,15 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   const variantClasses: Record<IconButtonVariant, string> = {
     primary:
-      'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] hover:bg-[var(--ui-primary-action-hover)] active:opacity-90 ui-border-default border-transparent ui-elevation-control',
+      'bg-ui-action-bg text-ui-action-text hover:bg-[var(--ui-primary-action-hover)] active:opacity-90 ui-border-default border-transparent ui-elevation-control',
     secondary:
-      'bg-surface-subtle text-primary hover:bg-surface-elevated active:bg-surface-hover ui-border-default border-subtle',
+      'bg-ui-surface-subtle text-ui-content-primary hover:bg-surface-elevated active:bg-surface-hover ui-border-default border-ui-stroke-subtle',
     outline:
-      'bg-surface text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-theme ui-elevation-control',
+      'bg-ui-surface text-ui-content-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-ui-stroke-default ui-elevation-control',
     ghost:
-      'bg-transparent text-secondary hover:text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-transparent',
+      'bg-transparent text-ui-content-secondary hover:text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-transparent',
     destructive:
-      'bg-[var(--ui-error-bg)] text-[var(--ui-error-text)] hover:opacity-90 ui-border-default border-[var(--ui-error-border)]',
+      'bg-ui-error-bg text-ui-error-text hover:opacity-90 ui-border-default border-ui-error-border',
   };
 
   return (

@@ -23,12 +23,12 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="w-full text-left">
         {label && (
           <div className="flex items-center justify-between mb-1.5">
-            <label htmlFor={textareaId} className="block type-label text-primary">
+            <label htmlFor={textareaId} className="block type-label text-ui-content-primary">
               {label}
               {required && <span className="text-red-600 dark:text-red-400 ml-1" aria-hidden="true">*</span>}
             </label>
             {maxCharacters && (
-              <span className="type-compact text-muted">
+              <span className="type-compact text-ui-content-muted">
                 {charCount}/{maxCharacters}
               </span>
             )}
@@ -45,10 +45,10 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           disabled={disabled}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined}
-          className={`w-full bg-surface text-primary placeholder:text-muted ui-border-default ui-radius-control ui-space-textarea transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)] disabled:bg-surface-subtle disabled:text-muted disabled:cursor-not-allowed ${
+          className={`w-full bg-ui-surface text-ui-content-primary placeholder:text-muted ui-border-default ui-radius-control ui-space-textarea transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)] disabled:bg-surface-subtle disabled:text-muted disabled:cursor-not-allowed ${
             error
               ? 'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500'
-              : 'border-theme hover:border-strong'
+              : 'border-ui-stroke-default hover:border-strong'
           } ${className}`}
           {...props}
         />
@@ -58,7 +58,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           </p>
         )}
         {!error && helperText && (
-          <p id={`${textareaId}-helper`} className="mt-1.5 type-helper text-muted">
+          <p id={`${textareaId}-helper`} className="mt-1.5 type-helper text-ui-content-muted">
             {helperText}
           </p>
         )}

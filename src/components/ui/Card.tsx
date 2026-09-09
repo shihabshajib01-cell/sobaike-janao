@@ -22,17 +22,17 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantClasses = {
-    default: 'bg-surface ui-border-default border-subtle ui-elevation-card ui-radius-card',
-    subtle: 'bg-surface-subtle ui-border-default border-subtle ui-radius-card',
-    outline: 'bg-transparent ui-border-default border-theme ui-radius-card',
+    default: 'bg-ui-surface ui-border-default border-ui-stroke-subtle ui-elevation-card ui-radius-card',
+    subtle: 'bg-ui-surface-subtle ui-border-default border-ui-stroke-subtle ui-radius-card',
+    outline: 'bg-transparent ui-border-default border-ui-stroke-default ui-radius-card',
     interactive:
-      'bg-surface ui-border-default border-subtle hover:border-theme hover:bg-surface-hover active:bg-surface-subtle transition-all ui-radius-card cursor-pointer',
+      'bg-ui-surface ui-border-default border-ui-stroke-subtle hover:border-theme hover:bg-surface-hover active:bg-surface-subtle transition-all ui-radius-card cursor-pointer',
   };
 
   return (
     <div
       id={id}
-      className={`${variantClasses[variant]} ${paddingClasses[padding]} text-primary text-left ${className}`}
+      className={`${variantClasses[variant]} ${paddingClasses[padding]} text-ui-content-primary text-left ${className}`}
       {...props}
     >
       {children}
