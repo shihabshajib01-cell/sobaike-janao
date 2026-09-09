@@ -43,8 +43,8 @@ export const Accordion: React.FC<AccordionProps> = ({
         hasError
           ? 'border-red-500/50 bg-red-500/5'
           : isExpanded
-          ? 'border-strong bg-surface'
-          : 'border-subtle bg-surface hover:border-strong/60'
+          ? 'border-ui-stroke-strong bg-ui-surface'
+          : 'border-ui-stroke-subtle bg-ui-surface hover:border-ui-stroke-strong/60'
       } ${className}`}
     >
       {collapsible ? (
@@ -54,7 +54,7 @@ export const Accordion: React.FC<AccordionProps> = ({
           onClick={onToggle}
           aria-expanded={isExpanded}
           aria-controls={panelId}
-          className={`w-full flex items-center justify-between p-4 md:p-5 text-left transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] ${headerClassName}`}
+          className={`w-full flex items-center justify-between p-4 md:p-5 text-left transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${headerClassName}`}
         >
           <div className="flex items-center gap-3 min-w-0 pr-2">
             {icon && (
@@ -63,8 +63,8 @@ export const Accordion: React.FC<AccordionProps> = ({
                   hasError
                     ? 'bg-red-500/10 text-red-500'
                     : isExpanded
-                    ? 'bg-accent-soft text-accent'
-                    : 'bg-surface-subtle text-secondary'
+                    ? 'bg-ui-accent-soft text-ui-accent'
+                    : 'bg-ui-surface-subtle text-ui-content-secondary'
                 }`}
               >
                 {icon}
@@ -73,7 +73,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[16px] md:text-[18px] font-bold text-primary leading-tight">
+                <span className="text-[16px] md:text-[18px] font-bold text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
@@ -86,7 +86,7 @@ export const Accordion: React.FC<AccordionProps> = ({
               </div>
 
               {summary && !isExpanded && (
-                <div className="text-[14px] leading-snug text-muted mt-1 truncate">
+                <div className="text-[14px] leading-snug text-ui-content-muted mt-1 truncate">
                   {summary}
                 </div>
               )}
@@ -95,8 +95,8 @@ export const Accordion: React.FC<AccordionProps> = ({
 
           <div className="flex items-center gap-2 shrink-0">
             <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center text-muted transition-transform duration-200 ${
-                isExpanded ? 'rotate-180 text-primary bg-surface-subtle' : 'hover:text-primary'
+              className={`w-8 h-8 rounded-lg flex items-center justify-center text-ui-content-muted transition-transform duration-200 ${
+                isExpanded ? 'rotate-180 text-ui-content-primary bg-ui-surface-subtle' : 'hover:text-ui-content-primary'
               }`}
             >
               <ChevronDown className="w-5 h-5" />
@@ -114,7 +114,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                 className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                   hasError
                     ? 'bg-red-500/10 text-red-500'
-                    : 'bg-accent-soft text-accent'
+                    : 'bg-ui-accent-soft text-ui-accent'
                 }`}
               >
                 {icon}
@@ -123,7 +123,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[16px] md:text-[18px] font-bold text-primary leading-tight">
+                <span className="text-[16px] md:text-[18px] font-bold text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
@@ -144,7 +144,7 @@ export const Accordion: React.FC<AccordionProps> = ({
           id={panelId}
           role="region"
           aria-labelledby={headerId}
-          className={`px-4 pb-5 md:px-5 md:pb-6 pt-1 border-t border-subtle ${contentClassName}`}
+          className={`px-4 pb-5 md:px-5 md:pb-6 pt-1 border-t border-ui-stroke-subtle ${contentClassName}`}
         >
           {children}
         </div>

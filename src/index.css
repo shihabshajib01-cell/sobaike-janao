@@ -745,13 +745,7 @@
 .bg-accent { background-color: var(--ui-accent) !important; }
 .bg-accent-soft { background-color: var(--ui-accent-soft) !important; }
 .border-accent { border-color: var(--ui-accent-border) !important; }
-.border-accent-strong { border-color: var(--ui-accent) !important; }
 .ring-accent { --tw-ring-color: var(--ui-accent) !important; }
-
-.focus-ring:focus-visible, .focus-ring:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 2px var(--ui-surface), 0 0 0 4px var(--ui-focus) !important;
-}
 
 /* Primary Action Buttons */
 .btn-primary-action {

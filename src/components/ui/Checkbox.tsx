@@ -28,14 +28,14 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             className="peer sr-only"
             {...props}
           />
-          <div className="w-5 h-5 rounded-lg border border-theme bg-surface transition-colors peer-checked:bg-[var(--ui-primary-action-bg)] peer-checked:border-[var(--ui-primary-action-bg)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--ui-focus)] peer-focus-visible:ring-offset-1 flex items-center justify-center">
-            {checked && <Check className="w-3.5 h-3.5 text-[var(--ui-primary-action-text)] stroke-[2.5]" />}
+          <div className="w-5 h-5 rounded-lg border border-ui-stroke-default bg-ui-surface transition-colors peer-checked:bg-ui-action-bg peer-checked:border-ui-action-bg peer-focus-visible:ring-2 peer-focus-visible:ring-ui-focus peer-focus-visible:ring-offset-1 flex items-center justify-center">
+            {checked && <Check className="w-3.5 h-3.5 text-ui-action-text stroke-[2.5]" />}
           </div>
         </div>
         {(label || description) && (
           <div>
-            {label && <div className="type-label text-primary">{label}</div>}
-            {description && <div className="type-helper text-muted mt-0.5">{description}</div>}
+            {label && <div className="type-label text-ui-content-primary">{label}</div>}
+            {description && <div className="type-helper text-ui-content-muted mt-0.5">{description}</div>}
           </div>
         )}
       </label>

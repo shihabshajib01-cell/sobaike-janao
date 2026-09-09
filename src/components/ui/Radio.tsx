@@ -43,7 +43,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
 
   return (
     <fieldset id={id} className={`w-full text-left ${className}`} disabled={disabled}>
-      {label && <legend className="block type-label text-primary mb-2">{label}</legend>}
+      {label && <legend className="block type-label text-ui-content-primary mb-2">{label}</legend>}
       <div className="space-y-2.5">
         {options.map((opt) => {
           const optId = `${name}-${opt.value}`;
@@ -56,8 +56,8 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
               htmlFor={optId}
               className={`flex items-start gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer select-none min-h-[48px] ${
                 isChecked
-                  ? 'border-[var(--ui-primary-action-bg)] bg-surface-elevated shadow-2xs'
-                  : 'border-subtle bg-surface hover:border-theme'
+                  ? 'border-ui-action-bg bg-ui-surface-elevated shadow-2xs'
+                  : 'border-ui-stroke-subtle bg-ui-surface hover:border-ui-stroke-default'
               } ${isOptDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="relative flex items-center justify-center mt-0.5 shrink-0">
@@ -71,14 +71,14 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
                   onChange={() => handleChange(opt.value)}
                   className="peer sr-only"
                 />
-                <div className="w-5 h-5 rounded-full border border-theme bg-surface transition-colors peer-checked:border-[var(--ui-primary-action-bg)] flex items-center justify-center peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--ui-focus)] peer-focus-visible:ring-offset-1">
-                  {isChecked && <div className="w-2.5 h-2.5 rounded-full bg-[var(--ui-primary-action-bg)]" />}
+                <div className="w-5 h-5 rounded-full border border-ui-stroke-default bg-ui-surface transition-colors peer-checked:border-ui-action-bg flex items-center justify-center peer-focus-visible:ring-2 peer-focus-visible:ring-ui-focus peer-focus-visible:ring-offset-1">
+                  {isChecked && <div className="w-2.5 h-2.5 rounded-full bg-ui-action-bg" />}
                 </div>
               </div>
               <div>
-                <div className="type-label text-primary">{opt.label}</div>
+                <div className="type-label text-ui-content-primary">{opt.label}</div>
                 {opt.description && (
-                  <div className="type-helper text-muted mt-0.5">{opt.description}</div>
+                  <div className="type-helper text-ui-content-muted mt-0.5">{opt.description}</div>
                 )}
               </div>
             </label>
