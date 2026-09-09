@@ -67,7 +67,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
               navigateTo('/explore');
             }
           }}
-          className="hover:text-ui-content-primary flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary"
+          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরে যান' : 'Back to Explore'}</span>
@@ -100,7 +100,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           <button
             type="button"
             onClick={() => setIsResponseModalOpen(true)}
-            className="px-4 py-2.5 bg-ui-surface-subtle hover:bg-ui-surface-subtle/80 border border-ui-stroke-subtle text-ui-content-primary text-[16px] font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px]"
+            className="px-4 py-2.5 bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-primary text-[16px] font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px]"
           >
             <Scale className="w-4 h-4 text-ui-content-secondary" />
             <span>{language === 'bn' ? 'সংশ্লিষ্ট পক্ষের বক্তব্য দিন' : 'Submit Statement'}</span>

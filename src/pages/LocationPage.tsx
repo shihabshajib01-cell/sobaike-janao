@@ -79,7 +79,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               navigateTo('/explore');
             }
           }}
-          className="hover:text-ui-content-primary flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary"
+          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to Explore'}</span>
