@@ -1,5 +1,71 @@
 @import "tailwindcss";
 
+@theme inline {
+  /* Surfaces */
+  --color-ui-page: var(--ui-page);
+  --color-ui-surface: var(--ui-surface);
+  --color-ui-surface-subtle: var(--ui-surface-subtle);
+  --color-ui-surface-elevated: var(--ui-surface-elevated);
+  --color-ui-surface-hover: var(--ui-surface-hover);
+
+  /* Content / Text */
+  --color-ui-content-primary: var(--ui-text-primary);
+  --color-ui-content-secondary: var(--ui-text-secondary);
+  --color-ui-content-muted: var(--ui-text-muted);
+  --color-ui-content-inverse: var(--ui-text-inverse);
+
+  /* Border / Stroke */
+  --color-ui-stroke-subtle: var(--ui-border-subtle);
+  --color-ui-stroke-default: var(--ui-border);
+  --color-ui-stroke-strong: var(--ui-border-strong);
+
+  /* Input / Disabled */
+  --color-ui-input: var(--ui-input);
+  --color-ui-input-placeholder: var(--ui-input-placeholder);
+  --color-ui-disabled-bg: var(--ui-disabled-bg);
+  --color-ui-disabled-text: var(--ui-disabled-text);
+
+  /* Accent / Focus */
+  --color-ui-accent: var(--ui-accent);
+  --color-ui-accent-soft: var(--ui-accent-soft);
+  --color-ui-accent-border: var(--ui-accent-border);
+  --color-ui-accent-hover: var(--ui-accent-hover);
+  --color-ui-focus: var(--ui-focus);
+  --color-ui-overlay: var(--ui-overlay);
+
+  /* Primary Action */
+  --color-ui-action-bg: var(--ui-primary-action-bg);
+  --color-ui-action-hover: var(--ui-primary-action-hover);
+  --color-ui-action-active: var(--ui-primary-action-active);
+  --color-ui-action-text: var(--ui-primary-action-text);
+
+  /* Feedback - Success */
+  --color-ui-success-text: var(--ui-success-text);
+  --color-ui-success-bg: var(--ui-success-bg);
+  --color-ui-success-border: var(--ui-success-border);
+
+  /* Feedback - Warning */
+  --color-ui-warning-text: var(--ui-warning-text);
+  --color-ui-warning-bg: var(--ui-warning-bg);
+  --color-ui-warning-border: var(--ui-warning-border);
+
+  /* Feedback - Error */
+  --color-ui-error-text: var(--ui-error-text);
+  --color-ui-error-bg: var(--ui-error-bg);
+  --color-ui-error-border: var(--ui-error-border);
+
+  /* Feedback - Info */
+  --color-ui-info-text: var(--ui-info-text);
+  --color-ui-info-bg: var(--ui-info-bg);
+  --color-ui-info-border: var(--ui-info-border);
+
+  /* Sensitive Information */
+  --color-ui-sensitive-bg: var(--ui-sensitive-bg);
+  --color-ui-sensitive-border: var(--ui-sensitive-border);
+  --color-ui-sensitive-text: var(--ui-sensitive-text);
+  --color-ui-sensitive-muted: var(--ui-sensitive-muted);
+}
+
 @layer base {
   :root {
     --font-ui: 'Noto Sans Bengali', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
