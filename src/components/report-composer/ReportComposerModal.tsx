@@ -1264,7 +1264,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 id="draft-recovery-delete-btn"
                 type="button"
                 onClick={handleDeleteSavedDraft}
-                className="px-4 py-2.5 rounded-xl border border-rose-500/30 bg-ui-surface hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
+                className="px-4 py-2.5 rounded-xl border border-rose-500/30 bg-ui-surface text-rose-600 dark:text-rose-400 font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>{language === 'bn' ? 'খসড়া মুছে ফেলুন' : 'Delete Draft'}</span>

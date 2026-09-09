@@ -1625,7 +1625,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-ui-accent hover:bg-ui-accent-hover text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-ui-accent text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'লোকেশন চালু করুন' : 'Allow location'}</span>
@@ -2288,7 +2288,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <button
                       type="button"
                       onClick={handleAddAdditionalParty}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-ui-surface hover:bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-semibold text-ui-content-primary cursor-pointer transition-colors min-h-[40px]"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-ui-surface border border-ui-stroke-subtle text-[13px] font-semibold text-ui-content-primary cursor-pointer transition-colors min-h-[40px]"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>

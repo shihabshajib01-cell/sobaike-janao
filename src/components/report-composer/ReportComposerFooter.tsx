@@ -43,7 +43,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           size="lg"
           onClick={onClose}
           leftIcon={<X className="w-4 h-4" />}
-          className="min-h-[44px] text-[16px] text-ui-content-muted hover:text-ui-content-primary"
+          className="min-h-[44px] text-[16px] text-ui-content-muted"
         >
           {language === 'bn' ? 'বাতিল করুন' : 'Cancel'}
         </Button>

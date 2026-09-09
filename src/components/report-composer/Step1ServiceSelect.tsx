@@ -182,7 +182,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
             <span className="text-[12px] font-bold text-ui-content-muted uppercase tracking-wider">
               {language === 'bn' ? 'আসন্ন সেবাসমূহ' : 'Upcoming Services'}
             </span>
-            <span className="h-px bg-ui-stroke-subtle flex-1" />
+            <span className="h-px flex-1" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -61,7 +61,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
 
           <div
             className={`w-7 h-7 rounded-lg flex items-center justify-center text-ui-content-muted shrink-0 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-ui-content-primary bg-ui-surface-subtle' : ''
+              isOpen ? 'rotate-180 bg-ui-surface-subtle' : ''
             }`}
           >
             <ChevronDown className="w-4 h-4" />

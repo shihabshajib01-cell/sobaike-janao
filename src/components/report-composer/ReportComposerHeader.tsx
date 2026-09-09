@@ -127,7 +127,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
           aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close composer'}
           size="md"
           onClick={onClose}
-          className="text-ui-content-muted hover:text-ui-content-primary min-h-[44px] min-w-[44px]"
+          className="text-ui-content-muted min-h-[44px] min-w-[44px]"
         />
       </div>
 
@@ -148,7 +148,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
                 isCurrent
                   ? 'bg-ui-accent text-ui-content-inverse font-bold shadow-2xs'
                   : isCompleted
-                  ? 'bg-ui-accent-soft text-ui-content-primary hover:bg-ui-surface-elevated border border-ui-accent/40 font-semibold'
+                  ? 'bg-ui-accent-soft text-ui-content-primary border font-semibold'
                   : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
               }`}
             >

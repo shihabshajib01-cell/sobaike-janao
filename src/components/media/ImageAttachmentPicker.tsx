@@ -267,10 +267,10 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+          className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] ${
             isDragging
               ? 'border-emerald-600 bg-emerald-500/10'
-              : 'border-ui-stroke-subtle bg-ui-surface-subtle'
+              : 'border-subtle bg-surface-subtle'
           }`}
         >
           <input
@@ -286,14 +286,14 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
               }
             }}
           />
-          <div className="w-12 h-12 rounded-2xl bg-ui-surface border border-ui-stroke-subtle flex items-center justify-center shadow-2xs text-ui-content-secondary">
+          <div className="w-12 h-12 rounded-2xl bg-surface border border-subtle flex items-center justify-center shadow-2xs text-secondary">
             <UploadCloud className="w-6 h-6 text-emerald-600" />
           </div>
           <div className="space-y-1">
-            <p className="text-[14px] font-semibold text-ui-content-primary">
+            <p className="text-[14px] font-semibold text-primary">
               {language === 'bn' ? 'সহায়ক ছবি সংযুক্ত করুন' : 'Attach supporting images'}
             </p>
-            <p className="text-[14px] text-ui-content-secondary">
+            <p className="text-[14px] text-secondary">
               {language === 'bn'
                 ? `ঐচ্ছিক · সর্বোচ্চ ${maxImages}টি JPG বা PNG ছবি (প্রতি ছবি ৫MB, মোট ২৫MB)`
                 : `Optional · Up to ${maxImages} JPG or PNG images (5MB each, 25MB total)`}
@@ -305,7 +305,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
       {/* Image Previews Grid */}
       {images.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-[14px] font-semibold text-ui-content-primary">
+          <div className="flex items-center justify-between text-[14px] font-semibold text-primary">
             <span className="flex items-center gap-2">
               <span>
                 {language === 'bn'
@@ -326,13 +326,13 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
               return (
                 <div
                   key={img.id}
-                  className={`relative group rounded-xl overflow-hidden border bg-ui-surface flex flex-col justify-between shadow-2xs transition-all ${
+                  className={`relative group rounded-xl overflow-hidden border bg-surface flex flex-col justify-between shadow-2xs transition-all ${
                     img.compressionError
                       ? 'border-rose-500/50 bg-rose-500/5'
-                      : 'border-ui-stroke-subtle'
+                      : 'border-subtle'
                   }`}
                 >
-                  <div className="relative aspect-4/3 overflow-hidden bg-ui-surface-subtle flex items-center justify-center">
+                  <div className="relative aspect-4/3 overflow-hidden bg-surface-subtle flex items-center justify-center">
                     {img.previewUrl ? (
                       <img
                         src={img.previewUrl}
@@ -345,7 +345,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-ui-surface-subtle text-ui-content-muted">
+                      <div className="w-full h-full flex items-center justify-center bg-surface-subtle text-muted">
                         <UploadCloud className="w-8 h-8 opacity-40" />
                       </div>
                     )}
@@ -390,8 +390,8 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                   </div>
 
                   {/* File info bar & Reorder controls */}
-                  <div className="p-2.5 bg-ui-surface border-t border-ui-stroke-subtle flex items-center justify-between gap-2">
-                    <div className="truncate text-[13px] text-ui-content-primary flex-1 min-w-0">
+                  <div className="p-2.5 bg-surface border-t border-subtle flex items-center justify-between gap-2">
+                    <div className="truncate text-[13px] text-primary flex-1 min-w-0">
                       <p className="truncate font-medium" title={img.file.name}>
                         {img.originalName || img.file.name}
                       </p>
@@ -404,7 +404,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                         disabled={index === 0 || img.isCompressing}
                         onClick={() => handleMoveImage(index, 'prev')}
                         aria-label={language === 'bn' ? 'পূর্বে সরান' : 'Move previous'}
-                        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-subtle bg-surface-subtle text-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
                       >
                         <ArrowLeft className="w-4 h-4" />
                       </button>
@@ -413,7 +413,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                         disabled={index === images.length - 1 || img.isCompressing}
                         onClick={() => handleMoveImage(index, 'next')}
                         aria-label={language === 'bn' ? 'পরে সরান' : 'Move next'}
-                        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-subtle bg-surface-subtle text-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
                       >
                         <ArrowRight className="w-4 h-4" />
                       </button>
