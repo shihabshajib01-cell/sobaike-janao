@@ -293,7 +293,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleZoomIn}
           title={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
           aria-label={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
-          className="w-9 h-9 rounded-xl bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
+          className="w-9 h-9 rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
         >
           <MapIcon name="plus" size="sm" />
         </button>
@@ -303,7 +303,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleZoomOut}
           title={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
           aria-label={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
-          className="w-9 h-9 rounded-xl bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
+          className="w-9 h-9 rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
         >
           <MapIcon name="minus" size="sm" />
         </button>
@@ -313,14 +313,14 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleResetView}
           title={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
           aria-label={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
-          className="w-9 h-9 rounded-xl bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
+          className="w-9 h-9 rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
         >
           <MapIcon name="reset" size="sm" />
         </button>
       </div>
 
       {/* Map Legend Overlay Top-Left */}
-      <div className="absolute top-3.5 left-3.5 z-[500] bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 shadow-2xs flex flex-col gap-1.5 text-[12px] max-w-[220px]">
+      <div className="absolute top-3.5 left-3.5 z-[500] bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle rounded-xl p-2.5 shadow-2xs flex flex-col gap-1.5 text-[12px] max-w-[220px]">
         <span className="font-bold text-ui-content-primary text-[11px] uppercase tracking-wider">
           {language === 'bn' ? 'মানচিত্র নির্দেশিকা' : 'Map Legend'}
         </span>
@@ -345,7 +345,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       </div>
 
       {/* Total Mapped Indicator Bottom-Left */}
-      <div className="absolute bottom-3.5 left-3.5 z-[500] bg-ui-surface border border-ui-stroke-subtle rounded-xl px-3 py-1.5 shadow-2xs flex items-center gap-2 text-[12px] font-bold text-ui-content-primary">
+      <div className="absolute bottom-3.5 left-3.5 z-[500] bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle rounded-xl px-3 py-1.5 shadow-2xs flex items-center gap-2 text-[12px] font-bold text-ui-content-primary">
         <MapIcon name="map-pin" size="xs" className="text-ui-content-primary" />
         <span>
           {language === 'bn'
@@ -363,7 +363,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
       {/* Empty State Banner if 0 reports match */}
       {mappedPoints.length === 0 && (
-        <div className="absolute inset-0 z-[550] bg-ui-surface flex flex-col items-center justify-center p-6 text-center space-y-3">
+        <div className="absolute inset-0 z-[550] bg-ui-surface backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center space-y-3">
           <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
           <h4 className="text-[17px] font-bold text-ui-content-primary">
             {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Mapped Reports'}
@@ -378,7 +378,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
       {/* Active Selected Report Details Popup Card (Desktop floating / Mobile bottom sheet) */}
       {activeReport && (
-        <div className="absolute bottom-3.5 right-3.5 left-3.5 sm:left-auto sm:max-w-sm z-[600] bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="absolute bottom-3.5 right-3.5 left-3.5 sm:left-auto sm:max-w-sm z-[600] bg-ui-surface border border-ui-stroke-default rounded-2xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="flex items-start justify-between gap-2 pb-2 border-b border-ui-stroke-subtle">
             <div className="flex items-center gap-2 min-w-0">
               <CategoryBadge section={activeReport.segment} language={language} size="sm" />

@@ -314,7 +314,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => onSelectDistrict(item.nameEn)}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle/50 hover:bg-ui-surface-subtle border-ui-stroke-subtle/60 group"
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle border-ui-stroke-subtle group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span
