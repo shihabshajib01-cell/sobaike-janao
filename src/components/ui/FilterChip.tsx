@@ -47,7 +47,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
         selected && !config
           ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg font-semibold ui-elevation-selected'
           : !selected
-          ? 'bg-ui-surface text-ui-content-secondary hover:text-primary border-ui-stroke-default hover:border-strong hover:bg-surface-hover'
+          ? 'bg-ui-surface text-ui-content-secondary hover:text-ui-content-primary border-ui-stroke-default hover:border-ui-stroke-strong hover:bg-ui-surface-hover'
           : ''
       } ${className}`}
     >

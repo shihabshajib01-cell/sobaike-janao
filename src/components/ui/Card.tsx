@@ -26,7 +26,7 @@ export const Card: React.FC<CardProps> = ({
     subtle: 'bg-ui-surface-subtle ui-border-default border-ui-stroke-subtle ui-radius-card',
     outline: 'bg-transparent ui-border-default border-ui-stroke-default ui-radius-card',
     interactive:
-      'bg-ui-surface ui-border-default border-ui-stroke-subtle hover:border-theme hover:bg-surface-hover active:bg-surface-subtle transition-all ui-radius-card cursor-pointer',
+      'bg-ui-surface ui-border-default border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover active:bg-ui-surface-subtle transition-all ui-radius-card cursor-pointer',
   };
 
   return (
