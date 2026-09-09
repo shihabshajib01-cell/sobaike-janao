@@ -83,18 +83,18 @@ export const HarassmentPage: React.FC = () => {
             </span>
           </div>
 
-          <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-primary tracking-tight">
+          <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-ui-content-primary tracking-tight">
             {language === 'bn' ? config.nameBn : config.nameEn}
           </h1>
 
-          <p className="text-[16px] leading-[1.6] md:leading-[26px] text-secondary">
+          <p className="text-[16px] leading-[1.6] md:leading-[26px] text-ui-content-secondary">
             {language === 'bn' ? config.descriptionBn : config.descriptionEn}
           </p>
         </div>
 
         {/* Quiet Helpline Information Strip */}
-        <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-secondary bg-surface-subtle border border-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-          <PhoneCall className="w-4 h-4 text-muted shrink-0" />
+        <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
+          <PhoneCall className="w-4 h-4 text-ui-content-muted shrink-0" />
           <span>
             {language === 'bn'
               ? 'জরুরি সহায়তার জন্য: জাতীয় জরুরি সেবা ৯৯৯ | নারী ও শিশু নির্যাতন প্রতিরোধ ১০৯'
@@ -105,12 +105,12 @@ export const HarassmentPage: React.FC = () => {
 
       {/* 2. Subcategory & Location Filter Controls */}
       <section id="harassment-filter-section" className="space-y-3">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-subtle pb-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
-            <h2 className="text-[16px] font-bold text-primary">
+            <h2 className="text-[16px] font-bold text-ui-content-primary">
               {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by Subcategory'}
             </h2>
-            <p className="text-[14px] text-muted">
+            <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'
                 ? `${filteredReports.length}টি প্রকাশিত প্রতিবেদন পাওয়া গেছে`
                 : `${filteredReports.length} published reports found`}
@@ -162,7 +162,7 @@ export const HarassmentPage: React.FC = () => {
 
       {/* 4. Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
+        <div className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
           <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'

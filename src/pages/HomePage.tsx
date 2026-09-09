@@ -129,12 +129,12 @@ export const HomePage: React.FC = () => {
       {/* 2. Combined Public Feed */}
       <section id="home-feed-section" className="space-y-4 pt-1">
         {/* Feed Header & District Filter */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-subtle pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
-            <h2 className="text-[20px] font-bold leading-[1.3] text-primary">
+            <h2 className="text-[20px] font-bold leading-[1.3] text-ui-content-primary">
               {language === 'bn' ? 'সাম্প্রতিক প্রকাশনা ও প্রতিবেদন' : 'Recent Public Reports'}
             </h2>
-            <p className="text-[14px] leading-[1.5] text-secondary mt-0.5">
+            <p className="text-[14px] leading-[1.5] text-ui-content-secondary mt-0.5">
               {language === 'bn'
                 ? 'মডারেশন শেষে প্রকাশিত নাগরিক প্রতিবেদনের সময়ানুক্রমিক ফিড'
                 : 'Moderated public feed across citizen reporting categories'}
@@ -194,7 +194,7 @@ export const HomePage: React.FC = () => {
 
         {/* Error State */}
         {!isLoading && fetchError && (
-          <div className="bg-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
+          <div className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
             <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" />
             <p className="text-[16px] font-semibold text-rose-500">
               {language === 'bn'
