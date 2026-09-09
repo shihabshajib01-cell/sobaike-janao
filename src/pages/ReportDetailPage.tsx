@@ -133,7 +133,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 navigateTo('/');
               }
             }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>{language === 'bn' ? 'ফিরে যান' : 'Go Back'}</span>
@@ -172,7 +172,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 navigateTo('/');
               }
             }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>{language === 'bn' ? 'পূর্ববর্তী পাতায় যান' : 'Go Back'}</span>
@@ -246,7 +246,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               navigateTo('/');
             }
           }}
-          className="inline-flex items-center gap-2 text-[16px] leading-[24px] font-medium text-ui-content-secondary hover:text-ui-content-primary bg-ui-surface hover:bg-ui-surface-subtle border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px]"
+          className="inline-flex items-center gap-2 text-[16px] leading-[24px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px]"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{language === 'bn' ? 'তালিকায় ফিরে যান' : 'Back to Reports'}</span>
@@ -256,7 +256,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         <button
           type="button"
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 text-[16px] font-medium text-ui-content-secondary hover:text-ui-content-primary bg-ui-surface hover:bg-ui-surface-subtle border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px]"
+          className="inline-flex items-center gap-1.5 text-[16px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px]"
         >
           {isCopied ? (
             <>
@@ -543,7 +543,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <button
             type="button"
             onClick={() => setIsCitizenModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle hover:bg-ui-surface text-ui-content-secondary hover:text-ui-content-primary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
           >
             {language === 'bn'
               ? 'আমার কাছে তথ্য আছে / আমিও ভুক্তভোগী'
@@ -552,7 +552,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <button
             type="button"
             onClick={() => setIsSubjectModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle hover:bg-ui-surface text-ui-content-secondary hover:text-ui-content-primary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer"
           >
             {language === 'bn' ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ' : 'I’m the person or party mentioned'}
           </button>

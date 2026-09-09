@@ -75,7 +75,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
             return (
               <div
                 key={report.id}
-                className="bg-ui-surface border border-ui-stroke-subtle hover:border-ui-accent rounded-2xl p-4 transition-all duration-150 flex flex-col justify-between space-y-3 shadow-2xs hover:shadow-xs group text-left"
+                className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 transition-all duration-150 flex flex-col justify-between space-y-3 shadow-2xs hover:shadow-xs group text-left"
               >
                 <div className="space-y-2">
                   {/* Category Badge */}
@@ -90,7 +90,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                   {/* Title */}
                   <h4
                     onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                    className="text-[15px] font-bold text-ui-content-primary hover:text-ui-accent transition-colors line-clamp-2 leading-snug cursor-pointer"
+                    className="text-[15px] font-bold text-ui-content-primary transition-colors line-clamp-2 leading-snug cursor-pointer"
                   >
                     {title}
                   </h4>
@@ -117,10 +117,10 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                   <button
                     type="button"
                     onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                    className="shrink-0 text-[12px] font-semibold text-ui-content-primary hover:text-ui-accent flex items-center gap-1 cursor-pointer transition-colors"
+                    className="shrink-0 text-[12px] font-semibold text-ui-content-primary flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
-                    <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted group-hover:text-ui-content-primary transition-transform group-hover:translate-x-0.5" />
+                    <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </div>
               </div>

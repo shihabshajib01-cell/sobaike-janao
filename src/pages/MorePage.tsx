@@ -46,8 +46,8 @@ export const MorePage: React.FC = () => {
             onClick={() => setActiveTab('about')}
             className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'about'
-                ? 'bg-ui-primary-action-bg text-ui-primary-action-text font-bold'
-                : 'bg-ui-surface-subtle text-ui-content-secondary hover:bg-ui-surface border border-ui-stroke-subtle'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
             {language === 'bn' ? 'প্ল্যাটফর্ম সম্পর্কে' : 'About Platform'}
@@ -58,8 +58,8 @@ export const MorePage: React.FC = () => {
             onClick={() => setActiveTab('helplines')}
             className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'helplines'
-                ? 'bg-ui-primary-action-bg text-ui-primary-action-text font-bold'
-                : 'bg-ui-surface-subtle text-ui-content-secondary hover:bg-ui-surface border border-ui-stroke-subtle'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
             {language === 'bn' ? 'জরুরি ও সহায়তা সেবা' : 'Emergency & Support Resources'}
@@ -70,8 +70,8 @@ export const MorePage: React.FC = () => {
             onClick={() => setActiveTab('principles')}
             className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'principles'
-                ? 'bg-ui-primary-action-bg text-ui-primary-action-text font-bold'
-                : 'bg-ui-surface-subtle text-ui-content-secondary hover:bg-ui-surface border border-ui-stroke-subtle'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
             {language === 'bn' ? 'সুরক্ষা ও মডারেশন নীতি' : 'Safety & Moderation'}
@@ -82,8 +82,8 @@ export const MorePage: React.FC = () => {
             onClick={() => setActiveTab('response')}
             className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'response'
-                ? 'bg-ui-primary-action-bg text-ui-primary-action-text font-bold'
-                : 'bg-ui-surface-subtle text-ui-content-secondary hover:bg-ui-surface border border-ui-stroke-subtle'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
             {language === 'bn' ? 'প্রতিউত্তরের অধিকার' : 'Right of Response'}
@@ -94,8 +94,8 @@ export const MorePage: React.FC = () => {
             onClick={() => setActiveTab('faq')}
             className={`px-4 py-2.5 rounded-xl text-[16px] leading-[24px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'faq'
-                ? 'bg-ui-primary-action-bg text-ui-primary-action-text font-bold'
-                : 'bg-ui-surface-subtle text-ui-content-secondary hover:bg-ui-surface border border-ui-stroke-subtle'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
             {language === 'bn' ? 'সাধারণ জিজ্ঞাসা (FAQ)' : 'FAQ'}

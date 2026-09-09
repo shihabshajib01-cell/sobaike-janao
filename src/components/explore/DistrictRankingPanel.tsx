@@ -250,7 +250,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   <div
                     key={r.id}
                     onClick={() => navigateTo(`/report-detail/${r.id}`)}
-                    className="p-2.5 rounded-xl bg-ui-surface-subtle/60 hover:bg-ui-surface-subtle border border-ui-stroke-subtle/80 hover:border-ui-accent cursor-pointer transition-colors text-left group"
+                    className="p-2.5 rounded-xl bg-ui-surface-subtle/60 hover:bg-ui-surface-subtle border border-ui-stroke-subtle/80 cursor-pointer transition-colors text-left group"
                   >
                     <div className="text-[14px] font-bold text-ui-content-primary transition-colors line-clamp-1">
                       {language === 'bn' ? r.titleBn : r.titleEn}
@@ -314,7 +314,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => onSelectDistrict(item.nameEn)}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle/50 hover:bg-ui-surface-subtle border-ui-stroke-subtle/60 hover:border-ui-accent group"
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle/50 hover:bg-ui-surface-subtle border-ui-stroke-subtle/60 group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span
@@ -359,7 +359,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                       <span className="text-[13px] font-bold text-ui-content-primary font-mono">
                         {countDisplay}
                       </span>
-                      <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted group-hover:text-ui-content-primary transition-transform group-hover:translate-x-0.5" />
+                      <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </button>
                 );
@@ -380,7 +380,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <button
             type="button"
             onClick={() => setShowAllDistricts(!showAllDistricts)}
-            className="w-full py-2 px-3 rounded-xl bg-ui-surface-subtle hover:bg-ui-surface border border-ui-stroke-subtle text-[13px] font-bold text-ui-content-secondary hover:text-ui-content-primary transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
+            className="w-full py-2 px-3 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-bold text-ui-content-secondary transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
           >
             <span>
               {showAllDistricts
