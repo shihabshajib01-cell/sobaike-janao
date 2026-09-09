@@ -106,6 +106,9 @@ export const Modal: React.FC<ModalProps> = ({
         savedBodyOverflow = null;
       }
       window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
+        previouslyFocusedElementRef.current.focus();
+      }
     };
   }, [isOpen]);
 

@@ -32,6 +32,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             ref={ref}
             disabled={disabled}
+            required={required}
+            aria-required={required ? 'true' : undefined}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}
             className={`w-full appearance-none min-h-[44px] bg-ui-surface text-ui-content-primary ui-border-default ui-radius-control ui-space-select transition-colors focus:outline-none focus:ring-2 disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
@@ -53,7 +55,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           </div>
         </div>
         {error && (
-          <p id={`${selectId}-error`} className="mt-1.5 type-helper text-ui-validation-text font-medium">
+          <p id={`${selectId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-medium">
             {error}
           </p>
         )}

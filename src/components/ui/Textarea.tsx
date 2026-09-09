@@ -43,6 +43,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           defaultValue={defaultValue}
           onChange={handleChange}
           disabled={disabled}
+          required={required}
+          aria-required={required ? 'true' : undefined}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined}
           className={`w-full bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-border-default ui-radius-control ui-space-textarea transition-colors focus:outline-none focus:ring-2 disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
@@ -53,7 +55,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {error && (
-          <p id={`${textareaId}-error`} className="mt-1.5 type-helper text-ui-validation-text font-medium">
+          <p id={`${textareaId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-medium">
             {error}
           </p>
         )}

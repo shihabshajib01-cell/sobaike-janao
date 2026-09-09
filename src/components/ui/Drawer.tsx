@@ -85,6 +85,9 @@ export const Drawer: React.FC<DrawerProps> = ({
       clearTimeout(timeoutId);
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
+        previouslyFocusedElementRef.current.focus();
+      }
     };
   }, [isOpen]);
 

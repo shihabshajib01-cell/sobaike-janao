@@ -30,6 +30,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             disabled={disabled}
+            required={required}
+            aria-required={required ? 'true' : undefined}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
             className={`w-full min-h-[44px] bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-border-default ui-radius-control ui-space-field-y transition-colors focus:outline-none focus:ring-2 disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
@@ -48,7 +50,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <p id={`${inputId}-error`} className="mt-1.5 type-helper text-ui-validation-text font-medium">
+          <p id={`${inputId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-medium">
             {error}
           </p>
         )}

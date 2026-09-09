@@ -19,14 +19,25 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   language,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const viewerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (isOpen) {
+      previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
       setCurrentIndex(initialIndex);
-      closeButtonRef.current?.focus();
+      const timeoutId = setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 30);
+      return () => {
+        clearTimeout(timeoutId);
+        if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
+          previouslyFocusedElementRef.current.focus();
+        }
+      };
     }
   }, [initialIndex, isOpen]);
 
@@ -51,11 +62,34 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         onCloseRef.current();
       } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
         handlePrevRef.current();
       } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
         handleNextRef.current();
+      } else if (e.key === 'Tab' && viewerRef.current) {
+        const focusableElements = viewerRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
@@ -103,6 +137,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
 
   return (
     <div
+      ref={viewerRef}
       role="dialog"
       aria-modal="true"
       aria-label={language === 'bn' ? 'ছবির পূর্ণরূপ' : 'Image viewer'}
@@ -127,7 +162,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           type="button"
           onClick={onClose}
           aria-label={language === 'bn' ? 'ভিউয়ার বন্ধ করুন' : 'Close image viewer'}
-          className="min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+          className="min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
           <X className="w-6 h-6" />
         </button>
@@ -166,7 +201,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
               handlePrev();
             }}
             aria-label={language === 'bn' ? 'পূর্ববর্তী ছবি' : 'Previous image'}
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-md z-10"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -178,7 +213,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
               handleNext();
             }}
             aria-label={language === 'bn' ? 'পরবর্তী ছবি' : 'Next image'}
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-md z-10"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -202,7 +237,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     ? `ছবি ${toBanglaNum(idx + 1)}-এ যান`
                     : `Go to image ${idx + 1}`
                 }
-                className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                   idx === currentIndex
                     ? 'border-emerald-500 scale-105 opacity-100'
                     : 'border-transparent opacity-50 hover:opacity-80'
