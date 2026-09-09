@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { PublicPublishedResponse, PublicResponseType, PublicSubjectResponderType } from '../types/report';
+import { mockStorage } from './mockStorage';
 
 /**
  * Feature gate: Controls whether the frontend connects to the public published response RPC.
@@ -28,7 +29,7 @@ export const PublicResponseService = {
 
     // C. Supabase configuration check
     if (!isSupabaseConfigured() || !supabase) {
-      throw new Error('Supabase client is not configured.');
+      return mockStorage.getMockResponses(cleanId);
     }
 
     // D. Call authoritative public read RPC
