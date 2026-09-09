@@ -10,6 +10,11 @@ export interface ApiError {
 }
 
 class ApiClient {
+  // Helper to check if mock fallback should be used
+  private isMockAllowed(): boolean {
+    return !isSupabaseConfigured() || !supabase || import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
+  }
+
   // --- Public Response APIs ---
   async submitCitizenResponse(
     reportId: string,
@@ -21,10 +26,7 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-      );
-      if (!isMockAllowed) {
+      if (!this.isMockAllowed()) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
           message: 'Supabase client is not configured.',
@@ -89,10 +91,7 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-      );
-      if (!isMockAllowed) {
+      if (!this.isMockAllowed()) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
           message: 'Supabase client is not configured.',
@@ -164,11 +163,8 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-      );
-      if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in local mock mode (DEV only)');
+      if (this.isMockAllowed()) {
+        console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
         return {

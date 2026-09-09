@@ -91,8 +91,12 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
 };
 
 const isMockModeAllowed = (): boolean => {
-  return Boolean(
-    import.meta.env.DEV &&
+  // If Supabase credentials are not configured, fallback to mock/seed data
+  if (!isSupabaseConfigured() || !supabase) {
+    return true;
+  }
+  return (
+    Boolean(import.meta.env.DEV) ||
     import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
   );
 };
