@@ -43,7 +43,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
 
   return (
     <fieldset id={id} className={`w-full text-left ${className}`} disabled={disabled}>
-      {label && <legend className="block text-[16px] leading-[24px] font-medium text-primary mb-2">{label}</legend>}
+      {label && <legend className="block type-label text-primary mb-2">{label}</legend>}
       <div className="space-y-2.5">
         {options.map((opt) => {
           const optId = `${name}-${opt.value}`;
@@ -76,9 +76,9 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
                 </div>
               </div>
               <div>
-                <div className="text-[16px] leading-[24px] font-medium text-primary">{opt.label}</div>
+                <div className="type-label text-primary">{opt.label}</div>
                 {opt.description && (
-                  <div className="text-[14px] leading-[20px] text-muted mt-0.5">{opt.description}</div>
+                  <div className="type-meta text-muted mt-0.5">{opt.description}</div>
                 )}
               </div>
             </label>

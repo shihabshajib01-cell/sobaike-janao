@@ -22,7 +22,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full text-left">
         {label && (
-          <label htmlFor={selectId} className="block text-[16px] leading-[24px] font-medium text-primary mb-1.5">
+          <label htmlFor={selectId} className="block type-label text-primary mb-1.5">
             {label}
             {required && <span className="text-red-600 dark:text-red-400 ml-1" aria-hidden="true">*</span>}
           </label>
@@ -34,7 +34,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             disabled={disabled}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}
-            className={`w-full appearance-none text-[16px] leading-[24px] min-h-[44px] bg-surface text-primary border rounded-xl pl-3.5 pr-10 py-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)] disabled:bg-surface-subtle disabled:text-muted disabled:cursor-not-allowed ${
+            className={`w-full appearance-none min-h-[44px] bg-surface text-primary border rounded-xl pl-3.5 pr-10 py-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-[var(--ui-accent)] disabled:bg-surface-subtle disabled:text-muted disabled:cursor-not-allowed ${
               error
                 ? 'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500'
                 : 'border-theme hover:border-strong'
@@ -53,12 +53,12 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           </div>
         </div>
         {error && (
-          <p id={`${selectId}-error`} className="mt-1.5 text-[14px] leading-[20px] text-red-600 dark:text-red-400 font-medium">
+          <p id={`${selectId}-error`} className="mt-1.5 type-meta text-red-600 dark:text-red-400 font-medium">
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p id={`${selectId}-helper`} className="mt-1.5 text-[14px] leading-[20px] text-muted">
+          <p id={`${selectId}-helper`} className="mt-1.5 type-meta text-muted">
             {helperText}
           </p>
         )}
