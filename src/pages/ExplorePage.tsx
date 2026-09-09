@@ -130,7 +130,7 @@ export const ExplorePage: React.FC = () => {
       />
 
       {/* 2. Map Controls (Search, Categories, Location Search) */}
-      <div className="space-y-3 pb-3 border-b border-subtle">
+      <div className="space-y-3 pb-3 border-b border-ui-stroke-subtle">
         {/* Search Bar, Division and District Dropdowns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
           {/* Main Keyword Search */}

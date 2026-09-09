@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { ReportMediaGrid } from '../media/ReportMediaGrid';
 import { AppIcon } from '../ui/AppIcon';
+import { formatBillingMonth, toBanglaDigits } from '../../utils/formatters';
 
 export interface ReportCardProps {
   report: ReportItem;
@@ -83,6 +84,20 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
           <span className="font-semibold text-ui-content-primary truncate max-w-full">
             {report.reportedSubject}
           </span>
+        </div>
+      )}
+
+      {/* 3.5 Electricity Bill Snapshot (for billing reports) */}
+      {(report.subcategoryId === 'excess-electricity-bill' || report.recentBillAmount !== undefined) && (
+        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] bg-ui-surface-subtle border border-ui-stroke-subtle rounded-lg px-2.5 py-1 text-ui-content-secondary max-w-full flex-wrap">
+          <span className="font-semibold text-ui-content-primary">
+            {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : (language === 'bn' ? 'সাম্প্রতিক বিল' : 'Recent bill')}: ৳{report.recentBillAmount !== undefined ? (language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()) : '-'}
+          </span>
+          {report.previousBillAmount !== undefined && (
+            <span className="text-ui-content-muted">
+              ({language === 'bn' ? 'পূর্বে: ' : 'prev: '}৳{language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()})
+            </span>
+          )}
         </div>
       )}
 

@@ -62,7 +62,7 @@ export const ExtortionPage: React.FC = () => {
       {/* 1. Standard Type A Section Header */}
       <section
         id="extortion-header-banner"
-        className="bg-surface border border-subtle rounded-2xl p-4 sm:p-5 md:p-7 space-y-3.5 md:space-y-4 shadow-2xs"
+        className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 md:p-7 space-y-3.5 md:space-y-4 shadow-2xs"
       >
         <div className="space-y-2 text-left">
           <div className="flex items-center gap-2">

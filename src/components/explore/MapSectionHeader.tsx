@@ -18,7 +18,7 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
       className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1"
     >
       <div className="space-y-1">
-        <h1 className="text-[24px] md:text-[30px] leading-[1.3] font-bold text-primary tracking-tight">
+        <h1 className="text-[24px] md:text-[30px] leading-[1.3] font-bold text-ui-content-primary tracking-tight">
           {viewMode === 'map'
             ? language === 'bn'
               ? 'প্রতিবেদনের মানচিত্র'
@@ -27,7 +27,7 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
             ? 'প্রতিবেদন খুঁজুন'
             : 'Explore Reports'}
         </h1>
-        <p className="text-[15px] leading-[1.6] text-secondary">
+        <p className="text-[15px] leading-[1.6] text-ui-content-secondary">
           {viewMode === 'map'
             ? language === 'bn'
               ? 'এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন দেখুন'
@@ -39,14 +39,14 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
       </div>
 
       {/* View Mode Switcher: List vs Map */}
-      <div className="flex items-center bg-surface-subtle p-1 rounded-xl border border-subtle self-start sm:self-center shrink-0 shadow-2xs">
+      <div className="flex items-center bg-ui-surface-subtle p-1 rounded-xl border border-ui-stroke-subtle self-start sm:self-center shrink-0 shadow-2xs">
         <button
           type="button"
           onClick={() => onViewModeChange('feed')}
           className={`px-3.5 py-1.5 rounded-lg text-[14px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[38px] ${
             viewMode === 'feed'
-              ? 'bg-surface text-primary shadow-2xs font-bold'
-              : 'text-secondary hover:text-primary'
+              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
+              : 'text-ui-content-secondary hover:text-ui-content-primary'
           }`}
         >
           <MapIcon name="list" size="md" />
@@ -58,8 +58,8 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
           onClick={() => onViewModeChange('map')}
           className={`px-3.5 py-1.5 rounded-lg text-[14px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[38px] ${
             viewMode === 'map'
-              ? 'bg-surface text-primary shadow-2xs font-bold'
-              : 'text-secondary hover:text-primary'
+              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
+              : 'text-ui-content-secondary hover:text-ui-content-primary'
           }`}
         >
           <MapIcon name="map" size="md" />

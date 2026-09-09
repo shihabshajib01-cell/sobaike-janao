@@ -58,6 +58,7 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
       seed.previousBillAmount !== undefined && seed.previousBillAmount !== null
         ? Number(seed.previousBillAmount)
         : undefined,
+    utilityEndTime: seed.utilityEndTime,
     publishedDateBn: '২৩ ফেব্রুয়ারি ২০২৬',
     publishedDateEn: '23 Feb 2026',
     publishedAt: seed.createdAt,

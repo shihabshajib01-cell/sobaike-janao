@@ -208,7 +208,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
               ? 'এলাকা, রাস্তা, প্রতিষ্ঠান বা পরিচিত জায়গার নাম লিখুন'
               : 'Type an area, road, place, or landmark'
           }
-          className="w-full pl-10 pr-10 py-2.5 bg-surface border border-subtle rounded-xl text-[14px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-surface-subtle"
+          className="w-full pl-10 pr-10 py-2.5 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-ui-accent min-h-[42px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-ui-surface-subtle"
         />
 
         {/* Clear Button */}
@@ -216,7 +216,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 p-1 text-secondary hover:text-primary rounded-full hover:bg-surface-hover cursor-pointer transition-colors"
+            className="absolute right-3 p-1 text-ui-content-secondary hover:text-ui-content-primary rounded-full hover:bg-ui-surface-subtle cursor-pointer transition-colors"
             title={language === 'bn' ? 'মুছে ফেলুন' : 'Clear'}
             aria-label={language === 'bn' ? 'মুছে ফেলুন' : 'Clear'}
           >
@@ -230,7 +230,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
         <div
           id="address-suggestions-list"
           role="listbox"
-          className="absolute left-0 right-0 z-50 mt-1 max-h-64 overflow-y-auto rounded-xl bg-surface border border-subtle shadow-lg py-1.5 focus:outline-none divide-y divide-subtle/40"
+          className="absolute left-0 right-0 z-50 mt-1 max-h-64 overflow-y-auto rounded-xl bg-ui-surface border border-ui-stroke-subtle shadow-lg py-1.5 focus:outline-none divide-y divide-ui-stroke-subtle/40"
         >
           {suggestions.length > 0 &&
             suggestions.map((suggestion, idx) => {
@@ -244,16 +244,16 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
                   onMouseEnter={() => setActiveIndex(idx)}
                   onClick={() => handleSelectSuggestion(suggestion)}
                   className={`flex items-start gap-2.5 px-3.5 py-2.5 cursor-pointer text-left transition-colors ${
-                    isSelected ? 'bg-surface-hover text-accent' : 'hover:bg-surface-subtle text-primary'
+                    isSelected ? 'bg-ui-surface-subtle text-ui-accent' : 'hover:bg-ui-surface-subtle text-ui-content-primary'
                   }`}
                 >
-                  <MapPin className="w-4 h-4 mt-0.5 text-accent shrink-0" />
+                  <MapPin className="w-4 h-4 mt-0.5 text-ui-accent shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13.5px] font-semibold text-primary truncate">
+                    <p className="text-[13.5px] font-semibold text-ui-content-primary truncate">
                       {suggestion.mainText}
                     </p>
                     {suggestion.secondaryText && (
-                      <p className="text-[12px] text-secondary truncate">
+                      <p className="text-[12px] text-ui-content-secondary truncate">
                         {suggestion.secondaryText}
                       </p>
                     )}
@@ -263,7 +263,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
             })}
 
           {hasNoResults && !isLoading && (
-            <div className="px-3.5 py-3 text-center text-[13px] text-secondary">
+            <div className="px-3.5 py-3 text-center text-[13px] text-ui-content-secondary">
               {language === 'bn' ? 'কোনো ফলাফল পাওয়া যায়নি' : 'No results found'}
             </div>
           )}

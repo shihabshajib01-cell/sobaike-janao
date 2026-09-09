@@ -64,15 +64,15 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
           aria-expanded={isOpen}
           aria-label={language === 'bn' ? 'প্রদর্শন থিম পরিবর্তন' : 'Change appearance theme'}
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-subtle hover:bg-surface-subtle transition-colors cursor-pointer text-secondary hover:text-primary min-h-[44px] bg-surface focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
         >
           <div className="flex items-center gap-2">
-            <CurrentDisplayIcon className="w-4 h-4 text-muted" />
+            <CurrentDisplayIcon className="w-4 h-4 text-ui-content-muted" />
             <span className="font-medium">{language === 'bn' ? 'প্রদর্শন' : 'Appearance'}</span>
           </div>
-          <div className="flex items-center gap-1 font-semibold text-[14px] text-primary">
+          <div className="flex items-center gap-1 font-semibold text-[14px] text-ui-content-primary">
             <span>{language === 'bn' ? currentOption.nameBn : currentOption.nameEn}</span>
-            <ChevronDown className={`w-3.5 h-3.5 text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-ui-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
@@ -80,7 +80,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
           <div
             role="listbox"
             aria-label="Theme options"
-            className="absolute bottom-full mb-2 left-0 right-0 z-50 bg-surface-elevated border border-theme rounded-xl shadow-lg p-1.5 space-y-1"
+            className="absolute bottom-full mb-2 left-0 right-0 z-50 bg-ui-surface-elevated border border-ui-stroke-default rounded-xl shadow-lg p-1.5 space-y-1"
           >
             {options.map((opt) => {
               const Icon = opt.icon;
@@ -97,15 +97,15 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[14px] font-medium transition-colors cursor-pointer min-h-[44px] text-left ${
                     isSelected
-                      ? 'bg-surface-subtle text-primary font-bold'
-                      : 'text-secondary hover:text-primary hover:bg-surface-subtle'
+                      ? 'bg-ui-surface-subtle text-ui-content-primary font-bold'
+                      : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isSelected ? 'text-primary' : 'text-muted'}`} />
+                    <Icon className={`w-4 h-4 ${isSelected ? 'text-ui-content-primary' : 'text-ui-content-muted'}`} />
                     <span>{language === 'bn' ? opt.nameBn : opt.nameEn}</span>
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
+                  {isSelected && <Check className="w-4 h-4 text-ui-content-primary shrink-0" />}
                 </button>
               );
             })}
@@ -130,11 +130,11 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
               onClick={() => setThemePreference(opt.id)}
               className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all cursor-pointer min-h-[56px] focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] ${
                 isSelected
-                  ? 'border-strong bg-surface-elevated text-primary font-bold shadow-2xs'
-                  : 'border-subtle bg-surface-subtle text-secondary hover:text-primary hover:bg-surface'
+                  ? 'border-ui-stroke-strong bg-ui-surface-elevated text-ui-content-primary font-bold shadow-2xs'
+                  : 'border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface'
               }`}
             >
-              <Icon className={`w-5 h-5 mb-1.5 ${isSelected ? 'text-primary' : 'text-muted'}`} />
+              <Icon className={`w-5 h-5 mb-1.5 ${isSelected ? 'text-ui-content-primary' : 'text-ui-content-muted'}`} />
               <span className="text-[16px] leading-tight">
                 {language === 'bn' ? opt.nameBn : opt.nameEn}
               </span>
@@ -148,7 +148,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
   // Segmented control (default)
   return (
     <div
-      className={`flex items-center p-1 bg-surface-subtle border border-subtle rounded-2xl gap-1 ${className}`}
+      className={`flex items-center p-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl gap-1 ${className}`}
       role="radiogroup"
       aria-label="Theme preference"
     >
@@ -164,11 +164,11 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
             onClick={() => setThemePreference(opt.id)}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-[16px] font-medium transition-all cursor-pointer min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] ${
               isSelected
-                ? 'bg-surface text-primary font-bold shadow-2xs border border-subtle'
-                : 'text-secondary hover:text-primary hover:bg-surface/50'
+                ? 'bg-ui-surface text-ui-content-primary font-bold shadow-2xs border border-ui-stroke-subtle'
+                : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface/50'
             }`}
           >
-            <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-primary' : 'text-muted'}`} />
+            <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-ui-content-primary' : 'text-ui-content-muted'}`} />
             <span className="truncate">
               {language === 'bn' ? opt.nameBn : opt.nameEn}
             </span>

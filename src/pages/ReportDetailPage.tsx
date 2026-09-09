@@ -15,7 +15,9 @@ import {
   AlertCircle,
   Home,
   Scale,
+  Zap,
 } from 'lucide-react';
+import { formatBillingMonth, toBanglaDigits } from '../utils/formatters';
 import { SECTIONS } from '../theme/tokens';
 import { CategoryBadge } from '../components/ui/CategoryBadge';
 import { Button } from '../components/ui/Button';
@@ -301,9 +303,21 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <div className="flex items-center gap-1.5 text-ui-content-muted">
             <Calendar className="w-4 h-4 text-ui-content-muted shrink-0" />
             <span>
-              {language === 'bn' ? `ঘটনার তারিখ: ${incidentDate}` : `Incident Date: ${incidentDate}`}
+              {report.subcategoryId === 'excess-electricity-bill' && report.recentBillMonth
+                ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing Period: '}${formatBillingMonth(report.recentBillMonth, language)}`
+                : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident Date: '}${incidentDate}`}
             </span>
           </div>
+          {report.utilityEndTime && (
+            <div className="flex items-center gap-1.5 text-ui-content-muted">
+              <Clock className="w-4 h-4 text-ui-content-muted shrink-0" />
+              <span>
+                {language === 'bn'
+                  ? `বিভ্রাটের সমাপ্তি: ${report.utilityEndTime}`
+                  : `Outage ended: ${report.utilityEndTime}`}
+              </span>
+            </div>
+          )}
           <div className="flex items-center gap-1.5 text-ui-content-muted">
             <Clock className="w-4 h-4 text-ui-content-muted shrink-0" />
             <span>
@@ -348,6 +362,65 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <p className="text-[16px] leading-[26px] text-ui-content-primary">
               {shortDesc}
             </p>
+          </div>
+        )}
+
+        {/* Excess Electricity Bill Context Block */}
+        {(report.recentBillMonth || report.recentBillAmount !== undefined) && (
+          <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-3">
+            <h2 className="text-[14px] font-semibold text-ui-content-secondary flex items-center gap-2">
+              <Zap className="w-4 h-4 text-ui-content-muted" />
+              <span>{language === 'bn' ? 'বিদ্যুৎ বিল সংক্রান্ত বিবরণ' : 'Electricity Billing Details'}</span>
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3 bg-ui-surface rounded-lg border border-ui-stroke-subtle space-y-1">
+                <span className="text-[12px] text-ui-content-muted block">
+                  {language === 'bn' ? 'সাম্প্রতিক বিলের মাস ও পরিমাণ' : 'Recent Bill Month & Amount'}
+                </span>
+                <p className="text-[16px] font-bold text-ui-content-primary">
+                  {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : '-'}
+                </p>
+                <p className="text-[16px] font-semibold text-rose-600 dark:text-rose-400">
+                  {report.recentBillAmount !== undefined
+                    ? `৳ ${language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()}`
+                    : '-'}
+                </p>
+              </div>
+
+              <div className="p-3 bg-ui-surface rounded-lg border border-ui-stroke-subtle space-y-1">
+                <span className="text-[12px] text-ui-content-muted block">
+                  {language === 'bn' ? 'পূর্ববর্তী বিলের মাস ও পরিমাণ' : 'Previous Bill Month & Amount'}
+                </span>
+                <p className="text-[16px] font-bold text-ui-content-primary">
+                  {report.previousBillMonth ? formatBillingMonth(report.previousBillMonth, language) : '-'}
+                </p>
+                <p className="text-[16px] font-semibold text-ui-content-secondary">
+                  {report.previousBillAmount !== undefined
+                    ? `৳ ${language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()}`
+                    : '-'}
+                </p>
+              </div>
+            </div>
+
+            {/* Difference / Increase indicator if both amounts exist */}
+            {report.recentBillAmount !== undefined && report.previousBillAmount !== undefined && (
+              <div className="flex items-center gap-2 text-[13px] text-ui-content-secondary pt-2 border-t border-ui-stroke-subtle">
+                <span className="text-ui-content-muted">
+                  {language === 'bn' ? 'পার্থক্য / অতিরিক্ত বৃদ্ধি:' : 'Difference / Excess Increase:'}
+                </span>
+                <span className="font-semibold text-rose-600 dark:text-rose-400">
+                  +৳ {language === 'bn'
+                    ? toBanglaDigits(Math.max(0, report.recentBillAmount - report.previousBillAmount))
+                    : Math.max(0, report.recentBillAmount - report.previousBillAmount).toLocaleString()}
+                  {report.previousBillAmount > 0 && (
+                    <span className="ml-1 text-[12px] font-normal text-ui-content-muted">
+                      ({Math.round(((report.recentBillAmount - report.previousBillAmount) / report.previousBillAmount) * 100)}% {language === 'bn' ? 'বৃদ্ধি' : 'increase'})
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
