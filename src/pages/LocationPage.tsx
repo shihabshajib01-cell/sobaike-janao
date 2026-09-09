@@ -69,7 +69,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
   return (
     <PublicPageContainer id="location-page-container">
       {/* Back button & Breadcrumb */}
-      <div className="flex items-center gap-2 text-[14px] text-muted">
+      <div className="flex items-center gap-2 text-[14px] text-ui-content-muted">
         <button
           type="button"
           onClick={() => {
@@ -79,29 +79,29 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               navigateTo('/explore');
             }
           }}
-          className="hover:text-primary flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-subtle bg-surface text-secondary"
+          className="hover:text-ui-content-primary flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to Explore'}</span>
         </button>
         <span>/</span>
-        <span className="text-primary font-semibold">{districtDisplayName}</span>
+        <span className="text-ui-content-primary font-semibold">{districtDisplayName}</span>
       </div>
 
       {/* District Header Card */}
-      <div className="bg-surface border border-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-[32px] leading-[42px] font-bold text-primary tracking-tight">
+            <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
               {districtDisplayName}
             </h1>
             {divisionDisplayName && (
-              <span className="text-[14px] px-2.5 py-0.5 rounded-lg bg-surface-subtle text-secondary font-medium border border-subtle">
+              <span className="text-[14px] px-2.5 py-0.5 rounded-lg bg-ui-surface-subtle text-ui-content-secondary font-medium border border-ui-stroke-subtle">
                 {language === 'bn' ? `${divisionDisplayName} বিভাগ` : `${divisionDisplayName} Division`}
               </span>
             )}
           </div>
-          <p className="text-[16px] leading-[26px] text-secondary">
+          <p className="text-[16px] leading-[26px] text-ui-content-secondary">
             {language === 'bn'
               ? 'এই এলাকার প্রকাশিত নাগরিক প্রতিবেদনসমূহ।'
               : 'Published community reports associated with this area.'}
@@ -109,7 +109,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         </div>
 
         {/* Quiet Inline Summary */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 border-t border-subtle text-[14px] text-secondary font-medium">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 border-t border-ui-stroke-subtle text-[14px] text-ui-content-secondary font-medium">
           <span>
             {language === 'bn' ? `${reports.length}টি প্রকাশিত প্রতিবেদন` : `${reports.length} published reports`}
           </span>
@@ -143,7 +143,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+        <div className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
@@ -163,8 +163,8 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
       {!isLoading && !fetchError && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] leading-[28px] font-bold text-primary flex items-center gap-2">
-              <FileText className="w-5 h-5 text-secondary" />
+            <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
+              <FileText className="w-5 h-5 text-ui-content-secondary" />
               <span>
                 {language === 'bn'
                   ? 'প্রকাশিত প্রতিবেদন'
@@ -180,9 +180,9 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               ))}
             </div>
           ) : (
-            <div className="bg-surface border border-subtle rounded-xl p-8 text-center space-y-2">
-              <AlertCircle className="w-8 h-8 text-muted mx-auto" />
-              <h3 className="text-[16px] font-bold text-primary">
+            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-8 text-center space-y-2">
+              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" />
+              <h3 className="text-[16px] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'এই এলাকার সঙ্গে বর্তমানে কোনো প্রকাশিত প্রতিবেদন যুক্ত নেই।' : 'No published reports are currently associated with this area.'}
               </h3>
             </div>

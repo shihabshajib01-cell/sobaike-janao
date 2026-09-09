@@ -128,10 +128,10 @@ export const SearchPage: React.FC = () => {
     <PublicPageContainer id="search-page-container">
       {/* Editorial Header */}
       <div className="space-y-1">
-        <h1 className="text-[32px] leading-[42px] font-bold text-primary tracking-tight">
+        <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
           {language === 'bn' ? 'অনুসন্ধান' : 'Search'}
         </h1>
-        <p className="text-[16px] leading-[26px] text-secondary">
+        <p className="text-[16px] leading-[26px] text-ui-content-secondary">
           {language === 'bn'
             ? 'বিষয়, জেলা বা সংশ্লিষ্ট পক্ষের নাম দিয়ে প্রকাশিত প্রতিবেদন অনুসন্ধান করুন।'
             : 'Find published reports, locations, or reported entities.'}
@@ -140,7 +140,7 @@ export const SearchPage: React.FC = () => {
 
       {/* Search Input Box */}
       <div className="relative flex items-center">
-        <Search className="w-4 h-4 text-muted absolute left-3.5 pointer-events-none" />
+        <Search className="w-4 h-4 text-ui-content-muted absolute left-3.5 pointer-events-none" />
         <input
           type="text"
           value={query}
@@ -150,20 +150,20 @@ export const SearchPage: React.FC = () => {
               ? 'বিষয়, স্থান, ব্যক্তি বা প্রতিষ্ঠানের নাম দিয়ে খুঁজুন...'
               : 'Search reports, districts, subjects, or organizations...'
           }
-          className="w-full pl-10 pr-4 py-2.5 bg-surface border border-subtle focus:border-[var(--ui-accent)] rounded-xl text-[16px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[44px]"
+          className="w-full pl-10 pr-4 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[16px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
         />
       </div>
 
       {/* Result Category Tabs */}
       {query.trim() && (
-        <div className="flex items-center gap-2 pb-2 border-b border-subtle overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 pb-2 border-b border-ui-stroke-subtle overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
             className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
               activeTab === 'all'
-                ? 'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] font-bold'
-                : 'bg-surface-subtle text-secondary hover:bg-surface-elevated'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
             {language === 'bn' ? 'সকল' : 'All'} ({totalResults})
@@ -173,8 +173,8 @@ export const SearchPage: React.FC = () => {
             onClick={() => setActiveTab('reports')}
             className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
               activeTab === 'reports'
-                ? 'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] font-bold'
-                : 'bg-surface-subtle text-secondary hover:bg-surface-elevated'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
             {language === 'bn' ? 'প্রতিবেদন' : 'Reports'} ({matchingReports.length})
@@ -184,8 +184,8 @@ export const SearchPage: React.FC = () => {
             onClick={() => setActiveTab('locations')}
             className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
               activeTab === 'locations'
-                ? 'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] font-bold'
-                : 'bg-surface-subtle text-secondary hover:bg-surface-elevated'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
             {language === 'bn' ? 'জেলা ও এলাকা' : 'Locations'} ({matchingLocations.length})
@@ -195,8 +195,8 @@ export const SearchPage: React.FC = () => {
             onClick={() => setActiveTab('subjects')}
             className={`px-4 py-2.5 rounded-xl text-[16px] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 ${
               activeTab === 'subjects'
-                ? 'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] font-bold'
-                : 'bg-surface-subtle text-secondary hover:bg-surface-elevated'
+                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
             {language === 'bn' ? 'সংশ্লিষ্ট পক্ষ' : 'Subjects'} ({matchingSubjects.length})
@@ -215,7 +215,7 @@ export const SearchPage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+        <div className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
@@ -234,8 +234,8 @@ export const SearchPage: React.FC = () => {
       {/* Initial Empty / Instructional State (Flattened per design rules) */}
       {!isLoading && !fetchError && !query.trim() && (
         <div className="py-14 text-center space-y-3">
-          <Search className="w-8 h-8 text-muted mx-auto" />
-          <p className="text-[16px] leading-[26px] text-secondary font-medium max-w-md mx-auto">
+          <Search className="w-8 h-8 text-ui-content-muted mx-auto" />
+          <p className="text-[16px] leading-[26px] text-ui-content-secondary font-medium max-w-md mx-auto">
             {language === 'bn'
               ? 'নাম, এলাকা, বিষয় বা প্রকাশিত তথ্য দিয়ে অনুসন্ধান করুন।'
               : 'Search by subject, location, category, or published information.'}
@@ -249,33 +249,33 @@ export const SearchPage: React.FC = () => {
           {/* 1. Locations Section */}
           {(activeTab === 'all' || activeTab === 'locations') && matchingLocations.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[14px] font-bold text-secondary uppercase tracking-wider">
+              <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'জেলা ও এলাকা ফলাফল' : 'Location Matches'}
               </h2>
-              <div className="bg-surface border border-subtle rounded-xl divide-y divide-subtle overflow-hidden shadow-2xs">
+              <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl divide-y divide-ui-stroke-subtle overflow-hidden shadow-2xs">
                 {matchingLocations.map((loc) => (
                   <button
                     key={loc.id}
                     type="button"
                     onClick={() => navigateTo(`/location/${loc.id}` as any)}
-                    className="w-full p-4.5 hover:bg-surface-subtle transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px]"
+                    className="w-full p-4.5 transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-surface-subtle flex items-center justify-center text-secondary shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-ui-surface-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
                         <MapPin className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="text-[16px] font-bold text-primary">
+                        <div className="text-[16px] font-bold text-ui-content-primary">
                           {language === 'bn' ? loc.nameBn : loc.nameEn}
                         </div>
-                        <div className="text-[14px] text-muted">
+                        <div className="text-[14px] text-ui-content-muted">
                           {language === 'bn' ? `${loc.divisionBn} বিভাগ` : `${loc.divisionEn} Division`}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[14px] font-semibold text-secondary group-hover:text-primary">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-ui-content-secondary">
                       <span>{language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}</span>
-                      <ArrowRight className="w-4 h-4 text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="w-4 h-4 text-ui-content-muted" />
                     </div>
                   </button>
                 ))}
@@ -286,35 +286,35 @@ export const SearchPage: React.FC = () => {
           {/* 2. Subjects Section */}
           {(activeTab === 'all' || activeTab === 'subjects') && matchingSubjects.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[14px] font-bold text-secondary uppercase tracking-wider">
+              <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'সংশ্লিষ্ট পক্ষ ফলাফল' : 'Reported Subject Matches'}
               </h2>
-              <div className="bg-surface border border-subtle rounded-xl divide-y divide-subtle overflow-hidden shadow-2xs">
+              <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl divide-y divide-ui-stroke-subtle overflow-hidden shadow-2xs">
                 {matchingSubjects.map((sub) => (
                   <button
                     key={sub.nameEn || sub.nameBn}
                     type="button"
                     onClick={() => navigateTo(`/subject/${encodeURIComponent(sub.nameEn || sub.nameBn)}` as any)}
-                    className="w-full p-4.5 hover:bg-surface-subtle transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px]"
+                    className="w-full p-4.5 transition-colors cursor-pointer flex items-center justify-between group text-left min-h-[52px]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-surface-subtle flex items-center justify-center text-secondary shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-ui-surface-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
                         <UserX className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="text-[16px] font-bold text-primary">
+                        <div className="text-[16px] font-bold text-ui-content-primary">
                           {language === 'bn' ? sub.nameBn : sub.nameEn}
                         </div>
-                        <div className="text-[14px] text-muted">
+                        <div className="text-[14px] text-ui-content-muted">
                           {language === 'bn'
                             ? `${sub.count}টি প্রকাশিত প্রতিবেদনে উল্লিখিত`
                             : `Mentioned in ${sub.count} published reports`}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[14px] font-semibold text-secondary group-hover:text-primary">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-ui-content-secondary">
                       <span>{language === 'bn' ? 'রেকর্ড দেখুন' : 'View records'}</span>
-                      <ArrowRight className="w-4 h-4 text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="w-4 h-4 text-ui-content-muted" />
                     </div>
                   </button>
                 ))}
@@ -325,7 +325,7 @@ export const SearchPage: React.FC = () => {
           {/* 3. Reports Section */}
           {(activeTab === 'all' || activeTab === 'reports') && matchingReports.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[14px] font-bold text-secondary uppercase tracking-wider">
+              <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'প্রতিবেদন ফলাফল' : 'Matching Reports'}
               </h2>
               <div className="space-y-3">
@@ -338,12 +338,12 @@ export const SearchPage: React.FC = () => {
 
           {/* Empty State */}
           {totalResults === 0 && (
-            <div className="bg-surface border border-subtle rounded-2xl p-10 text-center space-y-3 shadow-2xs">
-              <AlertCircle className="w-8 h-8 text-muted mx-auto" />
-              <h3 className="text-[16px] font-bold text-primary">
+            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3 shadow-2xs">
+              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" />
+              <h3 className="text-[16px] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'কোনো ফলাফল পাওয়া যায়নি' : 'No Results Found'}
               </h3>
-              <p className="text-[14px] text-muted max-w-sm mx-auto leading-relaxed">
+              <p className="text-[14px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                 {language === 'bn'
                   ? `"${query}" এর সাথে মিলে এমন কোনো প্রতিবেদন, এলাকা বা পক্ষ পাওয়া যায়নি।`
                   : `No public reports, places, or entities matched "${query}".`}

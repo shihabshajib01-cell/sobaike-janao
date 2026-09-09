@@ -57,7 +57,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   return (
     <PublicPageContainer id="subject-page-container">
       {/* Back button & Breadcrumb */}
-      <div className="flex items-center gap-2 text-[14px] text-muted">
+      <div className="flex items-center gap-2 text-[14px] text-ui-content-muted">
         <button
           type="button"
           onClick={() => {
@@ -67,7 +67,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
               navigateTo('/explore');
             }
           }}
-          className="hover:text-primary flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-subtle bg-surface text-secondary"
+          className="hover:text-ui-content-primary flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরে যান' : 'Back to Explore'}</span>
@@ -75,20 +75,20 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       </div>
 
       {/* Subject Header */}
-      <div className="bg-surface border border-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-surface-subtle border border-subtle flex items-center justify-center text-secondary shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
               <UserX className="w-6 h-6" />
             </div>
             <div className="space-y-1.5">
-              <h1 className="text-[32px] leading-[42px] font-bold text-primary tracking-tight">
+              <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
                 {displayName}
               </h1>
               {primaryReport?.organization && (
-                <p className="text-[16px] text-secondary font-medium">{primaryReport.organization}</p>
+                <p className="text-[16px] text-ui-content-secondary font-medium">{primaryReport.organization}</p>
               )}
-              <p className="text-[16px] leading-[26px] text-secondary">
+              <p className="text-[16px] leading-[26px] text-ui-content-secondary">
                 {language === 'bn'
                   ? `${reports.length}টি প্রকাশিত প্রতিবেদনে এই নাম/সত্ত্বার উল্লেখ রয়েছে।`
                   : `Mentioned in ${reports.length} published reports.`}
@@ -100,9 +100,9 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           <button
             type="button"
             onClick={() => setIsResponseModalOpen(true)}
-            className="px-4 py-2.5 bg-surface-subtle hover:bg-surface-elevated border border-subtle text-primary text-[16px] font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px]"
+            className="px-4 py-2.5 bg-ui-surface-subtle hover:bg-ui-surface-subtle/80 border border-ui-stroke-subtle text-ui-content-primary text-[16px] font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px]"
           >
-            <Scale className="w-4 h-4 text-secondary" />
+            <Scale className="w-4 h-4 text-ui-content-secondary" />
             <span>{language === 'bn' ? 'সংশ্লিষ্ট পক্ষের বক্তব্য দিন' : 'Submit Statement'}</span>
           </button>
         </div>
@@ -119,7 +119,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+        <div className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" />
           <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
@@ -138,8 +138,8 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       {/* Formal Responses Section if any */}
       {!isLoading && !fetchError && storedResponses.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-[18px] leading-[28px] font-bold text-primary flex items-center gap-2">
-            <Scale className="w-5 h-5 text-accent" />
+          <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
+            <Scale className="w-5 h-5 text-ui-accent" />
             <span>{language === 'bn' ? 'সংশ্লিষ্ট পক্ষের বক্তব্য ও ব্যাখ্যা' : 'Subject Statements & Responses'}</span>
           </h2>
           <div className="space-y-3">
@@ -157,9 +157,9 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
                   style={{ color: 'var(--ui-info-text)' }}
                 >
                   <span>{language === 'bn' ? res.respondentBn : res.respondentEn}</span>
-                  <span className="text-muted font-mono text-[14px]">{language === 'bn' ? res.dateBn : res.dateEn}</span>
+                  <span className="text-ui-content-muted font-mono text-[14px]">{language === 'bn' ? res.dateBn : res.dateEn}</span>
                 </div>
-                <p className="text-[16px] leading-[26px] text-secondary">
+                <p className="text-[16px] leading-[26px] text-ui-content-secondary">
                   {language === 'bn' ? res.statementBn : res.statementEn}
                 </p>
               </div>
@@ -172,8 +172,8 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       {!isLoading && !fetchError && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] leading-[28px] font-bold text-primary flex items-center gap-2">
-              <FileText className="w-5 h-5 text-secondary" />
+            <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
+              <FileText className="w-5 h-5 text-ui-content-secondary" />
               <span>
                 {language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published Reports'}
               </span>
@@ -187,12 +187,12 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
               ))}
             </div>
           ) : (
-            <div className="bg-surface border border-subtle rounded-xl p-8 text-center space-y-3">
-              <AlertCircle className="w-8 h-8 text-muted mx-auto" />
-              <h3 className="text-[16px] font-bold text-primary">
+            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-8 text-center space-y-3">
+              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" />
+              <h3 className="text-[16px] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Public Reports Found'}
               </h3>
-              <p className="text-[14px] text-muted max-w-sm mx-auto leading-relaxed">
+              <p className="text-[14px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                 {language === 'bn'
                   ? 'এই পক্ষের নামে বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই বা নাম গোপনীয়তার নীতি অনুযায়ী লুকানো রয়েছে।'
                   : 'There are no active public reports associated with this entity or the name has been withheld for privacy.'}

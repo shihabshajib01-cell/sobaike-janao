@@ -135,7 +135,7 @@ export const ExplorePage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
           {/* Main Keyword Search */}
           <div className="sm:col-span-2 lg:col-span-6 relative flex items-center">
-            <MapIcon name="search" size="sm" className="text-muted absolute left-3.5 pointer-events-none" />
+            <MapIcon name="search" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -145,13 +145,13 @@ export const ExplorePage: React.FC = () => {
                   ? 'এলাকা বা প্রতিবেদন খুঁজুন...'
                   : 'Search by area or report...'
               }
-              className="w-full pl-10 pr-9 py-2 bg-surface border border-subtle focus:border-theme rounded-xl text-[14px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+              className="w-full pl-10 pr-9 py-2 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 text-muted hover:text-primary cursor-pointer p-1"
+                className="absolute right-3 text-ui-content-muted cursor-pointer p-1"
               >
                 <MapIcon name="close" size="xs" />
               </button>
@@ -166,7 +166,7 @@ export const ExplorePage: React.FC = () => {
                 setSelectedDivision(e.target.value);
                 setSelectedDistrict('all'); // reset district when division changes
               }}
-              className="w-full px-3.5 py-2 bg-surface border border-subtle focus:border-theme rounded-xl text-[14px] text-primary min-h-[40px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] truncate"
+              className="w-full px-3.5 py-2 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[40px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ui-focus truncate"
             >
               <option value="all">
                 {language === 'bn' ? 'সকল বিভাগ' : 'All Divisions'}
@@ -181,11 +181,11 @@ export const ExplorePage: React.FC = () => {
 
           {/* District Dropdown */}
           <div className="sm:col-span-1 lg:col-span-3 relative flex items-center">
-            <MapIcon name="map-pin" size="sm" className="text-muted absolute left-3.5 pointer-events-none" />
+            <MapIcon name="map-pin" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" />
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="w-full pl-10 pr-8 py-2 bg-surface border border-subtle focus:border-theme rounded-xl text-[14px] text-primary min-h-[40px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] truncate"
+              className="w-full pl-10 pr-8 py-2 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[40px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ui-focus truncate"
             >
               <option value="all">
                 {language === 'bn' ? 'সকল জেলা' : 'All Districts'}
@@ -201,7 +201,7 @@ export const ExplorePage: React.FC = () => {
                 type="button"
                 onClick={() => setSelectedDistrict('all')}
                 title={language === 'bn' ? 'জেলা মুছুন' : 'Clear district'}
-                className="absolute right-3 text-muted hover:text-primary cursor-pointer p-1"
+                className="absolute right-3 text-ui-content-muted cursor-pointer p-1"
               >
                 <MapIcon name="close" size="xs" />
               </button>
@@ -216,8 +216,8 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setSelectedSection('all')}
             className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all min-h-[34px] ${
               selectedSection === 'all'
-                ? 'bg-primary text-white dark:text-slate-900 border-primary shadow-xs font-bold'
-                : 'bg-surface hover:bg-surface-subtle border-subtle text-secondary'
+                ? 'bg-ui-content-primary text-white dark:text-slate-900 border-ui-content-primary shadow-xs font-bold'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
             {language === 'bn' ? 'সব' : 'All'}
@@ -229,7 +229,7 @@ export const ExplorePage: React.FC = () => {
             className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[34px] ${
               selectedSection === 'harassment'
                 ? 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border-[var(--sec-harassment-border)] shadow-xs font-bold ring-1 ring-[var(--sec-harassment-border)]'
-                : 'bg-surface hover:bg-surface-subtle border-subtle text-secondary'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
             <CategoryIcon section="harassment" size="xs" />
@@ -242,7 +242,7 @@ export const ExplorePage: React.FC = () => {
             className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[34px] ${
               selectedSection === 'rickshaw'
                 ? 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border-[var(--sec-rickshaw-border)] shadow-xs font-bold ring-1 ring-[var(--sec-rickshaw-border)]'
-                : 'bg-surface hover:bg-surface-subtle border-subtle text-secondary'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
             <CategoryIcon section="rickshaw" size="xs" />
@@ -255,7 +255,7 @@ export const ExplorePage: React.FC = () => {
             className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[34px] ${
               selectedSection === 'extortion'
                 ? 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border-[var(--sec-extortion-border)] shadow-xs font-bold ring-1 ring-[var(--sec-extortion-border)]'
-                : 'bg-surface hover:bg-surface-subtle border-subtle text-secondary'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
             <CategoryIcon section="extortion" size="xs" />
@@ -266,7 +266,7 @@ export const ExplorePage: React.FC = () => {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-[12px] font-semibold text-secondary hover:text-primary underline ml-auto shrink-0 cursor-pointer px-2 py-1"
+              className="text-[12px] font-semibold text-ui-content-secondary underline ml-auto shrink-0 cursor-pointer px-2 py-1"
             >
               {language === 'bn' ? 'রিসেট' : 'Reset'}
             </button>
@@ -292,7 +292,7 @@ export const ExplorePage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div className="bg-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+        <div className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
           <MapIcon name="alert-circle" size="xl" className="text-rose-500 mx-auto" />
           <p className="text-[15px] font-semibold text-rose-500">
             {language === 'bn'
@@ -350,7 +350,7 @@ export const ExplorePage: React.FC = () => {
           ) : (
             /* Feed / List View */
             <div className="space-y-3.5">
-              <div className="flex items-center justify-between text-[13px] text-muted font-medium">
+              <div className="flex items-center justify-between text-[13px] text-ui-content-muted font-medium">
                 <span>
                   {language === 'bn'
                     ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
@@ -360,7 +360,7 @@ export const ExplorePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleResetFilters}
-                    className="text-secondary hover:text-primary font-semibold underline cursor-pointer"
+                    className="text-ui-content-secondary font-semibold underline cursor-pointer"
                   >
                     {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
                   </button>
@@ -374,12 +374,12 @@ export const ExplorePage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="bg-surface border border-subtle rounded-2xl p-10 text-center space-y-3">
-                  <MapIcon name="alert-circle" size="xl" className="text-muted mx-auto" />
-                  <h3 className="text-[16px] font-bold text-primary">
+                <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3">
+                  <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted mx-auto" />
+                  <h3 className="text-[16px] font-bold text-ui-content-primary">
                     {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Reports Found'}
                   </h3>
-                  <p className="text-[13px] text-muted max-w-sm mx-auto leading-relaxed">
+                  <p className="text-[13px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                     {language === 'bn'
                       ? 'আপনার অনুসন্ধানের সাথে মিলে এমন কোনো ফলাফল নেই। ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।'
                       : 'No reports matched your search filters. Try adjusting keywords or category filters.'}

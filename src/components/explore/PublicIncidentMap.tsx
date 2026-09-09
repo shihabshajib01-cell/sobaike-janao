@@ -283,7 +283,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   return (
     <div
       id="public-incident-map-card"
-      className="relative rounded-2xl border border-subtle bg-surface shadow-xs overflow-hidden flex flex-col"
+      className="relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col"
       style={{ minHeight: '520px' }}
     >
       {/* Map Control Bar Top-Right */}
@@ -293,7 +293,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleZoomIn}
           title={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
           aria-label={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
-          className="w-9 h-9 rounded-xl bg-surface/95 backdrop-blur-xs border border-subtle hover:bg-surface-elevated text-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+          className="w-9 h-9 rounded-xl bg-ui-surface/95 backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
         >
           <MapIcon name="plus" size="sm" />
         </button>
@@ -303,7 +303,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleZoomOut}
           title={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
           aria-label={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
-          className="w-9 h-9 rounded-xl bg-surface/95 backdrop-blur-xs border border-subtle hover:bg-surface-elevated text-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+          className="w-9 h-9 rounded-xl bg-ui-surface/95 backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
         >
           <MapIcon name="minus" size="sm" />
         </button>
@@ -313,40 +313,40 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleResetView}
           title={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
           aria-label={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
-          className="w-9 h-9 rounded-xl bg-surface/95 backdrop-blur-xs border border-subtle hover:bg-surface-elevated text-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+          className="w-9 h-9 rounded-xl bg-ui-surface/95 backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
         >
           <MapIcon name="reset" size="sm" />
         </button>
       </div>
 
       {/* Map Legend Overlay Top-Left */}
-      <div className="absolute top-3.5 left-3.5 z-[500] bg-surface/90 backdrop-blur-xs border border-subtle rounded-xl p-2.5 shadow-2xs flex flex-col gap-1.5 text-[12px] max-w-[220px]">
-        <span className="font-bold text-primary text-[11px] uppercase tracking-wider">
+      <div className="absolute top-3.5 left-3.5 z-[500] bg-ui-surface/90 backdrop-blur-xs border border-ui-stroke-subtle rounded-xl p-2.5 shadow-2xs flex flex-col gap-1.5 text-[12px] max-w-[220px]">
+        <span className="font-bold text-ui-content-primary text-[11px] uppercase tracking-wider">
           {language === 'bn' ? 'মানচিত্র নির্দেশিকা' : 'Map Legend'}
         </span>
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-[var(--sec-harassment-primary)] border border-white shrink-0" />
-          <span className="text-secondary truncate">
+          <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-[var(--sec-rickshaw-primary)] border border-white shrink-0" />
-          <span className="text-secondary truncate">
+          <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-[var(--sec-extortion-primary)] border border-white shrink-0" />
-          <span className="text-secondary truncate">
+          <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}
           </span>
         </div>
       </div>
 
       {/* Total Mapped Indicator Bottom-Left */}
-      <div className="absolute bottom-3.5 left-3.5 z-[500] bg-surface/95 backdrop-blur-xs border border-subtle rounded-xl px-3 py-1.5 shadow-2xs flex items-center gap-2 text-[12px] font-bold text-primary">
-        <MapIcon name="map-pin" size="xs" className="text-primary" />
+      <div className="absolute bottom-3.5 left-3.5 z-[500] bg-ui-surface/95 backdrop-blur-xs border border-ui-stroke-subtle rounded-xl px-3 py-1.5 shadow-2xs flex items-center gap-2 text-[12px] font-bold text-ui-content-primary">
+        <MapIcon name="map-pin" size="xs" className="text-ui-content-primary" />
         <span>
           {language === 'bn'
             ? `${toBanglaDigits(mappedPoints.length)}টি স্থান প্রদর্শিত`
@@ -363,12 +363,12 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
       {/* Empty State Banner if 0 reports match */}
       {mappedPoints.length === 0 && (
-        <div className="absolute inset-0 z-[550] bg-surface/85 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center space-y-3">
-          <MapIcon name="alert-circle" size="xl" className="text-muted" />
-          <h4 className="text-[17px] font-bold text-primary">
+        <div className="absolute inset-0 z-[550] bg-ui-surface/85 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center space-y-3">
+          <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
+          <h4 className="text-[17px] font-bold text-ui-content-primary">
             {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Mapped Reports'}
           </h4>
-          <p className="text-[13px] text-muted max-w-xs">
+          <p className="text-[13px] text-ui-content-muted max-w-xs">
             {language === 'bn'
               ? 'বর্তমান ফিল্টারের অধীনে কোনো তথ্য নেই। ফিল্টার পরিবর্তন করে দেখুন।'
               : 'No reports found for the selected category or area.'}
@@ -378,30 +378,30 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
       {/* Active Selected Report Details Popup Card (Desktop floating / Mobile bottom sheet) */}
       {activeReport && (
-        <div className="absolute bottom-3.5 right-3.5 left-3.5 sm:left-auto sm:max-w-sm z-[600] bg-surface border border-theme rounded-2xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-start justify-between gap-2 pb-2 border-b border-subtle">
+        <div className="absolute bottom-3.5 right-3.5 left-3.5 sm:left-auto sm:max-w-sm z-[600] bg-ui-surface border border-ui-accent rounded-2xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="flex items-start justify-between gap-2 pb-2 border-b border-ui-stroke-subtle">
             <div className="flex items-center gap-2 min-w-0">
               <CategoryBadge section={activeReport.segment} language={language} size="sm" />
-              <span className="text-[12px] font-mono text-muted">#{activeReport.id}</span>
+              <span className="text-[12px] font-mono text-ui-content-muted">#{activeReport.id}</span>
             </div>
             <button
               type="button"
               onClick={() => setActiveReport(null)}
               aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close card'}
-              className="text-muted hover:text-primary cursor-pointer p-1 rounded-lg hover:bg-surface-subtle"
+              className="text-ui-content-muted cursor-pointer p-1 rounded-lg"
             >
               <MapIcon name="close" size="xs" />
             </button>
           </div>
 
           <div className="py-2.5 space-y-1.5 text-left">
-            <h4 className="text-[15px] font-bold text-primary leading-snug line-clamp-2">
+            <h4 className="text-[15px] font-bold text-ui-content-primary leading-snug line-clamp-2">
               {language === 'bn' ? activeReport.titleBn : activeReport.titleEn}
             </h4>
-            <p className="text-[12px] text-secondary line-clamp-2 leading-relaxed">
+            <p className="text-[12px] text-ui-content-secondary line-clamp-2 leading-relaxed">
               {language === 'bn' ? activeReport.shortDescriptionBn : activeReport.shortDescriptionEn}
             </p>
-            <div className="flex items-center gap-3 text-[11px] text-muted pt-1">
+            <div className="flex items-center gap-3 text-[11px] text-ui-content-muted pt-1">
               <span className="flex items-center gap-1 truncate">
                 <MapIcon name="map-pin" size="xs" />
                 <span className="truncate">
@@ -414,7 +414,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             </div>
           </div>
 
-          <div className="pt-2 border-t border-subtle flex items-center justify-end">
+          <div className="pt-2 border-t border-ui-stroke-subtle flex items-center justify-end">
             <button
               type="button"
               onClick={() => navigateTo(`/report-detail/${activeReport.id}`)}
