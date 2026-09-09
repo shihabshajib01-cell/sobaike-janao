@@ -78,7 +78,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
               <div>
                 <div className="type-label text-primary">{opt.label}</div>
                 {opt.description && (
-                  <div className="text-[14px] leading-[20px] text-muted mt-0.5">{opt.description}</div>
+                  <div className="type-helper text-muted mt-0.5">{opt.description}</div>
                 )}
               </div>
             </label>

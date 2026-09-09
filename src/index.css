@@ -27,6 +27,13 @@
     --type-meta-line: 22px;
     --type-meta-weight: var(--font-weight-regular);
 
+    /* Central Typography Tokens - Helper & Compact */
+    --type-helper-size: 14px;
+    --type-helper-line: 20px;
+    --type-helper-weight: var(--font-weight-regular);
+
+    --type-compact-size: 14px;
+
     /* Central Typography Tokens - Headings */
     --type-h1-size-mobile: 28px;
     --type-h1-line-mobile: 38px;
@@ -395,6 +402,16 @@
     font-size: var(--type-meta-size) !important;
     line-height: var(--type-meta-line) !important;
     font-weight: var(--type-meta-weight) !important;
+  }
+
+  .type-helper {
+    font-size: var(--type-helper-size) !important;
+    line-height: var(--type-helper-line) !important;
+    font-weight: var(--type-helper-weight);
+  }
+
+  .type-compact {
+    font-size: var(--type-compact-size) !important;
   }
 }
 

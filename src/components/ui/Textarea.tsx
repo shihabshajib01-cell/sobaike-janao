@@ -28,7 +28,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
               {required && <span className="text-red-600 dark:text-red-400 ml-1" aria-hidden="true">*</span>}
             </label>
             {maxCharacters && (
-              <span className="text-[14px] text-muted">
+              <span className="type-compact text-muted">
                 {charCount}/{maxCharacters}
               </span>
             )}
@@ -53,12 +53,12 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {error && (
-          <p id={`${textareaId}-error`} className="mt-1.5 text-[14px] leading-[20px] text-red-600 dark:text-red-400 font-medium">
+          <p id={`${textareaId}-error`} className="mt-1.5 type-helper text-red-600 dark:text-red-400 font-medium">
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p id={`${textareaId}-helper`} className="mt-1.5 text-[14px] leading-[20px] text-muted">
+          <p id={`${textareaId}-helper`} className="mt-1.5 type-helper text-muted">
             {helperText}
           </p>
         )}

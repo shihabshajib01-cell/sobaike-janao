@@ -21,8 +21,8 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
 }) => {
   const sizeClasses: Record<BadgeSize, string> = {
-    sm: 'text-[14px] leading-none px-2.5 py-1 rounded-md gap-1',
-    md: 'text-[14px] leading-none px-3 py-1.5 rounded-lg gap-1.5 font-medium',
+    sm: 'type-compact leading-none px-2.5 py-1 rounded-md gap-1',
+    md: 'type-compact leading-none px-3 py-1.5 rounded-lg gap-1.5 font-medium',
   };
 
   const variantClasses: Record<BadgeVariant, string> = {
