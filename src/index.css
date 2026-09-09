@@ -314,14 +314,14 @@
     --sec-load_shedding-bg: #F0FDFA;
     --sec-load_shedding-border: #CCFBF1;
     --sec-load_shedding-text: #115E59;
-    --sec-load_shedding-on-primary: #FFFFFF;
+    --sec-load_shedding-on-primary: #050505;
 
     --sec-load-shedding-primary: #0D9488;
     --sec-load-shedding-hover: #0F766E;
     --sec-load-shedding-bg: #F0FDFA;
     --sec-load-shedding-border: #CCFBF1;
     --sec-load-shedding-text: #115E59;
-    --sec-load-shedding-on-primary: #FFFFFF;
+    --sec-load-shedding-on-primary: #050505;
   }
 
   html[data-theme="dark"],

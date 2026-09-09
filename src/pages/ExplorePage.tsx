@@ -142,7 +142,7 @@ export const ExplorePage: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label={
                 language === 'bn'
-                  ? 'এলাকা বা প্রতিবেদন অনুসন্ধান'
+                  ? 'এলাকা বা প্রতিবেদন খুঁজুন'
                   : 'Search by area or report'
               }
               placeholder={
@@ -172,7 +172,7 @@ export const ExplorePage: React.FC = () => {
                 setSelectedDivision(e.target.value);
                 setSelectedDistrict('all'); // reset district when division changes
               }}
-              aria-label={language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Select Division'}
+              aria-label={language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Select division'}
               className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
             >
               <option value="all">
@@ -192,7 +192,7 @@ export const ExplorePage: React.FC = () => {
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
-              aria-label={language === 'bn' ? 'জেলা নির্বাচন করুন' : 'Select District'}
+              aria-label={language === 'bn' ? 'জেলা নির্বাচন করুন' : 'Select district'}
               className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
             >
               <option value="all">
@@ -208,7 +208,7 @@ export const ExplorePage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedDistrict('all')}
-                aria-label={language === 'bn' ? 'নির্বাচিত জেলা মুছুন' : 'Clear district selection'}
+                aria-label={language === 'bn' ? 'নির্বাচিত জেলা মুছুন' : 'Clear selected district'}
                 title={language === 'bn' ? 'জেলা মুছুন' : 'Clear district'}
                 className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >

@@ -48,6 +48,7 @@ export const MorePage: React.FC = () => {
           <button
             role="tab"
             aria-selected={activeTab === 'about'}
+            aria-pressed={activeTab === 'about'}
             tabIndex={activeTab === 'about' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('about')}
@@ -63,6 +64,7 @@ export const MorePage: React.FC = () => {
           <button
             role="tab"
             aria-selected={activeTab === 'helplines'}
+            aria-pressed={activeTab === 'helplines'}
             tabIndex={activeTab === 'helplines' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('helplines')}
@@ -78,6 +80,7 @@ export const MorePage: React.FC = () => {
           <button
             role="tab"
             aria-selected={activeTab === 'principles'}
+            aria-pressed={activeTab === 'principles'}
             tabIndex={activeTab === 'principles' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('principles')}
@@ -93,6 +96,7 @@ export const MorePage: React.FC = () => {
           <button
             role="tab"
             aria-selected={activeTab === 'response'}
+            aria-pressed={activeTab === 'response'}
             tabIndex={activeTab === 'response' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('response')}
@@ -108,6 +112,7 @@ export const MorePage: React.FC = () => {
           <button
             role="tab"
             aria-selected={activeTab === 'faq'}
+            aria-pressed={activeTab === 'faq'}
             tabIndex={activeTab === 'faq' ? 0 : -1}
             type="button"
             onClick={() => setActiveTab('faq')}

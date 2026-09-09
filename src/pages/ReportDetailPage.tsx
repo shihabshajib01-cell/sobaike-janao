@@ -102,9 +102,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   // Network / API fetch error state
   if (fetchError) {
     return (
-      <div className="w-full py-12 px-4 text-center space-y-6">
+      <div role="alert" className="w-full py-12 px-4 text-center space-y-6">
         <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/30 rounded-full flex items-center justify-center mx-auto text-rose-600 dark:text-rose-400">
-          <AlertCircle className="w-7 h-7" />
+          <AlertCircle className="w-7 h-7" aria-hidden="true" />
         </div>
 
         <div className="space-y-2">
@@ -122,7 +122,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <button
             type="button"
             onClick={fetchReport}
-            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2"
+            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <span>{language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}</span>
           </button>
@@ -135,9 +135,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 navigateTo('/');
               }
             }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             <span>{language === 'bn' ? 'ফিরে যান' : 'Go Back'}</span>
           </button>
         </div>
@@ -505,7 +505,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <button
                   type="button"
                   onClick={fetchReport}
-                  className="min-h-[44px] px-3.5 py-2 text-[14px] font-semibold text-ui-content-primary bg-ui-surface border border-ui-stroke-subtle rounded-lg hover:bg-ui-surface-subtle transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus:ring-2 focus:ring-ui-stroke-strong"
+                  className="min-h-[44px] px-3.5 py-2 text-[14px] font-semibold text-ui-content-primary bg-ui-surface border border-ui-stroke-subtle rounded-lg hover:bg-ui-surface-subtle transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
                 </button>
