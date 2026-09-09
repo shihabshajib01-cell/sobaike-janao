@@ -20,16 +20,16 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         {/* Service Icon */}
         <div
           id={`coming-soon-icon-${serviceKey}`}
-          className="w-16 h-16 mx-auto rounded-2xl bg-surface-subtle border border-subtle text-secondary flex items-center justify-center shadow-xs"
+          className="w-16 h-16 mx-auto rounded-2xl bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary flex items-center justify-center shadow-xs"
         >
-          <AppIcon name={service.iconName} size="xl" strokeWidth={2} className="text-secondary" />
+          <AppIcon name={service.iconName} size="xl" strokeWidth={2} className="text-ui-content-secondary" />
         </div>
 
         {/* Coming Soon Status Pill */}
         <div className="flex justify-center">
           <span
             id={`coming-soon-badge-${serviceKey}`}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[13px] font-semibold bg-surface-subtle border border-subtle text-secondary shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[13px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-2xs"
           >
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             <span>{language === 'bn' ? service.badgeBn : service.badgeEn}</span>
@@ -40,14 +40,14 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         <div className="space-y-3">
           <h1
             id={`coming-soon-title-${serviceKey}`}
-            className="text-[26px] sm:text-[30px] font-extrabold text-primary tracking-tight leading-snug"
+            className="text-[26px] sm:text-[30px] font-extrabold text-ui-content-primary tracking-tight leading-snug"
           >
             {language === 'bn' ? service.nameBn : service.nameEn}
           </h1>
 
           <p
             id={`coming-soon-description-${serviceKey}`}
-            className="text-[16px] leading-[1.6] text-secondary max-w-[480px] mx-auto"
+            className="text-[16px] leading-[1.6] text-ui-content-secondary max-w-[480px] mx-auto"
           >
             {language === 'bn'
               ? 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি।'
@@ -56,11 +56,11 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         </div>
 
         {/* Informative Notice Box */}
-        <div className="bg-surface border border-subtle rounded-2xl p-4 sm:p-5 text-left max-w-[520px] mx-auto shadow-2xs space-y-2">
-          <p className="text-[14px] font-semibold text-primary">
+        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 text-left max-w-[520px] mx-auto shadow-2xs space-y-2">
+          <p className="text-[14px] font-semibold text-ui-content-primary">
             {language === 'bn' ? 'সেবার অবস্থা' : 'Service Status'}
           </p>
-          <p className="text-[13.5px] leading-relaxed text-secondary">
+          <p className="text-[13.5px] leading-relaxed text-ui-content-secondary">
             {language === 'bn'
               ? 'সেবাটি চালু হলে এখানে প্রয়োজনীয় তথ্য যোগ করা হবে।'
               : 'More information will be added when this service becomes available.'}

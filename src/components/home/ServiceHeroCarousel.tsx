@@ -134,7 +134,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         aria-roledescription="carousel"
         aria-label={language === 'bn' ? 'সেবা সমূহের হাইলাইট ব্যানার' : 'Service highlights hero banner'}
         onKeyDown={handleKeyDown}
-        className="relative overflow-hidden rounded-2xl border border-subtle bg-surface shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+        className="relative overflow-hidden rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         style={{
           borderLeftColor: conf ? conf.primaryColor : 'var(--ui-border-subtle)',
           borderLeftWidth: '4px',
@@ -163,19 +163,19 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 <FeatureIcon section={currentSlide.key as SectionKey} size="md" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-subtle bg-surface-subtle text-secondary shadow-2xs">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary shadow-2xs">
                 {currentSlide.iconName && <AppIcon name={currentSlide.iconName} size="lg" />}
               </div>
             )}
 
-            <span className="text-[16px] font-bold text-primary">
+            <span className="text-[16px] font-bold text-ui-content-primary">
               {language === 'bn' ? currentSlide.serviceLabelBn : currentSlide.serviceLabelEn}
             </span>
 
             {currentSlide.isComingSoon && (
               <span
                 id={`carousel-badge-${currentSlide.key}`}
-                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-semibold bg-surface-subtle border border-subtle text-secondary shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-2xs"
               >
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                 <span>{language === 'bn' ? currentSlide.badgeBn : currentSlide.badgeEn}</span>
@@ -183,7 +183,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             )}
 
             {count > 0 && conf && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-medium bg-surface-subtle border border-subtle text-secondary">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-medium bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary">
                 <span
                   className="w-1.5 h-1.5 rounded-full"
                   style={{ backgroundColor: conf.primaryColor }}
@@ -196,11 +196,11 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
           </div>
 
           <div className="space-y-1.5 text-left pt-1">
-            <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-extrabold leading-[1.3] text-primary tracking-tight">
+            <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-extrabold leading-[1.3] text-ui-content-primary tracking-tight">
               {language === 'bn' ? currentSlide.nameBn : currentSlide.nameEn}
             </h2>
 
-            <p className="text-[15px] leading-[1.6] text-secondary max-w-2xl">
+            <p className="text-[15px] leading-[1.6] text-ui-content-secondary max-w-2xl">
               {language === 'bn' ? currentSlide.descBn : currentSlide.descEn}
             </p>
           </div>
@@ -214,7 +214,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     id={`carousel-report-btn-${currentSlide.key}`}
                     type="button"
                     onClick={() => openReportComposer()}
-                    className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-xl font-bold text-[15px] transition-all cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] hover:brightness-105 active:scale-[0.98]"
+                    className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-xl font-bold text-[15px] transition-all cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus hover:brightness-105 active:scale-[0.98]"
                     style={{
                       backgroundColor: conf.primaryColor,
                       color: currentSlide.key === 'rickshaw' ? 'var(--sec-rickshaw-on-primary, #050505)' : '#FFFFFF',
@@ -230,12 +230,12 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     id={`carousel-cta-${currentSlide.key}`}
                     type="button"
                     onClick={() => navigateTo(currentSlide.path)}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 h-[44px] rounded-xl border border-subtle bg-surface hover:bg-surface-subtle text-primary font-semibold text-[14px] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 h-[44px] rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary font-semibold text-[14px] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                   >
                     <span>
                       {language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View Reports'}
                     </span>
-                    <AppIcon name="arrow-right" size="sm" className="text-muted" />
+                    <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted" />
                   </button>
                 </>
               )}
@@ -246,26 +246,26 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   id={`carousel-coming-soon-btn-${currentSlide.key}`}
                   type="button"
                   onClick={() => navigateTo(currentSlide.path)}
-                  className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-xl border border-subtle bg-surface hover:bg-surface-subtle text-primary font-semibold text-[14px] transition-colors cursor-pointer shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+                  className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary font-semibold text-[14px] transition-colors cursor-pointer shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   <span>
                     {language === 'bn' ? 'বিস্তারিত দেখুন' : 'Learn More'}
                   </span>
-                  <AppIcon name="arrow-right" size="sm" className="text-muted" />
+                  <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted" />
                 </button>
               )}
             </div>
 
             <div
               id="carousel-navigation-bar"
-              className="flex items-center justify-between sm:justify-start gap-1 bg-surface-subtle border border-subtle rounded-xl p-1 shrink-0 shadow-2xs self-end sm:self-center"
+              className="flex items-center justify-between sm:justify-start gap-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-1 shrink-0 shadow-2xs self-end sm:self-center"
             >
               <button
                 id="carousel-prev-btn"
                 type="button"
                 onClick={handlePrev}
                 aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-surface hover:bg-surface-hover text-secondary hover:text-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <AppIcon name="chevron-left" size="sm" />
               </button>
@@ -273,7 +273,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
               <span
                 id="carousel-slide-indicator"
                 aria-live="polite"
-                className="text-[13px] font-bold text-secondary px-2.5 select-none font-mono"
+                className="text-[13px] font-bold text-ui-content-secondary px-2.5 select-none font-mono"
               >
                 {slideIndicatorText}
               </span>
@@ -283,7 +283,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 type="button"
                 onClick={handleNext}
                 aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-surface hover:bg-surface-hover text-secondary hover:text-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <AppIcon name="chevron-right" size="sm" />
               </button>

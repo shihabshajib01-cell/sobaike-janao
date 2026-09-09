@@ -55,7 +55,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       aria-label={title}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
-      className={`group relative bg-surface border border-subtle hover:border-theme focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] focus-visible:outline-none rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none ${className}`}
+      className={`group relative bg-ui-surface border border-ui-stroke-subtle focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:outline-none rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none ${className}`}
     >
       {/* 1. Top Context Line: Service Badge */}
       <div className="flex items-center justify-between gap-2 text-[12px] sm:text-[13px] md:text-[14px]">
@@ -70,17 +70,17 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       </div>
 
       {/* 2. Main Headline (Refined Bengali typography, max 2 lines on mobile) */}
-      <h3 className="text-[16px] sm:text-[17px] md:text-[20px] leading-[1.38] sm:leading-[1.4] md:leading-[30px] font-bold md:font-semibold text-primary group-hover:text-primary transition-colors line-clamp-2 break-words">
+      <h3 className="text-[16px] sm:text-[17px] md:text-[20px] leading-[1.38] sm:leading-[1.4] md:leading-[30px] font-bold md:font-semibold text-ui-content-primary transition-colors line-clamp-2 break-words">
         {title}
       </h3>
 
       {/* 3. Reported Subject Context (Compact inline row) */}
       {report.reportedSubject && (
-        <div className="text-[12px] sm:text-[13px] md:text-[14px] text-secondary flex items-center gap-1.5 flex-wrap min-w-0">
-          <span className="text-muted font-normal text-[11.5px] sm:text-[12px] md:text-[13px]">
+        <div className="text-[12px] sm:text-[13px] md:text-[14px] text-ui-content-secondary flex items-center gap-1.5 flex-wrap min-w-0">
+          <span className="text-ui-content-muted font-normal text-[11.5px] sm:text-[12px] md:text-[13px]">
             {language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}
           </span>
-          <span className="font-semibold text-primary truncate max-w-full">
+          <span className="font-semibold text-ui-content-primary truncate max-w-full">
             {report.reportedSubject}
           </span>
         </div>
@@ -88,7 +88,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
       {/* 4. Description Preview (Lightened visual weight, 2 lines mobile / 3 lines desktop) */}
       {shouldShowDescription && (
-        <p className="text-[13px] sm:text-[14px] md:text-[16px] leading-[1.5] sm:leading-[1.55] md:leading-[26px] text-secondary line-clamp-2 md:line-clamp-3 font-normal break-words">
+        <p className="text-[13px] sm:text-[14px] md:text-[16px] leading-[1.5] sm:leading-[1.55] md:leading-[26px] text-ui-content-secondary line-clamp-2 md:line-clamp-3 font-normal break-words">
           {shortDesc}
         </p>
       )}
@@ -105,18 +105,18 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       )}
 
       {/* 5. Footer Metadata & Seamless Action Area */}
-      <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3 border-t border-subtle text-[12px] sm:text-[13px] md:text-[14px] text-muted">
+      <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3 border-t border-ui-stroke-subtle text-[12px] sm:text-[13px] md:text-[14px] text-ui-content-muted">
         {/* Location & Date */}
         <div className="flex items-center flex-wrap gap-x-2.5 sm:gap-x-3 gap-y-0.5 min-w-0 flex-1">
-          <div className="flex items-center gap-1 sm:gap-1.5 text-secondary font-medium min-w-0">
-            <AppIcon name="map-pin" size="xs" className="text-muted shrink-0 md:hidden" />
-            <AppIcon name="map-pin" size="sm" className="text-muted shrink-0 hidden md:inline-block" />
+          <div className="flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary font-medium min-w-0">
+            <AppIcon name="map-pin" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
+            <AppIcon name="map-pin" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <span className="truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[200px] md:max-w-xs">{location}</span>
           </div>
-          <span className="text-muted text-[10px] sm:text-[12px] md:text-[13px]">•</span>
-          <div className="flex items-center gap-1 text-muted shrink-0">
-            <AppIcon name="calendar" size="xs" className="text-muted shrink-0 md:hidden" />
-            <AppIcon name="calendar" size="sm" className="text-muted shrink-0 hidden md:inline-block" />
+          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[13px]">•</span>
+          <div className="flex items-center gap-1 text-ui-content-muted shrink-0">
+            <AppIcon name="calendar" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
+            <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <span className="whitespace-nowrap">{publishedDate}</span>
           </div>
         </div>
@@ -127,7 +127,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             type="button"
             onClick={handleShare}
             aria-label={language === 'bn' ? 'লিংক কপি করুন' : 'Copy link'}
-            className="inline-flex items-center gap-1 sm:gap-1.5 text-secondary hover:text-primary active:bg-surface-subtle transition-colors cursor-pointer py-1 md:py-1.5 px-1.5 sm:px-2 min-h-[36px] sm:min-h-[44px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+            className="inline-flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary transition-colors cursor-pointer py-1 md:py-1.5 px-1.5 sm:px-2 min-h-[36px] sm:min-h-[44px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {isCopied ? (
               <>
@@ -139,19 +139,19 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
               </>
             ) : (
               <>
-                <AppIcon name="share" size="xs" className="text-muted md:hidden" />
-                <AppIcon name="share" size="sm" className="text-muted hidden md:inline-block" />
+                <AppIcon name="share" size="xs" className="text-ui-content-muted md:hidden" />
+                <AppIcon name="share" size="sm" className="text-ui-content-muted hidden md:inline-block" />
                 <span className="text-[11.5px] sm:text-[13px] md:text-[14px]">{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
               </>
             )}
           </button>
 
-          <span className="text-subtle text-[10px] sm:text-[12px] md:text-[14px]">|</span>
+          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[14px]">|</span>
 
-          <span className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-primary group-hover:text-primary transition-colors py-1 md:py-1.5 px-1 min-h-[36px] sm:min-h-[44px]">
+          <span className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary transition-colors py-1 md:py-1.5 px-1 min-h-[36px] sm:min-h-[44px]">
             <span className="text-[11.5px] sm:text-[13px] md:text-[14px]">{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
-            <AppIcon name="arrow-right" size="xs" className="text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-transform md:hidden" />
-            <AppIcon name="arrow-right" size="sm" className="text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-transform hidden md:inline-block" />
+            <AppIcon name="arrow-right" size="xs" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform md:hidden" />
+            <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform hidden md:inline-block" />
           </span>
         </div>
       </div>

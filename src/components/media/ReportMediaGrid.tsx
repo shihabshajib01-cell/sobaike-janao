@@ -53,11 +53,11 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
       <div
         key={img.id}
         onClick={(e) => handleImageClick(e, index)}
-        className={`relative overflow-hidden bg-surface-subtle cursor-pointer select-none group transition-opacity hover:opacity-95 ${className}`}
+        className={`relative overflow-hidden bg-ui-surface-subtle cursor-pointer select-none group transition-opacity hover:opacity-95 ${className}`}
       >
         {isBroken ? (
-          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-muted bg-surface-subtle text-center space-y-1">
-            <ImageOff className="w-5 h-5 text-muted stroke-[1.5]" />
+          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-ui-content-muted bg-ui-surface-subtle text-center space-y-1">
+            <ImageOff className="w-5 h-5 text-ui-content-muted stroke-[1.5]" />
             <span className="text-[14px]">
               {language === 'bn' ? 'ছবিটি দেখানো যাচ্ছে না' : 'Image unavailable'}
             </span>
@@ -95,18 +95,18 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
   return (
     <div className="space-y-2 select-none" onClick={(e) => e.stopPropagation()}>
       {!isCompact && (
-        <div className="flex items-center justify-between text-[14px] text-secondary font-medium">
-          <span className="font-semibold text-primary">
+        <div className="flex items-center justify-between text-[14px] text-ui-content-secondary font-medium">
+          <span className="font-semibold text-ui-content-primary">
             {language === 'bn' ? 'সহায়ক ছবি' : 'Supporting images'} ({count})
           </span>
-          <span className="text-muted">
+          <span className="text-ui-content-muted">
             {language === 'bn' ? 'বড় করে দেখতে ট্যাপ করুন' : 'Click/tap to expand'}
           </span>
         </div>
       )}
 
       {/* Media container: Outer radius 12px, Internal gap 4px */}
-      <div className="rounded-[12px] overflow-hidden border border-subtle bg-surface-subtle">
+      <div className="rounded-[12px] overflow-hidden border border-ui-stroke-subtle bg-ui-surface-subtle">
         {/* 1 Image: Full width frame */}
         {count === 1 && (
           <div className={`w-full ${isCompact ? 'h-[170px] sm:h-[210px] md:h-[340px]' : 'h-[220px] md:h-[340px]'}`}>

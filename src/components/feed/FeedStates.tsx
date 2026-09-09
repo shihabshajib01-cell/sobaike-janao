@@ -39,15 +39,15 @@ export const FeedError: React.FC<FeedErrorProps> = ({
   language = 'bn',
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center bg-surface border border-subtle rounded-2xl max-w-md mx-auto my-6 space-y-3">
+    <div className="flex flex-col items-center justify-center p-8 text-center bg-ui-surface border border-ui-stroke-subtle rounded-2xl max-w-md mx-auto my-6 space-y-3">
       <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400">
         <AlertCircle className="w-6 h-6 stroke-[1.5]" />
       </div>
       <div>
-        <h3 className="text-[18px] font-bold text-primary">
+        <h3 className="text-[18px] font-bold text-ui-content-primary">
           {language === 'bn' ? titleBn : titleEn}
         </h3>
-        <p className="text-[14px] leading-[22px] text-secondary max-w-xs mt-1">
+        <p className="text-[14px] leading-[22px] text-ui-content-secondary max-w-xs mt-1">
           {language === 'bn' ? descriptionBn : descriptionEn}
         </p>
       </div>
