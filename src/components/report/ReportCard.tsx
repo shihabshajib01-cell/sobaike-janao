@@ -64,12 +64,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
       {/* 2. Main Headline (Refined Bengali typography, max 2 lines on mobile) */}
       <h3 className="text-[16px] sm:text-[17px] md:text-[20px] leading-[1.38] sm:leading-[1.4] md:leading-[30px] font-bold md:font-semibold text-ui-content-primary transition-colors line-clamp-2 break-words">
-        <Link
-          to={`/report-detail/${report.id}`}
-          className="hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-sm transition-colors text-ui-content-primary"
-        >
-          {title}
-        </Link>
+        {title}
       </h3>
 
       {/* 3. Reported Subject Context (Compact inline row) */}
@@ -162,6 +157,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
           <Link
             to={`/report-detail/${report.id}`}
+            onClick={(e) => e.stopPropagation()}
             aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
             className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
           >
