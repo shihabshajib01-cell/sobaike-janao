@@ -370,9 +370,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       }
     };
 
-    // Safe historical draft recovery: preserve old draft address parts if formattedAddress is blank
+    // Safe historical draft recovery: preserve old draft address parts if formattedAddress is blank (non-utility only)
     useEffect(() => {
-      if (formData.location && !formData.location.formattedAddress) {
+      if (!isUtilityReport && formData.location && !formData.location.formattedAddress) {
         const historicalParts = [
           formData.location.road,
           formData.location.area,
@@ -387,7 +387,32 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           });
         }
       }
-    }, []);
+    }, [isUtilityReport]);
+
+    // Clear stale address-specific location data for utility complaints
+    useEffect(() => {
+      if (isUtilityReport && formData.location) {
+        const hasStaleAddressData = Boolean(
+          formData.location.formattedAddress ||
+          formData.location.road ||
+          formData.location.area ||
+          formData.location.landmark ||
+          formData.location.placeId
+        );
+        if (hasStaleAddressData) {
+          onUpdateFormData({
+            location: {
+              ...formData.location,
+              formattedAddress: '',
+              road: '',
+              area: '',
+              landmark: '',
+              placeId: undefined,
+            },
+          });
+        }
+      }
+    }, [isUtilityReport, formData.location, onUpdateFormData]);
 
     // Privacy toggles (Harassment only)
     const isIdentityPrivate = formData.privacyChoice === 'anonymous';
@@ -707,22 +732,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             });
           }
         }
-
-        const detailedAddr = formData.location?.formattedAddress?.trim() || '';
-        if (!detailedAddr) {
-          newErrors.formattedAddress =
-            language === 'bn' ? 'বিস্তারিত ঠিকানা লিখুন' : 'Detailed address is required';
-        } else if (detailedAddr.length < 5) {
-          newErrors.formattedAddress =
-            language === 'bn'
-              ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
-              : 'Detailed address must be at least 5 characters';
-        } else if (detailedAddr.length > 500) {
-          newErrors.formattedAddress =
-            language === 'bn'
-              ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
-              : 'Detailed address must not exceed 500 characters';
-        }
       } else {
         // Auto-populate title if empty before validating
         let effectiveTitle = formData.title?.trim();
@@ -806,19 +815,18 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         }
 
         const detailedAddr = formData.location?.formattedAddress?.trim() || '';
-        if (!detailedAddr) {
-          newErrors.formattedAddress =
-            language === 'bn' ? 'বিস্তারিত ঠিকানা লিখুন' : 'Detailed address is required';
-        } else if (detailedAddr.length < 5) {
-          newErrors.formattedAddress =
-            language === 'bn'
-              ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
-              : 'Detailed address must be at least 5 characters';
-        } else if (detailedAddr.length > 500) {
-          newErrors.formattedAddress =
-            language === 'bn'
-              ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
-              : 'Detailed address must not exceed 500 characters';
+        if (detailedAddr) {
+          if (detailedAddr.length < 5) {
+            newErrors.formattedAddress =
+              language === 'bn'
+                ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
+                : 'Detailed address must be at least 5 characters';
+          } else if (detailedAddr.length > 500) {
+            newErrors.formattedAddress =
+              language === 'bn'
+                ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
+                : 'Detailed address must not exceed 500 characters';
+          }
         }
 
         // Harassment Identity Validation
@@ -1524,7 +1532,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             errors.division ||
             errors.district ||
             errors.upazilaOrThana ||
-            errors.formattedAddress ||
+            (!isUtilityReport && errors.formattedAddress) ||
             errors.reporterLocation
           )}
           icon={<MapPin className="w-5 h-5" />}
@@ -1636,8 +1644,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Clean Manual Incident Location Form */}
             <div className="space-y-3 pt-1">
-              {/* Row 1: Division & District (Desktop: 2 columns; Mobile: stacked) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Administrative Dropdowns (Desktop: 3 columns in 1 row; Tablet: 2 columns with Thana wrapping; Mobile: stacked) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {/* Division */}
                 <div>
                   <label
@@ -1699,70 +1707,72 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.district}</p>
                   )}
                 </div>
-              </div>
 
-              {/* Row 2: Thana / Upazila */}
-              <div>
-                <label
-                  htmlFor="complaint-thana-select"
-                  className="block text-[13px] font-bold text-primary mb-1"
-                >
-                  {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / Upazila *'}
-                </label>
-                <select
-                  id="complaint-thana-select"
-                  disabled={isLocationLocked || !resolvedDistrict}
-                  value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
-                  onChange={(e) => handleUpazilaChange(e.target.value)}
-                  className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                    isLocationLocked || !resolvedDistrict ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
-                  } ${
-                    errors.upazilaOrThana ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                  }`}
-                >
-                  <option value="">
-                    {language === 'bn' ? '-- থানা / উপজেলা বেছে নিন --' : '-- Select Thana / Upazila --'}
-                  </option>
-                  {availableUpazilas.map((u: UpazilaInfo) => (
-                    <option key={u.id} value={u.nameEn}>
-                      {language === 'bn' ? u.nameBn : u.nameEn}
+                {/* Thana / Upazila */}
+                <div className="sm:col-span-2 lg:col-span-1">
+                  <label
+                    htmlFor="complaint-thana-select"
+                    className="block text-[13px] font-bold text-primary mb-1"
+                  >
+                    {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / Upazila *'}
+                  </label>
+                  <select
+                    id="complaint-thana-select"
+                    disabled={isLocationLocked || !resolvedDistrict}
+                    value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
+                    onChange={(e) => handleUpazilaChange(e.target.value)}
+                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
+                      isLocationLocked || !resolvedDistrict ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                    } ${
+                      errors.upazilaOrThana ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                    }`}
+                  >
+                    <option value="">
+                      {language === 'bn' ? '-- থানা / উপজেলা বেছে নিন --' : '-- Select Thana / Upazila --'}
                     </option>
-                  ))}
-                </select>
-                {errors.upazilaOrThana && (
-                  <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.upazilaOrThana}</p>
-                )}
+                    {availableUpazilas.map((u: UpazilaInfo) => (
+                      <option key={u.id} value={u.nameEn}>
+                        {language === 'bn' ? u.nameBn : u.nameEn}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.upazilaOrThana && (
+                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.upazilaOrThana}</p>
+                  )}
+                </div>
               </div>
 
-              {/* Row 3: Detailed Address */}
-              <div>
-                <label
-                  htmlFor="complaint-address-input"
-                  className="block text-[13px] font-bold text-primary mb-1"
-                >
-                  {language === 'bn' ? 'বিস্তারিত ঠিকানা *' : 'Detailed Address *'}
-                </label>
-                <textarea
-                  id="complaint-address-input"
-                  rows={3}
-                  disabled={isLocationLocked}
-                  value={formData.location?.formattedAddress || ''}
-                  onChange={(e) => handleManualLocationChange({ formattedAddress: e.target.value })}
-                  placeholder={
-                    language === 'bn'
-                      ? 'বাড়ি/হোল্ডিং, রাস্তা, বাজার, প্রতিষ্ঠান, পরিচিত স্থান বা প্রয়োজনীয় অন্যান্য ঠিকানা লিখুন'
-                      : 'Enter house/holding, road, market, institution, landmark, or other useful address details'
-                  }
-                  className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent resize-none leading-relaxed ${
-                    isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
-                  } ${
-                    errors.formattedAddress ? 'border-red-500 bg-red-500/5' : 'border-subtle'
-                  }`}
-                />
-                {errors.formattedAddress && (
-                  <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.formattedAddress}</p>
-                )}
-              </div>
+              {/* Row 3: Detailed Address (Optional for non-utility, completely omitted for utility) */}
+              {!isUtilityReport && (
+                <div>
+                  <label
+                    htmlFor="complaint-address-input"
+                    className="block text-[13px] font-bold text-primary mb-1"
+                  >
+                    {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed Address (Optional)'}
+                  </label>
+                  <textarea
+                    id="complaint-address-input"
+                    rows={3}
+                    disabled={isLocationLocked}
+                    value={formData.location?.formattedAddress || ''}
+                    onChange={(e) => handleManualLocationChange({ formattedAddress: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? 'বাড়ি/হোল্ডিং, রাস্তা, বাজার, প্রতিষ্ঠান, পরিচিত স্থান বা প্রয়োজনীয় অন্যান্য ঠিকানা লিখুন'
+                        : 'Enter house/holding, road, market, institution, landmark, or other useful address details'
+                    }
+                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent resize-none leading-relaxed ${
+                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                    } ${
+                      errors.formattedAddress ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                    }`}
+                  />
+                  {errors.formattedAddress && (
+                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.formattedAddress}</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </Accordion>

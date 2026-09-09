@@ -142,7 +142,11 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const locationSummary =
     [
-      formData.location?.upazilaOrThana || formData.location?.area || (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : ''),
+      formData.location?.upazilaOrThana ||
+        (!isUtilityReport
+          ? formData.location?.area ||
+            (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : '')
+          : ''),
       formData.location?.district,
       formData.location?.division,
     ]
@@ -404,7 +408,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           <div className="p-3 rounded-xl bg-surface-subtle border border-subtle text-[14px] pt-1 space-y-1.5">
             <p className="font-semibold text-primary">
               {[
-                formData.location?.area,
+                !isUtilityReport ? formData.location?.area : undefined,
                 formData.location?.upazilaOrThana,
                 formData.location?.district,
                 formData.location?.division,
@@ -412,13 +416,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 .filter(Boolean)
                 .join(', ') || (language === 'bn' ? 'অবস্থান নির্দিষ্ট নেই' : 'Unspecified location')}
             </p>
-            {formData.location?.formattedAddress && (
+            {!isUtilityReport && formData.location?.formattedAddress?.trim() && (
               <p className="text-secondary text-[13px]">
                 {language === 'bn' ? 'ঠিকানা: ' : 'Address: '}
-                <span className="text-primary font-medium">{formData.location.formattedAddress}</span>
+                <span className="text-primary font-medium">{formData.location.formattedAddress.trim()}</span>
               </p>
             )}
-            {formData.location?.road && (
+            {!isUtilityReport && formData.location?.road && (
               <p className="text-secondary text-[13px]">
                 {language === 'bn' ? 'রাস্তা / লেন: ' : 'Road / Lane: '}
                 <span className="text-primary font-medium">{formData.location.road}</span>

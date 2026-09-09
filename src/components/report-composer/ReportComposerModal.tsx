@@ -231,6 +231,22 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setPendingImages([]);
       }
 
+      const isUtilityDraft =
+        (updatedDraft.segment as string) === 'utility' || updatedDraft.segment === 'load_shedding';
+      if (isUtilityDraft && updatedDraft.location) {
+        updatedDraft = {
+          ...updatedDraft,
+          location: {
+            ...updatedDraft.location,
+            formattedAddress: '',
+            area: '',
+            road: '',
+            landmark: '',
+            placeId: undefined,
+          },
+        };
+      }
+
       // If draft was saved on rape subcategory at step 3 or 4, require consent before displaying step 3/4
       if (
         savedDraftAvailable.subcategoryId === 'rape-sexual-violence' &&
@@ -453,9 +469,22 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setPendingImages([]);
       retryCredentialsRef.current = null;
 
+      const isSwitchingToUtility = (segment as string) === 'utility' || segment === 'load_shedding';
+
       setFormData((prev) => ({
         ...prev,
         segment,
+        location:
+          isSwitchingToUtility && prev.location
+            ? {
+                ...prev.location,
+                formattedAddress: '',
+                area: '',
+                road: '',
+                landmark: '',
+                placeId: undefined,
+              }
+            : prev.location,
         clientSubmissionId: undefined,
         serverSubmissionState: 'not_attempted',
         pendingEvidenceRecovery: undefined,
@@ -753,7 +782,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         return;
       }
 
-      const loc = formData.location || {
+      const isUtility = (formData.segment as string) === 'utility' || formData.segment === 'load_shedding';
+
+      const rawLoc = formData.location || {
         division: '',
         district: '',
         upazilaOrThana: '',
@@ -762,6 +793,32 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         landmark: '',
         formattedAddress: '',
       };
+
+      const loc = isUtility
+        ? {
+            division: rawLoc.division || '',
+            district: rawLoc.district || '',
+            upazilaOrThana: rawLoc.upazilaOrThana || '',
+            area: undefined,
+            road: undefined,
+            landmark: undefined,
+            placeId: undefined,
+            formattedAddress: '',
+            lat: rawLoc.lat,
+            lng: rawLoc.lng,
+          }
+        : {
+            division: rawLoc.division || '',
+            district: rawLoc.district || '',
+            upazilaOrThana: rawLoc.upazilaOrThana || '',
+            area: rawLoc.area || undefined,
+            road: rawLoc.road || undefined,
+            landmark: rawLoc.landmark || undefined,
+            placeId: rawLoc.placeId || undefined,
+            formattedAddress: rawLoc.formattedAddress?.trim() || '',
+            lat: rawLoc.lat,
+            lng: rawLoc.lng,
+          };
 
       const isHarassment = formData.segment === 'harassment';
       const isPartySegment = formData.segment === 'rickshaw' || formData.segment === 'extortion';

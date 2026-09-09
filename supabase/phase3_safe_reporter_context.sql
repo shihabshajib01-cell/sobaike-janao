@@ -526,10 +526,6 @@ BEGIN
     RAISE EXCEPTION 'VALIDATION_FAILED: Incident thana/upazila is required.';
   END IF;
 
-  IF v_address IS NULL THEN
-    RAISE EXCEPTION 'VALIDATION_FAILED: Incident detailed address is required.';
-  END IF;
-
   -- Optional incident coordinate validation (if provided)
   IF v_lat IS NULL AND v_lng IS NULL THEN
     -- Valid manual-address-only submission without coordinates
