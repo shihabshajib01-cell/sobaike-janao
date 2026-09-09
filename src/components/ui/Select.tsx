@@ -24,7 +24,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label htmlFor={selectId} className="block type-label text-ui-content-primary mb-1.5">
             {label}
-            {required && <span className="text-red-600 dark:text-red-400 ml-1" aria-hidden="true">*</span>}
+            {required && <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>}
           </label>
         )}
         <div className="relative">
@@ -36,7 +36,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}
             className={`w-full appearance-none min-h-[44px] bg-ui-surface text-ui-content-primary ui-border-default ui-radius-control ui-space-select transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
               error
-                ? 'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500'
+                ? 'border-ui-validation-border focus:ring-ui-validation-focus focus:border-ui-validation-focus'
                 : 'border-ui-stroke-default hover:border-ui-stroke-strong'
             } ${className}`}
             {...props}
@@ -53,7 +53,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           </div>
         </div>
         {error && (
-          <p id={`${selectId}-error`} className="mt-1.5 type-helper text-red-600 dark:text-red-400 font-medium">
+          <p id={`${selectId}-error`} className="mt-1.5 type-helper text-ui-validation-text font-medium">
             {error}
           </p>
         )}

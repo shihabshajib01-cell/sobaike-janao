@@ -17,7 +17,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label htmlFor={inputId} className="block type-label text-ui-content-primary mb-1.5">
             {label}
-            {required && <span className="text-red-600 dark:text-red-400 ml-1" aria-hidden="true">*</span>}
+            {required && <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>}
           </label>
         )}
         <div className="relative flex items-center">
@@ -36,7 +36,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               leftIcon ? 'pl-10' : 'pl-3.5'
             } ${rightIcon ? 'pr-10' : 'pr-3.5'} ${
               error
-                ? 'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500'
+                ? 'border-ui-validation-border focus:ring-ui-validation-focus focus:border-ui-validation-focus'
                 : 'border-ui-stroke-default hover:border-ui-stroke-strong'
             } ${className}`}
             {...props}
@@ -48,7 +48,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <p id={`${inputId}-error`} className="mt-1.5 type-helper text-red-600 dark:text-red-400 font-medium">
+          <p id={`${inputId}-error`} className="mt-1.5 type-helper text-ui-validation-text font-medium">
             {error}
           </p>
         )}

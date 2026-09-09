@@ -64,6 +64,11 @@
   --color-ui-sensitive-border: var(--ui-sensitive-border);
   --color-ui-sensitive-text: var(--ui-sensitive-text);
   --color-ui-sensitive-muted: var(--ui-sensitive-muted);
+
+  /* Form Validation */
+  --color-ui-validation-text: var(--ui-validation-text);
+  --color-ui-validation-border: var(--ui-validation-border);
+  --color-ui-validation-focus: var(--ui-validation-focus);
 }
 
 @layer base {
@@ -256,6 +261,11 @@
     --ui-info-bg: #EFF6FF;
     --ui-info-border: #BFDBFE;
 
+    /* Form Validation Tokens - Light */
+    --ui-validation-text: #DC2626;
+    --ui-validation-border: #EF4444;
+    --ui-validation-focus: #EF4444;
+
     /* Sensitive Information Tokens - Light */
     --ui-sensitive-bg: #FFF5F7;
     --ui-sensitive-border: #F3C7D1;
@@ -360,6 +370,11 @@
     --ui-info-text: #93C5FD;
     --ui-info-bg: #101E32;
     --ui-info-border: #254B78;
+
+    /* Form Validation Tokens - Dark */
+    --ui-validation-text: #F87171;
+    --ui-validation-border: #F87171;
+    --ui-validation-focus: #EF4444;
 
     /* Sensitive Information Tokens - Dark */
     --ui-sensitive-bg: #24151A;
