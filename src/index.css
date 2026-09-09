@@ -64,6 +64,14 @@
     --type-h5-size: 16px;
     --type-h5-line: 24px;
     --type-h5-weight: var(--font-weight-semibold);
+
+    /* Central Radius Tokens */
+    --radius-badge-sm: 6px;
+    --radius-badge-md: 8px;
+    --radius-control: 12px;
+    --radius-card: 16px;
+    --radius-modal: 24px;
+    --radius-pill: 9999px;
   }
 
   :root,
@@ -412,6 +420,31 @@
 
   .type-compact {
     font-size: var(--type-compact-size) !important;
+  }
+
+  /* Central Shape / Radius Utilities */
+  .ui-radius-badge-sm {
+    border-radius: var(--radius-badge-sm);
+  }
+
+  .ui-radius-badge-md {
+    border-radius: var(--radius-badge-md);
+  }
+
+  .ui-radius-control {
+    border-radius: var(--radius-control);
+  }
+
+  .ui-radius-card {
+    border-radius: var(--radius-card);
+  }
+
+  .ui-radius-modal {
+    border-radius: var(--radius-modal);
+  }
+
+  .ui-radius-pill {
+    border-radius: var(--radius-pill);
   }
 }
 
