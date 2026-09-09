@@ -31,11 +31,11 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   const variantClasses: Record<IconButtonVariant, string> = {
     primary:
-      'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] hover:bg-[var(--ui-primary-action-hover)] active:opacity-90 ui-border-default border-transparent shadow-2xs',
+      'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] hover:bg-[var(--ui-primary-action-hover)] active:opacity-90 ui-border-default border-transparent ui-elevation-control',
     secondary:
       'bg-surface-subtle text-primary hover:bg-surface-elevated active:bg-surface-hover ui-border-default border-subtle',
     outline:
-      'bg-surface text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-theme shadow-2xs',
+      'bg-surface text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-theme ui-elevation-control',
     ghost:
       'bg-transparent text-secondary hover:text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-transparent',
     destructive:

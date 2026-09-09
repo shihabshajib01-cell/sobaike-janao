@@ -121,6 +121,7 @@
     --elevation-low: 0 1px rgb(0 0 0 / 0.05);
     --elevation-card: var(--elevation-low);
     --elevation-selected-control: var(--elevation-low);
+    --elevation-control: var(--elevation-low);
 
     /* Central Border Structure Tokens */
     --border-width-default: 1px;
@@ -589,6 +590,10 @@
 
   .ui-elevation-selected {
     box-shadow: var(--elevation-selected-control);
+  }
+
+  .ui-elevation-control {
+    box-shadow: var(--elevation-control);
   }
 
   /* Central Border Structure Utilities */
