@@ -33,7 +33,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
 }) => {
 
   return (
-    <div className="sticky bottom-0 z-20 bg-surface border-t border-subtle px-4 md:px-8 py-3.5 flex items-center justify-between gap-3 shrink-0 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
+    <div className="sticky bottom-0 z-20 bg-ui-surface border-t border-ui-stroke-subtle px-4 md:px-8 py-3.5 flex items-center justify-between gap-3 shrink-0 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
       {/* Left-side action (Cancel or Back) */}
       {currentStep === 1 ? (
         <Button
@@ -43,7 +43,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           size="lg"
           onClick={onClose}
           leftIcon={<X className="w-4 h-4" />}
-          className="min-h-[44px] text-[16px] text-muted hover:text-primary"
+          className="min-h-[44px] text-[16px] text-ui-content-muted hover:text-ui-content-primary"
         >
           {language === 'bn' ? 'বাতিল করুন' : 'Cancel'}
         </Button>

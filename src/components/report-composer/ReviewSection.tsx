@@ -32,8 +32,8 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
   return (
     <div
       id={id}
-      className={`border rounded-2xl bg-surface transition-colors duration-150 overflow-hidden shadow-2xs ${
-        isOpen ? 'border-strong' : 'border-subtle hover:border-strong/60'
+      className={`border rounded-2xl bg-ui-surface transition-colors duration-150 overflow-hidden shadow-2xs ${
+        isOpen ? 'border-ui-stroke-strong' : 'border-ui-stroke-subtle'
       } ${className}`}
     >
       <div className="flex items-center justify-between p-3.5 sm:p-4 gap-2">
@@ -43,16 +43,16 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-controls={panelId}
-          className="flex-1 flex items-center justify-between gap-3 text-left cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] min-h-[38px] min-w-0"
+          className="flex-1 flex items-center justify-between gap-3 text-left cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[38px] min-w-0"
         >
           <div className="flex items-center gap-2.5 min-w-0 pr-2">
-            {icon && <div className="text-primary shrink-0">{icon}</div>}
+            {icon && <div className="text-ui-content-primary shrink-0">{icon}</div>}
             <div className="min-w-0">
-              <span className="text-[14px] sm:text-[15px] font-bold text-primary leading-tight block truncate">
+              <span className="text-[14px] sm:text-[15px] font-bold text-ui-content-primary leading-tight block truncate">
                 {title}
               </span>
               {!isOpen && summary && (
-                <div className="text-[12.5px] sm:text-[13px] text-muted truncate mt-0.5 font-normal">
+                <div className="text-[12.5px] sm:text-[13px] text-ui-content-muted truncate mt-0.5 font-normal">
                   {summary}
                 </div>
               )}
@@ -60,8 +60,8 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           </div>
 
           <div
-            className={`w-7 h-7 rounded-lg flex items-center justify-center text-muted shrink-0 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-primary bg-surface-subtle' : 'hover:text-primary'
+            className={`w-7 h-7 rounded-lg flex items-center justify-center text-ui-content-muted shrink-0 transition-transform duration-200 ${
+              isOpen ? 'rotate-180 text-ui-content-primary bg-ui-surface-subtle' : ''
             }`}
           >
             <ChevronDown className="w-4 h-4" />
@@ -75,7 +75,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
               e.stopPropagation();
               onEdit();
             }}
-            className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline cursor-pointer min-h-[38px] px-2 py-1 shrink-0 rounded-lg hover:bg-surface-subtle transition-colors"
+            className="inline-flex items-center gap-1 text-[13px] font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[38px] px-2 py-1 shrink-0 rounded-lg transition-colors"
           >
             <Edit2 className="w-3.5 h-3.5" />
             <span>{editLabel}</span>
@@ -85,7 +85,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
 
       {isOpen && (
         <div id={panelId} role="region" aria-labelledby={headerId} className="px-3.5 sm:px-4 pb-3.5 sm:pb-4 pt-0">
-          <div className="pt-2 border-t border-subtle/60">{children}</div>
+          <div className="pt-2 border-t border-ui-stroke-subtle/60">{children}</div>
         </div>
       )}
     </div>

@@ -942,8 +942,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             <div className="space-y-4 pt-1 text-left">
               {/* Title / Headline: Compact with secondary action */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[13px] text-secondary">
-                  <span className="font-semibold text-primary truncate max-w-[70%]">
+                <div className="flex items-center justify-between text-[13px] text-ui-content-secondary">
+                  <span className="font-semibold text-ui-content-primary truncate max-w-[70%]">
                     {formData.title ||
                       (isExcessElectricityBill
                         ? language === 'bn'
@@ -960,7 +960,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={() => setShowTitleField(!showTitleField)}
-                    className="text-primary hover:underline cursor-pointer py-0.5 font-medium shrink-0 ml-2"
+                    className="text-ui-content-primary hover:underline cursor-pointer py-0.5 font-medium shrink-0 ml-2"
                   >
                     {showTitleField
                       ? language === 'bn'
@@ -985,8 +985,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       placeholder={
                         language === 'bn' ? 'সংক্ষিপ্ত শিরোনাম' : 'Short headline'
                       }
-                      className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[15px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
-                        errors.title ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
+                        errors.title ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.title && (
@@ -1003,10 +1003,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <div>
                       <label
                         htmlFor="recent-bill-month-input"
-                        className="block text-[13px] font-bold text-primary mb-1"
+                        className="block text-[13px] font-bold text-ui-content-primary mb-1"
                       >
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-primary" />
+                          <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
                           <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent Bill Month *'}</span>
                         </div>
                       </label>
@@ -1018,8 +1018,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           onUpdateFormData({ recentBillMonth: e.target.value });
                           if (errors.recentBillMonth) setErrors((prev) => ({ ...prev, recentBillMonth: '' }));
                         }}
-                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                          errors.recentBillMonth ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                          errors.recentBillMonth ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.recentBillMonth && (
@@ -1031,10 +1031,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <div>
                       <label
                         htmlFor="recent-bill-amount-input"
-                        className="block text-[13px] font-bold text-primary mb-1"
+                        className="block text-[13px] font-bold text-ui-content-primary mb-1"
                       >
                         <div className="flex items-center gap-1.5">
-                          <Coins className="w-3.5 h-3.5 text-primary" />
+                          <Coins className="w-3.5 h-3.5 text-ui-content-primary" />
                           <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent Bill Amount (BDT) *'}</span>
                         </div>
                       </label>
@@ -1050,8 +1050,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           onUpdateFormData({ recentBillAmount: val === '' ? undefined : Number(val) });
                           if (errors.recentBillAmount) setErrors((prev) => ({ ...prev, recentBillAmount: '' }));
                         }}
-                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                          errors.recentBillAmount ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                          errors.recentBillAmount ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.recentBillAmount && (
@@ -1065,10 +1065,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <div>
                       <label
                         htmlFor="previous-bill-month-input"
-                        className="block text-[13px] font-bold text-primary mb-1"
+                        className="block text-[13px] font-bold text-ui-content-primary mb-1"
                       >
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-secondary" />
+                          <Calendar className="w-3.5 h-3.5 text-ui-content-secondary" />
                           <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous Bill Month *'}</span>
                         </div>
                       </label>
@@ -1080,8 +1080,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           onUpdateFormData({ previousBillMonth: e.target.value });
                           if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
                         }}
-                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                          errors.previousBillMonth ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                          errors.previousBillMonth ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.previousBillMonth && (
@@ -1093,10 +1093,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <div>
                       <label
                         htmlFor="previous-bill-amount-input"
-                        className="block text-[13px] font-bold text-primary mb-1"
+                        className="block text-[13px] font-bold text-ui-content-primary mb-1"
                       >
                         <div className="flex items-center gap-1.5">
-                          <Coins className="w-3.5 h-3.5 text-secondary" />
+                          <Coins className="w-3.5 h-3.5 text-ui-content-secondary" />
                           <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous Bill Amount (BDT) *'}</span>
                         </div>
                       </label>
@@ -1112,8 +1112,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           onUpdateFormData({ previousBillAmount: val === '' ? undefined : Number(val) });
                           if (errors.previousBillAmount) setErrors((prev) => ({ ...prev, previousBillAmount: '' }));
                         }}
-                        className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                          errors.previousBillAmount ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                        className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                          errors.previousBillAmount ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.previousBillAmount && (
@@ -1129,10 +1129,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <div>
                     <label
                       htmlFor="complaint-date-input"
-                      className="block text-[13px] font-bold text-primary mb-1"
+                      className="block text-[13px] font-bold text-ui-content-primary mb-1"
                     >
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-primary" />
+                        <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
                         <span>{language === 'bn' ? 'তারিখ *' : 'Date *'}</span>
                       </div>
                     </label>
@@ -1156,8 +1156,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         onUpdateFormData({ incidentDate: selectedDate });
                         if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
                       }}
-                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                        errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                        errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.incidentDate && (
@@ -1169,10 +1169,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <div>
                     <label
                       htmlFor="utility-start-time-input"
-                      className="block text-[13px] font-bold text-primary mb-1"
+                      className="block text-[13px] font-bold text-ui-content-primary mb-1"
                     >
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-primary" />
+                        <Clock className="w-3.5 h-3.5 text-ui-content-primary" />
                         <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start Time *'}</span>
                       </div>
                     </label>
@@ -1187,8 +1187,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
                         }
                       }}
-                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                        errors.incidentTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                        errors.incidentTime ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.incidentTime && (
@@ -1200,10 +1200,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <div>
                     <label
                       htmlFor="utility-end-time-input"
-                      className="block text-[13px] font-bold text-primary mb-1"
+                      className="block text-[13px] font-bold text-ui-content-primary mb-1"
                     >
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-secondary" />
+                        <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
                         <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End Time (Optional)'}</span>
                       </div>
                     </label>
@@ -1215,8 +1215,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         onUpdateFormData({ utilityEndTime: e.target.value });
                         if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
                       }}
-                      className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                        errors.utilityEndTime ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                        errors.utilityEndTime ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.utilityEndTime && (
@@ -1230,7 +1230,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="space-y-1">
                 <label
                   htmlFor="complaint-desc-input"
-                  className="block text-[14px] font-bold text-primary"
+                  className="block text-[14px] font-bold text-ui-content-primary"
                 >
                   {language === 'bn' ? 'বিবরণ *' : 'Description *'}
                 </label>
@@ -1256,8 +1256,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       ? 'গ্যাস সংকট, চাপ কম বা সম্পূর্ণ সরবরাহ বন্ধ থাকার বিবরণ লিখুন...'
                       : 'Describe the gas shortage, low pressure, or outage details...'
                   }
-                  className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[15px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed ${
-                    errors.description ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                  className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
+                    errors.description ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                   }`}
                 />
                 <div className="flex items-center justify-between gap-2">
@@ -1271,7 +1271,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       className={`text-[12px] font-mono shrink-0 ml-auto ${
                         (formData.description?.length || 0) > 2000
                           ? 'text-red-500 font-bold'
-                          : 'text-muted'
+                          : 'text-ui-content-muted'
                       }`}
                     >
                       {formData.description?.length || 0} / 2000
@@ -1284,14 +1284,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           <div className="space-y-4 pt-1 text-left">
             {/* Title / Headline: Compact with secondary action */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[13px] text-secondary">
-                <span className="font-semibold text-primary truncate max-w-[70%]">
+              <div className="flex items-center justify-between text-[13px] text-ui-content-secondary">
+                <span className="font-semibold text-ui-content-primary truncate max-w-[70%]">
                   {formData.title || (language === 'bn' ? currentSubcategoryOption?.nameBn : currentSubcategoryOption?.nameEn) || (language === 'bn' ? 'অভিযোগ' : 'Complaint')}
                 </span>
                 <button
                   type="button"
                   onClick={() => setShowTitleField(!showTitleField)}
-                  className="text-primary hover:underline cursor-pointer py-0.5 font-medium shrink-0 ml-2"
+                  className="text-ui-content-primary hover:underline cursor-pointer py-0.5 font-medium shrink-0 ml-2"
                 >
                   {showTitleField
                     ? language === 'bn'
@@ -1316,8 +1316,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     placeholder={
                       language === 'bn' ? 'সংক্ষিপ্ত শিরোনাম' : 'Short headline'
                     }
-                    className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[15px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px] ${
-                      errors.title ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                    className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
+                      errors.title ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                     }`}
                   />
                   {errors.title && (
@@ -1331,7 +1331,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             <div className="space-y-1">
               <label
                 htmlFor="complaint-desc-input"
-                className="block text-[14px] font-bold text-primary"
+                className="block text-[14px] font-bold text-ui-content-primary"
               >
                 {language === 'bn' ? 'কী ঘটেছিল? *' : 'What happened? *'}
               </label>
@@ -1349,8 +1349,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     ? 'ঘটনাটি সংক্ষেপে ও স্পষ্টভাবে লিখুন...'
                     : 'Describe the incident clearly...'
                 }
-                className={`w-full px-3.5 py-2.5 bg-surface border rounded-xl text-[15px] text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed ${
-                  errors.description ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
+                  errors.description ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                 }`}
               />
               <div className="flex items-center justify-between gap-2">
@@ -1364,7 +1364,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     className={`text-[12px] font-mono shrink-0 ml-auto ${
                       (formData.description?.length || 0) > 2000
                         ? 'text-red-500 font-bold'
-                        : 'text-muted'
+                        : 'text-ui-content-muted'
                     }`}
                   >
                     {formData.description?.length || 0} / 2000
@@ -1378,10 +1378,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div>
                 <label
                   htmlFor="complaint-date-input"
-                  className="block text-[13px] font-bold text-primary mb-1"
+                  className="block text-[13px] font-bold text-ui-content-primary mb-1"
                 >
                   <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-primary" />
+                    <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
                     <span>{language === 'bn' ? 'ঘটনার তারিখ *' : 'Incident Date *'}</span>
                   </div>
                 </label>
@@ -1405,8 +1405,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     onUpdateFormData({ incidentDate: selectedDate });
                     if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
                   }}
-                  className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                    errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                  className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                    errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                   }`}
                 />
                 {errors.incidentDate && (
@@ -1417,10 +1417,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div>
                 <label
                   htmlFor="complaint-time-input"
-                  className="block text-[13px] font-bold text-primary mb-1"
+                  className="block text-[13px] font-bold text-ui-content-primary mb-1"
                 >
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-secondary" />
+                    <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
                     <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (Optional)'}</span>
                   </div>
                 </label>
@@ -1429,7 +1429,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   type="time"
                   value={formData.incidentTime || ''}
                   onChange={(e) => onUpdateFormData({ incidentTime: e.target.value })}
-                  className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                  className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px]"
                 />
               </div>
 
@@ -1437,10 +1437,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div>
                   <label
                     htmlFor="complaint-frequency-select"
-                    className="block text-[13px] font-bold text-primary mb-1"
+                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
                     <div className="flex items-center gap-1.5">
-                      <Repeat className="w-3.5 h-3.5 text-secondary" />
+                      <Repeat className="w-3.5 h-3.5 text-ui-content-secondary" />
                       <span>{language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}</span>
                     </div>
                   </label>
@@ -1450,7 +1450,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     onChange={(e) =>
                       onUpdateFormData({ frequency: e.target.value as 'one-time' | 'repeated' })
                     }
-                    className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px]"
+                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[42px]"
                   >
                     <option value="one-time">
                       {language === 'bn' ? 'এককালীন (One-time)' : 'One-time'}
@@ -1465,8 +1465,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Conditional Digital Threat Questions ONLY for Digital Harassment */}
             {isDigitalHarassment && (
-              <div className="p-3.5 rounded-xl bg-surface-subtle border border-subtle space-y-3 mt-2">
-                <h4 className="text-[13px] font-bold text-primary">
+              <div className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3 mt-2">
+                <h4 className="text-[13px] font-bold text-ui-content-primary">
                   {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital Threat & Evidence Details'}
                 </h4>
 
@@ -1474,7 +1474,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <div>
                     <label
                       htmlFor="intimate-action-select"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
                       {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat Status / Action'}
                     </label>
@@ -1482,7 +1482,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       id="intimate-action-select"
                       value={formData.intimateWhatHappened || ''}
                       onChange={(e) => onUpdateFormData({ intimateWhatHappened: e.target.value })}
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px]"
+                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[42px]"
                     >
                       <option value="">{language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}</option>
                       {INTIMATE_WHAT_HAPPENED_OPTIONS.map((opt) => (
@@ -1496,7 +1496,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <div>
                     <label
                       htmlFor="intimate-platform-select"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
                       {language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / Channel'}
                     </label>
@@ -1504,7 +1504,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       id="intimate-platform-select"
                       value={formData.intimatePlatform || ''}
                       onChange={(e) => onUpdateFormData({ intimatePlatform: e.target.value })}
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent cursor-pointer min-h-[42px]"
+                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[42px]"
                     >
                       <option value="">{language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}</option>
                       {INTIMATE_PLATFORMS.map((plat) => (
@@ -1540,7 +1540,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           <div className="space-y-3.5 pt-1 text-left">
             {/* Single Short Sentence for Digital Harassment Location Helper */}
             {isDigitalHarassment && (
-              <p className="text-[13px] text-secondary leading-normal">
+              <p className="text-[13px] text-ui-content-secondary leading-normal">
                 {language === 'bn'
                   ? 'অনলাইন বা ডিজিটাল ঘটনার ক্ষেত্রে প্রাসঙ্গিক এলাকা বা জেলা নির্বাচন করুন।'
                   : 'For online incidents, select the most relevant area or district.'}
@@ -1557,7 +1557,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="p-3.5 rounded-xl border border-red-500/30 bg-red-500/5 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                  <div className="flex-1 text-[13px] text-ui-content-primary leading-relaxed">
                     {language === 'bn'
                       ? 'লোকেশন অনুমতি পাওয়া যায়নি। ব্রাউজার বা ডিভাইসে লোকেশন চালু করে আবার চেষ্টা করুন।'
                       : 'Location permission was not granted. Please enable location in your browser or device settings and try again.'}
@@ -1578,7 +1578,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/5 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                  <div className="flex-1 text-[13px] text-ui-content-primary leading-relaxed">
                     {language === 'bn'
                       ? 'লোকেশন পাওয়া যাচ্ছে না। জিপিএস বা ডিভাইস লোকেশন চালু করে আবার চেষ্টা করুন।'
                       : 'Device location could not be detected. Make sure GPS or location services are enabled and try again.'}
@@ -1596,26 +1596,26 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
               </div>
             ) : reporterGateState === 'requesting' || reporterGateState === 'checking' ? (
-              <div className="p-3.5 rounded-xl border border-subtle bg-surface-subtle/70 space-y-2.5 text-left">
+              <div className="p-3.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle/70 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                  <MapPin className="w-4 h-4 text-ui-content-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 text-[13px] text-ui-content-primary leading-relaxed">
                     {language === 'bn'
                       ? 'অভিযোগের স্থান নির্বাচন করতে আপনার ডিভাইসের লোকেশন চালু করুন।'
                       : 'Turn on device location before selecting the incident location.'}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 pt-0.5 text-[13px] text-accent font-medium">
+                <div className="flex items-center gap-2 pt-0.5 text-[13px] text-ui-accent font-medium">
                   <Loader2 className="w-4 h-4 animate-spin shrink-0" />
                   <span>{language === 'bn' ? 'লোকেশন যাচাই হচ্ছে...' : 'Checking location...'}</span>
                 </div>
               </div>
             ) : (
               /* 'required' or idle */
-              <div className="p-3.5 rounded-xl border border-subtle bg-surface-subtle/70 space-y-2.5 text-left">
+              <div className="p-3.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle/70 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 text-[13px] text-primary leading-relaxed">
+                  <MapPin className="w-4 h-4 text-ui-content-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 text-[13px] text-ui-content-primary leading-relaxed">
                     {language === 'bn'
                       ? 'অভিযোগের স্থান নির্বাচন করতে আপনার ডিভাইসের লোকেশন চালু করুন।'
                       : 'Turn on device location before selecting the incident location.'}
@@ -1625,7 +1625,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent hover:bg-accent-hover text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-ui-accent hover:bg-ui-accent-hover text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'লোকেশন চালু করুন' : 'Allow location'}</span>
@@ -1650,7 +1650,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div>
                   <label
                     htmlFor="complaint-division-select"
-                    className="block text-[13px] font-bold text-primary mb-1"
+                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
                     {language === 'bn' ? 'বিভাগ *' : 'Division *'}
                   </label>
@@ -1659,10 +1659,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     disabled={isLocationLocked}
                     value={resolvedDivision ? resolvedDivision.nameEn : ''}
                     onChange={(e) => handleDivisionChange(e.target.value)}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                    className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
                     } ${
-                      errors.division ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      errors.division ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                     }`}
                   >
                     <option value="">{language === 'bn' ? '-- বিভাগ বেছে নিন --' : '-- Select Division --'}</option>
@@ -1681,7 +1681,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div>
                   <label
                     htmlFor="complaint-district-select"
-                    className="block text-[13px] font-bold text-primary mb-1"
+                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
                     {language === 'bn' ? 'জেলা *' : 'District *'}
                   </label>
@@ -1690,10 +1690,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     disabled={isLocationLocked || !resolvedDivision}
                     value={resolvedDistrict ? resolvedDistrict.nameEn : ''}
                     onChange={(e) => handleDistrictChange(e.target.value)}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                      isLocationLocked || !resolvedDivision ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                    className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                      isLocationLocked || !resolvedDivision ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
                     } ${
-                      errors.district ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      errors.district ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                     }`}
                   >
                     <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
@@ -1712,7 +1712,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div className="sm:col-span-2 lg:col-span-1">
                   <label
                     htmlFor="complaint-thana-select"
-                    className="block text-[13px] font-bold text-primary mb-1"
+                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
                     {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / Upazila *'}
                   </label>
@@ -1721,10 +1721,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     disabled={isLocationLocked || !resolvedDistrict}
                     value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
                     onChange={(e) => handleUpazilaChange(e.target.value)}
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                      isLocationLocked || !resolvedDistrict ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : 'cursor-pointer'
+                    className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                      isLocationLocked || !resolvedDistrict ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
                     } ${
-                      errors.upazilaOrThana ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      errors.upazilaOrThana ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                     }`}
                   >
                     <option value="">
@@ -1747,7 +1747,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div>
                   <label
                     htmlFor="complaint-address-input"
-                    className="block text-[13px] font-bold text-primary mb-1"
+                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
                     {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed Address (Optional)'}
                   </label>
@@ -1762,10 +1762,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         ? 'বাড়ি/হোল্ডিং, রাস্তা, বাজার, প্রতিষ্ঠান, পরিচিত স্থান বা প্রয়োজনীয় অন্যান্য ঠিকানা লিখুন'
                         : 'Enter house/holding, road, market, institution, landmark, or other useful address details'
                     }
-                    className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent resize-none leading-relaxed ${
-                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-surface-subtle' : ''
+                    className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent resize-none leading-relaxed ${
+                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : ''
                     } ${
-                      errors.formattedAddress ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                      errors.formattedAddress ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                     }`}
                   />
                   {errors.formattedAddress && (
@@ -1790,7 +1790,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           >
             <div className="space-y-3.5 pt-1 text-left">
               {/* Primary Toggle: Keep Identity Private */}
-              <div className="p-3.5 rounded-2xl bg-surface-subtle border border-subtle space-y-3">
+              <div className="p-3.5 rounded-2xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3">
                 <Toggle
                   id="toggle-keep-identity-private"
                   checked={isIdentityPrivate}
@@ -1810,9 +1810,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
                 {/* When Private is OFF -> Reveal Contact Fields */}
                 {!isIdentityPrivate && (
-                  <div className="pt-3 border-t border-subtle/70 space-y-3">
-                    <div className="flex items-center gap-2 text-[13px] font-semibold text-primary">
-                      <Lock className="w-3.5 h-3.5 text-primary" />
+                  <div className="pt-3 border-t border-ui-stroke-subtle/70 space-y-3">
+                    <div className="flex items-center gap-2 text-[13px] font-semibold text-ui-content-primary">
+                      <Lock className="w-3.5 h-3.5 text-ui-content-primary" />
                       <span>
                         {language === 'bn'
                           ? 'মডারেটরের সাথে যোগাযোগের তথ্য'
@@ -1824,7 +1824,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       <div>
                         <label
                           htmlFor="reporter-admin-name"
-                          className="block text-[13px] font-semibold text-primary mb-1"
+                          className="block text-[13px] font-semibold text-ui-content-primary mb-1"
                         >
                           {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
                         </label>
@@ -1834,7 +1834,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           value={formData.adminName || ''}
                           onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
                           placeholder={language === 'bn' ? 'নাম' : 'Name'}
-                          className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px]"
+                          className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px]"
                         />
                         {errors.adminName && (
                           <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.adminName}</p>
@@ -1844,7 +1844,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       <div>
                         <label
                           htmlFor="reporter-admin-contact"
-                          className="block text-[13px] font-semibold text-primary mb-1"
+                          className="block text-[13px] font-semibold text-ui-content-primary mb-1"
                         >
                           {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone Number or Email *'}
                         </label>
@@ -1858,8 +1858,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                               setErrors((prev) => ({ ...prev, adminContact: '' }));
                           }}
                           placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
-                          className={`w-full px-3 py-2 bg-surface border rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[42px] ${
-                            errors.adminContact ? 'border-red-500 bg-red-500/5' : 'border-subtle'
+                          className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
+                            errors.adminContact ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
                           }`}
                         />
                         {errors.adminContact && (
@@ -1892,8 +1892,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               </div>
 
               {/* Workflow Notice */}
-              <div className="p-3 rounded-xl bg-surface border border-subtle flex items-start gap-2 text-[13px] text-secondary">
-                <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <div className="p-3 rounded-xl bg-ui-surface border border-ui-stroke-subtle flex items-start gap-2 text-[13px] text-ui-content-secondary">
+                <Info className="w-4 h-4 text-ui-content-primary shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
                   {isIdentityPrivate
                     ? language === 'bn'
@@ -1923,13 +1923,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             }
             summary={
               hasChargingStationOperatorData ? (
-                <span className="inline-flex items-center gap-1.5 text-accent font-medium text-[13px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                <span className="inline-flex items-center gap-1.5 text-ui-accent font-medium text-[13px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-ui-accent inline-block" />
                   {language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added'}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-secondary text-[13px]">
-                  <Plus className="w-3.5 h-3.5 text-secondary" />
+                <span className="inline-flex items-center gap-1 text-ui-content-secondary text-[13px]">
+                  <Plus className="w-3.5 h-3.5 text-ui-content-secondary" />
                   <span>{language === 'bn' ? 'তথ্য যোগ করুন' : 'Add information'}</span>
                 </span>
               )
@@ -1942,7 +1942,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div>
                   <label
                     htmlFor="operator-subject-name"
-                    className="block text-[13px] font-bold text-primary mb-1"
+                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
                     {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
                   </label>
@@ -1956,14 +1956,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         ? 'স্টেশন, গ্যারেজ, ব্যক্তি বা প্রতিষ্ঠানের নাম জানা থাকলে লিখুন'
                         : 'Enter the station, garage, person, or organization name if known'
                     }
-                    className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="operator-contact"
-                    className="block text-[13px] font-semibold text-secondary mb-1"
+                    className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                   >
                     {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
                   </label>
@@ -1977,7 +1977,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         ? 'ফোন নম্বর বা জানা যোগাযোগের তথ্য'
                         : 'Phone number or known contact information'
                     }
-                    className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                   />
                 </div>
               </div>
@@ -1986,7 +1986,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div>
                 <label
                   htmlFor="operator-role"
-                  className="block text-[13px] font-semibold text-secondary mb-1"
+                  className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                 >
                   {language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / Responsibility'}
                 </label>
@@ -2000,7 +2000,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       ? 'যেমন: মালিক, ম্যানেজার, পরিচালনাকারী'
                       : 'e.g. Owner, Manager, Operator'
                   }
-                  className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                  className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                 />
               </div>
 
@@ -2008,7 +2008,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div>
                 <label
                   htmlFor="operator-identifying-desc"
-                  className="block text-[13px] font-semibold text-secondary mb-1"
+                  className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                 >
                   {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
                 </label>
@@ -2022,7 +2022,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       ? 'সাইনবোর্ড, চেহারা, অবস্থান সূত্র বা অন্য কোনো পরিচিত তথ্য'
                       : 'Signage, appearance, location clues, or any other known identifying information'
                   }
-                  className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed min-h-[44px]"
+                  className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed min-h-[44px]"
                 />
               </div>
             </div>
@@ -2043,13 +2043,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             }
             summary={
               hasExtortionPartyData ? (
-                <span className="inline-flex items-center gap-1.5 text-accent font-medium text-[13px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                <span className="inline-flex items-center gap-1.5 text-ui-accent font-medium text-[13px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-ui-accent inline-block" />
                   {language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added'}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-secondary text-[13px]">
-                  <Plus className="w-3.5 h-3.5 text-secondary" />
+                <span className="inline-flex items-center gap-1 text-ui-content-secondary text-[13px]">
+                  <Plus className="w-3.5 h-3.5 text-ui-content-secondary" />
                   <span>{language === 'bn' ? 'তথ্য যোগ করুন' : 'Add information'}</span>
                 </span>
               )
@@ -2063,7 +2063,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <div>
                     <label
                       htmlFor="extortion-subject-name"
-                      className="block text-[13px] font-bold text-primary mb-1"
+                      className="block text-[13px] font-bold text-ui-content-primary mb-1"
                     >
                       {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
                     </label>
@@ -2077,14 +2077,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           ? 'চাঁদা দাবিকারীর নাম বা পরিচিত নাম জানা থাকলে লিখুন'
                           : "Enter the person's or party's name if known"
                       }
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="extortion-contact"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
                       {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
                     </label>
@@ -2098,7 +2098,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           ? 'ফোন নম্বর, অনলাইন পরিচিতি বা অন্য যোগাযোগের তথ্য'
                           : 'Phone number, online identity, or other contact information'
                       }
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -2108,7 +2108,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <div>
                     <label
                       htmlFor="extortion-role"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
                       {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / Designation'}
                     </label>
@@ -2122,14 +2122,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           ? 'যেমন: লাইনম্যান, ম্যানেজার, স্থানীয় প্রতিনিধি'
                           : 'e.g. Lineman, Manager, Local Representative'
                       }
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="extortion-org"
-                      className="block text-[13px] font-semibold text-secondary mb-1"
+                      className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
                       {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / Organization / Association'}
                     </label>
@@ -2143,7 +2143,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           ? 'সংশ্লিষ্ট দল, সিন্ডিকেট, সমিতি বা প্রতিষ্ঠানের নাম'
                           : 'Related group, syndicate, association, or organization'
                       }
-                      className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent min-h-[44px]"
+                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -2152,7 +2152,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div>
                   <label
                     htmlFor="extortion-identifying-desc"
-                    className="block text-[13px] font-semibold text-secondary mb-1"
+                    className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                   >
                     {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
                   </label>
@@ -2166,7 +2166,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         ? 'চেহারা, গাড়ির নম্বর, অবস্থান সূত্র বা অন্য কোনো পরিচিত তথ্য'
                         : 'Appearance, vehicle number, location clues, or any other identifying information'
                     }
-                    className="w-full px-3 py-2 bg-surface border border-subtle rounded-xl text-[14px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-accent leading-relaxed min-h-[44px]"
+                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed min-h-[44px]"
                   />
                 </div>
               </div>
@@ -2175,16 +2175,16 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="space-y-3 pt-1">
                 {formData.mentionedParties && formData.mentionedParties.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-[13px] font-bold text-primary">
+                    <h4 className="text-[13px] font-bold text-ui-content-primary">
                       {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional Mentioned Parties'}
                     </h4>
                     {formData.mentionedParties.map((party, pIdx) => (
                       <div
                         key={party.id || pIdx}
-                        className="p-3.5 sm:p-4 rounded-2xl bg-surface border border-subtle space-y-3"
+                        className="p-3.5 sm:p-4 rounded-2xl bg-ui-surface border border-ui-stroke-subtle space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-[13px] font-bold text-primary">
+                          <span className="text-[13px] font-bold text-ui-content-primary">
                             {language === 'bn' ? `পক্ষ #${pIdx + 2}` : `Party #${pIdx + 2}`}
                           </span>
                           <button
@@ -2200,7 +2200,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         {/* Row 1: Name + Phone */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
-                            <label className="block text-[12px] font-semibold text-secondary mb-1">
+                            <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
                               {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
                             </label>
                             <input
@@ -2208,11 +2208,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                               value={party.name || ''}
                               onChange={(e) => handleUpdateAdditionalParty(party.id, { name: e.target.value })}
                               placeholder={language === 'bn' ? 'নাম বা পরিচিত নাম' : 'Name or known identity'}
-                              className="w-full px-2.5 py-1.5 bg-surface-subtle border border-subtle rounded-xl text-[13px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl text-[13px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
                             />
                           </div>
                           <div>
-                            <label className="block text-[12px] font-semibold text-secondary mb-1">
+                            <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
                               {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
                             </label>
                             <input
@@ -2225,7 +2225,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                                 })
                               }
                               placeholder={language === 'bn' ? 'ফোন নম্বর বা যোগাযোগের তথ্য' : 'Phone number or contact info'}
-                              className="w-full px-2.5 py-1.5 bg-surface-subtle border border-subtle rounded-xl text-[13px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl text-[13px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
                             />
                           </div>
                         </div>
@@ -2233,7 +2233,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         {/* Row 2: Role + Group/Organization */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
-                            <label className="block text-[12px] font-semibold text-secondary mb-1">
+                            <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
                               {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / Designation'}
                             </label>
                             <input
@@ -2243,11 +2243,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                                 handleUpdateAdditionalParty(party.id, { roleOrDesignation: e.target.value })
                               }
                               placeholder={language === 'bn' ? 'ভূমিকা বা পদবি' : 'Role or designation'}
-                              className="w-full px-2.5 py-1.5 bg-surface-subtle border border-subtle rounded-xl text-[13px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl text-[13px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
                             />
                           </div>
                           <div>
-                            <label className="block text-[12px] font-semibold text-secondary mb-1">
+                            <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
                               {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / Organization / Association'}
                             </label>
                             <input
@@ -2257,14 +2257,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                                 handleUpdateAdditionalParty(party.id, { organization: e.target.value })
                               }
                               placeholder={language === 'bn' ? 'দল, সমিতি বা প্রতিষ্ঠানের নাম' : 'Group, association, or organization'}
-                              className="w-full px-2.5 py-1.5 bg-surface-subtle border border-subtle rounded-xl text-[13px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl text-[13px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
                             />
                           </div>
                         </div>
 
                         {/* Row 3: Other Identifying Details */}
                         <div>
-                          <label className="block text-[12px] font-semibold text-secondary mb-1">
+                          <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
                             {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
                           </label>
                           <textarea
@@ -2274,7 +2274,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                               handleUpdateAdditionalParty(party.id, { identifyingDescription: e.target.value })
                             }
                             placeholder={language === 'bn' ? 'চেহারা, যানবাহন বা অন্য শনাক্তকারী তথ্য' : 'Appearance, vehicle, or identifying details'}
-                            className="w-full px-2.5 py-1.5 bg-surface-subtle border border-subtle rounded-xl text-[13px] text-primary focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] min-h-[40px] leading-relaxed"
+                            className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl text-[13px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px] leading-relaxed"
                           />
                         </div>
                       </div>
@@ -2288,7 +2288,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <button
                       type="button"
                       onClick={handleAddAdditionalParty}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface hover:bg-surface-subtle border border-subtle text-[13px] font-semibold text-primary cursor-pointer transition-colors min-h-[40px]"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-ui-surface hover:bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-semibold text-ui-content-primary cursor-pointer transition-colors min-h-[40px]"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>
@@ -2337,7 +2337,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             icon={<Paperclip className="w-5 h-5" />}
           >
             <div className="space-y-3.5 pt-1 text-left">
-              <p className="text-[13px] text-secondary">
+              <p className="text-[13px] text-ui-content-secondary">
                 {isExcessElectricityBill
                   ? language === 'bn'
                     ? 'বিদ্যুৎ বিলের কপি বা মিটারের ছবি থাকলে সংযুক্ত করুন। এটি সম্পূর্ণ ঐচ্ছিক।'

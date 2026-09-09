@@ -86,13 +86,13 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
   const progressPercentage = Math.round((currentStep / totalSteps) * 100);
 
   return (
-    <div className="border-b border-subtle bg-surface sticky top-0 z-20">
+    <div className="border-b border-ui-stroke-subtle bg-ui-surface sticky top-0 z-20">
       {/* Main Title Bar */}
       <div className="flex items-center justify-between px-4 md:px-8 py-3.5 md:py-4">
         <div className="flex items-center gap-3 min-w-0">
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="text-[20px] font-bold text-primary leading-tight">
+              <h2 className="text-[20px] font-bold text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'অভিযোগ জমা দিন' : 'File a Complaint'}
               </h2>
 
@@ -111,7 +111,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               )}
             </div>
 
-            <p className="text-[13px] sm:text-[14px] text-muted leading-tight mt-1">
+            <p className="text-[13px] sm:text-[14px] text-ui-content-muted leading-tight mt-1">
               <span>
                 {language === 'bn'
                   ? `ধাপ ${currentStep} / ${totalSteps}: ${currentStepInfo.titleBn}`
@@ -127,7 +127,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
           aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close composer'}
           size="md"
           onClick={onClose}
-          className="text-muted hover:text-primary min-h-[44px] min-w-[44px]"
+          className="text-ui-content-muted hover:text-ui-content-primary min-h-[44px] min-w-[44px]"
         />
       </div>
 
@@ -146,10 +146,10 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               onClick={() => isAccessible && onSelectStep && onSelectStep(st.step)}
               className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-1.5 rounded-xl text-[12px] sm:text-[13px] md:text-[14px] font-medium transition-all whitespace-nowrap cursor-pointer min-h-[36px] ${
                 isCurrent
-                  ? 'bg-accent text-inverse font-bold shadow-2xs'
+                  ? 'bg-ui-accent text-ui-content-inverse font-bold shadow-2xs'
                   : isCompleted
-                  ? 'bg-accent-soft text-primary hover:bg-surface-elevated border border-accent/40 font-semibold'
-                  : 'bg-surface-subtle text-secondary border border-subtle hover:text-primary'
+                  ? 'bg-ui-accent-soft text-ui-content-primary hover:bg-ui-surface-elevated border border-ui-accent/40 font-semibold'
+                  : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
               }`}
             >
               <span
@@ -157,8 +157,8 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
                   isCurrent
                     ? 'bg-white/25 text-white'
                     : isCompleted
-                    ? 'bg-accent text-inverse'
-                    : 'bg-surface text-muted border border-subtle'
+                    ? 'bg-ui-accent text-ui-content-inverse'
+                    : 'bg-ui-surface text-ui-content-muted border border-ui-stroke-subtle'
                 }`}
               >
                 {isCompleted ? <Check className="w-3 h-3 text-white" /> : st.step}
@@ -171,9 +171,9 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
       </div>
 
       {/* Subtle Progress Track */}
-      <div className="h-1 w-full bg-surface-subtle overflow-hidden">
+      <div className="h-1 w-full bg-ui-surface-subtle overflow-hidden">
         <div
-          className="h-full bg-accent transition-all duration-300 ease-out"
+          className="h-full bg-ui-accent transition-all duration-300 ease-out"
           style={{ width: `${progressPercentage}%` }}
         />
       </div>

@@ -18,17 +18,17 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
   language,
 }) => {
   return (
-    <div className="space-y-6 text-center py-2 text-primary">
+    <div className="space-y-6 text-center py-2 text-ui-content-primary">
       {/* Success Badge */}
       <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
         <CheckCircle2 className="w-10 h-10" />
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-[22px] md:text-[24px] font-bold text-primary">
+        <h3 className="text-[22px] md:text-[24px] font-bold text-ui-content-primary">
           {language === 'bn' ? 'অভিযোগ সফলভাবে জমা হয়েছে!' : 'Complaint Submitted Successfully!'}
         </h3>
-        <p className="text-[14px] md:text-[16px] text-secondary max-w-lg mx-auto leading-relaxed">
+        <p className="text-[14px] md:text-[16px] text-ui-content-secondary max-w-lg mx-auto leading-relaxed">
           {language === 'bn'
             ? 'আপনার অভিযোগ মডারেশন পর্যালোচনার জন্য জমা হয়েছে। দায়িত্বশীল পর্যালোচনার পর পরবর্তী পদক্ষেপ গ্রহণ করা হবে।'
             : 'Your complaint has been submitted for moderation review. Further steps will follow standard moderation review.'}
