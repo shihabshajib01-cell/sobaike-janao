@@ -222,7 +222,8 @@
   input,
   select,
   textarea,
-  a {
+  a,
+  small {
     font-family: var(--font-ui);
   }
 
