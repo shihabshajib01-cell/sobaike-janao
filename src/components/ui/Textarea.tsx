@@ -45,10 +45,10 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           disabled={disabled}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined}
-          className={`w-full bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-border-default ui-radius-control ui-space-textarea transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
+          className={`w-full bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-border-default ui-radius-control ui-space-textarea transition-colors focus:outline-none focus:ring-2 disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
             error
               ? 'border-ui-validation-border focus:ring-ui-validation-focus focus:border-ui-validation-focus'
-              : 'border-ui-stroke-default hover:border-ui-stroke-strong'
+              : 'border-ui-stroke-default hover:border-ui-stroke-strong focus:ring-ui-focus'
           } ${className}`}
           {...props}
         />
