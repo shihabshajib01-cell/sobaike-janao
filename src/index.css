@@ -116,6 +116,11 @@
     --chip-gap: 6px;
     --chip-padding-x-mobile: 10px;
     --chip-padding-x-sm: 12px;
+
+    /* Central Elevation Tokens */
+    --elevation-low: 0 1px rgb(0 0 0 / 0.05);
+    --elevation-card: var(--elevation-low);
+    --elevation-selected-control: var(--elevation-low);
   }
 
   :root,
@@ -571,6 +576,15 @@
       padding-left: var(--chip-padding-x-sm);
       padding-right: var(--chip-padding-x-sm);
     }
+  }
+
+  /* Central Elevation Utilities */
+  .ui-elevation-card {
+    box-shadow: var(--elevation-card);
+  }
+
+  .ui-elevation-selected {
+    box-shadow: var(--elevation-selected-control);
   }
 }
 

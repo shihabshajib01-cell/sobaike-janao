@@ -22,7 +22,7 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantClasses = {
-    default: 'bg-surface border border-subtle shadow-2xs ui-radius-card',
+    default: 'bg-surface border border-subtle ui-elevation-card ui-radius-card',
     subtle: 'bg-surface-subtle border border-subtle ui-radius-card',
     outline: 'bg-transparent border border-theme ui-radius-card',
     interactive:
