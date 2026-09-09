@@ -960,7 +960,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={() => setShowTitleField(!showTitleField)}
-                    className="text-ui-content-primary hover:underline cursor-pointer py-0.5 font-medium shrink-0 ml-2"
+                    className="text-ui-content-primary hover:underline cursor-pointer font-medium shrink-0 ml-2 min-h-[44px] inline-flex items-center px-2 py-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                   >
                     {showTitleField
                       ? language === 'bn'
@@ -1291,7 +1291,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <button
                   type="button"
                   onClick={() => setShowTitleField(!showTitleField)}
-                  className="text-ui-content-primary hover:underline cursor-pointer py-0.5 font-medium shrink-0 ml-2"
+                  className="text-ui-content-primary hover:underline cursor-pointer font-medium shrink-0 ml-2 min-h-[44px] inline-flex items-center px-2 py-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   {showTitleField
                     ? language === 'bn'
@@ -1567,9 +1567,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-red-600 hover:bg-red-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
-                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try again'}</span>
                   </button>
                 </div>
@@ -1588,9 +1588,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
-                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try again'}</span>
                   </button>
                 </div>
@@ -1625,7 +1625,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-ui-accent text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-accent text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'লোকেশন চালু করুন' : 'Allow location'}</span>
@@ -2190,7 +2190,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           <button
                             type="button"
                             onClick={() => handleRemoveAdditionalParty(party.id)}
-                            className="inline-flex items-center gap-1 text-[12px] text-red-500 hover:underline cursor-pointer p-1 min-h-[32px]"
+                            className="inline-flex items-center gap-1 text-[12px] text-red-500 hover:underline cursor-pointer px-2 py-1 min-h-[44px] min-w-[44px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span>{language === 'bn' ? 'মুছে ফেলুন' : 'Remove'}</span>
@@ -2288,7 +2288,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <button
                       type="button"
                       onClick={handleAddAdditionalParty}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-ui-surface border border-ui-stroke-subtle text-[13px] font-semibold text-ui-content-primary cursor-pointer transition-colors min-h-[40px]"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-ui-surface border border-ui-stroke-subtle text-[13px] font-semibold text-ui-content-primary cursor-pointer transition-colors min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>

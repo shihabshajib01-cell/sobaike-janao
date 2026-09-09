@@ -76,7 +76,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           type="button"
           onClick={handleClear}
           aria-label="Clear search"
-          className="absolute right-2.5 p-1.5 rounded-full text-ui-content-muted hover:text-ui-content-primary hover:bg-ui-surface-elevated focus:outline-none transition-colors"
+          className="absolute right-1 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-ui-content-muted hover:text-ui-content-primary hover:bg-ui-surface-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus transition-colors cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>

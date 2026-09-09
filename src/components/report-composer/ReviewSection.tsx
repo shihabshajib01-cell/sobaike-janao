@@ -43,7 +43,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-controls={panelId}
-          className="flex-1 flex items-center justify-between gap-3 text-left cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[38px] min-w-0"
+          className="flex-1 flex items-center justify-between gap-3 text-left cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] min-w-0"
         >
           <div className="flex items-center gap-2.5 min-w-0 pr-2">
             {icon && <div className="text-ui-content-primary shrink-0">{icon}</div>}
@@ -75,7 +75,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
               e.stopPropagation();
               onEdit();
             }}
-            className="inline-flex items-center gap-1 text-[13px] font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[38px] px-2 py-1 shrink-0 rounded-lg transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 text-[13px] font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[44px] min-w-[44px] px-2.5 py-1.5 shrink-0 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
           >
             <Edit2 className="w-3.5 h-3.5" />
             <span>{editLabel}</span>

@@ -149,7 +149,7 @@ export const Header: React.FC = () => {
       >
         <div className="space-y-4">
           {/* Navigation Section */}
-          <div className="space-y-1">
+          <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu Navigation'}>
             <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-3 mb-2">
               {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & Pages'}
             </p>
@@ -164,7 +164,8 @@ export const Header: React.FC = () => {
                     setIsTabletMenuOpen(false);
                     navigateTo(item.path);
                   }}
-                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-[16px] font-medium transition-colors text-left cursor-pointer min-h-[44px] ${
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-[16px] font-medium transition-colors text-left cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     isActive
                       ? getSectionActiveStyles(item.sectionKey)
                       : 'text-ui-content-secondary'
@@ -190,7 +191,7 @@ export const Header: React.FC = () => {
                 </button>
               );
             })}
-          </div>
+          </nav>
 
           {/* Secondary Utilities */}
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-1">

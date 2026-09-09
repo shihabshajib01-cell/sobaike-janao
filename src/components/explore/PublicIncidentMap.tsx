@@ -293,7 +293,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleZoomIn}
           title={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
           aria-label={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
-          className="w-9 h-9 rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
+          className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
         >
           <MapIcon name="plus" size="sm" />
         </button>
@@ -303,7 +303,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleZoomOut}
           title={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
           aria-label={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
-          className="w-9 h-9 rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
+          className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
         >
           <MapIcon name="minus" size="sm" />
         </button>
@@ -313,7 +313,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           onClick={handleResetView}
           title={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
           aria-label={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
-          className="w-9 h-9 rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ui-focus"
+          className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
         >
           <MapIcon name="reset" size="sm" />
         </button>

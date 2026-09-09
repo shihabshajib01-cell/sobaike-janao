@@ -68,6 +68,14 @@ export const AppShell: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-ui-page text-ui-content-primary flex flex-col">
+      {/* Skip Link for Keyboard & Screen Reader Accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-ui-action-bg focus:text-ui-action-text focus:rounded-xl focus:shadow-lg focus:font-semibold focus:outline-none focus:ring-2 focus:ring-ui-focus text-[15px]"
+      >
+        {language === 'bn' ? 'মূল বিষয়বস্তুতে যান' : 'Skip to main content'}
+      </a>
+
       {/* 1. Desktop Left Navigation Rail (fixed viewport left on >= 1440px) */}
       <ErrorBoundary componentName="DesktopLeftRail" silent>
         <DesktopLeftRail />
@@ -89,8 +97,9 @@ export const AppShell: React.FC = () => {
         className="w-full flex-1 flex flex-col min-[1440px]:pl-[240px] min-[1536px]:pl-[250px] min-[1920px]:pl-[260px]"
       >
         <main
-          id="public-main-workspace"
-          className="w-full mx-auto max-w-[900px] min-[1440px]:max-w-[880px] min-[1536px]:max-w-[900px] min-[1920px]:max-w-[920px] flex-1 flex flex-col justify-between pb-20 pb-safe md:pb-0"
+          id="main-content"
+          tabIndex={-1}
+          className="w-full mx-auto max-w-[900px] min-[1440px]:max-w-[880px] min-[1536px]:max-w-[900px] min-[1920px]:max-w-[920px] flex-1 flex flex-col justify-between pb-20 pb-safe md:pb-0 focus:outline-none"
         >
           <div className="w-full">
             <ErrorBoundary componentName="MainRoutes">

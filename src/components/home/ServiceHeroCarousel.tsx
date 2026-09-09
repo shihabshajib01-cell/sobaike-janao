@@ -265,7 +265,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 type="button"
                 onClick={handlePrev}
                 aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
               >
                 <AppIcon name="chevron-left" size="sm" />
               </button>
@@ -283,7 +283,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 type="button"
                 onClick={handleNext}
                 aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
               >
                 <AppIcon name="chevron-right" size="sm" />
               </button>

@@ -127,28 +127,28 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             type="button"
             onClick={handleShare}
             aria-label={language === 'bn' ? 'লিংক কপি করুন' : 'Copy link'}
-            className="inline-flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary transition-colors cursor-pointer py-1 md:py-1.5 px-1.5 sm:px-2 min-h-[36px] sm:min-h-[44px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="inline-flex items-center justify-center gap-1 sm:gap-1.5 text-ui-content-secondary transition-colors cursor-pointer py-1.5 px-2 min-h-[44px] min-w-[44px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
           >
             {isCopied ? (
-              <>
+              <span className="inline-flex items-center gap-1" aria-live="polite">
                 <AppIcon name="check" size="xs" className="text-emerald-600 dark:text-[#86EFAC] md:hidden" />
                 <AppIcon name="check" size="sm" className="text-emerald-600 dark:text-[#86EFAC] hidden md:inline-block" />
                 <span className="text-emerald-700 dark:text-[#86EFAC] font-semibold text-[11.5px] sm:text-[13px] md:text-[14px]">
                   {language === 'bn' ? 'কপি হয়েছে' : 'Copied'}
                 </span>
-              </>
+              </span>
             ) : (
-              <>
+              <span className="inline-flex items-center gap-1">
                 <AppIcon name="share" size="xs" className="text-ui-content-muted md:hidden" />
                 <AppIcon name="share" size="sm" className="text-ui-content-muted hidden md:inline-block" />
                 <span className="text-[11.5px] sm:text-[13px] md:text-[14px]">{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
-              </>
+              </span>
             )}
           </button>
 
           <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[14px]">|</span>
 
-          <span className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary transition-colors py-1 md:py-1.5 px-1 min-h-[36px] sm:min-h-[44px]">
+          <span className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary transition-colors py-1.5 px-1 min-h-[44px]">
             <span className="text-[11.5px] sm:text-[13px] md:text-[14px]">{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
             <AppIcon name="arrow-right" size="xs" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform md:hidden" />
             <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform hidden md:inline-block" />

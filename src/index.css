@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
   /* Surfaces */
   --color-ui-page: var(--ui-page);
@@ -781,6 +783,25 @@
   #bottom-nav { display: none !important; }
   #tablet-compact-header { display: none !important; }
   #desktop-left-navigation-rail { display: flex !important; }
+}
+
+/* D8 — Reduced Motion Support (Preserves essential loading indicators like .animate-spin) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-spin,
+  [role="status"] .animate-spin,
+  [aria-busy="true"] .animate-spin {
+    animation-duration: 1.5s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 

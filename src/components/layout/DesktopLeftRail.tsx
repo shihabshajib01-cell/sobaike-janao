@@ -102,7 +102,7 @@ export const DesktopLeftRail: React.FC = () => {
   return (
     <aside
       id="desktop-left-navigation-rail"
-      aria-label="Desktop Navigation"
+      aria-label={language === 'bn' ? 'ডেস্কটপ নেভিগেশন' : 'Desktop Navigation'}
       className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 h-[100dvh] overflow-y-auto w-[240px] min-[1536px]:w-[250px] min-[1920px]:w-[260px] px-4 min-[1920px]:px-5 py-5 bg-ui-surface border-r border-ui-stroke-subtle justify-between select-none z-30"
     >
       {/* Top: Brand Header & Primary Nav items */}
@@ -131,7 +131,7 @@ export const DesktopLeftRail: React.FC = () => {
         </div>
 
         {/* Nav Links List */}
-        <nav className="space-y-1" aria-label="Main Sections">
+        <nav className="space-y-1" aria-label={language === 'bn' ? 'প্রধান বিভাগসমূহ' : 'Main Sections'}>
           {navItems.map((item) => {
             const isActive = currentRoute === item.path;
             const secConfig = item.sectionKey ? SECTIONS[item.sectionKey] : null;
@@ -141,7 +141,8 @@ export const DesktopLeftRail: React.FC = () => {
                 key={item.id}
                 id={item.id}
                 onClick={() => navigateTo(item.path)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] ${
+                aria-current={isActive ? 'page' : undefined}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isActive
                     ? getSectionActiveStyles(item.sectionKey)
                     : 'text-ui-content-secondary'
@@ -195,7 +196,7 @@ export const DesktopLeftRail: React.FC = () => {
           id="rail-lang-toggle"
           onClick={toggleLanguage}
           aria-label={language === 'bn' ? 'Switch to English' : 'বাংলায় দেখুন'}
-          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <span className="font-medium">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
           <span className="font-semibold text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-lg text-[13px]">
