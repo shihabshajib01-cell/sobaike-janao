@@ -34,10 +34,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             disabled={disabled}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}
-            className={`w-full appearance-none min-h-[44px] bg-ui-surface text-ui-content-primary ui-border-default ui-radius-control ui-space-select transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] disabled:bg-surface-subtle disabled:text-muted disabled:cursor-not-allowed ${
+            className={`w-full appearance-none min-h-[44px] bg-ui-surface text-ui-content-primary ui-border-default ui-radius-control ui-space-select transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
               error
                 ? 'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500'
-                : 'border-ui-stroke-default hover:border-strong'
+                : 'border-ui-stroke-default hover:border-ui-stroke-strong'
             } ${className}`}
             {...props}
           >

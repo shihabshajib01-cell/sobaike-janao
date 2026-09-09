@@ -32,12 +32,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
-            className={`w-full min-h-[44px] bg-ui-surface text-ui-content-primary placeholder:text-muted ui-border-default ui-radius-control ui-space-field-y transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] disabled:bg-surface-subtle disabled:text-muted disabled:cursor-not-allowed ${
+            className={`w-full min-h-[44px] bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-border-default ui-radius-control ui-space-field-y transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
               leftIcon ? 'pl-10' : 'pl-3.5'
             } ${rightIcon ? 'pr-10' : 'pr-3.5'} ${
               error
                 ? 'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500'
-                : 'border-ui-stroke-default hover:border-strong'
+                : 'border-ui-stroke-default hover:border-ui-stroke-strong'
             } ${className}`}
             {...props}
           />
