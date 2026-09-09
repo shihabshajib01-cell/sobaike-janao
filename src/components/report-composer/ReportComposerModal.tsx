@@ -1288,7 +1288,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   type="button"
                   onClick={handleContinueSavedDraft}
                   disabled={isRestoringEvidence}
-                  className={`btn-primary-action px-5 py-2.5 rounded-xl font-bold text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center gap-2 ${
+                  className={`bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover px-5 py-2.5 rounded-xl font-bold text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center gap-2 ${
                     isRestoringEvidence ? 'opacity-70 cursor-not-allowed' : ''
                   }`}
                 >

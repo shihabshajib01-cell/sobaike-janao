@@ -2329,7 +2329,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             }
             badge={
               pendingImages.length > 0 ? (
-                <span className="px-2 py-0.5 rounded-full bg-accent-soft text-accent text-[13px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-ui-accent-soft text-ui-accent text-[13px] font-bold">
                   {pendingImages.length}
                 </span>
               ) : undefined
