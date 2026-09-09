@@ -262,9 +262,9 @@
     --ui-info-border: #BFDBFE;
 
     /* Form Validation Tokens - Light */
-    --ui-validation-text: #DC2626;
-    --ui-validation-border: #EF4444;
-    --ui-validation-focus: #EF4444;
+    --ui-validation-text: oklch(57.7% .245 27.325);
+    --ui-validation-border: oklch(63.7% .237 25.331);
+    --ui-validation-focus: oklch(63.7% .237 25.331);
 
     /* Sensitive Information Tokens - Light */
     --ui-sensitive-bg: #FFF5F7;
@@ -372,9 +372,9 @@
     --ui-info-border: #254B78;
 
     /* Form Validation Tokens - Dark */
-    --ui-validation-text: #F87171;
-    --ui-validation-border: #F87171;
-    --ui-validation-focus: #EF4444;
+    --ui-validation-text: oklch(70.4% .191 22.216);
+    --ui-validation-border: oklch(70.4% .191 22.216);
+    --ui-validation-focus: oklch(63.7% .237 25.331);
 
     /* Sensitive Information Tokens - Dark */
     --ui-sensitive-bg: #24151A;
