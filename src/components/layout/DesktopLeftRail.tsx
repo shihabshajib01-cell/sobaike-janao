@@ -112,7 +112,7 @@ export const DesktopLeftRail: React.FC = () => {
           id="rail-brand-logo"
           size="md"
           onClick={() => navigateTo('/')}
-          className="rounded-xl px-1 py-1 w-full"
+          className="transition-colors rounded-xl px-1 py-1 w-full"
         />
 
         {/* Primary Action Button: Contextual Report CTA */}
@@ -141,7 +141,7 @@ export const DesktopLeftRail: React.FC = () => {
                 key={item.id}
                 id={item.id}
                 onClick={() => navigateTo(item.path)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] ${
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] ${
                   isActive
                     ? getSectionActiveStyles(item.sectionKey)
                     : 'text-ui-content-secondary'
@@ -165,7 +165,7 @@ export const DesktopLeftRail: React.FC = () => {
                 {item.sectionKey && (
                   <span
                     className={`w-2.5 h-2.5 rounded-full shrink-0 transition-opacity ${
-                      isActive ? 'opacity-100' : 'opacity-30'
+                      isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'
                     }`}
                     style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
                   />

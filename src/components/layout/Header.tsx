@@ -127,7 +127,7 @@ export const Header: React.FC = () => {
                 aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
                 size="md"
                 onClick={() => setIsTabletMenuOpen(true)}
-                className="border border-ui-stroke-subtle rounded-xl bg-ui-surface-subtle hover:bg-ui-surface min-h-[44px] min-w-[44px]"
+                className="border border-ui-stroke-subtle rounded-xl bg-ui-surface-subtle min-h-[44px] min-w-[44px]"
               />
             </div>
           </div>
@@ -171,7 +171,7 @@ export const Header: React.FC = () => {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-ui-content-muted">
+                    <span className={isActive && !secConfig ? 'text-ui-content-primary' : 'text-ui-content-muted'}>
                       {item.icon}
                     </span>
                     <span>{language === 'bn' ? item.nameBn : item.nameEn}</span>
