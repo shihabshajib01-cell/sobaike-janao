@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ReportItem } from '../../types/report';
 import { useApp } from '../../context/AppContext';
 import { CategoryBadge } from '../ui/CategoryBadge';
@@ -30,13 +31,6 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     navigateTo(`/report-detail/${report.id}`);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleCardClick();
-    }
-  };
-
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
     const shareUrl = `${window.location.origin}${window.location.pathname}#/report-detail/${report.id}`;
@@ -51,12 +45,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
   return (
     <article
       id={`report-card-${report.id}`}
-      tabIndex={0}
       role="article"
       aria-label={title}
       onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      className={`group relative bg-ui-surface border border-ui-stroke-subtle focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:outline-none rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none ${className}`}
+      className={`group relative bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none ${className}`}
     >
       {/* 1. Top Context Line: Service Badge */}
       <div className="flex items-center justify-between gap-2 text-[12px] sm:text-[13px] md:text-[14px]">
@@ -72,7 +64,12 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
       {/* 2. Main Headline (Refined Bengali typography, max 2 lines on mobile) */}
       <h3 className="text-[16px] sm:text-[17px] md:text-[20px] leading-[1.38] sm:leading-[1.4] md:leading-[30px] font-bold md:font-semibold text-ui-content-primary transition-colors line-clamp-2 break-words">
-        {title}
+        <Link
+          to={`/report-detail/${report.id}`}
+          className="hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-sm transition-colors text-ui-content-primary"
+        >
+          {title}
+        </Link>
       </h3>
 
       {/* 3. Reported Subject Context (Compact inline row) */}
@@ -163,11 +160,15 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
           <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[14px]">|</span>
 
-          <span className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary transition-colors py-1.5 px-1 min-h-[44px]">
+          <Link
+            to={`/report-detail/${report.id}`}
+            aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
+            className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
+          >
             <span className="text-[11.5px] sm:text-[13px] md:text-[14px]">{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
             <AppIcon name="arrow-right" size="xs" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform md:hidden" />
             <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform hidden md:inline-block" />
-          </span>
+          </Link>
         </div>
       </div>
     </article>

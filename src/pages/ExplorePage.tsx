@@ -374,7 +374,7 @@ export const ExplorePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleResetFilters}
-                    className="text-ui-content-secondary font-semibold underline cursor-pointer"
+                    className="text-[13px] font-semibold text-ui-content-secondary underline cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
                   >
                     {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
                   </button>

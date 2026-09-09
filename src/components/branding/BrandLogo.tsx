@@ -92,7 +92,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   const textStyles = {
     sm: {
-      bangla: 'text-[15px] sm:text-[16px] font-bold leading-tight text-ui-content-primary tracking-tight whitespace-nowrap',
+      bangla: 'text-[14px] xs:text-[15px] sm:text-[16px] font-bold leading-tight text-ui-content-primary tracking-tight whitespace-nowrap',
       english: 'hidden min-[380px]:block text-[11px] sm:text-[12px] leading-tight font-medium text-ui-content-secondary tracking-normal whitespace-nowrap',
       gap: 'gap-1.5 sm:gap-2.5',
     },
@@ -112,7 +112,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   const style = textStyles[size];
 
   const brandContent = (
-    <div className={`flex items-center ${style.gap} select-none ${className}`}>
+    <div className={`flex items-center ${style.gap} select-none min-w-0 ${className}`}>
       {/* Official Sobaike Janao Teal Logo Mark */}
       <img
         src={getBrandAsset('sobaike-janao-mark-512.png')}
@@ -124,7 +124,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       />
 
       {/* Semantic Accessible Live HTML Wordmark */}
-      <div className="flex flex-col text-left">
+      <div className="flex flex-col text-left min-w-0">
         <span className={style.bangla}>
           সবাইকে জানাও
         </span>
@@ -144,7 +144,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         id={id}
         onClick={onClick}
         aria-label={ariaLabel}
-        className="flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl p-1 transition-colors cursor-pointer"
+        className="flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl p-0.5 sm:p-1 transition-colors cursor-pointer min-w-0"
       >
         {brandContent}
       </button>

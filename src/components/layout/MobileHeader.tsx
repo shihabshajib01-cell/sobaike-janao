@@ -17,9 +17,9 @@ export const MobileHeader: React.FC = () => {
       id="mobile-header"
       className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
     >
-      <div className="flex items-center justify-between h-14 px-2.5 sm:px-4 max-w-full">
+      <div className="flex items-center justify-between h-14 px-2 sm:px-4 max-w-full">
         {/* Brand Logo & Wordmark */}
-        <div className="min-w-0 shrink">
+        <div className="min-w-0 shrink mr-1">
           <BrandLogo
             id="mobile-brand-logo"
             size="sm"
@@ -82,7 +82,7 @@ export const MobileHeader: React.FC = () => {
             id="mobile-header-add-report-btn"
             onClick={() => openReportComposer()}
             aria-label={language === 'bn' ? 'অভিযোগ জানান' : 'Report Incident'}
-            className="btn-primary-action min-h-[44px] px-2 sm:px-3 text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center cursor-pointer transition-transform active:scale-95 shadow-xs whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="btn-primary-action min-h-[44px] px-2 sm:px-3 text-[12.5px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center cursor-pointer transition-transform active:scale-95 shadow-xs whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
           >
             {language === 'bn' ? '+ অভিযোগ' : '+ Report'}
           </button>

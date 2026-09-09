@@ -20,9 +20,11 @@ export interface ModalProps {
   ariaLabel?: string;
 }
 
-// Global reference counter for nested modal scroll locks
+// Global reference counter and stack for nested modal scroll locks & keyboard focus handling
 let openModalsCount = 0;
 let savedBodyOverflow: string | null = null;
+let modalInstanceCounter = 0;
+const modalStack: string[] = [];
 
 export const Modal: React.FC<ModalProps> = ({
   id = 'app-modal',
@@ -42,6 +44,10 @@ export const Modal: React.FC<ModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+  const instanceIdRef = useRef<string>('');
+  if (!instanceIdRef.current) {
+    instanceIdRef.current = `${id}-${++modalInstanceCounter}`;
+  }
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -69,6 +75,7 @@ export const Modal: React.FC<ModalProps> = ({
       document.body.style.overflow = 'hidden';
     }
     openModalsCount++;
+    modalStack.push(instanceIdRef.current);
 
     // Focus modal or first focusable element asynchronously without triggering synchronous loop
     const timeoutId = setTimeout(() => {
@@ -85,6 +92,11 @@ export const Modal: React.FC<ModalProps> = ({
     }, 30);
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // ONLY the topmost currently open Modal handles Escape and traps Tab
+      if (modalStack[modalStack.length - 1] !== instanceIdRef.current) {
+        return;
+      }
+
       if (e.key === 'Escape') {
         e.preventDefault();
         onCloseRef.current();
@@ -119,6 +131,10 @@ export const Modal: React.FC<ModalProps> = ({
 
     return () => {
       clearTimeout(timeoutId);
+      const stackIdx = modalStack.lastIndexOf(instanceIdRef.current);
+      if (stackIdx !== -1) {
+        modalStack.splice(stackIdx, 1);
+      }
       openModalsCount = Math.max(0, openModalsCount - 1);
       if (openModalsCount === 0) {
         document.body.style.overflow = savedBodyOverflow || '';
