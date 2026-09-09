@@ -48,12 +48,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <p id={`${inputId}-error`} className="mt-1.5 type-meta text-red-600 dark:text-red-400 font-medium">
+          <p id={`${inputId}-error`} className="mt-1.5 text-[14px] leading-[20px] text-red-600 dark:text-red-400 font-medium">
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p id={`${inputId}-helper`} className="mt-1.5 type-meta text-muted">
+          <p id={`${inputId}-helper`} className="mt-1.5 text-[14px] leading-[20px] text-muted">
             {helperText}
           </p>
         )}
