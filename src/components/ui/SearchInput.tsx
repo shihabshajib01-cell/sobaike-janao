@@ -69,7 +69,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full min-h-[44px] bg-surface-subtle hover:bg-surface focus:bg-surface text-primary placeholder:text-muted ui-radius-control pl-10 pr-9 py-2 border border-subtle hover:border-theme focus:border-[var(--ui-accent)] focus:ring-1 focus:ring-[var(--ui-focus)] transition-all outline-none"
+        className="w-full min-h-[44px] bg-surface-subtle hover:bg-surface focus:bg-surface text-primary placeholder:text-muted ui-radius-control ui-space-search border border-subtle hover:border-theme focus:border-[var(--ui-accent)] focus:ring-1 focus:ring-[var(--ui-focus)] transition-all outline-none"
       />
       {currentValue.length > 0 && (
         <button

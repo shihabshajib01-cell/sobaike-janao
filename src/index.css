@@ -72,6 +72,50 @@
     --radius-card: 16px;
     --radius-modal: 24px;
     --radius-pill: 9999px;
+
+    /* Central Control Spacing Tokens - Button */
+    --button-sm-padding-x: 14px;
+    --button-sm-padding-y: 8px;
+    --button-sm-gap: 6px;
+
+    --button-md-padding-x: 16px;
+    --button-md-padding-y: 10px;
+    --button-md-gap: 8px;
+
+    --button-lg-padding-x: 24px;
+    --button-lg-padding-y: 12px;
+    --button-lg-gap: 10px;
+
+    /* Central Control Spacing Tokens - Field & Select */
+    --field-padding-x: 14px;
+    --field-padding-y: 10px;
+    --field-icon-padding: 40px;
+
+    --select-padding-left: 14px;
+    --select-padding-right: 40px;
+    --select-padding-y: 10px;
+
+    /* Central Control Spacing Tokens - Textarea */
+    --textarea-padding: 14px;
+
+    /* Central Control Spacing Tokens - Search */
+    --search-padding-left: 40px;
+    --search-padding-right: 36px;
+    --search-padding-y: 8px;
+
+    /* Central Control Spacing Tokens - Badge */
+    --badge-sm-padding-x: 10px;
+    --badge-sm-padding-y: 4px;
+    --badge-sm-gap: 4px;
+
+    --badge-md-padding-x: 12px;
+    --badge-md-padding-y: 6px;
+    --badge-md-gap: 6px;
+
+    /* Central Control Spacing Tokens - Filter Chip */
+    --chip-gap: 6px;
+    --chip-padding-x-mobile: 10px;
+    --chip-padding-x-sm: 12px;
   }
 
   :root,
@@ -445,6 +489,88 @@
 
   .ui-radius-pill {
     border-radius: var(--radius-pill);
+  }
+
+  /* Central Control Spacing Utilities - Button */
+  .ui-space-button-sm {
+    padding-left: var(--button-sm-padding-x);
+    padding-right: var(--button-sm-padding-x);
+    padding-top: var(--button-sm-padding-y);
+    padding-bottom: var(--button-sm-padding-y);
+    gap: var(--button-sm-gap);
+  }
+
+  .ui-space-button-md {
+    padding-left: var(--button-md-padding-x);
+    padding-right: var(--button-md-padding-x);
+    padding-top: var(--button-md-padding-y);
+    padding-bottom: var(--button-md-padding-y);
+    gap: var(--button-md-gap);
+  }
+
+  .ui-space-button-lg {
+    padding-left: var(--button-lg-padding-x);
+    padding-right: var(--button-lg-padding-x);
+    padding-top: var(--button-lg-padding-y);
+    padding-bottom: var(--button-lg-padding-y);
+    gap: var(--button-lg-gap);
+  }
+
+  /* Central Control Spacing Utilities - Field & Select */
+  .ui-space-field-y {
+    padding-top: var(--field-padding-y);
+    padding-bottom: var(--field-padding-y);
+  }
+
+  .ui-space-select {
+    padding-left: var(--select-padding-left);
+    padding-right: var(--select-padding-right);
+    padding-top: var(--select-padding-y);
+    padding-bottom: var(--select-padding-y);
+  }
+
+  /* Central Control Spacing Utilities - Textarea */
+  .ui-space-textarea {
+    padding: var(--textarea-padding);
+  }
+
+  /* Central Control Spacing Utilities - Search */
+  .ui-space-search {
+    padding-left: var(--search-padding-left);
+    padding-right: var(--search-padding-right);
+    padding-top: var(--search-padding-y);
+    padding-bottom: var(--search-padding-y);
+  }
+
+  /* Central Control Spacing Utilities - Badge */
+  .ui-space-badge-sm {
+    padding-left: var(--badge-sm-padding-x);
+    padding-right: var(--badge-sm-padding-x);
+    padding-top: var(--badge-sm-padding-y);
+    padding-bottom: var(--badge-sm-padding-y);
+    gap: var(--badge-sm-gap);
+  }
+
+  .ui-space-badge-md {
+    padding-left: var(--badge-md-padding-x);
+    padding-right: var(--badge-md-padding-x);
+    padding-top: var(--badge-md-padding-y);
+    padding-bottom: var(--badge-md-padding-y);
+    gap: var(--badge-md-gap);
+  }
+
+  /* Central Control Spacing Utilities - Filter Chip */
+  .ui-space-filter-chip {
+    gap: var(--chip-gap);
+    padding-left: var(--chip-padding-x-mobile);
+    padding-right: var(--chip-padding-x-mobile);
+  }
+
+  @media (min-width: 640px) {
+    .ui-space-filter-chip {
+      padding-left: var(--chip-padding-x-sm);
+      padding-right: var(--chip-padding-x-sm);
+    }
   }
 }
 

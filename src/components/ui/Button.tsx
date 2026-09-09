@@ -31,9 +31,9 @@ export const Button: React.FC<ButtonProps> = ({
     'inline-flex items-center justify-center type-action transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:ring-offset-1 select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const sizeClasses: Record<ButtonSize, string> = {
-    sm: 'px-3.5 py-2 min-h-[44px] ui-radius-control gap-1.5',
-    md: 'px-4 py-2.5 min-h-[44px] ui-radius-control gap-2',
-    lg: 'px-6 py-3 min-h-[48px] ui-radius-control gap-2.5',
+    sm: 'ui-space-button-sm min-h-[44px] ui-radius-control',
+    md: 'ui-space-button-md min-h-[44px] ui-radius-control',
+    lg: 'ui-space-button-lg min-h-[48px] ui-radius-control',
   };
 
   const variantClasses: Record<ButtonVariant, string> = {
