@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { IconButton } from './IconButton';
+import { useApp } from '../../context/AppContext';
 
 export interface DrawerProps {
   id?: string;
@@ -11,6 +12,7 @@ export interface DrawerProps {
   position?: 'bottom' | 'right' | 'left';
   children: React.ReactNode;
   footer?: React.ReactNode;
+  language?: 'bn' | 'en';
 }
 
 export const Drawer: React.FC<DrawerProps> = ({
@@ -22,11 +24,26 @@ export const Drawer: React.FC<DrawerProps> = ({
   position = 'bottom',
   children,
   footer,
+  language: customLanguage,
 }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+
+  let appLanguage: 'bn' | 'en' = 'bn';
+  try {
+    const app = useApp();
+    if (app?.language) {
+      appLanguage = app.language;
+    }
+  } catch {
+    if (typeof document !== 'undefined' && document.documentElement.lang === 'en') {
+      appLanguage = 'en';
+    }
+  }
+  const activeLang = customLanguage || appLanguage;
+  const closeLabel = activeLang === 'bn' ? 'প্যানেল বন্ধ করুন' : 'Close panel';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -146,10 +163,10 @@ export const Drawer: React.FC<DrawerProps> = ({
           <IconButton
             id={`${id}-close`}
             icon={<X className="w-4 h-4" />}
-            aria-label="প্যানেল বন্ধ করুন (Close panel)"
+            aria-label={closeLabel}
             size="md"
             onClick={onClose}
-            className="text-muted hover:text-primary"
+            className="text-ui-content-muted hover:text-ui-content-primary"
           />
         </div>
 

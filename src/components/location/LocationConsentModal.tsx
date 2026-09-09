@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Loader2, ShieldCheck } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 
@@ -14,6 +14,20 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   onClose,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -49,7 +63,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       aria-describedby="location-consent-desc"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="bg-surface border border-subtle rounded-2xl w-full max-w-md p-6 shadow-xl flex flex-col gap-5 text-primary">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl w-full max-w-md p-6 shadow-xl flex flex-col gap-5 text-ui-content-primary">
         {/* Icon & Heading */}
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
@@ -59,7 +73,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             <h2 id="location-consent-title" className="text-lg font-bold tracking-tight">
               {isBn ? 'আপনার এলাকার পোস্ট দেখুন' : 'See more posts from your area'}
             </h2>
-            <div className="flex items-center gap-1.5 text-xs text-muted mt-0.5">
+            <div className="flex items-center gap-1.5 text-xs text-ui-content-muted mt-0.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
               <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy Protected'}</span>
             </div>
@@ -67,7 +81,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <div id="location-consent-desc" className="text-sm text-secondary leading-relaxed">
+        <div id="location-consent-desc" className="text-sm text-ui-content-secondary leading-relaxed">
           <p>
             {isBn
               ? 'লোকেশন চালু করলে আপনার আশপাশের অভিযোগ, রিপোর্ট ও পোস্টগুলো ফিডে বেশি প্রাধান্য পাবে। এতে আপনার এলাকার আপডেট সহজে দেখতে পারবেন।'
@@ -81,7 +95,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             type="button"
             onClick={handleShareLocation}
             disabled={isLoading}
-            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {isLoading ? (
               <>
@@ -96,7 +110,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             type="button"
             onClick={handleNotNow}
             disabled={isLoading}
-            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-surface-muted hover:bg-surface-muted/80 text-secondary border border-subtle transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50"
+            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-ui-surface-subtle hover:bg-ui-surface-subtle/80 text-ui-content-secondary border border-ui-stroke-subtle transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <span>{isBn ? 'এখন নয়' : 'Not now'}</span>
           </button>

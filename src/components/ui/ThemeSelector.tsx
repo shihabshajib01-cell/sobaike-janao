@@ -64,7 +64,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
           aria-expanded={isOpen}
           aria-label={language === 'bn' ? 'প্রদর্শন থিম পরিবর্তন' : 'Change appearance theme'}
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)]"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <div className="flex items-center gap-2">
             <CurrentDisplayIcon className="w-4 h-4 text-ui-content-muted" />
@@ -79,7 +79,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
         {isOpen && (
           <div
             role="listbox"
-            aria-label="Theme options"
+            aria-label={language === 'bn' ? 'থিম অপশন' : 'Theme options'}
             className="absolute bottom-full mb-2 left-0 right-0 z-50 bg-ui-surface-elevated border border-ui-stroke-default rounded-xl shadow-lg p-1.5 space-y-1"
           >
             {options.map((opt) => {
@@ -95,7 +95,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
                     setThemePreference(opt.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[14px] font-medium transition-colors cursor-pointer min-h-[44px] text-left ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[14px] font-medium transition-colors cursor-pointer min-h-[44px] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     isSelected
                       ? 'bg-ui-surface-subtle text-ui-content-primary font-bold'
                       : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
@@ -117,7 +117,11 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
 
   if (variant === 'cards') {
     return (
-      <div className={`grid grid-cols-3 gap-2.5 ${className}`} role="radiogroup" aria-label="Theme preference">
+      <div
+        className={`grid grid-cols-3 gap-2.5 ${className}`}
+        role="radiogroup"
+        aria-label={language === 'bn' ? 'থিম পছন্দ' : 'Theme preference'}
+      >
         {options.map((opt) => {
           const Icon = opt.icon;
           const isSelected = themePreference === opt.id;
@@ -128,7 +132,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
               role="radio"
               aria-checked={isSelected}
               onClick={() => setThemePreference(opt.id)}
-              className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all cursor-pointer min-h-[56px] focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] ${
+              className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all cursor-pointer min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isSelected
                   ? 'border-ui-stroke-strong bg-ui-surface-elevated text-ui-content-primary font-bold shadow-2xs'
                   : 'border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface'
@@ -150,7 +154,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
     <div
       className={`flex items-center p-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl gap-1 ${className}`}
       role="radiogroup"
-      aria-label="Theme preference"
+      aria-label={language === 'bn' ? 'থিম পছন্দ' : 'Theme preference'}
     >
       {options.map((opt) => {
         const Icon = opt.icon;
@@ -162,7 +166,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
             role="radio"
             aria-checked={isSelected}
             onClick={() => setThemePreference(opt.id)}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-[16px] font-medium transition-all cursor-pointer min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-xl text-[16px] font-medium transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isSelected
                 ? 'bg-ui-surface text-ui-content-primary font-bold shadow-2xs border border-ui-stroke-subtle'
                 : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface/50'

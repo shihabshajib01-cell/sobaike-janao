@@ -35,7 +35,7 @@ export const MobileHeader: React.FC = () => {
             type="button"
             onClick={() => setIsTabletMenuOpen(true)}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
-            className="min-h-[44px] min-w-[44px] px-2 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="min-h-[44px] min-w-[40px] sm:min-w-[44px] px-1.5 sm:px-2 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <Menu className="w-4 h-4 text-ui-content-secondary" />
           </button>
@@ -44,8 +44,12 @@ export const MobileHeader: React.FC = () => {
           <button
             id="mobile-header-lang-btn"
             onClick={toggleLanguage}
-            aria-label={`Switch language to ${language === 'bn' ? 'English' : 'Bengali'}`}
-            className="min-h-[44px] min-w-[44px] px-2 text-[13px] sm:text-[14px] font-semibold rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            aria-label={
+              language === 'bn'
+                ? 'ভাষা পরিবর্তন করে ইংরেজিতে নিন'
+                : 'Switch language to Bengali'
+            }
+            className="min-h-[44px] min-w-[40px] sm:min-w-[44px] px-1.5 sm:px-2 text-[13px] sm:text-[14px] font-semibold rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn' ? 'EN' : 'বাং'}
           </button>
@@ -64,12 +68,12 @@ export const MobileHeader: React.FC = () => {
                 ? 'Switch to Light theme'
                 : 'Switch to Dark theme'
             }
-            className="min-h-[44px] min-w-[44px] px-2 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="min-h-[44px] min-w-[40px] sm:min-w-[44px] px-1.5 sm:px-2 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {resolvedTheme === 'dark' ? (
               <Sun className="w-4 h-4 text-amber-400" />
             ) : (
-              <Moon className="w-4 h-4 text-slate-700" />
+              <Moon className="w-4 h-4 text-ui-content-primary" />
             )}
           </button>
 
@@ -78,7 +82,7 @@ export const MobileHeader: React.FC = () => {
             id="mobile-header-add-report-btn"
             onClick={() => openReportComposer()}
             aria-label={language === 'bn' ? 'অভিযোগ জানান' : 'Report Incident'}
-            className="btn-primary-action min-h-[44px] px-2.5 sm:px-3.5 text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center cursor-pointer transition-transform active:scale-95 shadow-xs whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="btn-primary-action min-h-[44px] px-2 sm:px-3 text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center cursor-pointer transition-transform active:scale-95 shadow-xs whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn' ? '+ অভিযোগ' : '+ Report'}
           </button>

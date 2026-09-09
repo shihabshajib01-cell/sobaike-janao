@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { IconButton } from './IconButton';
+import { useApp } from '../../context/AppContext';
 
 export interface ModalProps {
   id?: string;
@@ -15,6 +16,7 @@ export interface ModalProps {
   keepMounted?: boolean;
   containerClassName?: string;
   zIndexClass?: string;
+  language?: 'bn' | 'en';
 }
 
 // Global reference counter for nested modal scroll locks
@@ -34,11 +36,26 @@ export const Modal: React.FC<ModalProps> = ({
   keepMounted = false,
   containerClassName = '',
   zIndexClass = 'z-50',
+  language: customLanguage,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+
+  let appLanguage: 'bn' | 'en' = 'bn';
+  try {
+    const app = useApp();
+    if (app?.language) {
+      appLanguage = app.language;
+    }
+  } catch {
+    if (typeof document !== 'undefined' && document.documentElement.lang === 'en') {
+      appLanguage = 'en';
+    }
+  }
+  const activeLang = customLanguage || appLanguage;
+  const closeLabel = activeLang === 'bn' ? 'বন্ধ করুন' : 'Close dialog';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -168,10 +185,10 @@ export const Modal: React.FC<ModalProps> = ({
             <IconButton
               id={`${id}-close`}
               icon={<X className="w-4 h-4" />}
-              aria-label="বন্ধ করুন (Close dialog)"
+              aria-label={closeLabel}
               size="md"
               onClick={onClose}
-              className="text-muted hover:text-primary ml-3"
+              className="text-ui-content-muted hover:text-ui-content-primary ml-3"
             />
           </div>
         )}

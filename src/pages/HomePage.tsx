@@ -119,6 +119,13 @@ export const HomePage: React.FC = () => {
 
   return (
     <PublicPageContainer id="home-page-container">
+      {/* Semantic Page Level H1 for Screen Readers and Landmark Hierarchy */}
+      <h1 className="sr-only">
+        {language === 'bn'
+          ? 'সবাইকে জানাও — নাগরিক প্রতিবেদন প্ল্যাটফর্ম'
+          : 'Sobaike Janao — Citizen Reporting Platform'}
+      </h1>
+
       {/* 1. Service Hero Carousel */}
       <ServiceHeroCarousel
         id="home-service-carousel"

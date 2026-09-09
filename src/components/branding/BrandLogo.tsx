@@ -68,7 +68,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           id={id}
           onClick={onClick}
           aria-label={ariaLabel}
-          className="inline-flex items-center text-left focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] rounded-lg transition-colors cursor-pointer"
+          className="inline-flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg transition-colors cursor-pointer"
         >
           {content}
         </button>
@@ -92,18 +92,18 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   const textStyles = {
     sm: {
-      bangla: 'text-[15px] sm:text-[16px] font-bold leading-tight text-primary tracking-tight whitespace-nowrap',
-      english: 'hidden min-[380px]:block text-[11px] sm:text-[12px] leading-tight font-medium text-secondary tracking-normal whitespace-nowrap',
+      bangla: 'text-[15px] sm:text-[16px] font-bold leading-tight text-ui-content-primary tracking-tight whitespace-nowrap',
+      english: 'hidden min-[380px]:block text-[11px] sm:text-[12px] leading-tight font-medium text-ui-content-secondary tracking-normal whitespace-nowrap',
       gap: 'gap-1.5 sm:gap-2.5',
     },
     md: {
-      bangla: 'text-[18px] leading-[24px] font-bold text-primary tracking-tight whitespace-nowrap',
-      english: 'text-[14px] leading-tight font-medium text-secondary tracking-normal whitespace-nowrap',
+      bangla: 'text-[18px] leading-[24px] font-bold text-ui-content-primary tracking-tight whitespace-nowrap',
+      english: 'text-[14px] leading-tight font-medium text-ui-content-secondary tracking-normal whitespace-nowrap',
       gap: 'gap-3',
     },
     lg: {
-      bangla: 'text-[20px] leading-[26px] font-bold text-primary tracking-tight whitespace-nowrap',
-      english: 'text-[15px] leading-tight font-medium text-secondary tracking-normal whitespace-nowrap',
+      bangla: 'text-[20px] leading-[26px] font-bold text-ui-content-primary tracking-tight whitespace-nowrap',
+      english: 'text-[15px] leading-tight font-medium text-ui-content-secondary tracking-normal whitespace-nowrap',
       gap: 'gap-3.5',
     },
   };
@@ -144,7 +144,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         id={id}
         onClick={onClick}
         aria-label={ariaLabel}
-        className="flex items-center text-left focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] rounded-xl p-1 transition-colors cursor-pointer"
+        className="flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl p-1 transition-colors cursor-pointer"
       >
         {brandContent}
       </button>

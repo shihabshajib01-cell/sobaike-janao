@@ -195,7 +195,11 @@ export const DesktopLeftRail: React.FC = () => {
         <button
           id="rail-lang-toggle"
           onClick={toggleLanguage}
-          aria-label={language === 'bn' ? 'Switch to English' : 'বাংলায় দেখুন'}
+          aria-label={
+            language === 'bn'
+              ? 'ভাষা পরিবর্তন করে ইংরেজিতে নিন'
+              : 'Switch language to Bengali'
+          }
           className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <span className="font-medium">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
@@ -206,8 +210,12 @@ export const DesktopLeftRail: React.FC = () => {
 
         {/* Minimal Platform Signature */}
         <div className="px-2 pt-1 text-[13px] text-ui-content-muted leading-tight">
-          <p className="font-medium text-ui-content-secondary">নাগরিক সেবা প্ল্যাটফর্ম</p>
-          <p className="text-[12px] opacity-80">বাংলাদেশ ২০২৬</p>
+          <p className="font-medium text-ui-content-secondary">
+            {language === 'bn' ? 'নাগরিক সেবা প্ল্যাটফর্ম' : 'Citizen Platform'}
+          </p>
+          <p className="text-[12px] opacity-80">
+            {language === 'bn' ? 'বাংলাদেশ ২০২৬' : 'Bangladesh 2026'}
+          </p>
         </div>
       </div>
     </aside>
