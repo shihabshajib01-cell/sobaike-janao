@@ -59,7 +59,7 @@ export const SearchModal: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => handleSelectSection(sec.slug as RoutePath)}
-                  className="cursor-pointer focus:outline-none min-h-[44px] flex items-center"
+                  className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl min-h-[44px] flex items-center"
                 >
                   <CategoryBadge section={key} language={language} size="md" />
                 </button>
