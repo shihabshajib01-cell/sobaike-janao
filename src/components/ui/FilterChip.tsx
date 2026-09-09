@@ -43,7 +43,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
             }
           : undefined
       }
-      className={`inline-flex items-center justify-center ui-space-filter-chip h-[34px] sm:h-[36px] text-[13px] sm:text-[14px] font-medium ui-radius-pill border transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed ${
+      className={`inline-flex items-center justify-center ui-space-filter-chip h-[34px] sm:h-[36px] text-[13px] sm:text-[14px] font-medium ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed ${
         selected && !config
           ? 'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] border-[var(--ui-primary-action-bg)] font-semibold ui-elevation-selected'
           : !selected

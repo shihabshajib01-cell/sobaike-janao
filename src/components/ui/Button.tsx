@@ -38,15 +38,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantClasses: Record<ButtonVariant, string> = {
     primary:
-      'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] hover:bg-[var(--ui-primary-action-hover)] active:opacity-90 border border-transparent shadow-2xs',
+      'bg-[var(--ui-primary-action-bg)] text-[var(--ui-primary-action-text)] hover:bg-[var(--ui-primary-action-hover)] active:opacity-90 ui-border-default border-transparent shadow-2xs',
     secondary:
-      'bg-surface-subtle text-primary hover:bg-surface-elevated active:bg-surface-hover border border-subtle',
+      'bg-surface-subtle text-primary hover:bg-surface-elevated active:bg-surface-hover ui-border-default border-subtle',
     outline:
-      'bg-surface text-primary hover:bg-surface-subtle active:bg-surface-hover border border-theme shadow-2xs',
+      'bg-surface text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-theme shadow-2xs',
     ghost:
-      'bg-transparent text-secondary hover:text-primary hover:bg-surface-subtle active:bg-surface-hover border border-transparent',
+      'bg-transparent text-secondary hover:text-primary hover:bg-surface-subtle active:bg-surface-hover ui-border-default border-transparent',
     destructive:
-      'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 border border-red-600 shadow-2xs',
+      'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 ui-border-default border-red-600 shadow-2xs',
   };
 
   const widthClass = fullWidth ? 'w-full' : '';

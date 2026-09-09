@@ -22,11 +22,11 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantClasses = {
-    default: 'bg-surface border border-subtle ui-elevation-card ui-radius-card',
-    subtle: 'bg-surface-subtle border border-subtle ui-radius-card',
-    outline: 'bg-transparent border border-theme ui-radius-card',
+    default: 'bg-surface ui-border-default border-subtle ui-elevation-card ui-radius-card',
+    subtle: 'bg-surface-subtle ui-border-default border-subtle ui-radius-card',
+    outline: 'bg-transparent ui-border-default border-theme ui-radius-card',
     interactive:
-      'bg-surface border border-subtle hover:border-theme hover:bg-surface-hover active:bg-surface-subtle transition-all ui-radius-card cursor-pointer',
+      'bg-surface ui-border-default border-subtle hover:border-theme hover:bg-surface-hover active:bg-surface-subtle transition-all ui-radius-card cursor-pointer',
   };
 
   return (
