@@ -25,7 +25,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           <div className="flex items-center justify-between mb-1.5">
             <label htmlFor={textareaId} className="block type-label text-ui-content-primary">
               {label}
-              {required && <span className="text-red-600 dark:text-red-400 ml-1" aria-hidden="true">*</span>}
+              {required && <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>}
             </label>
             {maxCharacters && (
               <span className="type-compact text-ui-content-muted">
@@ -47,13 +47,13 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           aria-describedby={error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined}
           className={`w-full bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-border-default ui-radius-control ui-space-textarea transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
             error
-              ? 'border-red-500 dark:border-red-400 focus:ring-red-500 focus:border-red-500'
+              ? 'border-ui-validation-border focus:ring-ui-validation-focus focus:border-ui-validation-focus'
               : 'border-ui-stroke-default hover:border-ui-stroke-strong'
           } ${className}`}
           {...props}
         />
         {error && (
-          <p id={`${textareaId}-error`} className="mt-1.5 type-helper text-red-600 dark:text-red-400 font-medium">
+          <p id={`${textareaId}-error`} className="mt-1.5 type-helper text-ui-validation-text font-medium">
             {error}
           </p>
         )}
