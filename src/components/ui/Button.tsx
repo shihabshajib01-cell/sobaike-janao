@@ -46,7 +46,7 @@ export const Button: React.FC<ButtonProps> = ({
     ghost:
       'bg-transparent text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle active:bg-ui-surface-hover ui-border-default border-transparent',
     destructive:
-      'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 ui-border-default border-red-600 ui-elevation-control',
+      'bg-ui-destructive-bg text-ui-destructive-text hover:bg-ui-destructive-hover active:bg-ui-destructive-active ui-border-default border-ui-destructive-border ui-elevation-control',
   };
 
   const widthClass = fullWidth ? 'w-full' : '';

@@ -69,6 +69,13 @@
   --color-ui-validation-text: var(--ui-validation-text);
   --color-ui-validation-border: var(--ui-validation-border);
   --color-ui-validation-focus: var(--ui-validation-focus);
+
+  /* Destructive Action */
+  --color-ui-destructive-bg: var(--ui-destructive-bg);
+  --color-ui-destructive-hover: var(--ui-destructive-hover);
+  --color-ui-destructive-active: var(--ui-destructive-active);
+  --color-ui-destructive-border: var(--ui-destructive-border);
+  --color-ui-destructive-text: var(--ui-text-inverse);
 }
 
 @layer base {
@@ -197,6 +204,12 @@
     /* Central Border Structure Tokens */
     --border-width-default: 1px;
     --border-style-default: solid;
+
+    /* Destructive Action Tokens */
+    --ui-destructive-bg: oklch(57.7% .245 27.325);
+    --ui-destructive-hover: oklch(50.5% .213 27.518);
+    --ui-destructive-active: oklch(44.4% .177 26.899);
+    --ui-destructive-border: var(--ui-destructive-bg);
   }
 
   :root,
