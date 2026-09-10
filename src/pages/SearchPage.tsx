@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Search, MapPin, UserX, FileText, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, MapPin, UserX, ArrowRight, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';

@@ -10,8 +10,6 @@ import {
   UserX,
   FileText,
   Layers,
-  ChevronRight,
-  ShieldCheck,
   AlertCircle,
   Home,
   Scale,

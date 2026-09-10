@@ -1,7 +1,7 @@
 import React from 'react';
 import { HeartHandshake, ShieldAlert, ZapOff, LucideIcon } from 'lucide-react';
 import { EvStationIcon } from './EvStationIcon';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
 
 export type FeatureIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FeatureIconVariant = 'standard' | 'container' | 'marker' | 'badge';

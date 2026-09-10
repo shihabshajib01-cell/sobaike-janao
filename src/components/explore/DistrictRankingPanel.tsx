@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ReportItem } from '../../types/report';
 import { BANGLADESH_DISTRICTS } from '../../data/districts';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
 import { toBanglaDigits, formatRankNumber } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
 import { CategoryIcon } from '../branding/CategoryIcon';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { MapPin, ArrowLeft, AlertCircle, FileText, RefreshCw } from 'lucide-react';
+import { ArrowLeft, AlertCircle, FileText } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { BANGLADESH_DISTRICTS } from '../data/districts';
 import { PublicReportService } from '../services/publicReportService';
