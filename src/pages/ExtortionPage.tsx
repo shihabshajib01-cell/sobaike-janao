@@ -14,7 +14,7 @@ import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useApp } from '../context/AppContext';
 
 export const ExtortionPage: React.FC = () => {
-  const { language, openReportComposer } = useApp();
+  const { language } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('extortion') || SECTIONS.extortion;
 
@@ -64,47 +64,32 @@ export const ExtortionPage: React.FC = () => {
         id="extortion-header-banner"
         className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 md:p-7 space-y-3.5 md:space-y-4 shadow-2xs"
       >
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div className="space-y-2 text-left flex-1">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                style={{
-                  backgroundColor: 'var(--sec-extortion-bg)',
-                  color: 'var(--sec-extortion-primary)',
-                }}
-              >
-                <ShieldAlert className="w-4 h-4" aria-hidden="true" />
-              </div>
-              <span
-                className="text-[13px] sm:text-[14px] font-semibold"
-                style={{ color: 'var(--sec-extortion-text)' }}
-              >
-                {language === 'bn' ? config.shortNameBn : config.shortNameEn}
-              </span>
-            </div>
-
-            <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-ui-content-primary tracking-tight">
-              {language === 'bn' ? config.nameBn : config.nameEn}
-            </h1>
-
-            <p className="text-[16px] leading-[1.6] md:leading-[26px] text-ui-content-secondary">
-              {language === 'bn' ? config.descriptionBn : config.descriptionEn}
-            </p>
-          </div>
-
-          <div className="shrink-0 pt-1">
-            <Button
-              id="extortion-header-file-report-btn"
-              variant="primary"
-              size="md"
-              leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
-              onClick={() => openReportComposer('extortion')}
-              className="w-full sm:w-auto"
+        <div className="space-y-2 text-left">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+              style={{
+                backgroundColor: 'var(--sec-extortion-bg)',
+                color: 'var(--sec-extortion-primary)',
+              }}
             >
-              {language === 'bn' ? 'অভিযোগ জানান' : 'File Report'}
-            </Button>
+              <ShieldAlert className="w-4 h-4" aria-hidden="true" />
+            </div>
+            <span
+              className="text-[13px] sm:text-[14px] font-semibold"
+              style={{ color: 'var(--sec-extortion-text)' }}
+            >
+              {language === 'bn' ? config.shortNameBn : config.shortNameEn}
+            </span>
           </div>
+
+          <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-ui-content-primary tracking-tight">
+            {language === 'bn' ? config.nameBn : config.nameEn}
+          </h1>
+
+          <p className="text-[16px] leading-[1.6] md:leading-[26px] text-ui-content-secondary">
+            {language === 'bn' ? config.descriptionBn : config.descriptionEn}
+          </p>
         </div>
 
         {/* Quiet Information Strip */}
