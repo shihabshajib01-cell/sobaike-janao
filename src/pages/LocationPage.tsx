@@ -70,7 +70,15 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
     : '';
 
   useEffect(() => {
-    if (!isLoading && !fetchError) {
+    if (!district) {
+      setDynamicSeo({
+        title: language === 'bn' ? `এলাকার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Location Not Found | ${BRAND_NAME.en}`,
+        description: language === 'bn' ? 'অনুরোধকৃত এলাকার তথ্য পাওয়া যায়নি বা জেলাটি তালিকাভুক্ত নয়।' : 'The requested location was not found or is not a recognized district.',
+        robots: 'noindex, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    } else if (!isLoading && !fetchError) {
       const title =
         language === 'bn'
           ? `${districtDisplayName} এলাকার প্রতিবেদন | ${BRAND_NAME.bn}`
@@ -104,7 +112,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         ogSiteName: BRAND_NAME[language],
       });
     }
-  }, [districtDisplayName, isLoading, fetchError, language, setDynamicSeo]);
+  }, [district, districtDisplayName, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="location-page-container">

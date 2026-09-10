@@ -59,22 +59,38 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
 
   useEffect(() => {
     if (!isLoading && !fetchError) {
-      const title =
-        language === 'bn'
-          ? `${displayName} সংক্রান্ত প্রতিবেদন | ${BRAND_NAME.bn}`
-          : `Reports regarding ${displayName} | ${BRAND_NAME.en}`;
-      const description =
-        language === 'bn'
-          ? `${displayName} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`
-          : `Published public reports and statements regarding ${displayName}.`;
+      if (reports.length > 0) {
+        const title =
+          language === 'bn'
+            ? `${displayName} সংক্রান্ত প্রতিবেদন | ${BRAND_NAME.bn}`
+            : `Reports regarding ${displayName} | ${BRAND_NAME.en}`;
+        const description =
+          language === 'bn'
+            ? `${displayName} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`
+            : `Published public reports and statements regarding ${displayName}.`;
 
-      setDynamicSeo({
-        title,
-        description,
-        robots: 'index, follow',
-        ogType: 'website',
-        ogSiteName: BRAND_NAME[language],
-      });
+        setDynamicSeo({
+          title,
+          description,
+          robots: 'index, follow',
+          ogType: 'website',
+          ogSiteName: BRAND_NAME[language],
+        });
+      } else {
+        setDynamicSeo({
+          title:
+            language === 'bn'
+              ? `${displayName} সংক্রান্ত কোনো প্রতিবেদন নেই | ${BRAND_NAME.bn}`
+              : `No Reports for ${displayName} | ${BRAND_NAME.en}`,
+          description:
+            language === 'bn'
+              ? 'এই পক্ষের নামে বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
+              : 'There are no active public reports associated with this entity.',
+          robots: 'noindex, follow',
+          ogType: 'website',
+          ogSiteName: BRAND_NAME[language],
+        });
+      }
     } else if (fetchError) {
       setDynamicSeo({
         title: language === 'bn' ? `সত্ত্বার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Subject Unavailable | ${BRAND_NAME.en}`,
@@ -92,7 +108,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         ogSiteName: BRAND_NAME[language],
       });
     }
-  }, [displayName, isLoading, fetchError, language, setDynamicSeo]);
+  }, [displayName, reports.length, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="subject-page-container">

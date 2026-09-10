@@ -8,7 +8,6 @@ import {
 import { PublicEvidenceService } from './publicEvidenceService';
 import { PublicResponseService } from './publicResponseService';
 import { SEED_SUBMITTED_REPORTS } from '../data/seedSubmissions';
-import { mockStorage } from './mockStorage';
 
 export interface PublicReportFilters {
   segment?: SectionKey | 'all';
@@ -93,8 +92,8 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
 };
 
 const isMockModeAllowed = (): boolean => {
-  return (
-    !isSupabaseConfigured() ||
+  return Boolean(
+    import.meta.env.DEV &&
     import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
   );
 };
@@ -111,8 +110,7 @@ export const PublicReportService = {
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
-        const allSeeds = [...mockStorage.getMockReports(), ...SEED_SUBMITTED_REPORTS];
-        list = allSeeds.map(mapSeedToReportItem);
+        list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
       } else {
         throw new Error('Public reports service is currently unavailable.');
       }
@@ -121,8 +119,7 @@ export const PublicReportService = {
       if (error) {
         console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
         if (isMockModeAllowed()) {
-          const allSeeds = [...mockStorage.getMockReports(), ...SEED_SUBMITTED_REPORTS];
-          list = allSeeds.map(mapSeedToReportItem);
+          list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
         } else {
           throw new Error(error.message || 'Failed to load public reports from server.');
         }
@@ -222,12 +219,11 @@ export const PublicReportService = {
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
-        const allSeeds = [...mockStorage.getMockReports(), ...SEED_SUBMITTED_REPORTS];
-        const seed = allSeeds.find((r) => r.id.toUpperCase() === cleanId);
+        const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
         if (seed) {
           return {
             report: mapSeedToReportItem(seed),
-            responses: mockStorage.getMockResponses(cleanId),
+            responses: [],
             responseLoadError: false,
           };
         }
@@ -243,12 +239,11 @@ export const PublicReportService = {
     if (error) {
       console.warn('[PublicReportService.getById] Supabase RPC error:', error);
       if (isMockModeAllowed()) {
-        const allSeeds = [...mockStorage.getMockReports(), ...SEED_SUBMITTED_REPORTS];
-        const seed = allSeeds.find((r) => r.id.toUpperCase() === cleanId);
+        const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
         if (seed) {
           return {
             report: mapSeedToReportItem(seed),
-            responses: mockStorage.getMockResponses(cleanId),
+            responses: [],
             responseLoadError: false,
           };
         }
@@ -300,12 +295,11 @@ export const PublicReportService = {
 
     // Not found in database: only check seed in mock mode
     if (isMockModeAllowed()) {
-      const allSeeds = [...mockStorage.getMockReports(), ...SEED_SUBMITTED_REPORTS];
-      const seed = allSeeds.find((r) => r.id.toUpperCase() === cleanId);
+      const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
       if (seed) {
         return {
           report: mapSeedToReportItem(seed),
-          responses: mockStorage.getMockResponses(cleanId),
+          responses: [],
           responseLoadError: false,
         };
       }
