@@ -58,16 +58,22 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   }, [reports]);
 
   useEffect(() => {
+    const subjectPublicLabel = primaryReport
+      ? language === 'bn'
+        ? primaryReport.reportedSubjectBn || primaryReport.reportedSubject
+        : primaryReport.reportedSubjectEn || primaryReport.reportedSubject
+      : null;
+
     if (!isLoading && !fetchError) {
-      if (reports.length > 0) {
+      if (reports.length > 0 && primaryReport && subjectPublicLabel) {
         const title =
           language === 'bn'
-            ? `${displayName} সংক্রান্ত প্রতিবেদন | ${BRAND_NAME.bn}`
-            : `Reports regarding ${displayName} | ${BRAND_NAME.en}`;
+            ? `${subjectPublicLabel} সংক্রান্ত প্রতিবেদন | ${BRAND_NAME.bn}`
+            : `Reports regarding ${subjectPublicLabel} | ${BRAND_NAME.en}`;
         const description =
           language === 'bn'
-            ? `${displayName} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`
-            : `Published public reports and statements regarding ${displayName}.`;
+            ? `${subjectPublicLabel} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`
+            : `Published public reports and statements regarding ${subjectPublicLabel}.`;
 
         setDynamicSeo({
           title,
@@ -80,12 +86,12 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         setDynamicSeo({
           title:
             language === 'bn'
-              ? `${displayName} সংক্রান্ত কোনো প্রতিবেদন নেই | ${BRAND_NAME.bn}`
-              : `No Reports for ${displayName} | ${BRAND_NAME.en}`,
+              ? `সংশ্লিষ্ট পক্ষের তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}`
+              : `Subject Not Found | ${BRAND_NAME.en}`,
           description:
             language === 'bn'
-              ? 'এই পক্ষের নামে বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
-              : 'There are no active public reports associated with this entity.',
+              ? 'এই সংশ্লিষ্ট পক্ষের জন্য কোনো প্রকাশিত প্রতিবেদন পাওয়া যায়নি।'
+              : 'No published reports were found for this subject.',
           robots: 'noindex, follow',
           ogType: 'website',
           ogSiteName: BRAND_NAME[language],
@@ -108,7 +114,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         ogSiteName: BRAND_NAME[language],
       });
     }
-  }, [displayName, reports.length, isLoading, fetchError, language, setDynamicSeo]);
+  }, [primaryReport, reports.length, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="subject-page-container">

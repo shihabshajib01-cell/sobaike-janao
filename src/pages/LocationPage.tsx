@@ -71,22 +71,36 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
 
   useEffect(() => {
     if (!district) {
-      setDynamicSeo({
-        title: language === 'bn' ? `এলাকার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Location Not Found | ${BRAND_NAME.en}`,
-        description: language === 'bn' ? 'অনুরোধকৃত এলাকার তথ্য পাওয়া যায়নি বা জেলাটি তালিকাভুক্ত নয়।' : 'The requested location was not found or is not a recognized district.',
-        robots: 'noindex, follow',
-        ogType: 'website',
-        ogSiteName: BRAND_NAME[language],
-      });
+      if (!isLoading) {
+        setDynamicSeo({
+          title: language === 'bn' ? `এলাকা পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Location Not Found | ${BRAND_NAME.en}`,
+          description:
+            language === 'bn'
+              ? 'এই এলাকার জন্য কোনো বৈধ প্রকাশিত প্রতিবেদন পৃষ্ঠা পাওয়া যায়নি।'
+              : 'No valid published report page was found for this location.',
+          robots: 'noindex, follow',
+          ogType: 'website',
+          ogSiteName: BRAND_NAME[language],
+        });
+      } else {
+        setDynamicSeo({
+          title: language === 'bn' ? `এলাকার প্রতিবেদন লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Location Reports... | ${BRAND_NAME.en}`,
+          description: language === 'bn' ? 'এলাকাভিত্তিক নাগরিক প্রতিবেদন লোড হচ্ছে।' : 'Loading location-based community reports.',
+          robots: 'noindex, follow',
+          ogType: 'website',
+          ogSiteName: BRAND_NAME[language],
+        });
+      }
     } else if (!isLoading && !fetchError) {
+      const locName = language === 'bn' ? district.nameBn : district.nameEn;
       const title =
         language === 'bn'
-          ? `${districtDisplayName} এলাকার প্রতিবেদন | ${BRAND_NAME.bn}`
-          : `Reports from ${districtDisplayName} | ${BRAND_NAME.en}`;
+          ? `${locName} এলাকার প্রতিবেদন | ${BRAND_NAME.bn}`
+          : `Reports from ${locName} | ${BRAND_NAME.en}`;
       const description =
         language === 'bn'
-          ? `${districtDisplayName} এলাকার প্রকাশিত নাগরিক প্রতিবেদন ও জনস্বার্থ রেকর্ড।`
-          : `Published community reports and public records from ${districtDisplayName}, Bangladesh.`;
+          ? `${locName} এলাকার প্রকাশিত নাগরিক প্রতিবেদন ও জনস্বার্থ রেকর্ড।`
+          : `Published community reports and public records from ${locName}, Bangladesh.`;
 
       setDynamicSeo({
         title,
@@ -112,7 +126,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         ogSiteName: BRAND_NAME[language],
       });
     }
-  }, [district, districtDisplayName, isLoading, fetchError, language, setDynamicSeo]);
+  }, [district, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="location-page-container">
