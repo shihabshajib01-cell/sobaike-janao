@@ -30,6 +30,8 @@ import { ReportMediaGrid } from '../components/media/ReportMediaGrid';
 import { ReportItem, PublicPublishedResponse } from '../types/report';
 import { ReportDetailSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { useSeo } from '../components/seo/SeoManager';
+import { BRAND_NAME } from '../lib/seo';
 
 export interface ReportDetailPageProps {
   reportId: string;
@@ -37,6 +39,7 @@ export interface ReportDetailPageProps {
 
 export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) => {
   const { language, navigateTo } = useApp();
+  const { setDynamicSeo } = useSeo();
   const [isCopied, setIsCopied] = useState(false);
   const [isCitizenModalOpen, setIsCitizenModalOpen] = useState(false);
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
@@ -90,6 +93,40 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   useEffect(() => {
     fetchReport();
   }, [reportId]);
+
+  useEffect(() => {
+    if (report) {
+      const publicTitle = language === 'bn' ? report.titleBn : report.titleEn;
+      const publicDesc =
+        language === 'bn'
+          ? report.shortDescriptionBn || report.fullDescriptionBn || ''
+          : report.shortDescriptionEn || report.fullDescriptionEn || '';
+
+      setDynamicSeo({
+        title: `${publicTitle} | ${BRAND_NAME[language]}`,
+        description: publicDesc,
+        robots: 'index, follow',
+        ogType: 'article',
+        ogSiteName: BRAND_NAME[language],
+      });
+    } else if (!isLoading) {
+      setDynamicSeo({
+        title: `${language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি' : 'Report Unavailable / Not Found'} | ${BRAND_NAME[language]}`,
+        description: language === 'bn' ? 'অনুরোধকৃত প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ।' : 'The requested report could not be found or is unavailable.',
+        robots: 'noindex, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    } else {
+      setDynamicSeo({
+        title: `${language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading Report...'} | ${BRAND_NAME[language]}`,
+        description: language === 'bn' ? 'সবাইকে জানাও প্ল্যাটফর্মের প্রতিবেদন লোড হচ্ছে।' : 'Loading report on Sobaike Janao platform.',
+        robots: 'noindex, follow',
+        ogType: 'article',
+        ogSiteName: BRAND_NAME[language],
+      });
+    }
+  }, [report, isLoading, fetchError, language, setDynamicSeo]);
 
   if (isLoading) {
     return (

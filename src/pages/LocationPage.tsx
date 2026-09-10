@@ -8,6 +8,8 @@ import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { SECTIONS } from '../theme/tokens';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { useSeo } from '../components/seo/SeoManager';
+import { BRAND_NAME } from '../lib/seo';
 
 export interface LocationPageProps {
   locationId: string;
@@ -15,6 +17,7 @@ export interface LocationPageProps {
 
 export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
   const { language, navigateTo } = useApp();
+  const { setDynamicSeo } = useSeo();
 
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -65,6 +68,43 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
       ? district.divisionBn
       : district.divisionEn
     : '';
+
+  useEffect(() => {
+    if (!isLoading && !fetchError) {
+      const title =
+        language === 'bn'
+          ? `${districtDisplayName} এলাকার প্রতিবেদন | ${BRAND_NAME.bn}`
+          : `Reports from ${districtDisplayName} | ${BRAND_NAME.en}`;
+      const description =
+        language === 'bn'
+          ? `${districtDisplayName} এলাকার প্রকাশিত নাগরিক প্রতিবেদন ও জনস্বার্থ রেকর্ড।`
+          : `Published community reports and public records from ${districtDisplayName}, Bangladesh.`;
+
+      setDynamicSeo({
+        title,
+        description,
+        robots: 'index, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    } else if (fetchError) {
+      setDynamicSeo({
+        title: language === 'bn' ? `এলাকার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Location Unavailable | ${BRAND_NAME.en}`,
+        description: language === 'bn' ? 'এই এলাকার তথ্য লোড করতে সমস্যা হয়েছে।' : 'Failed to load reports for this location.',
+        robots: 'noindex, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    } else {
+      setDynamicSeo({
+        title: language === 'bn' ? `এলাকার প্রতিবেদন লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Location Reports... | ${BRAND_NAME.en}`,
+        description: language === 'bn' ? 'এলাকাভিত্তিক নাগরিক প্রতিবেদন লোড হচ্ছে।' : 'Loading location-based community reports.',
+        robots: 'noindex, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    }
+  }, [districtDisplayName, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="location-page-container">

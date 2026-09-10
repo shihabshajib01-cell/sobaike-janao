@@ -1,6 +1,6 @@
 {
-  "name": "Sobaike Janao (সবাইকে জানাও) 23",
-  "description": "Bangladesh moderated citizen reporting platform with public feed, 3-segment reporting wizard, and structured manual incident address selection with device GPS validation.",
+  "name": "Sobaike Janao (সবাইকে জানাও)",
+  "description": "Sobaike Janao is a citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.",
   "requestFramePermissions": [
     "geolocation"
   ],

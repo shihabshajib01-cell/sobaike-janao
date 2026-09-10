@@ -7,6 +7,8 @@ import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { useSeo } from '../components/seo/SeoManager';
+import { BRAND_NAME } from '../lib/seo';
 
 export interface SubjectPageProps {
   subjectId: string;
@@ -14,6 +16,7 @@ export interface SubjectPageProps {
 
 export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   const { language, navigateTo } = useApp();
+  const { setDynamicSeo } = useSeo();
   const [isResponseModalOpen, setIsResponseModalOpen] = useState(false);
 
   const [reports, setReports] = useState<ReportItem[]>([]);
@@ -53,6 +56,43 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   const storedResponses = useMemo(() => {
     return reports.filter((r) => r.response).map((r) => r.response!);
   }, [reports]);
+
+  useEffect(() => {
+    if (!isLoading && !fetchError) {
+      const title =
+        language === 'bn'
+          ? `${displayName} সংক্রান্ত প্রতিবেদন | ${BRAND_NAME.bn}`
+          : `Reports regarding ${displayName} | ${BRAND_NAME.en}`;
+      const description =
+        language === 'bn'
+          ? `${displayName} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`
+          : `Published public reports and statements regarding ${displayName}.`;
+
+      setDynamicSeo({
+        title,
+        description,
+        robots: 'index, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    } else if (fetchError) {
+      setDynamicSeo({
+        title: language === 'bn' ? `সত্ত্বার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Subject Unavailable | ${BRAND_NAME.en}`,
+        description: language === 'bn' ? 'সংশ্লিষ্ট পক্ষের তথ্য লোড করতে সমস্যা হয়েছে।' : 'Failed to load reports for this subject.',
+        robots: 'noindex, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    } else {
+      setDynamicSeo({
+        title: language === 'bn' ? `সত্ত্বার তথ্য লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Subject Reports... | ${BRAND_NAME.en}`,
+        description: language === 'bn' ? 'সংশ্লিষ্ট পক্ষের প্রতিবেদন লোড হচ্ছে।' : 'Loading subject-based community reports.',
+        robots: 'noindex, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
+    }
+  }, [displayName, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="subject-page-container">

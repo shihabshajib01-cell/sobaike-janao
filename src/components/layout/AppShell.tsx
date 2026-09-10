@@ -24,6 +24,7 @@ import { SearchPage } from '../../pages/SearchPage';
 import { MorePage } from '../../pages/MorePage';
 import { LocationPage } from '../../pages/LocationPage';
 import { SubjectPage } from '../../pages/SubjectPage';
+import { SeoManager } from '../seo/SeoManager';
 
 const ReportDetailRouteWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -102,24 +103,26 @@ export const AppShell: React.FC = () => {
           className="w-full mx-auto max-w-[900px] min-[1440px]:max-w-[880px] min-[1536px]:max-w-[900px] min-[1920px]:max-w-[920px] flex-1 flex flex-col justify-between pb-20 pb-safe md:pb-0 focus:outline-none"
         >
           <div className="w-full">
-            <ErrorBoundary componentName="MainRoutes">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/harassment" element={<HarassmentPage />} />
-                <Route path="/rickshaw" element={<RickshawPage />} />
-                <Route path="/extortion" element={<ExtortionPage />} />
-                <Route path="/load-shedding" element={<UtilityPage />} />
-                <Route path="/illegal-occupation" element={<ComingSoonPage serviceKey="illegal_occupation" />} />
-                <Route path="/report" element={<ReportPage />} />
-                <Route path="/explore" element={<ExplorePage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/more" element={<MorePage />} />
-                <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
-                <Route path="/location/:id" element={<LocationRouteWrapper />} />
-                <Route path="/subject/:id" element={<SubjectRouteWrapper />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </ErrorBoundary>
+            <SeoManager>
+              <ErrorBoundary componentName="MainRoutes">
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/harassment" element={<HarassmentPage />} />
+                  <Route path="/rickshaw" element={<RickshawPage />} />
+                  <Route path="/extortion" element={<ExtortionPage />} />
+                  <Route path="/load-shedding" element={<UtilityPage />} />
+                  <Route path="/illegal-occupation" element={<ComingSoonPage serviceKey="illegal_occupation" />} />
+                  <Route path="/report" element={<ReportPage />} />
+                  <Route path="/explore" element={<ExplorePage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/more" element={<MorePage />} />
+                  <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
+                  <Route path="/location/:id" element={<LocationRouteWrapper />} />
+                  <Route path="/subject/:id" element={<SubjectRouteWrapper />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </ErrorBoundary>
+            </SeoManager>
           </div>
 
           {/* Minimal Informational Trust Footer */}
