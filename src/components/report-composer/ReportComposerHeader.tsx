@@ -26,29 +26,29 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
       step: 1,
       shortBn: 'সেবা',
       shortEn: 'Service',
-      titleBn: 'সেবা',
-      titleEn: 'Service',
+      titleBn: 'সেবা নির্বাচন',
+      titleEn: 'Select Service',
     },
     {
       step: 2,
       shortBn: 'ধরন',
       shortEn: 'Type',
       titleBn: 'অভিযোগের ধরন',
-      titleEn: 'Complaint type',
+      titleEn: 'Complaint Type',
     },
     {
       step: 3,
-      shortBn: 'বিবরণ',
+      shortBn: 'তথ্য',
       shortEn: 'Details',
-      titleBn: 'বিবরণ',
-      titleEn: 'Details',
+      titleBn: 'অভিযোগের বিবরণ',
+      titleEn: 'Complaint Details',
     },
     {
       step: 4,
-      shortBn: 'যাচাই',
-      shortEn: 'Review',
-      titleBn: 'পর্যালোচনা',
-      titleEn: 'Review',
+      shortBn: 'জমা',
+      shortEn: 'Submit',
+      titleBn: 'পর্যালোচনা ও জমা',
+      titleEn: 'Review & Submit',
     },
   ];
 
@@ -93,7 +93,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
               <h2 className="text-[20px] font-bold text-ui-content-primary leading-tight">
-                {language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
+                {language === 'bn' ? 'অভিযোগ জমা দিন' : 'File a Complaint'}
               </h2>
 
               {segment && (

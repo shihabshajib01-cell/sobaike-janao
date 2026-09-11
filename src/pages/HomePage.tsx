@@ -139,8 +139,13 @@ export const HomePage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[20px] font-bold leading-[1.3] text-ui-content-primary">
-              {language === 'bn' ? 'সাম্প্রতিক প্রতিবেদন' : 'Recent reports'}
+              {language === 'bn' ? 'সাম্প্রতিক প্রকাশনা ও প্রতিবেদন' : 'Recent Public Reports'}
             </h2>
+            <p className="text-[14px] leading-[1.5] text-ui-content-secondary mt-0.5">
+              {language === 'bn'
+                ? 'মডারেশন শেষে প্রকাশিত নাগরিক প্রতিবেদনের সময়ানুক্রমিক ফিড'
+                : 'Moderated public feed across citizen reporting categories'}
+            </p>
           </div>
 
           {/* Location Selector */}
@@ -178,7 +183,7 @@ export const HomePage: React.FC = () => {
           />
           <FilterChip
             id="filter-chip-most-shared"
-            label={language === 'bn' ? 'সর্বাধিক শেয়ার' : 'Most shared'}
+            label={language === 'bn' ? 'সর্বাধিক শেয়ার' : 'Most Shared'}
             icon={<Share2 className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'most_shared'}
             onClick={() => setFeedFilter('most_shared')}
@@ -190,7 +195,7 @@ export const HomePage: React.FC = () => {
           <ReportFeedSkeleton
             count={4}
             id="home-feed-skeleton"
-            ariaLabel={language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading reports...'}
+            ariaLabel={language === 'bn' ? 'পাবলিক প্রতিবেদন লোড হচ্ছে...' : 'Loading published reports...'}
           />
         )}
 
@@ -200,8 +205,8 @@ export const HomePage: React.FC = () => {
             <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
             <p className="text-[16px] font-semibold text-ui-error-text">
               {language === 'bn'
-                ? 'প্রতিবেদন লোড করা যায়নি।'
-                : 'Couldn’t load reports.'}
+                ? 'সার্ভার থেকে পাবলিক ডেটা লোড করতে সমস্যা হয়েছে।'
+                : 'Unable to load public reports from server. Please check your connection.'}
             </p>
             <button
               type="button"
@@ -224,13 +229,13 @@ export const HomePage: React.FC = () => {
 
         {!isLoading && !fetchError && filteredReports.length === 0 && (
           <EmptyState
-            title={language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No reports found'}
+            title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Reports Found'}
             description={
               language === 'bn'
-                ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই।'
-                : 'No reports match these filters.'
+                ? 'নির্বাচিত ফিল্টার বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
+                : 'There are currently no published reports matching your selected filters.'
             }
-            actionLabel={language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
+            actionLabel={language === 'bn' ? 'সকল ফিল্টার রিসেট করুন' : 'Reset Filters'}
             onAction={() => {
               setFeedFilter('all');
               setSelectedDistrict('all');

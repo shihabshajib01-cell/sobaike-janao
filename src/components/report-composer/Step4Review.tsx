@@ -231,7 +231,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       {/* Clean Step Header without redundant explanations */}
       <div className="text-left">
         <h3 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-ui-content-primary">
-          {language === 'bn' ? 'প্রতিবেদন যাচাই' : 'Review report'}
+          {language === 'bn' ? 'তথ্য যাচাই করুন' : 'Review your report'}
         </h3>
       </div>
 
@@ -860,8 +860,8 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         <Info className="w-4 h-4 text-ui-content-primary shrink-0 mt-0.5" />
         <p className="leading-relaxed">
           {language === 'bn'
-            ? 'জমা দেওয়ার পর প্রতিবেদনটি মডারেশন পর্যালোচনার জন্য পাঠানো হবে। নীতিমালার সাথে সামঞ্জস্যপূর্ণ হলে এটি প্রকাশিত হবে।'
-            : 'Submitted reports will be reviewed by moderation before publication. Please ensure all details are factual and responsibly reported.'}
+            ? 'জমা দেওয়ার পর প্রতিবেদনটি মডারেশন পর্যালোচনার জন্য গৃহীত হবে। দায়িত্বশীল ব্যবহারের স্বার্থে অসত্য বা উদ্দেশ্যপ্রণোদিত তথ্য প্রদান থেকে বিরত থাকুন।'
+            : 'Submitted reports will be queued for moderation review. Please ensure all details are factual and responsibly reported.'}
         </p>
       </div>
 

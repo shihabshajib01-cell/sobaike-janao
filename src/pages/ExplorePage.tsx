@@ -176,7 +176,7 @@ export const ExplorePage: React.FC = () => {
               className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
             >
               <option value="all">
-                {language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}
+                {language === 'bn' ? 'সকল বিভাগ' : 'All Divisions'}
               </option>
               {DIVISIONS.map((div) => (
                 <option key={div.id} value={div.nameEn}>
@@ -196,7 +196,7 @@ export const ExplorePage: React.FC = () => {
               className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
             >
               <option value="all">
-                {language === 'bn' ? 'সকল জেলা' : 'All districts'}
+                {language === 'bn' ? 'সকল জেলা' : 'All Districts'}
               </option>
               {availableDistricts.map((d) => (
                 <option key={d.id} value={d.nameEn}>
@@ -292,7 +292,7 @@ export const ExplorePage: React.FC = () => {
         viewMode === 'map' ? (
           <MapExploreSkeleton
             id="explore-map-skeleton"
-            ariaLabel={language === 'bn' ? 'মানচিত্র লোড হচ্ছে...' : 'Loading map...'}
+            ariaLabel={language === 'bn' ? 'মানচিত্র ও এলাকাভিত্তিক তথ্য লোড হচ্ছে...' : 'Loading map and area insights...'}
           />
         ) : (
           <ReportFeedSkeleton
@@ -309,8 +309,8 @@ export const ExplorePage: React.FC = () => {
           <MapIcon name="alert-circle" size="xl" className="text-ui-error-text mx-auto" ariaHidden={true} />
           <p className="text-[15px] font-semibold text-ui-error-text">
             {language === 'bn'
-              ? 'প্রতিবেদন লোড করা যায়নি।'
-              : 'Couldn’t load reports.'}
+              ? 'তথ্য লোড করতে সমস্যা হয়েছে।'
+              : 'Unable to load explore reports. Please try again.'}
           </p>
           <button
             type="button"
@@ -367,8 +367,8 @@ export const ExplorePage: React.FC = () => {
               <div className="flex items-center justify-between text-[13px] text-ui-content-muted font-medium">
                 <span>
                   {language === 'bn'
-                    ? `${toBanglaDigits(filteredReports.length)}টি প্রতিবেদন`
-                    : `${filteredReports.length} reports`}
+                    ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
+                    : `${filteredReports.length} published reports`}
                 </span>
                 {(searchQuery || selectedSection !== 'all' || selectedDistrict !== 'all') && (
                   <button
@@ -376,7 +376,7 @@ export const ExplorePage: React.FC = () => {
                     onClick={handleResetFilters}
                     className="text-[13px] font-semibold text-ui-content-secondary underline cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
                   >
-                    {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
+                    {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
                   </button>
                 )}
               </div>
@@ -391,12 +391,12 @@ export const ExplorePage: React.FC = () => {
                 <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3">
                   <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted mx-auto" />
                   <h3 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No reports found'}
+                    {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Reports Found'}
                   </h3>
                   <p className="text-[13px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                     {language === 'bn'
-                      ? 'এই ফিল্টারে কোনো প্রতিবেদন পাওয়া যায়নি।'
-                      : 'No reports match your filters.'}
+                      ? 'আপনার অনুসন্ধানের সাথে মিলে এমন কোনো ফলাফল নেই। ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।'
+                      : 'No reports matched your search filters. Try adjusting keywords or category filters.'}
                   </p>
                 </div>
               )}

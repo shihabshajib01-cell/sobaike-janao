@@ -132,13 +132,13 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       closeOnBackdrop={false}
       showHeader={false}
       maxWidth="lg"
-      contentClassName="flex flex-col min-h-0 overflow-hidden md:block md:overflow-y-auto md:overscroll-contain"
+      contentClassName="flex flex-col min-h-0 overflow-hidden"
       language={language}
       ariaLabelledBy="subject-modal-title"
     >
-      <div className="flex flex-col h-full min-h-0 text-left md:block md:h-auto md:p-6 sm:md:p-7 md:space-y-5">
+      <div className="flex flex-col h-full min-h-0 text-left">
         {/* Header */}
-        <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-0 pb-3.5 sm:pb-4 md:pb-3.5 border-b border-ui-stroke-subtle">
+        <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-7 pb-3.5 sm:pb-4 border-b border-ui-stroke-subtle">
           <div className="space-y-1">
             {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
               <div
@@ -177,8 +177,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
         </header>
 
         {isSubmitted ? (
-          <div className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
-            <div role="status" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible py-6 text-center space-y-4">
+          <div className="flex flex-col flex-1 min-h-0">
+            <div role="status" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-7 py-6 text-center space-y-4">
               <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text border border-ui-success-border rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
@@ -209,7 +209,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 </div>
               )}
             </div>
-            <footer className="shrink-0 p-4 sm:p-5 md:p-0 border-t md:border-0 border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+            <footer className="shrink-0 p-4 sm:p-5 md:p-6 border-t border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-5">
               <button
                 type="button"
                 onClick={handleResetAndClose}
@@ -220,8 +220,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             </footer>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible space-y-4">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-7 space-y-4">
             {error && (
               <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-xl text-[14px] font-medium">
                 {error}
@@ -430,7 +430,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             </div>
 
             {/* Footer Buttons */}
-            <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-0 md:py-0 md:pt-2 border-t border-ui-stroke-subtle bg-ui-surface md:bg-transparent flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+            <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-7 border-t border-ui-stroke-subtle bg-ui-surface flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-4">
               <button
                 type="button"
                 onClick={handleResetAndClose}

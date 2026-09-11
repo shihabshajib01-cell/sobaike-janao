@@ -9,7 +9,6 @@ import { SubjectResponseModal } from '../components/report-detail/SubjectRespons
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
 import { BRAND_NAME } from '../lib/seo';
-import { toBanglaDigits } from '../utils/formatters';
 
 export interface SubjectPageProps {
   subjectId: string;
@@ -100,7 +99,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       }
     } else if (fetchError) {
       setDynamicSeo({
-        title: language === 'bn' ? `সংশ্লিষ্ট পক্ষের তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Subject Unavailable | ${BRAND_NAME.en}`,
+        title: language === 'bn' ? `সত্ত্বার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Subject Unavailable | ${BRAND_NAME.en}`,
         description: language === 'bn' ? 'সংশ্লিষ্ট পক্ষের তথ্য লোড করতে সমস্যা হয়েছে।' : 'Failed to load reports for this subject.',
         robots: 'noindex, follow',
         ogType: 'website',
@@ -108,7 +107,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       });
     } else {
       setDynamicSeo({
-        title: language === 'bn' ? `সংশ্লিষ্ট পক্ষের প্রতিবেদন লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Subject Reports... | ${BRAND_NAME.en}`,
+        title: language === 'bn' ? `সত্ত্বার তথ্য লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Subject Reports... | ${BRAND_NAME.en}`,
         description: language === 'bn' ? 'সংশ্লিষ্ট পক্ষের প্রতিবেদন লোড হচ্ছে।' : 'Loading subject-based community reports.',
         robots: 'noindex, follow',
         ogType: 'website',
@@ -133,7 +132,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}</span>
+          <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরে যান' : 'Back to Explore'}</span>
         </button>
       </div>
 
@@ -153,7 +152,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
               )}
               <p className="text-[16px] leading-[26px] text-ui-content-secondary">
                 {language === 'bn'
-                  ? `${toBanglaDigits(reports.length)}টি প্রকাশিত প্রতিবেদনে উল্লেখ রয়েছে।`
+                  ? `${reports.length}টি প্রকাশিত প্রতিবেদনে এই নাম/সত্ত্বার উল্লেখ রয়েছে।`
                   : `Mentioned in ${reports.length} published reports.`}
               </p>
             </div>
@@ -166,7 +165,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
             className="px-4 py-2.5 bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-primary text-[16px] font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <Scale className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
-            <span>{language === 'bn' ? 'জবাব দিন' : 'Submit response'}</span>
+            <span>{language === 'bn' ? 'সংশ্লিষ্ট পক্ষের বক্তব্য দিন' : 'Submit Statement'}</span>
           </button>
         </div>
       </div>
@@ -176,7 +175,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         <ReportFeedSkeleton
           count={3}
           id="subject-feed-skeleton"
-          ariaLabel={language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading reports...'}
+          ariaLabel={language === 'bn' ? 'সত্ত্বার তথ্য লোড হচ্ছে...' : 'Loading subject reports...'}
         />
       )}
 
@@ -186,15 +185,15 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
-              ? 'প্রতিবেদন লোড করা যায়নি।'
-              : "Couldn't load reports."}
+              ? 'সত্ত্বার তথ্য লোড করতে সমস্যা হয়েছে।'
+              : 'Failed to load reports for this subject. Please try again.'}
           </p>
           <button
             type="button"
             onClick={loadData}
             className="btn-primary-action px-4 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
-            {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
+            {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>
         </div>
       )}
@@ -204,7 +203,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         <div className="space-y-3">
           <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
             <Scale className="w-5 h-5 text-ui-accent" aria-hidden="true" />
-            <span>{language === 'bn' ? 'জবাব' : 'Responses'}</span>
+            <span>{language === 'bn' ? 'সংশ্লিষ্ট পক্ষের বক্তব্য ও ব্যাখ্যা' : 'Subject Statements & Responses'}</span>
           </h2>
           <div className="space-y-3">
             {storedResponses.map((res, rIdx) => (
@@ -239,7 +238,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
             <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
               <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>
-                {language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published reports'}
+                {language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published Reports'}
               </span>
             </h2>
           </div>
@@ -254,12 +253,12 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-8 text-center space-y-3">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
               <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
+                {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Public Reports Found'}
               </h3>
               <p className="text-[14px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                 {language === 'bn'
-                  ? 'এই নামে কোনো প্রকাশিত প্রতিবেদন নেই বা নাম গোপনীয়তার জন্য লুকানো থাকতে পারে।'
-                  : 'No published reports are available for this name, or the name may be hidden for privacy.'}
+                  ? 'এই পক্ষের নামে বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই বা নাম গোপনীয়তার নীতি অনুযায়ী লুকানো রয়েছে।'
+                  : 'There are no active public reports associated with this entity or the name has been withheld for privacy.'}
               </p>
             </div>
           )}

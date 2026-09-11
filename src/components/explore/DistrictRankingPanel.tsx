@@ -142,7 +142,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         <div className="flex items-center gap-2">
           <MapIcon name="map-pin" size="md" className="text-ui-content-primary" />
           <h3 className="text-[17px] font-bold text-ui-content-primary tracking-tight">
-            {language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area summary'}
+            {language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area Summary'}
           </h3>
         </div>
 
@@ -152,7 +152,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             onClick={() => onSelectDistrict('all')}
             className="text-[12px] font-semibold text-ui-content-secondary flex items-center gap-1 cursor-pointer px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle transition-colors"
           >
-            <span>{language === 'bn' ? 'সারাদেশ দেখুন' : 'All regions'}</span>
+            <span>{language === 'bn' ? 'সারাদেশ দেখুন' : 'All Regions'}</span>
             <MapIcon name="close" size="xs" />
           </button>
         )}
@@ -165,7 +165,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3.5 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-ui-content-muted uppercase tracking-wider">
-                {language === 'bn' ? 'নির্বাচিত এলাকা' : 'Selected area'}
+                {language === 'bn' ? 'নির্বাচিত এলাকা' : 'Selected Area'}
               </span>
               <span className="text-[12px] font-medium text-ui-content-secondary">
                 {language === 'bn'
@@ -183,7 +183,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               </h4>
               <span className="text-[14px] font-bold text-ui-content-primary font-mono">
                 {language === 'bn'
-                  ? `${toBanglaDigits(currentDistrictInfo.count)}টি প্রতিবেদন`
+                  ? `${toBanglaDigits(currentDistrictInfo.count)}টি রিপোর্ট`
                   : `${currentDistrictInfo.count} reports`}
               </span>
             </div>
@@ -192,7 +192,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           {/* Category Breakdown */}
           <div className="space-y-2">
             <span className="text-[13px] font-bold text-ui-content-secondary">
-              {language === 'bn' ? 'সমস্যার ধরন অনুযায়ী:' : 'By category:'}
+              {language === 'bn' ? 'সমস্যার ধরন অনুযায়ী:' : 'By Category:'}
             </span>
             <div className="grid grid-cols-3 gap-2 text-center">
               {/* Harassment */}
@@ -241,7 +241,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             <div className="space-y-2 pt-1 border-t border-ui-stroke-subtle">
               <div className="flex items-center justify-between text-[13px]">
                 <span className="font-bold text-ui-content-secondary">
-                  {language === 'bn' ? 'সাম্প্রতিক প্রতিবেদন:' : 'Recent reports:'}
+                  {language === 'bn' ? 'এলাকার সাম্প্রতিক রিপোর্ট:' : 'Recent in this area:'}
                 </span>
               </div>
 
@@ -298,7 +298,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           </div>
 
           <div className="text-[13px] font-bold text-ui-content-secondary">
-            {language === 'bn' ? 'এলাকা অনুযায়ী দেখুন:' : 'Explore by district:'}
+            {language === 'bn' ? 'এলাকা অনুযায়ী দেখুন (ক্লিক করে জুম করুন):' : 'Explore by District (Click to Focus):'}
           </div>
 
           {/* District list */}
@@ -386,10 +386,10 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               {showAllDistricts
                 ? language === 'bn'
                   ? 'কম দেখুন'
-                  : 'Show less'
+                  : 'Show Less'
                 : language === 'bn'
                 ? `সকল জেলা (${toBanglaDigits(rankedDistricts.length)}টি)`
-                : `All districts (${rankedDistricts.length})`}
+                : `All Districts (${rankedDistricts.length})`}
             </span>
             {showAllDistricts ? <MapIcon name="chevron-up" size="xs" /> : <MapIcon name="chevron-down" size="xs" />}
           </button>
