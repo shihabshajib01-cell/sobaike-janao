@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { ZapOff, PlusCircle, AlertCircle, RefreshCw, Info } from 'lucide-react';
+import { AlertCircle, Info } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
@@ -7,10 +7,10 @@ import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
 import { FilterChip } from '../components/ui/FilterChip';
-import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 
 export const UtilityPage: React.FC = () => {
@@ -59,64 +59,35 @@ export const UtilityPage: React.FC = () => {
 
   return (
     <PublicPageContainer id="utility-page-container">
-      {/* 1. Standard Type A Section Header */}
-      <section
+      {/* 1. Category Hero Slider */}
+      <CategoryHeroSlider
         id="utility-header-banner"
-        className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 md:p-7 space-y-3.5 md:space-y-4 shadow-2xs"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div className="space-y-2 text-left flex-1">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                style={{
-                  backgroundColor: 'var(--sec-load_shedding-bg)',
-                  color: 'var(--sec-load_shedding-primary)',
-                }}
-              >
-                <ZapOff className="w-4 h-4" aria-hidden="true" />
-              </div>
-              <span
-                className="text-[13px] sm:text-[14px] font-semibold"
-                style={{ color: 'var(--sec-load_shedding-text)' }}
-              >
-                {language === 'bn' ? config.shortNameBn : config.shortNameEn}
-              </span>
-            </div>
+        section="load_shedding"
+        slides={[
+          {
+            id: 'utility-primary',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
+            action: {
+              labelBn: 'অভিযোগ জানান',
+              labelEn: 'File Report',
+              onClick: () => openReportComposer('load_shedding'),
+            },
+          },
+        ]}
+      />
 
-            <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-ui-content-primary tracking-tight">
-              {language === 'bn' ? config.nameBn : config.nameEn}
-            </h1>
-
-            <p className="text-[16px] leading-[1.6] md:leading-[26px] text-ui-content-secondary">
-              {language === 'bn' ? config.descriptionBn : config.descriptionEn}
-            </p>
-          </div>
-
-          <div className="shrink-0 pt-1">
-            <Button
-              id="utility-header-file-report-btn"
-              variant="primary"
-              size="md"
-              leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
-              onClick={() => openReportComposer('load_shedding')}
-              className="w-full sm:w-auto"
-            >
-              {language === 'bn' ? 'অভিযোগ জানান' : 'File Report'}
-            </Button>
-          </div>
-        </div>
-
-        {/* Quiet Information Strip */}
-        <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-          <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-          <span>
-            {language === 'bn'
-              ? 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ জানান।'
-              : 'Report load shedding, gas shortages, or excess electricity bills responsibly.'}
-          </span>
-        </div>
-      </section>
+      {/* Quiet Information Strip */}
+      <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
+        <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+        <span>
+          {language === 'bn'
+            ? 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ জানান।'
+            : 'Report load shedding, gas shortages, or excess electricity bills responsibly.'}
+        </span>
+      </div>
 
       {/* 2. Subcategory & Location Filter Controls */}
       <section id="utility-filter-section" className="space-y-3">

@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { PlusCircle, AlertCircle, Info } from 'lucide-react';
-import { EvStationIcon } from '../components/branding/EvStationIcon';
+import { AlertCircle, Info } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
-import { FilterChip } from '../components/ui/FilterChip';
-import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 
 export const RickshawPage: React.FC = () => {
@@ -56,49 +54,30 @@ export const RickshawPage: React.FC = () => {
 
   return (
     <PublicPageContainer id="rickshaw-page-container">
-      {/* 1. Standard Type A Section Header */}
-      <section
+      {/* 1. Category Hero Slider */}
+      <CategoryHeroSlider
         id="rickshaw-header-banner"
-        className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 md:p-7 space-y-3.5 md:space-y-4 shadow-2xs"
-      >
-        <div className="space-y-2 text-left">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-              style={{
-                backgroundColor: 'var(--sec-rickshaw-bg)',
-                color: 'var(--sec-rickshaw-primary)',
-              }}
-            >
-              <EvStationIcon className="w-4 h-4" aria-hidden="true" />
-            </div>
-            <span
-              className="text-[13px] sm:text-[14px] font-semibold"
-              style={{ color: 'var(--sec-rickshaw-text)' }}
-            >
-              {language === 'bn' ? config.shortNameBn : config.shortNameEn}
-            </span>
-          </div>
+        section="rickshaw"
+        slides={[
+          {
+            id: 'rickshaw-primary',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
+          },
+        ]}
+      />
 
-          <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-ui-content-primary tracking-tight">
-            {language === 'bn' ? config.nameBn : config.nameEn}
-          </h1>
-
-          <p className="text-[16px] leading-[1.6] md:leading-[26px] text-ui-content-secondary">
-            {language === 'bn' ? config.descriptionBn : config.descriptionEn}
-          </p>
-        </div>
-
-        {/* Quiet Information Strip */}
-        <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-          <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-          <span>
-            {language === 'bn'
-              ? 'অবৈধ বা ঝুঁকিপূর্ণ অটোরিকশা চার্জিং স্টেশনের অবস্থান ও তথ্য জানান।'
-              : 'Report details and location of illegal or unsafe auto-rickshaw charging stations.'}
-          </span>
-        </div>
-      </section>
+      {/* Quiet Information Strip */}
+      <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
+        <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+        <span>
+          {language === 'bn'
+            ? 'অবৈধ বা ঝুঁকিপূর্ণ অটোরিকশা চার্জিং স্টেশনের অবস্থান ও তথ্য জানান।'
+            : 'Report details and location of illegal or unsafe auto-rickshaw charging stations.'}
+        </span>
+      </div>
 
       {/* 2. Location Filter Controls */}
       <section id="rickshaw-filter-section" className="space-y-3">
