@@ -145,8 +145,15 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
           <div className="space-y-2">
             <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি' : "Couldn't load report"}
+              {language === 'bn' ? 'প্রতিবেদনটি লোড করা সম্ভব হয়নি' : 'Unable to Load Report'}
             </h1>
+            <div className="max-w-[720px] mx-auto">
+              <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
+                {language === 'bn'
+                  ? 'সার্ভারের সাথে সংযোগে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
+                  : 'There was a temporary network issue connecting to the server. Please try again.'}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -155,7 +162,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               onClick={fetchReport}
               className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
-              <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}</span>
+              <span>{language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}</span>
             </button>
             <button
               type="button"
@@ -169,7 +176,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-              <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
+              <span>{language === 'bn' ? 'ফিরে যান' : 'Go Back'}</span>
             </button>
           </div>
         </div>
@@ -177,7 +184,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     );
   }
 
-  // If report does not exist, show dedicated "Report not found" state
+  // If report does not exist, show dedicated "Report Unavailable / Not Found" state
   if (!report) {
     return (
       <PublicPageContainer id="report-detail-not-found-container" className="w-full max-w-[900px] mx-auto">
@@ -188,13 +195,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
           <div className="space-y-2">
             <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'প্রতিবেদন পাওয়া যায়নি' : 'Report not found'}
+              {language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ' : 'Report Unavailable / Not Found'}
             </h1>
             <div className="max-w-[720px] mx-auto">
               <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
                 {language === 'bn'
-                  ? 'প্রতিবেদনটি অনুপলব্ধ হতে পারে বা লিংকটি সঠিক নয়।'
-                  : 'This report may be unavailable or the link may be incorrect.'}
+                  ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
+                  : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
               </p>
             </div>
           </div>
@@ -212,7 +219,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-              <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
+              <span>{language === 'bn' ? 'পূর্ববর্তী পাতায় যান' : 'Go Back'}</span>
             </button>
 
             <button
@@ -221,7 +228,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <Home className="w-4 h-4" aria-hidden="true" />
-              <span>{language === 'bn' ? 'মূল পাতায় ফিরুন' : 'Back to home'}</span>
+              <span>{language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}</span>
             </button>
           </div>
         </div>
@@ -287,7 +294,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           className="inline-flex items-center gap-2 text-[16px] leading-[24px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>{language === 'bn' ? 'তালিকায় ফিরুন' : 'Back to reports'}</span>
+          <span>{language === 'bn' ? 'তালিকায় ফিরে যান' : 'Back to Reports'}</span>
         </button>
 
         {/* Quiet Share CTA */}
@@ -299,12 +306,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           {isCopied ? (
             <>
               <Check className="w-4 h-4 text-ui-success-text" aria-hidden="true" />
-              <span className="text-ui-success-text font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link copied'}</span>
+              <span className="text-ui-success-text font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link Copied'}</span>
             </>
           ) : (
             <>
               <Share2 className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-              <span>{language === 'bn' ? 'শেয়ার করুন' : 'Share'}</span>
+              <span>{language === 'bn' ? 'শেয়ার করুন' : 'Share'}</span>
             </>
           )}
         </button>
@@ -340,8 +347,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <Calendar className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
             <span>
               {report.subcategoryId === 'excess-electricity-bill' && report.recentBillMonth
-                ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing period: '}${formatBillingMonth(report.recentBillMonth, language)}`
-                : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}${incidentDate}`}
+                ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing Period: '}${formatBillingMonth(report.recentBillMonth, language)}`
+                : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident Date: '}${incidentDate}`}
             </span>
           </div>
           {report.utilityEndTime && (
@@ -408,13 +415,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-3">
             <h2 className="text-[14px] font-semibold text-ui-content-secondary flex items-center gap-2">
               <Zap className="w-4 h-4 text-ui-content-muted" />
-              <span>{language === 'bn' ? 'বিদ্যুৎ বিল সংক্রান্ত বিবরণ' : 'Electricity billing details'}</span>
+              <span>{language === 'bn' ? 'বিদ্যুৎ বিল সংক্রান্ত বিবরণ' : 'Electricity Billing Details'}</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="p-3 bg-ui-surface rounded-lg border border-ui-stroke-subtle space-y-1">
                 <span className="text-[12px] text-ui-content-muted block">
-                  {language === 'bn' ? 'সাম্প্রতিক বিলের মাস ও পরিমাণ' : 'Recent bill month & amount'}
+                  {language === 'bn' ? 'সাম্প্রতিক বিলের মাস ও পরিমাণ' : 'Recent Bill Month & Amount'}
                 </span>
                 <p className="text-[16px] font-bold text-ui-content-primary">
                   {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : '-'}
@@ -428,7 +435,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
               <div className="p-3 bg-ui-surface rounded-lg border border-ui-stroke-subtle space-y-1">
                 <span className="text-[12px] text-ui-content-muted block">
-                  {language === 'bn' ? 'পূর্ববর্তী বিলের মাস ও পরিমাণ' : 'Previous bill month & amount'}
+                  {language === 'bn' ? 'পূর্ববর্তী বিলের মাস ও পরিমাণ' : 'Previous Bill Month & Amount'}
                 </span>
                 <p className="text-[16px] font-bold text-ui-content-primary">
                   {report.previousBillMonth ? formatBillingMonth(report.previousBillMonth, language) : '-'}
@@ -445,7 +452,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             {report.recentBillAmount !== undefined && report.previousBillAmount !== undefined && (
               <div className="flex items-center gap-2 text-[13px] text-ui-content-secondary pt-2 border-t border-ui-stroke-subtle">
                 <span className="text-ui-content-muted">
-                  {language === 'bn' ? 'পার্থক্য বা বৃদ্ধি:' : 'Difference / increase:'}
+                  {language === 'bn' ? 'পার্থক্য / অতিরিক্ত বৃদ্ধি:' : 'Difference / Excess Increase:'}
                 </span>
                 <span className="font-semibold text-ui-error-text">
                   +৳ {language === 'bn'
@@ -466,7 +473,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         <div className="pt-2 space-y-3">
           <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
             <FileText className="w-4 h-4 text-ui-content-muted" />
-            <span>{language === 'bn' ? 'প্রতিবেদনের বিবরণ' : 'Report details'}</span>
+            <span>{language === 'bn' ? 'প্রতিবেদনের বিবরণ' : 'Report Narrative'}</span>
           </h2>
           <div className="max-w-[720px] text-[16px] leading-[26px] text-ui-content-primary space-y-3">
             <p className="whitespace-pre-line">{fullDesc}</p>
@@ -495,7 +502,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             </ul>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'
-                ? '* ব্যক্তিগত গোপনীয়তার জন্য সংবেদনশীল তথ্য সার্বজনীনভাবে প্রদর্শিত হয় না।'
+                ? '* ব্যক্তিগত গোপনীয়তা ও সুরক্ষায় সংবেদনশীল ফাইলসমূহ সার্বজনীনভাবে প্রদর্শিত হয় না।'
                 : '* Sensitive contact materials are withheld for privacy.'}
             </p>
           </div>
@@ -531,7 +538,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
             <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
               <Scale className="w-4 h-4 text-ui-content-secondary" />
-              <span>{language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}</span>
+              <span>{language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}</span>
             </h3>
 
             {/* Error UI when responses failed to load and connection gate is active */}
@@ -539,7 +546,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               <div className="p-3.5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[14px]">
                 <span className="text-ui-content-secondary">
                   {language === 'bn'
-                    ? 'প্রকাশিত প্রতিক্রিয়াগুলো লোড করা যায়নি।'
+                    ? 'প্রকাশিত প্রতিক্রিয়াগুলো লোড করা যায়নি।'
                     : 'Published responses could not be loaded.'}
                 </span>
                 <button
@@ -578,7 +585,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   <div key={resp.id} className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2.5">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-[14px]">
                       <span className="font-semibold text-ui-content-primary">
-                        {language === 'bn' ? 'তথ্য বা অভিজ্ঞতা' : 'Information / experience'}
+                        {language === 'bn' ? 'তথ্য / অভিজ্ঞতা' : 'Information / Experience'}
                       </span>
                       <div className="flex flex-wrap items-center gap-3 text-ui-content-muted text-[13px]">
                         {resp.incidentDate && (
@@ -614,7 +621,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   <div className="flex flex-wrap items-start justify-between gap-2 text-[14px]">
                     <div className="space-y-0.5">
                       <div className="font-semibold text-ui-content-primary">
-                        {language === 'bn' ? 'উল্লেখিত ব্যক্তি বা পক্ষ' : 'Mentioned person / party'}
+                        {language === 'bn' ? 'উল্লেখিত ব্যক্তি / পক্ষ' : 'Mentioned Person / Party'}
                       </div>
                       {resp.responderName && (
                         <div className="text-[14px] font-medium text-ui-content-secondary break-words">
@@ -665,7 +672,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn'
-              ? 'আমার কাছে তথ্য আছে বা আমিও ভুক্তভোগী'
+              ? 'আমার কাছে তথ্য আছে / আমিও ভুক্তভোগী'
               : 'I have information / I experienced this too'}
           </button>
           <button
@@ -684,7 +691,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <div className="flex items-center justify-between">
             <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-1.5">
               <Layers className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-              <span>{language === 'bn' ? 'সম্পর্কিত প্রতিবেদন' : 'Related reports'}</span>
+              <span>{language === 'bn' ? 'সম্পর্কিত প্রতিবেদন' : 'Related Reports'}</span>
             </h3>
           </div>
 

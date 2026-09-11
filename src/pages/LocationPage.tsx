@@ -10,7 +10,6 @@ import { SECTIONS } from '../theme/tokens';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
 import { BRAND_NAME } from '../lib/seo';
-import { toBanglaDigits } from '../utils/formatters';
 
 export interface LocationPageProps {
   locationId: string;
@@ -145,7 +144,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
           className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}</span>
+          <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to Explore'}</span>
         </button>
         <span aria-hidden="true">/</span>
         <span className="text-ui-content-primary font-semibold">{districtDisplayName}</span>
@@ -160,35 +159,35 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
             </h1>
             {divisionDisplayName && (
               <span className="text-[14px] px-2.5 py-0.5 rounded-lg bg-ui-surface-subtle text-ui-content-secondary font-medium border border-ui-stroke-subtle">
-                {language === 'bn' ? `${divisionDisplayName} বিভাগ` : `${divisionDisplayName} division`}
+                {language === 'bn' ? `${divisionDisplayName} বিভাগ` : `${divisionDisplayName} Division`}
               </span>
             )}
           </div>
           <p className="text-[16px] leading-[26px] text-ui-content-secondary">
             {language === 'bn'
-              ? 'এই এলাকার প্রতিবেদন'
-              : 'Reports from this area'}
+              ? 'এই এলাকার প্রকাশিত নাগরিক প্রতিবেদনসমূহ।'
+              : 'Published community reports associated with this area.'}
           </p>
         </div>
 
         {/* Quiet Inline Summary */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 border-t border-ui-stroke-subtle text-[14px] text-ui-content-secondary font-medium">
           <span>
-            {language === 'bn' ? `${toBanglaDigits(reports.length)}টি প্রতিবেদন` : `${reports.length} reports`}
+            {language === 'bn' ? `${reports.length}টি প্রকাশিত প্রতিবেদন` : `${reports.length} published reports`}
           </span>
           {reports.length > 0 && (
             <>
               <span>·</span>
               <span>
-                {language === 'bn' ? `${SECTIONS.harassment.shortNameBn} ${toBanglaDigits(harassmentCount)}` : `${SECTIONS.harassment.shortNameEn} ${harassmentCount}`}
+                {language === 'bn' ? `${SECTIONS.harassment.shortNameBn} ${harassmentCount}` : `${SECTIONS.harassment.shortNameEn} ${harassmentCount}`}
               </span>
               <span>·</span>
               <span>
-                {language === 'bn' ? `${SECTIONS.rickshaw.shortNameBn} ${toBanglaDigits(rickshawCount)}` : `${SECTIONS.rickshaw.shortNameEn} ${rickshawCount}`}
+                {language === 'bn' ? `${SECTIONS.rickshaw.shortNameBn} ${rickshawCount}` : `${SECTIONS.rickshaw.shortNameEn} ${rickshawCount}`}
               </span>
               <span>·</span>
               <span>
-                {language === 'bn' ? `${SECTIONS.extortion.shortNameBn} ${toBanglaDigits(extortionCount)}` : `${SECTIONS.extortion.shortNameEn} ${extortionCount}`}
+                {language === 'bn' ? `${SECTIONS.extortion.shortNameBn} ${extortionCount}` : `${SECTIONS.extortion.shortNameEn} ${extortionCount}`}
               </span>
             </>
           )}
@@ -200,7 +199,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         <ReportFeedSkeleton
           count={3}
           id="location-feed-skeleton"
-          ariaLabel={language === 'bn' ? 'এলাকার প্রতিবেদন লোড হচ্ছে...' : 'Loading location reports...'}
+          ariaLabel={language === 'bn' ? 'এলাকার তথ্য লোড হচ্ছে...' : 'Loading location reports...'}
         />
       )}
 
@@ -210,15 +209,15 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
-              ? 'এই এলাকার প্রতিবেদন লোড করা যায়নি।'
-              : "Couldn't load reports for this area."}
+              ? 'এলাকার তথ্য লোড করতে সমস্যা হয়েছে।'
+              : 'Failed to load reports for this location. Please try again.'}
           </p>
           <button
             type="button"
             onClick={loadData}
             className="btn-primary-action px-4 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
-            {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
+            {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>
         </div>
       )}
@@ -232,7 +231,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               <span>
                 {language === 'bn'
                   ? 'প্রকাশিত প্রতিবেদন'
-                  : 'Published reports'}
+                  : 'Published Reports'}
               </span>
             </h2>
           </div>
@@ -247,7 +246,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-8 text-center space-y-2">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
               <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই।' : 'No reports in this area.'}
+                {language === 'bn' ? 'এই এলাকার সঙ্গে বর্তমানে কোনো প্রকাশিত প্রতিবেদন যুক্ত নেই।' : 'No published reports are currently associated with this area.'}
               </h3>
             </div>
           )}

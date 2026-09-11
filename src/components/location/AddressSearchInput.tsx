@@ -169,7 +169,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
         htmlFor="address-search-input"
         className="block text-[13px] font-bold text-primary"
       >
-        {language === 'bn' ? 'ঠিকানা বা এলাকা' : 'Address or area'}
+        {language === 'bn' ? 'ঠিকানা বা জায়গা খুঁজুন' : 'Search address or place'}
       </label>
 
       <div className="relative flex items-center">
@@ -205,8 +205,8 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
           disabled={disabled || isResolving}
           placeholder={
             language === 'bn'
-              ? 'এলাকা বা রাস্তার নাম লিখুন'
-              : 'Enter area or street name'
+              ? 'এলাকা, রাস্তা, প্রতিষ্ঠান বা পরিচিত জায়গার নাম লিখুন'
+              : 'Type an area, road, place, or landmark'
           }
           className="w-full pl-10 pr-10 py-2.5 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-ui-accent min-h-[42px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-ui-surface-subtle"
         />
@@ -217,8 +217,8 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
             type="button"
             onClick={handleClear}
             className="absolute right-3 p-1 text-ui-content-secondary hover:text-ui-content-primary rounded-full hover:bg-ui-surface-subtle cursor-pointer transition-colors"
-            title={language === 'bn' ? 'মুছুন' : 'Clear'}
-            aria-label={language === 'bn' ? 'ঠিকানা মুছুন' : 'Clear address'}
+            title={language === 'bn' ? 'মুছে ফেলুন' : 'Clear'}
+            aria-label={language === 'bn' ? 'মুছে ফেলুন' : 'Clear'}
           >
             <X className="w-4 h-4" />
           </button>
@@ -273,7 +273,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>
                 {language === 'bn'
-                  ? 'অনুসন্ধান করা যায়নি। আবার চেষ্টা করুন।'
+                  ? 'অনুসন্ধানে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
                   : 'Search error. Please try again.'}
               </span>
             </div>
