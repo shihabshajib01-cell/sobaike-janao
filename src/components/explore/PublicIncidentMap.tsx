@@ -176,7 +176,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     mappedPoints.forEach((pt) => {
       const isSelected = activeReport?.id === pt.report.id;
       const secConf = SECTIONS[pt.report.segment];
-      const color = secConf.primaryColor;
+      const color = `var(--sec-${pt.report.segment}-primary, ${secConf.primaryColor})`;
+      const strokeColor = pt.report.segment === 'rickshaw' ? 'var(--sec-rickshaw-on-primary, #050505)' : 'var(--ui-text-inverse, #FFFFFF)';
 
       // Icon SVG inside marker
       const markerHtml = `
@@ -185,16 +186,16 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           height: 32px;
           border-radius: 50%;
           background-color: ${color};
-          border: 2.5px solid #FFFFFF;
+          border: 2.5px solid var(--ui-surface, #FFFFFF);
           box-shadow: 0 4px 12px rgba(0,0,0,0.25);
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: transform 0.15s ease, box-shadow 0.15s ease;
-          ${isSelected ? 'transform: scale(1.3); box-shadow: 0 0 0 4px rgba(58,124,165,0.45); z-index: 1000;' : ''}
+          ${isSelected ? 'transform: scale(1.3); box-shadow: 0 0 0 4px var(--ui-focus, rgba(58,124,165,0.45)); z-index: 1000;' : ''}
         ">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             ${
               pt.report.segment === 'harassment'
                 ? '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />'

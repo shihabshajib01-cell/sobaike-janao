@@ -383,7 +383,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                         handleRemoveImage(img.id);
                       }}
                       aria-label={language === 'bn' ? `ছবি ${index + 1} মুছুন` : `Remove image ${index + 1}`}
-                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-ui-error-text hover:opacity-90 text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10"
+                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-ui-destructive-bg hover:bg-ui-destructive-hover text-ui-destructive-text border border-ui-destructive-border flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10"
                     >
                       <X className="w-5 h-5" />
                     </button>

@@ -34,11 +34,11 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       disabled={disabled}
       onClick={onClick}
       style={
-        selected && config
+        selected && section
           ? {
-              backgroundColor: config.primaryColor,
-              borderColor: config.primaryColor,
-              color: config.colors.filledText || 'var(--ui-content-inverse)',
+              backgroundColor: `var(--sec-${section}-primary)`,
+              borderColor: `var(--sec-${section}-primary)`,
+              color: `var(--sec-${section}-on-primary, var(--ui-text-inverse))`,
             }
           : undefined
       }

@@ -144,7 +144,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         {/* Bottom sheet pull indicator on mobile */}
         {position === 'bottom' && (
           <div className="w-full flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1.5 rounded-full bg-surface-hover" />
+            <div className="w-10 h-1.5 rounded-full bg-ui-surface-hover" />
           </div>
         )}
 

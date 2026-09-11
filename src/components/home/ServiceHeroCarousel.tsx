@@ -136,7 +136,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         onKeyDown={handleKeyDown}
         className="relative overflow-hidden rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         style={{
-          borderLeftColor: conf ? conf.primaryColor : 'var(--ui-border-subtle)',
+          borderLeftColor: conf ? `var(--sec-${currentSlide.key}-primary)` : 'var(--ui-border-subtle)',
           borderLeftWidth: '4px',
         }}
       >
@@ -186,7 +186,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-medium bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary">
                 <span
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: conf.primaryColor }}
+                  style={{ backgroundColor: `var(--sec-${currentSlide.key}-primary)` }}
                 />
                 {language === 'bn'
                   ? `${toBanglaDigits(count)}টি প্রকাশিত অভিযোগ`
@@ -216,8 +216,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     onClick={() => openReportComposer()}
                     className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-xl font-bold text-[15px] transition-all cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus hover:brightness-105 active:scale-[0.98]"
                     style={{
-                      backgroundColor: conf.primaryColor,
-                      color: currentSlide.key === 'rickshaw' ? 'var(--sec-rickshaw-on-primary, #050505)' : '#FFFFFF',
+                      backgroundColor: `var(--sec-${currentSlide.key}-primary)`,
+                      color: `var(--sec-${currentSlide.key}-on-primary, var(--ui-text-inverse))`,
                     }}
                   >
                     <AppIcon name="plus" size="md" strokeWidth={2.5} />

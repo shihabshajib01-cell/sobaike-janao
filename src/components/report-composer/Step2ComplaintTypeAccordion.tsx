@@ -90,7 +90,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
                   }`}
                 >
                   {isSelected ? (
-                    <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-ui-content-inverse" />
                   ) : null}
                 </div>
               </div>
