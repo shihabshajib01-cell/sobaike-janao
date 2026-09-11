@@ -8,13 +8,6 @@ export interface ApiError {
   field?: string;
 }
 
-const isMockAllowed = (): boolean => {
-  if (import.meta.env.VITE_ENABLE_MOCK_MODE === 'false') {
-    return false;
-  }
-  return !isSupabaseConfigured() || import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-};
-
 class ApiClient {
   // --- Public Response APIs ---
   async submitCitizenResponse(
@@ -27,7 +20,10 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      if (!isMockAllowed()) {
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
+      if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
           message: 'Supabase client is not configured.',
@@ -92,7 +88,10 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      if (!isMockAllowed()) {
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
+      if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
           message: 'Supabase client is not configured.',
@@ -164,8 +163,11 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      if (isMockAllowed()) {
-        console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
+      if (isMockAllowed) {
+        console.warn('[ApiClient] Supabase not configured — operating in local mock mode (DEV only)');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
         return {

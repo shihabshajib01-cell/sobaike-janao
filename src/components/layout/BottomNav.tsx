@@ -63,7 +63,7 @@ export const BottomNav: React.FC = () => {
         id="mobile-fab-report"
         type="button"
         onClick={() => openReportComposer()}
-        aria-label={language === 'bn' ? 'ঘটনা জানান' : 'Report Incident'}
+        aria-label={language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
         className="md:hidden fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom,0px)+12px)] z-40 w-14 h-14 min-w-[56px] min-h-[56px] rounded-full bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover active:scale-95 shadow-lg flex items-center justify-center cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
       >
         <Plus className="w-6 h-6 stroke-[2.5]" aria-hidden="true" />

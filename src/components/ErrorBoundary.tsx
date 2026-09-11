@@ -56,6 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
         return null;
       }
 
+      const isBn = typeof document !== 'undefined' ? document.documentElement.lang !== 'en' : true;
       return (
         <div className="min-h-screen bg-page text-primary flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-surface border border-subtle rounded-2xl p-6 md:p-8 text-center space-y-5 shadow-sm">
@@ -65,13 +66,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <div className="space-y-2">
               <h2 className="text-[24px] leading-[34px] font-bold text-primary">
-                কিছু সমস্যা হয়েছে / Something went wrong
+                {isBn ? 'কিছু সমস্যা হয়েছে' : 'Something went wrong'}
               </h2>
               <p className="text-[16px] leading-[26px] text-secondary">
-                অ্যাপ্লিকেশনটি সাময়িকভাবে কোনো ত্রুটির সম্মুখীন হয়েছে। নিচের বোতামে ক্লিক করে পুনরায় মূল পাতায় ফিরে যান।
-              </p>
-              <p className="text-[14px] leading-[22px] text-muted font-mono">
-                {this.state.errorMessage}
+                {isBn ? 'পৃষ্ঠাটি লোড করা যায়নি।' : "Couldn't load this page."}
               </p>
             </div>
 
@@ -81,7 +79,7 @@ export class ErrorBoundary extends Component<Props, State> {
               className="btn-primary-action inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl cursor-pointer min-h-[44px]"
             >
               <RotateCcw className="w-4 h-4" />
-              <span>মূল পাতায় ফিরে যান / Reload App</span>
+              <span>{isBn ? 'মূল পাতায় যান' : 'Go to home'}</span>
             </button>
           </div>
         </div>
