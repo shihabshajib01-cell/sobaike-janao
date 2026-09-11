@@ -16,7 +16,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
 
   return (
     <PublicPageContainer id={`coming-soon-${serviceKey}-page`}>
-      <div className="max-w-[640px] mx-auto py-10 md:py-16 px-4 text-center space-y-6">
+      <div className="w-full max-w-[640px] mx-auto py-10 md:py-16 text-center space-y-6">
         {/* Service Icon */}
         <div
           id={`coming-soon-icon-${serviceKey}`}
@@ -31,7 +31,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
             id={`coming-soon-badge-${serviceKey}`}
             className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[13px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-2xs"
           >
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-ui-warning-text animate-pulse" />
             <span>{language === 'bn' ? service.badgeBn : service.badgeEn}</span>
           </span>
         </div>
@@ -56,7 +56,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         </div>
 
         {/* Informative Notice Box */}
-        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 text-left max-w-[520px] mx-auto shadow-2xs space-y-2">
+        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 text-left w-full max-w-[480px] mx-auto shadow-2xs space-y-2">
           <p className="text-[14px] font-semibold text-ui-content-primary">
             {language === 'bn' ? 'সেবার অবস্থা' : 'Service Status'}
           </p>

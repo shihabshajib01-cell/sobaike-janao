@@ -34,11 +34,11 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       disabled={disabled}
       onClick={onClick}
       style={
-        selected && config
+        selected && section
           ? {
-              backgroundColor: config.primaryColor,
-              borderColor: config.primaryColor,
-              color: config.colors.filledText || '#FFFFFF',
+              backgroundColor: `var(--sec-${section}-primary)`,
+              borderColor: `var(--sec-${section}-primary)`,
+              color: `var(--sec-${section}-on-primary, var(--ui-text-inverse))`,
             }
           : undefined
       }
@@ -56,7 +56,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
         <span
           className={`ml-0.5 text-[11px] sm:text-[12px] px-1.5 py-0.2 rounded-full font-semibold leading-none ${
             selected
-              ? 'bg-black/20 dark:bg-black/30 text-current'
+              ? 'bg-current/20 text-current'
               : 'bg-ui-surface-subtle text-ui-content-muted'
           }`}
         >

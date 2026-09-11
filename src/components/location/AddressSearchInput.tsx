@@ -269,7 +269,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
           )}
 
           {hasError && !isLoading && (
-            <div className="flex items-center justify-center gap-1.5 px-3.5 py-3 text-center text-[13px] text-amber-600 dark:text-amber-400">
+            <div className="flex items-center justify-center gap-1.5 px-3.5 py-3 text-center text-[13px] text-ui-warning-text">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>
                 {language === 'bn'

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { MapPin, ArrowLeft, AlertCircle, FileText, RefreshCw } from 'lucide-react';
+import { ArrowLeft, AlertCircle, FileText } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { BANGLADESH_DISTRICTS } from '../data/districts';
 import { PublicReportService } from '../services/publicReportService';
@@ -70,15 +70,37 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
     : '';
 
   useEffect(() => {
-    if (!isLoading && !fetchError) {
+    if (!district) {
+      if (!isLoading) {
+        setDynamicSeo({
+          title: language === 'bn' ? `এলাকা পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Location Not Found | ${BRAND_NAME.en}`,
+          description:
+            language === 'bn'
+              ? 'এই এলাকার জন্য কোনো বৈধ প্রকাশিত প্রতিবেদন পৃষ্ঠা পাওয়া যায়নি।'
+              : 'No valid published report page was found for this location.',
+          robots: 'noindex, follow',
+          ogType: 'website',
+          ogSiteName: BRAND_NAME[language],
+        });
+      } else {
+        setDynamicSeo({
+          title: language === 'bn' ? `এলাকার প্রতিবেদন লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Location Reports... | ${BRAND_NAME.en}`,
+          description: language === 'bn' ? 'এলাকাভিত্তিক নাগরিক প্রতিবেদন লোড হচ্ছে।' : 'Loading location-based community reports.',
+          robots: 'noindex, follow',
+          ogType: 'website',
+          ogSiteName: BRAND_NAME[language],
+        });
+      }
+    } else if (!isLoading && !fetchError) {
+      const locName = language === 'bn' ? district.nameBn : district.nameEn;
       const title =
         language === 'bn'
-          ? `${districtDisplayName} এলাকার প্রতিবেদন | ${BRAND_NAME.bn}`
-          : `Reports from ${districtDisplayName} | ${BRAND_NAME.en}`;
+          ? `${locName} এলাকার প্রতিবেদন | ${BRAND_NAME.bn}`
+          : `Reports from ${locName} | ${BRAND_NAME.en}`;
       const description =
         language === 'bn'
-          ? `${districtDisplayName} এলাকার প্রকাশিত নাগরিক প্রতিবেদন ও জনস্বার্থ রেকর্ড।`
-          : `Published community reports and public records from ${districtDisplayName}, Bangladesh.`;
+          ? `${locName} এলাকার প্রকাশিত নাগরিক প্রতিবেদন ও জনস্বার্থ রেকর্ড।`
+          : `Published community reports and public records from ${locName}, Bangladesh.`;
 
       setDynamicSeo({
         title,
@@ -104,7 +126,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         ogSiteName: BRAND_NAME[language],
       });
     }
-  }, [districtDisplayName, isLoading, fetchError, language, setDynamicSeo]);
+  }, [district, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="location-page-container">
@@ -183,9 +205,9 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
-          <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" aria-hidden="true" />
-          <p className="text-[16px] font-semibold text-rose-500">
+        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
+          <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
+          <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
               ? 'এলাকার তথ্য লোড করতে সমস্যা হয়েছে।'
               : 'Failed to load reports for this location. Please try again.'}

@@ -1,7 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
-import { mockStorage } from './mockStorage';
-
 
 export interface ApiError {
   code: string;
@@ -22,10 +20,9 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed =
-        !isSupabaseConfigured() ||
-        import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
       if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
@@ -34,21 +31,9 @@ class ApiClient {
         };
         throw error;
       }
-      const respId = `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
-      mockStorage.addMockResponse(reportId, {
-        id: respId,
-        responseType: 'citizen_information',
-        content: payload.description,
-        incidentDate: payload.incidentDate || null,
-        publishedAt: new Date().toISOString(),
-        responderType: null,
-        responderName: null,
-        designation: null,
-        organizationName: null,
-      });
       return {
         success: true,
-        responseId: respId,
+        responseId: `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
         message: 'Mock response submitted successfully.',
         messageBn: 'আপনার তথ্য সফলভাবে জমা হয়েছে (মক মোড)।',
       };
@@ -103,10 +88,9 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed =
-        !isSupabaseConfigured() ||
-        import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
       if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
@@ -115,21 +99,9 @@ class ApiClient {
         };
         throw error;
       }
-      const respId = `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
-      mockStorage.addMockResponse(reportId, {
-        id: respId,
-        responseType: 'subject_response',
-        content: payload.officialStatement,
-        incidentDate: null,
-        publishedAt: new Date().toISOString(),
-        responderType: payload.responderType || 'mentioned_person',
-        responderName: payload.responderName,
-        designation: payload.designation || null,
-        organizationName: payload.organizationName || null,
-      });
       return {
         success: true,
-        responseId: respId,
+        responseId: `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
         message: 'Mock subject response submitted successfully.',
         messageBn: 'প্রতিউত্তর সফলভাবে জমা হয়েছে (মক মোড)।',
       };
@@ -191,63 +163,13 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed =
-        !isSupabaseConfigured() ||
-        import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-
+      const isMockAllowed = Boolean(
+        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
+      );
       if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
+        console.warn('[ApiClient] Supabase not configured — operating in local mock mode (DEV only)');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
-        const mockReport = {
-          id: mockReportId,
-          segment: payload.segment || 'harassment',
-          subcategoryId: payload.subcategoryId || 'other',
-          subcategoryBn: payload.subcategoryBn || payload.subcategoryId || '',
-          subcategoryEn: payload.subcategoryEn || payload.subcategoryId || '',
-          title: payload.title || `অভিযোগ #${mockReportId}`,
-          reportedSubject: payload.reportedSubject || 'অজ্ঞাত',
-          subjectType: payload.subjectType || 'individual',
-          organization: payload.organization,
-          incidentDate: payload.incidentDate || new Date().toISOString().split('T')[0],
-          incidentTime: payload.incidentTime,
-          description: payload.description || '',
-          location: payload.location,
-          hasSupportingInfo: Boolean(images && images.length > 0),
-          status: 'submitted',
-          statusBn: 'জমা হয়েছে / পর্যালোচনার অপেক্ষায়',
-          statusEn: 'Submitted / Awaiting Review',
-          createdAt: new Date().toISOString(),
-          publicVersion: {
-            titleBn: payload.title || `অভিযোগ #${mockReportId}`,
-            titleEn: payload.title || `Complaint #${mockReportId}`,
-            shortDescriptionBn: (payload.description || '').slice(0, 120),
-            shortDescriptionEn: (payload.description || '').slice(0, 120),
-            fullDescriptionBn: payload.description || '',
-            fullDescriptionEn: payload.description || '',
-            reportedSubjectBn: payload.reportedSubject,
-            reportedSubjectEn: payload.reportedSubject,
-            locationBn: payload.location?.formattedAddress || 'অবস্থান গোপন',
-            locationEn: payload.location?.formattedAddress || 'Location withheld',
-            districtBn: payload.location?.district || '',
-            districtEn: payload.location?.district || '',
-            areaBn: payload.location?.area || '',
-            areaEn: payload.location?.area || '',
-            incidentDateBn: payload.incidentDate || '',
-            incidentDateEn: payload.incidentDate || '',
-            evidenceSummaryBn: [],
-            evidenceSummaryEn: [],
-            sensitiveSettings: {
-              reporterIdentity: 'hidden',
-              locationPrivacy: 'public',
-              subjectNamePrivacy: 'public',
-              organizationPrivacy: 'public',
-              evidencePrivacy: 'public',
-            },
-          },
-        };
-        mockStorage.addMockReport(mockReport as any);
-
         return {
           success: true,
           reportId: mockReportId,

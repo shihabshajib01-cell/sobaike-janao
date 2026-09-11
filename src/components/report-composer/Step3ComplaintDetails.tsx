@@ -986,11 +986,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         language === 'bn' ? 'সংক্ষিপ্ত শিরোনাম' : 'Short headline'
                       }
                       className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.title ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                        errors.title ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.title && (
-                      <p className="text-[13px] text-red-500 font-semibold">{errors.title}</p>
+                      <p className="text-[13px] text-ui-error-text font-semibold">{errors.title}</p>
                     )}
                   </div>
                 )}
@@ -1019,11 +1019,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           if (errors.recentBillMonth) setErrors((prev) => ({ ...prev, recentBillMonth: '' }));
                         }}
                         className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                          errors.recentBillMonth ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                          errors.recentBillMonth ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.recentBillMonth && (
-                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.recentBillMonth}</p>
+                        <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.recentBillMonth}</p>
                       )}
                     </div>
 
@@ -1051,11 +1051,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           if (errors.recentBillAmount) setErrors((prev) => ({ ...prev, recentBillAmount: '' }));
                         }}
                         className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                          errors.recentBillAmount ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                          errors.recentBillAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.recentBillAmount && (
-                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.recentBillAmount}</p>
+                        <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.recentBillAmount}</p>
                       )}
                     </div>
                   </div>
@@ -1081,11 +1081,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
                         }}
                         className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                          errors.previousBillMonth ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                          errors.previousBillMonth ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.previousBillMonth && (
-                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.previousBillMonth}</p>
+                        <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.previousBillMonth}</p>
                       )}
                     </div>
 
@@ -1113,11 +1113,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           if (errors.previousBillAmount) setErrors((prev) => ({ ...prev, previousBillAmount: '' }));
                         }}
                         className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                          errors.previousBillAmount ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                          errors.previousBillAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                         }`}
                       />
                       {errors.previousBillAmount && (
-                        <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.previousBillAmount}</p>
+                        <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.previousBillAmount}</p>
                       )}
                     </div>
                   </div>
@@ -1157,11 +1157,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
                       }}
                       className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                        errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                        errors.incidentDate ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.incidentDate && (
-                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentDate}</p>
+                      <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.incidentDate}</p>
                     )}
                   </div>
 
@@ -1188,11 +1188,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         }
                       }}
                       className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                        errors.incidentTime ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                        errors.incidentTime ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.incidentTime && (
-                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentTime}</p>
+                      <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.incidentTime}</p>
                     )}
                   </div>
 
@@ -1216,11 +1216,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
                       }}
                       className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                        errors.utilityEndTime ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                        errors.utilityEndTime ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                       }`}
                     />
                     {errors.utilityEndTime && (
-                      <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.utilityEndTime}</p>
+                      <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.utilityEndTime}</p>
                     )}
                   </div>
                 </div>
@@ -1257,12 +1257,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       : 'Describe the gas shortage, low pressure, or outage details...'
                   }
                   className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
-                    errors.description ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                    errors.description ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                   }`}
                 />
                 <div className="flex items-center justify-between gap-2">
                   {errors.description ? (
-                    <p className="text-[13px] text-red-500 font-semibold">{errors.description}</p>
+                    <p className="text-[13px] text-ui-error-text font-semibold">{errors.description}</p>
                   ) : (
                     <span />
                   )}
@@ -1270,7 +1270,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     <span
                       className={`text-[12px] font-mono shrink-0 ml-auto ${
                         (formData.description?.length || 0) > 2000
-                          ? 'text-red-500 font-bold'
+                          ? 'text-ui-error-text font-bold'
                           : 'text-ui-content-muted'
                       }`}
                     >
@@ -1317,11 +1317,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       language === 'bn' ? 'সংক্ষিপ্ত শিরোনাম' : 'Short headline'
                     }
                     className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                      errors.title ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                      errors.title ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                     }`}
                   />
                   {errors.title && (
-                    <p className="text-[13px] text-red-500 font-semibold">{errors.title}</p>
+                    <p className="text-[13px] text-ui-error-text font-semibold">{errors.title}</p>
                   )}
                 </div>
               )}
@@ -1350,12 +1350,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     : 'Describe the incident clearly...'
                 }
                 className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-xl text-[15px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
-                  errors.description ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                  errors.description ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                 }`}
               />
               <div className="flex items-center justify-between gap-2">
                 {errors.description ? (
-                  <p className="text-[13px] text-red-500 font-semibold">{errors.description}</p>
+                  <p className="text-[13px] text-ui-error-text font-semibold">{errors.description}</p>
                 ) : (
                   <span />
                 )}
@@ -1363,7 +1363,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <span
                     className={`text-[12px] font-mono shrink-0 ml-auto ${
                       (formData.description?.length || 0) > 2000
-                        ? 'text-red-500 font-bold'
+                        ? 'text-ui-error-text font-bold'
                         : 'text-ui-content-muted'
                     }`}
                   >
@@ -1406,11 +1406,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
                   }}
                   className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                    errors.incidentDate ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                    errors.incidentDate ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                   }`}
                 />
                 {errors.incidentDate && (
-                  <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.incidentDate}</p>
+                  <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.incidentDate}</p>
                 )}
               </div>
 
@@ -1549,14 +1549,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Reporter Device Location Gate */}
             {reporterGateState === 'verified' ? (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[12.5px] font-semibold">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ui-success-bg border border-ui-success-border text-ui-success-text text-[12.5px] font-semibold">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{language === 'bn' ? 'ডিভাইস লোকেশন চালু আছে' : 'Device location is on'}</span>
               </div>
             ) : reporterGateState === 'denied' ? (
-              <div className="p-3.5 rounded-xl border border-red-500/30 bg-red-500/5 space-y-2.5 text-left">
+              <div className="p-3.5 rounded-xl border border-ui-error-border bg-ui-error-bg space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                  <AlertCircle className="w-4 h-4 text-ui-error-text shrink-0 mt-0.5" />
                   <div className="flex-1 text-[13px] text-ui-content-primary leading-relaxed">
                     {language === 'bn'
                       ? 'লোকেশন অনুমতি পাওয়া যায়নি। ব্রাউজার বা ডিভাইসে লোকেশন চালু করে আবার চেষ্টা করুন।'
@@ -1567,7 +1567,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-red-600 hover:bg-red-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try again'}</span>
@@ -1575,9 +1575,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
               </div>
             ) : reporterGateState === 'unavailable' ? (
-              <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/5 space-y-2.5 text-left">
+              <div className="p-3.5 rounded-xl border border-ui-warning-border bg-ui-warning-bg space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <AlertCircle className="w-4 h-4 text-ui-warning-text shrink-0 mt-0.5" />
                   <div className="flex-1 text-[13px] text-ui-content-primary leading-relaxed">
                     {language === 'bn'
                       ? 'লোকেশন পাওয়া যাচ্ছে না। জিপিএস বা ডিভাইস লোকেশন চালু করে আবার চেষ্টা করুন।'
@@ -1588,7 +1588,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-warning-text hover:opacity-90 text-ui-surface text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try again'}</span>
@@ -1625,7 +1625,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <button
                     type="button"
                     onClick={handleRequestDeviceLocation}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-accent text-white text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
                     <span>{language === 'bn' ? 'লোকেশন চালু করুন' : 'Allow location'}</span>
@@ -1636,8 +1636,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Prerequisite validation error message */}
             {errors.reporterLocation && (
-              <div className="text-[12.5px] text-red-500 font-semibold flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+              <div className="text-[12.5px] text-ui-error-text font-semibold flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-ui-error-text" />
                 <span>{errors.reporterLocation}</span>
               </div>
             )}
@@ -1662,7 +1662,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
                       isLocationLocked ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
                     } ${
-                      errors.division ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                      errors.division ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                     }`}
                   >
                     <option value="">{language === 'bn' ? '-- বিভাগ বেছে নিন --' : '-- Select Division --'}</option>
@@ -1673,7 +1673,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     ))}
                   </select>
                   {errors.division && (
-                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.division}</p>
+                    <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.division}</p>
                   )}
                 </div>
 
@@ -1693,7 +1693,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
                       isLocationLocked || !resolvedDivision ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
                     } ${
-                      errors.district ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                      errors.district ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                     }`}
                   >
                     <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
@@ -1704,7 +1704,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     ))}
                   </select>
                   {errors.district && (
-                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.district}</p>
+                    <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.district}</p>
                   )}
                 </div>
 
@@ -1724,7 +1724,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
                       isLocationLocked || !resolvedDistrict ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
                     } ${
-                      errors.upazilaOrThana ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                      errors.upazilaOrThana ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                     }`}
                   >
                     <option value="">
@@ -1737,7 +1737,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     ))}
                   </select>
                   {errors.upazilaOrThana && (
-                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.upazilaOrThana}</p>
+                    <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.upazilaOrThana}</p>
                   )}
                 </div>
               </div>
@@ -1765,11 +1765,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent resize-none leading-relaxed ${
                       isLocationLocked ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : ''
                     } ${
-                      errors.formattedAddress ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                      errors.formattedAddress ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                     }`}
                   />
                   {errors.formattedAddress && (
-                    <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.formattedAddress}</p>
+                    <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.formattedAddress}</p>
                   )}
                 </div>
               )}
@@ -1837,7 +1837,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px]"
                         />
                         {errors.adminName && (
-                          <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.adminName}</p>
+                          <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.adminName}</p>
                         )}
                       </div>
 
@@ -1859,11 +1859,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           }}
                           placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
                           className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                            errors.adminContact ? 'border-red-500 bg-red-500/5' : 'border-ui-stroke-subtle'
+                            errors.adminContact ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
                           }`}
                         />
                         {errors.adminContact && (
-                          <p className="text-[12px] text-red-500 mt-1 font-semibold">{errors.adminContact}</p>
+                          <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.adminContact}</p>
                         )}
                       </div>
                     </div>
@@ -2190,7 +2190,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           <button
                             type="button"
                             onClick={() => handleRemoveAdditionalParty(party.id)}
-                            className="inline-flex items-center gap-1 text-[12px] text-red-500 hover:underline cursor-pointer px-2 py-1 min-h-[44px] min-w-[44px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+                            className="inline-flex items-center gap-1 text-[12px] text-ui-error-text hover:underline cursor-pointer px-2 py-1 min-h-[44px] min-w-[44px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span>{language === 'bn' ? 'মুছে ফেলুন' : 'Remove'}</span>
@@ -2352,10 +2352,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 pendingImages.length === 0 && (
                   <div
                     id="pending-evidence-recovery-warning"
-                    className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
+                    className="p-3.5 rounded-xl border border-ui-warning-border bg-ui-warning-bg text-ui-warning-text space-y-2 text-[13px]"
                   >
                     <div className="flex items-start gap-2.5">
-                      <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <Info className="w-4 h-4 text-ui-warning-text shrink-0 mt-0.5" />
                       <div className="space-y-1">
                         <p className="font-semibold">
                           {language === 'bn'

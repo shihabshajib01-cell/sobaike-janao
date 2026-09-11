@@ -8,7 +8,7 @@ export interface SkeletonProps {
 export const Skeleton: React.FC<SkeletonProps> = ({ className = '', style }) => {
   return (
     <div
-      className={`animate-pulse bg-surface-hover rounded-md ${className}`}
+      className={`animate-pulse bg-ui-surface-hover rounded-md ${className}`}
       style={style}
       aria-hidden="true"
     />
@@ -186,28 +186,28 @@ export const MapCardSkeleton: React.FC<MapCardSkeletonProps> = ({
         <div className="relative w-full max-w-sm h-72 flex items-center justify-center">
           {/* Dhaka Center Cluster */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-surface-hover border-2 border-surface animate-ping opacity-35" />
-            <div className="w-8 h-8 rounded-full bg-surface-hover border-2 border-surface absolute top-1" />
+            <div className="w-10 h-10 rounded-full bg-ui-surface-hover border-2 border-ui-surface animate-ping opacity-35" />
+            <div className="w-8 h-8 rounded-full bg-ui-surface-hover border-2 border-ui-surface absolute top-1" />
           </div>
 
           {/* Chittagong / South-East Cluster */}
           <div className="absolute bottom-6 right-10 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-surface-hover border-2 border-surface" />
+            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
 
           {/* Sylhet / North-East Cluster */}
           <div className="absolute top-10 right-14 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-surface-hover border-2 border-surface" />
+            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
 
           {/* Rajshahi / North-West Cluster */}
           <div className="absolute top-14 left-10 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-surface-hover border-2 border-surface" />
+            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
 
           {/* Khulna / South-West Cluster */}
           <div className="absolute bottom-12 left-14 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-surface-hover border-2 border-surface" />
+            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
         </div>
       </div>

@@ -10,8 +10,6 @@ import {
   UserX,
   FileText,
   Layers,
-  ChevronRight,
-  ShieldCheck,
   AlertCircle,
   Home,
   Scale,
@@ -130,7 +128,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
   if (isLoading) {
     return (
-      <PublicPageContainer id="report-detail-loading-container">
+      <PublicPageContainer id="report-detail-loading-container" className="w-full max-w-[900px] mx-auto">
         <ReportDetailSkeleton id="report-detail-loading-skeleton" />
       </PublicPageContainer>
     );
@@ -139,94 +137,102 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   // Network / API fetch error state
   if (fetchError) {
     return (
-      <div role="alert" className="w-full py-12 px-4 text-center space-y-6">
-        <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/30 rounded-full flex items-center justify-center mx-auto text-rose-600 dark:text-rose-400">
-          <AlertCircle className="w-7 h-7" aria-hidden="true" />
-        </div>
+      <PublicPageContainer id="report-detail-error-container" className="w-full max-w-[900px] mx-auto">
+        <div role="alert" className="w-full py-12 text-center space-y-6">
+          <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
+            <AlertCircle className="w-7 h-7" aria-hidden="true" />
+          </div>
 
-        <div className="space-y-2">
-          <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
-            {language === 'bn' ? 'প্রতিবেদনটি লোড করা সম্ভব হয়নি' : 'Unable to Load Report'}
-          </h1>
-          <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-md mx-auto">
-            {language === 'bn'
-              ? 'সার্ভারের সাথে সংযোগে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
-              : 'There was a temporary network issue connecting to the server. Please try again.'}
-          </p>
-        </div>
+          <div className="space-y-2">
+            <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
+              {language === 'bn' ? 'প্রতিবেদনটি লোড করা সম্ভব হয়নি' : 'Unable to Load Report'}
+            </h1>
+            <div className="max-w-[720px] mx-auto">
+              <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
+                {language === 'bn'
+                  ? 'সার্ভারের সাথে সংযোগে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
+                  : 'There was a temporary network issue connecting to the server. Please try again.'}
+              </p>
+            </div>
+          </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={fetchReport}
-            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <span>{language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                navigateTo('/');
-              }
-            }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>{language === 'bn' ? 'ফিরে যান' : 'Go Back'}</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={fetchReport}
+              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <span>{language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  navigateTo('/');
+                }
+              }}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>{language === 'bn' ? 'ফিরে যান' : 'Go Back'}</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </PublicPageContainer>
     );
   }
 
   // If report does not exist, show dedicated "Report Unavailable / Not Found" state
   if (!report) {
     return (
-      <div role="alert" className="w-full py-12 px-4 text-center space-y-6">
-        <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
-          <AlertCircle className="w-7 h-7" aria-hidden="true" />
-        </div>
+      <PublicPageContainer id="report-detail-not-found-container" className="w-full max-w-[900px] mx-auto">
+        <div role="alert" className="w-full py-12 text-center space-y-6">
+          <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
+            <AlertCircle className="w-7 h-7" aria-hidden="true" />
+          </div>
 
-        <div className="space-y-2">
-          <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
-            {language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ' : 'Report Unavailable / Not Found'}
-          </h1>
-          <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-md mx-auto">
-            {language === 'bn'
-              ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
-              : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
-          </p>
-        </div>
+          <div className="space-y-2">
+            <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
+              {language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ' : 'Report Unavailable / Not Found'}
+            </h1>
+            <div className="max-w-[720px] mx-auto">
+              <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
+                {language === 'bn'
+                  ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
+                  : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
+              </p>
+            </div>
+          </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                navigateTo('/');
-              }
-            }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>{language === 'bn' ? 'পূর্ববর্তী পাতায় যান' : 'Go Back'}</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  navigateTo('/');
+                }
+              }}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>{language === 'bn' ? 'পূর্ববর্তী পাতায় যান' : 'Go Back'}</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => navigateTo('/')}
-            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <Home className="w-4 h-4" aria-hidden="true" />
-            <span>{language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => navigateTo('/')}
+              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <Home className="w-4 h-4" aria-hidden="true" />
+              <span>{language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </PublicPageContainer>
     );
   }
 
@@ -272,8 +278,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   };
 
   return (
-    <PublicPageContainer id="report-detail-page-container">
-      <div className="max-w-[720px] mx-auto w-full space-y-6">
+    <PublicPageContainer id="report-detail-page-container" className="w-full max-w-[900px] mx-auto">
+      <div className="w-full space-y-6">
         {/* 1. Single Primary Back Navigation */}
       <div className="flex items-center justify-between gap-4">
         <button
@@ -299,8 +305,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         >
           {isCopied ? (
             <>
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-              <span className="text-emerald-700 dark:text-emerald-300 font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link Copied'}</span>
+              <Check className="w-4 h-4 text-ui-success-text" aria-hidden="true" />
+              <span className="text-ui-success-text font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link Copied'}</span>
             </>
           ) : (
             <>
@@ -396,9 +402,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <h2 className="text-[14px] font-semibold text-ui-content-secondary">
               {language === 'bn' ? 'সারসংক্ষেপ' : 'Summary'}
             </h2>
-            <p className="text-[16px] leading-[26px] text-ui-content-primary">
-              {shortDesc}
-            </p>
+            <div className="max-w-[720px]">
+              <p className="text-[16px] leading-[26px] text-ui-content-primary">
+                {shortDesc}
+              </p>
+            </div>
           </div>
         )}
 
@@ -418,7 +426,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <p className="text-[16px] font-bold text-ui-content-primary">
                   {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : '-'}
                 </p>
-                <p className="text-[16px] font-semibold text-rose-600 dark:text-rose-400">
+                <p className="text-[16px] font-semibold text-ui-error-text">
                   {report.recentBillAmount !== undefined
                     ? `৳ ${language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()}`
                     : '-'}
@@ -446,7 +454,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <span className="text-ui-content-muted">
                   {language === 'bn' ? 'পার্থক্য / অতিরিক্ত বৃদ্ধি:' : 'Difference / Excess Increase:'}
                 </span>
-                <span className="font-semibold text-rose-600 dark:text-rose-400">
+                <span className="font-semibold text-ui-error-text">
                   +৳ {language === 'bn'
                     ? toBanglaDigits(Math.max(0, report.recentBillAmount - report.previousBillAmount))
                     : Math.max(0, report.recentBillAmount - report.previousBillAmount).toLocaleString()}
@@ -467,8 +475,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <FileText className="w-4 h-4 text-ui-content-muted" />
             <span>{language === 'bn' ? 'প্রতিবেদনের বিবরণ' : 'Report Narrative'}</span>
           </h2>
-          <div className="text-[16px] leading-[26px] text-ui-content-primary space-y-3">
-            <p>{fullDesc}</p>
+          <div className="max-w-[720px] text-[16px] leading-[26px] text-ui-content-primary space-y-3">
+            <p className="whitespace-pre-line">{fullDesc}</p>
           </div>
         </div>
 
@@ -514,9 +522,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     <span>{language === 'bn' ? update.titleBn : update.titleEn}</span>
                     <span className="text-ui-content-muted">{language === 'bn' ? update.dateBn : update.dateEn}</span>
                   </div>
-                  <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                    {language === 'bn' ? update.contentBn : update.contentEn}
-                  </p>
+                  <div className="max-w-[720px]">
+                    <p className="text-[16px] leading-[26px] text-ui-content-secondary">
+                      {language === 'bn' ? update.contentBn : update.contentEn}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -560,9 +570,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     {language === 'bn' ? report.response.dateBn : report.response.dateEn}
                   </span>
                 </div>
-                <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words">
-                  "{language === 'bn' ? report.response.statementBn : report.response.statementEn}"
-                </blockquote>
+                <div className="max-w-[720px]">
+                  <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words">
+                    "{language === 'bn' ? report.response.statementBn : report.response.statementEn}"
+                  </blockquote>
+                </div>
               </div>
             )}
 
@@ -590,9 +602,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                         )}
                       </div>
                     </div>
-                    <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
-                      "{resp.content}"
-                    </blockquote>
+                    <div className="max-w-[720px]">
+                      <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
+                        "{resp.content}"
+                      </blockquote>
+                    </div>
                   </div>
                 );
               }
@@ -633,9 +647,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       )}
                     </div>
                   </div>
-                  <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
-                    "{resp.content}"
-                  </blockquote>
+                  <div className="max-w-[720px]">
+                    <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
+                      "{resp.content}"
+                    </blockquote>
+                  </div>
                 </div>
               );
             })}

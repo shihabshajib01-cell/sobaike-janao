@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { FeatureIcon } from '../branding/FeatureIcon';
-import { AppIcon, AppIconName } from '../ui/AppIcon';
+import { Button } from '../ui/Button';
 
 export interface ServiceSlide {
   key: string;
   isComingSoon?: boolean;
-  serviceLabelBn: string;
-  serviceLabelEn: string;
+  serviceLabelBn?: string;
+  serviceLabelEn?: string;
   nameBn: string;
   nameEn: string;
   descBn: string;
@@ -16,7 +16,7 @@ export interface ServiceSlide {
   primaryCtaBn?: string;
   primaryCtaEn?: string;
   path: RoutePath;
-  iconName?: AppIconName;
+  illustrationSrc?: string;
   badgeBn?: string;
   badgeEn?: string;
   reportCount?: number;
@@ -28,19 +28,28 @@ export interface ServiceHeroCarouselProps {
   className?: string;
 }
 
+const AUTOPLAY_INTERVAL = 35_000;
+
 export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
-  id = 'service-hero-carousel',
-  reportCounts = {},
+  id = 'home-service-carousel',
+  reportCounts: _reportCounts = {},
   className = '',
 }) => {
-  const { language, navigateTo, openReportComposer } = useApp();
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const { language, openReportComposer } = useApp();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [isDocumentVisible, setIsDocumentVisible] = useState(true);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  const timerRef = useRef<number | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const sliderRef = useRef<HTMLElement | null>(null);
 
   const slides: ServiceSlide[] = [
     {
       key: 'harassment',
-      serviceLabelBn: 'হয়রানি ও নির্যাতন',
-      serviceLabelEn: 'Harassment & Abuse',
       nameBn: 'হয়রানি ও নির্যাতনের বিরুদ্ধে জানান',
       nameEn: 'Speak Out Against Harassment & Abuse',
       descBn: 'আপনার এলাকায় বা কর্মক্ষেত্রে হয়রানি, নির্যাতন ও সামাজিক নিপীড়নের তথ্য জানান।',
@@ -51,8 +60,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     },
     {
       key: 'rickshaw',
-      serviceLabelBn: 'অবৈধ চার্জিং স্টেশন',
-      serviceLabelEn: 'Illegal Charging Stations',
       nameBn: 'অবৈধ চার্জিং স্টেশন প্রকাশ করুন',
       nameEn: 'Expose Illegal Charging Stations',
       descBn: 'আপনার এলাকার অনুমোদনহীন ও ঝুঁকিপূর্ণ অটোরিকশা ব্যাটারি চার্জিং স্টেশনের তথ্য দিন।',
@@ -63,8 +70,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     },
     {
       key: 'extortion',
-      serviceLabelBn: 'চাঁদাবাজি',
-      serviceLabelEn: 'Extortion',
       nameBn: 'আপনার এলাকার চাঁদাবাজির তথ্য জানান',
       nameEn: 'Report Extortion in Your Area',
       descBn: 'দোকানপাট, পরিবহন বা এলাকায় চাঁদাবাজি ও অবৈধ চাঁদা দাবির বিরুদ্ধে তথ্য জানান।',
@@ -72,11 +77,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'অভিযোগ জানান',
       primaryCtaEn: 'File Report',
       path: '/extortion',
+      illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v01.png',
     },
     {
       key: 'load_shedding',
-      serviceLabelBn: SECTIONS.load_shedding.shortNameBn,
-      serviceLabelEn: SECTIONS.load_shedding.shortNameEn,
       nameBn: SECTIONS.load_shedding.nameBn,
       nameEn: SECTIONS.load_shedding.nameEn,
       descBn: SECTIONS.load_shedding.descriptionBn,
@@ -88,20 +92,94 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   ];
 
   const totalSlides = slides.length;
-  const currentSlide = slides[currentSlideIndex];
-  const isActiveService = !currentSlide.isComingSoon && currentSlide.key in SECTIONS;
-  const conf = isActiveService ? SECTIONS[currentSlide.key as SectionKey] : null;
-  const count = isActiveService ? reportCounts[currentSlide.key as SectionKey] ?? 0 : 0;
+  const isMultiSlide = totalSlides > 1;
 
-  const handlePrev = () => {
-    setCurrentSlideIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
-  };
+  // Check prefers-reduced-motion
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
 
-  const handleNext = () => {
-    setCurrentSlideIndex((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
-  };
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
 
+  // Track document visibility
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const handleVisibilityChange = () => {
+      setIsDocumentVisible(document.visibilityState === 'visible');
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  const handlePrev = useCallback(() => {
+    if (!isMultiSlide) return;
+    setCurrentIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+  }, [isMultiSlide, totalSlides]);
+
+  const handleNext = useCallback(() => {
+    if (!isMultiSlide) return;
+    setCurrentIndex((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
+  }, [isMultiSlide, totalSlides]);
+
+  // Autoplay management
+  useEffect(() => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (
+      !isMultiSlide ||
+      prefersReducedMotion ||
+      isHovered ||
+      isFocused ||
+      isSwiping ||
+      !isDocumentVisible
+    ) {
+      return;
+    }
+
+    timerRef.current = window.setTimeout(() => {
+      handleNext();
+    }, AUTOPLAY_INTERVAL);
+
+    return () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [
+    isMultiSlide,
+    currentIndex,
+    prefersReducedMotion,
+    isHovered,
+    isFocused,
+    isSwiping,
+    isDocumentVisible,
+    handleNext,
+  ]);
+
+  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isMultiSlide) return;
+
+    // Do not trigger carousel navigation when event originates from an interactive child
+    const target = e.target as HTMLElement | null;
+    if (target && target !== sliderRef.current) {
+      const isInteractive =
+        target.closest(
+          'button, a, input, textarea, select, [role="button"], [role="link"], [role="textbox"]'
+        ) !== null || target.isContentEditable;
+      if (isInteractive) {
+        return;
+      }
+    }
+
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
       handlePrev();
@@ -111,186 +189,204 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     }
   };
 
-  const toBanglaDigits = (num: number): string => {
-    const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return num
-      .toString()
-      .split('')
-      .map((d) => bnDigits[parseInt(d, 10)] ?? d)
-      .join('');
+  // Pointer-safe hover handling (ignores touch / coarse pointers)
+  const handlePointerEnter = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    ) {
+      setIsHovered(true);
+    }
   };
 
-  const slideIndicatorText =
-    language === 'bn'
-      ? `${toBanglaDigits(currentSlideIndex + 1)} / ${toBanglaDigits(totalSlides)}`
-      : `${currentSlideIndex + 1} / ${totalSlides}`;
+  const handlePointerLeave = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse') {
+      setIsHovered(false);
+    }
+  };
+
+  // Focus handling with inner containment check
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = (e: React.FocusEvent) => {
+    if (sliderRef.current && sliderRef.current.contains(e.relatedTarget as Node)) {
+      return;
+    }
+    setIsFocused(false);
+  };
+
+  // Touch / Pointer gestures for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMultiSlide) return;
+    setIsHovered(false);
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    setIsSwiping(true);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setIsHovered(false);
+    if (!isMultiSlide || !touchStartRef.current) {
+      setIsSwiping(false);
+      return;
+    }
+    const touch = e.changedTouches[0];
+    const diffX = touch.clientX - touchStartRef.current.x;
+    const diffY = touch.clientY - touchStartRef.current.y;
+
+    // Minimum swipe threshold of 45px and predominantly horizontal
+    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+      if (diffX < 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+    touchStartRef.current = null;
+    setIsSwiping(false);
+  };
+
+  const handleTouchCancel = () => {
+    setIsHovered(false);
+    touchStartRef.current = null;
+    setIsSwiping(false);
+  };
+
+  const currentSlide = slides[currentIndex];
+  const activeKey = currentSlide.key;
+
+  const containerStyle: React.CSSProperties = {
+    backgroundColor: `var(--sec-${activeKey}-bg)`,
+    borderColor: `var(--sec-${activeKey}-border)`,
+    touchAction: 'pan-y',
+  };
 
   return (
-    <div id={id} className={`space-y-3.5 ${className}`}>
-      {/* Interactive Hero Banner */}
-      <section
-        tabIndex={0}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label={language === 'bn' ? 'সেবা সমূহের হাইলাইট ব্যানার' : 'Service highlights hero banner'}
-        onKeyDown={handleKeyDown}
-        className="relative overflow-hidden rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+    <section
+      id={id}
+      ref={sliderRef}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={
+        language === 'bn'
+          ? 'সেবা সমূহের হাইলাইট ব্যানার'
+          : 'Service highlights hero banner'
+      }
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
+      className={`group w-full rounded-2xl border shadow-2xs relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
+      style={containerStyle}
+    >
+      {/* Slides Track */}
+      <div
+        className={`flex w-full items-stretch ${
+          prefersReducedMotion ? '' : 'transition-transform duration-500 ease-out'
+        }`}
         style={{
-          borderLeftColor: conf ? conf.primaryColor : 'var(--ui-border-subtle)',
-          borderLeftWidth: '4px',
+          transform: `translateX(-${currentIndex * 100}%)`,
         }}
       >
-        {conf && (
-          <div
-            className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-20 transition-all duration-300"
-            style={{
-              background: `radial-gradient(circle 350px at 90% 15%, var(--sec-${currentSlide.key}-bg), transparent 80%)`,
-            }}
-          />
-        )}
-
-        <div className="relative z-10 p-5 sm:p-6 md:p-7 space-y-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            {conf ? (
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border shadow-2xs transition-colors"
-                style={{
-                  backgroundColor: `var(--sec-${currentSlide.key}-bg)`,
-                  color: `var(--sec-${currentSlide.key}-text)`,
-                  borderColor: `var(--sec-${currentSlide.key}-border)`,
-                }}
-              >
-                <FeatureIcon section={currentSlide.key as SectionKey} size="md" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary shadow-2xs">
-                {currentSlide.iconName && <AppIcon name={currentSlide.iconName} size="lg" />}
-              </div>
-            )}
-
-            <span className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? currentSlide.serviceLabelBn : currentSlide.serviceLabelEn}
-            </span>
-
-            {currentSlide.isComingSoon && (
-              <span
-                id={`carousel-badge-${currentSlide.key}`}
-                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-2xs"
-              >
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                <span>{language === 'bn' ? currentSlide.badgeBn : currentSlide.badgeEn}</span>
-              </span>
-            )}
-
-            {count > 0 && conf && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-medium bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary">
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: conf.primaryColor }}
-                />
-                {language === 'bn'
-                  ? `${toBanglaDigits(count)}টি প্রকাশিত অভিযোগ`
-                  : `${count} published reports`}
-              </span>
-            )}
-          </div>
-
-          <div className="space-y-1.5 text-left pt-1">
-            <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-extrabold leading-[1.3] text-ui-content-primary tracking-tight">
-              {language === 'bn' ? currentSlide.nameBn : currentSlide.nameEn}
-            </h2>
-
-            <p className="text-[15px] leading-[1.6] text-ui-content-secondary max-w-2xl">
-              {language === 'bn' ? currentSlide.descBn : currentSlide.descEn}
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Active Service Actions */}
-              {isActiveService && conf && (
-                <>
-                  <button
-                    id={`carousel-report-btn-${currentSlide.key}`}
-                    type="button"
-                    onClick={() => openReportComposer()}
-                    className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-xl font-bold text-[15px] transition-all cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus hover:brightness-105 active:scale-[0.98]"
-                    style={{
-                      backgroundColor: conf.primaryColor,
-                      color: currentSlide.key === 'rickshaw' ? 'var(--sec-rickshaw-on-primary, #050505)' : '#FFFFFF',
-                    }}
-                  >
-                    <AppIcon name="plus" size="md" strokeWidth={2.5} />
-                    <span>
-                      {language === 'bn' ? currentSlide.primaryCtaBn : currentSlide.primaryCtaEn}
-                    </span>
-                  </button>
-
-                  <button
-                    id={`carousel-cta-${currentSlide.key}`}
-                    type="button"
-                    onClick={() => navigateTo(currentSlide.path)}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 h-[44px] rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary font-semibold text-[14px] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                  >
-                    <span>
-                      {language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View Reports'}
-                    </span>
-                    <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted" />
-                  </button>
-                </>
-              )}
-
-              {/* Coming Soon Actions: Purely informative / link to Coming Soon page. Does NOT open composer. */}
-              {currentSlide.isComingSoon && (
-                <button
-                  id={`carousel-coming-soon-btn-${currentSlide.key}`}
-                  type="button"
-                  onClick={() => navigateTo(currentSlide.path)}
-                  className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary font-semibold text-[14px] transition-colors cursor-pointer shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                >
-                  <span>
-                    {language === 'bn' ? 'বিস্তারিত দেখুন' : 'Learn More'}
-                  </span>
-                  <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted" />
-                </button>
-              )}
-            </div>
-
+        {slides.map((slide, index) => {
+          const isActive = index === currentIndex;
+          return (
             <div
-              id="carousel-navigation-bar"
-              className="flex items-center justify-between sm:justify-start gap-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-1 shrink-0 shadow-2xs self-end sm:self-center"
+              key={slide.key}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={
+                language === 'bn'
+                  ? `স্লাইড ${index + 1} / ${totalSlides}`
+                  : `Slide ${index + 1} of ${totalSlides}`
+              }
+              aria-hidden={!isActive}
+              className="w-full shrink-0 min-w-full p-4 sm:p-5 md:p-6"
+              style={{
+                backgroundColor: `var(--sec-${slide.key}-bg)`,
+              }}
             >
-              <button
-                id="carousel-prev-btn"
-                type="button"
-                onClick={handlePrev}
-                aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
-              >
-                <AppIcon name="chevron-left" size="sm" />
-              </button>
+              <div className="flex items-center justify-between gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
+                {/* Left Text Content */}
+                <div className="min-w-0 flex-1 space-y-1.5 sm:space-y-2 text-left z-10">
+                  <h2 className="type-h2 text-ui-content-primary tracking-tight">
+                    {language === 'bn' ? slide.nameBn : slide.nameEn}
+                  </h2>
 
-              <span
-                id="carousel-slide-indicator"
-                aria-live="polite"
-                className="text-[13px] font-bold text-ui-content-secondary px-2.5 select-none font-mono"
-              >
-                {slideIndicatorText}
-              </span>
+                  <p className="type-body text-ui-content-secondary max-w-2xl">
+                    {language === 'bn' ? slide.descBn : slide.descEn}
+                  </p>
 
-              <button
-                id="carousel-next-btn"
-                type="button"
-                onClick={handleNext}
-                aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-ui-surface text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
-              >
-                <AppIcon name="chevron-right" size="sm" />
-              </button>
+                  <div className="pt-1.5 sm:pt-2">
+                    <Button
+                      id={`${id}-report-btn-${slide.key}`}
+                      variant="primary"
+                      size="md"
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => openReportComposer()}
+                      style={{
+                        backgroundColor: `var(--sec-${slide.key}-primary)`,
+                        color: `var(--sec-${slide.key}-on-primary)`,
+                      }}
+                      className="w-auto shadow-xs"
+                    >
+                      {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Right Illustration Safe Area */}
+                <div className="shrink-0 w-24 min-[380px]:w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+                  {slide.illustrationSrc ? (
+                    <img
+                      src={slide.illustrationSrc}
+                      alt=""
+                      aria-hidden="true"
+                      className="w-full h-full max-h-[150px] sm:max-h-[170px] md:max-h-[190px] object-contain object-right"
+                    />
+                  ) : (
+                    <div
+                      aria-hidden="true"
+                      className="w-16 h-16 min-[380px]:w-20 min-[380px]:h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
+                    />
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
-    </div>
+          );
+        })}
+      </div>
+
+      {/* Large-Desktop (>=1440px) / Fine-Pointer Hover Arrows */}
+      {isMultiSlide && (
+        <>
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
+            className="hidden [@media(min-width:1440px)_and_(hover:hover)_and_(pointer:fine)]:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
+            className="hidden [@media(min-width:1440px)_and_(hover:hover)_and_(pointer:fine)]:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            <ChevronRight className="w-5 h-5" aria-hidden="true" />
+          </button>
+        </>
+      )}
+    </section>
   );
 };

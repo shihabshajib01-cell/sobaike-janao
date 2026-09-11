@@ -40,7 +40,7 @@ export const FeedError: React.FC<FeedErrorProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center bg-ui-surface border border-ui-stroke-subtle rounded-2xl max-w-md mx-auto my-6 space-y-3">
-      <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400">
+      <div className="w-12 h-12 rounded-full bg-ui-error-bg border border-ui-error-border flex items-center justify-center text-ui-error-text">
         <AlertCircle className="w-6 h-6 stroke-[1.5]" />
       </div>
       <div>

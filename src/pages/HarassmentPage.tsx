@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { HeartHandshake, PlusCircle, PhoneCall, RefreshCw, AlertCircle } from 'lucide-react';
+import { PhoneCall, AlertCircle } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
@@ -7,14 +7,14 @@ import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
 import { FilterChip } from '../components/ui/FilterChip';
-import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 
 export const HarassmentPage: React.FC = () => {
-  const { language, navigateTo } = useApp();
+  const { language } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('harassment') || SECTIONS.harassment;
 
@@ -59,49 +59,30 @@ export const HarassmentPage: React.FC = () => {
 
   return (
     <PublicPageContainer id="harassment-page-container">
-      {/* 1. Standard Type A Section Header */}
-      <section
+      {/* 1. Category Hero Slider */}
+      <CategoryHeroSlider
         id="harassment-header-banner"
-        className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 md:p-7 space-y-3.5 md:space-y-4 shadow-2xs"
-      >
-        <div className="space-y-2 text-left">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-              style={{
-                backgroundColor: 'var(--sec-harassment-bg)',
-                color: 'var(--sec-harassment-primary)',
-              }}
-            >
-              <HeartHandshake className="w-4 h-4" aria-hidden="true" />
-            </div>
-            <span
-              className="text-[13px] sm:text-[14px] font-semibold"
-              style={{ color: 'var(--sec-harassment-text)' }}
-            >
-              {language === 'bn' ? config.shortNameBn : config.shortNameEn}
-            </span>
-          </div>
+        section="harassment"
+        slides={[
+          {
+            id: 'harassment-primary',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
+          },
+        ]}
+      />
 
-          <h1 className="text-[24px] md:text-[32px] leading-[1.3] md:leading-[42px] font-bold text-ui-content-primary tracking-tight">
-            {language === 'bn' ? config.nameBn : config.nameEn}
-          </h1>
-
-          <p className="text-[16px] leading-[1.6] md:leading-[26px] text-ui-content-secondary">
-            {language === 'bn' ? config.descriptionBn : config.descriptionEn}
-          </p>
-        </div>
-
-        {/* Quiet Helpline Information Strip */}
-        <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-          <PhoneCall className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-          <span>
-            {language === 'bn'
-              ? 'জরুরি সহায়তার জন্য: জাতীয় জরুরি সেবা ৯৯৯ | নারী ও শিশু নির্যাতন প্রতিরোধ ১০৯'
-              : 'Emergency Hotlines: National Emergency 999 | Women & Children Helpline 109'}
-          </span>
-        </div>
-      </section>
+      {/* Quiet Helpline Information Strip */}
+      <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
+        <PhoneCall className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+        <span>
+          {language === 'bn'
+            ? 'জরুরি সহায়তার জন্য: জাতীয় জরুরি সেবা ৯৯৯ | নারী ও শিশু নির্যাতন প্রতিরোধ ১০৯'
+            : 'Emergency Hotlines: National Emergency 999 | Women & Children Helpline 109'}
+        </span>
+      </div>
 
       {/* 2. Subcategory & Location Filter Controls */}
       <section id="harassment-filter-section" className="space-y-3">
@@ -162,9 +143,9 @@ export const HarassmentPage: React.FC = () => {
 
       {/* 4. Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
-          <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" aria-hidden="true" />
-          <p className="text-[16px] font-semibold text-rose-500">
+        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
+          <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
+          <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
               ? 'তথ্য লোড করতে ত্রুটি হয়েছে।'
               : 'Failed to load harassment reports. Please try again.'}
