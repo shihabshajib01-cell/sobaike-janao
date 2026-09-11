@@ -128,8 +128,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
   if (isLoading) {
     return (
-      <PublicPageContainer id="report-detail-loading-container">
-        <div className="max-w-[720px] mx-auto w-full">
+      <PublicPageContainer id="report-detail-loading-container" className="w-full max-w-[900px] mx-auto">
+        <div className="w-full max-w-[720px] mx-auto">
           <ReportDetailSkeleton id="report-detail-loading-skeleton" />
         </div>
       </PublicPageContainer>
@@ -139,8 +139,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   // Network / API fetch error state
   if (fetchError) {
     return (
-      <PublicPageContainer id="report-detail-error-container">
-        <div role="alert" className="max-w-[720px] mx-auto w-full py-12 text-center space-y-6">
+      <PublicPageContainer id="report-detail-error-container" className="w-full max-w-[900px] mx-auto">
+        <div role="alert" className="w-full max-w-[720px] mx-auto py-12 text-center space-y-6">
           <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
@@ -187,8 +187,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   // If report does not exist, show dedicated "Report Unavailable / Not Found" state
   if (!report) {
     return (
-      <PublicPageContainer id="report-detail-not-found-container">
-        <div role="alert" className="max-w-[720px] mx-auto w-full py-12 text-center space-y-6">
+      <PublicPageContainer id="report-detail-not-found-container" className="w-full max-w-[900px] mx-auto">
+        <div role="alert" className="w-full max-w-[720px] mx-auto py-12 text-center space-y-6">
           <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
@@ -276,8 +276,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   };
 
   return (
-    <PublicPageContainer id="report-detail-page-container">
-      <div className="max-w-[720px] mx-auto w-full space-y-6">
+    <PublicPageContainer id="report-detail-page-container" className="w-full max-w-[900px] mx-auto">
+      <div className="w-full max-w-[720px] mx-auto space-y-6">
         {/* 1. Single Primary Back Navigation */}
       <div className="flex items-center justify-between gap-4">
         <button
