@@ -58,7 +58,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         {/* Informative Notice Box */}
         <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 text-left w-full max-w-[480px] mx-auto shadow-2xs space-y-2">
           <p className="text-[14px] font-semibold text-ui-content-primary">
-            {language === 'bn' ? 'সেবার অবস্থা' : 'Service Status'}
+            {language === 'bn' ? 'সেবার অবস্থা' : 'Service status'}
           </p>
           <p className="text-[13.5px] leading-relaxed text-ui-content-secondary">
             {language === 'bn'
@@ -77,7 +77,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
             onClick={() => navigateTo('/')}
             className="w-full sm:w-auto min-h-[44px]"
           >
-            {language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}
+            {language === 'bn' ? 'মূল পাতায় ফিরুন' : 'Back to home'}
           </Button>
 
           <Button
@@ -88,7 +88,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
             onClick={() => navigateTo('/explore')}
             className="w-full sm:w-auto min-h-[44px]"
           >
-            {language === 'bn' ? 'সক্রিয় সেবাসমূহ দেখুন' : 'Explore Active Services'}
+            {language === 'bn' ? 'সক্রিয় সেবাসমূহ দেখুন' : 'Explore active services'}
           </Button>
         </div>
       </div>

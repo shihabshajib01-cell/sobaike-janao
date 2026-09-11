@@ -62,7 +62,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
           id="compact-theme-selector-btn"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
-          aria-label={language === 'bn' ? 'প্রদর্শন থিম পরিবর্তন' : 'Change appearance theme'}
+          aria-label={language === 'bn' ? 'থিম নির্বাচন' : 'Select theme'}
           onClick={() => setIsOpen(!isOpen)}
           className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle hover:bg-ui-surface-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
@@ -79,7 +79,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
         {isOpen && (
           <div
             role="listbox"
-            aria-label={language === 'bn' ? 'থিম অপশন' : 'Theme options'}
+            aria-label={language === 'bn' ? 'থিম তালিকা' : 'Theme list'}
             className="absolute bottom-full mb-2 left-0 right-0 z-50 bg-ui-surface-elevated border border-ui-stroke-default rounded-xl shadow-lg p-1.5 space-y-1"
           >
             {options.map((opt) => {
@@ -120,7 +120,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
       <div
         className={`grid grid-cols-3 gap-2.5 ${className}`}
         role="radiogroup"
-        aria-label={language === 'bn' ? 'থিম পছন্দ' : 'Theme preference'}
+        aria-label={language === 'bn' ? 'থিম' : 'Theme'}
       >
         {options.map((opt) => {
           const Icon = opt.icon;
@@ -154,7 +154,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
     <div
       className={`flex items-center p-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl gap-1 ${className}`}
       role="radiogroup"
-      aria-label={language === 'bn' ? 'থিম পছন্দ' : 'Theme preference'}
+      aria-label={language === 'bn' ? 'থিম' : 'Theme'}
     >
       {options.map((opt) => {
         const Icon = opt.icon;

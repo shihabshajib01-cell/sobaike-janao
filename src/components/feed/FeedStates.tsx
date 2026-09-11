@@ -16,7 +16,7 @@ export interface FeedLoadingProps {
 export const FeedLoading: React.FC<FeedLoadingProps> = ({
   count = 3,
   id = 'feed-loading-container',
-  ariaLabel = 'Loading reports feed...',
+  ariaLabel = 'Loading reports...',
 }) => {
   return <ReportFeedSkeleton count={count} id={id} ariaLabel={ariaLabel} />;
 };
@@ -31,13 +31,15 @@ export interface FeedErrorProps {
 }
 
 export const FeedError: React.FC<FeedErrorProps> = ({
-  titleBn = 'প্রতিবেদন লোড করতে সমস্যা হয়েছে',
-  titleEn = 'Unable to load public feed',
-  descriptionBn = 'সংযোগ পরীক্ষা করুন এবং পুনরায় চেষ্টা করুন। কোনো কারিগরি ত্রুটি ঘটলে কিছু সময়ের মধ্যে ঠিক হয়ে যাবে।',
-  descriptionEn = 'Please check your connection and try again. The service will be restored shortly.',
+  titleBn = 'প্রতিবেদন লোড করা যায়নি',
+  titleEn = "Couldn't load reports",
+  descriptionBn,
+  descriptionEn,
   onRetry,
   language = 'bn',
 }) => {
+  const description = language === 'bn' ? descriptionBn : descriptionEn;
+
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center bg-ui-surface border border-ui-stroke-subtle rounded-2xl max-w-md mx-auto my-6 space-y-3">
       <div className="w-12 h-12 rounded-full bg-ui-error-bg border border-ui-error-border flex items-center justify-center text-ui-error-text">
@@ -47,9 +49,11 @@ export const FeedError: React.FC<FeedErrorProps> = ({
         <h3 className="text-[18px] font-bold text-ui-content-primary">
           {language === 'bn' ? titleBn : titleEn}
         </h3>
-        <p className="text-[14px] leading-[22px] text-ui-content-secondary max-w-xs mt-1">
-          {language === 'bn' ? descriptionBn : descriptionEn}
-        </p>
+        {description && (
+          <p className="text-[14px] leading-[22px] text-ui-content-secondary max-w-xs mt-1">
+            {description}
+          </p>
+        )}
       </div>
       {onRetry && (
         <Button
@@ -59,7 +63,7 @@ export const FeedError: React.FC<FeedErrorProps> = ({
           onClick={onRetry}
           className="min-h-[44px]"
         >
-          {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
+          {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
         </Button>
       )}
     </div>
