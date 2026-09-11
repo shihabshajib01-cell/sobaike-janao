@@ -28,8 +28,8 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
   const headerTitle = language === 'bn' ? (segmentInfo?.nameBn || SECTIONS[segment].nameBn) : (segmentInfo?.nameEn || SECTIONS[segment].nameEn);
   const helperText =
     language === 'bn'
-      ? 'আপনার সমস্যার সাথে মিল আছে এমন ধরন নির্বাচন করুন।'
-      : 'Select the type that matches your issue.';
+      ? 'অভিযোগের ধরন নির্বাচন করুন।'
+      : 'Select a complaint type.';
 
   return (
     <div className="space-y-4 sm:space-y-5">
