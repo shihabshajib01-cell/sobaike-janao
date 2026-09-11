@@ -85,16 +85,16 @@ export const DesktopLeftRail: React.FC = () => {
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
     if (!sectionKey) return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
     if (sectionKey === 'harassment') {
-      return 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)] font-semibold';
+      return 'bg-sec-harassment-bg text-sec-harassment-text border border-sec-harassment-border font-semibold';
     }
     if (sectionKey === 'rickshaw') {
-      return 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)] font-semibold';
+      return 'bg-sec-rickshaw-bg text-sec-rickshaw-text border border-sec-rickshaw-border font-semibold';
     }
     if (sectionKey === 'extortion') {
-      return 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)] font-semibold';
+      return 'bg-sec-extortion-bg text-sec-extortion-text border border-sec-extortion-border font-semibold';
     }
     if (sectionKey === 'load_shedding') {
-      return 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border border-[var(--sec-load_shedding-border)] font-semibold';
+      return 'bg-sec-load_shedding-bg text-sec-load_shedding-text border border-sec-load_shedding-border font-semibold';
     }
     return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
   };

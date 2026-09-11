@@ -141,15 +141,15 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={language === 'bn' ? 'ছবির পূর্ণরূপ' : 'Image viewer'}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ui-overlay-heavy backdrop-blur-sm select-none"
       onClick={onClose}
     >
       {/* Top Bar: Counter + Close Button */}
       <div
-        className="absolute top-0 inset-x-0 p-4 flex items-center justify-between z-10 bg-gradient-to-b from-black/80 to-transparent"
+        className="absolute top-0 inset-x-0 p-4 flex items-center justify-between z-10 bg-gradient-to-b from-ui-overlay-heavy to-transparent"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-white text-[14px] font-medium tracking-wide">
+        <div className="text-ui-content-inverse text-[14px] font-medium tracking-wide">
           <span>
             {language === 'bn'
               ? `ছবি ${toBanglaNum(currentIndex + 1)} / ${toBanglaNum(images.length)}`
@@ -162,7 +162,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           type="button"
           onClick={onClose}
           aria-label={language === 'bn' ? 'ভিউয়ার বন্ধ করুন' : 'Close image viewer'}
-          className="min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          className="min-w-[44px] min-h-[44px] rounded-full bg-ui-overlay-border hover:bg-ui-overlay-surface-hover text-ui-content-inverse flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-content-inverse focus-visible:ring-offset-2 focus-visible:ring-offset-ui-overlay-heavy"
         >
           <X className="w-6 h-6" />
         </button>
@@ -201,7 +201,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
               handlePrev();
             }}
             aria-label={language === 'bn' ? 'পূর্ববর্তী ছবি' : 'Previous image'}
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-overlay-surface hover:bg-ui-overlay-surface-hover text-ui-content-inverse border border-ui-overlay-border flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-content-inverse focus-visible:ring-offset-2 focus-visible:ring-offset-ui-overlay-heavy"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -213,7 +213,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
               handleNext();
             }}
             aria-label={language === 'bn' ? 'পরবর্তী ছবি' : 'Next image'}
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-overlay-surface hover:bg-ui-overlay-surface-hover text-ui-content-inverse border border-ui-overlay-border flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-content-inverse focus-visible:ring-offset-2 focus-visible:ring-offset-ui-overlay-heavy"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -226,7 +226,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           className="absolute bottom-4 inset-x-0 flex justify-center items-center gap-2 p-2 overflow-x-auto z-10"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex gap-2 p-1.5 rounded-xl bg-black/60 border border-white/10 backdrop-blur-md">
+          <div className="flex gap-2 p-1.5 rounded-xl bg-ui-overlay-surface border border-ui-overlay-border backdrop-blur-md">
             {images.map((img, idx) => (
               <button
                 key={img.id}

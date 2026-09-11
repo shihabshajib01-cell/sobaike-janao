@@ -239,7 +239,7 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setSelectedSection('harassment')}
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'harassment'
-                ? 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border-[var(--sec-harassment-border)] shadow-xs font-bold ring-1 ring-[var(--sec-harassment-border)]'
+                ? 'bg-sec-harassment-bg text-sec-harassment-text border-sec-harassment-border shadow-xs font-bold ring-1 ring-sec-harassment-border'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
@@ -253,7 +253,7 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setSelectedSection('rickshaw')}
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'rickshaw'
-                ? 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border-[var(--sec-rickshaw-border)] shadow-xs font-bold ring-1 ring-[var(--sec-rickshaw-border)]'
+                ? 'bg-sec-rickshaw-bg text-sec-rickshaw-text border-sec-rickshaw-border shadow-xs font-bold ring-1 ring-sec-rickshaw-border'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
@@ -267,12 +267,26 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setSelectedSection('extortion')}
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'extortion'
-                ? 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border-[var(--sec-extortion-border)] shadow-xs font-bold ring-1 ring-[var(--sec-extortion-border)]'
+                ? 'bg-sec-extortion-bg text-sec-extortion-text border-sec-extortion-border shadow-xs font-bold ring-1 ring-sec-extortion-border'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
             <CategoryIcon section="extortion" size="xs" />
             <span>{language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}</span>
+          </button>
+
+          <button
+            type="button"
+            aria-pressed={selectedSection === 'load_shedding'}
+            onClick={() => setSelectedSection('load_shedding')}
+            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              selectedSection === 'load_shedding'
+                ? 'bg-sec-load_shedding-bg text-sec-load_shedding-text border-sec-load_shedding-border shadow-xs font-bold ring-1 ring-sec-load_shedding-border'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
+            }`}
+          >
+            <CategoryIcon section="load_shedding" size="xs" />
+            <span>{language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}</span>
           </button>
 
           {(searchQuery || selectedSection !== 'all' || selectedDistrict !== 'all') && (

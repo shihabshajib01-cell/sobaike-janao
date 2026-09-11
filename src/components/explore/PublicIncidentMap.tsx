@@ -57,6 +57,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         harassmentCount: number;
         rickshawCount: number;
         extortionCount: number;
+        loadSheddingCount: number;
         reports: ReportItem[];
       }
     >();
@@ -99,6 +100,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             harassmentCount: 0,
             rickshawCount: 0,
             extortionCount: 0,
+            loadSheddingCount: 0,
             reports: [],
           });
         }
@@ -107,6 +109,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         if (rep.segment === 'harassment') cl.harassmentCount += 1;
         if (rep.segment === 'rickshaw') cl.rickshawCount += 1;
         if (rep.segment === 'extortion') cl.extortionCount += 1;
+        if (rep.segment === 'load_shedding') cl.loadSheddingCount += 1;
         cl.reports.push(rep);
       }
     });
@@ -175,9 +178,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
     mappedPoints.forEach((pt) => {
       const isSelected = activeReport?.id === pt.report.id;
-      const secConf = SECTIONS[pt.report.segment];
-      const color = `var(--sec-${pt.report.segment}-primary, ${secConf.primaryColor})`;
-      const strokeColor = pt.report.segment === 'rickshaw' ? 'var(--sec-rickshaw-on-primary, #050505)' : 'var(--ui-text-inverse, #FFFFFF)';
+      const color = `var(--sec-${pt.report.segment}-primary)`;
+      const strokeColor = pt.report.segment === 'rickshaw' ? 'var(--sec-rickshaw-on-primary)' : 'var(--ui-text-inverse)';
 
       // Icon SVG inside marker
       const markerHtml = `
@@ -186,7 +188,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           height: 32px;
           border-radius: 50%;
           background-color: ${color};
-          border: 2.5px solid var(--ui-surface, #FFFFFF);
+          border: 2.5px solid var(--ui-surface);
           box-shadow: 0 4px 12px rgba(0,0,0,0.25);
           display: flex;
           align-items: center;
@@ -201,6 +203,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
                 ? '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />'
                 : pt.report.segment === 'rickshaw'
                 ? '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />'
+                : pt.report.segment === 'load_shedding'
+                ? '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />'
                 : '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
             }
           </svg>
@@ -326,21 +330,27 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           {language === 'bn' ? 'মানচিত্র নির্দেশিকা' : 'Map Legend'}
         </span>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-harassment-primary)] border border-ui-surface shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-sec-harassment-primary border border-ui-surface shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-rickshaw-primary)] border border-ui-surface shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-sec-rickshaw-primary border border-ui-surface shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-extortion-primary)] border border-ui-surface shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-sec-extortion-primary border border-ui-surface shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-sec-load_shedding-primary border border-ui-surface shrink-0" />
+          <span className="text-ui-content-secondary truncate">
+            {language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}
           </span>
         </div>
       </div>

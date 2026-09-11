@@ -351,14 +351,14 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     )}
 
                     {/* Order indicator */}
-                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-md bg-black/75 text-white text-[12px] font-bold tracking-wide">
+                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-md bg-ui-overlay-heavy text-ui-content-inverse text-[12px] font-bold tracking-wide">
                       #{index + 1}
                     </div>
 
                     {/* Preparing Spinner Overlay */}
                     {img.isCompressing && (
-                      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-white text-center p-3">
-                        <Loader2 className="w-6 h-6 animate-spin text-white" />
+                      <div className="absolute inset-0 bg-ui-overlay-subtle backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-ui-content-inverse text-center p-3">
+                        <Loader2 className="w-6 h-6 animate-spin text-ui-content-inverse" />
                         <span className="text-[13px] font-semibold">
                           {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing image…'}
                         </span>
