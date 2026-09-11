@@ -124,6 +124,18 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isMultiSlide) return;
+
+    // Do not trigger carousel navigation when event originates from an interactive child
+    const target = e.target as HTMLElement | null;
+    if (target && target !== sliderRef.current) {
+      const isInteractive =
+        target.closest('button, a, input, textarea, select, [role="button"], [role="link"], [role="textbox"]') !== null ||
+        target.isContentEditable;
+      if (isInteractive) {
+        return;
+      }
+    }
+
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
       handlePrev();
@@ -190,10 +202,10 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
           {/* Left Text Content */}
           <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
-            <h1 className="text-[22px] sm:text-[26px] md:text-[30px] lg:text-[32px] leading-[1.25] md:leading-[40px] font-bold text-ui-content-primary tracking-tight">
+            <h1 className="type-h1 text-ui-content-primary tracking-tight">
               {language === 'bn' ? slide.titleBn : slide.titleEn}
             </h1>
-            <p className="text-[14px] sm:text-[15px] md:text-[16px] leading-[1.5] md:leading-[24px] text-ui-content-secondary max-w-2xl">
+            <p className="type-body text-ui-content-secondary max-w-2xl">
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
             </p>
             {slide.action && (
@@ -289,16 +301,16 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 {/* Left Text Content */}
                 <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
                   {index === 0 ? (
-                    <h1 className="text-[22px] sm:text-[26px] md:text-[30px] lg:text-[32px] leading-[1.25] md:leading-[40px] font-bold text-ui-content-primary tracking-tight">
+                    <h1 className="type-h1 text-ui-content-primary tracking-tight">
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h1>
                   ) : (
-                    <h2 className="text-[22px] sm:text-[26px] md:text-[30px] lg:text-[32px] leading-[1.25] md:leading-[40px] font-bold text-ui-content-primary tracking-tight">
+                    <h2 className="type-h2 text-ui-content-primary tracking-tight">
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h2>
                   )}
 
-                  <p className="text-[14px] sm:text-[15px] md:text-[16px] leading-[1.5] md:leading-[24px] text-ui-content-secondary max-w-2xl">
+                  <p className="type-body text-ui-content-secondary max-w-2xl">
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
                   </p>
 
@@ -350,7 +362,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         type="button"
         onClick={handlePrev}
         aria-label={language === 'bn' ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
-        className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus [@media(pointer:coarse)]:hidden"
+        className="hidden [@media(hover:hover)_and_(pointer:fine)]:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
       >
         <ChevronLeft className="w-5 h-5" aria-hidden="true" />
       </button>
@@ -359,7 +371,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         type="button"
         onClick={handleNext}
         aria-label={language === 'bn' ? 'পরবর্তী স্লাইড' : 'Next slide'}
-        className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus [@media(pointer:coarse)]:hidden"
+        className="hidden [@media(hover:hover)_and_(pointer:fine)]:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
       >
         <ChevronRight className="w-5 h-5" aria-hidden="true" />
       </button>
