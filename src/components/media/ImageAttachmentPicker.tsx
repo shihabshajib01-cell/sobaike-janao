@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { UploadCloud, X, ArrowLeft, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
+import { UploadCloud, X, ArrowLeft, ArrowRight, AlertCircle, Loader2, Maximize2 } from 'lucide-react';
 import { MEDIA_UPLOAD_CONFIG } from '../../config/mediaConfig';
 import { compressImageToWebP, generateStableImageId } from '../../services/imageCompressionService';
+import { AttachmentLightboxModal } from './AttachmentLightboxModal';
 
 export interface AttachedImagePreview {
   file: File;
@@ -36,6 +37,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState<{ bn: string; en: string } | null>(null);
+  const [expandedImageIndex, setExpandedImageIndex] = useState<number | null>(null);
 
   // Keep a ref to latest images to avoid stale closures during asynchronous compression
   const imagesRef = useRef(images);
@@ -332,15 +334,41 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                       : 'border-subtle'
                   }`}
                 >
-                  <div className="relative aspect-4/3 overflow-hidden bg-surface-subtle flex items-center justify-center">
+                  <div
+                    role={img.previewUrl && !img.isCompressing ? 'button' : undefined}
+                    tabIndex={img.previewUrl && !img.isCompressing ? 0 : undefined}
+                    onClick={() => {
+                      if (img.previewUrl && !img.isCompressing) {
+                        setExpandedImageIndex(index);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if ((e.key === 'Enter' || e.key === ' ') && img.previewUrl && !img.isCompressing) {
+                        e.preventDefault();
+                        setExpandedImageIndex(index);
+                      }
+                    }}
+                    aria-label={
+                      img.previewUrl && !img.isCompressing
+                        ? language === 'bn'
+                          ? `ছবি ${index + 1} বড় করে দেখুন`
+                          : `Expand image ${index + 1}`
+                        : undefined
+                    }
+                    className={`relative aspect-4/3 overflow-hidden bg-surface-subtle flex items-center justify-center ${
+                      img.previewUrl && !img.isCompressing ? 'cursor-pointer group/thumb' : ''
+                    }`}
+                  >
                     {img.previewUrl ? (
                       <img
                         src={img.previewUrl}
                         alt={`Selected ${index + 1}`}
                         loading="lazy"
                         decoding="async"
-                        className={`w-full h-full object-cover transition-opacity duration-300 ${
-                          img.isCompressing ? 'opacity-40 blur-[1px]' : 'opacity-100'
+                        className={`w-full h-full object-cover transition-all duration-300 ${
+                          img.isCompressing
+                            ? 'opacity-40 blur-[1px]'
+                            : 'opacity-100 group-hover/thumb:scale-[1.03]'
                         }`}
                         referrerPolicy="no-referrer"
                       />
@@ -350,14 +378,23 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                       </div>
                     )}
 
+                    {/* Expand overlay on hover */}
+                    {img.previewUrl && !img.isCompressing && (
+                      <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/25 transition-colors flex items-center justify-center pointer-events-none">
+                        <div className="opacity-0 group-hover/thumb:opacity-100 transition-all transform scale-90 group-hover/thumb:scale-100 p-2 rounded-full bg-black/60 text-white backdrop-blur-xs shadow-md">
+                          <Maximize2 className="w-4 h-4" />
+                        </div>
+                      </div>
+                    )}
+
                     {/* Order indicator */}
-                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-md bg-black/75 text-white text-[12px] font-bold tracking-wide">
+                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-md bg-black/75 text-white text-[12px] font-bold tracking-wide pointer-events-none">
                       #{index + 1}
                     </div>
 
                     {/* Preparing Spinner Overlay */}
                     {img.isCompressing && (
-                      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-white text-center p-3">
+                      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-white text-center p-3 pointer-events-none">
                         <Loader2 className="w-6 h-6 animate-spin text-white" />
                         <span className="text-[13px] font-semibold">
                           {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing image…'}
@@ -367,7 +404,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
 
                     {/* Error Overlay if any */}
                     {img.compressionError && !img.isCompressing && (
-                      <div className="absolute inset-0 bg-rose-950/80 p-3 flex flex-col items-center justify-center text-center text-rose-200 gap-1">
+                      <div className="absolute inset-0 bg-rose-950/80 p-3 flex flex-col items-center justify-center text-center text-rose-200 gap-1 pointer-events-none">
                         <AlertCircle className="w-5 h-5 text-rose-400" />
                         <span className="text-[12px] leading-tight">
                           {language === 'bn' ? img.compressionError.bn : img.compressionError.en}
@@ -383,7 +420,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                         handleRemoveImage(img.id);
                       }}
                       aria-label={language === 'bn' ? `ছবি ${index + 1} মুছুন` : `Remove image ${index + 1}`}
-                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10"
+                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -424,6 +461,17 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
             })}
           </div>
         </div>
+      )}
+
+      {/* Lightbox / Modal Viewer for Uploaded Attachments */}
+      {expandedImageIndex !== null && (
+        <AttachmentLightboxModal
+          images={images}
+          initialIndex={expandedImageIndex}
+          isOpen={expandedImageIndex !== null}
+          onClose={() => setExpandedImageIndex(null)}
+          language={language}
+        />
       )}
     </div>
   );
