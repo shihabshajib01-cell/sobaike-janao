@@ -94,8 +94,7 @@ export const Header: React.FC = () => {
     <>
       <header
         id="tablet-compact-header"
-        style={{ top: 'var(--connectivity-banner-height, 0px)' }}
-        className="hidden md:block min-[1440px]:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle transition-[top] duration-200"
+        className="hidden md:block min-[1440px]:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle"
       >
         <div className="w-full max-w-[900px] mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">

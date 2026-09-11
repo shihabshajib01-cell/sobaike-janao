@@ -1,8 +1,7 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, Send, Loader2, X, WifiOff } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Send, Loader2, X } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
-import { useApp } from '../../context/AppContext';
 
 export interface ReportComposerFooterProps {
   currentStep: number;
@@ -32,8 +31,6 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   canSubmit = true,
   isSubmitting = false,
 }) => {
-
-  const { isOnline } = useApp();
 
   return (
     <div className="sticky bottom-0 z-20 bg-ui-surface border-t border-ui-stroke-subtle px-4 md:px-8 py-3.5 flex items-center justify-between gap-3 shrink-0 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
@@ -111,47 +108,31 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
       )}
 
       {currentStep === 4 && (
-        <div className="flex items-center gap-2">
-          {!isOnline && (
-            <span
-              id="composer-offline-badge"
-              className="inline-flex items-center gap-1 text-[12px] font-semibold text-ui-warning-text bg-ui-warning-bg px-2.5 py-1.5 rounded-lg border border-ui-warning-border"
-              title={
-                language === 'bn'
-                  ? 'ইন্টারনেট সংযোগ নেই। খসড়া সংরক্ষিত আছে।'
-                  : 'No internet connection. Draft is saved locally.'
-              }
-            >
-              <WifiOff className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              <span>{language === 'bn' ? 'অফলাইন' : 'Offline'}</span>
-            </span>
-          )}
+        <Button
+          id="composer-footer-step4-submit-btn"
+          type="button"
+          variant="primary"
+          size="lg"
+          disabled={isSubmitting || !canSubmit}
+          onClick={onSubmit}
+          leftIcon={
+            isSubmitting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )
+          }
+          className="min-h-[44px] text-[16px] px-6"
+        >
+          {isSubmitting
+            ? language === 'bn'
+              ? 'প্রতিবেদন জমা হচ্ছে...'
+              : 'Submitting...'
+            : language === 'bn'
+            ? 'প্রতিবেদন জমা দিন'
+            : 'Submit Complaint'}
 
-          <Button
-            id="composer-footer-step4-submit-btn"
-            type="button"
-            variant="primary"
-            size="lg"
-            disabled={isSubmitting || !canSubmit}
-            onClick={onSubmit}
-            leftIcon={
-              isSubmitting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )
-            }
-            className="min-h-[44px] text-[16px] px-6"
-          >
-            {isSubmitting
-              ? language === 'bn'
-                ? 'প্রতিবেদন জমা হচ্ছে...'
-                : 'Submitting...'
-              : language === 'bn'
-              ? 'প্রতিবেদন জমা দিন'
-              : 'Submit Complaint'}
-          </Button>
-        </div>
+        </Button>
       )}
     </div>
   );

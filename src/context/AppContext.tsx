@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SectionKey } from '../theme/tokens';
-import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 export type RoutePath =
   | '/'
@@ -39,12 +38,6 @@ export interface AppContextType {
   reportComposerInitialSegment: SectionKey | null;
   openReportComposer: (segment?: SectionKey | null) => void;
   closeReportComposer: () => void;
-  // Network connectivity status
-  isOnline: boolean;
-  isCheckingConnection: boolean;
-  isConnectionRestored: boolean;
-  offlineSince: Date | null;
-  checkConnection: () => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,15 +45,6 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Browser network status engine
-  const {
-    isOnline,
-    isChecking: isCheckingConnection,
-    isRestored: isConnectionRestored,
-    offlineSince,
-    checkConnection,
-  } = useNetworkStatus();
 
   const [language, setLanguage] = useState<Language>('bn');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
@@ -164,11 +148,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportComposerInitialSegment,
       openReportComposer,
       closeReportComposer,
-      isOnline,
-      isCheckingConnection,
-      isConnectionRestored,
-      offlineSince,
-      checkConnection,
     }),
     [
       currentRoute,
@@ -185,11 +164,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportComposerInitialSegment,
       openReportComposer,
       closeReportComposer,
-      isOnline,
-      isCheckingConnection,
-      isConnectionRestored,
-      offlineSince,
-      checkConnection,
     ]
   );
 

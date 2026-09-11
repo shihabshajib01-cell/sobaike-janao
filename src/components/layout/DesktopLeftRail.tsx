@@ -102,12 +102,8 @@ export const DesktopLeftRail: React.FC = () => {
   return (
     <aside
       id="desktop-left-navigation-rail"
-      style={{
-        top: 'var(--connectivity-banner-height, 0px)',
-        height: 'calc(100dvh - var(--connectivity-banner-height, 0px))',
-      }}
       aria-label={language === 'bn' ? 'ডেস্কটপ নেভিগেশন' : 'Desktop Navigation'}
-      className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 overflow-y-auto w-[240px] min-[1536px]:w-[250px] min-[1920px]:w-[260px] px-4 min-[1920px]:px-5 py-5 bg-ui-surface border-r border-ui-stroke-subtle justify-between select-none z-30 transition-[top,height] duration-200"
+      className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 h-[100dvh] overflow-y-auto w-[240px] min-[1536px]:w-[250px] min-[1920px]:w-[260px] px-4 min-[1920px]:px-5 py-5 bg-ui-surface border-r border-ui-stroke-subtle justify-between select-none z-30"
     >
       {/* Top: Brand Header & Primary Nav items */}
       <div className="space-y-5">
