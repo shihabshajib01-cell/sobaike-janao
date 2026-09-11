@@ -100,7 +100,7 @@ export const AppShell: React.FC = () => {
         <main
           id="main-content"
           tabIndex={-1}
-          className="w-full mx-auto max-w-[900px] flex-1 flex flex-col justify-between pb-20 pb-safe md:pb-0 focus:outline-none"
+          className="w-full mx-auto max-w-[900px] flex-1 flex flex-col justify-between pb-28 pb-safe md:pb-0 focus:outline-none"
         >
           <div className="w-full">
             <SeoManager>
