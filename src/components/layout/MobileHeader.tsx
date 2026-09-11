@@ -15,7 +15,8 @@ export const MobileHeader: React.FC = () => {
   return (
     <header
       id="mobile-header"
-      className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
+      style={{ top: 'var(--connectivity-banner-height, 0px)' }}
+      className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[top] duration-200"
     >
       <div className="flex items-center justify-between h-14 px-2 sm:px-4 max-w-full">
         {/* Brand Logo & Wordmark */}

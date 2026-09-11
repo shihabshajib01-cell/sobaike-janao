@@ -11,6 +11,7 @@ import { ViewportDebugger } from '../debug/ViewportDebugger';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
 import { LocationConsentModal } from '../location/LocationConsentModal';
 import { VisitorSessionService } from '../../services/visitorSessionService';
+import { ConnectivityBanner } from './ConnectivityBanner';
 import { HomePage } from '../../pages/HomePage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
 import { RickshawPage } from '../../pages/RickshawPage';
@@ -76,6 +77,11 @@ export const AppShell: React.FC = () => {
       >
         {language === 'bn' ? 'মূল বিষয়বস্তুতে যান' : 'Skip to main content'}
       </a>
+
+      {/* Persistent Connectivity Banner (Alerts user when offline) */}
+      <ErrorBoundary componentName="ConnectivityBanner" silent>
+        <ConnectivityBanner />
+      </ErrorBoundary>
 
       {/* 1. Desktop Left Navigation Rail (fixed viewport left on >= 1440px) */}
       <ErrorBoundary componentName="DesktopLeftRail" silent>
