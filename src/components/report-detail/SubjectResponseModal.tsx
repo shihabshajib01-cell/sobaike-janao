@@ -198,7 +198,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="bg-ui-surface rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-ui-stroke-subtle text-left space-y-5 my-8 focus:outline-none"
+        className="bg-ui-surface rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-ui-stroke-subtle text-left space-y-5 my-8 focus:outline-none"
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-3 border-b border-ui-stroke-subtle pb-3.5">

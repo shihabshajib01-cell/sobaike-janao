@@ -129,7 +129,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   if (isLoading) {
     return (
       <PublicPageContainer id="report-detail-loading-container">
-        <ReportDetailSkeleton id="report-detail-loading-skeleton" />
+        <div className="max-w-[720px] mx-auto w-full">
+          <ReportDetailSkeleton id="report-detail-loading-skeleton" />
+        </div>
       </PublicPageContainer>
     );
   }
@@ -137,94 +139,98 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   // Network / API fetch error state
   if (fetchError) {
     return (
-      <div role="alert" className="w-full py-12 px-4 text-center space-y-6">
-        <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
-          <AlertCircle className="w-7 h-7" aria-hidden="true" />
-        </div>
+      <PublicPageContainer id="report-detail-error-container">
+        <div role="alert" className="max-w-[720px] mx-auto w-full py-12 text-center space-y-6">
+          <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
+            <AlertCircle className="w-7 h-7" aria-hidden="true" />
+          </div>
 
-        <div className="space-y-2">
-          <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
-            {language === 'bn' ? 'প্রতিবেদনটি লোড করা সম্ভব হয়নি' : 'Unable to Load Report'}
-          </h1>
-          <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-md mx-auto">
-            {language === 'bn'
-              ? 'সার্ভারের সাথে সংযোগে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
-              : 'There was a temporary network issue connecting to the server. Please try again.'}
-          </p>
-        </div>
+          <div className="space-y-2">
+            <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
+              {language === 'bn' ? 'প্রতিবেদনটি লোড করা সম্ভব হয়নি' : 'Unable to Load Report'}
+            </h1>
+            <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
+              {language === 'bn'
+                ? 'সার্ভারের সাথে সংযোগে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
+                : 'There was a temporary network issue connecting to the server. Please try again.'}
+            </p>
+          </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={fetchReport}
-            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <span>{language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                navigateTo('/');
-              }
-            }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>{language === 'bn' ? 'ফিরে যান' : 'Go Back'}</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={fetchReport}
+              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <span>{language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  navigateTo('/');
+                }
+              }}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>{language === 'bn' ? 'ফিরে যান' : 'Go Back'}</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </PublicPageContainer>
     );
   }
 
   // If report does not exist, show dedicated "Report Unavailable / Not Found" state
   if (!report) {
     return (
-      <div role="alert" className="w-full py-12 px-4 text-center space-y-6">
-        <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
-          <AlertCircle className="w-7 h-7" aria-hidden="true" />
-        </div>
+      <PublicPageContainer id="report-detail-not-found-container">
+        <div role="alert" className="max-w-[720px] mx-auto w-full py-12 text-center space-y-6">
+          <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
+            <AlertCircle className="w-7 h-7" aria-hidden="true" />
+          </div>
 
-        <div className="space-y-2">
-          <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
-            {language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ' : 'Report Unavailable / Not Found'}
-          </h1>
-          <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-md mx-auto">
-            {language === 'bn'
-              ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
-              : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
-          </p>
-        </div>
+          <div className="space-y-2">
+            <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
+              {language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ' : 'Report Unavailable / Not Found'}
+            </h1>
+            <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
+              {language === 'bn'
+                ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
+                : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
+            </p>
+          </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                navigateTo('/');
-              }
-            }}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>{language === 'bn' ? 'পূর্ববর্তী পাতায় যান' : 'Go Back'}</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  navigateTo('/');
+                }
+              }}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>{language === 'bn' ? 'পূর্ববর্তী পাতায় যান' : 'Go Back'}</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => navigateTo('/')}
-            className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <Home className="w-4 h-4" aria-hidden="true" />
-            <span>{language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => navigateTo('/')}
+              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <Home className="w-4 h-4" aria-hidden="true" />
+              <span>{language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </PublicPageContainer>
     );
   }
 

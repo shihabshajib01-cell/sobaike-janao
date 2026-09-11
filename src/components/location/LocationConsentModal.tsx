@@ -108,7 +108,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       style={{ backgroundColor: 'var(--ui-overlay)' }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl w-full max-w-md p-6 shadow-xl flex flex-col gap-5 text-ui-content-primary">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl w-full max-w-lg p-6 shadow-xl flex flex-col gap-5 text-ui-content-primary">
         {/* Icon & Heading */}
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-ui-info-bg text-ui-info-text border border-ui-info-border flex items-center justify-center shrink-0">
