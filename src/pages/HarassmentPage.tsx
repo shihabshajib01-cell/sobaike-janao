@@ -70,6 +70,7 @@ export const HarassmentPage: React.FC = () => {
             titleEn: config.nameEn,
             descriptionBn: config.descriptionBn,
             descriptionEn: config.descriptionEn,
+            illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v01.png',
           },
         ]}
       />

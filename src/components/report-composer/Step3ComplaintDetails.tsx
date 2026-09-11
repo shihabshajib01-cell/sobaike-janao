@@ -612,7 +612,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           // 1. Validate Recent Bill Month (Required)
           if (!formData.recentBillMonth?.trim()) {
             newErrors.recentBillMonth =
-              language === 'bn' ? 'সাম্প্রতিক বিলের মাস নির্বাচন করুন।' : 'Select the recent bill month.';
+              language === 'bn' ? 'সাম্প্রতিক বিলের মাস নির্বাচন করুন' : 'Recent bill month is required';
           }
 
           // 2. Validate Recent Bill Amount (Required, numeric > 0)
@@ -620,16 +620,16 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           const numRecentAmt = Number(rawRecentAmt);
           if (rawRecentAmt === undefined || rawRecentAmt === null || String(rawRecentAmt).trim() === '') {
             newErrors.recentBillAmount =
-              language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ লিখুন।' : 'Enter the recent bill amount.';
+              language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ লিখুন' : 'Recent bill amount is required';
           } else if (isNaN(numRecentAmt) || numRecentAmt <= 0) {
             newErrors.recentBillAmount =
-              language === 'bn' ? 'শূন্যের বেশি পরিমাণ লিখুন।' : 'Enter an amount greater than 0.';
+              language === 'bn' ? 'সঠিক ধনাত্মক সংখ্যা লিখুন' : 'Enter a valid positive number';
           }
 
           // 3. Validate Previous Bill Month (Required)
           if (!formData.previousBillMonth?.trim()) {
             newErrors.previousBillMonth =
-              language === 'bn' ? 'আগের বিলের মাস নির্বাচন করুন।' : 'Select the previous bill month.';
+              language === 'bn' ? 'আগের বিলের মাস নির্বাচন করুন' : 'Previous bill month is required';
           }
 
           // 4. Validate Previous Bill Amount (Required, numeric > 0)
@@ -637,28 +637,28 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           const numPrevAmt = Number(rawPrevAmt);
           if (rawPrevAmt === undefined || rawPrevAmt === null || String(rawPrevAmt).trim() === '') {
             newErrors.previousBillAmount =
-              language === 'bn' ? 'আগের বিলের পরিমাণ লিখুন।' : 'Enter the previous bill amount.';
+              language === 'bn' ? 'আগের বিলের পরিমাণ লিখুন' : 'Previous bill amount is required';
           } else if (isNaN(numPrevAmt) || numPrevAmt <= 0) {
             newErrors.previousBillAmount =
-              language === 'bn' ? 'শূন্যের বেশি পরিমাণ লিখুন।' : 'Enter an amount greater than 0.';
+              language === 'bn' ? 'সঠিক ধনাত্মক সংখ্যা লিখুন' : 'Enter a valid positive number';
           }
         } else {
           // 1. Validate Date (Required)
           if (!formData.incidentDate) {
             newErrors.incidentDate = isLoadShedding
-              ? (language === 'bn' ? 'লোডশেডিংয়ের তারিখ নির্বাচন করুন।' : 'Select the load shedding date.')
-              : (language === 'bn' ? 'গ্যাস সংকটের তারিখ নির্বাচন করুন।' : 'Select the gas shortage date.');
+              ? (language === 'bn' ? 'লোডশেডিংয়ের তারিখ নির্বাচন করুন' : 'Load shedding date is required')
+              : (language === 'bn' ? 'গ্যাস সংকটের তারিখ নির্বাচন করুন' : 'Gas shortage date is required');
           } else if (formData.incidentDate > todayLocal) {
             newErrors.incidentDate =
               language === 'bn'
-                ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                : 'Select today or an earlier date.';
+                ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                : 'Future dates are not allowed';
           }
 
           // 2. Validate Start Time (Required)
           if (!formData.incidentTime?.trim()) {
             newErrors.incidentTime =
-              language === 'bn' ? 'শুরুর সময় নির্বাচন করুন।' : 'Select a start time.';
+              language === 'bn' ? 'শুরুর সময় নির্বাচন করুন' : 'Start time is required';
           }
 
           // 3. Validate End Time (Optional, but if both provided, validate end time > start time)
@@ -666,8 +666,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             if (formData.utilityEndTime.trim() <= formData.incidentTime.trim()) {
               newErrors.utilityEndTime =
                 language === 'bn'
-                  ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে।'
-                  : 'End time must be after start time.';
+                  ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে'
+                  : 'End time must be after start time';
             }
           }
         }
@@ -675,37 +675,37 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         // 4. Validate Description (Required, 20 - 2000 chars)
         if (!formData.description?.trim()) {
           newErrors.description =
-            language === 'bn' ? 'ঘটনার বিবরণ লিখুন।' : 'Describe what happened.';
+            language === 'bn' ? 'বিবরণ দেওয়া আবশ্যক' : 'Description is required';
         } else if (formData.description.trim().length < 20) {
           newErrors.description =
             language === 'bn'
-              ? 'অন্তত ২০ অক্ষর লিখুন।'
-              : 'Enter at least 20 characters.';
+              ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
+              : 'Description must be at least 20 characters';
         } else if (formData.description.length > 2000) {
           newErrors.description =
             language === 'bn'
-              ? 'বিবরণ ২,০০০ অক্ষরের মধ্যে রাখুন।'
-              : 'Keep the description within 2,000 characters.';
+              ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+              : 'Please shorten the description to 2,000 characters.';
         }
 
         // 5. Validate Location (Required)
         if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
           newErrors.reporterLocation =
             language === 'bn'
-              ? 'প্রতিবেদন চালিয়ে যেতে ডিভাইসের লোকেশন চালু করুন।'
-              : 'Turn on device location to continue.';
+              ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
+              : 'Turn on device location before continuing.';
         }
 
         const utilityDivObj = getDivisionByStoredName(formData.location?.division);
         if (!utilityDivObj) {
           newErrors.division =
-            language === 'bn' ? 'বিভাগ নির্বাচন করুন।' : 'Select a division.';
+            language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
         }
 
         const utilityDistObj = utilityDivObj ? getDistrictByStoredName(formData.location?.district) : undefined;
         if (!utilityDistObj || utilityDistObj.divisionId.toLowerCase() !== utilityDivObj?.id.toLowerCase()) {
           newErrors.district =
-            language === 'bn' ? 'জেলা নির্বাচন করুন।' : 'Select a district.';
+            language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
         }
 
         const utilityUpazilaObj = utilityDistObj
@@ -713,7 +713,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           : undefined;
         if (!utilityUpazilaObj) {
           newErrors.upazilaOrThana =
-            language === 'bn' ? 'উপজেলা বা থানা নির্বাচন করুন।' : 'Select an upazila or thana.';
+            language === 'bn' ? 'থানা বা উপজেলা নির্বাচন করুন' : 'Select a thana or upazila';
         }
 
         if (utilityDivObj && utilityDistObj && utilityUpazilaObj) {
@@ -742,51 +742,51 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
         if (!effectiveTitle) {
           newErrors.title =
-            language === 'bn' ? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.';
+            language === 'bn' ? 'শিরোনাম দেওয়া আবশ্যক' : 'A report headline is required';
         }
 
         if (!formData.description?.trim()) {
           newErrors.description =
-            language === 'bn' ? 'ঘটনার বিবরণ লিখুন।' : 'Describe what happened.';
+            language === 'bn' ? 'ঘটনার বিবরণ দেওয়া আবশ্যক' : 'Incident description is required';
         } else if (formData.description.trim().length < 20) {
           newErrors.description =
             language === 'bn'
-              ? 'অন্তত ২০ অক্ষর লিখুন।'
-              : 'Enter at least 20 characters.';
+              ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
+              : 'Description must be at least 20 characters';
         } else if (formData.description.length > 2000) {
           newErrors.description =
             language === 'bn'
-              ? 'বিবরণ ২,০০০ অক্ষরের মধ্যে রাখুন।'
-              : 'Keep the description within 2,000 characters.';
+              ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+              : 'Please shorten the description to 2,000 characters.';
         }
 
         if (!formData.incidentDate) {
           newErrors.incidentDate =
-            language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন।' : 'Select the incident date.';
+            language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন' : 'Incident date is required';
         } else if (formData.incidentDate > todayLocal) {
           newErrors.incidentDate =
             language === 'bn'
-              ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-              : 'Select today or an earlier date.';
+              ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+              : 'Future dates are not allowed';
         }
 
         if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
           newErrors.reporterLocation =
             language === 'bn'
-              ? 'প্রতিবেদন চালিয়ে যেতে ডিভাইসের লোকেশন চালু করুন।'
-              : 'Turn on device location to continue.';
+              ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
+              : 'Turn on device location before continuing.';
         }
 
         const reportDivObj = getDivisionByStoredName(formData.location?.division);
         if (!reportDivObj) {
           newErrors.division =
-            language === 'bn' ? 'বিভাগ নির্বাচন করুন।' : 'Select a division.';
+            language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
         }
 
         const reportDistObj = reportDivObj ? getDistrictByStoredName(formData.location?.district) : undefined;
         if (!reportDistObj || reportDistObj.divisionId.toLowerCase() !== reportDivObj?.id.toLowerCase()) {
           newErrors.district =
-            language === 'bn' ? 'জেলা নির্বাচন করুন।' : 'Select a district.';
+            language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
         }
 
         const reportUpazilaObj = reportDistObj
@@ -794,7 +794,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           : undefined;
         if (!reportUpazilaObj) {
           newErrors.upazilaOrThana =
-            language === 'bn' ? 'উপজেলা বা থানা নির্বাচন করুন।' : 'Select an upazila or thana.';
+            language === 'bn' ? 'থানা বা উপজেলা নির্বাচন করুন' : 'Select a thana or upazila';
         }
 
         if (reportDivObj && reportDistObj && reportUpazilaObj) {
@@ -819,13 +819,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (detailedAddr.length < 5) {
             newErrors.formattedAddress =
               language === 'bn'
-                ? 'অন্তত ৫ অক্ষর লিখুন।'
-                : 'Enter at least 5 characters.';
+                ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
+                : 'Detailed address must be at least 5 characters';
           } else if (detailedAddr.length > 500) {
             newErrors.formattedAddress =
               language === 'bn'
-                ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে রাখুন।'
-                : 'Keep detailed address within 500 characters.';
+                ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
+                : 'Detailed address must not exceed 500 characters';
           }
         }
 
@@ -834,18 +834,18 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
             newErrors.adminContact =
               language === 'bn'
-                ? 'যোগাযোগের জন্য ইমেইল বা ফোন নম্বর লিখুন।'
-                : 'Enter an email or phone number for follow-up.';
+                ? 'মডারেটরের সাথে যোগাযোগের নম্বর বা ইমেইল দিন'
+                : 'Contact info is required for admin follow-up';
           }
 
           if (formData.privacyChoice === 'public_identity') {
             if (!formData.adminName?.trim()) {
               newErrors.adminName =
-                language === 'bn' ? 'আপনার নাম লিখুন।' : 'Enter your name.';
+                language === 'bn' ? 'আপনার নাম উল্লেখ করুন' : 'Your name is required';
             }
             if (!formData.adminContact?.trim()) {
               newErrors.adminContact =
-                language === 'bn' ? 'আপনার যোগাযোগের তথ্য লিখুন।' : 'Enter your contact information.';
+                language === 'bn' ? 'যোগাযোগের তথ্য দিন' : 'Contact info is required';
             }
           }
         }
@@ -1148,8 +1148,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                             ...prev,
                             incidentDate:
                               language === 'bn'
-                                ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                                : 'Select today or an earlier date.',
+                                ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                                : 'Future dates are not allowed',
                           }));
                           return;
                         }
@@ -1397,8 +1397,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         ...prev,
                         incidentDate:
                           language === 'bn'
-                            ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                            : 'Select today or an earlier date.',
+                            ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                            : 'Future dates are not allowed',
                       }));
                       return;
                     }
