@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Search } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { BrandLogo } from '../branding/BrandLogo';
 
 export const MobileHeader: React.FC = () => {
   const { navigateTo, language, setIsTabletMenuOpen } = useApp();
@@ -10,7 +11,7 @@ export const MobileHeader: React.FC = () => {
       id="mobile-header"
       className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
     >
-      <div className="flex items-center justify-between h-14 px-4 max-w-full">
+      <div className="grid grid-cols-[44px_1fr_44px] items-center h-14 px-3 sm:px-4 max-w-full gap-2">
         {/* Left: Menu Button to open navigation drawer */}
         <button
           id="mobile-header-menu-btn"
@@ -21,6 +22,15 @@ export const MobileHeader: React.FC = () => {
         >
           <Menu className="w-5 h-5 text-ui-content-primary" aria-hidden="true" />
         </button>
+
+        {/* Center: Centered Brand Logo */}
+        <div className="min-w-0 overflow-hidden flex justify-center items-center">
+          <BrandLogo
+            id="mobile-header-brand-logo"
+            size="sm"
+            onClick={() => navigateTo('/')}
+          />
+        </div>
 
         {/* Right: Search Button navigating to /search */}
         <button
@@ -36,4 +46,3 @@ export const MobileHeader: React.FC = () => {
     </header>
   );
 };
-
