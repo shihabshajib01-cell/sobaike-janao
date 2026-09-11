@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Loader2, ShieldCheck } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
-import { Modal } from '../ui/Modal';
 
 interface LocationConsentModalProps {
   isOpen: boolean;
@@ -15,16 +14,63 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   onClose,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const shareLocationBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      const timer = setTimeout(() => {
-        shareLocationBtnRef.current?.focus();
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+    if (!isOpen) return;
+
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+
+    const savedOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const timer = setTimeout(() => {
+      shareLocationBtnRef.current?.focus();
+    }, 30);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = savedOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
+        previouslyFocusedElementRef.current.focus();
+      }
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -53,17 +99,16 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   };
 
   return (
-    <Modal
-      id="location-consent-modal"
-      isOpen={isOpen}
-      onClose={onClose}
-      closeOnBackdrop={false}
-      showHeader={false}
-      maxWidth="md"
-      language={language}
-      ariaLabel={isBn ? 'আপনার এলাকার পোস্ট দেখুন' : 'See more posts from your area'}
+    <div
+      ref={modalRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-consent-title"
+      aria-describedby="location-consent-desc"
+      style={{ backgroundColor: 'var(--ui-overlay)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="p-5 sm:p-6 flex flex-col gap-5 text-ui-content-primary">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl w-full max-w-lg p-6 shadow-xl flex flex-col gap-5 text-ui-content-primary">
         {/* Icon & Heading */}
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-ui-info-bg text-ui-info-text border border-ui-info-border flex items-center justify-center shrink-0">
@@ -117,6 +162,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           </button>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 };

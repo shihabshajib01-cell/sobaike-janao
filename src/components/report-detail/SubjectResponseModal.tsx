@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
-import { Modal } from '../ui/Modal';
 
 /**
  * Temporary rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -38,6 +37,70 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+
+    const timeoutId = setTimeout(() => {
+      if (modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length > 0) {
+          focusableElements[0].focus();
+        } else {
+          modalRef.current.focus();
+        }
+      }
+    }, 30);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
+        previouslyFocusedElementRef.current.focus();
+      }
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -125,22 +188,18 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   };
 
   return (
-    <Modal
-      id="subject-response-modal"
-      isOpen={isOpen}
-      onClose={handleResetAndClose}
-      showHeader={false}
-      maxWidth="xl"
-      language={language}
-      ariaLabel={
-        SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-          ? (language === 'bn' ? 'এই প্রতিবেদনের জবাব দিন' : 'Respond to this report')
-          : (language === 'bn'
-              ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আনুষ্ঠানিক বক্তব্য জমা দিন'
-              : 'Submit Official Response or Clarification')
-      }
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="subject-modal-title"
+      style={{ backgroundColor: 'var(--ui-overlay)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto"
     >
-      <div className="p-5 sm:p-6 md:p-7 space-y-5 text-left">
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        className="bg-ui-surface rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-ui-stroke-subtle text-left space-y-5 my-8 focus:outline-none"
+      >
         {/* Header */}
         <div className="flex items-start justify-between gap-3 border-b border-ui-stroke-subtle pb-3.5">
           <div className="space-y-1">
@@ -464,7 +523,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
           </form>
         )}
       </div>
-    </Modal>
+    </div>
   );
 };
 

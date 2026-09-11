@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, PlusCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
 import { Button } from '../ui/Button';
@@ -145,9 +145,26 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     }
   };
 
+  // Hover handling with input awareness (fine-pointer mouse only)
+  const handlePointerEnter = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    if (typeof window !== 'undefined') {
+      const hasFineHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (!hasFineHover) return;
+    }
+    setIsHovered(true);
+  };
+
+  const handlePointerLeave = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse') {
+      setIsHovered(false);
+    }
+  };
+
   // Touch / Pointer gestures for swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!isMultiSlide) return;
+    setIsHovered(false);
     const touch = e.touches[0];
     touchStartRef.current = { x: touch.clientX, y: touch.clientY };
     setIsSwiping(true);
@@ -156,6 +173,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!isMultiSlide || !touchStartRef.current) {
       setIsSwiping(false);
+      setIsHovered(false);
       return;
     }
     const touch = e.changedTouches[0];
@@ -172,11 +190,13 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     }
     touchStartRef.current = null;
     setIsSwiping(false);
+    setIsHovered(false);
   };
 
   const handleTouchCancel = () => {
     touchStartRef.current = null;
     setIsSwiping(false);
+    setIsHovered(false);
   };
 
   // Section styling via CSS variables
@@ -214,7 +234,6 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   id={`${id}-cta-btn`}
                   variant="primary"
                   size="md"
-                  leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
                   onClick={slide.action.onClick}
                   style={{
                     backgroundColor: `var(--sec-${sectionKey}-primary)`,
@@ -263,8 +282,8 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
       }
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
       onTouchStart={handleTouchStart}
@@ -321,7 +340,6 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                         variant="primary"
                         size="md"
                         tabIndex={isActive ? 0 : -1}
-                        leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
                         onClick={slide.action.onClick}
                         style={{
                           backgroundColor: `var(--sec-${sectionKey}-primary)`,
@@ -357,12 +375,12 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         })}
       </div>
 
-      {/* Desktop / Fine-Pointer Hover Arrows (hidden on touch/coarse devices) */}
+      {/* Desktop / Fine-Pointer Hover Arrows (hidden on touch/coarse devices and viewports < 1440px) */}
       <button
         type="button"
         onClick={handlePrev}
         aria-label={language === 'bn' ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
-        className="hidden [@media(hover:hover)_and_(pointer:fine)]:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        className="hidden [@media(min-width:1440px)_and_(hover:hover)_and_(pointer:fine)]:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
       >
         <ChevronLeft className="w-5 h-5" aria-hidden="true" />
       </button>
@@ -371,7 +389,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         type="button"
         onClick={handleNext}
         aria-label={language === 'bn' ? 'পরবর্তী স্লাইড' : 'Next slide'}
-        className="hidden [@media(hover:hover)_and_(pointer:fine)]:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        className="hidden [@media(min-width:1440px)_and_(hover:hover)_and_(pointer:fine)]:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
       >
         <ChevronRight className="w-5 h-5" aria-hidden="true" />
       </button>
