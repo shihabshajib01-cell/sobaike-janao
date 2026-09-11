@@ -78,68 +78,6 @@
   --color-ui-destructive-active: var(--ui-destructive-active);
   --color-ui-destructive-border: var(--ui-destructive-border);
   --color-ui-destructive-text: var(--ui-text-inverse);
-
-  /* Section Theme Colors - Harassment */
-  --color-sec-harassment-primary: var(--sec-harassment-primary);
-  --color-sec-harassment-hover: var(--sec-harassment-hover);
-  --color-sec-harassment-bg: var(--sec-harassment-bg);
-  --color-sec-harassment-border: var(--sec-harassment-border);
-  --color-sec-harassment-text: var(--sec-harassment-text);
-  --color-sec-harassment-on-primary: var(--sec-harassment-on-primary);
-
-  /* Section Theme Colors - Rickshaw / Charging */
-  --color-sec-rickshaw-primary: var(--sec-rickshaw-primary);
-  --color-sec-rickshaw-hover: var(--sec-rickshaw-hover);
-  --color-sec-rickshaw-bg: var(--sec-rickshaw-bg);
-  --color-sec-rickshaw-border: var(--sec-rickshaw-border);
-  --color-sec-rickshaw-text: var(--sec-rickshaw-text);
-  --color-sec-rickshaw-on-primary: var(--sec-rickshaw-on-primary);
-
-  /* Section Theme Colors - Extortion */
-  --color-sec-extortion-primary: var(--sec-extortion-primary);
-  --color-sec-extortion-hover: var(--sec-extortion-hover);
-  --color-sec-extortion-bg: var(--sec-extortion-bg);
-  --color-sec-extortion-border: var(--sec-extortion-border);
-  --color-sec-extortion-text: var(--sec-extortion-text);
-  --color-sec-extortion-on-primary: var(--sec-extortion-on-primary);
-
-  /* Section Theme Colors - Utility / Load Shedding */
-  --color-sec-load_shedding-primary: var(--sec-load_shedding-primary);
-  --color-sec-load_shedding-hover: var(--sec-load_shedding-hover);
-  --color-sec-load_shedding-bg: var(--sec-load_shedding-bg);
-  --color-sec-load_shedding-border: var(--sec-load_shedding-border);
-  --color-sec-load_shedding-text: var(--sec-load_shedding-text);
-  --color-sec-load_shedding-on-primary: var(--sec-load_shedding-on-primary);
-
-  --color-sec-load-shedding-primary: var(--sec-load-shedding-primary);
-  --color-sec-load-shedding-hover: var(--sec-load-shedding-hover);
-  --color-sec-load-shedding-bg: var(--sec-load-shedding-bg);
-  --color-sec-load-shedding-border: var(--sec-load-shedding-border);
-  --color-sec-load-shedding-text: var(--sec-load-shedding-text);
-  --color-sec-load-shedding-on-primary: var(--sec-load-shedding-on-primary);
-
-  /* Section Theme Colors - Illegal Occupation */
-  --color-sec-illegal_occupation-primary: var(--sec-illegal_occupation-primary);
-  --color-sec-illegal_occupation-hover: var(--sec-illegal_occupation-hover);
-  --color-sec-illegal_occupation-bg: var(--sec-illegal_occupation-bg);
-  --color-sec-illegal_occupation-border: var(--sec-illegal_occupation-border);
-  --color-sec-illegal_occupation-text: var(--sec-illegal_occupation-text);
-  --color-sec-illegal_occupation-on-primary: var(--sec-illegal_occupation-on-primary);
-
-  --color-sec-illegal-occupation-primary: var(--sec-illegal-occupation-primary);
-  --color-sec-illegal-occupation-hover: var(--sec-illegal-occupation-hover);
-  --color-sec-illegal-occupation-bg: var(--sec-illegal-occupation-bg);
-  --color-sec-illegal-occupation-border: var(--sec-illegal-occupation-border);
-  --color-sec-illegal-occupation-text: var(--sec-illegal-occupation-text);
-  --color-sec-illegal-occupation-on-primary: var(--sec-illegal-occupation-on-primary);
-
-  /* Overlay and Modal Scrim Tokens */
-  --color-ui-overlay: var(--ui-overlay);
-  --color-ui-overlay-subtle: var(--ui-overlay-subtle);
-  --color-ui-overlay-heavy: var(--ui-overlay-heavy);
-  --color-ui-overlay-border: var(--ui-overlay-border);
-  --color-ui-overlay-surface: var(--ui-overlay-surface);
-  --color-ui-overlay-surface-hover: var(--ui-overlay-surface-hover);
 }
 
 @layer base {
@@ -268,6 +206,12 @@
     /* Central Border Structure Tokens */
     --border-width-default: 1px;
     --border-style-default: solid;
+
+    /* Destructive Action Tokens */
+    --ui-destructive-bg: oklch(57.7% .245 27.325);
+    --ui-destructive-hover: oklch(50.5% .213 27.518);
+    --ui-destructive-active: oklch(44.4% .177 26.899);
+    --ui-destructive-border: var(--ui-destructive-bg);
   }
 
   :root,
@@ -337,12 +281,6 @@
     --ui-validation-border: oklch(63.7% .237 25.331);
     --ui-validation-focus: oklch(63.7% .237 25.331);
 
-    /* Destructive Action Tokens - Light */
-    --ui-destructive-bg: oklch(57.7% .245 27.325);
-    --ui-destructive-hover: oklch(50.5% .213 27.518);
-    --ui-destructive-active: oklch(44.4% .177 26.899);
-    --ui-destructive-border: var(--ui-destructive-bg);
-
     /* Sensitive Information Tokens - Light */
     --ui-sensitive-bg: #FFF5F7;
     --ui-sensitive-border: #F3C7D1;
@@ -384,28 +322,6 @@
     --sec-load-shedding-border: #CCFBF1;
     --sec-load-shedding-text: #115E59;
     --sec-load-shedding-on-primary: #050505;
-
-    --sec-illegal_occupation-primary: #6B7280;
-    --sec-illegal_occupation-hover: #4B5563;
-    --sec-illegal_occupation-bg: #F3F4F6;
-    --sec-illegal_occupation-border: #E5E7EB;
-    --sec-illegal_occupation-text: #374151;
-    --sec-illegal_occupation-on-primary: #FFFFFF;
-
-    --sec-illegal-occupation-primary: #6B7280;
-    --sec-illegal-occupation-hover: #4B5563;
-    --sec-illegal-occupation-bg: #F3F4F6;
-    --sec-illegal-occupation-border: #E5E7EB;
-    --sec-illegal-occupation-text: #374151;
-    --sec-illegal-occupation-on-primary: #FFFFFF;
-
-    /* Overlay and Modal Scrim Tokens - Light */
-    --ui-overlay: rgba(15, 23, 42, 0.75);
-    --ui-overlay-subtle: rgba(15, 23, 42, 0.45);
-    --ui-overlay-heavy: rgba(15, 23, 42, 0.90);
-    --ui-overlay-border: rgba(255, 255, 255, 0.20);
-    --ui-overlay-surface: rgba(15, 23, 42, 0.65);
-    --ui-overlay-surface-hover: rgba(15, 23, 42, 0.85);
   }
 
   html[data-theme="dark"],
@@ -516,34 +432,6 @@
     --sec-load-shedding-border: #1D433F;
     --sec-load-shedding-text: #99F6E4;
     --sec-load-shedding-on-primary: #050505;
-
-    --sec-illegal_occupation-primary: #9CA3AF;
-    --sec-illegal_occupation-hover: #D1D5DB;
-    --sec-illegal_occupation-bg: #1F2937;
-    --sec-illegal_occupation-border: #374151;
-    --sec-illegal_occupation-text: #E5E7EB;
-    --sec-illegal_occupation-on-primary: #111827;
-
-    --sec-illegal-occupation-primary: #9CA3AF;
-    --sec-illegal-occupation-hover: #D1D5DB;
-    --sec-illegal-occupation-bg: #1F2937;
-    --sec-illegal-occupation-border: #374151;
-    --sec-illegal-occupation-text: #E5E7EB;
-    --sec-illegal-occupation-on-primary: #111827;
-
-    /* Destructive Action Tokens - Dark */
-    --ui-destructive-bg: oklch(57.7% .245 27.325);
-    --ui-destructive-hover: oklch(63.7% .237 25.331);
-    --ui-destructive-active: oklch(50.5% .213 27.518);
-    --ui-destructive-border: oklch(63.7% .237 25.331);
-
-    /* Overlay and Modal Scrim Tokens - Dark */
-    --ui-overlay: rgba(0, 0, 0, 0.80);
-    --ui-overlay-subtle: rgba(0, 0, 0, 0.50);
-    --ui-overlay-heavy: rgba(0, 0, 0, 0.92);
-    --ui-overlay-border: rgba(255, 255, 255, 0.15);
-    --ui-overlay-surface: rgba(20, 20, 22, 0.70);
-    --ui-overlay-surface-hover: rgba(30, 30, 34, 0.90);
   }
 
   html,

@@ -82,7 +82,7 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
 
         {/* +N Overlay for 5+ images on the 4th cell */}
         {overlayCount && overlayCount > 0 ? (
-          <div className="absolute inset-0 bg-ui-overlay-surface backdrop-blur-[2px] flex items-center justify-center text-ui-content-inverse">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center text-white">
             <span className="text-[20px] md:text-[24px] font-bold tracking-tight">
               +{overlayCount}
             </span>

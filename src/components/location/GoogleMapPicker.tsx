@@ -171,9 +171,9 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
       if (!haloMarkerRef.current) {
         haloMarkerRef.current = L.circleMarker(latLng, {
           radius: 16,
-          fillColor: 'var(--ui-accent)',
+          fillColor: '#dc2626',
           fillOpacity: 0.22,
-          color: 'var(--ui-accent)',
+          color: '#dc2626',
           weight: 1.5,
           opacity: 0.7,
           interactive: false,
@@ -186,9 +186,9 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
       if (!pinMarkerRef.current) {
         pinMarkerRef.current = L.circleMarker(latLng, {
           radius: 8,
-          fillColor: 'var(--ui-accent)',
+          fillColor: '#dc2626',
           fillOpacity: 1,
-          color: 'var(--ui-surface)',
+          color: '#ffffff',
           weight: 2.5,
           opacity: 1,
           interactive: false,

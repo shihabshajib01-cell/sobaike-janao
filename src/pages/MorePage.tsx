@@ -125,9 +125,9 @@ export const MorePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-              <span className="w-9 h-9 rounded-xl bg-sec-harassment-bg text-sec-harassment-text border border-sec-harassment-border flex items-center justify-center font-bold text-[16px]">
+              <span className="w-9 h-9 rounded-xl bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)] flex items-center justify-center font-bold text-[16px]">
                 ১
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
@@ -139,7 +139,7 @@ export const MorePage: React.FC = () => {
             </div>
 
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-              <span className="w-9 h-9 rounded-xl bg-sec-rickshaw-bg text-sec-rickshaw-text border border-sec-rickshaw-border flex items-center justify-center font-bold text-[16px]">
+              <span className="w-9 h-9 rounded-xl bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)] flex items-center justify-center font-bold text-[16px]">
                 ২
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
@@ -151,7 +151,7 @@ export const MorePage: React.FC = () => {
             </div>
 
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-              <span className="w-9 h-9 rounded-xl bg-sec-extortion-bg text-sec-extortion-text border border-sec-extortion-border flex items-center justify-center font-bold text-[16px]">
+              <span className="w-9 h-9 rounded-xl bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)] flex items-center justify-center font-bold text-[16px]">
                 ৩
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
@@ -159,18 +159,6 @@ export const MorePage: React.FC = () => {
               </h3>
               <p className="text-[14px] leading-[22px] text-ui-content-secondary">
                 {language === 'bn' ? 'দোকান, ক্ষুদ্র ব্যবসায়ী ও কর্মক্ষেত্রে অননুমোদিত অর্থ দাবি ও চাপ।' : 'Report illicit collections, coercive demands, and unlawful levies.'}
-              </p>
-            </div>
-
-            <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-              <span className="w-9 h-9 rounded-xl bg-sec-load_shedding-bg text-sec-load_shedding-text border border-sec-load_shedding-border flex items-center justify-center font-bold text-[16px]">
-                ৪
-              </span>
-              <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'লোডশেডিং ও বিদ্যুৎ বিভ্রাট' : 'Load Shedding & Outage'}
-              </h3>
-              <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                {language === 'bn' ? 'ঘন ঘন বিদ্যুৎ বিভ্রাট ও দীর্ঘ লোডশেডিংয়ের জনস্বার্থ নজরদারি।' : 'Monitor frequency and community impact of electrical outages.'}
               </p>
             </div>
           </div>
