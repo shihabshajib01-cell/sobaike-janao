@@ -21,7 +21,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   id = 'global-search-input',
   value,
   defaultValue = '',
-  placeholder = 'অভিযোগ বা এলাকা খুঁজুন... (Search reports or areas)',
+  placeholder,
   onChange,
   onSearch,
   onClear,
@@ -35,7 +35,11 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : internalValue;
 
-  const resolvedSearchLabel = ariaLabel || (language === 'bn' ? 'অনুসন্ধান করুন' : 'Search');
+  const defaultPlaceholder =
+    language === 'bn' ? 'প্রতিবেদন বা এলাকা খুঁজুন...' : 'Search reports or areas...';
+  const effectivePlaceholder = placeholder !== undefined ? placeholder : defaultPlaceholder;
+
+  const resolvedSearchLabel = ariaLabel || (language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports');
   const resolvedClearLabel = clearAriaLabel || (language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +81,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         value={currentValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
+        placeholder={effectivePlaceholder}
         className="w-full min-h-[44px] bg-ui-surface-subtle hover:bg-ui-surface focus:bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-radius-control ui-space-search ui-border-default border-ui-stroke-subtle hover:border-ui-stroke-default focus:ring-1 focus:ring-ui-focus transition-all outline-none"
       />
       {currentValue.length > 0 && (

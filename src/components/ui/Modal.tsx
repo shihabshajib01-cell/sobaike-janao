@@ -73,7 +73,7 @@ export const Modal: React.FC<ModalProps> = ({
     }
   }
   const activeLang = customLanguage || appLanguage;
-  const closeLabel = activeLang === 'bn' ? 'বন্ধ করুন' : 'Close dialog';
+  const closeLabel = activeLang === 'bn' ? 'ডায়ালগ বন্ধ করুন' : 'Close dialog';
 
   useEffect(() => {
     if (!isOpen) return;

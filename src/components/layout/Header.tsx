@@ -117,14 +117,14 @@ export const Header: React.FC = () => {
                 onClick={() => openReportComposer()}
                 className="shadow-2xs font-semibold text-[16px] min-h-[44px]"
               >
-                {language === 'bn' ? 'ঘটনা জানান' : 'Report Incident'}
+                {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
               </Button>
 
               {/* Menu Drawer Button */}
               <IconButton
                 id="tablet-menu-button"
                 icon={<Menu className="w-5 h-5 text-ui-content-primary" />}
-                aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open navigation menu'}
+                aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
                 size="md"
                 onClick={() => setIsTabletMenuOpen(true)}
                 className="border border-ui-stroke-subtle rounded-xl bg-ui-surface-subtle min-h-[44px] min-w-[44px]"
@@ -144,15 +144,15 @@ export const Header: React.FC = () => {
         title={language === 'bn' ? 'সবাইকে জানাও' : 'Sobaike Janao'}
         description={
           language === 'bn'
-            ? 'পাবলিক রিপোর্টিং ও জনসচেতনতা প্ল্যাটফর্ম'
-            : 'Public citizen reporting platform'
+            ? 'নাগরিক তথ্য ও অভিযোগ প্ল্যাটফর্ম'
+            : 'Citizen reporting platform'
         }
       >
         <div className="space-y-4">
           {/* Navigation Section */}
-          <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu Navigation'}>
+          <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu navigation'}>
             <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-3 mb-2">
-              {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & Pages'}
+              {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & pages'}
             </p>
             {navItems.map((item) => {
               const isActive = currentRoute === item.path;
@@ -209,7 +209,7 @@ export const Header: React.FC = () => {
               }`}
             >
               <Search className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
-              <span>{language === 'bn' ? 'অনুসন্ধান' : 'Search Reports'}</span>
+              <span>{language === 'bn' ? 'অনুসন্ধান' : 'Search'}</span>
             </button>
 
             <button
@@ -225,7 +225,7 @@ export const Header: React.FC = () => {
               }`}
             >
               <PhoneCall className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
-              <span>{language === 'bn' ? 'জরুরি সহায়তা ও তথ্য' : 'Support & Info'}</span>
+              <span>{language === 'bn' ? 'তথ্য ও সহায়তা' : 'Info & support'}</span>
             </button>
           </div>
 
@@ -238,7 +238,7 @@ export const Header: React.FC = () => {
             {/* Appearance / Theme Selector */}
             <div className="space-y-1.5">
               <span className="text-[14px] text-ui-content-secondary font-medium px-1">
-                {language === 'bn' ? 'প্রদর্শন (থিম)' : 'Appearance'}
+                {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
               </span>
               <ThemeSelector variant="segmented" />
             </div>
@@ -253,8 +253,8 @@ export const Header: React.FC = () => {
                 onClick={toggleLanguage}
                 aria-label={
                   language === 'bn'
-                    ? 'ভাষা পরিবর্তন করে ইংরেজিতে নিন'
-                    : 'Switch language to Bengali'
+                    ? 'ইংরেজিতে পরিবর্তন করুন'
+                    : 'Switch to Bangla'
                 }
                 className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >

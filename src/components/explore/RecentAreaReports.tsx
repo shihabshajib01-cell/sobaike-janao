@@ -43,23 +43,18 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-[18px] font-bold text-ui-content-primary tracking-tight">
-              {language === 'bn' ? 'এই এলাকার সাম্প্রতিক প্রতিবেদন' : 'Recent Area Reports'}
+              {language === 'bn' ? 'সাম্প্রতিক প্রতিবেদন' : 'Recent reports'}
             </h3>
             <span className="text-[12px] font-bold px-2 py-0.5 rounded-full bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary">
               {getDistrictNameDisplay()}
             </span>
           </div>
-          <p className="text-[13px] text-ui-content-secondary mt-0.5">
-            {language === 'bn'
-              ? 'নির্বাচিত এলাকার সর্বশেষ প্রকাশিত নাগরিক তথ্য ও সতর্কবার্তা'
-              : 'Latest published citizen reports and alerts in the selected area'}
-          </p>
         </div>
 
         <span className="text-[13px] font-medium text-ui-content-muted">
           {language === 'bn'
-            ? `${toBanglaDigits(reports.length)}টি প্রতিবেদন প্রাপ্ত`
-            : `${reports.length} reports available`}
+            ? `${toBanglaDigits(reports.length)}টি প্রতিবেদন`
+            : `${reports.length} reports`}
         </span>
       </div>
 
@@ -119,7 +114,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     onClick={() => navigateTo(`/report-detail/${report.id}`)}
                     className="shrink-0 text-[12px] font-semibold text-ui-content-primary flex items-center gap-1 cursor-pointer transition-colors"
                   >
-                    <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                    <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'View details'}</span>
                     <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </div>
@@ -131,12 +126,12 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
         <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-8 text-center space-y-2">
           <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted mx-auto" />
           <h4 className="text-[15px] font-bold text-ui-content-primary">
-            {language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই' : 'No reports found for this area'}
+            {language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই' : 'No reports in this area'}
           </h4>
           <p className="text-[13px] text-ui-content-muted max-w-sm mx-auto">
             {language === 'bn'
-              ? 'অন্য কোনো জেলা নির্বাচন করুন অথবা সকল প্রতিবেদনের তালিকা দেখুন।'
-              : 'Try selecting another district or explore nationwide reports.'}
+              ? 'অন্য কোনো জেলা নির্বাচন করুন বা সকল প্রতিবেদন দেখুন।'
+              : 'Try selecting another district or explore all reports.'}
           </p>
         </div>
       )}
