@@ -14,18 +14,9 @@ export const MorePage: React.FC = () => {
       {/* Page Header */}
       <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[14px] font-semibold bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle">
-            <Info className="w-4 h-4 text-ui-content-secondary" />
-            <span>{language === 'bn' ? 'তথ্য ও সম্পাদকীয় নির্দেশিকা' : 'Information & Editorial Guidelines'}</span>
-          </div>
           <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
-            {language === 'bn' ? 'সবাইকে জানাও প্ল্যাটফর্ম পরিচিতি' : 'About Sobaike Janao Platform'}
+            {language === 'bn' ? 'তথ্য ও সহায়তা' : 'Information & support'}
           </h1>
-          <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-            {language === 'bn'
-              ? 'নাগরিক সচেতনতা, সুরক্ষানীতি, প্রতিউত্তরের অধিকার এবং জরুরি সহায়তা।'
-              : 'Community awareness, moderation standards, right-of-response policy, and emergency assistance.'}
-          </p>
         </div>
 
         {/* Mobile-Only Appearance / Theme Setting Card (md:hidden) */}
@@ -33,7 +24,7 @@ export const MorePage: React.FC = () => {
           <div className="flex items-center gap-2">
             <Palette className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
             <span className="text-[14px] font-semibold text-ui-content-secondary">
-              {language === 'bn' ? 'প্রদর্শন (থিম পছন্দ)' : 'Appearance'}
+              {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
             </span>
           </div>
           <ThemeSelector variant="segmented" />
@@ -54,7 +45,7 @@ export const MorePage: React.FC = () => {
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
-            {language === 'bn' ? 'প্ল্যাটফর্ম সম্পর্কে' : 'About Platform'}
+            {language === 'bn' ? 'সম্পর্কে' : 'About'}
           </button>
 
           <button
@@ -67,7 +58,7 @@ export const MorePage: React.FC = () => {
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
-            {language === 'bn' ? 'জরুরি ও সহায়তা সেবা' : 'Emergency & Support Resources'}
+            {language === 'bn' ? 'সহায়তা' : 'Help'}
           </button>
 
           <button
@@ -80,7 +71,7 @@ export const MorePage: React.FC = () => {
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
-            {language === 'bn' ? 'সুরক্ষা ও মডারেশন নীতি' : 'Safety & Moderation'}
+            {language === 'bn' ? 'সুরক্ষা' : 'Safety'}
           </button>
 
           <button
@@ -93,7 +84,7 @@ export const MorePage: React.FC = () => {
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
-            {language === 'bn' ? 'প্রতিউত্তরের অধিকার' : 'Right of Response'}
+            {language === 'bn' ? 'প্রতিউত্তর' : 'Right of response'}
           </button>
 
           <button
@@ -106,7 +97,7 @@ export const MorePage: React.FC = () => {
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'
             }`}
           >
-            {language === 'bn' ? 'সাধারণ জিজ্ঞাসা (FAQ)' : 'FAQ'}
+            {language === 'bn' ? 'সাধারণ প্রশ্ন' : 'FAQ'}
           </button>
         </div>
       </div>
@@ -116,12 +107,12 @@ export const MorePage: React.FC = () => {
         <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
           <div className="space-y-3">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'সবাইকে জানাও (Sobaike Janao) কী?' : 'What is Sobaike Janao?'}
+              {language === 'bn' ? 'সবাইকে জানাও কী?' : 'What is Sobaike Janao?'}
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
               {language === 'bn'
-                ? 'সবাইকে জানাও একটি নাগরিক সচেতনতামূলক ও জনস্বার্থ ইন্টারফেস। বাংলাদেশের প্রেক্ষাপটে জনপরিসরে নারী ও নাগরিকদের সম্পর্ক, নির্যাতন ও হয়রানি, অননুমোদিত রিকশা ব্যাটারি চার্জিং ও গ্যারেজ ঝুঁকি, এবং দোকানপাট ও স্থানীয় ক্ষেত্রে চাঁদাবাজি ও জবরদস্তির মতো সুনির্দিষ্ট সমস্যাগুলো নিয়মতান্ত্রিকভাবে নথিভুক্ত করার উদ্দেশ্যে এটি নকশা করা হয়েছে।'
-                : 'Sobaike Janao is a civic awareness reporting platform designed for the Bangladesh community. It enables structured civilian documentation of Relationship, Abuse & Harassment, Rickshaw Charging & Garage hazards, and Extortion & Coercion to promote community safety.'}
+                ? 'সবাইকে জানাও-তে মানুষ জনস্বার্থের সমস্যা ও হয়রানির ঘটনা জানাতে পারেন। উপযুক্ত প্রতিবেদন পর্যালোচনার পর প্রকাশ করা হয়।'
+                : 'Sobaike Janao lets people report issues that affect their community. Suitable reports are reviewed before publication.'}
             </p>
           </div>
 
@@ -131,10 +122,10 @@ export const MorePage: React.FC = () => {
                 ১
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'সম্পর্ক, নির্যাতন ও হয়রানি' : 'Relationship, Abuse & Harassment'}
+                {language === 'bn' ? 'হয়রানি ও নির্যাতন' : 'Harassment & abuse'}
               </h3>
               <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                {language === 'bn' ? 'সম্পর্কগত নিপীড়ন, পারিবারিক নির্যাতন ও জনপরিসরে হয়রানির রিপোর্ট।' : 'Document relationship abuse, domestic pressure, or public harassment.'}
+                {language === 'bn' ? 'শারীরিক বা মানসিক নির্যাতন, নিপীড়ন ও অনলাইনে হেনস্তার তথ্য।' : 'Report incidents of harassment, abuse, or safety violations.'}
               </p>
             </div>
 
@@ -143,10 +134,10 @@ export const MorePage: React.FC = () => {
                 ২
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'রিকশা চার্জিং ও গ্যারেজ' : 'Rickshaw Charging & Garage'}
+                {language === 'bn' ? 'অননুমোদিত চার্জিং স্টেশন' : 'Unsafe charging stations'}
               </h3>
               <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                {language === 'bn' ? 'ঝুঁকিপূর্ণ ব্যাটারি চার্জিং, অগ্নিকাণ্ড শঙ্কা ও অননুমোদিত সংযোগের ঝুঁকি।' : 'Track hazardous electrical connections and unsafe battery garages.'}
+                {language === 'bn' ? 'অনুমোদনহীন ব্যাটারি চার্জিং স্টেশন ও ঝুঁকিপূর্ণ বৈদ্যুতিক সংযোগের তথ্য।' : 'Report unauthorized or unsafe auto-rickshaw battery charging stations.'}
               </p>
             </div>
 
@@ -155,10 +146,10 @@ export const MorePage: React.FC = () => {
                 ৩
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'চাঁদাবাজি ও জবরদস্তি' : 'Extortion & Coercion'}
+                {language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}
               </h3>
               <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                {language === 'bn' ? 'দোকান, ক্ষুদ্র ব্যবসায়ী ও কর্মক্ষেত্রে অননুমোদিত অর্থ দাবি ও চাপ।' : 'Report illicit collections, coercive demands, and unlawful levies.'}
+                {language === 'bn' ? 'দোকানপাট, পরিবহন বা এলাকায় অবৈধ চাঁদা দাবি ও হুমকির তথ্য।' : 'Report extortion, illegal tolls, or coercive demands.'}
               </p>
             </div>
           </div>
@@ -170,12 +161,12 @@ export const MorePage: React.FC = () => {
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-6 space-y-2 shadow-2xs">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
               <Phone className="w-5 h-5 text-ui-accent" aria-hidden="true" />
-              <span>{language === 'bn' ? 'জরুরি ও সহায়তা সেবা' : 'Emergency & Support Resources'}</span>
+              <span>{language === 'bn' ? 'জরুরি সহায়তা' : 'Emergency help'}</span>
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
               {language === 'bn'
-                ? 'জরুরি বা সহায়তার প্রয়োজন হলে প্রাসঙ্গিক সেবার সঙ্গে যোগাযোগ করতে নিচের তথ্য ব্যবহার করুন।'
-                : 'Use the relevant contact information below when emergency or support assistance is needed.'}
+                ? 'জরুরি সহায়তার জন্য নিচের উপযুক্ত সেবায় যোগাযোগ করুন।'
+                : 'Need urgent help? Contact the appropriate service below.'}
             </p>
           </div>
 
@@ -212,46 +203,46 @@ export const MorePage: React.FC = () => {
           <div className="space-y-2">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
               <Shield className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
-              <span>{language === 'bn' ? 'সম্পাদকীয় ও মডারেশন মূলনীতি' : 'Editorial & Moderation Principles'}</span>
+              <span>{language === 'bn' ? 'সুরক্ষা ও মডারেশন' : 'Safety & moderation'}</span>
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
               {language === 'bn'
-                ? 'সবাইকে জানাও প্ল্যাটফর্মের প্রতিটি প্রতিবেদন জনস্বার্থে এবং সম্পাদকীয় পর্যালোচনার মধ্য দিয়ে প্রকাশিত হয়।'
-                : 'Every report submitted to Sobaike Janao undergoes editorial moderation review before publication.'}
+                ? 'সবাইকে জানাও প্ল্যাটফর্মের প্রতিবেদন জনস্বার্থে এবং পর্যালোচনার মাধ্যমে প্রকাশিত হয়।'
+                : 'Reports submitted to Sobaike Janao are reviewed before publication.'}
             </p>
           </div>
 
           <div className="space-y-4 text-ui-content-secondary">
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
               <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
-                {language === 'bn' ? '১. ব্যক্তিগত তথ্যের সুরক্ষা (PII Protection)' : '1. PII Redaction'}
+                {language === 'bn' ? '১. ব্যক্তিগত তথ্যের সুরক্ষা' : '1. Protecting personal information'}
               </h3>
               <p className="text-[16px] leading-[26px] text-ui-content-secondary">
                 {language === 'bn'
                   ? 'ভুক্তভোগীর ব্যক্তিগত নিরাপত্তা অগ্রাধিকার। অভিযোগকারীর নাম, যোগাযোগের তথ্য ও ব্যক্তিগত গোপনীয় তথ্য জনসমক্ষে প্রকাশ করা হয় না।'
-                  : 'Complainant identity details are kept private. Contact info is only used for editorial follow-up when explicitly permitted.'}
+                  : 'Complainant identity details are kept private. Contact info is only used for follow-up when explicitly permitted.'}
               </p>
             </div>
 
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
               <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
-                {language === 'bn' ? '২. যাচাইযোগ্যতা ও তথ্য স্পষ্টতা' : '2. Editorial Moderation & Standards'}
+                {language === 'bn' ? '২. পর্যালোচনার মানদণ্ড' : '2. Review standards'}
               </h3>
               <p className="text-[16px] leading-[26px] text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'প্রতিটি জমা দেওয়া প্রতিবেদন সম্পাদকীয় পর্যালোচনায় যাচাই করা হয় যেন তা নীতিমালা মেনে জনস্বার্থে উপস্থাপিত হয়।'
-                  : 'All submissions are reviewed according to community moderation guidelines before public distribution.'}
+                  ? 'প্রতিটি জমা দেওয়া প্রতিবেদন পর্যালোচনায় যাচাই করা হয় যেন তা নীতিমালা মেনে জনস্বার্থে উপস্থাপিত হয়।'
+                  : 'Submissions are reviewed according to community guidelines before publication.'}
               </p>
             </div>
 
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
               <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
-                {language === 'bn' ? '৩. প্রমাণ ও পারিপার্শ্বিক তথ্যের গুরুত্ব' : '3. Evidence Weight'}
+                {language === 'bn' ? '৩. সুনির্দিষ্ট বিবরণ' : '3. Corroborating details'}
               </h3>
               <p className="text-[16px] leading-[26px] text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'যথাযথ তারিখ, সময়, সুনির্দিষ্ট অবস্থান ও পারিপার্শ্বিক বিবরণ পর্যালোচনার প্রক্রিয়াকে সাহায্য করে।'
-                  : 'Concrete dates, specific coordinates, and corroborating details assist in editorial review.'}
+                  ? 'যথাযথ তারিখ, সময়, সুনির্দিষ্ট অবস্থান ও বিবরণ পর্যালোচনার প্রক্রিয়াকে সাহায্য করে।'
+                  : 'Concrete dates, specific locations, and clear descriptions assist in the review process.'}
               </p>
             </div>
           </div>
@@ -263,23 +254,23 @@ export const MorePage: React.FC = () => {
           <div className="space-y-2">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
               <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
-              <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার নীতি (Right of Response)' : 'Right of Response Standards'}</span>
+              <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার' : 'Right of response'}</span>
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
               {language === 'bn'
-                ? 'যেকোনো প্রতিবেদনে উল্লেখিত ব্যক্তি, প্রতিষ্ঠান বা সংশ্লিষ্ট পক্ষ তাদের ব্যাখ্যা বা বক্তব্য প্ল্যাটফর্মে জমা দিতে পারেন।'
-                : 'Any individual or organization named in a report has the full right to submit a statement or clarification.'}
+                ? 'প্রতিবেদনে উল্লিখিত যেকোনো ব্যক্তি বা প্রতিষ্ঠান তাদের বক্তব্য বা ব্যাখ্যা জমা দিতে পারেন।'
+                : 'Any person or organization mentioned in a report has the right to submit a response or clarification.'}
             </p>
           </div>
 
           <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
             <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'কীভাবে প্রতিউত্তর জমা দেবেন?' : 'How to file a response?'}
+              {language === 'bn' ? 'কীভাবে প্রতিউত্তর জমা দেবেন?' : 'How do I submit a response?'}
             </h3>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
               {language === 'bn'
-                ? 'সংশ্লিষ্ট প্রতিবেদনের নিচে থাকা "বক্তব্য দিন" বাটনে ক্লিক করে ফরমটি পূরণ করুন। আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হবে এবং প্রকাশযোগ্য সংস্করণ প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
-                : 'Open the referenced report and select "Submit Statement" to submit your response for moderation. Any public display is handled through the publication workflow.'}
+                ? 'সংশ্লিষ্ট প্রতিবেদনে গিয়ে "জবাব দিন" বাটনে ক্লিক করে বক্তব্য জমা দিন। পর্যালোচনার পর তা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হয়।'
+                : 'Open the report and select "Submit response" to submit your statement for review. Approved responses are displayed alongside the report.'}
             </p>
           </div>
         </div>
@@ -289,7 +280,7 @@ export const MorePage: React.FC = () => {
         <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-5 shadow-2xs">
           <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
             <HelpCircle className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
-            <span>{language === 'bn' ? 'সাধারণ জিজ্ঞাসা ও প্রশ্নোত্তর' : 'Frequently Asked Questions'}</span>
+            <span>{language === 'bn' ? 'সাধারণ প্রশ্ন' : 'Frequently asked questions'}</span>
           </h2>
 
           <div className="space-y-4">
@@ -299,8 +290,8 @@ export const MorePage: React.FC = () => {
               </h3>
               <p className="text-ui-content-secondary text-[16px] leading-[26px]">
                 {language === 'bn'
-                  ? 'হ্যাঁ, প্রতিটি প্রতিবেদন সম্পাদকীয় টিমের পর্যালোচনায় স্থান পায় এবং প্রয়োজনীয় নিরাপত্তা ফিল্টারিং সম্পন্ন হলে জনসমক্ষে প্রকাশিত হয়।'
-                  : 'Yes, each submission undergoes editorial moderation review before being published to the public feed.'}
+                  ? 'হ্যাঁ, প্রতিটি প্রতিবেদন নীতিমালার আলোকে পর্যালোচনার পর জনসমক্ষে প্রকাশিত হয়।'
+                  : 'Yes, submissions undergo moderation review before being published.'}
               </p>
             </div>
 
@@ -310,8 +301,8 @@ export const MorePage: React.FC = () => {
               </h3>
               <p className="text-ui-content-secondary text-[16px] leading-[26px]">
                 {language === 'bn'
-                  ? 'প্রতিবেদন জমা দেওয়ার পর আপনাকে একটি ইউনিক রিপোর্ট আইডি প্রদান করা হয়। মডারেশন টিম তথ্য যাচাই শেষে উপযুক্ত ব্যবস্থা গ্রহণ করে।'
-                  : 'After submission, you receive a unique Report ID as reference while our team reviews the report.'}
+                  ? 'প্রতিবেদন জমা দেওয়ার পর একটি রেফারেন্স আইডি প্রদান করা হয় এবং সম্পাদকীয় দল তথ্য যাচাই করে।'
+                  : 'After submission, you receive a reference ID while our team reviews the report.'}
               </p>
             </div>
           </div>

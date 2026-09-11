@@ -77,7 +77,7 @@ export const DesktopLeftRail: React.FC = () => {
       id: 'rail-more',
       path: '/more',
       nameBn: 'তথ্য ও নীতিমালা',
-      nameEn: 'Info & Guidelines',
+      nameEn: 'Info & guidelines',
       iconName: 'info',
     },
   ];
@@ -102,7 +102,7 @@ export const DesktopLeftRail: React.FC = () => {
   return (
     <aside
       id="desktop-left-navigation-rail"
-      aria-label={language === 'bn' ? 'ডেস্কটপ নেভিগেশন' : 'Desktop Navigation'}
+      aria-label={language === 'bn' ? 'ডেস্কটপ নেভিগেশন' : 'Desktop navigation'}
       className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 h-[100dvh] overflow-y-auto w-[240px] min-[1536px]:w-[250px] min-[1920px]:w-[260px] px-4 min-[1920px]:px-5 py-5 bg-ui-surface border-r border-ui-stroke-subtle justify-between select-none z-30"
     >
       {/* Top: Brand Header & Primary Nav items */}
@@ -126,12 +126,12 @@ export const DesktopLeftRail: React.FC = () => {
             onClick={() => openReportComposer()}
             className="shadow-2xs font-semibold py-2.5 min-h-[44px] text-[16px]"
           >
-            {language === 'bn' ? 'ঘটনা জানান' : 'Report Incident'}
+            {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
           </Button>
         </div>
 
         {/* Nav Links List */}
-        <nav className="space-y-1" aria-label={language === 'bn' ? 'প্রধান বিভাগসমূহ' : 'Main Sections'}>
+        <nav className="space-y-1" aria-label={language === 'bn' ? 'প্রধান বিভাগ' : 'Main sections'}>
           {navItems.map((item) => {
             const isActive = currentRoute === item.path;
             const secConfig = item.sectionKey ? SECTIONS[item.sectionKey] : null;
@@ -197,8 +197,8 @@ export const DesktopLeftRail: React.FC = () => {
           onClick={toggleLanguage}
           aria-label={
             language === 'bn'
-              ? 'ভাষা পরিবর্তন করে ইংরেজিতে নিন'
-              : 'Switch language to Bengali'
+              ? 'ইংরেজিতে পরিবর্তন করুন'
+              : 'Switch to Bangla'
           }
           className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
@@ -211,7 +211,7 @@ export const DesktopLeftRail: React.FC = () => {
         {/* Minimal Platform Signature */}
         <div className="px-2 pt-1 text-[13px] text-ui-content-muted leading-tight">
           <p className="font-medium text-ui-content-secondary">
-            {language === 'bn' ? 'নাগরিক সেবা প্ল্যাটফর্ম' : 'Citizen Platform'}
+            {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
           </p>
           <p className="text-[12px] opacity-80">
             {language === 'bn' ? 'বাংলাদেশ ২০২৬' : 'Bangladesh 2026'}

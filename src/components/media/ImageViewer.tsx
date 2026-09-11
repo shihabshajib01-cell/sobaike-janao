@@ -161,7 +161,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           ref={closeButtonRef}
           type="button"
           onClick={onClose}
-          aria-label={language === 'bn' ? 'ভিউয়ার বন্ধ করুন' : 'Close image viewer'}
+          aria-label={language === 'bn' ? 'ছবি দেখা বন্ধ করুন' : 'Close image viewer'}
           className="min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
           <X className="w-6 h-6" />
@@ -234,7 +234,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                 onClick={() => setCurrentIndex(idx)}
                 aria-label={
                   language === 'bn'
-                    ? `ছবি ${toBanglaNum(idx + 1)}-এ যান`
+                    ? `ছবি ${toBanglaNum(idx + 1)} দেখুন`
                     : `Go to image ${idx + 1}`
                 }
                 className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
@@ -249,7 +249,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                   sizes="48px"
                   alt={
                     language === 'bn'
-                      ? `থাম্বনেইল ${toBanglaNum(idx + 1)}`
+                      ? `ছোট ছবি ${toBanglaNum(idx + 1)}`
                       : `Thumbnail ${idx + 1}`
                   }
                   loading="lazy"

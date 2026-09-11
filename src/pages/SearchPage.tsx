@@ -7,6 +7,7 @@ import { BANGLADESH_DISTRICTS } from '../data/districts';
 import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
+import { toBanglaDigits } from '../utils/formatters';
 
 export const SearchPage: React.FC = () => {
   const { language, navigateTo, queryParams } = useApp();
@@ -131,11 +132,6 @@ export const SearchPage: React.FC = () => {
         <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
           {language === 'bn' ? 'অনুসন্ধান' : 'Search'}
         </h1>
-        <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-          {language === 'bn'
-            ? 'বিষয়, জেলা বা সংশ্লিষ্ট পক্ষের নাম দিয়ে প্রকাশিত প্রতিবেদন অনুসন্ধান করুন।'
-            : 'Find published reports, locations, or reported entities.'}
-        </p>
       </div>
 
       {/* Search Input Box */}
@@ -152,8 +148,8 @@ export const SearchPage: React.FC = () => {
           }
           placeholder={
             language === 'bn'
-              ? 'বিষয়, স্থান, ব্যক্তি বা প্রতিষ্ঠানের নাম দিয়ে খুঁজুন...'
-              : 'Search reports, districts, subjects, or organizations...'
+              ? 'প্রতিবেদন, এলাকা, ব্যক্তি বা প্রতিষ্ঠান খুঁজুন...'
+              : 'Search reports, places, people or organizations...'
           }
           className="w-full pl-10 pr-4 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[16px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
         />
@@ -196,7 +192,7 @@ export const SearchPage: React.FC = () => {
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
-            {language === 'bn' ? 'জেলা ও এলাকা' : 'Locations'} ({matchingLocations.length})
+            {language === 'bn' ? 'এলাকা' : 'Locations'} ({matchingLocations.length})
           </button>
           <button
             type="button"
@@ -208,7 +204,7 @@ export const SearchPage: React.FC = () => {
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
-            {language === 'bn' ? 'সংশ্লিষ্ট পক্ষ' : 'Subjects'} ({matchingSubjects.length})
+            {language === 'bn' ? 'ব্যক্তি ও প্রতিষ্ঠান' : 'People & organizations'} ({matchingSubjects.length})
           </button>
         </div>
       )}
@@ -218,7 +214,7 @@ export const SearchPage: React.FC = () => {
         <ReportFeedSkeleton
           count={3}
           id="search-feed-skeleton"
-          ariaLabel={language === 'bn' ? 'অনুসন্ধান ডেটা প্রস্তুত করা হচ্ছে...' : 'Preparing search index...'}
+          ariaLabel={language === 'bn' ? 'অনুসন্ধান লোড হচ্ছে...' : 'Loading search...'}
         />
       )}
 
@@ -228,28 +224,23 @@ export const SearchPage: React.FC = () => {
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
-              ? 'অনুসন্ধান ডেটা লোড করতে সমস্যা হয়েছে।'
-              : 'Unable to load public data for search. Please try again.'}
+              ? 'অনুসন্ধান লোড করা যায়নি।'
+              : "Couldn't load search."}
           </p>
           <button
             type="button"
             onClick={loadData}
             className="btn-primary-action px-4 py-2.5 rounded-xl text-[14px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
-            {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
+            {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
           </button>
         </div>
       )}
 
-      {/* Initial Empty / Instructional State (Flattened per design rules) */}
+      {/* Initial Empty / Instructional State */}
       {!isLoading && !fetchError && !query.trim() && (
-        <div className="py-14 text-center space-y-3">
+        <div className="py-14 text-center">
           <Search className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
-          <p className="text-[16px] leading-[26px] text-ui-content-secondary font-medium max-w-md mx-auto">
-            {language === 'bn'
-              ? 'নাম, এলাকা, বিষয় বা প্রকাশিত তথ্য দিয়ে অনুসন্ধান করুন।'
-              : 'Search by subject, location, category, or published information.'}
-          </p>
         </div>
       )}
 
@@ -260,7 +251,7 @@ export const SearchPage: React.FC = () => {
           {(activeTab === 'all' || activeTab === 'locations') && matchingLocations.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
-                {language === 'bn' ? 'জেলা ও এলাকা ফলাফল' : 'Location Matches'}
+                {language === 'bn' ? 'এলাকা' : 'Locations'}
               </h2>
               <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl divide-y divide-ui-stroke-subtle overflow-hidden shadow-2xs">
                 {matchingLocations.map((loc) => (
@@ -297,7 +288,7 @@ export const SearchPage: React.FC = () => {
           {(activeTab === 'all' || activeTab === 'subjects') && matchingSubjects.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
-                {language === 'bn' ? 'সংশ্লিষ্ট পক্ষ ফলাফল' : 'Reported Subject Matches'}
+                {language === 'bn' ? 'ব্যক্তি ও প্রতিষ্ঠান' : 'People & organizations'}
               </h2>
               <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl divide-y divide-ui-stroke-subtle overflow-hidden shadow-2xs">
                 {matchingSubjects.map((sub) => (
@@ -317,13 +308,13 @@ export const SearchPage: React.FC = () => {
                         </div>
                         <div className="text-[14px] text-ui-content-muted">
                           {language === 'bn'
-                            ? `${sub.count}টি প্রকাশিত প্রতিবেদনে উল্লিখিত`
-                            : `Mentioned in ${sub.count} published reports`}
+                            ? `${toBanglaDigits(sub.count)}টি প্রতিবেদনে উল্লিখিত`
+                            : `Mentioned in ${sub.count} reports`}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-[14px] font-semibold text-ui-content-secondary">
-                      <span>{language === 'bn' ? 'রেকর্ড দেখুন' : 'View records'}</span>
+                      <span>{language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}</span>
                       <ArrowRight className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                     </div>
                   </button>
@@ -336,7 +327,7 @@ export const SearchPage: React.FC = () => {
           {(activeTab === 'all' || activeTab === 'reports') && matchingReports.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
-                {language === 'bn' ? 'প্রতিবেদন ফলাফল' : 'Matching Reports'}
+                {language === 'bn' ? 'প্রতিবেদন' : 'Reports'}
               </h2>
               <div className="space-y-3">
                 {matchingReports.map((report) => (
@@ -351,12 +342,12 @@ export const SearchPage: React.FC = () => {
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3 shadow-2xs">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
               <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'কোনো ফলাফল পাওয়া যায়নি' : 'No Results Found'}
+                {language === 'bn' ? 'কোনো ফল পাওয়া যায়নি।' : 'No results found.'}
               </h3>
               <p className="text-[14px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                 {language === 'bn'
-                  ? `"${query}" এর সাথে মিলে এমন কোনো প্রতিবেদন, এলাকা বা পক্ষ পাওয়া যায়নি।`
-                  : `No public reports, places, or entities matched "${query}".`}
+                  ? `"${query}" এর সাথে মিলে এমন কোনো ফলাফল পাওয়া যায়নি।`
+                  : `No reports, places, or entities match "${query}".`}
               </p>
             </div>
           )}

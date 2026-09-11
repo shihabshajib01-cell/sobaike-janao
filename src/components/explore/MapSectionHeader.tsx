@@ -22,19 +22,19 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
           {viewMode === 'map'
             ? language === 'bn'
               ? 'প্রতিবেদনের মানচিত্র'
-              : 'Reports Map'
+              : 'Reports map'
             : language === 'bn'
-            ? 'প্রতিবেদন খুঁজুন'
-            : 'Explore Reports'}
+            ? 'প্রতিবেদন অন্বেষণ'
+            : 'Explore reports'}
         </h1>
         <p className="text-[15px] leading-[1.6] text-ui-content-secondary">
           {viewMode === 'map'
             ? language === 'bn'
-              ? 'এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন দেখুন'
-              : 'View published reports by geographic area'
+              ? 'এলাকা অনুযায়ী প্রতিবেদন দেখুন'
+              : 'View reports by geographic area'
             : language === 'bn'
-            ? 'বিভাগ, এলাকা ও প্রকাশিত তথ্য অনুযায়ী প্রতিবেদন খুঁজুন।'
-            : 'Browse published reports by category and location.'}
+            ? 'বিভাগ, এলাকা ও ধরন অনুযায়ী প্রতিবেদন খুঁজুন।'
+            : 'Browse reports by category and location.'}
         </p>
       </div>
 
