@@ -14,7 +14,7 @@ export const ReportPage: React.FC<ReportPageProps> = () => {
 
   return (
     <PublicPageContainer id="report-page-launcher">
-      <div className="w-full max-w-[640px] mx-auto py-12 text-center space-y-6">
+      <div className="max-w-[640px] mx-auto py-12 px-4 text-center space-y-6">
         <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--ui-accent-soft)] text-ui-content-primary flex items-center justify-center">
           <PlusCircle className="w-8 h-8" />
         </div>

@@ -31,6 +31,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { EvStationIcon } from '../branding/EvStationIcon';
+import { SectionKey } from '../../theme/tokens';
 
 export type MapIconName =
   | 'map-pin'

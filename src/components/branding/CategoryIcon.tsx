@@ -1,5 +1,5 @@
 import React from 'react';
-import { FeatureIcon, FeatureIconSize, FeatureIconVariant } from './FeatureIcon';
+import { FeatureIcon, FeatureIconProps, FeatureIconSize, FeatureIconVariant } from './FeatureIcon';
 import { SectionKey } from '../../theme/tokens';
 
 export interface CategoryIconProps {

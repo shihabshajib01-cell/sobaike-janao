@@ -23,9 +23,9 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
     <div
       id={id}
       role="alert"
-      className={`flex flex-col items-center justify-center p-8 text-center bg-ui-error-bg border border-ui-error-border rounded-2xl max-w-md mx-auto my-6 ${className}`}
+      className={`flex flex-col items-center justify-center p-8 text-center bg-red-50/60 dark:bg-[#2B1416]/50 border border-red-200 dark:border-[#6B252A] rounded-2xl max-w-md mx-auto my-6 ${className}`}
     >
-      <div className="w-14 h-14 rounded-2xl bg-ui-error-border/30 flex items-center justify-center text-ui-error-text mb-4 shrink-0">
+      <div className="w-14 h-14 rounded-2xl bg-red-100 dark:bg-[#3E1A1E] flex items-center justify-center text-red-600 dark:text-[#FCA5A5] mb-4 shrink-0">
         <AlertCircle className="w-7 h-7 stroke-[1.5]" />
       </div>
       <h3 className="text-[18px] font-bold text-ui-content-primary mb-1.5">{title}</h3>

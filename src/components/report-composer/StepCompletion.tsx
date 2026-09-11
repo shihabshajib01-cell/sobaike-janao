@@ -24,7 +24,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
       className="space-y-6 text-center py-2 text-ui-content-primary"
     >
       {/* Success Badge */}
-      <div className="w-16 h-16 rounded-full bg-ui-success-bg text-ui-success-text border border-ui-success-border flex items-center justify-center mx-auto">
+      <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto">
         <CheckCircle2 className="w-10 h-10" aria-hidden="true" />
       </div>
 

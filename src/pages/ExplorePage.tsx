@@ -226,7 +226,7 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setSelectedSection('all')}
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'all'
-                ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg shadow-xs font-bold'
+                ? 'bg-ui-content-primary text-white dark:text-slate-900 border-ui-content-primary shadow-xs font-bold'
                 : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
             }`}
           >
@@ -305,9 +305,9 @@ export const ExplorePage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
-          <MapIcon name="alert-circle" size="xl" className="text-ui-error-text mx-auto" ariaHidden={true} />
-          <p className="text-[15px] font-semibold text-ui-error-text">
+        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+          <MapIcon name="alert-circle" size="xl" className="text-rose-500 mx-auto" ariaHidden={true} />
+          <p className="text-[15px] font-semibold text-rose-500">
             {language === 'bn'
               ? 'তথ্য লোড করতে সমস্যা হয়েছে।'
               : 'Unable to load explore reports. Please try again.'}

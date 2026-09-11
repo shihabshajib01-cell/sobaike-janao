@@ -156,13 +156,13 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               <span
                 className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] font-bold ${
                   isCurrent
-                    ? 'bg-ui-content-inverse/25 text-ui-content-inverse'
+                    ? 'bg-white/25 text-white'
                     : isCompleted
                     ? 'bg-ui-accent text-ui-content-inverse'
                     : 'bg-ui-surface text-ui-content-muted border border-ui-stroke-subtle'
                 }`}
               >
-                {isCompleted ? <Check className="w-3 h-3 text-ui-content-inverse" aria-hidden="true" /> : st.step}
+                {isCompleted ? <Check className="w-3 h-3 text-white" aria-hidden="true" /> : st.step}
               </span>
               <span className="sm:hidden truncate">{language === 'bn' ? st.shortBn : st.shortEn}</span>
               <span className="hidden sm:inline truncate">{language === 'bn' ? st.titleBn : st.titleEn}</span>

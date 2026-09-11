@@ -704,7 +704,6 @@
 .bg-surface { background-color: var(--ui-surface) !important; }
 .bg-surface-subtle { background-color: var(--ui-surface-subtle) !important; }
 .bg-surface-elevated { background-color: var(--ui-surface-elevated) !important; }
-.bg-surface-hover { background-color: var(--ui-surface-hover) !important; }
 .bg-surface-hover:hover { background-color: var(--ui-surface-hover) !important; }
 
 .text-primary { color: var(--ui-text-primary) !important; }
@@ -723,60 +722,6 @@
 
 .pt-safe {
   padding-top: env(safe-area-inset-top, 0px);
-}
-
-/* Additive safe-area utilities (base padding + safe inset) */
-.pt-safe-3\.5 {
-  padding-top: calc(0.875rem + env(safe-area-inset-top, 0px));
-}
-
-.pb-safe-2\.5 {
-  padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
-}
-
-.pb-safe-3\.5 {
-  padding-bottom: calc(0.875rem + env(safe-area-inset-bottom, 0px));
-}
-
-.pb-safe-4 {
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-}
-
-.pb-safe-sheet {
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-}
-
-.pb-safe-footer {
-  padding-bottom: calc(0.875rem + env(safe-area-inset-bottom, 0px));
-}
-
-.pt-safe-viewer {
-  padding-top: calc(0.875rem + env(safe-area-inset-top, 0px));
-}
-
-.pb-safe-viewer {
-  padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
-}
-
-/* Mobile bottom-sheet slide-up animation */
-@keyframes sheet-slide-up {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.animate-sheet-slide-up {
-  animation: sheet-slide-up 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@media (min-width: 768px) {
-  .animate-sheet-slide-up {
-    animation: none;
-    transform: none;
-  }
 }
 
 /* Custom themed scrollbar styling */

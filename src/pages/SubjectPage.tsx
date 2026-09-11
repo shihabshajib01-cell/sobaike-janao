@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { UserX, ArrowLeft, AlertCircle, FileText, Scale } from 'lucide-react';
+import { UserX, ArrowLeft, AlertCircle, FileText, Scale, ShieldCheck, RefreshCw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
@@ -58,45 +58,23 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   }, [reports]);
 
   useEffect(() => {
-    const subjectPublicLabel = primaryReport
-      ? language === 'bn'
-        ? primaryReport.reportedSubjectBn || primaryReport.reportedSubject
-        : primaryReport.reportedSubjectEn || primaryReport.reportedSubject
-      : null;
-
     if (!isLoading && !fetchError) {
-      if (reports.length > 0 && primaryReport && subjectPublicLabel) {
-        const title =
-          language === 'bn'
-            ? `${subjectPublicLabel} সংক্রান্ত প্রতিবেদন | ${BRAND_NAME.bn}`
-            : `Reports regarding ${subjectPublicLabel} | ${BRAND_NAME.en}`;
-        const description =
-          language === 'bn'
-            ? `${subjectPublicLabel} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`
-            : `Published public reports and statements regarding ${subjectPublicLabel}.`;
+      const title =
+        language === 'bn'
+          ? `${displayName} সংক্রান্ত প্রতিবেদন | ${BRAND_NAME.bn}`
+          : `Reports regarding ${displayName} | ${BRAND_NAME.en}`;
+      const description =
+        language === 'bn'
+          ? `${displayName} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`
+          : `Published public reports and statements regarding ${displayName}.`;
 
-        setDynamicSeo({
-          title,
-          description,
-          robots: 'index, follow',
-          ogType: 'website',
-          ogSiteName: BRAND_NAME[language],
-        });
-      } else {
-        setDynamicSeo({
-          title:
-            language === 'bn'
-              ? `সংশ্লিষ্ট পক্ষের তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}`
-              : `Subject Not Found | ${BRAND_NAME.en}`,
-          description:
-            language === 'bn'
-              ? 'এই সংশ্লিষ্ট পক্ষের জন্য কোনো প্রকাশিত প্রতিবেদন পাওয়া যায়নি।'
-              : 'No published reports were found for this subject.',
-          robots: 'noindex, follow',
-          ogType: 'website',
-          ogSiteName: BRAND_NAME[language],
-        });
-      }
+      setDynamicSeo({
+        title,
+        description,
+        robots: 'index, follow',
+        ogType: 'website',
+        ogSiteName: BRAND_NAME[language],
+      });
     } else if (fetchError) {
       setDynamicSeo({
         title: language === 'bn' ? `সত্ত্বার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Subject Unavailable | ${BRAND_NAME.en}`,
@@ -114,7 +92,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         ogSiteName: BRAND_NAME[language],
       });
     }
-  }, [primaryReport, reports.length, isLoading, fetchError, language, setDynamicSeo]);
+  }, [displayName, isLoading, fetchError, language, setDynamicSeo]);
 
   return (
     <PublicPageContainer id="subject-page-container">
@@ -181,9 +159,9 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
-          <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
-          <p className="text-[16px] font-semibold text-ui-error-text">
+        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
+          <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" aria-hidden="true" />
+          <p className="text-[16px] font-semibold text-rose-500">
             {language === 'bn'
               ? 'সত্ত্বার তথ্য লোড করতে সমস্যা হয়েছে।'
               : 'Failed to load reports for this subject. Please try again.'}

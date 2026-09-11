@@ -1266,7 +1266,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 id="draft-recovery-delete-btn"
                 type="button"
                 onClick={handleDeleteSavedDraft}
-                className="px-4 py-2.5 rounded-xl border border-ui-error-border bg-ui-surface text-ui-error-text font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 hover:bg-ui-error-bg"
+                className="px-4 py-2.5 rounded-xl border border-rose-500/30 bg-ui-surface text-rose-600 dark:text-rose-400 font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>{language === 'bn' ? 'খসড়া মুছে ফেলুন' : 'Delete Draft'}</span>
@@ -1616,7 +1616,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               id="draft-discard-btn"
               type="button"
               onClick={handleDiscardDraft}
-              className="px-3 py-2 rounded-xl text-ui-error-text hover:bg-ui-error-bg font-semibold text-[13.5px] sm:text-[14px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-ui-focus"
+              className="px-3 py-2 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-500/10 font-semibold text-[13.5px] sm:text-[14px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-red-500/40"
             >
               <Trash2 className="w-4 h-4" />
               <span>{language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}</span>

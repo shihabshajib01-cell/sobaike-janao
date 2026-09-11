@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ReportItem } from '../../types/report';
 import { BANGLADESH_DISTRICTS } from '../../data/districts';
-import { SectionKey } from '../../theme/tokens';
+import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { toBanglaDigits, formatRankNumber } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
 import { CategoryIcon } from '../branding/CategoryIcon';
@@ -318,14 +318,14 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span
-                        className={`w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-bold shrink-0 border ${
+                        className={`w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-bold shrink-0 ${
                           index === 0
-                            ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
+                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold'
                             : index === 1
-                            ? 'bg-ui-surface-elevated text-ui-content-primary border-ui-stroke-default font-bold'
+                            ? 'bg-slate-500/15 text-slate-700 dark:text-slate-300 font-bold'
                             : index === 2
-                            ? 'bg-ui-warning-bg text-ui-warning-text border-ui-warning-border font-bold'
-                            : 'bg-ui-surface text-ui-content-muted border-ui-stroke-subtle'
+                            ? 'bg-amber-700/15 text-amber-700 dark:text-amber-500'
+                            : 'bg-ui-surface text-ui-content-muted'
                         }`}
                       >
                         {rankDisplay}

@@ -176,8 +176,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     mappedPoints.forEach((pt) => {
       const isSelected = activeReport?.id === pt.report.id;
       const secConf = SECTIONS[pt.report.segment];
-      const color = `var(--sec-${pt.report.segment}-primary, ${secConf.primaryColor})`;
-      const strokeColor = pt.report.segment === 'rickshaw' ? 'var(--sec-rickshaw-on-primary, #050505)' : 'var(--ui-text-inverse, #FFFFFF)';
+      const color = secConf.primaryColor;
 
       // Icon SVG inside marker
       const markerHtml = `
@@ -186,16 +185,16 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           height: 32px;
           border-radius: 50%;
           background-color: ${color};
-          border: 2.5px solid var(--ui-surface, #FFFFFF);
+          border: 2.5px solid #FFFFFF;
           box-shadow: 0 4px 12px rgba(0,0,0,0.25);
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: transform 0.15s ease, box-shadow 0.15s ease;
-          ${isSelected ? 'transform: scale(1.3); box-shadow: 0 0 0 4px var(--ui-focus, rgba(58,124,165,0.45)); z-index: 1000;' : ''}
+          ${isSelected ? 'transform: scale(1.3); box-shadow: 0 0 0 4px rgba(58,124,165,0.45); z-index: 1000;' : ''}
         ">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             ${
               pt.report.segment === 'harassment'
                 ? '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />'
@@ -229,7 +228,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       const title = language === 'bn' ? pt.report.titleBn : pt.report.titleEn;
       const districtLabel = language === 'bn' ? pt.report.districtBn : pt.report.districtEn;
       marker.bindTooltip(
-        `<div style="font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ui-content-primary);">${title}</div><div style="font-size: 11px; color: var(--ui-content-secondary);">${districtLabel}</div>`,
+        `<div style="font-family: inherit; font-size: 13px; font-weight: 700; color: #050505;">${title}</div><div style="font-size: 11px; color: #65676B;">${districtLabel}</div>`,
         { direction: 'top', offset: [0, -12], opacity: 0.95 }
       );
 
@@ -326,19 +325,19 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           {language === 'bn' ? 'মানচিত্র নির্দেশিকা' : 'Map Legend'}
         </span>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-harassment-primary)] border border-ui-surface shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[var(--sec-harassment-primary)] border border-white shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-rickshaw-primary)] border border-ui-surface shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[var(--sec-rickshaw-primary)] border border-white shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-extortion-primary)] border border-ui-surface shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[var(--sec-extortion-primary)] border border-white shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}
           </span>

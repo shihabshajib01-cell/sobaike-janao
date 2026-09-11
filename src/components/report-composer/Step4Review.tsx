@@ -14,7 +14,6 @@ import {
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { DraftReport, isMeaningfulMentionedParty } from '../../services/types';
 import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
-import { AttachmentLightboxModal } from '../media/AttachmentLightboxModal';
 import { SEGMENT_SUBCATEGORIES } from '../../data/reportOptions';
 import {
   getReportSubjectConfig,
@@ -98,7 +97,6 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     identity_target: false,
     attachments: false,
   });
-  const [expandedReviewImageIndex, setExpandedReviewImageIndex] = useState<number | null>(null);
 
   const toggleSection = (key: string) => {
     setOpenSections((prev) => ({
@@ -775,10 +773,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               {hasMissingEvidence ? (
                 <div
                   id="review-missing-evidence-alert"
-                  className="p-3 rounded-xl border border-ui-warning-border bg-ui-warning-bg text-ui-warning-text space-y-2 text-[13px]"
+                  className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
                 >
                   <div className="flex items-start gap-2.5">
-                    <Info className="w-4 h-4 text-ui-warning-text shrink-0 mt-0.5" />
+                    <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                     <div className="space-y-1">
                       <p className="font-semibold">
                         {language === 'bn'
@@ -796,7 +794,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     <button
                       type="button"
                       onClick={() => onEditStep(3, 'attachments')}
-                      className="text-[12.5px] font-bold text-ui-warning-text hover:underline cursor-pointer"
+                      className="text-[12.5px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
                     >
                       {language === 'bn'
                         ? '৩ নং ধাপে সংযুক্তি যোগ করুন →'
@@ -811,39 +809,19 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   </span>
                   <div className="flex gap-1.5">
                     {pendingImages.slice(0, 4).map((img, idx) => (
-                      <button
+                      <img
                         key={idx}
-                        type="button"
-                        onClick={() => setExpandedReviewImageIndex(idx)}
-                        aria-label={
-                          language === 'bn'
-                            ? `সংযুক্ত ছবি ${idx + 1} বড় করে দেখুন`
-                            : `Expand attachment image ${idx + 1}`
-                        }
-                        className="w-9 h-9 rounded-lg overflow-hidden border border-ui-stroke-subtle hover:border-ui-accent hover:opacity-90 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
-                      >
-                        <img
-                          src={img.previewUrl}
-                          alt="attachment preview"
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover pointer-events-none"
-                        />
-                      </button>
+                        src={img.previewUrl}
+                        alt="attachment preview"
+                        loading="lazy"
+                        decoding="async"
+                        className="w-9 h-9 rounded-lg object-cover border border-ui-stroke-subtle"
+                      />
                     ))}
                     {pendingImages.length > 4 && (
-                      <button
-                        type="button"
-                        onClick={() => setExpandedReviewImageIndex(4)}
-                        aria-label={
-                          language === 'bn'
-                            ? `আরও ${pendingImages.length - 4}টি ছবি বড় করে দেখুন`
-                            : `Expand ${pendingImages.length - 4} more images`
-                        }
-                        className="w-9 h-9 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center font-bold text-ui-content-primary text-[13px] hover:border-ui-accent hover:opacity-90 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
-                      >
+                      <div className="w-9 h-9 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center font-bold text-ui-content-primary text-[13px]">
                         +{pendingImages.length - 4}
-                      </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -864,17 +842,6 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
             : 'Submitted reports will be queued for moderation review. Please ensure all details are factual and responsibly reported.'}
         </p>
       </div>
-
-      {/* Lightbox / Modal Viewer for Uploaded Attachments in Review */}
-      {expandedReviewImageIndex !== null && (
-        <AttachmentLightboxModal
-          images={pendingImages}
-          initialIndex={expandedReviewImageIndex}
-          isOpen={expandedReviewImageIndex !== null}
-          onClose={() => setExpandedReviewImageIndex(null)}
-          language={language}
-        />
-      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { HeartHandshake, ShieldAlert, ZapOff, LucideIcon } from 'lucide-react';
 import { EvStationIcon } from './EvStationIcon';
-import { SectionKey } from '../../theme/tokens';
+import { SectionKey, SECTIONS } from '../../theme/tokens';
 
 export type FeatureIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FeatureIconVariant = 'standard' | 'container' | 'marker' | 'badge';
@@ -57,7 +57,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   if (variant === 'marker') {
     return (
       <div
-        className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-full flex items-center justify-center text-ui-content-inverse border-2 border-ui-surface shadow-md transition-all shrink-0 ${className}`}
+        className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-full flex items-center justify-center text-white border-2 border-white shadow-md transition-all shrink-0 ${className}`}
         style={{
           backgroundColor: `var(--sec-${section}-primary)`,
         }}
