@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { X, CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
+import { Modal } from '../ui/Modal';
 
 /**
  * Temporary rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -37,70 +38,6 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const modalRef = useRef<HTMLDivElement>(null);
-  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
-
-    const timeoutId = setTimeout(() => {
-      if (modalRef.current) {
-        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length > 0) {
-          focusableElements[0].focus();
-        } else {
-          modalRef.current.focus();
-        }
-      }
-    }, 30);
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCloseRef.current();
-        return;
-      }
-
-      if (e.key === 'Tab' && modalRef.current) {
-        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length === 0) return;
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('keydown', handleKeyDown);
-      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
-        previouslyFocusedElementRef.current.focus();
-      }
-    };
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -188,20 +125,20 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="subject-modal-title"
-      style={{ backgroundColor: 'var(--ui-overlay)' }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto"
+    <Modal
+      id="subject-response-modal"
+      isOpen={isOpen}
+      onClose={onClose}
+      closeOnBackdrop={false}
+      showHeader={false}
+      maxWidth="lg"
+      contentClassName="flex flex-col min-h-0 overflow-hidden"
+      language={language}
+      ariaLabelledBy="subject-modal-title"
     >
-      <div
-        ref={modalRef}
-        tabIndex={-1}
-        className="bg-ui-surface rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-ui-stroke-subtle text-left space-y-5 my-8 focus:outline-none"
-      >
+      <div className="flex flex-col h-full min-h-0 text-left">
         {/* Header */}
-        <div className="flex items-start justify-between gap-3 border-b border-ui-stroke-subtle pb-3.5">
+        <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-7 pb-3.5 sm:pb-4 border-b border-ui-stroke-subtle">
           <div className="space-y-1">
             {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
               <div
@@ -237,40 +174,42 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
+        </header>
 
         {isSubmitted ? (
-          <div role="status" aria-live="polite" className="py-6 text-center space-y-4">
-            <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text border border-ui-success-border rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-7 h-7" />
-            </div>
-            <div className="space-y-1.5">
-              <h4 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
-                {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                  ? (language === 'bn' ? 'জবাব জমা হয়েছে' : 'Response submitted')
-                  : (language === 'bn' ? 'প্রতিউত্তর জমা সম্পন্ন হয়েছে' : 'Response Received')}
-              </h4>
-              <p className="text-[16px] leading-[24px] text-ui-content-secondary max-w-md mx-auto">
-                {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                  ? (language === 'bn'
-                      ? 'আপনার জবাব পর্যালোচনার জন্য পাঠানো হয়েছে।'
-                      : 'Your response has been sent for review.')
-                  : (language === 'bn'
-                      ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হয়েছে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
-                      : 'Your response will be submitted for moderation. Any public display is handled through the publication workflow.')}
-              </p>
-            </div>
-            {responseId && (
-              <div className="p-3 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle text-center inline-block max-w-xs mx-auto">
-                <span className="text-[13px] text-ui-content-muted block">
-                  {language === 'bn' ? 'রেসপন্স আইডি' : 'Response ID'}
-                </span>
-                <span className="font-mono text-[15px] font-bold text-ui-content-primary">
-                  {responseId}
-                </span>
+          <div className="flex flex-col flex-1 min-h-0">
+            <div role="status" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-7 py-6 text-center space-y-4">
+              <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text border border-ui-success-border rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-7 h-7" />
               </div>
-            )}
-            <div>
+              <div className="space-y-1.5">
+                <h4 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
+                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn' ? 'জবাব জমা হয়েছে' : 'Response submitted')
+                    : (language === 'bn' ? 'প্রতিউত্তর জমা সম্পন্ন হয়েছে' : 'Response Received')}
+                </h4>
+                <p className="text-[16px] leading-[24px] text-ui-content-secondary max-w-md mx-auto">
+                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn'
+                        ? 'আপনার জবাব পর্যালোচনার জন্য পাঠানো হয়েছে।'
+                        : 'Your response has been sent for review.')
+                    : (language === 'bn'
+                        ? 'আপনার প্রতিক্রিয়া মডারেশনের জন্য জমা হয়েছে। প্রকাশযোগ্য সংস্করণ আলাদা প্রকাশনা প্রক্রিয়ার মাধ্যমে পরিচালিত হবে।'
+                        : 'Your response will be submitted for moderation. Any public display is handled through the publication workflow.')}
+                </p>
+              </div>
+              {responseId && (
+                <div className="p-3 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle text-center inline-block max-w-xs mx-auto">
+                  <span className="text-[13px] text-ui-content-muted block">
+                    {language === 'bn' ? 'রেসপন্স আইডি' : 'Response ID'}
+                  </span>
+                  <span className="font-mono text-[15px] font-bold text-ui-content-primary">
+                    {responseId}
+                  </span>
+                </div>
+              )}
+            </div>
+            <footer className="shrink-0 p-4 sm:p-5 md:p-6 border-t border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-5">
               <button
                 type="button"
                 onClick={handleResetAndClose}
@@ -278,10 +217,11 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               >
                 {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
               </button>
-            </div>
+            </footer>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-7 space-y-4">
             {error && (
               <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-xl text-[14px] font-medium">
                 {error}
@@ -487,8 +427,10 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               </div>
             )}
 
+            </div>
+
             {/* Footer Buttons */}
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-ui-stroke-subtle">
+            <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-7 border-t border-ui-stroke-subtle bg-ui-surface flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-4">
               <button
                 type="button"
                 onClick={handleResetAndClose}
@@ -519,11 +461,11 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   </>
                 )}
               </button>
-            </div>
+            </footer>
           </form>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };
 
