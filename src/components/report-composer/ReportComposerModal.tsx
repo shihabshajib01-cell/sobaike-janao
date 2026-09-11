@@ -1174,12 +1174,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 </div>
                 <div>
                   <h2 className="text-[20px] md:text-[22px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'সংরক্ষিত খসড়া' : 'Saved draft'}
+                    {language === 'bn' ? 'সংরক্ষিত খসড়া পাওয়া গেছে' : 'Unfinished Draft Available'}
                   </h2>
                   <p className="text-[14px] text-ui-content-muted">
                     {language === 'bn'
-                      ? 'এই ডিভাইসে আপনার পূর্বে তৈরি করা একটি খসড়া সংরক্ষিত রয়েছে।'
-                      : 'You have a saved report draft on this device.'}
+                      ? 'আপনার পূর্বে তৈরি করা একটি খসড়া এই ডিভাইসে সংরক্ষিত রয়েছে।'
+                      : 'You have an unsaved complaint draft stored on this device.'}
                   </p>
                 </div>
               </div>
@@ -1269,7 +1269,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 className="px-4 py-2.5 rounded-xl border border-ui-error-border bg-ui-surface text-ui-error-text font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 hover:bg-ui-error-bg"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>{language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}</span>
+                <span>{language === 'bn' ? 'খসড়া মুছে ফেলুন' : 'Delete Draft'}</span>
               </button>
 
               <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5">
@@ -1281,7 +1281,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   className="px-4 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>{language === 'bn' ? 'নতুন প্রতিবেদন শুরু করুন' : 'Start new report'}</span>
+                  <span>{language === 'bn' ? 'নতুন অভিযোগ শুরু করুন' : 'Start New Complaint'}</span>
                 </button>
 
                 {/* Continue Draft */}
@@ -1300,8 +1300,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                         ? 'লোড হচ্ছে...'
                         : 'Loading...'
                       : language === 'bn'
-                      ? 'খসড়া চালু রাখুন'
-                      : 'Continue draft'}
+                      ? 'খসড়া থেকে শুরু করুন'
+                      : 'Continue Draft'}
                   </span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
@@ -1518,7 +1518,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             </div>
             <div className="space-y-1">
               <h3 className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
-                {language === 'bn' ? 'প্রতিবেদন শুরুর আগে' : 'Before you begin'}
+                {language === 'bn' ? 'রিপোর্ট শুরুর আগে' : 'Before you start'}
               </h3>
             </div>
           </div>
@@ -1526,13 +1526,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           <div className="space-y-3 text-[13.5px] sm:text-[14px] leading-relaxed text-ui-content-secondary bg-ui-surface-subtle p-3.5 sm:p-4 rounded-2xl border border-ui-stroke-subtle max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
             <p>
               {language === 'bn'
-                ? 'এই প্ল্যাটফর্ম কোনো আইনি বা বিচারিক সেবা নয়। এখানে প্রতিবেদন প্রকাশের উদ্দেশ্য জনস্বার্থে তথ্য তুলে ধরা—কারও অপরাধ প্রমাণ করা নয়।'
-                : 'This platform is not a legal or judicial service. Reports are published to document matters of public interest, not to establish legal guilt.'}
+                ? 'এই প্ল্যাটফর্ম কোনো আইনগত বা বিচারিক সেবা নয়। এখানে প্রতিবেদন প্রকাশের উদ্দেশ্য জনস্বার্থে ঘটনা তুলে ধরা—কারও অপরাধ প্রমাণ করা নয়।'
+                : 'This platform is not a legal or judicial service. Reports are published to bring matters of public interest to attention—not to determine guilt.'}
             </p>
             <p>
               {language === 'bn'
-                ? 'নিরাপত্তা ও অপব্যবহার রোধে প্রকাশিত প্রতিবেদনে উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আসল নাম দেখানো হবে না। সুরক্ষার স্বার্থে মডারেশন টিম তথ্য সম্পাদনা বা গোপন করতে পারে। নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশ নাও হতে পারে।'
-                : 'To prevent harm and misuse, published reports will not display the real name of a mentioned person or organization. Details may be redacted or edited for safety, and reports may not be published if they cannot be shared safely.'}
+                ? 'নিরাপত্তা ও অপব্যবহার রোধে প্রকাশিত প্রতিবেদনে অভিযুক্ত ব্যক্তি বা প্রতিষ্ঠানের আসল নাম দেখানো হবে না। এমন তথ্য থাকলে মডারেশন টিম তা গোপন বা সম্পাদনা করতে পারে। নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশ নাও হতে পারে।'
+                : 'To reduce harm and misuse, published reports will not reveal the real name of an accused person or organization. Moderators may hide or edit identifying information before publication. A report may not be published if it cannot be shared safely.'}
             </p>
           </div>
 
@@ -1550,8 +1550,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               />
               <span className="text-[13.5px] sm:text-[14px] font-semibold text-ui-content-primary leading-snug">
                 {language === 'bn'
-                  ? 'আমি এই প্রকাশনা নীতি পড়েছি এবং সম্মত।'
-                  : 'I have read and agree to this publishing policy.'}
+                  ? 'আমি বিষয়টি বুঝেছি এবং এই প্রকাশনা নীতিতে সম্মত।'
+                  : 'I understand and agree to this publishing policy.'}
               </span>
             </label>
           </div>
@@ -1575,7 +1575,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               onClick={handleAgreeRapeConsent}
               className="min-h-[44px] text-[15px] px-5"
             >
-              {language === 'bn' ? 'সম্মত হয়ে এগিয়ে যান' : 'Agree and continue'}
+              {language === 'bn' ? 'সম্মত হয়ে চালিয়ে যান' : 'Agree & Continue'}
             </Button>
           </div>
         </div>
@@ -1600,12 +1600,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             </div>
             <div className="space-y-1">
               <h3 className="text-[19px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
-                {language === 'bn' ? 'খসড়া সংরক্ষণ করবেন?' : 'Save draft and exit?'}
+                {language === 'bn' ? 'এখন বন্ধ করবেন?' : 'Close for now?'}
               </h3>
               <p className="text-[14px] sm:text-[14.5px] leading-relaxed text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'আপনার বর্তমান তথ্য এই ডিভাইসে সংরক্ষিত থাকবে। পরে আবার চালু করতে পারবেন।'
-                  : 'Your draft is saved on this device. You can continue later.'}
+                  ? 'আপনার খসড়া সংরক্ষিত আছে। পরে আবার এখান থেকে চালিয়ে যেতে পারবেন।'
+                  : 'Your draft is saved. You can continue from here later.'}
               </p>
             </div>
           </div>
@@ -1640,7 +1640,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 onClick={handleSaveAndExit}
                 className="min-h-[44px] text-[15px] px-6"
               >
-                {language === 'bn' ? 'সংরক্ষণ করে বের হন' : 'Save and close'}
+                {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
               </Button>
             </div>
           </div>

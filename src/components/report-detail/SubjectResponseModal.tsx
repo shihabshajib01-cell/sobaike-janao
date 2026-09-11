@@ -52,7 +52,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               ? 'আপনার পূর্ণ নাম, ইমেইল বা ফোন এবং জবাব লিখুন।'
               : 'অনুগ্রহ করে আপনার নাম, যোগাযোগের মাধ্যম এবং আনুষ্ঠানিক বক্তব্য পূরণ করুন।')
           : (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'Please enter your full name, email or phone, and response.'
+              ? 'Enter your full name, email or phone, and response.'
               : 'Please provide your full name, contact information, and formal statement.')
       );
       return;
@@ -62,10 +62,10 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       setError(
         language === 'bn'
           ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'জবাব কমপক্ষে ১০ অক্ষরের হতে হবে।'
+              ? 'জবাবে অন্তত ১০ অক্ষর লিখুন।'
               : 'বক্তব্য কমপক্ষে ১০ অক্ষরের হতে হবে।')
           : (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'Response must be at least 10 characters.'
+              ? 'Enter at least 10 characters in your response.'
               : 'Statement must be at least 10 characters.')
       );
       return;
@@ -161,7 +161,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     : 'Submit Official Response or Clarification')}
             </h3>
             <p className="text-[14px] text-ui-content-secondary">
-              {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned subject:'}{' '}
+              {language === 'bn' ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠান:' : 'Mentioned person or organization:'}{' '}
               <span className="font-semibold text-ui-content-primary">{subjectName}</span>
             </p>
           </div>

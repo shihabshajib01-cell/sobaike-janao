@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Send, FileText } from 'lucide-react';
+import { X, CheckCircle2, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
 
@@ -36,8 +36,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     if (!description.trim() || description.trim().length < 10) {
       setError(
         language === 'bn'
-          ? 'অনুগ্রহ করে অন্তত ১০ অক্ষরের সুস্পষ্ট বিবরণ লিখুন।'
-          : 'Please provide at least 10 characters of descriptive details.'
+          ? 'অন্তত ১০ অক্ষর লিখুন।'
+          : 'Enter at least 10 characters.'
       );
       return;
     }
@@ -94,14 +94,10 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
         {/* Header */}
         <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-0 pb-3.5 sm:pb-4 md:pb-3.5 border-b border-ui-stroke-subtle">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[13px] font-semibold bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle">
-              <FileText className="w-3.5 h-3.5 text-ui-content-secondary" />
-              <span>{language === 'bn' ? 'তথ্য ও অভিজ্ঞতা' : 'Information & experience'}</span>
-            </div>
             <h3 id="citizen-modal-title" className="text-[18px] sm:text-[20px] leading-[26px] sm:leading-[28px] font-bold text-ui-content-primary">
               {language === 'bn'
-                ? 'তথ্য বা অভিজ্ঞতা যোগ করুন'
-                : 'Add information or experience'}
+                ? 'তথ্য দিন'
+                : 'Share information'}
             </h3>
             <p className="text-[13px] sm:text-[14px] text-ui-content-muted">
               {language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `About: ${reportTitle}`}
@@ -126,12 +122,12 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               </div>
               <div className="space-y-1">
                 <h4 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'তথ্য সফলভাবে জমা হয়েছে' : 'Information submitted successfully'}
+                  {language === 'bn' ? 'তথ্য জমা হয়েছে' : 'Information submitted'}
                 </h4>
                 <p className="text-[15px] sm:text-[16px] leading-[22px] sm:leading-[24px] text-ui-content-secondary max-w-sm mx-auto">
                   {language === 'bn'
-                    ? 'আপনার প্রদত্ত বিবরণটি জমা হয়েছে এবং মডারেশন টিম পর্যালোচনা সম্পন্ন করে মূল প্রতিবেদনে সহায়ক আপডেট হিসেবে সংযুক্ত করবে।'
-                    : 'Your information has been submitted for moderation review.'}
+                    ? 'আপনার তথ্য পর্যালোচনার জন্য পাঠানো হয়েছে।'
+                    : 'Your information has been sent for review.'}
                 </p>
               </div>
               {responseId && (
@@ -167,8 +163,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               <div className="space-y-1.5">
                 <label htmlFor="citizen-description-input" className="block text-[15px] sm:text-[16px] font-medium text-ui-content-primary">
                   {language === 'bn'
-                    ? 'আপনার তথ্য বা অভিজ্ঞতা লিখুন *'
-                    : 'Describe your information or experience *'}
+                    ? 'আপনি কী তথ্য দিতে চান? *'
+                    : 'What would you like to share? *'}
                 </label>
                 <textarea
                   id="citizen-description-input"
@@ -180,8 +176,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={
                     language === 'bn'
-                      ? 'সুনির্দিষ্ট তারিখ, সময়, স্থান বা ঘটনা সম্পর্কিত প্রাসঙ্গিক তথ্য উল্লেখ করুন...'
-                      : 'Provide specific dates, timings, locations or contextual observations...'
+                      ? 'তারিখ, সময়, স্থান বা যা দেখেছেন—প্রাসঙ্গিক তথ্য লিখুন...'
+                      : 'Add relevant details such as date, time, place or what you observed...'
                   }
                   className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent focus:ring-1 focus:ring-ui-accent rounded-xl text-[15px] sm:text-[16px] text-ui-content-primary placeholder:text-ui-content-muted"
                 />
@@ -189,7 +185,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
 
               <div className="space-y-1.5">
                 <label htmlFor="citizen-witness-date-input" className="block text-[15px] sm:text-[16px] font-medium text-ui-content-secondary">
-                  {language === 'bn' ? 'ঘটনার সম্ভাব্য তারিখ (যদি জানা থাকে)' : 'Incident date (optional)'}
+                  {language === 'bn' ? 'ঘটনার তারিখ (ঐচ্ছিক)' : 'Incident date (optional)'}
                 </label>
                 <input
                   id="citizen-witness-date-input"
@@ -212,8 +208,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   />
                   <span>
                     {language === 'bn'
-                      ? 'প্রয়োজনে মডারেশন টিমের সাথে যোগাযোগের জন্য আমার ইমেইল বা ফোন নম্বর দিতে ইচ্ছুক'
-                      : 'I agree to provide contact details for editorial follow-up only.'}
+                      ? 'এই তথ্য সম্পর্কে প্রয়োজন হলে আমার সাথে যোগাযোগ করা যেতে পারে।'
+                      : 'You may contact me for follow-up about this information.'}
                   </span>
                 </label>
 
