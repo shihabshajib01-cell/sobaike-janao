@@ -30,12 +30,12 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
 
       <div className="space-y-2">
         <h3 className="text-[22px] md:text-[24px] font-bold text-ui-content-primary">
-          {language === 'bn' ? 'অভিযোগ সফলভাবে জমা হয়েছে!' : 'Complaint Submitted Successfully!'}
+          {language === 'bn' ? 'প্রতিবেদন জমা হয়েছে' : 'Report submitted'}
         </h3>
         <p className="text-[14px] md:text-[16px] text-ui-content-secondary max-w-lg mx-auto leading-relaxed">
           {language === 'bn'
-            ? 'আপনার অভিযোগ মডারেশন পর্যালোচনার জন্য জমা হয়েছে। দায়িত্বশীল পর্যালোচনার পর পরবর্তী পদক্ষেপ গ্রহণ করা হবে।'
-            : 'Your complaint has been submitted for moderation review. Further steps will follow standard moderation review.'}
+            ? 'আপনার প্রতিবেদন পর্যালোচনার জন্য জমা হয়েছে।'
+            : 'Your report has been submitted for review.'}
         </p>
       </div>
 
@@ -50,7 +50,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
           leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
           className="w-full md:w-auto min-h-[44px] text-[16px] px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
-          {language === 'bn' ? 'আরেকটি অভিযোগ দিন' : 'Submit Another Complaint'}
+          {language === 'bn' ? 'আরেকটি প্রতিবেদন জমা দিন' : 'Submit another report'}
         </Button>
 
         <Button
@@ -61,7 +61,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
           onClick={onClose}
           className="w-full md:w-auto min-h-[44px] text-[16px] px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
-          {language === 'bn' ? 'হোমপেজে ফিরে যান' : 'Return to Home'}
+          {language === 'bn' ? 'হোমে ফিরে যান' : 'Return to home'}
         </Button>
       </div>
     </div>

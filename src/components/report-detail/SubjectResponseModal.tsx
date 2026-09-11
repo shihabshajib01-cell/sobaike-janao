@@ -161,7 +161,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     : 'Submit Official Response or Clarification')}
             </h3>
             <p className="text-[14px] text-ui-content-secondary">
-              {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned Subject:'}{' '}
+              {language === 'bn' ? 'উল্লেখিত পক্ষ:' : 'Mentioned subject:'}{' '}
               <span className="font-semibold text-ui-content-primary">{subjectName}</span>
             </p>
           </div>
@@ -456,7 +456,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     <span>
                       {language === 'bn'
                         ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? 'জবাব জমা দিন' : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
-                        : 'Submit Response'}
+                        : 'Submit response'}
                     </span>
                   </>
                 )}

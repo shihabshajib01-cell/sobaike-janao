@@ -76,7 +76,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             </h2>
             <div className="flex items-center gap-1.5 text-xs text-ui-content-muted mt-0.5">
               <ShieldCheck className="w-3.5 h-3.5 text-ui-success-text" aria-hidden="true" />
-              <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy Protected'}</span>
+              <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy protected'}</span>
             </div>
           </div>
         </div>

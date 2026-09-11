@@ -96,12 +96,12 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[13px] font-semibold bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle">
               <FileText className="w-3.5 h-3.5 text-ui-content-secondary" />
-              <span>{language === 'bn' ? 'তথ্য ও অভিজ্ঞতা' : 'Information & Experience'}</span>
+              <span>{language === 'bn' ? 'তথ্য ও অভিজ্ঞতা' : 'Information & experience'}</span>
             </div>
             <h3 id="citizen-modal-title" className="text-[18px] sm:text-[20px] leading-[26px] sm:leading-[28px] font-bold text-ui-content-primary">
               {language === 'bn'
                 ? 'তথ্য বা অভিজ্ঞতা যোগ করুন'
-                : 'Add Information or Experience'}
+                : 'Add information or experience'}
             </h3>
             <p className="text-[13px] sm:text-[14px] text-ui-content-muted">
               {language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `About: ${reportTitle}`}
@@ -126,7 +126,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               </div>
               <div className="space-y-1">
                 <h4 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'তথ্য সফলভাবে জমা হয়েছে' : 'Information Submitted Successfully'}
+                  {language === 'bn' ? 'তথ্য সফলভাবে জমা হয়েছে' : 'Information submitted successfully'}
                 </h4>
                 <p className="text-[15px] sm:text-[16px] leading-[22px] sm:leading-[24px] text-ui-content-secondary max-w-sm mx-auto">
                   {language === 'bn'
@@ -189,7 +189,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
 
               <div className="space-y-1.5">
                 <label htmlFor="citizen-witness-date-input" className="block text-[15px] sm:text-[16px] font-medium text-ui-content-secondary">
-                  {language === 'bn' ? 'ঘটনার সম্ভাব্য তারিখ (যদি জানা থাকে)' : 'Incident Date (Optional)'}
+                  {language === 'bn' ? 'ঘটনার সম্ভাব্য তারিখ (যদি জানা থাকে)' : 'Incident date (optional)'}
                 </label>
                 <input
                   id="citizen-witness-date-input"
@@ -259,7 +259,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>{language === 'bn' ? 'তথ্য জমা দিন' : 'Submit Information'}</span>
+                    <span>{language === 'bn' ? 'তথ্য জমা দিন' : 'Submit information'}</span>
                   </>
                 )}
               </button>

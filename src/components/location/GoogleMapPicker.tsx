@@ -294,7 +294,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
         <label className="text-[13px] font-bold text-primary flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-accent" />
           <span>
-            {language === 'bn' ? 'ম্যাপে ঘটনার সুনির্দিষ্ট স্থান *' : 'Incident Location on Map *'}
+            {language === 'bn' ? 'ম্যাপে ঘটনার সুনির্দিষ্ট স্থান *' : 'Incident location on map *'}
           </span>
         </label>
 

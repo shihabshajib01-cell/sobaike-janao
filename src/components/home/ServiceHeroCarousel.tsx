@@ -57,7 +57,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report issue',
       path: '/harassment',
-      illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v01.png',
     },
     {
       key: 'rickshaw',
@@ -78,7 +77,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report issue',
       path: '/extortion',
-      illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v01.png',
     },
     {
       key: 'load_shedding',
