@@ -318,14 +318,14 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span
-                        className={`w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-bold shrink-0 ${
+                        className={`w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-bold shrink-0 border ${
                           index === 0
-                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold'
+                            ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
                             : index === 1
-                            ? 'bg-slate-500/15 text-slate-700 dark:text-slate-300 font-bold'
+                            ? 'bg-ui-surface-elevated text-ui-content-primary border-ui-stroke-default font-bold'
                             : index === 2
-                            ? 'bg-amber-700/15 text-amber-700 dark:text-amber-500'
-                            : 'bg-ui-surface text-ui-content-muted'
+                            ? 'bg-ui-warning-bg text-ui-warning-text border-ui-warning-border font-bold'
+                            : 'bg-ui-surface text-ui-content-muted border-ui-stroke-subtle'
                         }`}
                       >
                         {rankDisplay}

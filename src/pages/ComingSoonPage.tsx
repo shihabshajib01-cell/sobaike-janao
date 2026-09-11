@@ -31,7 +31,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
             id={`coming-soon-badge-${serviceKey}`}
             className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[13px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-2xs"
           >
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-ui-warning-text animate-pulse" />
             <span>{language === 'bn' ? service.badgeBn : service.badgeEn}</span>
           </span>
         </div>

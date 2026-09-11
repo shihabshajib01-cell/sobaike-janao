@@ -177,7 +177,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 id={`carousel-badge-${currentSlide.key}`}
                 className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-2xs"
               >
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-ui-warning-text animate-pulse" />
                 <span>{language === 'bn' ? currentSlide.badgeBn : currentSlide.badgeEn}</span>
               </span>
             )}

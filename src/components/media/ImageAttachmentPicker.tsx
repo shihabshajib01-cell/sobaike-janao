@@ -245,8 +245,8 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
     <div className="space-y-4">
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start gap-2.5 text-[14px] text-rose-700 dark:text-rose-400">
-          <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+        <div className="p-3.5 bg-ui-error-bg border border-ui-error-border rounded-xl flex items-start gap-2.5 text-[14px] text-ui-error-text">
+          <AlertCircle className="w-5 h-5 text-ui-error-text shrink-0 mt-0.5" />
           <span className="leading-[22px]">{language === 'bn' ? errorMessage.bn : errorMessage.en}</span>
         </div>
       )}
@@ -269,7 +269,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)] ${
             isDragging
-              ? 'border-emerald-600 bg-emerald-500/10'
+              ? 'border-ui-accent bg-ui-accent/10'
               : 'border-subtle bg-surface-subtle'
           }`}
         >
@@ -287,7 +287,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
             }}
           />
           <div className="w-12 h-12 rounded-2xl bg-surface border border-subtle flex items-center justify-center shadow-2xs text-secondary">
-            <UploadCloud className="w-6 h-6 text-emerald-600" />
+            <UploadCloud className="w-6 h-6 text-ui-accent" />
           </div>
           <div className="space-y-1">
             <p className="text-[14px] font-semibold text-primary">
@@ -313,7 +313,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                   : `Attached Evidence (${images.length}/${maxImages})`}
               </span>
               {hasAnyCompressing && (
-                <span className="flex items-center gap-1 text-[12px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1 text-[12px] font-medium text-ui-success-text bg-ui-success-bg border border-ui-success-border px-2 py-0.5 rounded-full">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing…'}
                 </span>
@@ -328,7 +328,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                   key={img.id}
                   className={`relative group rounded-xl overflow-hidden border bg-surface flex flex-col justify-between shadow-2xs transition-all ${
                     img.compressionError
-                      ? 'border-rose-500/50 bg-rose-500/5'
+                      ? 'border-ui-error-border bg-ui-error-bg'
                       : 'border-subtle'
                   }`}
                 >
@@ -367,8 +367,8 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
 
                     {/* Error Overlay if any */}
                     {img.compressionError && !img.isCompressing && (
-                      <div className="absolute inset-0 bg-rose-950/80 p-3 flex flex-col items-center justify-center text-center text-rose-200 gap-1">
-                        <AlertCircle className="w-5 h-5 text-rose-400" />
+                      <div className="absolute inset-0 bg-ui-error-bg/95 p-3 flex flex-col items-center justify-center text-center text-ui-error-text gap-1">
+                        <AlertCircle className="w-5 h-5 text-ui-error-text" />
                         <span className="text-[12px] leading-tight">
                           {language === 'bn' ? img.compressionError.bn : img.compressionError.en}
                         </span>
@@ -383,7 +383,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                         handleRemoveImage(img.id);
                       }}
                       aria-label={language === 'bn' ? `ছবি ${index + 1} মুছুন` : `Remove image ${index + 1}`}
-                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10"
+                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-ui-error-text hover:opacity-90 text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10"
                     >
                       <X className="w-5 h-5" />
                     </button>

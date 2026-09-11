@@ -105,12 +105,13 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       aria-modal="true"
       aria-labelledby="location-consent-title"
       aria-describedby="location-consent-desc"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      style={{ backgroundColor: 'var(--ui-overlay)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-200"
     >
       <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl w-full max-w-md p-6 shadow-xl flex flex-col gap-5 text-ui-content-primary">
         {/* Icon & Heading */}
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-ui-info-bg text-ui-info-text border border-ui-info-border flex items-center justify-center shrink-0">
             <MapPin className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="flex-1">
@@ -118,7 +119,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
               {isBn ? 'আপনার এলাকার পোস্ট দেখুন' : 'See more posts from your area'}
             </h2>
             <div className="flex items-center gap-1.5 text-xs text-ui-content-muted mt-0.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+              <ShieldCheck className="w-3.5 h-3.5 text-ui-success-text" aria-hidden="true" />
               <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy Protected'}</span>
             </div>
           </div>
@@ -140,7 +141,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             type="button"
             onClick={handleShareLocation}
             disabled={isLoading}
-            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="w-full sm:flex-1 h-11 px-5 rounded-xl font-medium text-sm bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {isLoading ? (
               <>

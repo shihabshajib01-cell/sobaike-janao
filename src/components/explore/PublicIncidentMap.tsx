@@ -228,7 +228,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       const title = language === 'bn' ? pt.report.titleBn : pt.report.titleEn;
       const districtLabel = language === 'bn' ? pt.report.districtBn : pt.report.districtEn;
       marker.bindTooltip(
-        `<div style="font-family: inherit; font-size: 13px; font-weight: 700; color: #050505;">${title}</div><div style="font-size: 11px; color: #65676B;">${districtLabel}</div>`,
+        `<div style="font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ui-content-primary);">${title}</div><div style="font-size: 11px; color: var(--ui-content-secondary);">${districtLabel}</div>`,
         { direction: 'top', offset: [0, -12], opacity: 0.95 }
       );
 
@@ -325,19 +325,19 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           {language === 'bn' ? 'মানচিত্র নির্দেশিকা' : 'Map Legend'}
         </span>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-harassment-primary)] border border-white shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[var(--sec-harassment-primary)] border border-ui-surface shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-rickshaw-primary)] border border-white shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[var(--sec-rickshaw-primary)] border border-ui-surface shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-extortion-primary)] border border-white shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[var(--sec-extortion-primary)] border border-ui-surface shrink-0" />
           <span className="text-ui-content-secondary truncate">
             {language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}
           </span>

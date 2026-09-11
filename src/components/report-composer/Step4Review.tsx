@@ -773,10 +773,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               {hasMissingEvidence ? (
                 <div
                   id="review-missing-evidence-alert"
-                  className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 space-y-2 text-[13px]"
+                  className="p-3 rounded-xl border border-ui-warning-border bg-ui-warning-bg text-ui-warning-text space-y-2 text-[13px]"
                 >
                   <div className="flex items-start gap-2.5">
-                    <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <Info className="w-4 h-4 text-ui-warning-text shrink-0 mt-0.5" />
                     <div className="space-y-1">
                       <p className="font-semibold">
                         {language === 'bn'
@@ -794,7 +794,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     <button
                       type="button"
                       onClick={() => onEditStep(3, 'attachments')}
-                      className="text-[12.5px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
+                      className="text-[12.5px] font-bold text-ui-warning-text hover:underline cursor-pointer"
                     >
                       {language === 'bn'
                         ? '৩ নং ধাপে সংযুক্তি যোগ করুন →'

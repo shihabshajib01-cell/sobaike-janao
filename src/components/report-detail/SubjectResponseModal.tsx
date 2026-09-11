@@ -192,7 +192,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="subject-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto"
+      style={{ backgroundColor: 'var(--ui-overlay)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto"
     >
       <div
         ref={modalRef}
@@ -240,7 +241,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
         {isSubmitted ? (
           <div role="status" aria-live="polite" className="py-6 text-center space-y-4">
-            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-full flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text border border-ui-success-border rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-7 h-7" />
             </div>
             <div className="space-y-1.5">
@@ -282,7 +283,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div role="alert" className="p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-600 rounded-xl text-[14px] font-medium">
+              <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-xl text-[14px] font-medium">
                 {error}
               </div>
             )}

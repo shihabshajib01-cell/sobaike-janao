@@ -138,9 +138,9 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
           >
             {isCopied ? (
               <span className="inline-flex items-center gap-1" aria-live="polite">
-                <AppIcon name="check" size="xs" className="text-emerald-600 dark:text-[#86EFAC] md:hidden" />
-                <AppIcon name="check" size="sm" className="text-emerald-600 dark:text-[#86EFAC] hidden md:inline-block" />
-                <span className="text-emerald-700 dark:text-[#86EFAC] font-semibold text-[11.5px] sm:text-[13px] md:text-[14px]">
+                <AppIcon name="check" size="xs" className="text-ui-success-text md:hidden" />
+                <AppIcon name="check" size="sm" className="text-ui-success-text hidden md:inline-block" />
+                <span className="text-ui-success-text font-semibold text-[11.5px] sm:text-[13px] md:text-[14px]">
                   {language === 'bn' ? 'কপি হয়েছে' : 'Copied'}
                 </span>
               </span>

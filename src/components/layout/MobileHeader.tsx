@@ -71,7 +71,7 @@ export const MobileHeader: React.FC = () => {
             className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary flex items-center justify-center cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
           >
             {resolvedTheme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+              <Sun className="w-4 h-4 text-ui-warning-text" aria-hidden="true" />
             ) : (
               <Moon className="w-4 h-4 text-ui-content-primary" aria-hidden="true" />
             )}

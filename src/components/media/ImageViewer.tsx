@@ -239,7 +239,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                 }
                 className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                   idx === currentIndex
-                    ? 'border-emerald-500 scale-105 opacity-100'
+                    ? 'border-ui-accent scale-105 opacity-100'
                     : 'border-transparent opacity-50 hover:opacity-80'
                 }`}
               >

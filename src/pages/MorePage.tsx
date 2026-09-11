@@ -127,7 +127,7 @@ export const MorePage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-              <span className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center font-bold text-[16px]">
+              <span className="w-9 h-9 rounded-xl bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)] flex items-center justify-center font-bold text-[16px]">
                 ১
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
@@ -139,7 +139,7 @@ export const MorePage: React.FC = () => {
             </div>
 
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-              <span className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-[16px]">
+              <span className="w-9 h-9 rounded-xl bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)] flex items-center justify-center font-bold text-[16px]">
                 ২
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
@@ -151,7 +151,7 @@ export const MorePage: React.FC = () => {
             </div>
 
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-              <span className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-[16px]">
+              <span className="w-9 h-9 rounded-xl bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)] flex items-center justify-center font-bold text-[16px]">
                 ৩
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
@@ -169,7 +169,7 @@ export const MorePage: React.FC = () => {
         <div className="space-y-4">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-6 space-y-2 shadow-2xs">
             <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
-              <Phone className="w-5 h-5 text-rose-500" aria-hidden="true" />
+              <Phone className="w-5 h-5 text-ui-accent" aria-hidden="true" />
               <span>{language === 'bn' ? 'জরুরি ও সহায়তা সেবা' : 'Emergency & Support Resources'}</span>
             </h2>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">

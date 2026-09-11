@@ -299,14 +299,14 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
         </label>
 
         {hasValidCoordinates ? (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-[12px] font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-success-bg border border-ui-success-border text-ui-success-text text-[12px] font-semibold">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span>
               {language === 'bn' ? 'ঘটনাস্থলের পয়েন্ট নির্বাচন করা হয়েছে' : 'Incident point selected'}
             </span>
           </div>
         ) : (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-[12px] font-medium">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-warning-bg border border-ui-warning-border text-ui-warning-text text-[12px] font-medium">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>
               {language === 'bn' ? 'ম্যাপে ট্যাপ করে পয়েন্ট দিন' : 'Tap map to place point'}
@@ -324,7 +324,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
       {/* Interactive Map Container */}
       <div
         className={`w-full h-60 sm:h-72 rounded-2xl border overflow-hidden bg-surface-subtle relative shadow-2xs transition-colors ${
-          error ? 'border-red-500 ring-1 ring-red-500' : 'border-subtle'
+          error ? 'border-ui-error-border ring-1 ring-ui-error-border' : 'border-subtle'
         }`}
       >
         <div ref={mapContainerRef} className="w-full h-full z-0" />
@@ -375,7 +375,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
 
       {/* Error Message */}
       {error && (
-        <p className="text-[12px] text-red-500 font-semibold flex items-center gap-1.5 pt-0.5">
+        <p className="text-[12px] text-ui-error-text font-semibold flex items-center gap-1.5 pt-0.5">
           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           <span>{error}</span>
         </p>

@@ -224,9 +224,9 @@ export const SearchPage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-xl p-8 text-center space-y-4">
-          <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" aria-hidden="true" />
-          <p className="text-[16px] font-semibold text-rose-500">
+        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
+          <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
+          <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
               ? 'অনুসন্ধান ডেটা লোড করতে সমস্যা হয়েছে।'
               : 'Unable to load public data for search. Please try again.'}

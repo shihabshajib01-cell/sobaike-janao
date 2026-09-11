@@ -162,9 +162,9 @@ export const ExtortionPage: React.FC = () => {
 
       {/* 4. Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-rose-500/30 rounded-2xl p-6 text-center space-y-3">
-          <AlertCircle className="w-6 h-6 text-rose-500 mx-auto" aria-hidden="true" />
-          <p className="text-[16px] font-semibold text-rose-500">
+        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
+          <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
+          <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
               ? 'তথ্য লোড করতে ত্রুটি হয়েছে।'
               : 'Failed to load extortion reports. Please try again.'}

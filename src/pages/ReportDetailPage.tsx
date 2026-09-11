@@ -138,7 +138,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   if (fetchError) {
     return (
       <div role="alert" className="w-full py-12 px-4 text-center space-y-6">
-        <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/30 rounded-full flex items-center justify-center mx-auto text-rose-600 dark:text-rose-400">
+        <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
           <AlertCircle className="w-7 h-7" aria-hidden="true" />
         </div>
 
@@ -297,8 +297,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         >
           {isCopied ? (
             <>
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-              <span className="text-emerald-700 dark:text-emerald-300 font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link Copied'}</span>
+              <Check className="w-4 h-4 text-ui-success-text" aria-hidden="true" />
+              <span className="text-ui-success-text font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link Copied'}</span>
             </>
           ) : (
             <>
@@ -416,7 +416,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <p className="text-[16px] font-bold text-ui-content-primary">
                   {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : '-'}
                 </p>
-                <p className="text-[16px] font-semibold text-rose-600 dark:text-rose-400">
+                <p className="text-[16px] font-semibold text-ui-error-text">
                   {report.recentBillAmount !== undefined
                     ? `৳ ${language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()}`
                     : '-'}
@@ -444,7 +444,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <span className="text-ui-content-muted">
                   {language === 'bn' ? 'পার্থক্য / অতিরিক্ত বৃদ্ধি:' : 'Difference / Excess Increase:'}
                 </span>
-                <span className="font-semibold text-rose-600 dark:text-rose-400">
+                <span className="font-semibold text-ui-error-text">
                   +৳ {language === 'bn'
                     ? toBanglaDigits(Math.max(0, report.recentBillAmount - report.previousBillAmount))
                     : Math.max(0, report.recentBillAmount - report.previousBillAmount).toLocaleString()}

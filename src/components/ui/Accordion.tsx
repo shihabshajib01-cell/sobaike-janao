@@ -41,7 +41,7 @@ export const Accordion: React.FC<AccordionProps> = ({
       id={id}
       className={`border rounded-2xl transition-colors duration-150 overflow-hidden ${
         hasError
-          ? 'border-red-500/50 bg-red-500/5'
+          ? 'border-ui-error-border bg-ui-error-bg'
           : isExpanded
           ? 'border-ui-stroke-strong bg-ui-surface'
           : 'border-ui-stroke-subtle bg-ui-surface'
@@ -61,7 +61,7 @@ export const Accordion: React.FC<AccordionProps> = ({
               <div
                 className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                   hasError
-                    ? 'bg-red-500/10 text-red-500'
+                    ? 'bg-ui-error-bg text-ui-error-text'
                     : isExpanded
                     ? 'bg-ui-accent-soft text-ui-accent'
                     : 'bg-ui-surface-subtle text-ui-content-secondary'
@@ -78,7 +78,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-md">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-md">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>ত্রুটি / Error</span>
                   </span>
@@ -113,7 +113,7 @@ export const Accordion: React.FC<AccordionProps> = ({
               <div
                 className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                   hasError
-                    ? 'bg-red-500/10 text-red-500'
+                    ? 'bg-ui-error-bg text-ui-error-text'
                     : 'bg-ui-accent-soft text-ui-accent'
                 }`}
               >
@@ -128,7 +128,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-md">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-md">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>ত্রুটি / Error</span>
                   </span>

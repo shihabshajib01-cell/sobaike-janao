@@ -212,7 +212,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                         id={`service-select-badge-${cs.key}`}
                         className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[12px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-ui-warning-text animate-pulse" />
                         <span>{language === 'bn' ? cs.badgeBn : cs.badgeEn}</span>
                       </span>
                     </div>
