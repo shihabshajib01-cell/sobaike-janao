@@ -77,6 +77,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'অভিযোগ জানান',
       primaryCtaEn: 'File Report',
       path: '/extortion',
+      illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v01.png',
     },
     {
       key: 'load_shedding',

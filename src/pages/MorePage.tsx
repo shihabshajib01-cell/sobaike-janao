@@ -224,7 +224,7 @@ export const MorePage: React.FC = () => {
           <div className="space-y-4 text-ui-content-secondary">
             <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
               <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
-                {language === 'bn' ? '১. ব্যক্তিগত তথ্যের সুরক্ষা' : '1. Protecting personal information'}
+                {language === 'bn' ? '১. ব্যক্তিগত তথ্যের সুরক্ষা (PII Protection)' : '1. PII Redaction'}
               </h3>
               <p className="text-[16px] leading-[26px] text-ui-content-secondary">
                 {language === 'bn'
@@ -274,7 +274,7 @@ export const MorePage: React.FC = () => {
 
           <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
             <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'কীভাবে প্রতিউত্তর জমা দেবেন?' : 'How do I submit a response?'}
+              {language === 'bn' ? 'কীভাবে প্রতিউত্তর জমা দেবেন?' : 'How to file a response?'}
             </h3>
             <p className="text-[16px] leading-[26px] text-ui-content-secondary">
               {language === 'bn'
