@@ -72,11 +72,11 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           </div>
           <div className="flex-1">
             <h2 id="location-consent-title" className="text-lg font-bold tracking-tight">
-              {isBn ? 'আপনার এলাকার পোস্ট দেখুন' : 'See more posts from your area'}
+              {isBn ? 'আপনার এলাকার প্রতিবেদন দেখুন' : 'See reports from your area'}
             </h2>
             <div className="flex items-center gap-1.5 text-xs text-ui-content-muted mt-0.5">
               <ShieldCheck className="w-3.5 h-3.5 text-ui-success-text" aria-hidden="true" />
-              <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy Protected'}</span>
+              <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy protected'}</span>
             </div>
           </div>
         </div>
@@ -85,8 +85,8 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         <div id="location-consent-desc" className="text-sm text-ui-content-secondary leading-relaxed">
           <p>
             {isBn
-              ? 'লোকেশন চালু করলে আপনার আশপাশের অভিযোগ, রিপোর্ট ও পোস্টগুলো ফিডে বেশি প্রাধান্য পাবে। এতে আপনার এলাকার আপডেট সহজে দেখতে পারবেন।'
-              : 'Turn on location to see more complaints, reports, and posts from places near you. It helps keep your feed more relevant to where you are.'}
+              ? 'লোকেশন চালু করলে আপনার আশপাশের ঘটনা ও প্রতিবেদনগুলো আগে দেখতে পাবেন।'
+              : 'Turn on location to see incidents and reports near you first.'}
           </p>
         </div>
 
@@ -102,7 +102,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                <span>{isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...'}</span>
+                <span>{isBn ? 'অনুমতি নেওয়া হচ্ছে...' : 'Requesting...'}</span>
               </>
             ) : (
               <span>{isBn ? 'লোকেশন চালু করুন' : 'Turn on location'}</span>

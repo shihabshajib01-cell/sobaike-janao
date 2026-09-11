@@ -13,10 +13,10 @@ export interface ErrorStateProps {
 
 export const ErrorState: React.FC<ErrorStateProps> = ({
   id,
-  title = 'তথ্য লোড করতে সমস্যা হয়েছে',
-  message = 'দয়া করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন অথবা পুনরায় চেষ্টা করুন।',
+  title = 'তথ্য লোড করা যায়নি',
+  message = 'অনুগ্রহ করে আবার চেষ্টা করুন।',
   onRetry,
-  retryLabel = 'পুনরায় চেষ্টা করুন (Retry)',
+  retryLabel = 'আবার চেষ্টা করুন',
   className = '',
 }) => {
   return (

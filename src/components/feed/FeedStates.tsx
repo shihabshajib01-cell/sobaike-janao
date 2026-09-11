@@ -16,7 +16,7 @@ export interface FeedLoadingProps {
 export const FeedLoading: React.FC<FeedLoadingProps> = ({
   count = 3,
   id = 'feed-loading-container',
-  ariaLabel = 'Loading reports feed...',
+  ariaLabel = 'Loading reports...',
 }) => {
   return <ReportFeedSkeleton count={count} id={id} ariaLabel={ariaLabel} />;
 };
@@ -31,10 +31,10 @@ export interface FeedErrorProps {
 }
 
 export const FeedError: React.FC<FeedErrorProps> = ({
-  titleBn = 'প্রতিবেদন লোড করতে সমস্যা হয়েছে',
-  titleEn = 'Unable to load public feed',
-  descriptionBn = 'সংযোগ পরীক্ষা করুন এবং পুনরায় চেষ্টা করুন। কোনো কারিগরি ত্রুটি ঘটলে কিছু সময়ের মধ্যে ঠিক হয়ে যাবে।',
-  descriptionEn = 'Please check your connection and try again. The service will be restored shortly.',
+  titleBn = 'প্রতিবেদন লোড করা যায়নি',
+  titleEn = "Couldn't load reports",
+  descriptionBn = 'অনুগ্রহ করে আবার চেষ্টা করুন।',
+  descriptionEn = 'Please try again.',
   onRetry,
   language = 'bn',
 }) => {
@@ -59,7 +59,7 @@ export const FeedError: React.FC<FeedErrorProps> = ({
           onClick={onRetry}
           className="min-h-[44px]"
         >
-          {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
+          {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
         </Button>
       )}
     </div>
