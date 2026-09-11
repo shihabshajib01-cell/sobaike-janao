@@ -92,10 +92,7 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
 };
 
 const isMockModeAllowed = (): boolean => {
-  return Boolean(
-    import.meta.env.DEV &&
-    import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-  );
+  return !isSupabaseConfigured() || import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
 };
 
 export const PublicReportService = {
