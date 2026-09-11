@@ -129,9 +129,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   if (isLoading) {
     return (
       <PublicPageContainer id="report-detail-loading-container" className="w-full max-w-[900px] mx-auto">
-        <div className="w-full max-w-[720px] mx-auto">
-          <ReportDetailSkeleton id="report-detail-loading-skeleton" />
-        </div>
+        <ReportDetailSkeleton id="report-detail-loading-skeleton" />
       </PublicPageContainer>
     );
   }
@@ -140,7 +138,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   if (fetchError) {
     return (
       <PublicPageContainer id="report-detail-error-container" className="w-full max-w-[900px] mx-auto">
-        <div role="alert" className="w-full max-w-[720px] mx-auto py-12 text-center space-y-6">
+        <div role="alert" className="w-full py-12 text-center space-y-6">
           <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
@@ -149,11 +147,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
               {language === 'bn' ? 'প্রতিবেদনটি লোড করা সম্ভব হয়নি' : 'Unable to Load Report'}
             </h1>
-            <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
-              {language === 'bn'
-                ? 'সার্ভারের সাথে সংযোগে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
-                : 'There was a temporary network issue connecting to the server. Please try again.'}
-            </p>
+            <div className="max-w-[720px] mx-auto">
+              <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
+                {language === 'bn'
+                  ? 'সার্ভারের সাথে সংযোগে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
+                  : 'There was a temporary network issue connecting to the server. Please try again.'}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -188,7 +188,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   if (!report) {
     return (
       <PublicPageContainer id="report-detail-not-found-container" className="w-full max-w-[900px] mx-auto">
-        <div role="alert" className="w-full max-w-[720px] mx-auto py-12 text-center space-y-6">
+        <div role="alert" className="w-full py-12 text-center space-y-6">
           <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
@@ -197,11 +197,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
               {language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ' : 'Report Unavailable / Not Found'}
             </h1>
-            <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
-              {language === 'bn'
-                ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
-                : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
-            </p>
+            <div className="max-w-[720px] mx-auto">
+              <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
+                {language === 'bn'
+                  ? 'অনুরোধকৃত প্রতিবেদনটি খুঁজে পাওয়া যায়নি। এটি প্রকাশিত নাও হতে পারে, এখনও পর্যালোচনায় থাকতে পারে অথবা লিংকটি সঠিক নাও হতে পারে।'
+                  : 'The requested report could not be found. It may not be published, may still be under review, or the link may be invalid.'}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -277,7 +279,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
   return (
     <PublicPageContainer id="report-detail-page-container" className="w-full max-w-[900px] mx-auto">
-      <div className="w-full max-w-[720px] mx-auto space-y-6">
+      <div className="w-full space-y-6">
         {/* 1. Single Primary Back Navigation */}
       <div className="flex items-center justify-between gap-4">
         <button
@@ -400,9 +402,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <h2 className="text-[14px] font-semibold text-ui-content-secondary">
               {language === 'bn' ? 'সারসংক্ষেপ' : 'Summary'}
             </h2>
-            <p className="text-[16px] leading-[26px] text-ui-content-primary">
-              {shortDesc}
-            </p>
+            <div className="max-w-[720px]">
+              <p className="text-[16px] leading-[26px] text-ui-content-primary">
+                {shortDesc}
+              </p>
+            </div>
           </div>
         )}
 
@@ -471,8 +475,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <FileText className="w-4 h-4 text-ui-content-muted" />
             <span>{language === 'bn' ? 'প্রতিবেদনের বিবরণ' : 'Report Narrative'}</span>
           </h2>
-          <div className="text-[16px] leading-[26px] text-ui-content-primary space-y-3">
-            <p>{fullDesc}</p>
+          <div className="max-w-[720px] text-[16px] leading-[26px] text-ui-content-primary space-y-3">
+            <p className="whitespace-pre-line">{fullDesc}</p>
           </div>
         </div>
 
@@ -518,9 +522,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     <span>{language === 'bn' ? update.titleBn : update.titleEn}</span>
                     <span className="text-ui-content-muted">{language === 'bn' ? update.dateBn : update.dateEn}</span>
                   </div>
-                  <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                    {language === 'bn' ? update.contentBn : update.contentEn}
-                  </p>
+                  <div className="max-w-[720px]">
+                    <p className="text-[16px] leading-[26px] text-ui-content-secondary">
+                      {language === 'bn' ? update.contentBn : update.contentEn}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -564,9 +570,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     {language === 'bn' ? report.response.dateBn : report.response.dateEn}
                   </span>
                 </div>
-                <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words">
-                  "{language === 'bn' ? report.response.statementBn : report.response.statementEn}"
-                </blockquote>
+                <div className="max-w-[720px]">
+                  <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words">
+                    "{language === 'bn' ? report.response.statementBn : report.response.statementEn}"
+                  </blockquote>
+                </div>
               </div>
             )}
 
@@ -594,9 +602,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                         )}
                       </div>
                     </div>
-                    <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
-                      "{resp.content}"
-                    </blockquote>
+                    <div className="max-w-[720px]">
+                      <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
+                        "{resp.content}"
+                      </blockquote>
+                    </div>
                   </div>
                 );
               }
@@ -637,9 +647,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       )}
                     </div>
                   </div>
-                  <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
-                    "{resp.content}"
-                  </blockquote>
+                  <div className="max-w-[720px]">
+                    <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
+                      "{resp.content}"
+                    </blockquote>
+                  </div>
                 </div>
               );
             })}
