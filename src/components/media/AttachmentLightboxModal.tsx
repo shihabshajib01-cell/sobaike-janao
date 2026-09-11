@@ -175,7 +175,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
       role="dialog"
       aria-modal="true"
       aria-label={language === 'bn' ? 'সংযুক্ত ছবির বিশদ রূপ' : 'Attachment image viewer'}
-      className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden select-none animate-in fade-in duration-200"
+      className="fixed inset-0 z-[70] flex items-center justify-center p-0 md:p-6 overflow-hidden select-none animate-in fade-in duration-200"
     >
       {/* Backdrop */}
       <div
@@ -184,14 +184,14 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
         aria-hidden="true"
       />
 
-      {/* Modal Dialog Card using standard modal radius */}
+      {/* Modal Dialog Card: Full screen on mobile, centered card on md+ */}
       <div
         ref={modalRef}
-        className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl md:rounded-[var(--radius-modal)] ui-radius-modal border border-white/15 bg-neutral-900 text-white shadow-2xl overflow-hidden z-10"
+        className="relative w-full max-w-4xl h-full md:h-auto max-h-none md:max-h-[92vh] flex flex-col rounded-none md:rounded-2xl md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-white/15 bg-neutral-900 text-white shadow-2xl overflow-hidden z-10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-4 sm:px-6 py-3.5 border-b border-white/10 bg-neutral-900/90 backdrop-blur-md flex items-center justify-between gap-3 shrink-0">
+        <div className="px-4 sm:px-6 py-3.5 border-b border-white/10 bg-neutral-900/90 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 pt-safe md:pt-3.5">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Image Counter Badge */}
             <span className="shrink-0 px-2.5 py-1 rounded-full bg-white/10 text-white text-[12px] sm:text-[13px] font-semibold tracking-wide">
@@ -227,7 +227,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
 
         {/* Modal Body: Image Stage Preserving Aspect Ratio */}
         <div
-          className="relative flex-1 min-h-[240px] max-h-[calc(88vh-130px)] flex items-center justify-center p-3 sm:p-6 bg-black/95 overflow-hidden touch-pan-y"
+          className="relative flex-1 min-h-[240px] max-h-none md:max-h-[calc(88vh-130px)] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/95 overflow-hidden touch-pan-y"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -282,7 +282,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
 
         {/* Modal Footer: Thumbnail strip when multiple images */}
         {images.length > 1 && (
-          <div className="px-4 py-2.5 bg-neutral-900/95 border-t border-white/10 flex items-center justify-center gap-2 overflow-x-auto shrink-0">
+          <div className="px-4 py-2.5 bg-neutral-900/95 border-t border-white/10 flex items-center justify-center gap-2 overflow-x-auto shrink-0 pb-safe md:pb-2.5">
             <div className="flex gap-2 p-1 rounded-xl bg-black/40 border border-white/5">
               {images.map((img, idx) => {
                 const thumbUrl = img.previewUrl || img.url || '';
