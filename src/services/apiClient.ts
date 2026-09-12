@@ -20,7 +20,7 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
+      const isMockAllowed = !isSupabaseConfigured() || Boolean(
         import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
       );
       if (!isMockAllowed) {
@@ -88,7 +88,7 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
+      const isMockAllowed = !isSupabaseConfigured() || Boolean(
         import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
       );
       if (!isMockAllowed) {
@@ -163,7 +163,7 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
+      const isMockAllowed = !isSupabaseConfigured() || Boolean(
         import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
       );
       if (isMockAllowed) {
