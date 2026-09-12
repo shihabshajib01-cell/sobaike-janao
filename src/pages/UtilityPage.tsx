@@ -71,8 +71,8 @@ export const UtilityPage: React.FC = () => {
             descriptionBn: config.descriptionBn,
             descriptionEn: config.descriptionEn,
             action: {
-              labelBn: 'অভিযোগ জানান',
-              labelEn: 'File Report',
+              labelBn: 'প্রতিবেদন জমা দিন',
+              labelEn: 'Submit report',
               onClick: () => openReportComposer('load_shedding'),
             },
           },
@@ -84,7 +84,7 @@ export const UtilityPage: React.FC = () => {
         <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
         <span>
           {language === 'bn'
-            ? 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ জানান।'
+            ? 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত প্রতিবেদন জমা দিন।'
             : 'Report load shedding, gas shortages, or excess electricity bills responsibly.'}
         </span>
       </div>
@@ -94,11 +94,11 @@ export const UtilityPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'অভিযোগের ধরন অনুসারে ফিল্টার' : 'Filter by Complaint Type'}
+              {language === 'bn' ? 'প্রতিবেদনের ধরন অনুসারে ফিল্টার' : 'Filter by report type'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'
-                ? `${filteredReports.length}টি প্রকাশিত অভিযোগ পাওয়া গেছে`
+                ? `${filteredReports.length}টি প্রকাশিত প্রতিবেদন পাওয়া গেছে`
                 : `${filteredReports.length} published reports found`}
             </p>
           </div>
@@ -142,7 +142,7 @@ export const UtilityPage: React.FC = () => {
         <ReportFeedSkeleton
           count={3}
           id="utility-feed-skeleton"
-          ariaLabel={language === 'bn' ? 'অভিযোগ লোড হচ্ছে...' : 'Loading reports...'}
+          ariaLabel={language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading reports...'}
         />
       )}
 
@@ -174,13 +174,13 @@ export const UtilityPage: React.FC = () => {
             ))
           ) : (
             <EmptyState
-              title={language === 'bn' ? 'কোনো অভিযোগ পাওয়া যায়নি' : 'No Reports Found'}
+              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               description={
                 language === 'bn'
-                  ? 'এই মুহূর্তে ইউটিলিটি সেবা সংক্রান্ত কোনো প্রকাশিত অভিযোগ নেই। নতুন অভিযোগ জানাতে নিচের বোতামে চাপ দিন।'
-                  : 'No utility complaints published yet. Click below to file a report.'
+                  ? 'এই মুহূর্তে ইউটিলিটি সেবা সংক্রান্ত কোনো প্রকাশিত প্রতিবেদন নেই। নতুন প্রতিবেদন জমা দিতে নিচের বোতামটি ব্যবহার করুন।'
+                  : 'No utility reports have been published yet. Use the button below to submit a report.'
               }
-              actionLabel={language === 'bn' ? 'অভিযোগ জানান' : 'File Report'}
+              actionLabel={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit report'}
               onAction={() => openReportComposer('load_shedding')}
             />
           )}

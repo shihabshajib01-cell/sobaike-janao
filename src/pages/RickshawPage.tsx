@@ -84,7 +84,7 @@ export const RickshawPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[18px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'চার্জিং স্টেশন প্রতিবেদনসমূহ' : 'Charging Station Reports'}
+              {language === 'bn' ? 'চার্জিং স্টেশন প্রতিবেদনসমূহ' : 'Charging station reports'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'
@@ -139,13 +139,13 @@ export const RickshawPage: React.FC = () => {
             ))
           ) : (
             <EmptyState
-              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Reports Found'}
+              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               description={
                 language === 'bn'
                   ? 'এই উপ-বিভাগ বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
                   : 'There are currently no published reports under this subcategory.'
               }
-              actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
+              actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               onAction={() => {
                 setSelectedDistrict('all');
               }}

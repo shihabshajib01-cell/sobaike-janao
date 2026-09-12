@@ -26,7 +26,7 @@ export const ReportPage: React.FC<ReportPageProps> = () => {
           <p className="text-[16px] text-ui-content-muted max-w-[480px] mx-auto">
             {language === 'bn'
               ? 'প্রতিবেদন ফরম খোলা হচ্ছে। স্বয়ংক্রিয়ভাবে না খুললে নিচের বোতামে চাপ দিন।'
-              : 'Opening report form. If it did not open automatically, click the button below.'}
+              : 'Opening report form. If it did not open automatically, use the button below.'}
           </p>
         </div>
 
