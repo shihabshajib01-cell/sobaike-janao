@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Send } from 'lucide-react';
+import { X, CheckCircle2, Send, FileText } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
 
@@ -36,8 +36,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     if (!description.trim() || description.trim().length < 10) {
       setError(
         language === 'bn'
-          ? 'অন্তত ১০ অক্ষর লিখুন।'
-          : 'Enter at least 10 characters.'
+          ? 'অনুগ্রহ করে অন্তত ১০ অক্ষরের সুস্পষ্ট বিবরণ লিখুন।'
+          : 'Please provide at least 10 characters of descriptive details.'
       );
       return;
     }
@@ -86,18 +86,22 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       closeOnBackdrop={false}
       showHeader={false}
       maxWidth="md"
-      contentClassName="flex flex-col min-h-0 overflow-hidden md:block md:overflow-y-auto md:overscroll-contain"
+      contentClassName="flex flex-col min-h-0 overflow-hidden"
       language={language}
       ariaLabelledBy="citizen-modal-title"
     >
-      <div className="flex flex-col h-full min-h-0 text-left md:block md:h-auto md:p-6 sm:md:p-7 md:space-y-5">
+      <div className="flex flex-col h-full min-h-0 text-left">
         {/* Header */}
-        <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-0 pb-3.5 sm:pb-4 md:pb-3.5 border-b border-ui-stroke-subtle">
+        <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-7 pb-3.5 sm:pb-4 border-b border-ui-stroke-subtle">
           <div className="space-y-1">
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[13px] font-semibold bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle">
+              <FileText className="w-3.5 h-3.5 text-ui-content-secondary" />
+              <span>{language === 'bn' ? 'তথ্য ও অভিজ্ঞতা' : 'Information & Experience'}</span>
+            </div>
             <h3 id="citizen-modal-title" className="text-[18px] sm:text-[20px] leading-[26px] sm:leading-[28px] font-bold text-ui-content-primary">
               {language === 'bn'
-                ? 'তথ্য দিন'
-                : 'Share information'}
+                ? 'তথ্য বা অভিজ্ঞতা যোগ করুন'
+                : 'Add Information or Experience'}
             </h3>
             <p className="text-[13px] sm:text-[14px] text-ui-content-muted">
               {language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `About: ${reportTitle}`}
@@ -115,19 +119,19 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
         </header>
 
         {isSubmitted ? (
-          <div className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
-            <div role="status" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible py-6 text-center space-y-4">
+          <div className="flex flex-col flex-1 min-h-0">
+            <div role="status" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-7 py-6 text-center space-y-4">
               <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text border border-ui-success-border rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div className="space-y-1">
                 <h4 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'তথ্য জমা হয়েছে' : 'Information submitted'}
+                  {language === 'bn' ? 'তথ্য সফলভাবে জমা হয়েছে' : 'Information Submitted Successfully'}
                 </h4>
                 <p className="text-[15px] sm:text-[16px] leading-[22px] sm:leading-[24px] text-ui-content-secondary max-w-sm mx-auto">
                   {language === 'bn'
-                    ? 'আপনার তথ্য পর্যালোচনার জন্য পাঠানো হয়েছে।'
-                    : 'Your information has been sent for review.'}
+                    ? 'আপনার প্রদত্ত বিবরণটি জমা হয়েছে এবং মডারেশন টিম পর্যালোচনা সম্পন্ন করে মূল প্রতিবেদনে সহায়ক আপডেট হিসেবে সংযুক্ত করবে।'
+                    : 'Your information has been submitted for moderation review.'}
                 </p>
               </div>
               {responseId && (
@@ -141,7 +145,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                 </div>
               )}
             </div>
-            <footer className="shrink-0 p-4 sm:p-5 md:p-0 border-t md:border-0 border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+            <footer className="shrink-0 p-4 sm:p-5 md:p-6 border-t border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-5">
               <button
                 type="button"
                 onClick={handleResetAndClose}
@@ -152,8 +156,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             </footer>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible space-y-4">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-7 space-y-4">
               {error && (
                 <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-xl text-[14px] font-medium">
                   {error}
@@ -163,8 +167,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               <div className="space-y-1.5">
                 <label htmlFor="citizen-description-input" className="block text-[15px] sm:text-[16px] font-medium text-ui-content-primary">
                   {language === 'bn'
-                    ? 'আপনি কী তথ্য দিতে চান? *'
-                    : 'What would you like to share? *'}
+                    ? 'আপনার তথ্য বা অভিজ্ঞতা লিখুন *'
+                    : 'Describe your information or experience *'}
                 </label>
                 <textarea
                   id="citizen-description-input"
@@ -176,8 +180,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={
                     language === 'bn'
-                      ? 'তারিখ, সময়, স্থান বা যা দেখেছেন—প্রাসঙ্গিক তথ্য লিখুন...'
-                      : 'Add relevant details such as date, time, place or what you observed...'
+                      ? 'সুনির্দিষ্ট তারিখ, সময়, স্থান বা ঘটনা সম্পর্কিত প্রাসঙ্গিক তথ্য উল্লেখ করুন...'
+                      : 'Provide specific dates, timings, locations or contextual observations...'
                   }
                   className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent focus:ring-1 focus:ring-ui-accent rounded-xl text-[15px] sm:text-[16px] text-ui-content-primary placeholder:text-ui-content-muted"
                 />
@@ -185,7 +189,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
 
               <div className="space-y-1.5">
                 <label htmlFor="citizen-witness-date-input" className="block text-[15px] sm:text-[16px] font-medium text-ui-content-secondary">
-                  {language === 'bn' ? 'ঘটনার তারিখ (ঐচ্ছিক)' : 'Incident date (optional)'}
+                  {language === 'bn' ? 'ঘটনার সম্ভাব্য তারিখ (যদি জানা থাকে)' : 'Incident Date (Optional)'}
                 </label>
                 <input
                   id="citizen-witness-date-input"
@@ -208,8 +212,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   />
                   <span>
                     {language === 'bn'
-                      ? 'এই তথ্য সম্পর্কে প্রয়োজন হলে আমার সাথে যোগাযোগ করা যেতে পারে।'
-                      : 'You may contact me for follow-up about this information.'}
+                      ? 'প্রয়োজনে মডারেশন টিমের সাথে যোগাযোগের জন্য আমার ইমেইল বা ফোন নম্বর দিতে ইচ্ছুক'
+                      : 'I agree to provide contact details for editorial follow-up only.'}
                   </span>
                 </label>
 
@@ -232,7 +236,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               </div>
             </div>
 
-            <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-0 md:py-0 md:pt-2 border-t border-ui-stroke-subtle bg-ui-surface md:bg-transparent flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+            <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-7 border-t border-ui-stroke-subtle bg-ui-surface flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-4">
               <button
                 type="button"
                 onClick={handleResetAndClose}
@@ -255,7 +259,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>{language === 'bn' ? 'তথ্য জমা দিন' : 'Submit information'}</span>
+                    <span>{language === 'bn' ? 'তথ্য জমা দিন' : 'Submit Information'}</span>
                   </>
                 )}
               </button>

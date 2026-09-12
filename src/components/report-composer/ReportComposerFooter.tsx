@@ -45,7 +45,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           leftIcon={<X className="w-4 h-4" />}
           className="min-h-[44px] text-[16px] text-ui-content-muted"
         >
-          {language === 'bn' ? 'বাতিল' : 'Cancel'}
+          {language === 'bn' ? 'বাতিল করুন' : 'Cancel'}
         </Button>
       ) : (
         <Button
@@ -74,7 +74,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           rightIcon={<ArrowRight className="w-4 h-4" />}
           className="min-h-[44px] text-[16px] px-6"
         >
-          {language === 'bn' ? 'এগিয়ে যান' : 'Continue'}
+          {language === 'bn' ? 'পরবর্তী ধাপে যান' : 'Continue'}
         </Button>
       )}
 
@@ -89,7 +89,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           rightIcon={<ArrowRight className="w-4 h-4" />}
           className="min-h-[44px] text-[16px] px-6"
         >
-          {language === 'bn' ? 'এগিয়ে যান' : 'Continue'}
+          {language === 'bn' ? 'বিবরণ প্রদানে যান' : 'Continue to Details'}
         </Button>
       )}
 
@@ -103,7 +103,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           rightIcon={<ArrowRight className="w-4 h-4" />}
           className="min-h-[44px] text-[16px] px-6"
         >
-          {language === 'bn' ? 'পর্যালোচনা' : 'Review'}
+          {language === 'bn' ? 'পর্যালোচনা ও জমা দিন' : 'Review & Submit'}
         </Button>
       )}
 
@@ -126,11 +126,12 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
         >
           {isSubmitting
             ? language === 'bn'
-              ? 'জমা দেওয়া হচ্ছে...'
+              ? 'প্রতিবেদন জমা হচ্ছে...'
               : 'Submitting...'
             : language === 'bn'
             ? 'প্রতিবেদন জমা দিন'
-            : 'Submit report'}
+            : 'Submit Complaint'}
+
         </Button>
       )}
     </div>

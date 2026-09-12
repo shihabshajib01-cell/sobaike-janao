@@ -84,22 +84,22 @@ const RICKSHAW_OPERATOR_OPTIONS: { value: SubjectTypeValue; labelBn: string; lab
   {
     value: 'business',
     labelBn: 'চার্জিং স্টেশন / গ্যারেজ',
-    labelEn: 'Charging station / garage',
+    labelEn: 'Charging Station / Garage',
   },
   {
     value: 'individual',
     labelBn: 'পরিচালনাকারী ব্যক্তি',
-    labelEn: 'Individual operator',
+    labelEn: 'Individual Operator',
   },
   {
     value: 'organization',
     labelBn: 'প্রতিষ্ঠান / ভবন কর্তৃপক্ষ',
-    labelEn: 'Organization / building authority',
+    labelEn: 'Organization / Building Authority',
   },
   {
     value: 'unknown',
     labelBn: 'অজ্ঞাত / নিশ্চিত নই',
-    labelEn: 'Unknown / not sure',
+    labelEn: 'Unknown / Not Sure',
   },
 ];
 
@@ -612,7 +612,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           // 1. Validate Recent Bill Month (Required)
           if (!formData.recentBillMonth?.trim()) {
             newErrors.recentBillMonth =
-              language === 'bn' ? 'সাম্প্রতিক বিলের মাস নির্বাচন করুন।' : 'Select the recent bill month.';
+              language === 'bn' ? 'সাম্প্রতিক বিলের মাস নির্বাচন করুন' : 'Recent bill month is required';
           }
 
           // 2. Validate Recent Bill Amount (Required, numeric > 0)
@@ -620,16 +620,16 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           const numRecentAmt = Number(rawRecentAmt);
           if (rawRecentAmt === undefined || rawRecentAmt === null || String(rawRecentAmt).trim() === '') {
             newErrors.recentBillAmount =
-              language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ লিখুন।' : 'Enter the recent bill amount.';
+              language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ লিখুন' : 'Recent bill amount is required';
           } else if (isNaN(numRecentAmt) || numRecentAmt <= 0) {
             newErrors.recentBillAmount =
-              language === 'bn' ? 'শূন্যের বেশি পরিমাণ লিখুন।' : 'Enter an amount greater than 0.';
+              language === 'bn' ? 'সঠিক ধনাত্মক সংখ্যা লিখুন' : 'Enter a valid positive number';
           }
 
           // 3. Validate Previous Bill Month (Required)
           if (!formData.previousBillMonth?.trim()) {
             newErrors.previousBillMonth =
-              language === 'bn' ? 'আগের বিলের মাস নির্বাচন করুন।' : 'Select the previous bill month.';
+              language === 'bn' ? 'আগের বিলের মাস নির্বাচন করুন' : 'Previous bill month is required';
           }
 
           // 4. Validate Previous Bill Amount (Required, numeric > 0)
@@ -637,28 +637,28 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           const numPrevAmt = Number(rawPrevAmt);
           if (rawPrevAmt === undefined || rawPrevAmt === null || String(rawPrevAmt).trim() === '') {
             newErrors.previousBillAmount =
-              language === 'bn' ? 'আগের বিলের পরিমাণ লিখুন।' : 'Enter the previous bill amount.';
+              language === 'bn' ? 'আগের বিলের পরিমাণ লিখুন' : 'Previous bill amount is required';
           } else if (isNaN(numPrevAmt) || numPrevAmt <= 0) {
             newErrors.previousBillAmount =
-              language === 'bn' ? 'শূন্যের বেশি পরিমাণ লিখুন।' : 'Enter an amount greater than 0.';
+              language === 'bn' ? 'সঠিক ধনাত্মক সংখ্যা লিখুন' : 'Enter a valid positive number';
           }
         } else {
           // 1. Validate Date (Required)
           if (!formData.incidentDate) {
             newErrors.incidentDate = isLoadShedding
-              ? (language === 'bn' ? 'লোডশেডিংয়ের তারিখ নির্বাচন করুন।' : 'Select the load shedding date.')
-              : (language === 'bn' ? 'গ্যাস সংকটের তারিখ নির্বাচন করুন।' : 'Select the gas shortage date.');
+              ? (language === 'bn' ? 'লোডশেডিংয়ের তারিখ নির্বাচন করুন' : 'Load shedding date is required')
+              : (language === 'bn' ? 'গ্যাস সংকটের তারিখ নির্বাচন করুন' : 'Gas shortage date is required');
           } else if (formData.incidentDate > todayLocal) {
             newErrors.incidentDate =
               language === 'bn'
-                ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                : 'Select today or an earlier date.';
+                ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                : 'Future dates are not allowed';
           }
 
           // 2. Validate Start Time (Required)
           if (!formData.incidentTime?.trim()) {
             newErrors.incidentTime =
-              language === 'bn' ? 'শুরুর সময় নির্বাচন করুন।' : 'Select a start time.';
+              language === 'bn' ? 'শুরুর সময় নির্বাচন করুন' : 'Start time is required';
           }
 
           // 3. Validate End Time (Optional, but if both provided, validate end time > start time)
@@ -666,8 +666,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             if (formData.utilityEndTime.trim() <= formData.incidentTime.trim()) {
               newErrors.utilityEndTime =
                 language === 'bn'
-                  ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে।'
-                  : 'End time must be after start time.';
+                  ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে'
+                  : 'End time must be after start time';
             }
           }
         }
@@ -675,37 +675,37 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         // 4. Validate Description (Required, 20 - 2000 chars)
         if (!formData.description?.trim()) {
           newErrors.description =
-            language === 'bn' ? 'ঘটনার বিবরণ লিখুন।' : 'Describe what happened.';
+            language === 'bn' ? 'বিবরণ দেওয়া আবশ্যক' : 'Description is required';
         } else if (formData.description.trim().length < 20) {
           newErrors.description =
             language === 'bn'
-              ? 'অন্তত ২০ অক্ষর লিখুন।'
-              : 'Enter at least 20 characters.';
+              ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
+              : 'Description must be at least 20 characters';
         } else if (formData.description.length > 2000) {
           newErrors.description =
             language === 'bn'
-              ? 'বিবরণ ২,০০০ অক্ষরের মধ্যে রাখুন।'
-              : 'Keep the description within 2,000 characters.';
+              ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+              : 'Please shorten the description to 2,000 characters.';
         }
 
         // 5. Validate Location (Required)
         if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
           newErrors.reporterLocation =
             language === 'bn'
-              ? 'প্রতিবেদন চালিয়ে যেতে ডিভাইসের লোকেশন চালু করুন।'
-              : 'Turn on device location to continue.';
+              ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
+              : 'Turn on device location before continuing.';
         }
 
         const utilityDivObj = getDivisionByStoredName(formData.location?.division);
         if (!utilityDivObj) {
           newErrors.division =
-            language === 'bn' ? 'বিভাগ নির্বাচন করুন।' : 'Select a division.';
+            language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
         }
 
         const utilityDistObj = utilityDivObj ? getDistrictByStoredName(formData.location?.district) : undefined;
         if (!utilityDistObj || utilityDistObj.divisionId.toLowerCase() !== utilityDivObj?.id.toLowerCase()) {
           newErrors.district =
-            language === 'bn' ? 'জেলা নির্বাচন করুন।' : 'Select a district.';
+            language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
         }
 
         const utilityUpazilaObj = utilityDistObj
@@ -713,7 +713,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           : undefined;
         if (!utilityUpazilaObj) {
           newErrors.upazilaOrThana =
-            language === 'bn' ? 'উপজেলা বা থানা নির্বাচন করুন।' : 'Select an upazila or thana.';
+            language === 'bn' ? 'থানা বা উপজেলা নির্বাচন করুন' : 'Select a thana or upazila';
         }
 
         if (utilityDivObj && utilityDistObj && utilityUpazilaObj) {
@@ -742,51 +742,51 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
         if (!effectiveTitle) {
           newErrors.title =
-            language === 'bn' ? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.';
+            language === 'bn' ? 'শিরোনাম দেওয়া আবশ্যক' : 'A report headline is required';
         }
 
         if (!formData.description?.trim()) {
           newErrors.description =
-            language === 'bn' ? 'ঘটনার বিবরণ লিখুন।' : 'Describe what happened.';
+            language === 'bn' ? 'ঘটনার বিবরণ দেওয়া আবশ্যক' : 'Incident description is required';
         } else if (formData.description.trim().length < 20) {
           newErrors.description =
             language === 'bn'
-              ? 'অন্তত ২০ অক্ষর লিখুন।'
-              : 'Enter at least 20 characters.';
+              ? 'বিবরণ অন্তত ২০ অক্ষরের হতে হবে'
+              : 'Description must be at least 20 characters';
         } else if (formData.description.length > 2000) {
           newErrors.description =
             language === 'bn'
-              ? 'বিবরণ ২,০০০ অক্ষরের মধ্যে রাখুন।'
-              : 'Keep the description within 2,000 characters.';
+              ? 'বিবরণটি ২০০০ অক্ষরের মধ্যে সংক্ষিপ্ত করুন।'
+              : 'Please shorten the description to 2,000 characters.';
         }
 
         if (!formData.incidentDate) {
           newErrors.incidentDate =
-            language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন।' : 'Select the incident date.';
+            language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন' : 'Incident date is required';
         } else if (formData.incidentDate > todayLocal) {
           newErrors.incidentDate =
             language === 'bn'
-              ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-              : 'Select today or an earlier date.';
+              ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+              : 'Future dates are not allowed';
         }
 
         if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
           newErrors.reporterLocation =
             language === 'bn'
-              ? 'প্রতিবেদন চালিয়ে যেতে ডিভাইসের লোকেশন চালু করুন।'
-              : 'Turn on device location to continue.';
+              ? 'অভিযোগ চালিয়ে যেতে ডিভাইস লোকেশন চালু করুন।'
+              : 'Turn on device location before continuing.';
         }
 
         const reportDivObj = getDivisionByStoredName(formData.location?.division);
         if (!reportDivObj) {
           newErrors.division =
-            language === 'bn' ? 'বিভাগ নির্বাচন করুন।' : 'Select a division.';
+            language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Division is required';
         }
 
         const reportDistObj = reportDivObj ? getDistrictByStoredName(formData.location?.district) : undefined;
         if (!reportDistObj || reportDistObj.divisionId.toLowerCase() !== reportDivObj?.id.toLowerCase()) {
           newErrors.district =
-            language === 'bn' ? 'জেলা নির্বাচন করুন।' : 'Select a district.';
+            language === 'bn' ? 'জেলা নির্বাচন করুন' : 'District is required';
         }
 
         const reportUpazilaObj = reportDistObj
@@ -794,7 +794,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           : undefined;
         if (!reportUpazilaObj) {
           newErrors.upazilaOrThana =
-            language === 'bn' ? 'উপজেলা বা থানা নির্বাচন করুন।' : 'Select an upazila or thana.';
+            language === 'bn' ? 'থানা বা উপজেলা নির্বাচন করুন' : 'Select a thana or upazila';
         }
 
         if (reportDivObj && reportDistObj && reportUpazilaObj) {
@@ -819,13 +819,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (detailedAddr.length < 5) {
             newErrors.formattedAddress =
               language === 'bn'
-                ? 'অন্তত ৫ অক্ষর লিখুন।'
-                : 'Enter at least 5 characters.';
+                ? 'বিস্তারিত ঠিকানা অন্তত ৫ অক্ষরের হতে হবে'
+                : 'Detailed address must be at least 5 characters';
           } else if (detailedAddr.length > 500) {
             newErrors.formattedAddress =
               language === 'bn'
-                ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে রাখুন।'
-                : 'Keep detailed address within 500 characters.';
+                ? 'বিস্তারিত ঠিকানা ৫০০ অক্ষরের মধ্যে লিখুন'
+                : 'Detailed address must not exceed 500 characters';
           }
         }
 
@@ -834,18 +834,18 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
             newErrors.adminContact =
               language === 'bn'
-                ? 'যোগাযোগের জন্য ইমেইল বা ফোন নম্বর লিখুন।'
-                : 'Enter an email or phone number for follow-up.';
+                ? 'মডারেটরের সাথে যোগাযোগের নম্বর বা ইমেইল দিন'
+                : 'Contact info is required for admin follow-up';
           }
 
           if (formData.privacyChoice === 'public_identity') {
             if (!formData.adminName?.trim()) {
               newErrors.adminName =
-                language === 'bn' ? 'আপনার নাম লিখুন।' : 'Enter your name.';
+                language === 'bn' ? 'আপনার নাম উল্লেখ করুন' : 'Your name is required';
             }
             if (!formData.adminContact?.trim()) {
               newErrors.adminContact =
-                language === 'bn' ? 'আপনার যোগাযোগের তথ্য লিখুন।' : 'Enter your contact information.';
+                language === 'bn' ? 'যোগাযোগের তথ্য দিন' : 'Contact info is required';
             }
           }
         }
@@ -1007,7 +1007,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent bill month *'}</span>
+                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent Bill Month *'}</span>
                         </div>
                       </label>
                       <input
@@ -1035,7 +1035,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Coins className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent bill amount (BDT) *'}</span>
+                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent Bill Amount (BDT) *'}</span>
                         </div>
                       </label>
                       <input
@@ -1069,7 +1069,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous bill month *'}</span>
+                          <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous Bill Month *'}</span>
                         </div>
                       </label>
                       <input
@@ -1097,7 +1097,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Coins className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous bill amount (BDT) *'}</span>
+                          <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous Bill Amount (BDT) *'}</span>
                         </div>
                       </label>
                       <input
@@ -1148,8 +1148,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                             ...prev,
                             incidentDate:
                               language === 'bn'
-                                ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                                : 'Select today or an earlier date.',
+                                ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                                : 'Future dates are not allowed',
                           }));
                           return;
                         }
@@ -1173,7 +1173,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     >
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-ui-content-primary" />
-                        <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start time *'}</span>
+                        <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start Time *'}</span>
                       </div>
                     </label>
                     <input
@@ -1204,7 +1204,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     >
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                        <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End time (optional)'}</span>
+                        <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End Time (Optional)'}</span>
                       </div>
                     </label>
                     <input
@@ -1382,7 +1382,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 >
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                    <span>{language === 'bn' ? 'ঘটনার তারিখ *' : 'Incident date *'}</span>
+                    <span>{language === 'bn' ? 'ঘটনার তারিখ *' : 'Incident Date *'}</span>
                   </div>
                 </label>
                 <input
@@ -1397,8 +1397,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         ...prev,
                         incidentDate:
                           language === 'bn'
-                            ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                            : 'Select today or an earlier date.',
+                            ? 'ভবিষ্যতের তারিখ নির্বাচন করা যাবে না'
+                            : 'Future dates are not allowed',
                       }));
                       return;
                     }
@@ -1421,7 +1421,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 >
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                    <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}</span>
+                    <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (Optional)'}</span>
                   </div>
                 </label>
                 <input
@@ -1467,7 +1467,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             {isDigitalHarassment && (
               <div className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3 mt-2">
                 <h4 className="text-[13px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital threat & evidence details'}
+                  {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital Threat & Evidence Details'}
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1476,7 +1476,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="intimate-action-select"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat status / action'}
+                      {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat Status / Action'}
                     </label>
                     <select
                       id="intimate-action-select"
@@ -1498,7 +1498,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="intimate-platform-select"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / channel'}
+                      {language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / Channel'}
                     </label>
                     <select
                       id="intimate-platform-select"
@@ -1714,7 +1714,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="complaint-thana-select"
                     className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
-                    {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / upazila *'}
+                    {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / Upazila *'}
                   </label>
                   <select
                     id="complaint-thana-select"
@@ -1749,7 +1749,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="complaint-address-input"
                     className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
-                    {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed address (optional)'}
+                    {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed Address (Optional)'}
                   </label>
                   <textarea
                     id="complaint-address-input"
@@ -1826,7 +1826,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           htmlFor="reporter-admin-name"
                           className="block text-[13px] font-semibold text-ui-content-primary mb-1"
                         >
-                          {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)'}
+                          {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
                         </label>
                         <input
                           id="reporter-admin-name"
@@ -1846,7 +1846,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           htmlFor="reporter-admin-contact"
                           className="block text-[13px] font-semibold text-ui-content-primary mb-1"
                         >
-                          {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone number or email *'}
+                          {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone Number or Email *'}
                         </label>
                         <input
                           id="reporter-admin-contact"
@@ -1919,7 +1919,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             title={
               language === 'bn'
                 ? '৩. চার্জিং স্টেশন / পরিচালনাকারীর তথ্য (ঐচ্ছিক)'
-                : '3. Charging station / operator information (optional)'
+                : '3. Charging Station / Operator Information (Optional)'
             }
             summary={
               hasChargingStationOperatorData ? (
@@ -1944,7 +1944,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="operator-subject-name"
                     className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
-                    {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
+                    {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
                   </label>
                   <input
                     id="operator-subject-name"
@@ -1965,7 +1965,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="operator-contact"
                     className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                   >
-                    {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                    {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
                   </label>
                   <input
                     id="operator-contact"
@@ -1988,7 +1988,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   htmlFor="operator-role"
                   className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                 >
-                  {language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / responsibility'}
+                  {language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / Responsibility'}
                 </label>
                 <input
                   id="operator-role"
@@ -2010,7 +2010,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   htmlFor="operator-identifying-desc"
                   className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                 >
-                  {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                  {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
                 </label>
                 <textarea
                   id="operator-identifying-desc"
@@ -2039,7 +2039,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             title={
               language === 'bn'
                 ? '৩. চাঁদা দাবিকারীর তথ্য (ঐচ্ছিক)'
-                : '3. Extortion party information (optional)'
+                : '3. Extortion Party Information (Optional)'
             }
             summary={
               hasExtortionPartyData ? (
@@ -2065,7 +2065,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-subject-name"
                       className="block text-[13px] font-bold text-ui-content-primary mb-1"
                     >
-                      {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
+                      {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
                     </label>
                     <input
                       id="extortion-subject-name"
@@ -2086,7 +2086,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-contact"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                      {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
                     </label>
                     <input
                       id="extortion-contact"
@@ -2110,7 +2110,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-role"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / designation'}
+                      {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / Designation'}
                     </label>
                     <input
                       id="extortion-role"
@@ -2131,7 +2131,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-org"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / organization / association'}
+                      {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / Organization / Association'}
                     </label>
                     <input
                       id="extortion-org"
@@ -2154,7 +2154,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="extortion-identifying-desc"
                     className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                   >
-                    {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                    {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
                   </label>
                   <textarea
                     id="extortion-identifying-desc"
@@ -2176,7 +2176,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 {formData.mentionedParties && formData.mentionedParties.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="text-[13px] font-bold text-ui-content-primary">
-                      {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional mentioned parties'}
+                      {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional Mentioned Parties'}
                     </h4>
                     {formData.mentionedParties.map((party, pIdx) => (
                       <div
@@ -2201,7 +2201,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
+                              {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
                             </label>
                             <input
                               type="text"
@@ -2213,7 +2213,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           </div>
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                              {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
                             </label>
                             <input
                               type="text"
@@ -2234,7 +2234,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / designation'}
+                              {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / Designation'}
                             </label>
                             <input
                               type="text"
@@ -2248,7 +2248,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           </div>
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / organization / association'}
+                              {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / Organization / Association'}
                             </label>
                             <input
                               type="text"
@@ -2265,7 +2265,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         {/* Row 3: Other Identifying Details */}
                         <div>
                           <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                            {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                            {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
                           </label>
                           <textarea
                             rows={2}
@@ -2315,10 +2315,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               isUtilityReport
                 ? language === 'bn'
                   ? '৩. সংযুক্তি (ঐচ্ছিক)'
-                  : '3. Attachments (optional)'
+                  : '3. Attachments (Optional)'
                 : language === 'bn'
                 ? '৪. সংযুক্তি (ঐচ্ছিক)'
-                : '4. Attachments (optional)'
+                : '4. Attachments (Optional)'
             }
             summary={
               pendingImages.length > 0

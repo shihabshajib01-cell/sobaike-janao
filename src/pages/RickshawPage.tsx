@@ -65,6 +65,7 @@ export const RickshawPage: React.FC = () => {
             titleEn: config.nameEn,
             descriptionBn: config.descriptionBn,
             descriptionEn: config.descriptionEn,
+            illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v01.png',
           },
         ]}
       />
@@ -117,15 +118,15 @@ export const RickshawPage: React.FC = () => {
           <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
-              ? 'প্রতিবেদন লোড করা যায়নি।'
-              : "Couldn't load reports."}
+              ? 'তথ্য লোড করতে ত্রুটি হয়েছে।'
+              : 'Failed to load rickshaw reports. Please try again.'}
           </p>
           <button
             type="button"
             onClick={loadData}
             className="btn-primary-action px-4 py-2 text-[16px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
-            {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
+            {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
           </button>
         </div>
       )}

@@ -132,7 +132,7 @@ export interface MapCardSkeletonProps {
 export const MapCardSkeleton: React.FC<MapCardSkeletonProps> = ({
   id = 'map-card-skeleton',
   className = '',
-  ariaLabel = 'Loading map...',
+  ariaLabel = 'Loading incident map...',
 }) => {
   return (
     <div
@@ -313,7 +313,7 @@ export const RecentAreaReportsSkeleton: React.FC<{ count?: number; id?: string }
  */
 export const MapExploreSkeleton: React.FC<{ id?: string; ariaLabel?: string }> = ({
   id = 'map-explore-skeleton',
-  ariaLabel = 'Loading map and reports...',
+  ariaLabel = 'Loading interactive map and reports...',
 }) => {
   return (
     <div
@@ -349,8 +349,8 @@ export const StatCardSkeleton: React.FC<{ id?: string }> = ({ id }) => {
 
 export const ReportDetailSkeleton: React.FC<{ id?: string }> = ({ id = 'report-detail-skeleton' }) => {
   return (
-    <div id={id} className="space-y-6 select-none" role="status" aria-busy="true" aria-label="Loading report...">
-      <span className="sr-only">Loading report...</span>
+    <div id={id} className="space-y-6 select-none" role="status" aria-busy="true" aria-label="Loading report details...">
+      <span className="sr-only">Loading report details...</span>
       {/* Back button */}
       <Skeleton className="w-24 h-8 rounded-lg" />
 

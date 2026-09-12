@@ -54,8 +54,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
     },
     {
       key: 'rickshaw',
-      titleBn: 'অবৈধ চার্জিং স্টেশন',
-      titleEn: 'Illegal charging station',
+      titleBn: 'অবৈধ চার্জিং স্টেশন রিপোর্ট করুন',
+      titleEn: 'Report an Illegal Charging Station',
       descBn: 'আপনার এলাকায় অবৈধ ব্যাটারি চার্জিং স্টেশনের অবস্থান ও প্রাসঙ্গিক তথ্য জানান।',
       descEn: 'Report the location and relevant details of an illegal battery charging station in your area.',
       bgVar: 'var(--sec-rickshaw-bg)',
@@ -109,7 +109,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       {/* Single Question Header */}
       <div className="text-left">
         <h3 className="text-[20px] md:text-[22px] font-bold text-ui-content-primary">
-          {language === 'bn' ? 'কোন বিষয়ে জানাতে চান?' : 'What would you like to report?'}
+          {language === 'bn' ? 'কোন বিষয়ে অভিযোগ জানাতে চান?' : 'What would you like to report?'}
         </h3>
       </div>
 
@@ -180,7 +180,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
         <div className="pt-2 space-y-3">
           <div className="flex items-center gap-2">
             <span className="text-[12px] font-bold text-ui-content-muted uppercase tracking-wider">
-              {language === 'bn' ? 'আসন্ন সেবাসমূহ' : 'Upcoming services'}
+              {language === 'bn' ? 'আসন্ন সেবাসমূহ' : 'Upcoming Services'}
             </span>
             <span className="h-px flex-1" />
           </div>
@@ -262,7 +262,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   onClick={() => onNavigateToComingSoon(activeComingSoonData.slug)}
                   className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-bold bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
-                  <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'Learn more'}</span>
+                  <span>{language === 'bn' ? 'বিস্তারিত জানুন' : 'Learn More'}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-ui-content-muted" />
                 </button>
               )}

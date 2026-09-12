@@ -26,7 +26,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           id="location-filter-select"
           value={selectedDistrict}
           onChange={(e) => onSelectDistrict(e.target.value)}
-          aria-label={language === 'bn' ? 'জেলা নির্বাচন' : 'Filter by district'}
+          aria-label={language === 'bn' ? 'এলাকা বা জেলা নির্বাচন করুন' : 'Select area or district'}
           className="appearance-none pl-9 pr-8 py-2 text-[16px] leading-[24px] font-semibold bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle rounded-xl min-h-[44px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ui-focus transition-colors shadow-2xs"
         >
           {POPULAR_DISTRICTS.map((district) => (
