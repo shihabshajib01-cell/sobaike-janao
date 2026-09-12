@@ -84,22 +84,22 @@ const RICKSHAW_OPERATOR_OPTIONS: { value: SubjectTypeValue; labelBn: string; lab
   {
     value: 'business',
     labelBn: 'চার্জিং স্টেশন / গ্যারেজ',
-    labelEn: 'Charging Station / Garage',
+    labelEn: 'Charging station / garage',
   },
   {
     value: 'individual',
     labelBn: 'পরিচালনাকারী ব্যক্তি',
-    labelEn: 'Individual Operator',
+    labelEn: 'Individual operator',
   },
   {
     value: 'organization',
     labelBn: 'প্রতিষ্ঠান / ভবন কর্তৃপক্ষ',
-    labelEn: 'Organization / Building Authority',
+    labelEn: 'Organization / building authority',
   },
   {
     value: 'unknown',
     labelBn: 'অজ্ঞাত / নিশ্চিত নই',
-    labelEn: 'Unknown / Not Sure',
+    labelEn: 'Unknown / not sure',
   },
 ];
 
@@ -1007,7 +1007,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent Bill Month *'}</span>
+                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent bill month *'}</span>
                         </div>
                       </label>
                       <input
@@ -1035,7 +1035,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Coins className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent Bill Amount (BDT) *'}</span>
+                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent bill amount (BDT) *'}</span>
                         </div>
                       </label>
                       <input
@@ -1069,7 +1069,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous Bill Month *'}</span>
+                          <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous bill month *'}</span>
                         </div>
                       </label>
                       <input
@@ -1097,7 +1097,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       >
                         <div className="flex items-center gap-1.5">
                           <Coins className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous Bill Amount (BDT) *'}</span>
+                          <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous bill amount (BDT) *'}</span>
                         </div>
                       </label>
                       <input
@@ -1173,7 +1173,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     >
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-ui-content-primary" />
-                        <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start Time *'}</span>
+                        <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start time *'}</span>
                       </div>
                     </label>
                     <input
@@ -1204,7 +1204,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     >
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                        <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End Time (Optional)'}</span>
+                        <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End time (optional)'}</span>
                       </div>
                     </label>
                     <input
@@ -1382,7 +1382,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 >
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                    <span>{language === 'bn' ? 'ঘটনার তারিখ *' : 'Incident Date *'}</span>
+                    <span>{language === 'bn' ? 'ঘটনার তারিখ *' : 'Incident date *'}</span>
                   </div>
                 </label>
                 <input
@@ -1421,7 +1421,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 >
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                    <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (Optional)'}</span>
+                    <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}</span>
                   </div>
                 </label>
                 <input
@@ -1467,7 +1467,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             {isDigitalHarassment && (
               <div className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3 mt-2">
                 <h4 className="text-[13px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital Threat & Evidence Details'}
+                  {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital threat & evidence details'}
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1476,7 +1476,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="intimate-action-select"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat Status / Action'}
+                      {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat status / action'}
                     </label>
                     <select
                       id="intimate-action-select"
@@ -1498,7 +1498,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="intimate-platform-select"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / Channel'}
+                      {language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / channel'}
                     </label>
                     <select
                       id="intimate-platform-select"
@@ -1714,7 +1714,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="complaint-thana-select"
                     className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
-                    {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / Upazila *'}
+                    {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / upazila *'}
                   </label>
                   <select
                     id="complaint-thana-select"
@@ -1749,7 +1749,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="complaint-address-input"
                     className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
-                    {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed Address (Optional)'}
+                    {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed address (optional)'}
                   </label>
                   <textarea
                     id="complaint-address-input"
@@ -1826,7 +1826,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           htmlFor="reporter-admin-name"
                           className="block text-[13px] font-semibold text-ui-content-primary mb-1"
                         >
-                          {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
+                          {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)'}
                         </label>
                         <input
                           id="reporter-admin-name"
@@ -1846,7 +1846,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           htmlFor="reporter-admin-contact"
                           className="block text-[13px] font-semibold text-ui-content-primary mb-1"
                         >
-                          {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone Number or Email *'}
+                          {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone number or email *'}
                         </label>
                         <input
                           id="reporter-admin-contact"
@@ -1919,7 +1919,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             title={
               language === 'bn'
                 ? '৩. চার্জিং স্টেশন / পরিচালনাকারীর তথ্য (ঐচ্ছিক)'
-                : '3. Charging Station / Operator Information (Optional)'
+                : '3. Charging station / operator information (optional)'
             }
             summary={
               hasChargingStationOperatorData ? (
@@ -1944,7 +1944,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="operator-subject-name"
                     className="block text-[13px] font-bold text-ui-content-primary mb-1"
                   >
-                    {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
+                    {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
                   </label>
                   <input
                     id="operator-subject-name"
@@ -1965,7 +1965,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="operator-contact"
                     className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                   >
-                    {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
+                    {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
                   </label>
                   <input
                     id="operator-contact"
@@ -1988,7 +1988,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   htmlFor="operator-role"
                   className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                 >
-                  {language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / Responsibility'}
+                  {language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / responsibility'}
                 </label>
                 <input
                   id="operator-role"
@@ -2010,7 +2010,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   htmlFor="operator-identifying-desc"
                   className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                 >
-                  {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
+                  {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
                 </label>
                 <textarea
                   id="operator-identifying-desc"
@@ -2039,7 +2039,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             title={
               language === 'bn'
                 ? '৩. চাঁদা দাবিকারীর তথ্য (ঐচ্ছিক)'
-                : '3. Extortion Party Information (Optional)'
+                : '3. Extortion party information (optional)'
             }
             summary={
               hasExtortionPartyData ? (
@@ -2065,7 +2065,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-subject-name"
                       className="block text-[13px] font-bold text-ui-content-primary mb-1"
                     >
-                      {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
+                      {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
                     </label>
                     <input
                       id="extortion-subject-name"
@@ -2086,7 +2086,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-contact"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
+                      {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
                     </label>
                     <input
                       id="extortion-contact"
@@ -2110,7 +2110,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-role"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / Designation'}
+                      {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / designation'}
                     </label>
                     <input
                       id="extortion-role"
@@ -2131,7 +2131,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-org"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / Organization / Association'}
+                      {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / organization / association'}
                     </label>
                     <input
                       id="extortion-org"
@@ -2154,7 +2154,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     htmlFor="extortion-identifying-desc"
                     className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                   >
-                    {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
+                    {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
                   </label>
                   <textarea
                     id="extortion-identifying-desc"
@@ -2176,7 +2176,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 {formData.mentionedParties && formData.mentionedParties.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="text-[13px] font-bold text-ui-content-primary">
-                      {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional Mentioned Parties'}
+                      {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional mentioned parties'}
                     </h4>
                     {formData.mentionedParties.map((party, pIdx) => (
                       <div
@@ -2201,7 +2201,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / Known Identity'}
+                              {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
                             </label>
                             <input
                               type="text"
@@ -2213,7 +2213,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           </div>
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / Contact'}
+                              {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
                             </label>
                             <input
                               type="text"
@@ -2234,7 +2234,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / Designation'}
+                              {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / designation'}
                             </label>
                             <input
                               type="text"
@@ -2248,7 +2248,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           </div>
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / Organization / Association'}
+                              {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / organization / association'}
                             </label>
                             <input
                               type="text"
@@ -2265,7 +2265,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         {/* Row 3: Other Identifying Details */}
                         <div>
                           <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                            {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other Identifying Details'}
+                            {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
                           </label>
                           <textarea
                             rows={2}
@@ -2315,10 +2315,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               isUtilityReport
                 ? language === 'bn'
                   ? '৩. সংযুক্তি (ঐচ্ছিক)'
-                  : '3. Attachments (Optional)'
+                  : '3. Attachments (optional)'
                 : language === 'bn'
                 ? '৪. সংযুক্তি (ঐচ্ছিক)'
-                : '4. Attachments (Optional)'
+                : '4. Attachments (optional)'
             }
             summary={
               pendingImages.length > 0
