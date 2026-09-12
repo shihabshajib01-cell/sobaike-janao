@@ -294,7 +294,7 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
         <label className="text-[13px] font-bold text-primary flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-accent" />
           <span>
-            {language === 'bn' ? 'ম্যাপে ঘটনার সুনির্দিষ্ট স্থান *' : 'Incident Location on Map *'}
+            {language === 'bn' ? 'ঘটনার স্থান *' : 'Incident location *'}
           </span>
         </label>
 
@@ -302,14 +302,14 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-success-bg border border-ui-success-border text-ui-success-text text-[12px] font-semibold">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span>
-              {language === 'bn' ? 'ঘটনাস্থলের পয়েন্ট নির্বাচন করা হয়েছে' : 'Incident point selected'}
+              {language === 'bn' ? 'স্থান নির্বাচন করা হয়েছে' : 'Location selected'}
             </span>
           </div>
         ) : (
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-warning-bg border border-ui-warning-border text-ui-warning-text text-[12px] font-medium">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>
-              {language === 'bn' ? 'ম্যাপে ট্যাপ করে পয়েন্ট দিন' : 'Tap map to place point'}
+              {language === 'bn' ? 'ম্যাপে একটি স্থান নির্বাচন করুন' : 'Select a point on the map'}
             </span>
           </div>
         )}
@@ -317,8 +317,8 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
 
       <p className="text-[12.5px] text-secondary leading-relaxed">
         {language === 'bn'
-          ? 'ম্যাপের মধ্যে ঘটনার সঠিক স্থানে ক্লিক বা স্পর্শ করে লাল মার্কার বসান।'
-          : 'Click or tap on the map to place the incident marker at the exact location.'}
+          ? 'ঘটনাস্থলে ট্যাপ বা ক্লিক করুন।'
+          : 'Tap or click the incident location.'}
       </p>
 
       {/* Interactive Map Container */}
@@ -339,8 +339,8 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
               <Lock className="w-4 h-4 text-muted shrink-0" />
               <span>
                 {language === 'bn'
-                  ? 'ম্যাপে স্থান নির্বাচন করতে ডিভাইসের লোকেশন চালু করুন'
-                  : 'Turn on device location to select incident point'}
+                  ? 'ম্যাপে স্থান নির্বাচন করতে ডিভাইসের লোকেশন চালু করুন।'
+                  : 'Turn on device location to choose a point on the map.'}
               </span>
             </div>
           </div>
@@ -360,15 +360,15 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
           }`}
           title={
             language === 'bn'
-              ? 'ম্যাপের কেন্দ্রকে ঘটনাস্থল হিসেবে নির্বাচন করুন'
-              : 'Set point at map center'
+              ? 'ম্যাপের কেন্দ্রকে স্থান হিসেবে নির্বাচন করুন'
+              : 'Set location at map center'
           }
         >
           <Crosshair className="w-3.5 h-3.5 text-accent shrink-0" />
           <span>
             {language === 'bn'
-              ? 'ম্যাপের কেন্দ্রকে ঘটনাস্থল হিসেবে নির্বাচন করুন'
-              : 'Set point at map center'}
+              ? 'ম্যাপের কেন্দ্রকে স্থান হিসেবে নির্বাচন করুন'
+              : 'Set location at map center'}
           </span>
         </button>
       </div>

@@ -89,7 +89,7 @@ export const ExtortionPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by subcategory'}
+              {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by Subcategory'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'
@@ -169,13 +169,13 @@ export const ExtortionPage: React.FC = () => {
             ))
           ) : (
             <EmptyState
-              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
+              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Reports Found'}
               description={
                 language === 'bn'
                   ? 'এই উপ-বিভাগ বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
                   : 'There are currently no published reports under this subcategory.'
               }
-              actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
+              actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
               onAction={() => {
                 setSelectedSubcat('all');
                 setSelectedDistrict('all');

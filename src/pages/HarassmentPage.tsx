@@ -70,7 +70,6 @@ export const HarassmentPage: React.FC = () => {
             titleEn: config.nameEn,
             descriptionBn: config.descriptionBn,
             descriptionEn: config.descriptionEn,
-            illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v01.png',
           },
         ]}
       />
@@ -90,7 +89,7 @@ export const HarassmentPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by Subcategory'}
+              {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by subcategory'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'
@@ -148,15 +147,15 @@ export const HarassmentPage: React.FC = () => {
           <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-ui-error-text">
             {language === 'bn'
-              ? 'তথ্য লোড করতে ত্রুটি হয়েছে।'
-              : 'Failed to load harassment reports. Please try again.'}
+              ? 'প্রতিবেদন লোড করা যায়নি।'
+              : "Couldn't load reports."}
           </p>
           <button
             type="button"
             onClick={loadData}
             className="btn-primary-action px-4 py-2 text-[16px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
-            {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
+            {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
           </button>
         </div>
       )}
@@ -170,13 +169,13 @@ export const HarassmentPage: React.FC = () => {
             ))
           ) : (
             <EmptyState
-              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Reports Found'}
+              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               description={
                 language === 'bn'
                   ? 'এই উপ-বিভাগ বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
                   : 'There are currently no published reports under this subcategory.'
               }
-              actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
+              actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               onAction={() => {
                 setSelectedSubcat('all');
                 setSelectedDistrict('all');

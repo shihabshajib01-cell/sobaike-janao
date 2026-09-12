@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Loader2, ShieldCheck } from 'lucide-react';
+import { MapPin, Loader2 } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { Modal } from '../ui/Modal';
 
@@ -72,12 +72,8 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           </div>
           <div className="flex-1">
             <h2 id="location-consent-title" className="text-lg font-bold tracking-tight">
-              {isBn ? 'আপনার এলাকার পোস্ট দেখুন' : 'See more posts from your area'}
+              {isBn ? 'কাছাকাছি প্রতিবেদন দেখুন' : 'See reports near you'}
             </h2>
-            <div className="flex items-center gap-1.5 text-xs text-ui-content-muted mt-0.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-ui-success-text" aria-hidden="true" />
-              <span>{isBn ? 'গোপনীয়তা সুরক্ষিত' : 'Privacy Protected'}</span>
-            </div>
           </div>
         </div>
 
@@ -85,8 +81,8 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         <div id="location-consent-desc" className="text-sm text-ui-content-secondary leading-relaxed">
           <p>
             {isBn
-              ? 'লোকেশন চালু করলে আপনার আশপাশের অভিযোগ, রিপোর্ট ও পোস্টগুলো ফিডে বেশি প্রাধান্য পাবে। এতে আপনার এলাকার আপডেট সহজে দেখতে পারবেন।'
-              : 'Turn on location to see more complaints, reports, and posts from places near you. It helps keep your feed more relevant to where you are.'}
+              ? 'লোকেশন চালু করলে কাছাকাছি এলাকার আরও প্রতিবেদন দেখতে পারবেন।'
+              : 'Turn on location to show more reports from nearby areas.'}
           </p>
         </div>
 
