@@ -208,7 +208,7 @@ export const HomePage: React.FC = () => {
               onClick={loadReports}
               className="btn-primary-action px-4 py-2 text-[14px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
             >
-              {language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry'}
+              {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
             </button>
           </div>
         )}

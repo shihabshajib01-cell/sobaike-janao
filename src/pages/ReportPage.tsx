@@ -21,12 +21,12 @@ export const ReportPage: React.FC<ReportPageProps> = () => {
 
         <div className="space-y-2">
           <h1 className="text-[24px] font-bold text-ui-content-primary">
-            {language === 'bn' ? 'অভিযোগ বা ঘটনা জানান' : 'Report an Incident'}
+            {language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
           </h1>
           <p className="text-[16px] text-ui-content-muted max-w-[480px] mx-auto">
             {language === 'bn'
-              ? 'রিপোর্ট কম্পোজার খোলা হচ্ছে। আপনি যদি এটি না দেখতে পান, নিচের বোতামে ক্লিক করুন।'
-              : 'Opening Report Composer. If it did not open automatically, click the button below.'}
+              ? 'প্রতিবেদন ফরম খোলা হচ্ছে। স্বয়ংক্রিয়ভাবে না খুললে নিচের বোতামে চাপ দিন।'
+              : 'Opening report form. If it did not open automatically, click the button below.'}
           </p>
         </div>
 
@@ -41,7 +41,7 @@ export const ReportPage: React.FC<ReportPageProps> = () => {
             }}
             className="w-full sm:w-auto min-h-[44px]"
           >
-            {language === 'bn' ? 'কম্পোজার খুলুন' : 'Open Composer'}
+            {language === 'bn' ? 'প্রতিবেদন ফরম খুলুন' : 'Open report form'}
           </Button>
 
           <Button
@@ -52,7 +52,7 @@ export const ReportPage: React.FC<ReportPageProps> = () => {
             onClick={() => navigateTo('/')}
             className="w-full sm:w-auto min-h-[44px]"
           >
-            {language === 'bn' ? 'মূলপাতায় ফিরে যান' : 'Back to Home'}
+            {language === 'bn' ? 'মূল পাতায় ফিরুন' : 'Back to home'}
           </Button>
         </div>
       </div>
