@@ -63,7 +63,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         leftIcon && <span className="shrink-0 inline-flex items-center">{leftIcon}</span>
       )}
-      <span className="truncate leading-normal">{children}</span>
+      <span className="truncate">{children}</span>
       {!isLoading && rightIcon && (
         <span className="shrink-0 inline-flex items-center">{rightIcon}</span>
       )}
