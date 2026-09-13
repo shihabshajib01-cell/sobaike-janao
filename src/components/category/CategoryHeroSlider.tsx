@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { SectionKey, HERO_TOKENS, getHeroCtaStyle } from '../../theme/tokens';
+import {
+  SectionKey,
+  HERO_TOKENS,
+  HERO_SLIDER_TOKENS,
+  HERO_SLIDER_BEHAVIOR,
+  getHeroCtaStyle,
+} from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
 import { Button } from '../ui/Button';
 
@@ -31,7 +37,7 @@ export interface CategoryHeroSliderProps {
   className?: string;
 }
 
-const AUTOPLAY_INTERVAL = 35_000;
+const AUTOPLAY_INTERVAL = HERO_SLIDER_BEHAVIOR.autoplayIntervalMs;
 
 const resolvePublicAsset = (src?: string) => {
   if (!src) return src;
@@ -68,7 +74,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
   const timerRef = useRef<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const sliderRef = useRef<HTMLDivElement | null>(null);
+  const sliderRef = useRef<HTMLElement | null>(null);
 
   // Section key for CSS variables & art background override
   const sectionKey = section;
@@ -206,8 +212,11 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     const diffX = touch.clientX - touchStartRef.current.x;
     const diffY = touch.clientY - touchStartRef.current.y;
 
-    // Minimum swipe threshold of 45px and predominantly horizontal
-    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+    // Minimum swipe threshold and predominantly horizontal
+    if (
+      Math.abs(diffX) > HERO_SLIDER_BEHAVIOR.swipeThresholdPx &&
+      Math.abs(diffX) > Math.abs(diffY) * HERO_SLIDER_BEHAVIOR.swipeDominanceRatio
+    ) {
       if (diffX < 0) {
         handleNext();
       } else {
@@ -222,6 +231,18 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     setIsHovered(false);
     touchStartRef.current = null;
     setIsSwiping(false);
+  };
+
+  // Focus handling with inner containment check
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = (e: React.FocusEvent) => {
+    if (sliderRef.current && sliderRef.current.contains(e.relatedTarget as Node)) {
+      return;
+    }
+    setIsFocused(false);
   };
 
   // Section styling via CSS variables & art background override
@@ -241,14 +262,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     return (
       <section
         id={id}
-        className={`w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors ${className}`}
+        className={`${HERO_SLIDER_TOKENS.layout.staticContainer} ${className}`}
         style={containerStyle}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-stretch min-h-[160px] md:min-h-[180px] lg:min-h-[230px] xl:min-h-[250px]">
+        <div className={HERO_SLIDER_TOKENS.layout.grid}>
           {/* Left 50% Content Column */}
-          <div className="px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3 md:px-6 md:py-6 lg:px-8 lg:py-7 xl:px-10 xl:py-8 flex flex-col justify-center items-center lg:items-start text-center lg:text-left min-w-0 z-10 space-y-2 md:space-y-3">
+          <div className={HERO_SLIDER_TOKENS.layout.contentCol}>
             <h1
-              className="type-h1 tracking-tight"
+              className={HERO_SLIDER_TOKENS.typography.title}
               style={{ color: HERO_TOKENS.text.primary }}
             >
               {language === 'bn' ? slide.titleBn : slide.titleEn}
@@ -257,7 +278,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             {/* Mobile Question */}
             {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
               <p
-                className="block md:hidden type-body text-center max-w-md mx-auto"
+                className={HERO_SLIDER_TOKENS.typography.mobileDesc}
                 style={{ color: HERO_TOKENS.text.secondary }}
               >
                 {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
@@ -266,7 +287,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
             {/* Tablet Short Description */}
             <p
-              className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
+              className={HERO_SLIDER_TOKENS.typography.tabletDesc}
               style={{ color: HERO_TOKENS.text.secondary }}
             >
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
@@ -274,7 +295,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
             {/* Desktop Long Description */}
             <p
-              className="hidden lg:block type-body max-w-xl"
+              className={HERO_SLIDER_TOKENS.typography.desktopDesc}
               style={{ color: HERO_TOKENS.text.secondary }}
             >
               {language === 'bn'
@@ -284,13 +305,13 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
             {/* CTA (if exists) */}
             {slide.action && (
-              <div className="pt-2 sm:pt-2.5 md:pt-1.5 w-full flex justify-center lg:justify-start">
+              <div className={HERO_SLIDER_TOKENS.layout.ctaRow}>
                 <Button
                   id={`${id}-cta-btn`}
                   variant="outline"
                   size="md"
                   onClick={slide.action.onClick}
-                  className="w-auto shadow-none btn-hero-cta"
+                  className={HERO_SLIDER_TOKENS.layout.ctaButton}
                   style={getHeroCtaStyle(sectionKey)}
                 >
                   {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
@@ -300,7 +321,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           </div>
 
           {/* Right 50% Illustration Column */}
-          <div className="w-full h-[150px] sm:h-[180px] md:h-auto lg:h-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none min-w-0 overflow-hidden">
+          <div className={HERO_SLIDER_TOKENS.layout.mediaCol}>
             {slide.illustrationSrc ? (
               (() => {
                 const resolvedDesktopMediaPosition =
@@ -321,14 +342,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                       '--hero-desktop-media-position': resolvedDesktopMediaPosition,
                       '--hero-desktop-media-scale': resolvedDesktopMediaScale,
                     } as React.CSSProperties}
-                    className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover hero-desktop-media-framed mx-auto block"
+                    className={HERO_SLIDER_TOKENS.media.image}
                   />
                 );
               })()
             ) : (
               <div
                 aria-hidden="true"
-                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
+                className={HERO_SLIDER_TOKENS.media.placeholder}
               />
             )}
           </div>
@@ -353,18 +374,18 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
       onKeyDown={handleKeyDown}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchCancel}
-      className={`group w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
+      className={`${HERO_SLIDER_TOKENS.layout.container} ${className}`}
       style={containerStyle}
     >
       {/* Slides Track */}
       <div
-        className={`flex w-full items-stretch ${
-          prefersReducedMotion ? '' : 'transition-transform duration-500 ease-out'
+        className={`${HERO_SLIDER_TOKENS.layout.track} ${
+          prefersReducedMotion ? '' : HERO_SLIDER_TOKENS.layout.trackTransition
         }`}
         style={{
           transform: `translateX(-${currentIndex * 100}%)`,
@@ -383,24 +404,24 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className="w-full shrink-0 min-w-full p-0"
+              className={HERO_SLIDER_TOKENS.layout.slide}
               style={{
                 backgroundColor: heroBackground,
               }}
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-stretch min-h-[160px] md:min-h-[180px] lg:min-h-[230px] xl:min-h-[250px]">
+              <div className={HERO_SLIDER_TOKENS.layout.grid}>
                 {/* Left 50% Content Column */}
-                <div className="px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3 md:px-6 md:py-6 lg:px-8 lg:py-7 xl:px-10 xl:py-8 flex flex-col justify-center items-center lg:items-start text-center lg:text-left min-w-0 z-10 space-y-2 md:space-y-3">
+                <div className={HERO_SLIDER_TOKENS.layout.contentCol}>
                   {index === 0 ? (
                     <h1
-                      className="type-h1 tracking-tight"
+                      className={HERO_SLIDER_TOKENS.typography.title}
                       style={{ color: HERO_TOKENS.text.primary }}
                     >
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h1>
                   ) : (
                     <h2
-                      className="type-h1 tracking-tight"
+                      className={HERO_SLIDER_TOKENS.typography.title}
                       style={{ color: HERO_TOKENS.text.primary }}
                     >
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
@@ -410,7 +431,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   {/* Mobile Question */}
                   {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
                     <p
-                      className="block md:hidden type-body text-center max-w-md mx-auto"
+                      className={HERO_SLIDER_TOKENS.typography.mobileDesc}
                       style={{ color: HERO_TOKENS.text.secondary }}
                     >
                       {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
@@ -419,7 +440,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                   {/* Tablet Short Description */}
                   <p
-                    className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
+                    className={HERO_SLIDER_TOKENS.typography.tabletDesc}
                     style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
@@ -427,7 +448,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                   {/* Desktop Long Description */}
                   <p
-                    className="hidden lg:block type-body max-w-xl"
+                    className={HERO_SLIDER_TOKENS.typography.desktopDesc}
                     style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn'
@@ -437,14 +458,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                   {/* CTA (if exists) */}
                   {slide.action && (
-                    <div className="pt-2 sm:pt-2.5 md:pt-1.5 w-full flex justify-center lg:justify-start">
+                    <div className={HERO_SLIDER_TOKENS.layout.ctaRow}>
                       <Button
                         id={`${id}-cta-btn-${index}`}
                         variant="outline"
                         size="md"
                         tabIndex={isActive ? 0 : -1}
                         onClick={slide.action.onClick}
-                        className="w-auto shadow-none btn-hero-cta"
+                        className={HERO_SLIDER_TOKENS.layout.ctaButton}
                         style={getHeroCtaStyle(sectionKey)}
                       >
                         {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
@@ -454,7 +475,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 </div>
 
                 {/* Right 50% Illustration Column */}
-                <div className="w-full h-[150px] sm:h-[180px] md:h-auto lg:h-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none min-w-0 overflow-hidden">
+                <div className={HERO_SLIDER_TOKENS.layout.mediaCol}>
                   {slide.illustrationSrc ? (
                     (() => {
                       const resolvedDesktopMediaPosition =
@@ -475,14 +496,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                             '--hero-desktop-media-position': resolvedDesktopMediaPosition,
                             '--hero-desktop-media-scale': resolvedDesktopMediaScale,
                           } as React.CSSProperties}
-                          className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover hero-desktop-media-framed mx-auto block"
+                          className={HERO_SLIDER_TOKENS.media.image}
                         />
                       );
                     })()
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
+                      className={HERO_SLIDER_TOKENS.media.placeholder}
                     />
                   )}
                 </div>
@@ -497,18 +518,18 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         type="button"
         onClick={handlePrev}
         aria-label={language === 'bn' ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
-        className="hidden [@media(min-width:1440px)_and_(hover:hover)_and_(pointer:fine)]:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        className={`${HERO_SLIDER_TOKENS.navArrows.base} ${HERO_SLIDER_TOKENS.navArrows.prev}`}
       >
-        <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+        <ChevronLeft className={HERO_SLIDER_TOKENS.navArrows.icon} aria-hidden="true" />
       </button>
 
       <button
         type="button"
         onClick={handleNext}
         aria-label={language === 'bn' ? 'পরবর্তী স্লাইড' : 'Next slide'}
-        className="hidden [@media(min-width:1440px)_and_(hover:hover)_and_(pointer:fine)]:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        className={`${HERO_SLIDER_TOKENS.navArrows.base} ${HERO_SLIDER_TOKENS.navArrows.next}`}
       >
-        <ChevronRight className="w-5 h-5" aria-hidden="true" />
+        <ChevronRight className={HERO_SLIDER_TOKENS.navArrows.icon} aria-hidden="true" />
       </button>
     </section>
   );

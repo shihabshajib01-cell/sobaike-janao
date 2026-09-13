@@ -246,6 +246,50 @@ export const HERO_TOKENS = {
   } satisfies Record<SectionKey, HeroSectionTheme>,
 };
 
+export const HERO_SLIDER_BEHAVIOR = {
+  autoplayIntervalMs: 35_000,
+  swipeThresholdPx: 45,
+  swipeDominanceRatio: 1.2,
+  transitionDurationMs: 500,
+} as const;
+
+export const HERO_SLIDER_TOKENS = {
+  layout: {
+    container:
+      'group w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus',
+    staticContainer:
+      'w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors',
+    track: 'flex w-full items-stretch',
+    trackTransition: 'transition-transform duration-500 ease-out',
+    slide: 'w-full shrink-0 min-w-full p-0',
+    grid: 'grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-stretch min-h-[160px] md:min-h-[180px] lg:min-h-[230px] xl:min-h-[250px]',
+    contentCol:
+      'px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3 md:px-6 md:py-6 lg:px-8 lg:py-7 xl:px-10 xl:py-8 flex flex-col justify-center items-center lg:items-start text-center lg:text-left min-w-0 z-10 space-y-2 md:space-y-3',
+    mediaCol:
+      'w-full h-[150px] sm:h-[180px] md:h-auto lg:h-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none min-w-0 overflow-hidden',
+    ctaRow: 'pt-2 sm:pt-2.5 md:pt-1.5 w-full flex justify-center lg:justify-start',
+    ctaButton: 'w-auto shadow-none btn-hero-cta',
+  },
+  typography: {
+    title: 'type-h1 tracking-tight',
+    mobileDesc: 'block md:hidden type-body text-center max-w-md mx-auto',
+    tabletDesc: 'hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left',
+    desktopDesc: 'hidden lg:block type-body max-w-xl',
+  },
+  media: {
+    image:
+      'w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover hero-desktop-media-framed mx-auto block',
+    placeholder:
+      'w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0',
+  },
+  navArrows: {
+    base: 'hidden [@media(min-width:1440px)_and_(hover:hover)_and_(pointer:fine)]:flex absolute top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-ui-surface/90 hover:bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle shadow-md backdrop-blur-xs items-center justify-center cursor-pointer transition-opacity duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus',
+    prev: 'left-3',
+    next: 'right-3',
+    icon: 'w-5 h-5',
+  },
+} as const;
+
 export const getHeroCtaStyle = (section: SectionKey): React.CSSProperties => {
   const t = HERO_TOKENS.sections[section];
   if (!t) return {};
