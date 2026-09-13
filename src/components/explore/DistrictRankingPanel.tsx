@@ -130,7 +130,68 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   }, [reports, selectedDistrict]);
 
   const isDistrictSelected = selectedDistrict !== 'all' && currentDistrictInfo !== null;
-  const displayedDistricts = showAllDistricts ? rankedDistricts : rankedDistricts.slice(0, 5);
+  const mobileDisplayedDistricts = showAllDistricts ? rankedDistricts : rankedDistricts.slice(0, 5);
+
+  const renderDistrictItem = (item: RankedDistrict, index: number) => {
+    const rankDisplay = formatRankNumber(index + 1, language);
+    const countDisplay =
+      language === 'bn' ? toBanglaDigits(item.count) : item.count;
+
+    return (
+      <button
+        key={item.id}
+        type="button"
+        onClick={() => onSelectDistrict(item.nameEn)}
+        className="w-full flex items-center justify-between p-2 md:p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle border-ui-stroke-subtle group min-h-[44px]"
+      >
+        <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
+          <span
+            className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[11px] md:text-[12px] font-bold shrink-0 border ${
+              index === 0
+                ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
+                : index === 1
+                ? 'bg-ui-surface-elevated text-ui-content-primary border-ui-stroke-default font-bold'
+                : index === 2
+                ? 'bg-ui-warning-bg text-ui-warning-text border-ui-warning-border font-bold'
+                : 'bg-ui-surface text-ui-content-muted border-ui-stroke-subtle'
+            }`}
+          >
+            {rankDisplay}
+          </span>
+
+          <div className="min-w-0">
+            <span className="text-[13px] md:text-[14px] font-bold text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
+              {language === 'bn' ? item.nameBn : item.nameEn}
+            </span>
+            <div className="flex items-center gap-2 text-[11px] md:text-[12px] text-ui-content-muted mt-0.5">
+              {item.harassmentCount > 0 && (
+                <span className="inline-flex items-center gap-0.5">
+                  <CategoryIcon section="harassment" size="xs" /> {item.harassmentCount}
+                </span>
+              )}
+              {item.rickshawCount > 0 && (
+                <span className="inline-flex items-center gap-0.5">
+                  <CategoryIcon section="rickshaw" size="xs" /> {item.rickshawCount}
+                </span>
+              )}
+              {item.extortionCount > 0 && (
+                <span className="inline-flex items-center gap-0.5">
+                  <CategoryIcon section="extortion" size="xs" /> {item.extortionCount}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-[13px] font-bold text-ui-content-primary font-mono">
+            {countDisplay}
+          </span>
+          <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
+        </div>
+      </button>
+    );
+  };
 
   return (
     <div
@@ -303,68 +364,17 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
           {/* District list */}
           {rankedDistricts.length > 0 ? (
-            <div className="space-y-1.5 max-h-none overflow-visible md:max-h-[260px] md:overflow-y-auto md:pr-1">
-              {displayedDistricts.map((item, index) => {
-                const rankDisplay = formatRankNumber(index + 1, language);
-                const countDisplay =
-                  language === 'bn' ? toBanglaDigits(item.count) : item.count;
+            <>
+              {/* Mobile District List (<768px): Top 5 by default, expandable to full, natural page flow */}
+              <div className="space-y-1.5 max-h-none overflow-visible md:hidden">
+                {mobileDisplayedDistricts.map(renderDistrictItem)}
+              </div>
 
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => onSelectDistrict(item.nameEn)}
-                    className="w-full flex items-center justify-between p-2 md:p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle border-ui-stroke-subtle group min-h-[44px]"
-                  >
-                    <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
-                      <span
-                        className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[11px] md:text-[12px] font-bold shrink-0 border ${
-                          index === 0
-                            ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
-                            : index === 1
-                            ? 'bg-ui-surface-elevated text-ui-content-primary border-ui-stroke-default font-bold'
-                            : index === 2
-                            ? 'bg-ui-warning-bg text-ui-warning-text border-ui-warning-border font-bold'
-                            : 'bg-ui-surface text-ui-content-muted border-ui-stroke-subtle'
-                        }`}
-                      >
-                        {rankDisplay}
-                      </span>
-
-                      <div className="min-w-0">
-                        <span className="text-[13px] md:text-[14px] font-bold text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
-                          {language === 'bn' ? item.nameBn : item.nameEn}
-                        </span>
-                        <div className="flex items-center gap-2 text-[11px] md:text-[12px] text-ui-content-muted mt-0.5">
-                          {item.harassmentCount > 0 && (
-                            <span className="inline-flex items-center gap-0.5">
-                              <CategoryIcon section="harassment" size="xs" /> {item.harassmentCount}
-                            </span>
-                          )}
-                          {item.rickshawCount > 0 && (
-                            <span className="inline-flex items-center gap-0.5">
-                              <CategoryIcon section="rickshaw" size="xs" /> {item.rickshawCount}
-                            </span>
-                          )}
-                          {item.extortionCount > 0 && (
-                            <span className="inline-flex items-center gap-0.5">
-                              <CategoryIcon section="extortion" size="xs" /> {item.extortionCount}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-[13px] font-bold text-ui-content-primary font-mono">
-                        {countDisplay}
-                      </span>
-                      <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+              {/* Desktop / Tablet District List (>=768px): Always full ranking, internal vertical scroll */}
+              <div className="hidden md:block space-y-1.5 md:max-h-[260px] md:overflow-y-auto md:pr-1">
+                {rankedDistricts.map(renderDistrictItem)}
+              </div>
+            </>
           ) : (
             <div className="py-6 text-center text-[13px] text-ui-content-muted space-y-1">
               <MapIcon name="map-pin" size="lg" className="mx-auto text-ui-content-muted" />
@@ -374,9 +384,9 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         </div>
       )}
 
-      {/* Show All / Less Toggle for District List */}
+      {/* Show All / Less Toggle for District List (Mobile only, <768px) */}
       {!isDistrictSelected && rankedDistricts.length > 5 && (
-        <div className="pt-2 border-t border-ui-stroke-subtle">
+        <div className="pt-2 border-t border-ui-stroke-subtle md:hidden">
           <button
             type="button"
             aria-expanded={showAllDistricts}
