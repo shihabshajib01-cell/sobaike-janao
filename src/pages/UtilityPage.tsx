@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AlertCircle, Info } from 'lucide-react';
-import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -15,8 +14,7 @@ import { useApp } from '../context/AppContext';
 
 export const UtilityPage: React.FC = () => {
   const { language, openReportComposer } = useApp();
-  const { getFeedSubcategories, getSegment } = useTaxonomy();
-  const config = getSegment('load_shedding') || SECTIONS.load_shedding;
+  const { getFeedSubcategories } = useTaxonomy();
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -66,10 +64,10 @@ export const UtilityPage: React.FC = () => {
         slides={[
           {
             id: 'utility-primary',
-            titleBn: config.nameBn,
-            titleEn: config.nameEn,
-            descriptionBn: config.descriptionBn,
-            descriptionEn: config.descriptionEn,
+            titleBn: 'ইউটিলিটি সমস্যা',
+            titleEn: 'Utility Issues',
+            descriptionBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা জানান।',
+            descriptionEn: 'Report power, gas or billing issues.',
             illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.png',
             action: {
               labelBn: 'প্রতিবেদন জমা দিন',
