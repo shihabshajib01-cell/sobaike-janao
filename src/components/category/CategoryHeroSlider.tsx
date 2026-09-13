@@ -216,52 +216,50 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         className={`w-full rounded-2xl border p-4 sm:p-5 md:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 w-full">
-          {/* Copy Block */}
-          <div className="min-w-0 space-y-2 sm:space-y-2.5 text-center md:text-left z-10 md:col-start-1 md:row-start-1">
+        <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
+          {/* Left Text Content */}
+          <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
             <h1 className="type-h1 text-ui-content-primary tracking-tight">
               {language === 'bn' ? slide.titleBn : slide.titleEn}
             </h1>
-            <p className="type-body text-ui-content-secondary max-w-2xl mx-auto md:mx-0">
+            <p className="type-body text-ui-content-secondary max-w-2xl">
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
             </p>
+            {slide.action && (
+              <div className="pt-1.5 sm:pt-2">
+                <Button
+                  id={`${id}-cta-btn`}
+                  variant="primary"
+                  size="md"
+                  onClick={slide.action.onClick}
+                  style={{
+                    backgroundColor: `var(--sec-${sectionKey}-primary)`,
+                    color: `var(--sec-${sectionKey}-on-primary)`,
+                  }}
+                  className="w-full sm:w-auto shadow-xs"
+                >
+                  {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* Image Block */}
-          <div className="min-w-0 w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none md:col-start-2 md:row-start-1 md:row-span-2">
+          {/* Right Illustration Safe Area (Phase 1 Quiet Placeholder) */}
+          <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
             {slide.illustrationSrc ? (
               <img
                 src={slide.illustrationSrc}
                 alt=""
                 aria-hidden="true"
-                className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto"
+                className="w-full h-full max-h-[150px] sm:max-h-[170px] md:max-h-[190px] object-contain object-right"
               />
             ) : (
               <div
                 aria-hidden="true"
-                className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0 mx-auto md:ml-auto md:mr-0"
+                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
               />
             )}
           </div>
-
-          {/* CTA Block (if action exists) */}
-          {slide.action && (
-            <div className="w-full flex justify-center md:justify-start pt-1 sm:pt-1.5 md:pt-2 md:col-start-1 md:row-start-2">
-              <Button
-                id={`${id}-cta-btn`}
-                variant="primary"
-                size="md"
-                onClick={slide.action.onClick}
-                style={{
-                  backgroundColor: `var(--sec-${sectionKey}-primary)`,
-                  color: `var(--sec-${sectionKey}-on-primary)`,
-                }}
-                className="w-full sm:w-full md:w-auto shadow-xs"
-              >
-                {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
-              </Button>
-            </div>
-          )}
         </div>
       </section>
     );
@@ -315,9 +313,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               aria-hidden={!isActive}
               className="w-full shrink-0 p-4 sm:p-5 md:p-7 min-w-full"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 w-full">
-                {/* Copy Block */}
-                <div className="min-w-0 space-y-2 sm:space-y-2.5 text-center md:text-left z-10 md:col-start-1 md:row-start-1">
+              <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
+                {/* Left Text Content */}
+                <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
                   {index === 0 ? (
                     <h1 className="type-h1 text-ui-content-primary tracking-tight">
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
@@ -328,47 +326,46 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                     </h2>
                   )}
 
-                  <p className="type-body text-ui-content-secondary max-w-2xl mx-auto md:mx-0">
+                  <p className="type-body text-ui-content-secondary max-w-2xl">
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
                   </p>
+
+                  {slide.action && (
+                    <div className="pt-1.5 sm:pt-2">
+                      <Button
+                        id={`${id}-cta-btn-${index}`}
+                        variant="primary"
+                        size="md"
+                        tabIndex={isActive ? 0 : -1}
+                        onClick={slide.action.onClick}
+                        style={{
+                          backgroundColor: `var(--sec-${sectionKey}-primary)`,
+                          color: `var(--sec-${sectionKey}-on-primary)`,
+                        }}
+                        className="w-full sm:w-auto shadow-xs"
+                      >
+                        {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Image Block */}
-                <div className="min-w-0 w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none md:col-start-2 md:row-start-1 md:row-span-2">
+                {/* Right Illustration Safe Area */}
+                <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
                   {slide.illustrationSrc ? (
                     <img
                       src={slide.illustrationSrc}
                       alt=""
                       aria-hidden="true"
-                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto"
+                      className="w-full h-full max-h-[150px] sm:max-h-[170px] md:max-h-[190px] object-contain object-right"
                     />
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0 mx-auto md:ml-auto md:mr-0"
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
                     />
                   )}
                 </div>
-
-                {/* CTA Block */}
-                {slide.action && (
-                  <div className="w-full flex justify-center md:justify-start pt-1 sm:pt-1.5 md:pt-2 md:col-start-1 md:row-start-2">
-                    <Button
-                      id={`${id}-cta-btn-${index}`}
-                      variant="primary"
-                      size="md"
-                      tabIndex={isActive ? 0 : -1}
-                      onClick={slide.action.onClick}
-                      style={{
-                        backgroundColor: `var(--sec-${sectionKey}-primary)`,
-                        color: `var(--sec-${sectionKey}-on-primary)`,
-                      }}
-                      className="w-full sm:w-full md:w-auto shadow-xs"
-                    >
-                      {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
           );

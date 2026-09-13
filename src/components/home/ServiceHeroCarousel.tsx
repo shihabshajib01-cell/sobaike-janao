@@ -51,22 +51,22 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     {
       key: 'harassment',
       nameBn: 'হয়রানি ও নির্যাতন',
-      nameEn: 'Harassment & Abuse',
-      descBn: 'হয়রানি বা নির্যাতনের ঘটনা জানান।',
-      descEn: 'Report harassment or abusive incidents.',
+      nameEn: 'Harassment & abuse',
+      descBn: 'শারীরিক বা মানসিক নির্যাতন, নিপীড়ন ও অনলাইনে হেনস্তার তথ্য জানান।',
+      descEn: 'Report incidents of harassment, abuse, or safety violations.',
       primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
+      primaryCtaEn: 'Report issue',
       path: '/harassment',
       illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.png',
     },
     {
       key: 'rickshaw',
-      nameBn: 'ঝুঁকিপূর্ণ চার্জিং',
-      nameEn: 'Unsafe Charging',
-      descBn: 'অনিরাপদ ব্যাটারি চার্জিংয়ের তথ্য জানান।',
-      descEn: 'Report unsafe battery charging.',
+      nameBn: 'অবৈধ অটো চার্জিং',
+      nameEn: 'Illegal auto-rickshaw charging',
+      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।',
+      descEn: 'Share the location and details of illegal or unsafe charging stations.',
       primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
+      primaryCtaEn: 'Report issue',
       path: '/rickshaw',
       illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
     },
@@ -74,21 +74,21 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'extortion',
       nameBn: 'চাঁদাবাজি',
       nameEn: 'Extortion',
-      descBn: 'অবৈধ চাঁদা বা হুমকির তথ্য জানান।',
-      descEn: 'Report illegal demands or threats.',
+      descBn: 'দোকানপাট, পরিবহন বা এলাকায় অবৈধ চাঁদা দাবি ও হুমকির তথ্য জানান।',
+      descEn: 'Report extortion, illegal tolls, or coercive demands.',
       primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
+      primaryCtaEn: 'Report issue',
       path: '/extortion',
       illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.png',
     },
     {
       key: 'load_shedding',
-      nameBn: 'ইউটিলিটি সমস্যা',
-      nameEn: 'Utility Issues',
-      descBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা জানান।',
-      descEn: 'Report power, gas or billing issues.',
+      nameBn: SECTIONS.load_shedding.nameBn,
+      nameEn: SECTIONS.load_shedding.nameEn,
+      descBn: SECTIONS.load_shedding.descriptionBn,
+      descEn: SECTIONS.load_shedding.descriptionEn,
       primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
+      primaryCtaEn: 'Report issue',
       path: '/load-shedding',
       illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.png',
     },
@@ -317,51 +317,50 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 backgroundColor: `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 w-full">
-                {/* Copy Block */}
-                <div className="min-w-0 space-y-1.5 sm:space-y-2 text-center md:text-left z-10 md:col-start-1 md:row-start-1">
+              <div className="flex items-center justify-between gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
+                {/* Left Text Content */}
+                <div className="min-w-0 flex-1 space-y-1.5 sm:space-y-2 text-left z-10">
                   <h2 className="type-h2 text-ui-content-primary tracking-tight">
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
 
-                  <p className="type-body text-ui-content-secondary max-w-2xl mx-auto md:mx-0">
+                  <p className="type-body text-ui-content-secondary max-w-2xl">
                     {language === 'bn' ? slide.descBn : slide.descEn}
                   </p>
+
+                  <div className="pt-1.5 sm:pt-2">
+                    <Button
+                      id={`${id}-report-btn-${slide.key}`}
+                      variant="primary"
+                      size="md"
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => openReportComposer()}
+                      style={{
+                        backgroundColor: `var(--sec-${slide.key}-primary)`,
+                        color: `var(--sec-${slide.key}-on-primary)`,
+                      }}
+                      className="w-auto shadow-xs"
+                    >
+                      {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
+                    </Button>
+                  </div>
                 </div>
 
-                {/* Image Block */}
-                <div className="min-w-0 w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none md:col-start-2 md:row-start-1 md:row-span-2">
+                {/* Right Illustration Safe Area */}
+                <div className="shrink-0 w-24 min-[380px]:w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
                   {slide.illustrationSrc ? (
                     <img
                       src={slide.illustrationSrc}
                       alt=""
                       aria-hidden="true"
-                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto"
+                      className="w-full h-full max-h-[150px] sm:max-h-[170px] md:max-h-[190px] object-contain object-right"
                     />
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0 mx-auto md:ml-auto md:mr-0"
+                      className="w-16 h-16 min-[380px]:w-20 min-[380px]:h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
                     />
                   )}
-                </div>
-
-                {/* CTA Block */}
-                <div className="w-full flex justify-center md:justify-start pt-1 sm:pt-1.5 md:pt-2 md:col-start-1 md:row-start-2">
-                  <Button
-                    id={`${id}-report-btn-${slide.key}`}
-                    variant="primary"
-                    size="md"
-                    tabIndex={isActive ? 0 : -1}
-                    onClick={() => openReportComposer()}
-                    style={{
-                      backgroundColor: `var(--sec-${slide.key}-primary)`,
-                      color: `var(--sec-${slide.key}-on-primary)`,
-                    }}
-                    className="w-full sm:w-full md:w-auto shadow-xs"
-                  >
-                    {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
-                  </Button>
                 </div>
               </div>
             </div>

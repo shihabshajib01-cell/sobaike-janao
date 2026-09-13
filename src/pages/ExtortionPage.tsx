@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AlertCircle, PhoneCall } from 'lucide-react';
+import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -14,7 +15,8 @@ import { useApp } from '../context/AppContext';
 
 export const ExtortionPage: React.FC = () => {
   const { language } = useApp();
-  const { getFeedSubcategories } = useTaxonomy();
+  const { getFeedSubcategories, getSegment } = useTaxonomy();
+  const config = getSegment('extortion') || SECTIONS.extortion;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -64,10 +66,10 @@ export const ExtortionPage: React.FC = () => {
         slides={[
           {
             id: 'extortion-primary',
-            titleBn: 'চাঁদাবাজি',
-            titleEn: 'Extortion',
-            descriptionBn: 'অবৈধ চাঁদা বা হুমকির তথ্য জানান।',
-            descriptionEn: 'Report illegal demands or threats.',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
             illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.png',
           },
         ]}
