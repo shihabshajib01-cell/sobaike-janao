@@ -12,6 +12,7 @@ import { DistrictRankingPanel } from '../components/explore/DistrictRankingPanel
 import { RecentAreaReports } from '../components/explore/RecentAreaReports';
 import { ReportAnalyticsOverview } from '../components/explore/ReportAnalyticsOverview';
 import { ReportSubcategoryBreakdown } from '../components/explore/ReportSubcategoryBreakdown';
+import { ReportActivityTimeline } from '../components/explore/ReportActivityTimeline';
 import { ReportGeographicBreakdown } from '../components/explore/ReportGeographicBreakdown';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
@@ -431,6 +432,11 @@ export const ExplorePage: React.FC = () => {
               />
 
               <ReportSubcategoryBreakdown
+                reports={filteredReports}
+                language={language}
+              />
+
+              <ReportActivityTimeline
                 reports={filteredReports}
                 language={language}
               />
