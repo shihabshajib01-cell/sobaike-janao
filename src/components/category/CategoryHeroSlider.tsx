@@ -16,6 +16,7 @@ export interface CategoryHeroSlide {
   desktopDescriptionEn?: string;
   illustrationSrc?: string;
   desktopMediaPosition?: string;
+  desktopMediaScale?: number;
   action?: {
     labelBn: string;
     labelEn: string;
@@ -301,12 +302,29 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           {/* Right 50% Illustration Column */}
           <div className="w-full h-[150px] sm:h-[180px] md:h-auto lg:h-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none min-w-0 overflow-hidden">
             {slide.illustrationSrc ? (
-              <img
-                src={resolvePublicAsset(slide.illustrationSrc)}
-                alt=""
-                aria-hidden="true"
-                className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover lg:object-bottom mx-auto block"
-              />
+              (() => {
+                const resolvedDesktopMediaPosition =
+                  slide.desktopMediaPosition ??
+                  HERO_TOKENS.sections[sectionKey]?.desktopMediaPosition ??
+                  'center bottom';
+                const resolvedDesktopMediaScale =
+                  slide.desktopMediaScale ??
+                  HERO_TOKENS.sections[sectionKey]?.desktopMediaScale ??
+                  1;
+
+                return (
+                  <img
+                    src={resolvePublicAsset(slide.illustrationSrc)}
+                    alt=""
+                    aria-hidden="true"
+                    style={{
+                      '--hero-desktop-media-position': resolvedDesktopMediaPosition,
+                      '--hero-desktop-media-scale': resolvedDesktopMediaScale,
+                    } as React.CSSProperties}
+                    className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover hero-desktop-media-framed mx-auto block"
+                  />
+                );
+              })()
             ) : (
               <div
                 aria-hidden="true"
@@ -438,12 +456,29 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 {/* Right 50% Illustration Column */}
                 <div className="w-full h-[150px] sm:h-[180px] md:h-auto lg:h-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none min-w-0 overflow-hidden">
                   {slide.illustrationSrc ? (
-                    <img
-                      src={resolvePublicAsset(slide.illustrationSrc)}
-                      alt=""
-                      aria-hidden="true"
-                      className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover lg:object-bottom mx-auto block"
-                    />
+                    (() => {
+                      const resolvedDesktopMediaPosition =
+                        slide.desktopMediaPosition ??
+                        HERO_TOKENS.sections[sectionKey]?.desktopMediaPosition ??
+                        'center bottom';
+                      const resolvedDesktopMediaScale =
+                        slide.desktopMediaScale ??
+                        HERO_TOKENS.sections[sectionKey]?.desktopMediaScale ??
+                        1;
+
+                      return (
+                        <img
+                          src={resolvePublicAsset(slide.illustrationSrc)}
+                          alt=""
+                          aria-hidden="true"
+                          style={{
+                            '--hero-desktop-media-position': resolvedDesktopMediaPosition,
+                            '--hero-desktop-media-scale': resolvedDesktopMediaScale,
+                          } as React.CSSProperties}
+                          className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover hero-desktop-media-framed mx-auto block"
+                        />
+                      );
+                    })()
                   ) : (
                     <div
                       aria-hidden="true"

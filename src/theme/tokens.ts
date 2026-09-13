@@ -198,6 +198,7 @@ export interface HeroSectionTheme {
   ctaHover: string;
   ctaHoverText: string;
   desktopMediaPosition?: string;
+  desktopMediaScale?: number;
 }
 
 export const HERO_TOKENS = {
@@ -213,6 +214,7 @@ export const HERO_TOKENS = {
       ctaHover: '#B84A62',
       ctaHoverText: '#FFFFFF',
       desktopMediaPosition: 'center bottom',
+      desktopMediaScale: 1.05,
     },
     rickshaw: {
       background: '#E4F8EE',
@@ -221,6 +223,7 @@ export const HERO_TOKENS = {
       ctaHover: '#D9822B',
       ctaHoverText: '#050505',
       desktopMediaPosition: 'center bottom',
+      desktopMediaScale: 1.0,
     },
     extortion: {
       background: '#FEEADE',
@@ -229,6 +232,7 @@ export const HERO_TOKENS = {
       ctaHover: '#4F5D95',
       ctaHoverText: '#FFFFFF',
       desktopMediaPosition: 'center bottom',
+      desktopMediaScale: 1.0,
     },
     load_shedding: {
       background: '#FEEDD4',
@@ -237,6 +241,7 @@ export const HERO_TOKENS = {
       ctaHover: '#0D9488',
       ctaHoverText: '#050505',
       desktopMediaPosition: 'center bottom',
+      desktopMediaScale: 1.0,
     },
   } satisfies Record<SectionKey, HeroSectionTheme>,
 };
