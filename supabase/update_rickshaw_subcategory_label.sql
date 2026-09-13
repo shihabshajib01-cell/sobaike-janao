@@ -3,7 +3,7 @@
 
 UPDATE public.subcategories
 SET
-  name_en = 'Illegal auto-rickshaw charging',
-  name_bn = 'অবৈধ অটো চার্জিং'
+  name_en = 'Illegal Charging Station',
+  name_bn = 'অবৈধ চার্জিং স্টেশন'
 WHERE id = 'charging-station-location'
   AND segment_id = 'rickshaw';

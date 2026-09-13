@@ -90,7 +90,7 @@ export const ExtortionPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'প্রতিবেদনের ধরন' : 'Report type'}
+              {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by subcategory'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'

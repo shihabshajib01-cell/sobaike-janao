@@ -68,15 +68,15 @@ export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> 
   },
   '/rickshaw': {
     bn: {
-      title: 'অবৈধ অটো চার্জিং রিপোর্ট করুন | সবাইকে জানাও',
-      description: 'অবৈধ বা ঝুঁকিপূর্ণ অটো চার্জিং স্টেশনের অবস্থান ও তথ্য জানান।',
+      title: 'অবৈধ চার্জিং স্টেশন প্রকাশ করুন | সবাইকে জানাও',
+      description: 'আবাসিক বা ঝুঁকিপূর্ণ এলাকায় অননুমোদিত চার্জিং স্টেশন ও অনিরাপদ সংযোগের তথ্য জানান।',
       robots: 'index, follow',
       ogType: 'website',
       ogSiteName: 'সবাইকে জানাও',
     },
     en: {
-      title: 'Report Illegal Auto-rickshaw Charging | Sobaike Janao',
-      description: 'Report the location and details of illegal or unsafe auto-rickshaw charging stations.',
+      title: 'Expose Unsafe Charging Stations | Sobaike Janao',
+      description: 'Report locations and hazards of unauthorized auto-rickshaw battery charging stations.',
       robots: 'index, follow',
       ogType: 'website',
       ogSiteName: 'Sobaike Janao',
@@ -100,14 +100,14 @@ export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> 
   },
   '/load-shedding': {
     bn: {
-      title: 'ইউটিলিটি সমস্যা | সবাইকে জানাও',
+      title: 'ইউটিলিটি সেবা অভিযোগ | সবাইকে জানাও',
       description: 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত সমস্যা দায়িত্বশীলভাবে জানান।',
       robots: 'index, follow',
       ogType: 'website',
       ogSiteName: 'সবাইকে জানাও',
     },
     en: {
-      title: 'Utility Issues | Sobaike Janao',
+      title: 'Utility Service Complaints | Sobaike Janao',
       description: 'Report load shedding, gas shortages, or excess electricity bill issues responsibly.',
       robots: 'index, follow',
       ogType: 'website',
