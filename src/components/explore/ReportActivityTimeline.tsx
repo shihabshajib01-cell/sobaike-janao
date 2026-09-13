@@ -121,8 +121,8 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
         latestTimestamp = time;
       }
 
-      const year = d.getFullYear();
-      const month = d.getMonth();
+      const year = d.getUTCFullYear();
+      const month = d.getUTCMonth();
       const key = `${year}-${String(month + 1).padStart(2, '0')}`;
       validReportKeys.push(key);
     });
@@ -138,16 +138,16 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
 
     // 2. Determine anchor month and build 6 consecutive calendar months
     const latestDate = new Date(latestTimestamp);
-    const anchorYear = latestDate.getFullYear();
-    const anchorMonth = latestDate.getMonth();
+    const anchorYear = latestDate.getUTCFullYear();
+    const anchorMonth = latestDate.getUTCMonth();
 
     const sequence: MonthBucket[] = [];
     const countMap = new Map<string, number>();
 
     for (let offset = 5; offset >= 0; offset--) {
-      const targetDate = new Date(anchorYear, anchorMonth - offset, 1);
-      const year = targetDate.getFullYear();
-      const monthIndex = targetDate.getMonth();
+      const targetDate = new Date(Date.UTC(anchorYear, anchorMonth - offset, 1));
+      const year = targetDate.getUTCFullYear();
+      const monthIndex = targetDate.getUTCMonth();
       const key = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
 
       sequence.push({
