@@ -8,6 +8,7 @@ import {
 } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
 import { CategoryHeroBanner } from './CategoryHeroBanner';
+import { IconButton } from '../ui/IconButton';
 
 export interface CategoryHeroSlide {
   id: string;
@@ -337,23 +338,23 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
       </div>
 
       {/* Large-Desktop (>=1440px) / Fine-Pointer Hover Arrows */}
-      <button
-        type="button"
+      <IconButton
+        variant="outline"
+        size="md"
         onClick={handlePrev}
         aria-label={language === 'bn' ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
-        className="hero-slider-arrow hero-slider-arrow-prev"
-      >
-        <ChevronLeft aria-hidden="true" />
-      </button>
+        icon={<ChevronLeft aria-hidden="true" />}
+        className="hero-slider-arrow hero-slider-arrow-prev ui-radius-pill"
+      />
 
-      <button
-        type="button"
+      <IconButton
+        variant="outline"
+        size="md"
         onClick={handleNext}
         aria-label={language === 'bn' ? 'পরবর্তী স্লাইড' : 'Next slide'}
-        className="hero-slider-arrow hero-slider-arrow-next"
-      >
-        <ChevronRight aria-hidden="true" />
-      </button>
+        icon={<ChevronRight aria-hidden="true" />}
+        className="hero-slider-arrow hero-slider-arrow-next ui-radius-pill"
+      />
     </section>
   );
 };

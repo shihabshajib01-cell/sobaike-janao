@@ -126,7 +126,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
 
         {/* Tablet Short Description (768px - 1023px) */}
         <p
-          className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
+          className="hidden md:block lg:hidden type-body max-w-xl text-left"
           style={{ color: HERO_TOKENS.text.secondary }}
         >
           {language === 'bn' ? descriptionBn : descriptionEn}
@@ -134,7 +134,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
 
         {/* Desktop Long Description (>= 1024px) */}
         <p
-          className="hidden lg:block type-body max-w-xl"
+          className="hidden lg:block type-body max-w-xl text-left"
           style={{ color: HERO_TOKENS.text.secondary }}
         >
           {language === 'bn'
@@ -195,7 +195,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             size="md"
             tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
             onClick={action.onClick}
-            className="w-full shadow-none btn-hero-cta justify-center min-h-[44px]"
+            className="w-auto shadow-none btn-hero-cta justify-center min-h-[44px]"
             style={getHeroCtaStyle(sectionKey)}
           >
             {language === 'bn' ? action.labelBn : action.labelEn}

@@ -9,6 +9,7 @@ import {
 import { useApp, RoutePath } from '../../context/AppContext';
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 import { CANONICAL_BANNER_CONTENT } from '../../data/bannerContent';
+import { IconButton } from '../ui/IconButton';
 
 export interface ServiceSlide {
   key: SectionKey;
@@ -319,27 +320,27 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       {/* Large-Desktop (>=1440px) / Fine-Pointer Hover Arrows */}
       {isMultiSlide && (
         <>
-          <button
-            type="button"
+          <IconButton
+            variant="outline"
+            size="md"
             onClick={handlePrev}
             onFocus={() => setIsFocused(true)}
             onBlur={handleBlur}
             aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
-            className="hero-slider-arrow hero-slider-arrow-prev"
-          >
-            <ChevronLeft aria-hidden="true" />
-          </button>
+            icon={<ChevronLeft aria-hidden="true" />}
+            className="hero-slider-arrow hero-slider-arrow-prev ui-radius-pill"
+          />
 
-          <button
-            type="button"
+          <IconButton
+            variant="outline"
+            size="md"
             onClick={handleNext}
             onFocus={() => setIsFocused(true)}
             onBlur={handleBlur}
             aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
-            className="hero-slider-arrow hero-slider-arrow-next"
-          >
-            <ChevronRight aria-hidden="true" />
-          </button>
+            icon={<ChevronRight aria-hidden="true" />}
+            className="hero-slider-arrow hero-slider-arrow-next ui-radius-pill"
+          />
         </>
       )}
     </div>
