@@ -25,6 +25,7 @@ interface RankedDistrict {
   harassmentCount: number;
   rickshawCount: number;
   extortionCount: number;
+  loadSheddingCount: number;
 }
 
 export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
@@ -38,11 +39,20 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   const [showAllDistricts, setShowAllDistricts] = useState(false);
 
   // Compute district level aggregations
-  const { rankedDistricts, currentDistrictInfo, totalCount, totalHarass, totalRickshaw, totalExtortion } = useMemo(() => {
+  const {
+    rankedDistricts,
+    currentDistrictInfo,
+    totalCount,
+    totalHarass,
+    totalRickshaw,
+    totalExtortion,
+    totalLoadShedding,
+  } = useMemo(() => {
     const map = new Map<string, RankedDistrict>();
     let harass = 0;
     let rickshaw = 0;
     let extortion = 0;
+    let loadShedding = 0;
 
     reports.forEach((rep) => {
       if (selectedSection !== 'all' && rep.segment !== selectedSection) return;
@@ -50,6 +60,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       if (rep.segment === 'harassment') harass += 1;
       if (rep.segment === 'rickshaw') rickshaw += 1;
       if (rep.segment === 'extortion') extortion += 1;
+      if (rep.segment === 'load_shedding') loadShedding += 1;
 
       const dEn = rep.districtEn || '';
       const dBn = rep.districtBn || '';
@@ -80,6 +91,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           harassmentCount: 0,
           rickshawCount: 0,
           extortionCount: 0,
+          loadSheddingCount: 0,
         });
       }
 
@@ -88,6 +100,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       if (rep.segment === 'harassment') entry.harassmentCount += 1;
       if (rep.segment === 'rickshaw') entry.rickshawCount += 1;
       if (rep.segment === 'extortion') entry.extortionCount += 1;
+      if (rep.segment === 'load_shedding') entry.loadSheddingCount += 1;
     });
 
     const list = Array.from(map.values());
@@ -112,6 +125,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       totalHarass: harass,
       totalRickshaw: rickshaw,
       totalExtortion: extortion,
+      totalLoadShedding: loadShedding,
     };
   }, [reports, selectedSection, selectedDistrict]);
 
@@ -163,7 +177,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             <span className="text-[13px] md:text-[14px] font-bold text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
               {language === 'bn' ? item.nameBn : item.nameEn}
             </span>
-            <div className="flex items-center gap-2 text-[11px] md:text-[12px] text-ui-content-muted mt-0.5">
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] md:text-[12px] text-ui-content-muted mt-0.5">
               {item.harassmentCount > 0 && (
                 <span className="inline-flex items-center gap-0.5">
                   <CategoryIcon section="harassment" size="xs" /> {item.harassmentCount}
@@ -177,6 +191,11 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               {item.extortionCount > 0 && (
                 <span className="inline-flex items-center gap-0.5">
                   <CategoryIcon section="extortion" size="xs" /> {item.extortionCount}
+                </span>
+              )}
+              {item.loadSheddingCount > 0 && (
+                <span className="inline-flex items-center gap-0.5">
+                  <CategoryIcon section="load_shedding" size="xs" /> {item.loadSheddingCount}
                 </span>
               )}
             </div>
@@ -255,7 +274,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             <span className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary">
               {language === 'bn' ? 'সমস্যার ধরন অনুযায়ী:' : 'By category:'}
             </span>
-            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-1.5 sm:gap-2 text-center">
               {/* Harassment */}
               <div className="bg-[var(--sec-harassment-bg)] border border-[var(--sec-harassment-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
                 <CategoryIcon section="harassment" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-harassment-text)]" />
@@ -294,6 +313,19 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                     : currentDistrictInfo.extortionCount}
                 </div>
               </div>
+
+              {/* Utility */}
+              <div className="bg-[var(--sec-load_shedding-bg)] border border-[var(--sec-load_shedding-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
+                <CategoryIcon section="load_shedding" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-load_shedding-text)]" />
+                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-load_shedding-text)] truncate max-w-full">
+                  {language === 'bn' ? 'ইউটিলিটি' : 'Utility'}
+                </div>
+                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-load_shedding-text)] font-mono mt-0.5">
+                  {language === 'bn'
+                    ? toBanglaDigits(currentDistrictInfo.loadSheddingCount)
+                    : currentDistrictInfo.loadSheddingCount}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -308,10 +340,11 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
               <div className="space-y-2">
                 {activeDistrictReports.map((r) => (
-                  <div
+                  <button
                     key={r.id}
+                    type="button"
                     onClick={() => navigateTo(`/report-detail/${r.id}`)}
-                    className="p-2.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle cursor-pointer transition-colors text-left group"
+                    className="w-full p-2.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle cursor-pointer transition-colors text-left group min-h-[44px] hover:bg-ui-surface-hover hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus block"
                   >
                     <div className="text-[14px] font-bold text-ui-content-primary transition-colors line-clamp-1">
                       {language === 'bn' ? r.titleBn : r.titleEn}
@@ -322,7 +355,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                         {language === 'bn' ? 'বিস্তারিত' : 'Details'} →
                       </span>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -332,7 +365,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         /* Nationwide View: Top Active Districts and Overview */
         <div className="space-y-2.5 md:space-y-3">
           {/* Nationwide Category Totals */}
-          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center pb-2.5 md:pb-2 border-b border-ui-stroke-subtle">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-1.5 sm:gap-2 text-center pb-2.5 md:pb-2 border-b border-ui-stroke-subtle">
             <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
               <CategoryIcon section="harassment" size="xs" className="mb-0.5 text-ui-content-secondary" />
               <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'হয়রানি' : 'Harassment'}</div>
@@ -354,6 +387,14 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}</div>
               <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
                 {language === 'bn' ? toBanglaDigits(totalExtortion) : totalExtortion}
+              </div>
+            </div>
+
+            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
+              <CategoryIcon section="load_shedding" size="xs" className="mb-0.5 text-ui-content-secondary" />
+              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'ইউটিলিটি' : 'Utility'}</div>
+              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
+                {language === 'bn' ? toBanglaDigits(totalLoadShedding) : totalLoadShedding}
               </div>
             </div>
           </div>
