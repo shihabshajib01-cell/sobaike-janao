@@ -14,7 +14,7 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 
 export const HarassmentPage: React.FC = () => {
-  const { language } = useApp();
+  const { language, openReportComposer } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('harassment') || SECTIONS.harassment;
 
@@ -68,9 +68,16 @@ export const HarassmentPage: React.FC = () => {
             id: 'harassment-primary',
             titleBn: 'হয়রানি ও নির্যাতন',
             titleEn: 'Harassment & Abuse',
-            descriptionBn: 'হয়রানি বা নির্যাতনের ঘটনা জানান।',
-            descriptionEn: 'Report harassment or abusive incidents.',
+            descriptionBn: 'শারীরিক, মৌখিক বা অনলাইন নির্যাতন।',
+            descriptionEn: 'Physical, verbal, or online abuse.',
+            desktopDescriptionBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',
+            desktopDescriptionEn: 'Report physical, verbal, or online harassment, abuse, threats, or other unsafe behaviour.',
             illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.png',
+            action: {
+              labelBn: 'রিপোর্ট করুন',
+              labelEn: 'Report now',
+              onClick: () => openReportComposer('harassment'),
+            },
           },
         ]}
       />

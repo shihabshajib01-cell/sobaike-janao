@@ -14,7 +14,7 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 
 export const ExtortionPage: React.FC = () => {
-  const { language } = useApp();
+  const { language, openReportComposer } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('extortion') || SECTIONS.extortion;
 
@@ -68,9 +68,16 @@ export const ExtortionPage: React.FC = () => {
             id: 'extortion-primary',
             titleBn: 'চাঁদাবাজি',
             titleEn: 'Extortion',
-            descriptionBn: 'অবৈধ চাঁদা বা হুমকির তথ্য জানান।',
-            descriptionEn: 'Report illegal demands or threats.',
+            descriptionBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ দাবি।',
+            descriptionEn: 'Illegal demands, threats, or forced payments.',
+            desktopDescriptionBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',
+            desktopDescriptionEn: 'Report illegal demands for money, threats, coercion, or forced payments in shops, transport, or local areas.',
             illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.png',
+            action: {
+              labelBn: 'রিপোর্ট করুন',
+              labelEn: 'Report now',
+              onClick: () => openReportComposer('extortion'),
+            },
           },
         ]}
       />

@@ -5,7 +5,7 @@ import { useApp, RoutePath } from '../../context/AppContext';
 import { Button } from '../ui/Button';
 
 export interface ServiceSlide {
-  key: string;
+  key: SectionKey;
   isComingSoon?: boolean;
   serviceLabelBn?: string;
   serviceLabelEn?: string;
@@ -13,6 +13,8 @@ export interface ServiceSlide {
   nameEn: string;
   descBn: string;
   descEn: string;
+  desktopDescBn: string;
+  desktopDescEn: string;
   primaryCtaBn?: string;
   primaryCtaEn?: string;
   path: RoutePath;
@@ -49,11 +51,18 @@ const resolvePublicAsset = (src?: string) => {
   return `${normalizedBase}${normalizedSrc}`;
 };
 
-const HERO_ART_BACKGROUNDS: Record<string, string> = {
+const HERO_ART_BACKGROUNDS: Record<SectionKey, string> = {
   harassment: '#FEEAEC',
   rickshaw: '#E4F8EE',
   extortion: '#FEEADE',
   load_shedding: '#FEEDD4',
+};
+
+const HERO_CTA_THEMES: Record<SectionKey, string> = {
+  harassment: '!bg-[#B84A62] hover:!bg-[#9E384E] !text-white',
+  rickshaw: '!bg-[#D9822B] hover:!bg-[#B8681A] !text-[#050505]',
+  extortion: '!bg-[#4F5D95] hover:!bg-[#3E4A7A] !text-white',
+  load_shedding: '!bg-[#0D9488] hover:!bg-[#0E8A80] !text-[#050505]',
 };
 
 export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
@@ -78,8 +87,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'harassment',
       nameBn: 'হয়রানি ও নির্যাতন',
       nameEn: 'Harassment & Abuse',
-      descBn: 'হয়রানি বা নির্যাতনের ঘটনা জানান।',
-      descEn: 'Report harassment or abusive incidents.',
+      descBn: 'শারীরিক, মৌখিক বা অনলাইন নির্যাতন।',
+      descEn: 'Physical, verbal, or online abuse.',
+      desktopDescBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',
+      desktopDescEn: 'Report physical, verbal, or online harassment, abuse, threats, or other unsafe behaviour.',
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/harassment',
@@ -89,8 +100,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'rickshaw',
       nameBn: 'ঝুঁকিপূর্ণ চার্জিং',
       nameEn: 'Unsafe Charging',
-      descBn: 'অনিরাপদ ব্যাটারি চার্জিংয়ের তথ্য জানান।',
-      descEn: 'Report unsafe battery charging.',
+      descBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
+      descEn: 'Unsafe battery charging and risky connections.',
+      desktopDescBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
+      desktopDescEn: 'Report unsafe battery charging stations, exposed wiring, overloaded connections, or other electrical risks.',
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/rickshaw',
@@ -100,8 +113,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'extortion',
       nameBn: 'চাঁদাবাজি',
       nameEn: 'Extortion',
-      descBn: 'অবৈধ চাঁদা বা হুমকির তথ্য জানান।',
-      descEn: 'Report illegal demands or threats.',
+      descBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ দাবি।',
+      descEn: 'Illegal demands, threats, or forced payments.',
+      desktopDescBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',
+      desktopDescEn: 'Report illegal demands for money, threats, coercion, or forced payments in shops, transport, or local areas.',
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/extortion',
@@ -111,8 +126,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'load_shedding',
       nameBn: 'ইউটিলিটি সমস্যা',
       nameEn: 'Utility Issues',
-      descBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা জানান।',
-      descEn: 'Report power, gas or billing issues.',
+      descBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা।',
+      descEn: 'Power, gas, or billing problems.',
+      desktopDescBn: 'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ সরবরাহ সমস্যা বা ভুল ইউটিলিটি বিলের তথ্য জানান।',
+      desktopDescEn: 'Report load shedding, gas shortages, electricity supply problems, or incorrect utility billing.',
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/load-shedding',
@@ -339,26 +356,35 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className="w-full shrink-0 min-w-full p-4 sm:p-5 md:p-6"
+              className="w-full shrink-0 min-w-full p-4 sm:p-5 md:p-6 lg:p-7"
               style={{
                 backgroundColor: HERO_ART_BACKGROUNDS[slide.key] ?? `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-3 sm:gap-4 md:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6">
                 {/* Left Text Content */}
-                <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-1.5 sm:space-y-2 text-center md:text-left z-10">
+                <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10">
                   <h2
-                    className="type-h2 tracking-tight"
+                    className="type-h1 tracking-tight"
                     style={{ color: '#102A43' }}
                   >
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
 
+                  {/* Tablet Short Description */}
                   <p
-                    className="type-body max-w-2xl mx-auto md:mx-0"
-                    style={{ color: '#667085' }}
+                    className="hidden md:block lg:hidden type-body max-w-2xl mx-auto md:mx-0"
+                    style={{ color: '#596579' }}
                   >
                     {language === 'bn' ? slide.descBn : slide.descEn}
+                  </p>
+
+                  {/* Desktop Long Description */}
+                  <p
+                    className="hidden lg:block type-body max-w-2xl mx-auto md:mx-0"
+                    style={{ color: '#596579' }}
+                  >
+                    {language === 'bn' ? slide.desktopDescBn : slide.desktopDescEn}
                   </p>
                 </div>
 
@@ -369,12 +395,12 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                       src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
-                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto block"
+                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] lg:max-h-[220px] object-contain object-center md:object-right mx-auto block"
                     />
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-16 h-16 min-[380px]:w-20 min-[380px]:h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
                     />
                   )}
                 </div>
@@ -386,12 +412,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     variant="primary"
                     size="md"
                     tabIndex={isActive ? 0 : -1}
-                    onClick={() => openReportComposer()}
-                    style={{
-                      backgroundColor: `var(--sec-${slide.key}-primary)`,
-                      color: `var(--sec-${slide.key}-on-primary)`,
-                    }}
-                    className="w-full md:w-auto shadow-xs"
+                    onClick={() => openReportComposer(slide.key)}
+                    className={`w-full md:w-auto shadow-xs ${HERO_CTA_THEMES[slide.key] || ''}`}
                   >
                     {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
                   </Button>

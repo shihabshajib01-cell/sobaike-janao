@@ -13,7 +13,7 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 
 export const RickshawPage: React.FC = () => {
-  const { language } = useApp();
+  const { language, openReportComposer } = useApp();
   const { getSegment } = useTaxonomy();
   const config = getSegment('rickshaw') || SECTIONS.rickshaw;
 
@@ -63,9 +63,16 @@ export const RickshawPage: React.FC = () => {
             id: 'rickshaw-primary',
             titleBn: 'ঝুঁকিপূর্ণ চার্জিং',
             titleEn: 'Unsafe Charging',
-            descriptionBn: 'অনিরাপদ ব্যাটারি চার্জিংয়ের তথ্য জানান।',
-            descriptionEn: 'Report unsafe battery charging.',
+            descriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
+            descriptionEn: 'Unsafe battery charging and risky connections.',
+            desktopDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
+            desktopDescriptionEn: 'Report unsafe battery charging stations, exposed wiring, overloaded connections, or other electrical risks.',
             illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
+            action: {
+              labelBn: 'রিপোর্ট করুন',
+              labelEn: 'Report now',
+              onClick: () => openReportComposer('rickshaw'),
+            },
           },
         ]}
       />
