@@ -3,13 +3,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   SectionKey,
   HERO_TOKENS,
-  HERO_SLIDER_TOKENS,
   HERO_SLIDER_BEHAVIOR,
-  getHeroCtaStyle,
   getHeroSliderCssVars,
 } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { Button } from '../ui/Button';
+import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 
 export interface ServiceSlide {
   key: SectionKey;
@@ -43,25 +41,6 @@ export interface ServiceHeroCarouselProps {
 }
 
 const AUTOPLAY_INTERVAL = HERO_SLIDER_BEHAVIOR.autoplayIntervalMs;
-
-const resolvePublicAsset = (src?: string) => {
-  if (!src) return src;
-
-  if (
-    src.startsWith('http://') ||
-    src.startsWith('https://') ||
-    src.startsWith('data:') ||
-    src.startsWith('blob:')
-  ) {
-    return src;
-  }
-
-  const base = import.meta.env.BASE_URL || './';
-  const normalizedBase = base.endsWith('/') ? base : `${base}/`;
-  const normalizedSrc = src.replace(/^\/+/, '');
-
-  return `${normalizedBase}${normalizedSrc}`;
-};
 
 export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   id = 'home-service-carousel',
@@ -372,98 +351,30 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className="hero-slider-grid">
-                {/* Left 50% Content Column */}
-                <div className="hero-slider-content">
-                  <h2
-                    className="type-h1 tracking-tight"
-                    style={{ color: HERO_TOKENS.text.primary }}
-                  >
-                    {language === 'bn' ? slide.nameBn : slide.nameEn}
-                  </h2>
-
-                  {/* Mobile Question */}
-                  {(slide.mobileDescBn || slide.mobileDescEn) && (
-                    <p
-                      className="block md:hidden type-body text-center max-w-md mx-auto"
-                      style={{ color: HERO_TOKENS.text.secondary }}
-                    >
-                      {language === 'bn' ? slide.mobileDescBn : slide.mobileDescEn}
-                    </p>
-                  )}
-
-                  {/* Tablet Short Description */}
-                  <p
-                    className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
-                    style={{ color: HERO_TOKENS.text.secondary }}
-                  >
-                    {language === 'bn' ? slide.descBn : slide.descEn}
-                  </p>
-
-                  {/* Desktop Long Description */}
-                  <p
-                    className="hidden lg:block type-body max-w-xl"
-                    style={{ color: HERO_TOKENS.text.secondary }}
-                  >
-                    {language === 'bn' ? slide.desktopDescBn : slide.desktopDescEn}
-                  </p>
-
-                  {/* CTA */}
-                  <div className="hero-slider-cta-row">
-                    <Button
-                      id={`${id}-report-btn-${slide.key}`}
-                      variant="outline"
-                      size="md"
-                      tabIndex={isActive ? 0 : -1}
-                      onClick={() => openReportComposer(slide.key)}
-                      className="w-auto shadow-none btn-hero-cta"
-                      style={getHeroCtaStyle(slide.key)}
-                    >
-                      {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Right 50% Illustration Column */}
-                <div className="hero-slider-media">
-                  {slide.illustrationSrc ? (
-                    (() => {
-                      const resolvedDesktopMediaPosition =
-                        slide.desktopMediaPosition ??
-                        HERO_TOKENS.sections[slide.key]?.desktopMediaPosition ??
-                        HERO_SLIDER_TOKENS.media.defaultDesktopPosition;
-                      const resolvedDesktopMediaScale =
-                        slide.desktopMediaScale ??
-                        HERO_TOKENS.sections[slide.key]?.desktopMediaScale ??
-                        HERO_SLIDER_TOKENS.media.defaultDesktopScale;
-                      const resolvedDesktopMediaTranslateY =
-                        slide.desktopMediaTranslateY ??
-                        HERO_TOKENS.sections[slide.key]?.desktopMediaTranslateY;
-
-                      return (
-                        <img
-                          src={resolvePublicAsset(slide.illustrationSrc)}
-                          alt=""
-                          aria-hidden="true"
-                          style={{
-                            '--hero-desktop-media-position': resolvedDesktopMediaPosition,
-                            '--hero-desktop-media-scale': resolvedDesktopMediaScale,
-                            ...(resolvedDesktopMediaTranslateY
-                              ? { '--hero-desktop-media-translate-y': resolvedDesktopMediaTranslateY }
-                              : {}),
-                          } as React.CSSProperties}
-                          className="hero-slider-image hero-desktop-media-framed"
-                        />
-                      );
-                    })()
-                  ) : (
-                    <div
-                      aria-hidden="true"
-                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
-                    />
-                  )}
-                </div>
-              </div>
+              <CategoryHeroBanner
+                section={slide.key}
+                titleBn={slide.nameBn}
+                titleEn={slide.nameEn}
+                mobileDescriptionBn={slide.mobileDescBn}
+                mobileDescriptionEn={slide.mobileDescEn}
+                descriptionBn={slide.descBn}
+                descriptionEn={slide.descEn}
+                desktopDescriptionBn={slide.desktopDescBn}
+                desktopDescriptionEn={slide.desktopDescEn}
+                illustrationSrc={slide.illustrationSrc}
+                desktopMediaPosition={slide.desktopMediaPosition}
+                desktopMediaScale={slide.desktopMediaScale}
+                desktopMediaTranslateY={slide.desktopMediaTranslateY}
+                action={{
+                  labelBn: slide.primaryCtaBn || (language === 'bn' ? 'রিপোর্ট করুন' : 'Report now'),
+                  labelEn: slide.primaryCtaEn || 'Report now',
+                  onClick: () => openReportComposer(slide.key),
+                }}
+                headingLevel="h2"
+                active={isActive}
+                ctaId={`${id}-report-btn-${slide.key}`}
+                ctaTabIndex={isActive ? 0 : -1}
+              />
             </div>
           );
         })}
