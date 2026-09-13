@@ -9,7 +9,6 @@ import { BottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
 import { ViewportDebugger } from '../debug/ViewportDebugger';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
-import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
 import { LocationConsentModal } from '../location/LocationConsentModal';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { HomePage } from '../../pages/HomePage';
@@ -42,26 +41,6 @@ const SubjectRouteWrapper: React.FC = () => {
   return <SubjectPage subjectId={id ? decodeURIComponent(id) : ''} />;
 };
 
-const RESPONSIBILITY_NOTICE_KEY = 'sobaike_responsibility_notice_v1';
-
-function hasAcceptedResponsibilityNotice(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    return localStorage.getItem(RESPONSIBILITY_NOTICE_KEY) === 'accepted';
-  } catch {
-    return false;
-  }
-}
-
-function setAcceptedResponsibilityNotice(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(RESPONSIBILITY_NOTICE_KEY, 'accepted');
-  } catch {
-    // Ignore private browsing / restricted storage errors
-  }
-}
-
 export const AppShell: React.FC = () => {
   const {
     language,
@@ -71,45 +50,22 @@ export const AppShell: React.FC = () => {
     navigateTo,
   } = useApp();
 
-  const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   useEffect(() => {
-    // Check if visitor has accepted the responsibility notice
-    const hasNoticeAccepted = hasAcceptedResponsibilityNotice();
-
-    if (!hasNoticeAccepted) {
-      // First visit: Show responsibility notice first.
-      // Do NOT trigger location modal or geolocation permission yet.
-      setIsFirstVisitNoticeOpen(true);
+    // Check if user has answered the first-visit location prompt
+    const choice = VisitorSessionService.getLocationChoice();
+    if (!choice) {
+      setIsLocationModalOpen(true);
     } else {
-      // Notice already accepted: proceed directly with location decision
-      const choice = VisitorSessionService.getLocationChoice();
-      if (!choice) {
-        setIsLocationModalOpen(true);
-      } else {
-        // If user previously granted consent, restore session & watch
-        VisitorSessionService.initReturningVisitor();
-      }
+      // If user previously granted consent, restore session & watch
+      VisitorSessionService.initReturningVisitor();
     }
 
     return () => {
       VisitorSessionService.stopLocationWatch();
     };
   }, []);
-
-  const handleAcknowledgeNotice = () => {
-    setAcceptedResponsibilityNotice();
-    setIsFirstVisitNoticeOpen(false);
-
-    // After notice is accepted, trigger the location decision
-    const choice = VisitorSessionService.getLocationChoice();
-    if (!choice) {
-      setIsLocationModalOpen(true);
-    } else {
-      VisitorSessionService.initReturningVisitor();
-    }
-  };
 
   return (
     <div className="min-h-screen bg-ui-page text-ui-content-primary flex flex-col">
@@ -209,16 +165,7 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      {/* 8. First-Visit Responsibility & Independence Notice Modal */}
-      <ErrorBoundary componentName="FirstVisitNoticeModal" silent>
-        <FirstVisitNoticeModal
-          isOpen={isFirstVisitNoticeOpen}
-          language={language}
-          onAcknowledge={handleAcknowledgeNotice}
-        />
-      </ErrorBoundary>
-
-      {/* 9. First-Visit Location Sharing Consent Modal */}
+      {/* 8. First-Visit Location Sharing Consent Modal */}
       <ErrorBoundary componentName="LocationConsentModal" silent>
         <LocationConsentModal
           isOpen={isLocationModalOpen}
@@ -227,7 +174,7 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      {/* 10. Dev-only Viewport Sizing Debugger */}
+      {/* 9. Dev-only Viewport Sizing Debugger */}
       {import.meta.env.DEV && <ViewportDebugger />}
     </div>
   );

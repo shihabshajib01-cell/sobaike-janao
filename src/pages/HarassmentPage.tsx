@@ -66,10 +66,10 @@ export const HarassmentPage: React.FC = () => {
         slides={[
           {
             id: 'harassment-primary',
-            titleBn: 'হয়রানি ও নির্যাতন',
-            titleEn: 'Harassment & Abuse',
-            descriptionBn: 'হয়রানি বা নির্যাতনের ঘটনা জানান।',
-            descriptionEn: 'Report harassment or abusive incidents.',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
             illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.png',
           },
         ]}

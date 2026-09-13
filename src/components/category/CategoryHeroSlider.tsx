@@ -27,6 +27,25 @@ export interface CategoryHeroSliderProps {
 
 const AUTOPLAY_INTERVAL = 35_000;
 
+const resolvePublicAsset = (src?: string) => {
+  if (!src) return src;
+
+  if (
+    src.startsWith('http://') ||
+    src.startsWith('https://') ||
+    src.startsWith('data:') ||
+    src.startsWith('blob:')
+  ) {
+    return src;
+  }
+
+  const base = import.meta.env.BASE_URL || './';
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`;
+  const normalizedSrc = src.replace(/^\/+/, '');
+
+  return `${normalizedBase}${normalizedSrc}`;
+};
+
 const HERO_ART_BACKGROUNDS: Record<string, string> = {
   harassment: '#FEEAEC',
   rickshaw: '#E4F8EE',
@@ -247,7 +266,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           <div className={`md:col-start-2 md:row-start-1 ${slide.action ? 'md:row-span-2' : ''} w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none`}>
             {slide.illustrationSrc ? (
               <img
-                src={slide.illustrationSrc}
+                src={resolvePublicAsset(slide.illustrationSrc)}
                 alt=""
                 aria-hidden="true"
                 className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto block"
@@ -365,7 +384,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 <div className={`md:col-start-2 md:row-start-1 ${slide.action ? 'md:row-span-2' : ''} w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none`}>
                   {slide.illustrationSrc ? (
                     <img
-                      src={slide.illustrationSrc}
+                      src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
                       className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto block"

@@ -61,10 +61,10 @@ export const RickshawPage: React.FC = () => {
         slides={[
           {
             id: 'rickshaw-primary',
-            titleBn: 'ঝুঁকিপূর্ণ চার্জিং',
-            titleEn: 'Unsafe Charging',
-            descriptionBn: 'অনিরাপদ ব্যাটারি চার্জিংয়ের তথ্য জানান।',
-            descriptionEn: 'Report unsafe battery charging.',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
             illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
           },
         ]}
