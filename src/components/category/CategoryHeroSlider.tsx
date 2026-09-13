@@ -253,12 +253,12 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     return (
       <section
         id={id}
-        className={`w-full rounded-2xl border px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:p-6 lg:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
+        className={`w-full rounded-2xl border px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:px-6 md:py-6 lg:px-8 lg:py-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
-          {/* Left Text Content */}
-          <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 text-center md:text-left z-10 pb-0 md:pb-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 lg:gap-8 min-h-[160px] md:min-h-[180px] lg:min-h-[200px]">
+          {/* Left 50% Content Column */}
+          <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left min-w-0 z-10 space-y-2 md:space-y-3">
             <h1
               className="type-h1 tracking-tight"
               style={{ color: '#102A43' }}
@@ -269,7 +269,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             {/* Mobile Question */}
             {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
               <p
-                className="block md:hidden type-body text-center max-w-md mx-auto mt-1.5 sm:mt-2"
+                className="block md:hidden type-body text-center max-w-md mx-auto"
                 style={{ color: '#596579' }}
               >
                 {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
@@ -278,7 +278,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
             {/* Tablet Short Description */}
             <p
-              className="hidden md:block lg:hidden type-body max-w-2xl mx-auto md:mx-0 mt-2"
+              className="hidden md:block lg:hidden type-body max-w-xl"
               style={{ color: '#596579' }}
             >
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
@@ -286,23 +286,38 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
             {/* Desktop Long Description */}
             <p
-              className="hidden lg:block type-body max-w-2xl mx-auto md:mx-0 mt-2"
+              className="hidden lg:block type-body max-w-xl"
               style={{ color: '#596579' }}
             >
               {language === 'bn'
                 ? (slide.desktopDescriptionBn || slide.descriptionBn)
                 : (slide.desktopDescriptionEn || slide.descriptionEn)}
             </p>
+
+            {/* CTA (if exists) */}
+            {slide.action && (
+              <div className="pt-2 sm:pt-2.5 md:pt-1 w-full flex justify-center md:justify-start">
+                <Button
+                  id={`${id}-cta-btn`}
+                  variant="outline"
+                  size="md"
+                  onClick={slide.action.onClick}
+                  className={`w-auto shadow-none ${HERO_CTA_THEMES[sectionKey] || ''}`}
+                >
+                  {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* Right Illustration Safe Area - Edge to edge on mobile */}
-          <div className="order-3 md:order-none md:col-start-2 md:row-start-1 md:row-span-2 -mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none">
+          {/* Right 50% Illustration Column */}
+          <div className="-mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none h-full">
             {slide.illustrationSrc ? (
               <img
                 src={resolvePublicAsset(slide.illustrationSrc)}
                 alt=""
                 aria-hidden="true"
-                className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] lg:max-h-[220px] object-contain object-center md:object-right mx-auto block"
+                className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[200px] lg:max-h-[230px] object-contain object-center md:object-right mx-auto block"
               />
             ) : (
               <div
@@ -311,21 +326,6 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               />
             )}
           </div>
-
-          {/* CTA (if exists) */}
-          {slide.action && (
-            <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-3 sm:pt-3.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
-              <Button
-                id={`${id}-cta-btn`}
-                variant="outline"
-                size="md"
-                onClick={slide.action.onClick}
-                className={`w-auto shadow-none ${HERO_CTA_THEMES[sectionKey] || ''}`}
-              >
-                {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
-              </Button>
-            </div>
-          )}
         </div>
       </section>
     );
@@ -357,7 +357,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     >
       {/* Slides Track */}
       <div
-        className={`flex w-full ${
+        className={`flex w-full items-stretch ${
           prefersReducedMotion ? '' : 'transition-transform duration-500 ease-out'
         }`}
         style={{
@@ -377,14 +377,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className="w-full shrink-0 px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:p-6 lg:p-7 min-w-full"
+              className="w-full shrink-0 min-w-full px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:px-6 md:py-6 lg:px-8 lg:py-7"
               style={{
                 backgroundColor: heroBackground,
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
-                {/* Left Text Content */}
-                <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 text-center md:text-left z-10 pb-0 md:pb-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 lg:gap-8 min-h-[160px] md:min-h-[180px] lg:min-h-[200px]">
+                {/* Left 50% Content Column */}
+                <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left min-w-0 z-10 space-y-2 md:space-y-3">
                   {index === 0 ? (
                     <h1
                       className="type-h1 tracking-tight"
@@ -404,7 +404,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   {/* Mobile Question */}
                   {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
                     <p
-                      className="block md:hidden type-body text-center max-w-md mx-auto mt-1.5 sm:mt-2"
+                      className="block md:hidden type-body text-center max-w-md mx-auto"
                       style={{ color: '#596579' }}
                     >
                       {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
@@ -413,7 +413,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                   {/* Tablet Short Description */}
                   <p
-                    className="hidden md:block lg:hidden type-body max-w-2xl mx-auto md:mx-0 mt-2"
+                    className="hidden md:block lg:hidden type-body max-w-xl"
                     style={{ color: '#596579' }}
                   >
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
@@ -421,23 +421,39 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                   {/* Desktop Long Description */}
                   <p
-                    className="hidden lg:block type-body max-w-2xl mx-auto md:mx-0 mt-2"
+                    className="hidden lg:block type-body max-w-xl"
                     style={{ color: '#596579' }}
                   >
                     {language === 'bn'
                       ? (slide.desktopDescriptionBn || slide.descriptionBn)
                       : (slide.desktopDescriptionEn || slide.descriptionEn)}
                   </p>
+
+                  {/* CTA (if exists) */}
+                  {slide.action && (
+                    <div className="pt-2 sm:pt-2.5 md:pt-1 w-full flex justify-center md:justify-start">
+                      <Button
+                        id={`${id}-cta-btn-${index}`}
+                        variant="outline"
+                        size="md"
+                        tabIndex={isActive ? 0 : -1}
+                        onClick={slide.action.onClick}
+                        className={`w-auto shadow-none ${HERO_CTA_THEMES[sectionKey] || ''}`}
+                      >
+                        {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Right Illustration Safe Area - Edge to edge on mobile */}
-                <div className="order-3 md:order-none md:col-start-2 md:row-start-1 md:row-span-2 -mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none">
+                {/* Right 50% Illustration Column */}
+                <div className="-mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none h-full">
                   {slide.illustrationSrc ? (
                     <img
                       src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
-                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] lg:max-h-[220px] object-contain object-center md:object-right mx-auto block"
+                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[200px] lg:max-h-[230px] object-contain object-center md:object-right mx-auto block"
                     />
                   ) : (
                     <div
@@ -446,22 +462,6 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                     />
                   )}
                 </div>
-
-                {/* CTA (if exists) */}
-                {slide.action && (
-                  <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-3 sm:pt-3.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
-                    <Button
-                      id={`${id}-cta-btn-${index}`}
-                      variant="outline"
-                      size="md"
-                      tabIndex={isActive ? 0 : -1}
-                      onClick={slide.action.onClick}
-                      className={`w-auto shadow-none ${HERO_CTA_THEMES[sectionKey] || ''}`}
-                    >
-                      {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
           );

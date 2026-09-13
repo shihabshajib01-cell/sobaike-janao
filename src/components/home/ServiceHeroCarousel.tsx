@@ -366,14 +366,14 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className="w-full shrink-0 min-w-full px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:p-6 lg:p-7"
+              className="w-full shrink-0 min-w-full px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:px-6 md:py-6 lg:px-8 lg:py-7"
               style={{
                 backgroundColor: HERO_ART_BACKGROUNDS[slide.key] ?? `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
-                {/* Left Text Content */}
-                <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 text-center md:text-left z-10 pb-0 md:pb-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 lg:gap-8 min-h-[160px] md:min-h-[180px] lg:min-h-[200px]">
+                {/* Left 50% Content Column */}
+                <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left min-w-0 z-10 space-y-2 md:space-y-3">
                   <h2
                     className="type-h1 tracking-tight"
                     style={{ color: '#102A43' }}
@@ -384,7 +384,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   {/* Mobile Question */}
                   {(slide.mobileDescBn || slide.mobileDescEn) && (
                     <p
-                      className="block md:hidden type-body text-center max-w-md mx-auto mt-1.5 sm:mt-2"
+                      className="block md:hidden type-body text-center max-w-md mx-auto"
                       style={{ color: '#596579' }}
                     >
                       {language === 'bn' ? slide.mobileDescBn : slide.mobileDescEn}
@@ -393,7 +393,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
                   {/* Tablet Short Description */}
                   <p
-                    className="hidden md:block lg:hidden type-body max-w-2xl mx-auto md:mx-0 mt-2"
+                    className="hidden md:block lg:hidden type-body max-w-xl"
                     style={{ color: '#596579' }}
                   >
                     {language === 'bn' ? slide.descBn : slide.descEn}
@@ -401,21 +401,35 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
                   {/* Desktop Long Description */}
                   <p
-                    className="hidden lg:block type-body max-w-2xl mx-auto md:mx-0 mt-2"
+                    className="hidden lg:block type-body max-w-xl"
                     style={{ color: '#596579' }}
                   >
                     {language === 'bn' ? slide.desktopDescBn : slide.desktopDescEn}
                   </p>
+
+                  {/* CTA */}
+                  <div className="pt-2 sm:pt-2.5 md:pt-1 w-full flex justify-center md:justify-start">
+                    <Button
+                      id={`${id}-report-btn-${slide.key}`}
+                      variant="outline"
+                      size="md"
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => openReportComposer(slide.key)}
+                      className={`w-auto shadow-none ${HERO_CTA_THEMES[slide.key] || ''}`}
+                    >
+                      {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
+                    </Button>
+                  </div>
                 </div>
 
-                {/* Right Illustration Safe Area - Edge to edge on mobile */}
-                <div className="order-3 md:order-none md:col-start-2 md:row-start-1 md:row-span-2 -mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none">
+                {/* Right 50% Illustration Column */}
+                <div className="-mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none h-full">
                   {slide.illustrationSrc ? (
                     <img
                       src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
-                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] lg:max-h-[220px] object-contain object-center md:object-right mx-auto block"
+                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[200px] lg:max-h-[230px] object-contain object-center md:object-right mx-auto block"
                     />
                   ) : (
                     <div
@@ -423,20 +437,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                       className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
                     />
                   )}
-                </div>
-
-                {/* CTA */}
-                <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-3 sm:pt-3.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
-                  <Button
-                    id={`${id}-report-btn-${slide.key}`}
-                    variant="outline"
-                    size="md"
-                    tabIndex={isActive ? 0 : -1}
-                    onClick={() => openReportComposer(slide.key)}
-                    className={`w-auto shadow-none ${HERO_CTA_THEMES[slide.key] || ''}`}
-                  >
-                    {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
-                  </Button>
                 </div>
               </div>
             </div>

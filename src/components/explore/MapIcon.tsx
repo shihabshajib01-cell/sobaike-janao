@@ -29,6 +29,8 @@ import {
   HeartHandshake,
   ShieldAlert,
   Building2,
+  Flame,
+  FileText,
 } from 'lucide-react';
 import { EvStationIcon } from '../branding/EvStationIcon';
 
@@ -64,7 +66,9 @@ export type MapIconName =
   | 'building'
   | 'harassment'
   | 'rickshaw'
-  | 'extortion';
+  | 'extortion'
+  | 'flame'
+  | 'file-text';
 
 export type MapIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -110,6 +114,8 @@ const MAP_ICON_REGISTRY: Record<MapIconName, LucideIcon | React.ComponentType<an
   harassment: HeartHandshake,
   rickshaw: EvStationIcon,
   extortion: ShieldAlert,
+  flame: Flame,
+  'file-text': FileText,
 };
 
 const MAP_SIZE_MAP: Record<MapIconSize, string> = {

@@ -1,13 +1,17 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import L from 'leaflet';
+// Ensure global Leaflet is set before leaflet.heat evaluates in browser
+if (typeof window !== 'undefined' && !(window as any).L) {
+  (window as any).L = L;
+}
+import 'leaflet.heat';
+
 import { ReportItem } from '../../types/report';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
 import { BANGLADESH_DISTRICTS, DistrictInfo } from '../../data/districts';
-import { useApp } from '../../context/AppContext';
 import { toBanglaDigits } from '../../utils/formatters';
-import { FeatureIcon } from '../branding/FeatureIcon';
-import { CategoryBadge } from '../ui/CategoryBadge';
 import { MapIcon } from './MapIcon';
+import { HeatmapLegend } from './HeatmapLegend';
 
 export interface PublicIncidentMapProps {
   reports: ReportItem[];
@@ -15,7 +19,7 @@ export interface PublicIncidentMapProps {
   selectedSection: SectionKey | 'all';
   selectedDistrict: string;
   onSelectDistrict: (district: string) => void;
-  onCenterChange?: (district: string) => void;
+  onResetFilters?: () => void;
 }
 
 const BANGLADESH_CENTER: [number, number] = [23.8103, 90.4125];
@@ -27,98 +31,113 @@ const BANGLADESH_BOUNDS: L.LatLngBoundsExpression = [
 export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   reports,
   language,
-  selectedSection,
   selectedDistrict,
   onSelectDistrict,
+  onResetFilters,
 }) => {
-  const { navigateTo } = useApp();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const heatLayerRef = useRef<L.HeatLayer | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
-  const [activeReport, setActiveReport] = useState<ReportItem | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
 
-  // Group reports by district to compute district clusters and coordinates
-  const { mappedPoints, districtClusters } = useMemo(() => {
-    const points: Array<{
-      report: ReportItem;
-      lat: number;
-      lng: number;
-      district: DistrictInfo | null;
-    }> = [];
+  // 1. Filter reports with real incident coordinates
+  const reportsWithRealCoords = useMemo(() => {
+    return reports.filter((r) => {
+      if (!r.coordinates) return false;
+      const lat = r.coordinates.lat;
+      const lng = r.coordinates.lng;
+      return (
+        typeof lat === 'number' &&
+        typeof lng === 'number' &&
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat >= 20.0 &&
+        lat <= 27.5 &&
+        lng >= 88.0 &&
+        lng <= 93.0
+      );
+    });
+  }, [reports]);
 
-    const clusterMap = new Map<
-      string,
-      {
-        district: DistrictInfo;
-        count: number;
-        harassmentCount: number;
-        rickshawCount: number;
-        extortionCount: number;
-        reports: ReportItem[];
-      }
-    >();
+  // 2. Aggregate reports by district for fallback & top district insight
+  const { districtCounts, topDistrict, totalMappedInDistricts } = useMemo(() => {
+    const map = new Map<string, { district: DistrictInfo; count: number }>();
+    let mappedInDist = 0;
 
-    // Map each report to district coordinates
-    reports.forEach((rep, idx) => {
-      if (selectedSection !== 'all' && rep.segment !== selectedSection) return;
-
+    reports.forEach((rep) => {
       const dEn = (rep.districtEn || '').toLowerCase().trim();
       const dBn = (rep.districtBn || '').trim();
-
-      const foundDistrict = BANGLADESH_DISTRICTS.find(
+      const found = BANGLADESH_DISTRICTS.find(
         (d) =>
           d.nameEn.toLowerCase() === dEn ||
           d.nameBn === dBn ||
           d.id === dEn
       );
-
-      if (foundDistrict) {
-        // Add subtle deterministic jitter so multiple reports in the same district don't overlap exactly
-        const seed = (idx * 17 + rep.id.charCodeAt(0)) % 100;
-        const jitterLat = ((seed % 10) - 5) * 0.012;
-        const jitterLng = (((seed / 10) | 0) - 5) * 0.012;
-
-        const lat = foundDistrict.lat + jitterLat;
-        const lng = foundDistrict.lng + jitterLng;
-
-        points.push({
-          report: rep,
-          lat,
-          lng,
-          district: foundDistrict,
-        });
-
-        // Update district cluster
-        if (!clusterMap.has(foundDistrict.id)) {
-          clusterMap.set(foundDistrict.id, {
-            district: foundDistrict,
-            count: 0,
-            harassmentCount: 0,
-            rickshawCount: 0,
-            extortionCount: 0,
-            reports: [],
-          });
+      if (found) {
+        mappedInDist += 1;
+        if (!map.has(found.id)) {
+          map.set(found.id, { district: found, count: 0 });
         }
-        const cl = clusterMap.get(foundDistrict.id)!;
-        cl.count += 1;
-        if (rep.segment === 'harassment') cl.harassmentCount += 1;
-        if (rep.segment === 'rickshaw') cl.rickshawCount += 1;
-        if (rep.segment === 'extortion') cl.extortionCount += 1;
-        cl.reports.push(rep);
+        map.get(found.id)!.count += 1;
       }
     });
 
-    return {
-      mappedPoints: points,
-      districtClusters: Array.from(clusterMap.values()),
-    };
-  }, [reports, selectedSection]);
+    const list = Array.from(map.values());
+    list.sort((a, b) => b.count - a.count);
 
-  // Determine current theme for tiles
-  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+    return {
+      districtCounts: list,
+      topDistrict: list.length > 0 ? list[0].district : null,
+      totalMappedInDistricts: mappedInDist,
+    };
+  }, [reports]);
+
+  // 3. Determine resolution mode: 'incident' (real coords) vs 'district' (fallback)
+  const hasRealCoords = reportsWithRealCoords.length > 0;
+  const isDistrictFallback = !hasRealCoords && reports.length > 0;
+
+  const totalReportsCount = reports.length;
+  const mappedCount = hasRealCoords
+    ? reportsWithRealCoords.length
+    : isDistrictFallback
+    ? totalMappedInDistricts
+    : 0;
+
+  // 4. Compute heat points and max intensity
+  const { heatPoints, maxHeatWeight } = useMemo(() => {
+    if (hasRealCoords) {
+      // Case 1: Build heat layer ONLY from real incident coordinates (base weight = 1)
+      // DO NOT mix district centers into this layer
+      const pts: Array<[number, number, number]> = reportsWithRealCoords.map((r) => [
+        r.coordinates!.lat,
+        r.coordinates!.lng,
+        1,
+      ]);
+      const maxVal = Math.max(2, Math.min(8, Math.ceil(reportsWithRealCoords.length / 5)));
+      return { heatPoints: pts, maxHeatWeight: maxVal };
+    }
+
+    if (isDistrictFallback) {
+      // Case 2: District-level fallback heatmap (ONE point per district, weighted by count)
+      // NO jitter, NO fake per-report markers
+      const pts: Array<[number, number, number]> = districtCounts.map((dc) => [
+        dc.district.lat,
+        dc.district.lng,
+        dc.count,
+      ]);
+      const maxVal = districtCounts.length > 0 ? Math.max(...districtCounts.map((dc) => dc.count)) : 1;
+      return { heatPoints: pts, maxHeatWeight: Math.max(maxVal, 2) };
+    }
+
+    return { heatPoints: [], maxHeatWeight: 1 };
+  }, [hasRealCoords, isDistrictFallback, reportsWithRealCoords, districtCounts]);
+
+  // Check dark mode
+  const isDarkMode =
+    typeof document !== 'undefined' &&
+    document.documentElement.classList.contains('dark');
 
   // Initialize Map
   useEffect(() => {
@@ -134,108 +153,72 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         [27.5, 94.0],
       ],
       maxBoundsViscosity: 0.85,
-      zoomControl: false, // We use custom accessible zoom controls
+      zoomControl: false,
       attributionControl: true,
     });
 
-    // Use high-contrast clean tiles
     const tileUrl = isDarkMode
       ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
       : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
     const tileLayer = L.tileLayer(tileUrl, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19,
     }).addTo(map);
 
     tileLayerRef.current = tileLayer;
-
-    const markersLayer = L.layerGroup().addTo(map);
-    markersLayerRef.current = markersLayer;
     mapInstanceRef.current = map;
-
     setIsMapReady(true);
 
-    // Clean up on unmount
     return () => {
+      if (heatLayerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(heatLayerRef.current);
+        heatLayerRef.current = null;
+      }
       map.remove();
       mapInstanceRef.current = null;
-      markersLayerRef.current = null;
       tileLayerRef.current = null;
     };
   }, [isDarkMode]);
 
-  // Update Markers whenever mappedPoints or selectedDistrict changes
+  // Update Heatmap Layer whenever heatPoints change
   useEffect(() => {
-    if (!mapInstanceRef.current || !markersLayerRef.current || !isMapReady) return;
+    if (!mapInstanceRef.current || !isMapReady) return;
 
-    const markersLayer = markersLayerRef.current;
-    markersLayer.clearLayers();
+    const map = mapInstanceRef.current;
 
-    mappedPoints.forEach((pt) => {
-      const isSelected = activeReport?.id === pt.report.id;
-      const secConf = SECTIONS[pt.report.segment];
-      const color = `var(--sec-${pt.report.segment}-primary, ${secConf.primaryColor})`;
-      const strokeColor = pt.report.segment === 'rickshaw' ? 'var(--sec-rickshaw-on-primary, #050505)' : 'var(--ui-text-inverse, #FFFFFF)';
+    // Clean up existing heat layer
+    if (heatLayerRef.current) {
+      map.removeLayer(heatLayerRef.current);
+      heatLayerRef.current = null;
+    }
 
-      // Icon SVG inside marker
-      const markerHtml = `
-        <div class="custom-leaflet-marker ${isSelected ? 'is-selected' : ''}" style="
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background-color: ${color};
-          border: 2.5px solid var(--ui-surface, #FFFFFF);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
-          ${isSelected ? 'transform: scale(1.3); box-shadow: 0 0 0 4px var(--ui-focus, rgba(58,124,165,0.45)); z-index: 1000;' : ''}
-        ">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            ${
-              pt.report.segment === 'harassment'
-                ? '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />'
-                : pt.report.segment === 'rickshaw'
-                ? '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />'
-                : '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
-            }
-          </svg>
-        </div>
-      `;
+    if (heatPoints.length > 0) {
+      try {
+        const heatLayer = (L as any).heatLayer(heatPoints, {
+          radius: hasRealCoords ? 24 : 32,
+          blur: hasRealCoords ? 15 : 22,
+          maxZoom: 14,
+          max: maxHeatWeight,
+          minOpacity: 0.4,
+          gradient: {
+            0.2: '#2563EB',
+            0.4: '#06B6D4',
+            0.6: '#10B981',
+            0.8: '#F59E0B',
+            1.0: '#EF4444',
+          },
+        });
 
-      const customIcon = L.divIcon({
-        html: markerHtml,
-        className: 'leaflet-custom-marker-wrapper',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -18],
-      });
-
-      const marker = L.marker([pt.lat, pt.lng], { icon: customIcon });
-
-      // Click handler
-      marker.on('click', () => {
-        setActiveReport(pt.report);
-        if (pt.district) {
-          onSelectDistrict(pt.district.nameEn);
-        }
-      });
-
-      // Hover tooltip
-      const title = language === 'bn' ? pt.report.titleBn : pt.report.titleEn;
-      const districtLabel = language === 'bn' ? pt.report.districtBn : pt.report.districtEn;
-      marker.bindTooltip(
-        `<div style="font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ui-content-primary);">${title}</div><div style="font-size: 11px; color: var(--ui-content-secondary);">${districtLabel}</div>`,
-        { direction: 'top', offset: [0, -12], opacity: 0.95 }
-      );
-
-      marker.addTo(markersLayer);
-    });
-  }, [mappedPoints, activeReport, isMapReady, language, onSelectDistrict]);
+        heatLayer.addTo(map);
+        heatLayerRef.current = heatLayer;
+      } catch (err) {
+        console.warn('[PublicIncidentMap] Heatmap layer creation error:', err);
+      }
+    }
+  }, [heatPoints, maxHeatWeight, hasRealCoords, isMapReady]);
 
   // Center on Selected District when changed from dropdown or district panel
   useEffect(() => {
@@ -278,155 +261,159 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       });
     }
     onSelectDistrict('all');
-    setActiveReport(null);
   };
 
+  // Generate accessible summary text
+  const accessibleSummary = useMemo(() => {
+    if (totalReportsCount === 0) {
+      return language === 'bn'
+        ? 'বর্তমান ফিল্টারে কোনো প্রতিবেদন নেই।'
+        : 'No reports match the current filters.';
+    }
+
+    const topDistrictName = topDistrict
+      ? language === 'bn'
+        ? topDistrict.nameBn
+        : topDistrict.nameEn
+      : null;
+
+    if (language === 'bn') {
+      const totalBn = toBanglaDigits(totalReportsCount);
+      const mappedBn = toBanglaDigits(mappedCount);
+      return topDistrictName
+        ? `${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে। সবচেয়ে বেশি প্রতিবেদন ${topDistrictName} জেলায়।`
+        : `${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে।`;
+    } else {
+      return topDistrictName
+        ? `${mappedCount} of ${totalReportsCount} reports are mapped. ${topDistrictName} has the most reports.`
+        : `${mappedCount} of ${totalReportsCount} reports are mapped.`;
+    }
+  }, [totalReportsCount, mappedCount, topDistrict, language]);
+
   return (
-    <div
-      id="public-incident-map-card"
-      className="relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col"
-      style={{ minHeight: '520px' }}
-    >
-      {/* Map Control Bar Top-Right */}
-      <div className="absolute top-3.5 right-3.5 z-[500] flex flex-col gap-1.5 shadow-sm">
-        <button
-          type="button"
-          onClick={handleZoomIn}
-          title={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
-          aria-label={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
-          className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
-        >
-          <MapIcon name="plus" size="sm" />
-        </button>
-
-        <button
-          type="button"
-          onClick={handleZoomOut}
-          title={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
-          aria-label={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
-          className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
-        >
-          <MapIcon name="minus" size="sm" />
-        </button>
-
-        <button
-          type="button"
-          onClick={handleResetView}
-          title={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
-          aria-label={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
-          className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
-        >
-          <MapIcon name="reset" size="sm" />
-        </button>
-      </div>
-
-      {/* Map Legend Overlay Top-Left */}
-      <div className="absolute top-3.5 left-3.5 z-[500] bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle rounded-xl p-2.5 shadow-2xs flex flex-col gap-1.5 text-[12px] max-w-[220px]">
-        <span className="font-bold text-ui-content-primary text-[11px] uppercase tracking-wider">
-          {language === 'bn' ? 'মানচিত্র নির্দেশিকা' : 'Map Legend'}
-        </span>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-harassment-primary)] border border-ui-surface shrink-0" />
-          <span className="text-ui-content-secondary truncate">
-            {language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-rickshaw-primary)] border border-ui-surface shrink-0" />
-          <span className="text-ui-content-secondary truncate">
-            {language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-[var(--sec-extortion-primary)] border border-ui-surface shrink-0" />
-          <span className="text-ui-content-secondary truncate">
-            {language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}
-          </span>
-        </div>
-      </div>
-
-      {/* Total Mapped Indicator Bottom-Left */}
-      <div className="absolute bottom-3.5 left-3.5 z-[500] bg-ui-surface backdrop-blur-xs border border-ui-stroke-subtle rounded-xl px-3 py-1.5 shadow-2xs flex items-center gap-2 text-[12px] font-bold text-ui-content-primary">
-        <MapIcon name="map-pin" size="xs" className="text-ui-content-primary" />
-        <span>
-          {language === 'bn'
-            ? `${toBanglaDigits(mappedPoints.length)}টি স্থান প্রদর্শিত`
-            : `${mappedPoints.length} locations mapped`}
-        </span>
-      </div>
-
-      {/* Real Leaflet Map Container */}
+    <div className="space-y-2">
+      {/* 1. Accessible Text Summary (Above map) */}
       <div
-        ref={mapContainerRef}
-        className="w-full flex-1 z-10"
-        style={{ minHeight: '520px', backgroundColor: 'var(--ui-surface-subtle)' }}
-      />
-
-      {/* Empty State Banner if 0 reports match */}
-      {mappedPoints.length === 0 && (
-        <div className="absolute inset-0 z-[550] bg-ui-surface backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center space-y-3">
-          <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
-          <h4 className="text-[17px] font-bold text-ui-content-primary">
-            {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No Mapped Reports'}
-          </h4>
-          <p className="text-[13px] text-ui-content-muted max-w-xs">
-            {language === 'bn'
-              ? 'বর্তমান ফিল্টারের অধীনে কোনো তথ্য নেই। ফিল্টার পরিবর্তন করে দেখুন।'
-              : 'No reports found for the selected category or area.'}
-          </p>
+        role="status"
+        aria-live="polite"
+        className="px-3.5 py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] text-ui-content-secondary flex items-center justify-between gap-2 shadow-2xs"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <MapIcon name="info" size="xs" className="text-ui-content-muted shrink-0" ariaHidden={true} />
+          <span className="truncate">{accessibleSummary}</span>
         </div>
-      )}
+      </div>
 
-      {/* Active Selected Report Details Popup Card (Desktop floating / Mobile bottom sheet) */}
-      {activeReport && (
-        <div className="absolute bottom-3.5 right-3.5 left-3.5 sm:left-auto sm:max-w-sm z-[600] bg-ui-surface border border-ui-stroke-default rounded-2xl p-4 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-start justify-between gap-2 pb-2 border-b border-ui-stroke-subtle">
-            <div className="flex items-center gap-2 min-w-0">
-              <CategoryBadge section={activeReport.segment} language={language} size="sm" />
-              <span className="text-[12px] font-mono text-ui-content-muted">#{activeReport.id}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setActiveReport(null)}
-              aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close card'}
-              className="text-ui-content-muted cursor-pointer p-1 rounded-lg"
-            >
-              <MapIcon name="close" size="xs" />
-            </button>
+      {/* 2. Map Container & Visual Overlays */}
+      <div
+        id="public-heatmap-card"
+        role="region"
+        aria-label={language === 'bn' ? 'প্রতিবেদন হিটম্যাপ' : 'Reports heatmap'}
+        className="relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col"
+        style={{ minHeight: '520px' }}
+      >
+        {/* Zoom & Recenter Controls (Top-Right) */}
+        <div className="absolute top-3.5 right-3.5 z-[500] flex flex-col gap-1.5 shadow-sm">
+          <button
+            type="button"
+            onClick={handleZoomIn}
+            title={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
+            aria-label={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
+            className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+          >
+            <MapIcon name="plus" size="sm" />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleZoomOut}
+            title={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
+            aria-label={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
+            className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+          >
+            <MapIcon name="minus" size="sm" />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResetView}
+            title={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
+            aria-label={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
+            className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+          >
+            <MapIcon name="reset" size="sm" />
+          </button>
+        </div>
+
+        {/* Heatmap Legend (Top-Left) */}
+        {totalReportsCount > 0 && (
+          <div className="absolute top-3.5 left-3.5 z-[500]">
+            <HeatmapLegend language={language} />
           </div>
+        )}
 
-          <div className="py-2.5 space-y-1.5 text-left">
-            <h4 className="text-[15px] font-bold text-ui-content-primary leading-snug line-clamp-2">
-              {language === 'bn' ? activeReport.titleBn : activeReport.titleEn}
+        {/* District-Level Fallback Notification (Top-Center / Below Top-Left on mobile) */}
+        {isDistrictFallback && (
+          <div className="absolute top-3.5 sm:top-3.5 left-3.5 sm:left-1/2 sm:-translate-x-1/2 mt-20 sm:mt-0 z-[500] max-w-[280px] sm:max-w-md bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-3 py-2 shadow-2xs text-left">
+            <div className="flex items-start gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0" />
+              <div className="space-y-0.5">
+                <div className="text-[12px] font-bold text-ui-content-primary">
+                  {language === 'bn' ? 'জেলা-ভিত্তিক হিটম্যাপ' : 'District-level heatmap'}
+                </div>
+                <div className="text-[11px] text-ui-content-secondary leading-snug">
+                  {language === 'bn'
+                    ? 'সুনির্দিষ্ট অবস্থান না থাকায় জেলা অনুযায়ী প্রতিবেদন দেখানো হচ্ছে।'
+                    : 'Reports are shown by district because precise incident locations are unavailable.'}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Map Coverage Indicator (Bottom-Left) */}
+        {totalReportsCount > 0 && (
+          <div className="absolute bottom-3.5 left-3.5 z-[500] bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-3 py-1.5 shadow-2xs flex items-center gap-2 text-[12px] font-medium text-ui-content-primary select-none">
+            <MapIcon name="map-pin" size="xs" className="text-ui-content-muted" ariaHidden={true} />
+            <span>
+              {language === 'bn'
+                ? `${toBanglaDigits(mappedCount)} / ${toBanglaDigits(totalReportsCount)} প্রতিবেদন মানচিত্রে দেখানো হয়েছে`
+                : `${mappedCount} of ${totalReportsCount} reports mapped`}
+            </span>
+          </div>
+        )}
+
+        {/* Real Leaflet Map Container */}
+        <div
+          ref={mapContainerRef}
+          className="w-full flex-1 z-10"
+          style={{ minHeight: '520px', backgroundColor: 'var(--ui-surface-subtle)' }}
+        />
+
+        {/* Empty State Banner if 0 reports match active filters */}
+        {totalReportsCount === 0 && (
+          <div className="absolute inset-0 z-[550] bg-ui-surface/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-3">
+            <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
+            <h4 className="text-[17px] font-bold text-ui-content-primary">
+              {language === 'bn' ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই' : 'No reports match these filters'}
             </h4>
-            <p className="text-[12px] text-ui-content-secondary line-clamp-2 leading-relaxed">
-              {language === 'bn' ? activeReport.shortDescriptionBn : activeReport.shortDescriptionEn}
+            <p className="text-[13px] text-ui-content-muted max-w-xs">
+              {language === 'bn'
+                ? 'বর্তমান অনুসন্ধান বা ফিল্টারের সাথে কোনো তথ্যের মিল পাওয়া যায়নি।'
+                : 'No reports found matching your current filter selection.'}
             </p>
-            <div className="flex items-center gap-3 text-[11px] text-ui-content-muted pt-1">
-              <span className="flex items-center gap-1 truncate">
-                <MapIcon name="map-pin" size="xs" />
-                <span className="truncate">
-                  {language === 'bn' ? activeReport.locationBn : activeReport.locationEn}
-                </span>
-              </span>
-              <span className="shrink-0">
-                {language === 'bn' ? activeReport.publishedDateBn : activeReport.publishedDateEn}
-              </span>
-            </div>
+            {onResetFilters && (
+              <button
+                type="button"
+                onClick={onResetFilters}
+                className="btn-primary-action px-4 py-2 rounded-xl text-[13px] font-semibold min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
+              </button>
+            )}
           </div>
-
-          <div className="pt-2 border-t border-ui-stroke-subtle flex items-center justify-end">
-            <button
-              type="button"
-              onClick={() => navigateTo(`/report-detail/${activeReport.id}`)}
-              className="btn-primary-action px-3.5 py-1.5 rounded-xl text-[13px] font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs hover:brightness-105"
-            >
-              <span>{language === 'bn' ? 'সম্পূর্ণ প্রতিবেদন দেখুন' : 'View Full Report'}</span>
-              <MapIcon name="arrow-right" size="xs" />
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

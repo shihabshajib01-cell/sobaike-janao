@@ -11,13 +11,14 @@ interface RecentAreaReportsProps {
   selectedDistrict: string;
   selectedSection: SectionKey | 'all';
   language: 'bn' | 'en';
+  onViewAllReports?: () => void;
 }
 
 export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
   reports,
   selectedDistrict,
-  selectedSection,
   language,
+  onViewAllReports,
 }) => {
   const { navigateTo } = useApp();
 
@@ -36,32 +37,41 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
     return selectedDistrict;
   };
 
+  const previewReports = reports.slice(0, 4);
+
   return (
-    <section id="recent-area-reports-section" className="space-y-3.5 pt-2">
+    <section id="recent-area-reports-section" className="space-y-3 pt-2">
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ui-stroke-subtle pb-2.5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-[18px] font-bold text-ui-content-primary tracking-tight">
-              {language === 'bn' ? 'সাম্প্রতিক প্রতিবেদন' : 'Recent reports'}
-            </h3>
-            <span className="text-[12px] font-bold px-2 py-0.5 rounded-full bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary">
-              {getDistrictNameDisplay()}
-            </span>
-          </div>
+        <div className="flex items-center gap-2">
+          <h3 className="text-[17px] md:text-[18px] font-bold text-ui-content-primary tracking-tight">
+            {language === 'bn' ? 'এলাকার সাম্প্রতিক প্রতিবেদন' : 'Recent area reports'}
+          </h3>
+          <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary">
+            {getDistrictNameDisplay()}
+          </span>
         </div>
 
-        <span className="text-[13px] font-medium text-ui-content-muted">
-          {language === 'bn'
-            ? `${toBanglaDigits(reports.length)}টি প্রতিবেদন`
-            : `${reports.length} reports`}
-        </span>
+        {reports.length > 4 && onViewAllReports && (
+          <button
+            type="button"
+            onClick={onViewAllReports}
+            className="text-[13px] font-bold text-ui-action-bg hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto min-h-[44px] sm:min-h-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
+          >
+            <span>
+              {language === 'bn'
+                ? `সবগুলো দেখুন (${toBanglaDigits(reports.length)})`
+                : `View all in Reports (${reports.length})`}
+            </span>
+            <MapIcon name="arrow-right" size="xs" />
+          </button>
+        )}
       </div>
 
-      {/* Reports Grid / Cards */}
-      {reports.length > 0 ? (
+      {/* Reports Grid (Compact 4-card preview) */}
+      {previewReports.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {reports.slice(0, 6).map((report) => {
+          {previewReports.map((report) => {
             const title = language === 'bn' ? report.titleBn : report.titleEn;
             const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
             const location = language === 'bn' ? report.locationBn : report.locationEn;
@@ -73,7 +83,6 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                 className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 transition-all duration-150 flex flex-col justify-between space-y-3 shadow-2xs hover:shadow-xs group text-left"
               >
                 <div className="space-y-2">
-                  {/* Category Badge */}
                   <div className="flex items-center justify-between gap-2">
                     <CategoryBadge
                       section={report.segment}
@@ -82,21 +91,18 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     />
                   </div>
 
-                  {/* Title */}
                   <h4
                     onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                    className="text-[15px] font-bold text-ui-content-primary transition-colors line-clamp-2 leading-snug cursor-pointer"
+                    className="text-[15px] font-bold text-ui-content-primary transition-colors line-clamp-2 leading-snug cursor-pointer hover:text-ui-accent"
                   >
                     {title}
                   </h4>
 
-                  {/* Short Description */}
                   <p className="text-[13px] text-ui-content-secondary line-clamp-2 leading-relaxed">
                     {shortDesc}
                   </p>
                 </div>
 
-                {/* Footer Meta & Action */}
                 <div className="pt-2.5 border-t border-ui-stroke-subtle flex items-center justify-between gap-2 text-[12px]">
                   <div className="flex items-center gap-3 text-ui-content-muted min-w-0">
                     <span className="flex items-center gap-1 truncate max-w-[160px]">
@@ -112,9 +118,9 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                   <button
                     type="button"
                     onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                    className="shrink-0 text-[12px] font-semibold text-ui-content-primary flex items-center gap-1 cursor-pointer transition-colors"
+                    className="shrink-0 text-[12px] font-semibold text-ui-content-primary flex items-center gap-1 cursor-pointer transition-colors hover:text-ui-accent min-h-[44px] sm:min-h-0 items-center"
                   >
-                    <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'View details'}</span>
+                    <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
                     <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </div>
@@ -123,7 +129,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
           })}
         </div>
       ) : (
-        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-8 text-center space-y-2">
+        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 text-center space-y-2">
           <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted mx-auto" />
           <h4 className="text-[15px] font-bold text-ui-content-primary">
             {language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই' : 'No reports in this area'}
@@ -140,4 +146,3 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
 };
 
 export default RecentAreaReports;
-

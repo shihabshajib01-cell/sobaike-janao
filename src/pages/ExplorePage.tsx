@@ -6,7 +6,7 @@ import { BANGLADESH_DISTRICTS, DIVISIONS } from '../data/districts';
 import { SECTIONS, SectionKey } from '../theme/tokens';
 import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton, MapExploreSkeleton } from '../components/ui/LoadingSkeleton';
-import { MapSectionHeader } from '../components/explore/MapSectionHeader';
+import { MapSectionHeader, ExploreViewMode } from '../components/explore/MapSectionHeader';
 import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
 import { DistrictRankingPanel } from '../components/explore/DistrictRankingPanel';
 import { RecentAreaReports } from '../components/explore/RecentAreaReports';
@@ -17,12 +17,12 @@ import { MapIcon } from '../components/explore/MapIcon';
 
 export const ExplorePage: React.FC = () => {
   const { language } = useApp();
-  const [viewMode, setViewMode] = useState<'feed' | 'map'>('map'); // Default to map exploration per user focus
+  // Default to 'heatmap' mode per product direction
+  const [viewMode, setViewMode] = useState<ExploreViewMode>('heatmap');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSection, setSelectedSection] = useState<SectionKey | 'all'>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
-  const [locationSearchQuery, setLocationSearchQuery] = useState('');
 
   const [allReports, setAllReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -46,7 +46,7 @@ export const ExplorePage: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Filtered reports
+  // Shared Filtered Reports - single source of truth for both Heatmap and Reports modes
   const filteredReports: ReportItem[] = useMemo(() => {
     return allReports.filter((r) => {
       // Section filter
@@ -72,7 +72,8 @@ export const ExplorePage: React.FC = () => {
       if (selectedDistrict !== 'all') {
         const matchDist =
           (r.districtEn || '').toLowerCase() === selectedDistrict.toLowerCase() ||
-          r.districtBn === selectedDistrict;
+          r.districtBn === selectedDistrict ||
+          (r.districtEn || '').toLowerCase() === selectedDistrict.trim().toLowerCase();
         if (!matchDist) return false;
       }
       // Search query
@@ -117,25 +118,35 @@ export const ExplorePage: React.FC = () => {
     setSelectedSection('all');
     setSelectedDivision('all');
     setSelectedDistrict('all');
-    setLocationSearchQuery('');
   };
+
+  const hasActiveFilters =
+    Boolean(searchQuery) ||
+    selectedSection !== 'all' ||
+    selectedDivision !== 'all' ||
+    selectedDistrict !== 'all';
 
   return (
     <PublicPageContainer id="explore-page-container">
-      {/* 1. Header with View Toggle */}
+      {/* 1. Header with Mode Switcher (Heatmap vs Reports) */}
       <MapSectionHeader
         language={language}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
 
-      {/* 2. Map Controls (Search, Categories, Location Search) */}
+      {/* 2. Shared Search & Filter Controls */}
       <div className="space-y-3 pb-3 border-b border-ui-stroke-subtle">
-        {/* Search Bar, Division and District Dropdowns */}
+        {/* Keyword Search, Division and District Dropdowns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
           {/* Main Keyword Search */}
           <div className="sm:col-span-2 lg:col-span-6 relative flex items-center">
-            <MapIcon name="search" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" aria-hidden="true" />
+            <MapIcon
+              name="search"
+              size="sm"
+              className="text-ui-content-muted absolute left-3.5 pointer-events-none"
+              ariaHidden={true}
+            />
             <input
               type="text"
               value={searchQuery}
@@ -159,7 +170,7 @@ export const ExplorePage: React.FC = () => {
                 aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'}
                 className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
-                <MapIcon name="close" size="xs" aria-hidden="true" />
+                <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
             )}
           </div>
@@ -188,7 +199,12 @@ export const ExplorePage: React.FC = () => {
 
           {/* District Dropdown */}
           <div className="sm:col-span-1 lg:col-span-3 relative flex items-center">
-            <MapIcon name="map-pin" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" aria-hidden="true" />
+            <MapIcon
+              name="map-pin"
+              size="sm"
+              className="text-ui-content-muted absolute left-3.5 pointer-events-none"
+              ariaHidden={true}
+            />
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
@@ -200,7 +216,9 @@ export const ExplorePage: React.FC = () => {
               </option>
               {availableDistricts.map((d) => (
                 <option key={d.id} value={d.nameEn}>
-                  {language === 'bn' ? `${d.nameBn} (${d.divisionBn})` : `${d.nameEn} (${d.divisionEn})`}
+                  {language === 'bn'
+                    ? `${d.nameBn} (${d.divisionBn})`
+                    : `${d.nameEn} (${d.divisionEn})`}
                 </option>
               ))}
             </select>
@@ -212,7 +230,7 @@ export const ExplorePage: React.FC = () => {
                 title={language === 'bn' ? 'জেলা মুছুন' : 'Clear district'}
                 className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
-                <MapIcon name="close" size="xs" aria-hidden="true" />
+                <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
             )}
           </div>
@@ -227,7 +245,7 @@ export const ExplorePage: React.FC = () => {
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'all'
                 ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg shadow-xs font-bold'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
             }`}
           >
             {language === 'bn' ? 'সব' : 'All'}
@@ -240,11 +258,15 @@ export const ExplorePage: React.FC = () => {
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'harassment'
                 ? 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border-[var(--sec-harassment-border)] shadow-xs font-bold ring-1 ring-[var(--sec-harassment-border)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
             }`}
           >
             <CategoryIcon section="harassment" size="xs" />
-            <span>{language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}</span>
+            <span>
+              {language === 'bn'
+                ? SECTIONS.harassment.shortNameBn
+                : SECTIONS.harassment.shortNameEn}
+            </span>
           </button>
 
           <button
@@ -254,11 +276,15 @@ export const ExplorePage: React.FC = () => {
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'rickshaw'
                 ? 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border-[var(--sec-rickshaw-border)] shadow-xs font-bold ring-1 ring-[var(--sec-rickshaw-border)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
             }`}
           >
             <CategoryIcon section="rickshaw" size="xs" />
-            <span>{language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}</span>
+            <span>
+              {language === 'bn'
+                ? SECTIONS.rickshaw.shortNameBn
+                : SECTIONS.rickshaw.shortNameEn}
+            </span>
           </button>
 
           <button
@@ -268,18 +294,22 @@ export const ExplorePage: React.FC = () => {
             className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               selectedSection === 'extortion'
                 ? 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border-[var(--sec-extortion-border)] shadow-xs font-bold ring-1 ring-[var(--sec-extortion-border)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
             }`}
           >
             <CategoryIcon section="extortion" size="xs" />
-            <span>{language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}</span>
+            <span>
+              {language === 'bn'
+                ? SECTIONS.extortion.shortNameBn
+                : SECTIONS.extortion.shortNameEn}
+            </span>
           </button>
 
-          {(searchQuery || selectedSection !== 'all' || selectedDistrict !== 'all') && (
+          {hasActiveFilters && (
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-[13px] font-semibold text-ui-content-secondary underline ml-auto shrink-0 cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
+              className="text-[13px] font-semibold text-ui-content-secondary hover:text-ui-content-primary underline ml-auto shrink-0 cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
             >
               {language === 'bn' ? 'রিসেট' : 'Reset'}
             </button>
@@ -289,7 +319,7 @@ export const ExplorePage: React.FC = () => {
 
       {/* Loading Skeleton States */}
       {isLoading && (
-        viewMode === 'map' ? (
+        viewMode === 'heatmap' ? (
           <MapExploreSkeleton
             id="explore-map-skeleton"
             ariaLabel={language === 'bn' ? 'মানচিত্র লোড হচ্ছে...' : 'Loading map...'}
@@ -305,8 +335,16 @@ export const ExplorePage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
-          <MapIcon name="alert-circle" size="xl" className="text-ui-error-text mx-auto" ariaHidden={true} />
+        <div
+          role="alert"
+          className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4 shadow-xs"
+        >
+          <MapIcon
+            name="alert-circle"
+            size="xl"
+            className="text-ui-error-text mx-auto"
+            ariaHidden={true}
+          />
           <p className="text-[15px] font-semibold text-ui-error-text">
             {language === 'bn'
               ? 'প্রতিবেদন লোড করা যায়নি।'
@@ -325,11 +363,12 @@ export const ExplorePage: React.FC = () => {
       {/* Main View Area */}
       {!isLoading && !fetchError && (
         <>
-          {viewMode === 'map' ? (
+          {viewMode === 'heatmap' ? (
+            /* HEATMAP VIEW */
             <div className="space-y-6">
               {/* Map & District Ranking Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                {/* 1. Interactive Map (Left/Main on Desktop, Top on Mobile) */}
+                {/* 1. Truthful Heatmap (Main on Desktop, Top on Mobile) */}
                 <div className="lg:col-span-8 w-full">
                   <PublicIncidentMap
                     reports={filteredReports}
@@ -337,7 +376,7 @@ export const ExplorePage: React.FC = () => {
                     selectedSection={selectedSection}
                     selectedDistrict={selectedDistrict}
                     onSelectDistrict={setSelectedDistrict}
-                    onCenterChange={setSelectedDistrict}
+                    onResetFilters={handleResetFilters}
                   />
                 </div>
 
@@ -353,16 +392,17 @@ export const ExplorePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* 3. Recent Area Reports Section (Below Map & Ranking) */}
+              {/* 3. Recent Area Reports Contextual Preview (Compact) */}
               <RecentAreaReports
                 reports={filteredReports}
                 selectedDistrict={selectedDistrict}
                 selectedSection={selectedSection}
                 language={language}
+                onViewAllReports={() => setViewMode('reports')}
               />
             </div>
           ) : (
-            /* Feed / List View */
+            /* REPORTS VIEW (Preserves full ReportCard list browsing experience) */
             <div className="space-y-3.5">
               <div className="flex items-center justify-between text-[13px] text-ui-content-muted font-medium">
                 <span>
@@ -370,11 +410,11 @@ export const ExplorePage: React.FC = () => {
                     ? `${toBanglaDigits(filteredReports.length)}টি প্রতিবেদন`
                     : `${filteredReports.length} reports`}
                 </span>
-                {(searchQuery || selectedSection !== 'all' || selectedDistrict !== 'all') && (
+                {hasActiveFilters && (
                   <button
                     type="button"
                     onClick={handleResetFilters}
-                    className="text-[13px] font-semibold text-ui-content-secondary underline cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
+                    className="text-[13px] font-semibold text-ui-content-secondary hover:text-ui-content-primary underline cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
                   >
                     {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
                   </button>
@@ -389,15 +429,31 @@ export const ExplorePage: React.FC = () => {
                 </div>
               ) : (
                 <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3">
-                  <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted mx-auto" />
+                  <MapIcon
+                    name="alert-circle"
+                    size="xl"
+                    className="text-ui-content-muted mx-auto"
+                    ariaHidden={true}
+                  />
                   <h3 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No reports found'}
+                    {language === 'bn'
+                      ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই'
+                      : 'No reports match these filters'}
                   </h3>
                   <p className="text-[13px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                     {language === 'bn'
-                      ? 'এই ফিল্টারে কোনো প্রতিবেদন পাওয়া যায়নি।'
-                      : 'No reports match your filters.'}
+                      ? 'বর্তমান অনুসন্ধান বা ফিল্টারের সাথে কোনো তথ্যের মিল পাওয়া যায়নি।'
+                      : 'Try clearing filters or search to view more reports.'}
                   </p>
+                  {hasActiveFilters && (
+                    <button
+                      type="button"
+                      onClick={handleResetFilters}
+                      className="btn-primary-action px-4 py-2 rounded-xl text-[13px] font-semibold min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                    >
+                      {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -409,4 +465,3 @@ export const ExplorePage: React.FC = () => {
 };
 
 export default ExplorePage;
-
