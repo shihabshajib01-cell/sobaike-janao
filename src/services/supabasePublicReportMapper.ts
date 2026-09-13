@@ -1,6 +1,7 @@
 import { ReportItem } from '../types/report';
 import { SectionKey } from '../theme/tokens';
 import { toBanglaDigits } from '../utils/formatters';
+import { isValidIncidentCoordinates } from './types';
 
 export interface SupabasePublicReportRPC {
   id: string;
@@ -17,6 +18,8 @@ export interface SupabasePublicReportRPC {
   district?: string | null;
   area?: string | null;
   location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   incidentDate?: string | null;
   publishedAt?: string | null;
   priority?: string | null;
@@ -120,6 +123,18 @@ export const mapSupabasePublicReportToItem = (
   const priority = rpc.priority ? rpc.priority.toLowerCase() : 'medium';
   const isHighUrgency = priority === 'urgent' || priority === 'high';
 
+  const rawLat =
+    rpc.latitude !== undefined && rpc.latitude !== null ? Number(rpc.latitude) : null;
+  const rawLng =
+    rpc.longitude !== undefined && rpc.longitude !== null ? Number(rpc.longitude) : null;
+
+  // Strict incident coordinates: both must be valid finite numbers, within bounds, non-zero,
+  // and location must not be withheld.
+  const coordinates =
+    rpc.location && isValidIncidentCoordinates(rawLat, rawLng)
+      ? { lat: rawLat as number, lng: rawLng as number }
+      : undefined;
+
   return {
     id: rpc.id,
     segment,
@@ -169,6 +184,7 @@ export const mapSupabasePublicReportToItem = (
     statusBn: 'প্রকাশিত',
     statusEn: 'Published',
     isHighUrgency,
+    coordinates,
     images: [],
     media: {
       type: 'none',
