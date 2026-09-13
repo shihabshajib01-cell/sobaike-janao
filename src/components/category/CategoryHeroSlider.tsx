@@ -254,9 +254,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         className={`w-full rounded-2xl border p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
           {/* Left Text Content */}
-          <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10">
+          <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10 pb-3 sm:pb-4 md:pb-0">
             <h1
               className="type-h1 tracking-tight"
               style={{ color: '#102A43' }}
@@ -283,8 +283,8 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             </p>
           </div>
 
-          {/* Right Illustration Safe Area */}
-          <div className="md:col-start-2 md:row-start-1 md:row-span-2 w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none">
+          {/* Right Illustration Safe Area - Edge to edge on mobile */}
+          <div className="md:col-start-2 md:row-start-1 md:row-span-2 -mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none">
             {slide.illustrationSrc ? (
               <img
                 src={resolvePublicAsset(slide.illustrationSrc)}
@@ -302,7 +302,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
           {/* CTA (if exists) */}
           {slide.action && (
-            <div className="md:col-start-1 md:row-start-2 pt-1.5 sm:pt-2 w-full flex justify-center md:justify-start">
+            <div className="md:col-start-1 md:row-start-2 pt-0 md:pt-2 w-full flex justify-center md:justify-start">
               <Button
                 id={`${id}-cta-btn`}
                 variant="primary"
@@ -370,9 +370,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 backgroundColor: heroBackground,
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
                 {/* Left Text Content */}
-                <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10">
+                <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10 pb-3 sm:pb-4 md:pb-0">
                   {index === 0 ? (
                     <h1
                       className="type-h1 tracking-tight"
@@ -408,8 +408,8 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   </p>
                 </div>
 
-                {/* Right Illustration Safe Area */}
-                <div className="md:col-start-2 md:row-start-1 md:row-span-2 w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none">
+                {/* Right Illustration Safe Area - Edge to edge on mobile */}
+                <div className="md:col-start-2 md:row-start-1 md:row-span-2 -mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none">
                   {slide.illustrationSrc ? (
                     <img
                       src={resolvePublicAsset(slide.illustrationSrc)}
@@ -427,7 +427,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                 {/* CTA (if exists) */}
                 {slide.action && (
-                  <div className="md:col-start-1 md:row-start-2 pt-1.5 sm:pt-2 w-full flex justify-center md:justify-start">
+                  <div className="md:col-start-1 md:row-start-2 pt-0 md:pt-2 w-full flex justify-center md:justify-start">
                     <Button
                       id={`${id}-cta-btn-${index}`}
                       variant="primary"
