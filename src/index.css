@@ -1178,7 +1178,19 @@
 
 .hero-slider-track .hero-slider-grid {
   height: 100%;
+  min-height: 100%;
   flex: 1 1 auto;
+}
+
+.hero-slider-track .hero-slider-media {
+  height: 100%;
+}
+
+@media (min-width: 1024px) {
+  .hero-slider-track .hero-slider-media {
+    height: 100%;
+    min-height: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
