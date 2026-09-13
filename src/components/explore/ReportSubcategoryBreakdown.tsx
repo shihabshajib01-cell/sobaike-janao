@@ -67,7 +67,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
           nameEn: foundSub.nameEn,
           parentShortNameBn: sectionInfo?.shortNameBn || seg,
           parentShortNameEn: sectionInfo?.shortNameEn || seg,
-          primaryColor: sectionInfo?.primaryColor || '#3A7CA5',
+          primaryColor: SECTIONS[seg].primaryColor,
           count: 0,
           percentage: 0,
         });
