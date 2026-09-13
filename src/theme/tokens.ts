@@ -197,6 +197,7 @@ export interface HeroSectionTheme {
   ctaBorder: string;
   ctaHover: string;
   ctaHoverText: string;
+  desktopMediaPosition?: string;
 }
 
 export const HERO_TOKENS = {
@@ -211,6 +212,7 @@ export const HERO_TOKENS = {
       ctaBorder: '#9E384E',
       ctaHover: '#B84A62',
       ctaHoverText: '#FFFFFF',
+      desktopMediaPosition: 'center bottom',
     },
     rickshaw: {
       background: '#E4F8EE',
@@ -218,6 +220,7 @@ export const HERO_TOKENS = {
       ctaBorder: '#9A520A',
       ctaHover: '#D9822B',
       ctaHoverText: '#050505',
+      desktopMediaPosition: 'center bottom',
     },
     extortion: {
       background: '#FEEADE',
@@ -225,6 +228,7 @@ export const HERO_TOKENS = {
       ctaBorder: '#4F5D95',
       ctaHover: '#4F5D95',
       ctaHoverText: '#FFFFFF',
+      desktopMediaPosition: 'center bottom',
     },
     load_shedding: {
       background: '#FEEDD4',
@@ -232,6 +236,7 @@ export const HERO_TOKENS = {
       ctaBorder: '#0A756E',
       ctaHover: '#0D9488',
       ctaHoverText: '#050505',
+      desktopMediaPosition: 'center bottom',
     },
   } satisfies Record<SectionKey, HeroSectionTheme>,
 };

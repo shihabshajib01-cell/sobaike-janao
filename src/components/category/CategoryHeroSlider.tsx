@@ -15,6 +15,7 @@ export interface CategoryHeroSlide {
   desktopDescriptionBn?: string;
   desktopDescriptionEn?: string;
   illustrationSrc?: string;
+  desktopMediaPosition?: string;
   action?: {
     labelBn: string;
     labelEn: string;
@@ -304,7 +305,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 src={resolvePublicAsset(slide.illustrationSrc)}
                 alt=""
                 aria-hidden="true"
-                className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover mx-auto block"
+                className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover lg:object-bottom mx-auto block"
               />
             ) : (
               <div
@@ -441,7 +442,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                       src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
-                      className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover mx-auto block"
+                      className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover lg:object-bottom mx-auto block"
                     />
                   ) : (
                     <div

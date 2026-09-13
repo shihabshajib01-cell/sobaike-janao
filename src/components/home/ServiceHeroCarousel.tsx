@@ -21,6 +21,7 @@ export interface ServiceSlide {
   primaryCtaEn?: string;
   path: RoutePath;
   illustrationSrc?: string;
+  desktopMediaPosition?: string;
   badgeBn?: string;
   badgeEn?: string;
   reportCount?: number;
@@ -416,7 +417,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                       src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
-                      className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover mx-auto block"
+                      className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover lg:object-bottom mx-auto block"
                     />
                   ) : (
                     <div
