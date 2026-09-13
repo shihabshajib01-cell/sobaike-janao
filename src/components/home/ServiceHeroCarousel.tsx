@@ -8,30 +8,11 @@ import {
 } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
+import { CANONICAL_BANNER_CONTENT } from '../../data/bannerContent';
 
 export interface ServiceSlide {
   key: SectionKey;
-  isComingSoon?: boolean;
-  serviceLabelBn?: string;
-  serviceLabelEn?: string;
-  nameBn: string;
-  nameEn: string;
-  mobileDescBn?: string;
-  mobileDescEn?: string;
-  descBn: string;
-  descEn: string;
-  desktopDescBn: string;
-  desktopDescEn: string;
-  primaryCtaBn?: string;
-  primaryCtaEn?: string;
   path: RoutePath;
-  illustrationSrc?: string;
-  desktopMediaPosition?: string;
-  desktopMediaScale?: number;
-  desktopMediaTranslateY?: string;
-  badgeBn?: string;
-  badgeEn?: string;
-  reportCount?: number;
 }
 
 export interface ServiceHeroCarouselProps {
@@ -61,66 +42,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const slides: ServiceSlide[] = [
-    {
-      key: 'harassment',
-      nameBn: 'হয়রানি ও নির্যাতন',
-      nameEn: 'Harassment & Abuse',
-      mobileDescBn: 'আপনি বা পরিচিত কেউ কি কোনো ধরনের হয়রানি বা নির্যাতনের শিকার হচ্ছেন?',
-      mobileDescEn: 'Are you or someone you know facing harassment or abuse?',
-      descBn: 'শারীরিক, মৌখিক বা অনলাইন নির্যাতন।',
-      descEn: 'Physical, verbal, or online abuse.',
-      desktopDescBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',
-      desktopDescEn: 'Report physical, verbal, or online harassment, abuse, threats, or other unsafe behaviour.',
-      primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
-      path: '/harassment',
-      illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.jpg',
-    },
-    {
-      key: 'rickshaw',
-      nameBn: 'অবৈধ চার্জিং স্টেশন',
-      nameEn: 'Expose Illegal Charging Stations',
-      mobileDescBn: 'আপনার এলাকায় কি কোনো অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশন আছে?',
-      mobileDescEn: 'Is there an illegal or unsafe charging station in your area?',
-      descBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
-      descEn: 'Unsafe battery charging and risky connections.',
-      desktopDescBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
-      desktopDescEn: 'Report unsafe battery charging stations, exposed wiring, overloaded connections, or other electrical risks.',
-      primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
-      path: '/rickshaw',
-      illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.jpg',
-    },
-    {
-      key: 'extortion',
-      nameBn: 'চাঁদাবাজি',
-      nameEn: 'Extortion',
-      mobileDescBn: 'আপনার কাছে কি চাঁদা দাবি করা হয়েছে বা হুমকি দেওয়া হয়েছে?',
-      mobileDescEn: 'Have you been asked for illegal payment or threatened?',
-      descBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ দাবি।',
-      descEn: 'Illegal demands, threats, or forced payments.',
-      desktopDescBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',
-      desktopDescEn: 'Report illegal demands for money, threats, coercion, or forced payments in shops, transport, or local areas.',
-      primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
-      path: '/extortion',
-      illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.jpg',
-    },
-    {
-      key: 'load_shedding',
-      nameBn: 'ইউটিলিটি সমস্যা',
-      nameEn: 'Utility Issues',
-      mobileDescBn: 'আপনি কি বিদ্যুৎ, গ্যাস বা বিলিং সমস্যায় ভুগছেন?',
-      mobileDescEn: 'Are you facing power, gas, or billing problems?',
-      descBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা।',
-      descEn: 'Power, gas, or billing problems.',
-      desktopDescBn: 'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ সরবরাহ সমস্যা বা ভুল ইউটিলিটি বিলের তথ্য জানান।',
-      desktopDescEn: 'Report load shedding, gas shortages, electricity supply problems, or incorrect utility billing.',
-      primaryCtaBn: 'রিপোর্ট করুন',
-      primaryCtaEn: 'Report now',
-      path: '/load-shedding',
-      illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.jpg',
-    },
+    { key: 'harassment', path: '/harassment' },
+    { key: 'rickshaw', path: '/rickshaw' },
+    { key: 'extortion', path: '/extortion' },
+    { key: 'load_shedding', path: '/load-shedding' },
   ];
 
   const totalSlides = slides.length;
@@ -346,6 +271,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         >
           {slides.map((slide, index) => {
             const isActive = index === currentIndex;
+            const content = CANONICAL_BANNER_CONTENT[slide.key];
+
             return (
               <div
                 key={slide.key}
@@ -357,29 +284,25 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     : `Slide ${index + 1} of ${totalSlides}`
                 }
                 aria-hidden={!isActive}
-                className="w-full h-full shrink-0 min-w-full p-0 flex flex-col"
+                className="w-full shrink-0 min-w-full p-0 flex flex-col"
                 style={{
                   backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
                 }}
               >
                 <CategoryHeroBanner
-                  className="w-full h-full flex-1"
                   section={slide.key}
-                  titleBn={slide.nameBn}
-                  titleEn={slide.nameEn}
-                  mobileDescriptionBn={slide.mobileDescBn}
-                  mobileDescriptionEn={slide.mobileDescEn}
-                  descriptionBn={slide.descBn}
-                  descriptionEn={slide.descEn}
-                  desktopDescriptionBn={slide.desktopDescBn}
-                  desktopDescriptionEn={slide.desktopDescEn}
-                  illustrationSrc={slide.illustrationSrc}
-                  desktopMediaPosition={slide.desktopMediaPosition}
-                  desktopMediaScale={slide.desktopMediaScale}
-                  desktopMediaTranslateY={slide.desktopMediaTranslateY}
+                  titleBn={content.titleBn}
+                  titleEn={content.titleEn}
+                  mobileDescriptionBn={content.mobileDescriptionBn}
+                  mobileDescriptionEn={content.mobileDescriptionEn}
+                  descriptionBn={content.tabletDescriptionBn}
+                  descriptionEn={content.tabletDescriptionEn}
+                  desktopDescriptionBn={content.desktopDescriptionBn}
+                  desktopDescriptionEn={content.desktopDescriptionEn}
+                  illustrationSrc={content.illustrationSrc}
                   action={{
-                    labelBn: slide.primaryCtaBn || (language === 'bn' ? 'রিপোর্ট করুন' : 'Report now'),
-                    labelEn: slide.primaryCtaEn || 'Report now',
+                    labelBn: content.primaryCtaBn,
+                    labelEn: content.primaryCtaEn,
                     onClick: () => openReportComposer(slide.key),
                   }}
                   headingLevel="h2"
@@ -422,3 +345,4 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     </div>
   );
 };
+

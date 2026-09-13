@@ -306,13 +306,12 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className="w-full h-full shrink-0 min-w-full p-0 flex flex-col"
+              className="w-full shrink-0 min-w-full p-0 flex flex-col"
               style={{
                 backgroundColor: heroBackground,
               }}
             >
               <CategoryHeroBanner
-                className="w-full h-full flex-1"
                 section={sectionKey}
                 titleBn={slide.titleBn}
                 titleEn={slide.titleEn}

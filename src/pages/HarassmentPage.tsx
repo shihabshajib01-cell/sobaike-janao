@@ -12,11 +12,13 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export const HarassmentPage: React.FC = () => {
   const { language, openReportComposer } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('harassment') || SECTIONS.harassment;
+  const bannerContent = CANONICAL_BANNER_CONTENT.harassment;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -66,18 +68,18 @@ export const HarassmentPage: React.FC = () => {
         slides={[
           {
             id: 'harassment-primary',
-            titleBn: 'হয়রানি ও নির্যাতন',
-            titleEn: 'Harassment & Abuse',
-            mobileDescriptionBn: 'আপনি বা পরিচিত কেউ কি কোনো ধরনের হয়রানি বা নির্যাতনের শিকার হচ্ছেন?',
-            mobileDescriptionEn: 'Are you or someone you know facing harassment or abuse?',
-            descriptionBn: 'শারীরিক, মৌখিক বা অনলাইন নির্যাতন।',
-            descriptionEn: 'Physical, verbal, or online abuse.',
-            desktopDescriptionBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',
-            desktopDescriptionEn: 'Report physical, verbal, or online harassment, abuse, threats, or other unsafe behaviour.',
-            illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.jpg',
+            titleBn: bannerContent.titleBn,
+            titleEn: bannerContent.titleEn,
+            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
+            descriptionBn: bannerContent.tabletDescriptionBn,
+            descriptionEn: bannerContent.tabletDescriptionEn,
+            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            illustrationSrc: bannerContent.illustrationSrc,
             action: {
-              labelBn: 'রিপোর্ট করুন',
-              labelEn: 'Report now',
+              labelBn: bannerContent.primaryCtaBn,
+              labelEn: bannerContent.primaryCtaEn,
               onClick: () => openReportComposer('harassment'),
             },
           },

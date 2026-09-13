@@ -12,11 +12,13 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export const ExtortionPage: React.FC = () => {
   const { language, openReportComposer } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('extortion') || SECTIONS.extortion;
+  const bannerContent = CANONICAL_BANNER_CONTENT.extortion;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -66,18 +68,18 @@ export const ExtortionPage: React.FC = () => {
         slides={[
           {
             id: 'extortion-primary',
-            titleBn: 'চাঁদাবাজি',
-            titleEn: 'Extortion',
-            mobileDescriptionBn: 'আপনার কাছে কি চাঁদা দাবি করা হয়েছে বা হুমকি দেওয়া হয়েছে?',
-            mobileDescriptionEn: 'Have you been asked for illegal payment or threatened?',
-            descriptionBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ দাবি।',
-            descriptionEn: 'Illegal demands, threats, or forced payments.',
-            desktopDescriptionBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',
-            desktopDescriptionEn: 'Report illegal demands for money, threats, coercion, or forced payments in shops, transport, or local areas.',
-            illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.jpg',
+            titleBn: bannerContent.titleBn,
+            titleEn: bannerContent.titleEn,
+            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
+            descriptionBn: bannerContent.tabletDescriptionBn,
+            descriptionEn: bannerContent.tabletDescriptionEn,
+            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            illustrationSrc: bannerContent.illustrationSrc,
             action: {
-              labelBn: 'রিপোর্ট করুন',
-              labelEn: 'Report now',
+              labelBn: bannerContent.primaryCtaBn,
+              labelEn: bannerContent.primaryCtaEn,
               onClick: () => openReportComposer('extortion'),
             },
           },

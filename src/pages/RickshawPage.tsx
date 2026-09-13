@@ -11,11 +11,13 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export const RickshawPage: React.FC = () => {
   const { language, openReportComposer } = useApp();
   const { getSegment } = useTaxonomy();
   const config = getSegment('rickshaw') || SECTIONS.rickshaw;
+  const bannerContent = CANONICAL_BANNER_CONTENT.rickshaw;
 
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
 
@@ -61,18 +63,18 @@ export const RickshawPage: React.FC = () => {
         slides={[
           {
             id: 'rickshaw-primary',
-            titleBn: 'অবৈধ চার্জিং স্টেশন',
-            titleEn: 'Expose Illegal Charging Stations',
-            mobileDescriptionBn: 'আপনার এলাকায় কি কোনো অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশন আছে?',
-            mobileDescriptionEn: 'Is there an illegal or unsafe charging station in your area?',
-            descriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
-            descriptionEn: 'Unsafe battery charging and risky connections.',
-            desktopDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
-            desktopDescriptionEn: 'Report unsafe battery charging stations, exposed wiring, overloaded connections, or other electrical risks.',
-            illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.jpg',
+            titleBn: bannerContent.titleBn,
+            titleEn: bannerContent.titleEn,
+            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
+            descriptionBn: bannerContent.tabletDescriptionBn,
+            descriptionEn: bannerContent.tabletDescriptionEn,
+            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            illustrationSrc: bannerContent.illustrationSrc,
             action: {
-              labelBn: 'রিপোর্ট করুন',
-              labelEn: 'Report now',
+              labelBn: bannerContent.primaryCtaBn,
+              labelEn: bannerContent.primaryCtaEn,
               onClick: () => openReportComposer('rickshaw'),
             },
           },

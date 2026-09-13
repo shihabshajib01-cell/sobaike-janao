@@ -12,11 +12,13 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export const UtilityPage: React.FC = () => {
   const { language, openReportComposer } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('load_shedding') || SECTIONS.load_shedding;
+  const bannerContent = CANONICAL_BANNER_CONTENT.load_shedding;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -66,18 +68,18 @@ export const UtilityPage: React.FC = () => {
         slides={[
           {
             id: 'utility-primary',
-            titleBn: 'ইউটিলিটি সমস্যা',
-            titleEn: 'Utility Issues',
-            mobileDescriptionBn: 'আপনি কি বিদ্যুৎ, গ্যাস বা বিলিং সমস্যায় ভুগছেন?',
-            mobileDescriptionEn: 'Are you facing power, gas, or billing problems?',
-            descriptionBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা।',
-            descriptionEn: 'Power, gas, or billing problems.',
-            desktopDescriptionBn: 'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ সরবরাহ সমস্যা বা ভুল ইউটিলিটি বিলের তথ্য জানান।',
-            desktopDescriptionEn: 'Report load shedding, gas shortages, electricity supply problems, or incorrect utility billing.',
-            illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.jpg',
+            titleBn: bannerContent.titleBn,
+            titleEn: bannerContent.titleEn,
+            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
+            descriptionBn: bannerContent.tabletDescriptionBn,
+            descriptionEn: bannerContent.tabletDescriptionEn,
+            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            illustrationSrc: bannerContent.illustrationSrc,
             action: {
-              labelBn: 'রিপোর্ট করুন',
-              labelEn: 'Report now',
+              labelBn: bannerContent.primaryCtaBn,
+              labelEn: bannerContent.primaryCtaEn,
               onClick: () => openReportComposer('load_shedding'),
             },
           },
