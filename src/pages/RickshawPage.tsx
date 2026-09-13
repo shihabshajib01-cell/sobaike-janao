@@ -89,15 +89,17 @@ export const RickshawPage: React.FC = () => {
 
       {/* 2. Location Filter Controls */}
       <section id="rickshaw-filter-section" className="space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
-          <div>
-            <h2 className="text-[18px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'চার্জিং প্রতিবেদন' : 'Charging reports'}
-            </h2>
-            <p className="text-[14px] text-ui-content-muted">
+        <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
               {language === 'bn'
-                ? `${filteredReports.length}টি প্রকাশিত প্রতিবেদন পাওয়া গেছে`
-                : `${filteredReports.length} published reports found`}
+                ? 'অবৈধ ও ঝুঁকিপূর্ণ চার্জিং স্টেশন'
+                : 'Illegal & unsafe charging stations'}
+            </h2>
+            <p className="text-[14px] text-ui-content-muted mt-0.5">
+              {language === 'bn'
+                ? `${filteredReports.length}টি প্রকাশিত প্রতিবেদন`
+                : `${filteredReports.length} published reports`}
             </p>
           </div>
 

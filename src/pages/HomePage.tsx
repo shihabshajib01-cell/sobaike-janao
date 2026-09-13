@@ -136,15 +136,15 @@ export const HomePage: React.FC = () => {
       {/* 2. Combined Public Feed */}
       <section id="home-feed-section" className="space-y-4 pt-1">
         {/* Feed Header & District Filter */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
-          <div>
-            <h2 className="text-[20px] font-bold leading-[1.3] text-ui-content-primary">
-              {language === 'bn' ? 'সাম্প্রতিক প্রতিবেদন' : 'Recent reports'}
+        <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
+              {language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports'}
             </h2>
           </div>
 
           {/* Location Selector */}
-          <div className="shrink-0 flex items-center gap-2">
+          <div className="shrink-0">
             <LocationSelector
               selectedDistrict={selectedDistrict}
               onSelectDistrict={setSelectedDistrict}
