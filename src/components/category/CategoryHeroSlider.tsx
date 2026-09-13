@@ -251,12 +251,12 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     return (
       <section
         id={id}
-        className={`w-full rounded-2xl border p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
+        className={`w-full rounded-2xl border px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:p-6 lg:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
           {/* Left Text Content */}
-          <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10 pb-3 sm:pb-4 md:pb-0">
+          <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10 pb-2 sm:pb-2 md:pb-0">
             <h1
               className="type-h1 tracking-tight"
               style={{ color: '#102A43' }}
@@ -302,7 +302,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
           {/* CTA (if exists) */}
           {slide.action && (
-            <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-0 md:pt-2 w-full flex justify-center md:justify-start">
+            <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-0 pb-4 sm:pb-5 md:pb-0 md:pt-2 w-full flex justify-center md:justify-start">
               <Button
                 id={`${id}-cta-btn`}
                 variant="primary"
@@ -365,14 +365,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className="w-full shrink-0 p-4 sm:p-5 md:p-6 lg:p-7 min-w-full"
+              className="w-full shrink-0 px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:p-6 lg:p-7 min-w-full"
               style={{
                 backgroundColor: heroBackground,
               }}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
                 {/* Left Text Content */}
-                <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10 pb-3 sm:pb-4 md:pb-0">
+                <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10 pb-2 sm:pb-2 md:pb-0">
                   {index === 0 ? (
                     <h1
                       className="type-h1 tracking-tight"
@@ -427,7 +427,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                 {/* CTA (if exists) */}
                 {slide.action && (
-                  <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-0 md:pt-2 w-full flex justify-center md:justify-start">
+                  <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-0 pb-4 sm:pb-5 md:pb-0 md:pt-2 w-full flex justify-center md:justify-start">
                     <Button
                       id={`${id}-cta-btn-${index}`}
                       variant="primary"

@@ -93,8 +93,8 @@ export const RickshawPage: React.FC = () => {
           <div className="min-w-0 flex-1">
             <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
               {language === 'bn'
-                ? 'অবৈধ ও ঝুঁকিপূর্ণ চার্জিং স্টেশন'
-                : 'Illegal & unsafe charging stations'}
+                ? 'সকল প্রতিবেদন'
+                : 'All reports'}
             </h2>
             <p className="text-[14px] text-ui-content-muted mt-0.5">
               {language === 'bn'
