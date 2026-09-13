@@ -338,16 +338,19 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchCancel}
-      className={`${HERO_SLIDER_TOKENS.layout.container} ${className}`}
+      className={`group w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
       style={containerStyle}
     >
       {/* Slides Track */}
       <div
-        className={`${HERO_SLIDER_TOKENS.layout.track} ${
-          prefersReducedMotion ? '' : HERO_SLIDER_TOKENS.layout.trackTransition
+        className={`hero-slider-track ${
+          prefersReducedMotion ? '!transition-none' : ''
         }`}
         style={{
           transform: `translateX(-${currentIndex * 100}%)`,
+          transitionDuration: prefersReducedMotion
+            ? '0ms'
+            : `${HERO_SLIDER_BEHAVIOR.transitionDurationMs}ms`,
         }}
       >
         {slides.map((slide, index) => {
@@ -363,16 +366,16 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className={HERO_SLIDER_TOKENS.layout.slide}
+              className="w-full shrink-0 min-w-full p-0"
               style={{
                 backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className={HERO_SLIDER_TOKENS.layout.grid}>
+              <div className="hero-slider-grid">
                 {/* Left 50% Content Column */}
-                <div className={HERO_SLIDER_TOKENS.layout.contentCol}>
+                <div className="hero-slider-content">
                   <h2
-                    className={HERO_SLIDER_TOKENS.typography.title}
+                    className="type-h1 tracking-tight"
                     style={{ color: HERO_TOKENS.text.primary }}
                   >
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
@@ -381,7 +384,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   {/* Mobile Question */}
                   {(slide.mobileDescBn || slide.mobileDescEn) && (
                     <p
-                      className={HERO_SLIDER_TOKENS.typography.mobileDesc}
+                      className="block md:hidden type-body text-center max-w-md mx-auto"
                       style={{ color: HERO_TOKENS.text.secondary }}
                     >
                       {language === 'bn' ? slide.mobileDescBn : slide.mobileDescEn}
@@ -390,7 +393,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
                   {/* Tablet Short Description */}
                   <p
-                    className={HERO_SLIDER_TOKENS.typography.tabletDesc}
+                    className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
                     style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn' ? slide.descBn : slide.descEn}
@@ -398,21 +401,21 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
                   {/* Desktop Long Description */}
                   <p
-                    className={HERO_SLIDER_TOKENS.typography.desktopDesc}
+                    className="hidden lg:block type-body max-w-xl"
                     style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn' ? slide.desktopDescBn : slide.desktopDescEn}
                   </p>
 
                   {/* CTA */}
-                  <div className={HERO_SLIDER_TOKENS.layout.ctaRow}>
+                  <div className="hero-slider-cta-row">
                     <Button
                       id={`${id}-report-btn-${slide.key}`}
                       variant="outline"
                       size="md"
                       tabIndex={isActive ? 0 : -1}
                       onClick={() => openReportComposer(slide.key)}
-                      className={HERO_SLIDER_TOKENS.layout.ctaButton}
+                      className="w-auto shadow-none btn-hero-cta"
                       style={getHeroCtaStyle(slide.key)}
                     >
                       {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
@@ -421,17 +424,17 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 </div>
 
                 {/* Right 50% Illustration Column */}
-                <div className={HERO_SLIDER_TOKENS.layout.mediaCol}>
+                <div className="hero-slider-media">
                   {slide.illustrationSrc ? (
                     (() => {
                       const resolvedDesktopMediaPosition =
                         slide.desktopMediaPosition ??
                         HERO_TOKENS.sections[slide.key]?.desktopMediaPosition ??
-                        'center bottom';
+                        HERO_SLIDER_TOKENS.media.defaultDesktopPosition;
                       const resolvedDesktopMediaScale =
                         slide.desktopMediaScale ??
                         HERO_TOKENS.sections[slide.key]?.desktopMediaScale ??
-                        1;
+                        HERO_SLIDER_TOKENS.media.defaultDesktopScale;
 
                       return (
                         <img
@@ -442,14 +445,14 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                             '--hero-desktop-media-position': resolvedDesktopMediaPosition,
                             '--hero-desktop-media-scale': resolvedDesktopMediaScale,
                           } as React.CSSProperties}
-                          className={HERO_SLIDER_TOKENS.media.image}
+                          className="hero-slider-image hero-desktop-media-framed"
                         />
                       );
                     })()
                   ) : (
                     <div
                       aria-hidden="true"
-                      className={HERO_SLIDER_TOKENS.media.placeholder}
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
                     />
                   )}
                 </div>
@@ -466,18 +469,18 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             type="button"
             onClick={handlePrev}
             aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
-            className={`${HERO_SLIDER_TOKENS.navArrows.base} ${HERO_SLIDER_TOKENS.navArrows.prev}`}
+            className="hero-slider-arrow hero-slider-arrow-prev"
           >
-            <ChevronLeft className={HERO_SLIDER_TOKENS.navArrows.icon} aria-hidden="true" />
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
           </button>
 
           <button
             type="button"
             onClick={handleNext}
             aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
-            className={`${HERO_SLIDER_TOKENS.navArrows.base} ${HERO_SLIDER_TOKENS.navArrows.next}`}
+            className="hero-slider-arrow hero-slider-arrow-next"
           >
-            <ChevronRight className={HERO_SLIDER_TOKENS.navArrows.icon} aria-hidden="true" />
+            <ChevronRight className="w-5 h-5" aria-hidden="true" />
           </button>
         </>
       )}
