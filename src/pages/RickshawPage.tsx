@@ -61,10 +61,10 @@ export const RickshawPage: React.FC = () => {
         slides={[
           {
             id: 'rickshaw-primary',
-            titleBn: 'ঝুঁকিপূর্ণ চার্জিং',
-            titleEn: 'Unsafe Charging',
-            mobileDescriptionBn: 'ব্যাটারি • তার • চার্জিং',
-            mobileDescriptionEn: 'Batteries • wiring • charging',
+            titleBn: 'অবৈধ চার্জিং স্টেশন',
+            titleEn: 'Expose Illegal Charging Stations',
+            mobileDescriptionBn: 'আপনার এলাকায় কি কোনো অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশন আছে?',
+            mobileDescriptionEn: 'Is there an illegal or unsafe charging station in your area?',
             descriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
             descriptionEn: 'Unsafe battery charging and risky connections.',
             desktopDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',

@@ -89,8 +89,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'harassment',
       nameBn: 'হয়রানি ও নির্যাতন',
       nameEn: 'Harassment & Abuse',
-      mobileDescBn: 'শারীরিক • মৌখিক • অনলাইন',
-      mobileDescEn: 'Physical • verbal • online',
+      mobileDescBn: 'আপনি বা পরিচিত কেউ কি কোনো ধরনের হয়রানি বা নির্যাতনের শিকার হচ্ছেন?',
+      mobileDescEn: 'Are you or someone you know facing harassment or abuse?',
       descBn: 'শারীরিক, মৌখিক বা অনলাইন নির্যাতন।',
       descEn: 'Physical, verbal, or online abuse.',
       desktopDescBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',
@@ -102,10 +102,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     },
     {
       key: 'rickshaw',
-      nameBn: 'ঝুঁকিপূর্ণ চার্জিং',
-      nameEn: 'Unsafe Charging',
-      mobileDescBn: 'ব্যাটারি • তার • চার্জিং',
-      mobileDescEn: 'Batteries • wiring • charging',
+      nameBn: 'অবৈধ চার্জিং স্টেশন',
+      nameEn: 'Expose Illegal Charging Stations',
+      mobileDescBn: 'আপনার এলাকায় কি কোনো অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশন আছে?',
+      mobileDescEn: 'Is there an illegal or unsafe charging station in your area?',
       descBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
       descEn: 'Unsafe battery charging and risky connections.',
       desktopDescBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
@@ -119,8 +119,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'extortion',
       nameBn: 'চাঁদাবাজি',
       nameEn: 'Extortion',
-      mobileDescBn: 'হুমকি • চাপ • অর্থ আদায়',
-      mobileDescEn: 'Threats • coercion • payments',
+      mobileDescBn: 'আপনার কাছে কি চাঁদা দাবি করা হয়েছে বা হুমকি দেওয়া হয়েছে?',
+      mobileDescEn: 'Have you been asked for illegal payment or threatened?',
       descBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ দাবি।',
       descEn: 'Illegal demands, threats, or forced payments.',
       desktopDescBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',
@@ -134,8 +134,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'load_shedding',
       nameBn: 'ইউটিলিটি সমস্যা',
       nameEn: 'Utility Issues',
-      mobileDescBn: 'বিদ্যুৎ • গ্যাস • বিলিং',
-      mobileDescEn: 'Power • gas • billing',
+      mobileDescBn: 'আপনি কি বিদ্যুৎ, গ্যাস বা বিলিং সমস্যায় ভুগছেন?',
+      mobileDescEn: 'Are you facing power, gas, or billing problems?',
       descBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা।',
       descEn: 'Power, gas, or billing problems.',
       desktopDescBn: 'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ সরবরাহ সমস্যা বা ভুল ইউটিলিটি বিলের তথ্য জানান।',
@@ -381,10 +381,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
 
-                  {/* Mobile Short Secondary Line */}
+                  {/* Mobile Question */}
                   {(slide.mobileDescBn || slide.mobileDescEn) && (
                     <p
-                      className="block md:hidden type-meta text-[14px] font-medium leading-tight whitespace-nowrap text-center mt-1 sm:mt-1.5"
+                      className="block md:hidden type-body text-center max-w-md mx-auto mt-1.5 sm:mt-2"
                       style={{ color: '#596579' }}
                     >
                       {language === 'bn' ? slide.mobileDescBn : slide.mobileDescEn}
@@ -426,7 +426,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 </div>
 
                 {/* CTA */}
-                <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-2.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
+                <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-3 sm:pt-3.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
                   <Button
                     id={`${id}-report-btn-${slide.key}`}
                     variant="outline"

@@ -266,10 +266,10 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               {language === 'bn' ? slide.titleBn : slide.titleEn}
             </h1>
 
-            {/* Mobile Short Secondary Line */}
+            {/* Mobile Question */}
             {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
               <p
-                className="block md:hidden type-meta text-[14px] font-medium leading-tight whitespace-nowrap text-center mt-1 sm:mt-1.5"
+                className="block md:hidden type-body text-center max-w-md mx-auto mt-1.5 sm:mt-2"
                 style={{ color: '#596579' }}
               >
                 {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
@@ -314,7 +314,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
           {/* CTA (if exists) */}
           {slide.action && (
-            <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-2.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
+            <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-3 sm:pt-3.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
               <Button
                 id={`${id}-cta-btn`}
                 variant="outline"
@@ -401,10 +401,10 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                     </h2>
                   )}
 
-                  {/* Mobile Short Secondary Line */}
+                  {/* Mobile Question */}
                   {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
                     <p
-                      className="block md:hidden type-meta text-[14px] font-medium leading-tight whitespace-nowrap text-center mt-1 sm:mt-1.5"
+                      className="block md:hidden type-body text-center max-w-md mx-auto mt-1.5 sm:mt-2"
                       style={{ color: '#596579' }}
                     >
                       {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
@@ -449,7 +449,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                 {/* CTA (if exists) */}
                 {slide.action && (
-                  <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-2.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
+                  <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-3 sm:pt-3.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
                     <Button
                       id={`${id}-cta-btn-${index}`}
                       variant="outline"
