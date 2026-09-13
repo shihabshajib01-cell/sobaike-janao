@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { SectionKey } from '../../theme/tokens';
+import { SectionKey, HERO_TOKENS, getHeroCtaStyle } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
 import { Button } from '../ui/Button';
 
@@ -50,20 +50,6 @@ const resolvePublicAsset = (src?: string) => {
   return `${normalizedBase}${normalizedSrc}`;
 };
 
-const HERO_ART_BACKGROUNDS: Record<SectionKey, string> = {
-  harassment: '#FEEAEC',
-  rickshaw: '#E4F8EE',
-  extortion: '#FEEADE',
-  load_shedding: '#FEEDD4',
-};
-
-const HERO_CTA_THEMES: Record<SectionKey, string> = {
-  harassment: '!bg-transparent !border-[#9E384E] !text-[#9E384E] hover:!bg-[#B84A62] hover:!border-[#B84A62] hover:!text-white',
-  rickshaw: '!bg-transparent !border-[#9A520A] !text-[#9A520A] hover:!bg-[#D9822B] hover:!border-[#D9822B] hover:!text-[#050505]',
-  extortion: '!bg-transparent !border-[#4F5D95] !text-[#4F5D95] hover:!bg-[#4F5D95] hover:!border-[#4F5D95] hover:!text-white',
-  load_shedding: '!bg-transparent !border-[#0A756E] !text-[#0A756E] hover:!bg-[#0D9488] hover:!border-[#0D9488] hover:!text-[#050505]',
-};
-
 export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   id = 'category-hero-slider',
   section,
@@ -85,7 +71,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   // Section key for CSS variables & art background override
   const sectionKey = section;
   const heroBackground =
-    HERO_ART_BACKGROUNDS[sectionKey] ??
+    HERO_TOKENS.sections[sectionKey]?.background ??
     `var(--sec-${sectionKey}-bg)`;
 
   const totalSlides = slides.length;
@@ -261,7 +247,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           <div className="px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3 md:px-6 md:py-6 lg:px-8 lg:py-7 xl:px-10 xl:py-8 flex flex-col justify-center items-center lg:items-start text-center lg:text-left min-w-0 z-10 space-y-2 md:space-y-3">
             <h1
               className="type-h1 tracking-tight"
-              style={{ color: '#102A43' }}
+              style={{ color: HERO_TOKENS.text.primary }}
             >
               {language === 'bn' ? slide.titleBn : slide.titleEn}
             </h1>
@@ -270,7 +256,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
               <p
                 className="block md:hidden type-body text-center max-w-md mx-auto"
-                style={{ color: '#596579' }}
+                style={{ color: HERO_TOKENS.text.secondary }}
               >
                 {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
               </p>
@@ -279,7 +265,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             {/* Tablet Short Description */}
             <p
               className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
-              style={{ color: '#596579' }}
+              style={{ color: HERO_TOKENS.text.secondary }}
             >
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
             </p>
@@ -287,7 +273,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             {/* Desktop Long Description */}
             <p
               className="hidden lg:block type-body max-w-xl"
-              style={{ color: '#596579' }}
+              style={{ color: HERO_TOKENS.text.secondary }}
             >
               {language === 'bn'
                 ? (slide.desktopDescriptionBn || slide.descriptionBn)
@@ -302,7 +288,8 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   variant="outline"
                   size="md"
                   onClick={slide.action.onClick}
-                  className={`w-auto shadow-none ${HERO_CTA_THEMES[sectionKey] || ''}`}
+                  className="w-auto shadow-none btn-hero-cta"
+                  style={getHeroCtaStyle(sectionKey)}
                 >
                   {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
                 </Button>
@@ -388,14 +375,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   {index === 0 ? (
                     <h1
                       className="type-h1 tracking-tight"
-                      style={{ color: '#102A43' }}
+                      style={{ color: HERO_TOKENS.text.primary }}
                     >
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h1>
                   ) : (
                     <h2
                       className="type-h1 tracking-tight"
-                      style={{ color: '#102A43' }}
+                      style={{ color: HERO_TOKENS.text.primary }}
                     >
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h2>
@@ -405,7 +392,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   {(slide.mobileDescriptionBn || slide.mobileDescriptionEn) && (
                     <p
                       className="block md:hidden type-body text-center max-w-md mx-auto"
-                      style={{ color: '#596579' }}
+                      style={{ color: HERO_TOKENS.text.secondary }}
                     >
                       {language === 'bn' ? slide.mobileDescriptionBn : slide.mobileDescriptionEn}
                     </p>
@@ -414,7 +401,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   {/* Tablet Short Description */}
                   <p
                     className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
-                    style={{ color: '#596579' }}
+                    style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
                   </p>
@@ -422,7 +409,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   {/* Desktop Long Description */}
                   <p
                     className="hidden lg:block type-body max-w-xl"
-                    style={{ color: '#596579' }}
+                    style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn'
                       ? (slide.desktopDescriptionBn || slide.descriptionBn)
@@ -438,7 +425,8 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                         size="md"
                         tabIndex={isActive ? 0 : -1}
                         onClick={slide.action.onClick}
-                        className={`w-auto shadow-none ${HERO_CTA_THEMES[sectionKey] || ''}`}
+                        className="w-auto shadow-none btn-hero-cta"
+                        style={getHeroCtaStyle(sectionKey)}
                       >
                         {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
                       </Button>

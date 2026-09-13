@@ -190,3 +190,60 @@ export const LAYOUT_TOKENS = {
   },
   touchTargetMin: '44px',
 };
+
+export interface HeroSectionTheme {
+  background: string;
+  ctaText: string;
+  ctaBorder: string;
+  ctaHover: string;
+  ctaHoverText: string;
+}
+
+export const HERO_TOKENS = {
+  text: {
+    primary: '#102A43',
+    secondary: '#596579',
+  },
+  sections: {
+    harassment: {
+      background: '#FEEAEC',
+      ctaText: '#9E384E',
+      ctaBorder: '#9E384E',
+      ctaHover: '#B84A62',
+      ctaHoverText: '#FFFFFF',
+    },
+    rickshaw: {
+      background: '#E4F8EE',
+      ctaText: '#9A520A',
+      ctaBorder: '#9A520A',
+      ctaHover: '#D9822B',
+      ctaHoverText: '#050505',
+    },
+    extortion: {
+      background: '#FEEADE',
+      ctaText: '#4F5D95',
+      ctaBorder: '#4F5D95',
+      ctaHover: '#4F5D95',
+      ctaHoverText: '#FFFFFF',
+    },
+    load_shedding: {
+      background: '#FEEDD4',
+      ctaText: '#0A756E',
+      ctaBorder: '#0A756E',
+      ctaHover: '#0D9488',
+      ctaHoverText: '#050505',
+    },
+  } as Record<SectionKey, HeroSectionTheme>,
+};
+
+export const getHeroCtaStyle = (section: SectionKey): React.CSSProperties => {
+  const t = HERO_TOKENS.sections[section];
+  if (!t) return {};
+  return {
+    '--hero-cta-text': t.ctaText,
+    '--hero-cta-border': t.ctaBorder,
+    '--hero-cta-hover-bg': t.ctaHover,
+    '--hero-cta-hover-border': t.ctaHover,
+    '--hero-cta-hover-text': t.ctaHoverText,
+  } as React.CSSProperties;
+};

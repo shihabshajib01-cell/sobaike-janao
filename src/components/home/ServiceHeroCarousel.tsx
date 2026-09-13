@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { SectionKey } from '../../theme/tokens';
+import { SectionKey, HERO_TOKENS, getHeroCtaStyle } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { Button } from '../ui/Button';
 
@@ -51,20 +51,6 @@ const resolvePublicAsset = (src?: string) => {
   const normalizedSrc = src.replace(/^\/+/, '');
 
   return `${normalizedBase}${normalizedSrc}`;
-};
-
-const HERO_ART_BACKGROUNDS: Record<SectionKey, string> = {
-  harassment: '#FEEAEC',
-  rickshaw: '#E4F8EE',
-  extortion: '#FEEADE',
-  load_shedding: '#FEEDD4',
-};
-
-const HERO_CTA_THEMES: Record<SectionKey, string> = {
-  harassment: '!bg-transparent !border-[#9E384E] !text-[#9E384E] hover:!bg-[#B84A62] hover:!border-[#B84A62] hover:!text-white',
-  rickshaw: '!bg-transparent !border-[#9A520A] !text-[#9A520A] hover:!bg-[#D9822B] hover:!border-[#D9822B] hover:!text-[#050505]',
-  extortion: '!bg-transparent !border-[#4F5D95] !text-[#4F5D95] hover:!bg-[#4F5D95] hover:!border-[#4F5D95] hover:!text-white',
-  load_shedding: '!bg-transparent !border-[#0A756E] !text-[#0A756E] hover:!bg-[#0D9488] hover:!border-[#0D9488] hover:!text-[#050505]',
 };
 
 export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
@@ -313,7 +299,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
   const currentSlide = slides[currentIndex];
   const activeKey = currentSlide.key;
-  const activeHeroBg = HERO_ART_BACKGROUNDS[activeKey] ?? `var(--sec-${activeKey}-bg)`;
+  const activeHeroBg = HERO_TOKENS.sections[activeKey]?.background ?? `var(--sec-${activeKey}-bg)`;
 
   const containerStyle: React.CSSProperties = {
     backgroundColor: activeHeroBg,
@@ -368,7 +354,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
               aria-hidden={!isActive}
               className="w-full shrink-0 min-w-full p-0"
               style={{
-                backgroundColor: HERO_ART_BACKGROUNDS[slide.key] ?? `var(--sec-${slide.key}-bg)`,
+                backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
               }}
             >
               <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-stretch min-h-[160px] md:min-h-[180px] lg:min-h-[230px] xl:min-h-[250px]">
@@ -376,7 +362,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 <div className="px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3 md:px-6 md:py-6 lg:px-8 lg:py-7 xl:px-10 xl:py-8 flex flex-col justify-center items-center lg:items-start text-center lg:text-left min-w-0 z-10 space-y-2 md:space-y-3">
                   <h2
                     className="type-h1 tracking-tight"
-                    style={{ color: '#102A43' }}
+                    style={{ color: HERO_TOKENS.text.primary }}
                   >
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
@@ -385,7 +371,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   {(slide.mobileDescBn || slide.mobileDescEn) && (
                     <p
                       className="block md:hidden type-body text-center max-w-md mx-auto"
-                      style={{ color: '#596579' }}
+                      style={{ color: HERO_TOKENS.text.secondary }}
                     >
                       {language === 'bn' ? slide.mobileDescBn : slide.mobileDescEn}
                     </p>
@@ -394,7 +380,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   {/* Tablet Short Description */}
                   <p
                     className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
-                    style={{ color: '#596579' }}
+                    style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn' ? slide.descBn : slide.descEn}
                   </p>
@@ -402,7 +388,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   {/* Desktop Long Description */}
                   <p
                     className="hidden lg:block type-body max-w-xl"
-                    style={{ color: '#596579' }}
+                    style={{ color: HERO_TOKENS.text.secondary }}
                   >
                     {language === 'bn' ? slide.desktopDescBn : slide.desktopDescEn}
                   </p>
@@ -415,7 +401,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                       size="md"
                       tabIndex={isActive ? 0 : -1}
                       onClick={() => openReportComposer(slide.key)}
-                      className={`w-auto shadow-none ${HERO_CTA_THEMES[slide.key] || ''}`}
+                      className="w-auto shadow-none btn-hero-cta"
+                      style={getHeroCtaStyle(slide.key)}
                     >
                       {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
                     </Button>

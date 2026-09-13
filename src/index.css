@@ -813,6 +813,18 @@
   background-color: var(--ui-primary-action-hover) !important;
 }
 
+/* Hero Carousel & Slider CTA Button Recipe */
+.btn-hero-cta {
+  background-color: transparent !important;
+  border-color: var(--hero-cta-border) !important;
+  color: var(--hero-cta-text) !important;
+}
+.btn-hero-cta:hover {
+  background-color: var(--hero-cta-hover-bg) !important;
+  border-color: var(--hero-cta-hover-border, var(--hero-cta-hover-bg)) !important;
+  color: var(--hero-cta-hover-text) !important;
+}
+
 ::selection {
   background-color: var(--ui-accent-soft);
   color: var(--ui-text-primary);
