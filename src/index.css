@@ -1051,8 +1051,8 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 20;
-  width: var(--hero-slider-arrow-size);
-  height: var(--hero-slider-arrow-size);
+  width: var(--hero-slider-arrow-size, 44px);
+  height: var(--hero-slider-arrow-size, 44px);
   border-radius: 9999px;
   background-color: color-mix(in srgb, var(--ui-surface) 90%, transparent);
   color: var(--ui-text-primary);
@@ -1091,11 +1091,29 @@
 }
 
 .hero-slider-arrow-prev {
-  left: var(--hero-slider-arrow-offset);
+  left: calc(-1 * (var(--hero-slider-arrow-size, 44px) + var(--hero-slider-arrow-offset, 12px)));
 }
 
 .hero-slider-arrow-next {
-  right: var(--hero-slider-arrow-offset);
+  right: calc(-1 * (var(--hero-slider-arrow-size, 44px) + var(--hero-slider-arrow-offset, 12px)));
+}
+
+.hero-slider-arrow-prev::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(-1 * var(--hero-slider-arrow-offset, 12px));
+  width: var(--hero-slider-arrow-offset, 12px);
+}
+
+.hero-slider-arrow-next::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--hero-slider-arrow-offset, 12px));
+  width: var(--hero-slider-arrow-offset, 12px);
 }
 
 .hero-slider-arrow svg {

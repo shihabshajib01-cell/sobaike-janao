@@ -58,6 +58,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const timerRef = useRef<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const sliderRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const slides: ServiceSlide[] = [
     {
@@ -243,7 +244,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   };
 
   const handleBlur = (e: React.FocusEvent) => {
-    if (sliderRef.current && sliderRef.current.contains(e.relatedTarget as Node)) {
+    if (
+      (containerRef.current && containerRef.current.contains(e.relatedTarget as Node)) ||
+      (sliderRef.current && sliderRef.current.contains(e.relatedTarget as Node))
+    ) {
       return;
     }
     setIsFocused(false);
@@ -301,84 +305,92 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   };
 
   return (
-    <section
-      id={id}
-      ref={sliderRef}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={
-        language === 'bn'
-          ? 'সেবা সমূহের হাইলাইট ব্যানার'
-          : 'Service highlights hero banner'
-      }
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
+    <div
+      ref={containerRef}
+      className={`relative group w-full ${className}`}
+      style={getHeroSliderCssVars()}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchCancel}
-      className={`group w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
-      style={containerStyle}
     >
-      {/* Slides Track */}
-      <div
-        className={`hero-slider-track ${
-          prefersReducedMotion ? '!transition-none' : ''
-        }`}
-        style={{
-          transform: `translateX(-${currentIndex * 100}%)`,
-          ...(prefersReducedMotion ? { transitionDuration: '0ms' } : {}),
-        }}
+      <section
+        id={id}
+        ref={sliderRef}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={
+          language === 'bn'
+            ? 'সেবা সমূহের হাইলাইট ব্যানার'
+            : 'Service highlights hero banner'
+        }
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+        className="w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        style={containerStyle}
       >
-        {slides.map((slide, index) => {
-          const isActive = index === currentIndex;
-          return (
-            <div
-              key={slide.key}
-              role="group"
-              aria-roledescription="slide"
-              aria-label={
-                language === 'bn'
-                  ? `স্লাইড ${index + 1} / ${totalSlides}`
-                  : `Slide ${index + 1} of ${totalSlides}`
-              }
-              aria-hidden={!isActive}
-              className="w-full shrink-0 min-w-full p-0"
-              style={{
-                backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
-              }}
-            >
-              <CategoryHeroBanner
-                section={slide.key}
-                titleBn={slide.nameBn}
-                titleEn={slide.nameEn}
-                mobileDescriptionBn={slide.mobileDescBn}
-                mobileDescriptionEn={slide.mobileDescEn}
-                descriptionBn={slide.descBn}
-                descriptionEn={slide.descEn}
-                desktopDescriptionBn={slide.desktopDescBn}
-                desktopDescriptionEn={slide.desktopDescEn}
-                illustrationSrc={slide.illustrationSrc}
-                desktopMediaPosition={slide.desktopMediaPosition}
-                desktopMediaScale={slide.desktopMediaScale}
-                desktopMediaTranslateY={slide.desktopMediaTranslateY}
-                action={{
-                  labelBn: slide.primaryCtaBn || (language === 'bn' ? 'রিপোর্ট করুন' : 'Report now'),
-                  labelEn: slide.primaryCtaEn || 'Report now',
-                  onClick: () => openReportComposer(slide.key),
+        {/* Slides Track */}
+        <div
+          className={`hero-slider-track ${
+            prefersReducedMotion ? '!transition-none' : ''
+          }`}
+          style={{
+            transform: `translateX(-${currentIndex * 100}%)`,
+            ...(prefersReducedMotion ? { transitionDuration: '0ms' } : {}),
+          }}
+        >
+          {slides.map((slide, index) => {
+            const isActive = index === currentIndex;
+            return (
+              <div
+                key={slide.key}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={
+                  language === 'bn'
+                    ? `স্লাইড ${index + 1} / ${totalSlides}`
+                    : `Slide ${index + 1} of ${totalSlides}`
+                }
+                aria-hidden={!isActive}
+                className="w-full shrink-0 min-w-full p-0"
+                style={{
+                  backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
                 }}
-                headingLevel="h2"
-                active={isActive}
-                ctaId={`${id}-report-btn-${slide.key}`}
-                ctaTabIndex={isActive ? 0 : -1}
-              />
-            </div>
-          );
-        })}
-      </div>
+              >
+                <CategoryHeroBanner
+                  section={slide.key}
+                  titleBn={slide.nameBn}
+                  titleEn={slide.nameEn}
+                  mobileDescriptionBn={slide.mobileDescBn}
+                  mobileDescriptionEn={slide.mobileDescEn}
+                  descriptionBn={slide.descBn}
+                  descriptionEn={slide.descEn}
+                  desktopDescriptionBn={slide.desktopDescBn}
+                  desktopDescriptionEn={slide.desktopDescEn}
+                  illustrationSrc={slide.illustrationSrc}
+                  desktopMediaPosition={slide.desktopMediaPosition}
+                  desktopMediaScale={slide.desktopMediaScale}
+                  desktopMediaTranslateY={slide.desktopMediaTranslateY}
+                  action={{
+                    labelBn: slide.primaryCtaBn || (language === 'bn' ? 'রিপোর্ট করুন' : 'Report now'),
+                    labelEn: slide.primaryCtaEn || 'Report now',
+                    onClick: () => openReportComposer(slide.key),
+                  }}
+                  headingLevel="h2"
+                  active={isActive}
+                  ctaId={`${id}-report-btn-${slide.key}`}
+                  ctaTabIndex={isActive ? 0 : -1}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Large-Desktop (>=1440px) / Fine-Pointer Hover Arrows */}
       {isMultiSlide && (
@@ -386,6 +398,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
           <button
             type="button"
             onClick={handlePrev}
+            onFocus={() => setIsFocused(true)}
+            onBlur={handleBlur}
             aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
             className="hero-slider-arrow hero-slider-arrow-prev"
           >
@@ -395,6 +409,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
           <button
             type="button"
             onClick={handleNext}
+            onFocus={() => setIsFocused(true)}
+            onBlur={handleBlur}
             aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
             className="hero-slider-arrow hero-slider-arrow-next"
           >
@@ -402,6 +418,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
           </button>
         </>
       )}
-    </section>
+    </div>
   );
 };
