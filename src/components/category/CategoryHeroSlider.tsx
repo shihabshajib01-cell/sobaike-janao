@@ -313,9 +313,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               aria-hidden={!isActive}
               className="w-full shrink-0 p-4 sm:p-5 md:p-7 min-w-full"
             >
-              <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
+              <div className="grid grid-cols-2 items-center gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
                 {/* Left Text Content */}
-                <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
+                <div className="min-w-0 space-y-2 sm:space-y-2.5 text-left z-10">
                   {index === 0 ? (
                     <h1 className="type-h1 text-ui-content-primary tracking-tight">
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
@@ -351,7 +351,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 </div>
 
                 {/* Right Illustration Safe Area */}
-                <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+                <div className="min-w-0 w-full h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
                   {slide.illustrationSrc ? (
                     <img
                       src={slide.illustrationSrc}

@@ -317,9 +317,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 backgroundColor: `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className="flex items-center justify-between gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
+              <div className="grid grid-cols-2 items-center gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
                 {/* Left Text Content */}
-                <div className="min-w-0 flex-1 space-y-1.5 sm:space-y-2 text-left z-10">
+                <div className="min-w-0 space-y-1.5 sm:space-y-2 text-left z-10">
                   <h2 className="type-h2 text-ui-content-primary tracking-tight">
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
@@ -347,7 +347,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 </div>
 
                 {/* Right Illustration Safe Area */}
-                <div className="shrink-0 w-24 min-[380px]:w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+                <div className="min-w-0 w-full h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
                   {slide.illustrationSrc ? (
                     <img
                       src={slide.illustrationSrc}
