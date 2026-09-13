@@ -363,7 +363,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 }}
               >
                 <CategoryHeroBanner
-                  className="h-full"
+                  className="w-full h-full flex-1"
                   section={slide.key}
                   titleBn={slide.nameBn}
                   titleEn={slide.nameEn}
