@@ -30,6 +30,7 @@ export interface ServiceSlide {
   illustrationSrc?: string;
   desktopMediaPosition?: string;
   desktopMediaScale?: number;
+  desktopMediaTranslateY?: string;
   badgeBn?: string;
   badgeEn?: string;
   reportCount?: number;
@@ -435,6 +436,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                         slide.desktopMediaScale ??
                         HERO_TOKENS.sections[slide.key]?.desktopMediaScale ??
                         HERO_SLIDER_TOKENS.media.defaultDesktopScale;
+                      const resolvedDesktopMediaTranslateY =
+                        slide.desktopMediaTranslateY ??
+                        HERO_TOKENS.sections[slide.key]?.desktopMediaTranslateY;
 
                       return (
                         <img
@@ -444,6 +448,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                           style={{
                             '--hero-desktop-media-position': resolvedDesktopMediaPosition,
                             '--hero-desktop-media-scale': resolvedDesktopMediaScale,
+                            ...(resolvedDesktopMediaTranslateY
+                              ? { '--hero-desktop-media-translate-y': resolvedDesktopMediaTranslateY }
+                              : {}),
                           } as React.CSSProperties}
                           className="hero-slider-image hero-desktop-media-framed"
                         />

@@ -199,6 +199,7 @@ export interface HeroSectionTheme {
   ctaHoverText: string;
   desktopMediaPosition?: string;
   desktopMediaScale?: number;
+  desktopMediaTranslateY?: string;
 }
 
 export const HERO_TOKENS = {
@@ -215,6 +216,7 @@ export const HERO_TOKENS = {
       ctaHoverText: '#FFFFFF',
       desktopMediaPosition: 'center bottom',
       desktopMediaScale: 1.05,
+      desktopMediaTranslateY: '10px',
     },
     rickshaw: {
       background: '#E4F8EE',
@@ -243,7 +245,7 @@ export const HERO_TOKENS = {
       desktopMediaPosition: 'center bottom',
       desktopMediaScale: 1.0,
     },
-  } satisfies Record<SectionKey, HeroSectionTheme>,
+  } as Record<SectionKey, HeroSectionTheme>,
 };
 
 export const HERO_SLIDER_BEHAVIOR = {

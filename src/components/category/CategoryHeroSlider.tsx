@@ -24,6 +24,7 @@ export interface CategoryHeroSlide {
   illustrationSrc?: string;
   desktopMediaPosition?: string;
   desktopMediaScale?: number;
+  desktopMediaTranslateY?: string;
   action?: {
     labelBn: string;
     labelEn: string;
@@ -322,6 +323,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   slide.desktopMediaScale ??
                   HERO_TOKENS.sections[sectionKey]?.desktopMediaScale ??
                   HERO_SLIDER_TOKENS.media.defaultDesktopScale;
+                const resolvedDesktopMediaTranslateY =
+                  slide.desktopMediaTranslateY ??
+                  HERO_TOKENS.sections[sectionKey]?.desktopMediaTranslateY;
 
                 return (
                   <img
@@ -331,6 +335,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                     style={{
                       '--hero-desktop-media-position': resolvedDesktopMediaPosition,
                       '--hero-desktop-media-scale': resolvedDesktopMediaScale,
+                      ...(resolvedDesktopMediaTranslateY
+                        ? { '--hero-desktop-media-translate-y': resolvedDesktopMediaTranslateY }
+                        : {}),
                     } as React.CSSProperties}
                     className="hero-slider-image hero-desktop-media-framed"
                   />
@@ -477,6 +484,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                         slide.desktopMediaScale ??
                         HERO_TOKENS.sections[sectionKey]?.desktopMediaScale ??
                         HERO_SLIDER_TOKENS.media.defaultDesktopScale;
+                      const resolvedDesktopMediaTranslateY =
+                        slide.desktopMediaTranslateY ??
+                        HERO_TOKENS.sections[sectionKey]?.desktopMediaTranslateY;
 
                       return (
                         <img
@@ -486,6 +496,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                           style={{
                             '--hero-desktop-media-position': resolvedDesktopMediaPosition,
                             '--hero-desktop-media-scale': resolvedDesktopMediaScale,
+                            ...(resolvedDesktopMediaTranslateY
+                              ? { '--hero-desktop-media-translate-y': resolvedDesktopMediaTranslateY }
+                              : {}),
                           } as React.CSSProperties}
                           className="hero-slider-image hero-desktop-media-framed"
                         />

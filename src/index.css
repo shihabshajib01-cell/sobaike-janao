@@ -875,7 +875,7 @@
 @media (min-width: 1024px) {
   .hero-desktop-media-framed {
     object-position: var(--hero-desktop-media-position, center bottom) !important;
-    transform: scale(var(--hero-desktop-media-scale, 1));
+    transform: translateY(var(--hero-desktop-media-translate-y, 0)) scale(var(--hero-desktop-media-scale, 1));
     transform-origin: center bottom;
   }
 }
