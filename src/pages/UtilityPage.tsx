@@ -70,6 +70,7 @@ export const UtilityPage: React.FC = () => {
             titleEn: config.nameEn,
             descriptionBn: config.descriptionBn,
             descriptionEn: config.descriptionEn,
+            illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.png',
             action: {
               labelBn: 'প্রতিবেদন জমা দিন',
               labelEn: 'Submit report',

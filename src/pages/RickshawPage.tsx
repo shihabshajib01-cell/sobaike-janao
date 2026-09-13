@@ -65,6 +65,7 @@ export const RickshawPage: React.FC = () => {
             titleEn: config.nameEn,
             descriptionBn: config.descriptionBn,
             descriptionEn: config.descriptionEn,
+            illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
           },
         ]}
       />
