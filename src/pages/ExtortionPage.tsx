@@ -66,10 +66,10 @@ export const ExtortionPage: React.FC = () => {
         slides={[
           {
             id: 'extortion-primary',
-            titleBn: config.nameBn,
-            titleEn: config.nameEn,
-            descriptionBn: config.descriptionBn,
-            descriptionEn: config.descriptionEn,
+            titleBn: 'চাঁদাবাজি',
+            titleEn: 'Extortion',
+            descriptionBn: 'অবৈধ চাঁদা বা হুমকির তথ্য জানান।',
+            descriptionEn: 'Report illegal demands or threats.',
             illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.png',
           },
         ]}
