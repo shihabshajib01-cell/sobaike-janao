@@ -67,7 +67,7 @@ export const RickshawPage: React.FC = () => {
             descriptionEn: 'Unsafe battery charging and risky connections.',
             desktopDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
             desktopDescriptionEn: 'Report unsafe battery charging stations, exposed wiring, overloaded connections, or other electrical risks.',
-            illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
+            illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.jpeg',
             action: {
               labelBn: 'রিপোর্ট করুন',
               labelEn: 'Report now',

@@ -94,7 +94,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/harassment',
-      illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.png',
+      illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.jpeg',
     },
     {
       key: 'rickshaw',
@@ -107,7 +107,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/rickshaw',
-      illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
+      illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.jpeg',
     },
     {
       key: 'extortion',
@@ -120,7 +120,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/extortion',
-      illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.png',
+      illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.jpeg',
     },
     {
       key: 'load_shedding',
@@ -133,7 +133,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report now',
       path: '/load-shedding',
-      illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.png',
+      illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.jpeg',
     },
   ];
 

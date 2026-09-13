@@ -72,7 +72,7 @@ export const HarassmentPage: React.FC = () => {
             descriptionEn: 'Physical, verbal, or online abuse.',
             desktopDescriptionBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',
             desktopDescriptionEn: 'Report physical, verbal, or online harassment, abuse, threats, or other unsafe behaviour.',
-            illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.png',
+            illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.jpeg',
             action: {
               labelBn: 'রিপোর্ট করুন',
               labelEn: 'Report now',
