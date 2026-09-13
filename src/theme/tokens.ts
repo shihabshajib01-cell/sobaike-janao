@@ -226,6 +226,7 @@ export const HERO_TOKENS = {
       ctaHoverText: '#050505',
       desktopMediaPosition: 'center bottom',
       desktopMediaScale: 1.0,
+      desktopMediaTranslateY: undefined,
     },
     extortion: {
       background: '#FEEADE',
@@ -235,6 +236,7 @@ export const HERO_TOKENS = {
       ctaHoverText: '#FFFFFF',
       desktopMediaPosition: 'center bottom',
       desktopMediaScale: 1.0,
+      desktopMediaTranslateY: undefined,
     },
     load_shedding: {
       background: '#FEEDD4',
@@ -244,8 +246,9 @@ export const HERO_TOKENS = {
       ctaHoverText: '#050505',
       desktopMediaPosition: 'center bottom',
       desktopMediaScale: 1.0,
+      desktopMediaTranslateY: undefined,
     },
-  } as Record<SectionKey, HeroSectionTheme>,
+  } satisfies Record<SectionKey, HeroSectionTheme>,
 };
 
 export const HERO_SLIDER_BEHAVIOR = {
