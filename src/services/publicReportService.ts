@@ -91,8 +91,35 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
   };
 };
 
+const LOCAL_MOCK_STORAGE_KEY = 'sobaike_janao_mock_reports';
+
+export function getLocalMockReports(): any[] {
+  try {
+    if (typeof window === 'undefined') return [];
+    const raw = localStorage.getItem(LOCAL_MOCK_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalMockReport(report: any): void {
+  try {
+    if (typeof window === 'undefined') return;
+    const existing = getLocalMockReports();
+    existing.unshift(report);
+    localStorage.setItem(LOCAL_MOCK_STORAGE_KEY, JSON.stringify(existing));
+  } catch (err) {
+    console.warn('[PublicReportService] Failed to save mock report to localStorage', err);
+  }
+}
+
 const isMockModeAllowed = (): boolean => {
-  return Boolean(
+  // If Supabase is not configured, automatically allow mock mode so the app works out-of-the-box in preview
+  if (!isSupabaseConfigured()) {
+    return import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
+  }
+  return (
     import.meta.env.DEV &&
     import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
   );
@@ -110,7 +137,8 @@ export const PublicReportService = {
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
-        list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+        const local = getLocalMockReports().map(mapSeedToReportItem);
+        list = [...local, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
       } else {
         throw new Error('Public reports service is currently unavailable.');
       }
@@ -119,7 +147,8 @@ export const PublicReportService = {
       if (error) {
         console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
         if (isMockModeAllowed()) {
-          list = SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem);
+          const local = getLocalMockReports().map(mapSeedToReportItem);
+          list = [...local, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
         } else {
           throw new Error(error.message || 'Failed to load public reports from server.');
         }
@@ -219,10 +248,12 @@ export const PublicReportService = {
 
     if (!isSupabaseConfigured() || !supabase) {
       if (isMockModeAllowed()) {
-        const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
-        if (seed) {
+        const local = getLocalMockReports().map(mapSeedToReportItem);
+        const combined = [...local, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
+        const found = combined.find((r) => r.id.toUpperCase() === cleanId);
+        if (found) {
           return {
-            report: mapSeedToReportItem(seed),
+            report: found,
             responses: [],
             responseLoadError: false,
           };

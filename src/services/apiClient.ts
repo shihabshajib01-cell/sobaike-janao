@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
+import { saveLocalMockReport } from './publicReportService';
 
 export interface ApiError {
   code: string;
@@ -20,9 +21,7 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-      );
+      const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
       if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
@@ -88,9 +87,7 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-      );
+      const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
       if (!isMockAllowed) {
         const error: ApiError = {
           code: 'SUPABASE_NOT_CONFIGURED',
@@ -163,22 +160,25 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = Boolean(
-        import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-      );
+      const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
       if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in local mock mode (DEV only)');
+        console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
         const randomNum = Math.floor(100000 + Math.random() * 900000);
         const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
+        const mockReportData = {
+          id: mockReportId,
+          ...payload,
+          createdAt: new Date().toISOString(),
+          status: 'submitted',
+          statusBn: 'জমা হয়েছে / পর্যালোচনার অপেক্ষায়',
+          statusEn: 'Submitted / Awaiting Review',
+        };
+        saveLocalMockReport(mockReportData);
         return {
           success: true,
           reportId: mockReportId,
           message: 'Report submitted successfully (local mock mode).',
-          report: {
-            id: mockReportId,
-            ...payload,
-            createdAt: new Date().toISOString(),
-          },
+          report: mockReportData,
         };
       }
 
