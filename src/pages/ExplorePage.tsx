@@ -10,6 +10,7 @@ import { MapSectionHeader, ExploreViewMode } from '../components/explore/MapSect
 import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
 import { DistrictRankingPanel } from '../components/explore/DistrictRankingPanel';
 import { RecentAreaReports } from '../components/explore/RecentAreaReports';
+import { ReportAnalyticsOverview } from '../components/explore/ReportAnalyticsOverview';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
@@ -421,7 +422,12 @@ export const ExplorePage: React.FC = () => {
             </div>
           ) : (
             /* REPORTS VIEW (Preserves full ReportCard list browsing experience) */
-            <div className="space-y-3.5">
+            <div className="space-y-4">
+              <ReportAnalyticsOverview
+                reports={filteredReports}
+                language={language}
+              />
+
               <div className="flex items-center justify-between text-[13px] text-ui-content-muted font-medium">
                 <span>
                   {language === 'bn'
