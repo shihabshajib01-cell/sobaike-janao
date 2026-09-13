@@ -74,7 +74,7 @@ export const ExtortionPage: React.FC = () => {
             descriptionEn: 'Illegal demands, threats, or forced payments.',
             desktopDescriptionBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',
             desktopDescriptionEn: 'Report illegal demands for money, threats, coercion, or forced payments in shops, transport, or local areas.',
-            illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.jpeg',
+            illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.jpg',
             action: {
               labelBn: 'রিপোর্ট করুন',
               labelEn: 'Report now',

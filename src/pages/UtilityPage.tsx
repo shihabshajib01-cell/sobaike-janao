@@ -74,7 +74,7 @@ export const UtilityPage: React.FC = () => {
             descriptionEn: 'Power, gas, or billing problems.',
             desktopDescriptionBn: 'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ সরবরাহ সমস্যা বা ভুল ইউটিলিটি বিলের তথ্য জানান।',
             desktopDescriptionEn: 'Report load shedding, gas shortages, electricity supply problems, or incorrect utility billing.',
-            illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.jpeg',
+            illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.jpg',
             action: {
               labelBn: 'রিপোর্ট করুন',
               labelEn: 'Report now',
