@@ -317,18 +317,18 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 backgroundColor: `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className="grid grid-cols-2 items-center gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
+              <div className="grid grid-cols-2 items-center gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full w-full">
                 {/* Left Text Content */}
-                <div className="min-w-0 space-y-1.5 sm:space-y-2 text-left z-10">
-                  <h2 className="type-h2 text-ui-content-primary tracking-tight">
+                <div className="min-w-0 w-full space-y-1.5 sm:space-y-2 md:space-y-2.5 text-left z-10">
+                  <h2 className="type-h2 font-bold tracking-tight text-ui-content-primary !text-base min-[380px]:!text-lg sm:!text-xl md:!text-2xl !leading-tight sm:!leading-snug">
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
 
-                  <p className="type-body text-ui-content-secondary max-w-2xl">
+                  <p className="type-body font-normal text-ui-content-secondary !text-xs min-[380px]:!text-sm sm:!text-base !leading-snug sm:!leading-relaxed max-w-2xl">
                     {language === 'bn' ? slide.descBn : slide.descEn}
                   </p>
 
-                  <div className="pt-1.5 sm:pt-2">
+                  <div className="pt-1 sm:pt-1.5 md:pt-2">
                     <Button
                       id={`${id}-report-btn-${slide.key}`}
                       variant="primary"
@@ -358,7 +358,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-16 h-16 min-[380px]:w-20 min-[380px]:h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
+                      className="w-16 h-16 min-[380px]:w-20 min-[380px]:h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40"
                     />
                   )}
                 </div>

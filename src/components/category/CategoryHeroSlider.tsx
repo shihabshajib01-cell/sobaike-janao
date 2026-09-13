@@ -216,17 +216,17 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         className={`w-full rounded-2xl border p-4 sm:p-5 md:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
-        <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
+        <div className="grid grid-cols-2 items-center gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full w-full">
           {/* Left Text Content */}
-          <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
-            <h1 className="type-h1 text-ui-content-primary tracking-tight">
+          <div className="min-w-0 w-full space-y-1.5 sm:space-y-2 md:space-y-2.5 text-left z-10">
+            <h1 className="type-h1 font-bold sm:font-extrabold tracking-tight text-ui-content-primary !text-lg min-[380px]:!text-xl sm:!text-2xl md:!text-3xl !leading-tight sm:!leading-snug">
               {language === 'bn' ? slide.titleBn : slide.titleEn}
             </h1>
-            <p className="type-body text-ui-content-secondary max-w-2xl">
+            <p className="type-body font-normal text-ui-content-secondary !text-xs min-[380px]:!text-sm sm:!text-base !leading-snug sm:!leading-relaxed max-w-2xl">
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
             </p>
             {slide.action && (
-              <div className="pt-1.5 sm:pt-2">
+              <div className="pt-1 sm:pt-1.5 md:pt-2">
                 <Button
                   id={`${id}-cta-btn`}
                   variant="primary"
@@ -245,7 +245,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           </div>
 
           {/* Right Illustration Safe Area (Phase 1 Quiet Placeholder) */}
-          <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+          <div className="min-w-0 w-full h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
             {slide.illustrationSrc ? (
               <img
                 src={slide.illustrationSrc}
@@ -256,7 +256,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             ) : (
               <div
                 aria-hidden="true"
-                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
+                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40"
               />
             )}
           </div>
@@ -313,25 +313,25 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               aria-hidden={!isActive}
               className="w-full shrink-0 p-4 sm:p-5 md:p-7 min-w-full"
             >
-              <div className="grid grid-cols-2 items-center gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
+              <div className="grid grid-cols-2 items-center gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full w-full">
                 {/* Left Text Content */}
-                <div className="min-w-0 space-y-2 sm:space-y-2.5 text-left z-10">
+                <div className="min-w-0 w-full space-y-1.5 sm:space-y-2 md:space-y-2.5 text-left z-10">
                   {index === 0 ? (
-                    <h1 className="type-h1 text-ui-content-primary tracking-tight">
+                    <h1 className="type-h1 font-bold sm:font-extrabold tracking-tight text-ui-content-primary !text-lg min-[380px]:!text-xl sm:!text-2xl md:!text-3xl !leading-tight sm:!leading-snug">
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h1>
                   ) : (
-                    <h2 className="type-h2 text-ui-content-primary tracking-tight">
+                    <h2 className="type-h2 font-bold tracking-tight text-ui-content-primary !text-base min-[380px]:!text-lg sm:!text-xl md:!text-2xl !leading-tight sm:!leading-snug">
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h2>
                   )}
 
-                  <p className="type-body text-ui-content-secondary max-w-2xl">
+                  <p className="type-body font-normal text-ui-content-secondary !text-xs min-[380px]:!text-sm sm:!text-base !leading-snug sm:!leading-relaxed max-w-2xl">
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
                   </p>
 
                   {slide.action && (
-                    <div className="pt-1.5 sm:pt-2">
+                    <div className="pt-1 sm:pt-1.5 md:pt-2">
                       <Button
                         id={`${id}-cta-btn-${index}`}
                         variant="primary"
@@ -362,7 +362,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40"
                     />
                   )}
                 </div>
