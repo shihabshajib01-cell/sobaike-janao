@@ -191,6 +191,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         <div className="hero-slider-mobile-cta">
           <Button
             id={ctaId ? `${ctaId}-mobile` : undefined}
+            fullWidth
             variant="outline"
             size="md"
             tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
