@@ -11,6 +11,7 @@ import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
 import { DistrictRankingPanel } from '../components/explore/DistrictRankingPanel';
 import { RecentAreaReports } from '../components/explore/RecentAreaReports';
 import { ReportAnalyticsOverview } from '../components/explore/ReportAnalyticsOverview';
+import { ReportGeographicBreakdown } from '../components/explore/ReportGeographicBreakdown';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
@@ -424,6 +425,11 @@ export const ExplorePage: React.FC = () => {
             /* REPORTS VIEW (Preserves full ReportCard list browsing experience) */
             <div className="space-y-4">
               <ReportAnalyticsOverview
+                reports={filteredReports}
+                language={language}
+              />
+
+              <ReportGeographicBreakdown
                 reports={filteredReports}
                 language={language}
               />
