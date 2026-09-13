@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AlertCircle, Info } from 'lucide-react';
-import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
-import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
@@ -14,8 +12,6 @@ import { useApp } from '../context/AppContext';
 
 export const RickshawPage: React.FC = () => {
   const { language } = useApp();
-  const { getSegment } = useTaxonomy();
-  const config = getSegment('rickshaw') || SECTIONS.rickshaw;
 
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
 
@@ -61,10 +57,10 @@ export const RickshawPage: React.FC = () => {
         slides={[
           {
             id: 'rickshaw-primary',
-            titleBn: config.nameBn,
-            titleEn: config.nameEn,
-            descriptionBn: config.descriptionBn,
-            descriptionEn: config.descriptionEn,
+            titleBn: 'অননুমোদিত চার্জিং স্টেশন',
+            titleEn: 'Unsafe charging stations',
+            descriptionBn: 'অনুমোদনহীন ব্যাটারি চার্জিং স্টেশন ও ঝুঁকিপূর্ণ সংযোগের তথ্য জানান।',
+            descriptionEn: 'Report unauthorized or unsafe auto-rickshaw battery charging stations.',
             illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
           },
         ]}

@@ -33,7 +33,7 @@ export const SECTIONS = {
     nameEn: 'Unsafe charging stations',
     shortNameBn: 'চার্জিং',
     shortNameEn: 'Charging',
-    descriptionBn: 'অনুমোদনহীন ব্যাটারি চার্জিং স্টেশন ও ঝুঁকিপূর্ণ বৈদ্যুতিক সংযোগের তথ্য জানান।',
+    descriptionBn: 'অনুমোদনহীন ব্যাটারি চার্জিং স্টেশন ও ঝুঁকিপূর্ণ সংযোগের তথ্য জানান।',
     descriptionEn: 'Report unauthorized or unsafe auto-rickshaw battery charging stations.',
     primaryColor: '#D9822B',
     hoverColor: '#B8681A',

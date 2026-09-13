@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { PhoneCall, AlertCircle } from 'lucide-react';
-import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -15,8 +14,7 @@ import { useApp } from '../context/AppContext';
 
 export const HarassmentPage: React.FC = () => {
   const { language } = useApp();
-  const { getFeedSubcategories, getSegment } = useTaxonomy();
-  const config = getSegment('harassment') || SECTIONS.harassment;
+  const { getFeedSubcategories } = useTaxonomy();
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -66,10 +64,10 @@ export const HarassmentPage: React.FC = () => {
         slides={[
           {
             id: 'harassment-primary',
-            titleBn: config.nameBn,
-            titleEn: config.nameEn,
-            descriptionBn: config.descriptionBn,
-            descriptionEn: config.descriptionEn,
+            titleBn: 'হয়রানি ও নির্যাতন',
+            titleEn: 'Harassment & abuse',
+            descriptionBn: 'শারীরিক বা মানসিক নির্যাতন, নিপীড়ন ও অনলাইনে হেনস্তার তথ্য জানান।',
+            descriptionEn: 'Report incidents of harassment, abuse, or safety violations.',
             illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.png',
           },
         ]}
