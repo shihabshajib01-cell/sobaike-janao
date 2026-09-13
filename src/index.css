@@ -99,8 +99,8 @@
     --type-label-line: 24px;
     --type-label-weight: var(--font-weight-medium);
 
-    --type-action-size: 16px;
-    --type-action-line: 24px;
+    --type-action-size: var(--type-body-size);
+    --type-action-line: var(--type-body-line);
     --type-action-weight: var(--font-weight-semibold);
 
     --type-meta-size: 14px;
