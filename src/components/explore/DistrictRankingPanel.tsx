@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ReportItem } from '../../types/report';
 import { BANGLADESH_DISTRICTS } from '../../data/districts';
-import { SectionKey } from '../../theme/tokens';
+import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { toBanglaDigits, formatRankNumber } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
 import { CategoryIcon } from '../branding/CategoryIcon';
@@ -318,7 +318,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               <div className="bg-[var(--sec-load_shedding-bg)] border border-[var(--sec-load_shedding-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
                 <CategoryIcon section="load_shedding" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-load_shedding-text)]" />
                 <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-load_shedding-text)] truncate max-w-full">
-                  {language === 'bn' ? 'ইউটিলিটি' : 'Utility'}
+                  {language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}
                 </div>
                 <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-load_shedding-text)] font-mono mt-0.5">
                   {language === 'bn'
@@ -392,7 +392,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
             <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
               <CategoryIcon section="load_shedding" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'ইউটিলিটি' : 'Utility'}</div>
+              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}</div>
               <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
                 {language === 'bn' ? toBanglaDigits(totalLoadShedding) : totalLoadShedding}
               </div>
