@@ -6,6 +6,7 @@ import {
   HERO_SLIDER_TOKENS,
   HERO_SLIDER_BEHAVIOR,
   getHeroCtaStyle,
+  getHeroSliderCssVars,
 } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { Button } from '../ui/Button';
@@ -313,6 +314,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const activeHeroBg = HERO_TOKENS.sections[activeKey]?.background ?? `var(--sec-${activeKey}-bg)`;
 
   const containerStyle: React.CSSProperties = {
+    ...getHeroSliderCssVars(),
     backgroundColor: activeHeroBg,
     borderColor: `var(--sec-${activeKey}-border)`,
     touchAction: 'pan-y',
@@ -348,9 +350,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         }`}
         style={{
           transform: `translateX(-${currentIndex * 100}%)`,
-          transitionDuration: prefersReducedMotion
-            ? '0ms'
-            : `${HERO_SLIDER_BEHAVIOR.transitionDurationMs}ms`,
+          ...(prefersReducedMotion ? { transitionDuration: '0ms' } : {}),
         }}
       >
         {slides.map((slide, index) => {
@@ -471,7 +471,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             aria-label={language === 'bn' ? 'পূর্ববর্তী সেবা' : 'Previous service'}
             className="hero-slider-arrow hero-slider-arrow-prev"
           >
-            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+            <ChevronLeft aria-hidden="true" />
           </button>
 
           <button
@@ -480,7 +480,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             aria-label={language === 'bn' ? 'পরবর্তী সেবা' : 'Next service'}
             className="hero-slider-arrow hero-slider-arrow-next"
           >
-            <ChevronRight className="w-5 h-5" aria-hidden="true" />
+            <ChevronRight aria-hidden="true" />
           </button>
         </>
       )}

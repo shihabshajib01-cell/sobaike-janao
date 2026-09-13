@@ -304,14 +304,55 @@ export const HERO_SLIDER_TOKENS = {
     arrowSize: '44px',
     arrowOffset: '12px',
     arrowIconSize: '20px',
-    arrowMinViewport: '1440px',
-  },
-
-  layout: {
-    desktopBreakpoint: '1024px',
-    desktopColumns: 'minmax(0,1fr) minmax(0,1fr)',
   },
 } as const;
+
+export const getHeroSliderCssVars = (): React.CSSProperties =>
+  ({
+    '--hero-slider-media-mobile-h': HERO_SLIDER_TOKENS.dimensions.mediaHeightMobile,
+    '--hero-slider-media-sm-h': HERO_SLIDER_TOKENS.dimensions.mediaHeightSmall,
+    '--hero-slider-media-tablet-max-h': HERO_SLIDER_TOKENS.dimensions.mediaMaxHeightTablet,
+
+    '--hero-slider-min-mobile': HERO_SLIDER_TOKENS.dimensions.minHeightMobile,
+    '--hero-slider-min-tablet': HERO_SLIDER_TOKENS.dimensions.minHeightTablet,
+    '--hero-slider-min-desktop': HERO_SLIDER_TOKENS.dimensions.minHeightDesktop,
+    '--hero-slider-min-xl': HERO_SLIDER_TOKENS.dimensions.minHeightLargeDesktop,
+
+    '--hero-slider-content-mobile-x': HERO_SLIDER_TOKENS.spacing.contentMobileX,
+    '--hero-slider-content-mobile-top': HERO_SLIDER_TOKENS.spacing.contentMobileTop,
+    '--hero-slider-content-mobile-bottom': HERO_SLIDER_TOKENS.spacing.contentMobileBottom,
+
+    '--hero-slider-content-sm-x': HERO_SLIDER_TOKENS.spacing.contentSmallX,
+    '--hero-slider-content-sm-top': HERO_SLIDER_TOKENS.spacing.contentSmallTop,
+    '--hero-slider-content-sm-bottom': HERO_SLIDER_TOKENS.spacing.contentSmallBottom,
+
+    '--hero-slider-content-tablet-x': HERO_SLIDER_TOKENS.spacing.contentTabletX,
+    '--hero-slider-content-tablet-y': HERO_SLIDER_TOKENS.spacing.contentTabletY,
+
+    '--hero-slider-content-desktop-x': HERO_SLIDER_TOKENS.spacing.contentDesktopX,
+    '--hero-slider-content-desktop-y': HERO_SLIDER_TOKENS.spacing.contentDesktopY,
+
+    '--hero-slider-content-xl-x': HERO_SLIDER_TOKENS.spacing.contentLargeDesktopX,
+    '--hero-slider-content-xl-y': HERO_SLIDER_TOKENS.spacing.contentLargeDesktopY,
+
+    '--hero-slider-content-gap-mobile': HERO_SLIDER_TOKENS.spacing.contentGapMobile,
+    '--hero-slider-content-gap-tablet': HERO_SLIDER_TOKENS.spacing.contentGapTablet,
+
+    '--hero-slider-cta-top-mobile': HERO_SLIDER_TOKENS.spacing.ctaTopMobile,
+    '--hero-slider-cta-top-sm': HERO_SLIDER_TOKENS.spacing.ctaTopSmall,
+    '--hero-slider-cta-top-tablet': HERO_SLIDER_TOKENS.spacing.ctaTopTablet,
+
+    '--hero-slider-arrow-size': HERO_SLIDER_TOKENS.controls.arrowSize,
+    '--hero-slider-arrow-offset': HERO_SLIDER_TOKENS.controls.arrowOffset,
+    '--hero-slider-arrow-icon-size': HERO_SLIDER_TOKENS.controls.arrowIconSize,
+
+    '--hero-slider-media-fit-mobile': HERO_SLIDER_TOKENS.media.mobileFit,
+    '--hero-slider-media-position-mobile': HERO_SLIDER_TOKENS.media.mobilePosition,
+    '--hero-slider-media-fit-tablet': HERO_SLIDER_TOKENS.media.tabletFit,
+    '--hero-slider-media-fit-desktop': HERO_SLIDER_TOKENS.media.desktopFit,
+
+    '--hero-slider-transition-duration': `${HERO_SLIDER_BEHAVIOR.transitionDurationMs}ms`,
+  } as React.CSSProperties);
 
 export const getHeroCtaStyle = (section: SectionKey): React.CSSProperties => {
   const t = HERO_TOKENS.sections[section];

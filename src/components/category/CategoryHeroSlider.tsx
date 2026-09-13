@@ -6,6 +6,7 @@ import {
   HERO_SLIDER_TOKENS,
   HERO_SLIDER_BEHAVIOR,
   getHeroCtaStyle,
+  getHeroSliderCssVars,
 } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
 import { Button } from '../ui/Button';
@@ -235,6 +236,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
   // Section styling via CSS variables & art background override
   const containerStyle: React.CSSProperties = {
+    ...getHeroSliderCssVars(),
     backgroundColor: heroBackground,
     borderColor: `var(--sec-${sectionKey}-border)`,
     touchAction: 'pan-y',
@@ -377,9 +379,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         }`}
         style={{
           transform: `translateX(-${currentIndex * 100}%)`,
-          transitionDuration: prefersReducedMotion
-            ? '0ms'
-            : `${HERO_SLIDER_BEHAVIOR.transitionDurationMs}ms`,
+          ...(prefersReducedMotion ? { transitionDuration: '0ms' } : {}),
         }}
       >
         {slides.map((slide, index) => {
@@ -511,7 +511,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         aria-label={language === 'bn' ? 'পূর্ববর্তী স্লাইড' : 'Previous slide'}
         className="hero-slider-arrow hero-slider-arrow-prev"
       >
-        <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+        <ChevronLeft aria-hidden="true" />
       </button>
 
       <button
@@ -520,7 +520,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         aria-label={language === 'bn' ? 'পরবর্তী স্লাইড' : 'Next slide'}
         className="hero-slider-arrow hero-slider-arrow-next"
       >
-        <ChevronRight className="w-5 h-5" aria-hidden="true" />
+        <ChevronRight aria-hidden="true" />
       </button>
     </section>
   );
