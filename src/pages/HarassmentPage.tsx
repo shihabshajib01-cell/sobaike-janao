@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { PhoneCall, AlertCircle } from 'lucide-react';
+import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -14,7 +15,8 @@ import { useApp } from '../context/AppContext';
 
 export const HarassmentPage: React.FC = () => {
   const { language } = useApp();
-  const { getFeedSubcategories } = useTaxonomy();
+  const { getFeedSubcategories, getSegment } = useTaxonomy();
+  const config = getSegment('harassment') || SECTIONS.harassment;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -64,10 +66,10 @@ export const HarassmentPage: React.FC = () => {
         slides={[
           {
             id: 'harassment-primary',
-            titleBn: 'হয়রানি ও নির্যাতন',
-            titleEn: 'Harassment & Abuse',
-            descriptionBn: 'হয়রানি বা নির্যাতনের ঘটনা জানান।',
-            descriptionEn: 'Report harassment or abusive incidents.',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
             illustrationSrc: '/illustrations/services/harassment-hero-public-harassment-v02.png',
           },
         ]}
@@ -88,7 +90,7 @@ export const HarassmentPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by subcategory'}
+              {language === 'bn' ? 'প্রতিবেদনের ধরন' : 'Report type'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'

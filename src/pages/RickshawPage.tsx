@@ -75,8 +75,8 @@ export const RickshawPage: React.FC = () => {
         <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
         <span>
           {language === 'bn'
-            ? 'অবৈধ বা ঝুঁকিপূর্ণ অটোরিকশা চার্জিং স্টেশনের অবস্থান ও তথ্য জানান।'
-            : 'Report details and location of illegal or unsafe auto-rickshaw charging stations.'}
+            ? 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।'
+            : 'Share the location and details of illegal or unsafe charging stations.'}
         </span>
       </div>
 
@@ -85,7 +85,7 @@ export const RickshawPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[18px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'চার্জিং স্টেশন প্রতিবেদনসমূহ' : 'Charging station reports'}
+              {language === 'bn' ? 'চার্জিং প্রতিবেদন' : 'Charging reports'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'

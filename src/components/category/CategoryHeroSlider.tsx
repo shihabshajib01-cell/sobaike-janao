@@ -216,9 +216,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         className={`w-full rounded-2xl border p-4 sm:p-5 md:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
-        <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] sm:grid-cols-[minmax(0,11fr)_minmax(0,9fr)] md:grid-cols-2 items-center gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full w-full">
+        <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
           {/* Left Text Content */}
-          <div className="min-w-0 space-y-2 sm:space-y-2.5 text-left z-10">
+          <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
             <h1 className="type-h1 text-ui-content-primary tracking-tight">
               {language === 'bn' ? slide.titleBn : slide.titleEn}
             </h1>
@@ -245,7 +245,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           </div>
 
           {/* Right Illustration Safe Area (Phase 1 Quiet Placeholder) */}
-          <div className="min-w-0 w-full h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+          <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
             {slide.illustrationSrc ? (
               <img
                 src={slide.illustrationSrc}
@@ -313,9 +313,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               aria-hidden={!isActive}
               className="w-full shrink-0 p-4 sm:p-5 md:p-7 min-w-full"
             >
-              <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] sm:grid-cols-[minmax(0,11fr)_minmax(0,9fr)] md:grid-cols-2 items-center gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full w-full">
+              <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
                 {/* Left Text Content */}
-                <div className="min-w-0 space-y-2 sm:space-y-2.5 text-left z-10">
+                <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
                   {index === 0 ? (
                     <h1 className="type-h1 text-ui-content-primary tracking-tight">
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
@@ -351,7 +351,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 </div>
 
                 {/* Right Illustration Safe Area */}
-                <div className="min-w-0 w-full h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+                <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
                   {slide.illustrationSrc ? (
                     <img
                       src={slide.illustrationSrc}

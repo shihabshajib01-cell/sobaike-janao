@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { SectionKey } from '../../theme/tokens';
+import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { Button } from '../ui/Button';
 
@@ -51,9 +51,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     {
       key: 'harassment',
       nameBn: 'হয়রানি ও নির্যাতন',
-      nameEn: 'Harassment & Abuse',
-      descBn: 'হয়রানি বা নির্যাতনের ঘটনা জানান।',
-      descEn: 'Report harassment or abusive incidents.',
+      nameEn: 'Harassment & abuse',
+      descBn: 'শারীরিক বা মানসিক নির্যাতন, নিপীড়ন ও অনলাইনে হেনস্তার তথ্য জানান।',
+      descEn: 'Report incidents of harassment, abuse, or safety violations.',
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report issue',
       path: '/harassment',
@@ -61,10 +61,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     },
     {
       key: 'rickshaw',
-      nameBn: 'ঝুঁকিপূর্ণ চার্জিং',
-      nameEn: 'Unsafe Charging',
-      descBn: 'অনিরাপদ ব্যাটারি চার্জিংয়ের তথ্য জানান।',
-      descEn: 'Report unsafe battery charging.',
+      nameBn: 'অবৈধ অটো চার্জিং',
+      nameEn: 'Illegal auto-rickshaw charging',
+      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।',
+      descEn: 'Share the location and details of illegal or unsafe charging stations.',
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report issue',
       path: '/rickshaw',
@@ -74,8 +74,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'extortion',
       nameBn: 'চাঁদাবাজি',
       nameEn: 'Extortion',
-      descBn: 'অবৈধ চাঁদা বা হুমকির তথ্য জানান।',
-      descEn: 'Report illegal demands or threats.',
+      descBn: 'দোকানপাট, পরিবহন বা এলাকায় অবৈধ চাঁদা দাবি ও হুমকির তথ্য জানান।',
+      descEn: 'Report extortion, illegal tolls, or coercive demands.',
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report issue',
       path: '/extortion',
@@ -83,10 +83,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     },
     {
       key: 'load_shedding',
-      nameBn: 'ইউটিলিটি সমস্যা',
-      nameEn: 'Utility Issues',
-      descBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা জানান।',
-      descEn: 'Report power, gas or billing issues.',
+      nameBn: SECTIONS.load_shedding.nameBn,
+      nameEn: SECTIONS.load_shedding.nameEn,
+      descBn: SECTIONS.load_shedding.descriptionBn,
+      descEn: SECTIONS.load_shedding.descriptionEn,
       primaryCtaBn: 'রিপোর্ট করুন',
       primaryCtaEn: 'Report issue',
       path: '/load-shedding',
@@ -317,9 +317,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 backgroundColor: `var(--sec-${slide.key}-bg)`,
               }}
             >
-              <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] sm:grid-cols-[minmax(0,11fr)_minmax(0,9fr)] md:grid-cols-2 items-center gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full w-full">
+              <div className="flex items-center justify-between gap-3 sm:gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px] h-full">
                 {/* Left Text Content */}
-                <div className="min-w-0 space-y-1.5 sm:space-y-2 text-left z-10">
+                <div className="min-w-0 flex-1 space-y-1.5 sm:space-y-2 text-left z-10">
                   <h2 className="type-h2 text-ui-content-primary tracking-tight">
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
@@ -347,7 +347,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 </div>
 
                 {/* Right Illustration Safe Area */}
-                <div className="min-w-0 w-full h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+                <div className="shrink-0 w-24 min-[380px]:w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
                   {slide.illustrationSrc ? (
                     <img
                       src={slide.illustrationSrc}

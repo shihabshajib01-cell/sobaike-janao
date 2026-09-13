@@ -134,10 +134,10 @@ export const MorePage: React.FC = () => {
                 ২
               </span>
               <h3 className="text-[16px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'অননুমোদিত চার্জিং স্টেশন' : 'Unsafe charging stations'}
+                {language === 'bn' ? 'অবৈধ অটো চার্জিং' : 'Illegal auto-rickshaw charging'}
               </h3>
               <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                {language === 'bn' ? 'অনুমোদনহীন ব্যাটারি চার্জিং স্টেশন ও ঝুঁকিপূর্ণ বৈদ্যুতিক সংযোগের তথ্য।' : 'Report unauthorized or unsafe auto-rickshaw battery charging stations.'}
+                {language === 'bn' ? 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।' : 'Share the location and details of illegal or unsafe charging stations.'}
               </p>
             </div>
 
