@@ -311,13 +311,13 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           </div>
 
           {/* Right 50% Illustration Column */}
-          <div className="w-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none h-full min-w-0 overflow-hidden">
+          <div className="w-full h-[150px] sm:h-[180px] md:h-auto lg:h-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none min-w-0 overflow-hidden">
             {slide.illustrationSrc ? (
               <img
                 src={resolvePublicAsset(slide.illustrationSrc)}
                 alt=""
                 aria-hidden="true"
-                className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[220px] lg:max-h-none lg:h-full lg:w-full object-contain lg:object-cover object-center mx-auto block"
+                className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover mx-auto block"
               />
             ) : (
               <div
@@ -447,13 +447,13 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 </div>
 
                 {/* Right 50% Illustration Column */}
-                <div className="w-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none h-full min-w-0 overflow-hidden">
+                <div className="w-full h-[150px] sm:h-[180px] md:h-auto lg:h-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none min-w-0 overflow-hidden">
                   {slide.illustrationSrc ? (
                     <img
                       src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
-                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[220px] lg:max-h-none lg:h-full lg:w-full object-contain lg:object-cover object-center mx-auto block"
+                      className="w-full h-full object-cover object-center md:h-auto md:max-h-[220px] md:object-contain lg:max-h-none lg:h-full lg:w-full lg:object-cover mx-auto block"
                     />
                   ) : (
                     <div
