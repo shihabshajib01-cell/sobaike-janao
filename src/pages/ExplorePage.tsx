@@ -305,6 +305,24 @@ export const ExplorePage: React.FC = () => {
             </span>
           </button>
 
+          <button
+            type="button"
+            aria-pressed={selectedSection === 'load_shedding'}
+            onClick={() => setSelectedSection('load_shedding')}
+            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              selectedSection === 'load_shedding'
+                ? 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border-[var(--sec-load_shedding-border)] shadow-xs font-bold ring-1 ring-[var(--sec-load_shedding-border)]'
+                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+            }`}
+          >
+            <CategoryIcon section="load_shedding" size="xs" />
+            <span>
+              {language === 'bn'
+                ? SECTIONS.load_shedding.shortNameBn
+                : SECTIONS.load_shedding.shortNameEn}
+            </span>
+          </button>
+
           {hasActiveFilters && (
             <button
               type="button"
