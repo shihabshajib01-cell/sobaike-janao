@@ -91,8 +91,8 @@
     --font-weight-bold: 700;
 
     /* Central Typography Tokens - Body, Label, Action, Meta */
-    --type-body-size: 16px;
-    --type-body-line: 26px;
+    --type-body-size: 14px;
+    --type-body-line: 22px;
     --type-body-weight: var(--font-weight-regular);
 
     --type-label-size: 16px;
@@ -212,6 +212,20 @@
     --ui-destructive-hover: oklch(50.5% .213 27.518);
     --ui-destructive-active: oklch(44.4% .177 26.899);
     --ui-destructive-border: var(--ui-destructive-bg);
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --type-body-size: 16px;
+      --type-body-line: 26px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    :root {
+      --type-body-size: 16px;
+      --type-body-line: 26px;
+    }
   }
 
   :root,
