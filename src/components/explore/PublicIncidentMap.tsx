@@ -271,11 +271,41 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         : 'No reports match the current filters.';
     }
 
+    const selectedDistrictObj =
+      selectedDistrict !== 'all'
+        ? BANGLADESH_DISTRICTS.find(
+            (d) =>
+              d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+              d.nameBn === selectedDistrict ||
+              d.id === selectedDistrict.toLowerCase()
+          )
+        : null;
+
     const topDistrictName = topDistrict
       ? language === 'bn'
         ? topDistrict.nameBn
         : topDistrict.nameEn
       : null;
+
+    if (selectedDistrictObj) {
+      if (language === 'bn') {
+        return `${selectedDistrictObj.nameBn} জেলা: ${toBanglaDigits(totalReportsCount)}টি প্রতিবেদনের মধ্যে ${toBanglaDigits(mappedCount)}টি মানচিত্রে দেখানো হয়েছে।`;
+      }
+      return `${selectedDistrictObj.nameEn}: ${mappedCount} of ${totalReportsCount} reports mapped.`;
+    }
+
+    if (isDistrictFallback) {
+      if (language === 'bn') {
+        const totalBn = toBanglaDigits(totalReportsCount);
+        const mappedBn = toBanglaDigits(mappedCount);
+        return topDistrictName
+          ? `জেলা-ভিত্তিক: ${totalBn}টি প্রতিবেদনের ${mappedBn}টি মানচিত্রে। সর্বাধিক প্রতিবেদন ${topDistrictName} জেলায়।`
+          : `জেলা-ভিত্তিক: ${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে।`;
+      }
+      return topDistrictName
+        ? `District-level: ${mappedCount} of ${totalReportsCount} reports mapped. Most in ${topDistrictName}.`
+        : `District-level: ${mappedCount} of ${totalReportsCount} reports mapped.`;
+    }
 
     if (language === 'bn') {
       const totalBn = toBanglaDigits(totalReportsCount);
@@ -288,7 +318,17 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         ? `${mappedCount} of ${totalReportsCount} reports are mapped. ${topDistrictName} has the most reports.`
         : `${mappedCount} of ${totalReportsCount} reports are mapped.`;
     }
-  }, [totalReportsCount, mappedCount, topDistrict, language]);
+  }, [totalReportsCount, mappedCount, topDistrict, isDistrictFallback, selectedDistrict, language]);
+
+  // Keep Leaflet properly sized when container dimensions change
+  useEffect(() => {
+    if (!mapContainerRef.current || !mapInstanceRef.current) return;
+    const observer = new ResizeObserver(() => {
+      mapInstanceRef.current?.invalidateSize();
+    });
+    observer.observe(mapContainerRef.current);
+    return () => observer.disconnect();
+  }, [isMapReady]);
 
   return (
     <div className="space-y-2">
@@ -296,11 +336,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       <div
         role="status"
         aria-live="polite"
-        className="px-3.5 py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] text-ui-content-secondary flex items-center justify-between gap-2 shadow-2xs"
+        className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[12px] sm:text-[13px] text-ui-content-secondary flex items-start sm:items-center justify-between gap-2 shadow-2xs"
       >
-        <div className="flex items-center gap-2 min-w-0">
-          <MapIcon name="info" size="xs" className="text-ui-content-muted shrink-0" ariaHidden={true} />
-          <span className="truncate">{accessibleSummary}</span>
+        <div className="flex items-start sm:items-center gap-2 min-w-0 w-full">
+          <MapIcon name="info" size="xs" className="text-ui-content-muted shrink-0 mt-0.5 sm:mt-0" ariaHidden={true} />
+          <span className="break-words leading-snug md:truncate md:leading-normal">{accessibleSummary}</span>
         </div>
       </div>
 
@@ -309,8 +349,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         id="public-heatmap-card"
         role="region"
         aria-label={language === 'bn' ? 'প্রতিবেদন হিটম্যাপ' : 'Reports heatmap'}
-        className="relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col"
-        style={{ minHeight: '520px' }}
+        className="relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col h-[330px] sm:h-[370px] md:h-[520px] md:min-h-[520px]"
       >
         {/* Zoom & Recenter Controls (Top-Right) */}
         <div className="absolute top-3.5 right-3.5 z-[500] flex flex-col gap-1.5 shadow-sm">
@@ -354,14 +393,14 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
         {/* District-Level Fallback Notification (Top-Center / Below Top-Left on mobile) */}
         {isDistrictFallback && (
-          <div className="absolute top-3.5 sm:top-3.5 left-3.5 sm:left-1/2 sm:-translate-x-1/2 mt-20 sm:mt-0 z-[500] max-w-[280px] sm:max-w-md bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-3 py-2 shadow-2xs text-left">
+          <div className="absolute top-3 sm:top-3.5 left-3 sm:left-1/2 sm:-translate-x-1/2 mt-16 sm:mt-0 z-[500] max-w-[240px] xs:max-w-[270px] sm:max-w-md bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-2xs text-left">
             <div className="flex items-start gap-2">
               <span className="inline-block w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0" />
               <div className="space-y-0.5">
-                <div className="text-[12px] font-bold text-ui-content-primary">
+                <div className="text-[11px] sm:text-[12px] font-bold text-ui-content-primary">
                   {language === 'bn' ? 'জেলা-ভিত্তিক হিটম্যাপ' : 'District-level heatmap'}
                 </div>
-                <div className="text-[11px] text-ui-content-secondary leading-snug">
+                <div className="text-[10px] sm:text-[11px] text-ui-content-secondary leading-tight sm:leading-snug">
                   {language === 'bn'
                     ? 'সুনির্দিষ্ট অবস্থান না থাকায় জেলা অনুযায়ী প্রতিবেদন দেখানো হচ্ছে।'
                     : 'Reports are shown by district because precise incident locations are unavailable.'}
@@ -373,12 +412,17 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
         {/* Map Coverage Indicator (Bottom-Left) */}
         {totalReportsCount > 0 && (
-          <div className="absolute bottom-3.5 left-3.5 z-[500] bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-3 py-1.5 shadow-2xs flex items-center gap-2 text-[12px] font-medium text-ui-content-primary select-none">
-            <MapIcon name="map-pin" size="xs" className="text-ui-content-muted" ariaHidden={true} />
-            <span>
-              {language === 'bn'
-                ? `${toBanglaDigits(mappedCount)} / ${toBanglaDigits(totalReportsCount)} প্রতিবেদন মানচিত্রে দেখানো হয়েছে`
-                : `${mappedCount} of ${totalReportsCount} reports mapped`}
+          <div className="absolute bottom-3 sm:bottom-3.5 left-3 sm:left-3.5 z-[500] bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-2.5 py-1 sm:px-3 sm:py-1.5 shadow-2xs flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-[12px] font-medium text-ui-content-primary select-none max-w-[calc(100%-65px)]">
+            <MapIcon name="map-pin" size="xs" className="text-ui-content-muted shrink-0" ariaHidden={true} />
+            <span className="truncate sm:overflow-visible">
+              {language === 'bn' ? (
+                <>
+                  <span className="sm:hidden">{toBanglaDigits(mappedCount)} / {toBanglaDigits(totalReportsCount)} প্রতিবেদন মানচিত্রে</span>
+                  <span className="hidden sm:inline">{toBanglaDigits(mappedCount)} / {toBanglaDigits(totalReportsCount)} প্রতিবেদন মানচিত্রে দেখানো হয়েছে</span>
+                </>
+              ) : (
+                `${mappedCount} of ${totalReportsCount} reports mapped`
+              )}
             </span>
           </div>
         )}
@@ -386,8 +430,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         {/* Real Leaflet Map Container */}
         <div
           ref={mapContainerRef}
-          className="w-full flex-1 z-10"
-          style={{ minHeight: '520px', backgroundColor: 'var(--ui-surface-subtle)' }}
+          className="w-full flex-1 z-10 h-[330px] sm:h-[370px] md:h-[520px]"
+          style={{ backgroundColor: 'var(--ui-surface-subtle)' }}
         />
 
         {/* Empty State Banner if 0 reports match active filters */}

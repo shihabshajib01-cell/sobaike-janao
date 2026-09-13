@@ -387,7 +387,7 @@ export const ExplorePage: React.FC = () => {
         <>
           {viewMode === 'heatmap' ? (
             /* HEATMAP VIEW */
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {/* Map & District Ranking Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
                 {/* 1. Truthful Heatmap (Main on Desktop, Top on Mobile) */}

@@ -135,13 +135,13 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   return (
     <div
       id="area-summary-panel"
-      className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4"
+      className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3.5 sm:p-4 md:p-5 shadow-xs flex flex-col justify-between space-y-3 md:space-y-4"
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-ui-stroke-subtle pb-3">
+      <div className="flex items-center justify-between border-b border-ui-stroke-subtle pb-2.5 md:pb-3">
         <div className="flex items-center gap-2">
           <MapIcon name="map-pin" size="md" className="text-ui-content-primary" />
-          <h3 className="text-[17px] font-bold text-ui-content-primary tracking-tight">
+          <h3 className="text-[16px] md:text-[17px] font-bold text-ui-content-primary tracking-tight">
             {language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area summary'}
           </h3>
         </div>
@@ -150,7 +150,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <button
             type="button"
             onClick={() => onSelectDistrict('all')}
-            className="text-[12px] font-semibold text-ui-content-secondary flex items-center gap-1 cursor-pointer px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle transition-colors"
+            className="text-[12px] font-semibold text-ui-content-secondary flex items-center gap-1 cursor-pointer px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle transition-colors min-h-[36px]"
           >
             <span>{language === 'bn' ? 'সারাদেশ দেখুন' : 'All regions'}</span>
             <MapIcon name="close" size="xs" />
@@ -160,14 +160,14 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
       {/* Main Content: District Specific or Nationwide */}
       {isDistrictSelected ? (
-        <div className="space-y-4 animate-in fade-in duration-200">
+        <div className="space-y-3 md:space-y-4 animate-in fade-in duration-200">
           {/* Selected District Card */}
-          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3.5 space-y-1.5">
+          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3 md:p-3.5 space-y-1 md:space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-ui-content-muted uppercase tracking-wider">
+              <span className="text-[10px] md:text-[11px] font-bold text-ui-content-muted uppercase tracking-wider">
                 {language === 'bn' ? 'নির্বাচিত এলাকা' : 'Selected area'}
               </span>
-              <span className="text-[12px] font-medium text-ui-content-secondary">
+              <span className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary">
                 {language === 'bn'
                   ? currentDistrictInfo.divisionBn
                   : currentDistrictInfo.divisionEn}{' '}
@@ -176,12 +176,12 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             </div>
 
             <div className="flex items-baseline justify-between pt-0.5">
-              <h4 className="text-[18px] font-bold text-ui-content-primary leading-tight">
+              <h4 className="text-[16px] md:text-[18px] font-bold text-ui-content-primary leading-tight">
                 {language === 'bn'
                   ? `${currentDistrictInfo.nameBn} জেলা`
                   : `${currentDistrictInfo.nameEn} District`}
               </h4>
-              <span className="text-[14px] font-bold text-ui-content-primary font-mono">
+              <span className="text-[13px] md:text-[14px] font-bold text-ui-content-primary font-mono">
                 {language === 'bn'
                   ? `${toBanglaDigits(currentDistrictInfo.count)}টি প্রতিবেদন`
                   : `${currentDistrictInfo.count} reports`}
@@ -190,18 +190,18 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           </div>
 
           {/* Category Breakdown */}
-          <div className="space-y-2">
-            <span className="text-[13px] font-bold text-ui-content-secondary">
+          <div className="space-y-1.5 md:space-y-2">
+            <span className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary">
               {language === 'bn' ? 'সমস্যার ধরন অনুযায়ী:' : 'By category:'}
             </span>
-            <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center">
               {/* Harassment */}
-              <div className="bg-[var(--sec-harassment-bg)] border border-[var(--sec-harassment-border)]/50 p-2.5 rounded-xl flex flex-col items-center">
-                <CategoryIcon section="harassment" size="sm" className="mb-1 text-[var(--sec-harassment-text)]" />
-                <div className="text-[12px] font-semibold text-[var(--sec-harassment-text)]">
+              <div className="bg-[var(--sec-harassment-bg)] border border-[var(--sec-harassment-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
+                <CategoryIcon section="harassment" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-harassment-text)]" />
+                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-harassment-text)] truncate max-w-full">
                   {language === 'bn' ? 'হয়রানি' : 'Harassment'}
                 </div>
-                <div className="text-[16px] font-bold text-[var(--sec-harassment-text)] font-mono mt-0.5">
+                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-harassment-text)] font-mono mt-0.5">
                   {language === 'bn'
                     ? toBanglaDigits(currentDistrictInfo.harassmentCount)
                     : currentDistrictInfo.harassmentCount}
@@ -209,12 +209,12 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               </div>
 
               {/* Charging */}
-              <div className="bg-[var(--sec-rickshaw-bg)] border border-[var(--sec-rickshaw-border)]/50 p-2.5 rounded-xl flex flex-col items-center">
-                <CategoryIcon section="rickshaw" size="sm" className="mb-1 text-[var(--sec-rickshaw-text)]" />
-                <div className="text-[12px] font-semibold text-[var(--sec-rickshaw-text)]">
+              <div className="bg-[var(--sec-rickshaw-bg)] border border-[var(--sec-rickshaw-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
+                <CategoryIcon section="rickshaw" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-rickshaw-text)]" />
+                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-rickshaw-text)] truncate max-w-full">
                   {language === 'bn' ? 'চার্জিং' : 'Charging'}
                 </div>
-                <div className="text-[16px] font-bold text-[var(--sec-rickshaw-text)] font-mono mt-0.5">
+                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-rickshaw-text)] font-mono mt-0.5">
                   {language === 'bn'
                     ? toBanglaDigits(currentDistrictInfo.rickshawCount)
                     : currentDistrictInfo.rickshawCount}
@@ -222,12 +222,12 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               </div>
 
               {/* Extortion */}
-              <div className="bg-[var(--sec-extortion-bg)] border border-[var(--sec-extortion-border)]/50 p-2.5 rounded-xl flex flex-col items-center">
-                <CategoryIcon section="extortion" size="sm" className="mb-1 text-[var(--sec-extortion-text)]" />
-                <div className="text-[12px] font-semibold text-[var(--sec-extortion-text)]">
+              <div className="bg-[var(--sec-extortion-bg)] border border-[var(--sec-extortion-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
+                <CategoryIcon section="extortion" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-extortion-text)]" />
+                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-extortion-text)] truncate max-w-full">
                   {language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}
                 </div>
-                <div className="text-[16px] font-bold text-[var(--sec-extortion-text)] font-mono mt-0.5">
+                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-extortion-text)] font-mono mt-0.5">
                   {language === 'bn'
                     ? toBanglaDigits(currentDistrictInfo.extortionCount)
                     : currentDistrictInfo.extortionCount}
@@ -269,41 +269,41 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         </div>
       ) : (
         /* Nationwide View: Top Active Districts and Overview */
-        <div className="space-y-3">
+        <div className="space-y-2.5 md:space-y-3">
           {/* Nationwide Category Totals */}
-          <div className="grid grid-cols-3 gap-2 text-center pb-2 border-b border-ui-stroke-subtle">
-            <div className="bg-ui-surface-subtle p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center pb-2.5 md:pb-2 border-b border-ui-stroke-subtle">
+            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
               <CategoryIcon section="harassment" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[12px] font-medium text-ui-content-secondary">{language === 'bn' ? 'হয়রানি' : 'Harassment'}</div>
-              <div className="text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
+              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'হয়রানি' : 'Harassment'}</div>
+              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
                 {language === 'bn' ? toBanglaDigits(totalHarass) : totalHarass}
               </div>
             </div>
 
-            <div className="bg-ui-surface-subtle p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
+            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
               <CategoryIcon section="rickshaw" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[12px] font-medium text-ui-content-secondary">{language === 'bn' ? 'চার্জিং' : 'Charging'}</div>
-              <div className="text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
+              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'চার্জিং' : 'Charging'}</div>
+              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
                 {language === 'bn' ? toBanglaDigits(totalRickshaw) : totalRickshaw}
               </div>
             </div>
 
-            <div className="bg-ui-surface-subtle p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
+            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
               <CategoryIcon section="extortion" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[12px] font-medium text-ui-content-secondary">{language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}</div>
-              <div className="text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
+              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}</div>
+              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
                 {language === 'bn' ? toBanglaDigits(totalExtortion) : totalExtortion}
               </div>
             </div>
           </div>
 
-          <div className="text-[13px] font-bold text-ui-content-secondary">
+          <div className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary">
             {language === 'bn' ? 'এলাকা অনুযায়ী দেখুন:' : 'Explore by district:'}
           </div>
 
           {/* District list */}
           {rankedDistricts.length > 0 ? (
-            <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+            <div className="space-y-1.5 max-h-none overflow-visible md:max-h-[260px] md:overflow-y-auto md:pr-1">
               {displayedDistricts.map((item, index) => {
                 const rankDisplay = formatRankNumber(index + 1, language);
                 const countDisplay =
@@ -314,11 +314,11 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => onSelectDistrict(item.nameEn)}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle border-ui-stroke-subtle group"
+                    className="w-full flex items-center justify-between p-2 md:p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle border-ui-stroke-subtle group min-h-[44px]"
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
                       <span
-                        className={`w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-bold shrink-0 border ${
+                        className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[11px] md:text-[12px] font-bold shrink-0 border ${
                           index === 0
                             ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
                             : index === 1
@@ -332,10 +332,10 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                       </span>
 
                       <div className="min-w-0">
-                        <span className="text-[14px] font-bold text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
+                        <span className="text-[13px] md:text-[14px] font-bold text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
                           {language === 'bn' ? item.nameBn : item.nameEn}
                         </span>
-                        <div className="flex items-center gap-2 text-[12px] text-ui-content-muted mt-0.5">
+                        <div className="flex items-center gap-2 text-[11px] md:text-[12px] text-ui-content-muted mt-0.5">
                           {item.harassmentCount > 0 && (
                             <span className="inline-flex items-center gap-0.5">
                               <CategoryIcon section="harassment" size="xs" /> {item.harassmentCount}
@@ -379,8 +379,9 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         <div className="pt-2 border-t border-ui-stroke-subtle">
           <button
             type="button"
+            aria-expanded={showAllDistricts}
             onClick={() => setShowAllDistricts(!showAllDistricts)}
-            className="w-full py-2 px-3 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-bold text-ui-content-secondary transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
+            className="w-full py-2.5 px-3 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-bold text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-hover transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <span>
               {showAllDistricts
@@ -388,10 +389,14 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   ? 'কম দেখুন'
                   : 'Show less'
                 : language === 'bn'
-                ? `সকল জেলা (${toBanglaDigits(rankedDistricts.length)}টি)`
-                : `All districts (${rankedDistricts.length})`}
+                ? 'সব জেলা দেখুন'
+                : 'Show all districts'}
             </span>
-            {showAllDistricts ? <MapIcon name="chevron-up" size="xs" /> : <MapIcon name="chevron-down" size="xs" />}
+            {showAllDistricts ? (
+              <MapIcon name="chevron-up" size="xs" ariaHidden={true} />
+            ) : (
+              <MapIcon name="chevron-down" size="xs" ariaHidden={true} />
+            )}
           </button>
         </div>
       )}
