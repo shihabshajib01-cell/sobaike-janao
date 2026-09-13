@@ -31,6 +31,7 @@ export interface CategoryHeroBannerProps {
   active?: boolean;
   ctaId?: string;
   ctaTabIndex?: number;
+  className?: string;
 }
 
 export const resolvePublicAsset = (src?: string) => {
@@ -76,6 +77,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   active = true,
   ctaId,
   ctaTabIndex,
+  className,
 }) => {
   const { language } = useApp();
   const sectionKey = section;
@@ -96,28 +98,33 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
 
   const HeadingTag = headingLevel;
 
+  const mobileDescription =
+    language === 'bn'
+      ? mobileDescriptionBn || descriptionBn
+      : mobileDescriptionEn || descriptionEn;
+
   return (
-    <div className="hero-slider-grid">
-      {/* Left 50% Content Column */}
+    <div className={`hero-slider-grid ${className || ''}`.trim()}>
+      {/* 1 & 2: Title and Description Header (plus Desktop CTA row) */}
       <div className="hero-slider-content">
         <HeadingTag
-          className="type-h1 tracking-tight"
+          className="type-h1 tracking-tight text-center md:text-left"
           style={{ color: HERO_TOKENS.text.primary }}
         >
           {language === 'bn' ? titleBn : titleEn}
         </HeadingTag>
 
-        {/* Mobile Question */}
-        {(mobileDescriptionBn || mobileDescriptionEn) && (
+        {/* Mobile Question / Description (shown < 768px) */}
+        {mobileDescription && (
           <p
-            className="block md:hidden type-body text-center max-w-md mx-auto"
+            className="block md:hidden type-body text-center max-w-md mx-auto leading-relaxed"
             style={{ color: HERO_TOKENS.text.secondary }}
           >
-            {language === 'bn' ? mobileDescriptionBn : mobileDescriptionEn}
+            {mobileDescription}
           </p>
         )}
 
-        {/* Tablet Short Description */}
+        {/* Tablet Short Description (768px - 1023px) */}
         <p
           className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
           style={{ color: HERO_TOKENS.text.secondary }}
@@ -125,7 +132,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
           {language === 'bn' ? descriptionBn : descriptionEn}
         </p>
 
-        {/* Desktop Long Description */}
+        {/* Desktop Long Description (>= 1024px) */}
         <p
           className="hidden lg:block type-body max-w-xl"
           style={{ color: HERO_TOKENS.text.secondary }}
@@ -135,7 +142,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             : desktopDescriptionEn || descriptionEn}
         </p>
 
-        {/* CTA (if exists) */}
+        {/* Desktop/Tablet CTA (hidden on mobile <768px, shown on >=768px) */}
         {action && (
           <div className="hero-slider-cta-row">
             <Button
@@ -153,7 +160,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         )}
       </div>
 
-      {/* Right 50% Illustration Column */}
+      {/* 3: Mobile/Desktop Illustration */}
       <div className="hero-slider-media">
         {illustrationSrc ? (
           <img
@@ -178,6 +185,23 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
           />
         )}
       </div>
+
+      {/* 4: Mobile CTA (shown on mobile <768px below illustration, hidden on >=768px) */}
+      {action && (
+        <div className="hero-slider-mobile-cta">
+          <Button
+            id={ctaId ? `${ctaId}-mobile` : undefined}
+            variant="outline"
+            size="md"
+            tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
+            onClick={action.onClick}
+            className="w-full shadow-none btn-hero-cta justify-center min-h-[44px]"
+            style={getHeroCtaStyle(sectionKey)}
+          >
+            {language === 'bn' ? action.labelBn : action.labelEn}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

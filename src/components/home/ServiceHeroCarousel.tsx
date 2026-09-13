@@ -357,12 +357,13 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     : `Slide ${index + 1} of ${totalSlides}`
                 }
                 aria-hidden={!isActive}
-                className="w-full shrink-0 min-w-full p-0"
+                className="w-full h-full shrink-0 min-w-full p-0 flex flex-col"
                 style={{
                   backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
                 }}
               >
                 <CategoryHeroBanner
+                  className="h-full"
                   section={slide.key}
                   titleBn={slide.nameBn}
                   titleEn={slide.nameEn}
