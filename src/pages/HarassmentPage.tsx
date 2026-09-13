@@ -68,6 +68,8 @@ export const HarassmentPage: React.FC = () => {
             id: 'harassment-primary',
             titleBn: 'হয়রানি ও নির্যাতন',
             titleEn: 'Harassment & Abuse',
+            mobileDescriptionBn: 'শারীরিক • মৌখিক • অনলাইন',
+            mobileDescriptionEn: 'Physical • verbal • online',
             descriptionBn: 'শারীরিক, মৌখিক বা অনলাইন নির্যাতন।',
             descriptionEn: 'Physical, verbal, or online abuse.',
             desktopDescriptionBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',

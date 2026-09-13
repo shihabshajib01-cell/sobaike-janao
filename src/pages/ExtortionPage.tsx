@@ -68,6 +68,8 @@ export const ExtortionPage: React.FC = () => {
             id: 'extortion-primary',
             titleBn: 'চাঁদাবাজি',
             titleEn: 'Extortion',
+            mobileDescriptionBn: 'হুমকি • চাপ • অর্থ আদায়',
+            mobileDescriptionEn: 'Threats • coercion • payments',
             descriptionBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ দাবি।',
             descriptionEn: 'Illegal demands, threats, or forced payments.',
             desktopDescriptionBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',

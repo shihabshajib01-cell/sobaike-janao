@@ -11,6 +11,8 @@ export interface ServiceSlide {
   serviceLabelEn?: string;
   nameBn: string;
   nameEn: string;
+  mobileDescBn?: string;
+  mobileDescEn?: string;
   descBn: string;
   descEn: string;
   desktopDescBn: string;
@@ -59,10 +61,10 @@ const HERO_ART_BACKGROUNDS: Record<SectionKey, string> = {
 };
 
 const HERO_CTA_THEMES: Record<SectionKey, string> = {
-  harassment: '!bg-[#B84A62] hover:!bg-[#9E384E] !text-white',
-  rickshaw: '!bg-[#D9822B] hover:!bg-[#B8681A] !text-[#050505]',
-  extortion: '!bg-[#4F5D95] hover:!bg-[#3E4A7A] !text-white',
-  load_shedding: '!bg-[#0D9488] hover:!bg-[#0E8A80] !text-[#050505]',
+  harassment: '!bg-transparent !border-[#9E384E] !text-[#9E384E] hover:!bg-[#B84A62] hover:!border-[#B84A62] hover:!text-white',
+  rickshaw: '!bg-transparent !border-[#9A520A] !text-[#9A520A] hover:!bg-[#D9822B] hover:!border-[#D9822B] hover:!text-[#050505]',
+  extortion: '!bg-transparent !border-[#4F5D95] !text-[#4F5D95] hover:!bg-[#4F5D95] hover:!border-[#4F5D95] hover:!text-white',
+  load_shedding: '!bg-transparent !border-[#0A756E] !text-[#0A756E] hover:!bg-[#0D9488] hover:!border-[#0D9488] hover:!text-[#050505]',
 };
 
 export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
@@ -87,6 +89,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'harassment',
       nameBn: 'হয়রানি ও নির্যাতন',
       nameEn: 'Harassment & Abuse',
+      mobileDescBn: 'শারীরিক • মৌখিক • অনলাইন',
+      mobileDescEn: 'Physical • verbal • online',
       descBn: 'শারীরিক, মৌখিক বা অনলাইন নির্যাতন।',
       descEn: 'Physical, verbal, or online abuse.',
       desktopDescBn: 'শারীরিক, মৌখিক বা অনলাইন হয়রানি, নির্যাতন, হুমকি বা অন্য অনিরাপদ আচরণের তথ্য জানান।',
@@ -100,6 +104,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'rickshaw',
       nameBn: 'ঝুঁকিপূর্ণ চার্জিং',
       nameEn: 'Unsafe Charging',
+      mobileDescBn: 'ব্যাটারি • তার • চার্জিং',
+      mobileDescEn: 'Batteries • wiring • charging',
       descBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
       descEn: 'Unsafe battery charging and risky connections.',
       desktopDescBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
@@ -113,6 +119,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'extortion',
       nameBn: 'চাঁদাবাজি',
       nameEn: 'Extortion',
+      mobileDescBn: 'হুমকি • চাপ • অর্থ আদায়',
+      mobileDescEn: 'Threats • coercion • payments',
       descBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ দাবি।',
       descEn: 'Illegal demands, threats, or forced payments.',
       desktopDescBn: 'দোকান, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি, চাপ বা জোরপূর্বক আদায়ের তথ্য জানান।',
@@ -126,6 +134,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       key: 'load_shedding',
       nameBn: 'ইউটিলিটি সমস্যা',
       nameEn: 'Utility Issues',
+      mobileDescBn: 'বিদ্যুৎ • গ্যাস • বিলিং',
+      mobileDescEn: 'Power • gas • billing',
       descBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা।',
       descEn: 'Power, gas, or billing problems.',
       desktopDescBn: 'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ সরবরাহ সমস্যা বা ভুল ইউটিলিটি বিলের তথ্য জানান।',
@@ -363,7 +373,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             >
               <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-0 md:gap-6">
                 {/* Left Text Content */}
-                <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 space-y-2 text-center md:text-left z-10 pb-2 sm:pb-2 md:pb-0">
+                <div className="order-1 md:order-none md:col-start-1 md:row-start-1 min-w-0 text-center md:text-left z-10 pb-0 md:pb-0">
                   <h2
                     className="type-h1 tracking-tight"
                     style={{ color: '#102A43' }}
@@ -371,9 +381,19 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     {language === 'bn' ? slide.nameBn : slide.nameEn}
                   </h2>
 
+                  {/* Mobile Short Secondary Line */}
+                  {(slide.mobileDescBn || slide.mobileDescEn) && (
+                    <p
+                      className="block md:hidden type-meta text-[14px] font-medium leading-tight whitespace-nowrap text-center mt-1 sm:mt-1.5"
+                      style={{ color: '#596579' }}
+                    >
+                      {language === 'bn' ? slide.mobileDescBn : slide.mobileDescEn}
+                    </p>
+                  )}
+
                   {/* Tablet Short Description */}
                   <p
-                    className="hidden md:block lg:hidden type-body max-w-2xl mx-auto md:mx-0"
+                    className="hidden md:block lg:hidden type-body max-w-2xl mx-auto md:mx-0 mt-2"
                     style={{ color: '#596579' }}
                   >
                     {language === 'bn' ? slide.descBn : slide.descEn}
@@ -381,7 +401,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
                   {/* Desktop Long Description */}
                   <p
-                    className="hidden lg:block type-body max-w-2xl mx-auto md:mx-0"
+                    className="hidden lg:block type-body max-w-2xl mx-auto md:mx-0 mt-2"
                     style={{ color: '#596579' }}
                   >
                     {language === 'bn' ? slide.desktopDescBn : slide.desktopDescEn}
@@ -406,14 +426,14 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 </div>
 
                 {/* CTA */}
-                <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-0 pb-4 sm:pb-5 md:pb-0 md:pt-2 w-full flex justify-center md:justify-start">
+                <div className="order-2 md:order-none md:col-start-1 md:row-start-2 pt-2.5 pb-4 sm:pb-5 md:pb-0 md:pt-4 w-full flex justify-center md:justify-start">
                   <Button
                     id={`${id}-report-btn-${slide.key}`}
-                    variant="primary"
+                    variant="outline"
                     size="md"
                     tabIndex={isActive ? 0 : -1}
                     onClick={() => openReportComposer(slide.key)}
-                    className={`w-full md:w-auto shadow-xs ${HERO_CTA_THEMES[slide.key] || ''}`}
+                    className={`w-auto shadow-none ${HERO_CTA_THEMES[slide.key] || ''}`}
                   >
                     {language === 'bn' ? slide.primaryCtaBn : slide.primaryCtaEn}
                   </Button>

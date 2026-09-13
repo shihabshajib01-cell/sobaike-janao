@@ -63,6 +63,8 @@ export const RickshawPage: React.FC = () => {
             id: 'rickshaw-primary',
             titleBn: 'ঝুঁকিপূর্ণ চার্জিং',
             titleEn: 'Unsafe Charging',
+            mobileDescriptionBn: 'ব্যাটারি • তার • চার্জিং',
+            mobileDescriptionEn: 'Batteries • wiring • charging',
             descriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ সংযোগ।',
             descriptionEn: 'Unsafe battery charging and risky connections.',
             desktopDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার, অতিরিক্ত লোড বা অন্যান্য বৈদ্যুতিক ঝুঁকির তথ্য জানান।',
