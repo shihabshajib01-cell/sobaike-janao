@@ -253,12 +253,12 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     return (
       <section
         id={id}
-        className={`w-full rounded-2xl border px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:px-6 md:py-6 lg:px-8 lg:py-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
+        className={`w-full rounded-2xl border shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 lg:gap-8 min-h-[160px] md:min-h-[180px] lg:min-h-[200px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-stretch min-h-[160px] md:min-h-[180px] lg:min-h-[230px] xl:min-h-[250px]">
           {/* Left 50% Content Column */}
-          <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left min-w-0 z-10 space-y-2 md:space-y-3">
+          <div className="px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3 md:px-6 md:py-6 lg:px-8 lg:py-7 xl:px-10 xl:py-8 flex flex-col justify-center items-center lg:items-start text-center lg:text-left min-w-0 z-10 space-y-2 md:space-y-3">
             <h1
               className="type-h1 tracking-tight"
               style={{ color: '#102A43' }}
@@ -278,7 +278,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
             {/* Tablet Short Description */}
             <p
-              className="hidden md:block lg:hidden type-body max-w-xl"
+              className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
               style={{ color: '#596579' }}
             >
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
@@ -296,7 +296,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
             {/* CTA (if exists) */}
             {slide.action && (
-              <div className="pt-2 sm:pt-2.5 md:pt-1 w-full flex justify-center md:justify-start">
+              <div className="pt-2 sm:pt-2.5 md:pt-1.5 w-full flex justify-center lg:justify-start">
                 <Button
                   id={`${id}-cta-btn`}
                   variant="outline"
@@ -311,18 +311,18 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           </div>
 
           {/* Right 50% Illustration Column */}
-          <div className="-mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none h-full">
+          <div className="w-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none h-full min-w-0 overflow-hidden">
             {slide.illustrationSrc ? (
               <img
                 src={resolvePublicAsset(slide.illustrationSrc)}
                 alt=""
                 aria-hidden="true"
-                className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[200px] lg:max-h-[230px] object-contain object-center md:object-right mx-auto block"
+                className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[220px] lg:max-h-none lg:h-full lg:w-full object-contain lg:object-cover object-center mx-auto block"
               />
             ) : (
               <div
                 aria-hidden="true"
-                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
+                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
               />
             )}
           </div>
@@ -377,14 +377,14 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   : `Slide ${index + 1} of ${totalSlides}`
               }
               aria-hidden={!isActive}
-              className="w-full shrink-0 min-w-full px-4 pt-4 pb-0 sm:px-5 sm:pt-5 sm:pb-0 md:px-6 md:py-6 lg:px-8 lg:py-7"
+              className="w-full shrink-0 min-w-full p-0"
               style={{
                 backgroundColor: heroBackground,
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6 lg:gap-8 min-h-[160px] md:min-h-[180px] lg:min-h-[200px]">
+              <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-stretch min-h-[160px] md:min-h-[180px] lg:min-h-[230px] xl:min-h-[250px]">
                 {/* Left 50% Content Column */}
-                <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left min-w-0 z-10 space-y-2 md:space-y-3">
+                <div className="px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3 md:px-6 md:py-6 lg:px-8 lg:py-7 xl:px-10 xl:py-8 flex flex-col justify-center items-center lg:items-start text-center lg:text-left min-w-0 z-10 space-y-2 md:space-y-3">
                   {index === 0 ? (
                     <h1
                       className="type-h1 tracking-tight"
@@ -413,7 +413,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                   {/* Tablet Short Description */}
                   <p
-                    className="hidden md:block lg:hidden type-body max-w-xl"
+                    className="hidden md:block lg:hidden type-body max-w-xl text-center lg:text-left"
                     style={{ color: '#596579' }}
                   >
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
@@ -431,7 +431,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
                   {/* CTA (if exists) */}
                   {slide.action && (
-                    <div className="pt-2 sm:pt-2.5 md:pt-1 w-full flex justify-center md:justify-start">
+                    <div className="pt-2 sm:pt-2.5 md:pt-1.5 w-full flex justify-center lg:justify-start">
                       <Button
                         id={`${id}-cta-btn-${index}`}
                         variant="outline"
@@ -447,18 +447,18 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 </div>
 
                 {/* Right 50% Illustration Column */}
-                <div className="-mx-4 sm:-mx-5 md:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+2.5rem)] md:w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none h-full">
+                <div className="w-full flex items-center justify-center lg:justify-end relative pointer-events-none select-none h-full min-w-0 overflow-hidden">
                   {slide.illustrationSrc ? (
                     <img
                       src={resolvePublicAsset(slide.illustrationSrc)}
                       alt=""
                       aria-hidden="true"
-                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[200px] lg:max-h-[230px] object-contain object-center md:object-right mx-auto block"
+                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[220px] lg:max-h-none lg:h-full lg:w-full object-contain lg:object-cover object-center mx-auto block"
                     />
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0"
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
                     />
                   )}
                 </div>
