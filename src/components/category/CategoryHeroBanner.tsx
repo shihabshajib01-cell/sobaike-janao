@@ -151,7 +151,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
               size="md"
               tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
               onClick={action.onClick}
-              className="w-auto shadow-none btn-hero-cta"
+              className="shadow-none btn-hero-cta"
               style={getHeroCtaStyle(sectionKey)}
             >
               {language === 'bn' ? action.labelBn : action.labelEn}
@@ -195,7 +195,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             size="md"
             tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
             onClick={action.onClick}
-            className="w-auto shadow-none btn-hero-cta justify-center min-h-[44px]"
+            className="shadow-none btn-hero-cta"
             style={getHeroCtaStyle(sectionKey)}
           >
             {language === 'bn' ? action.labelBn : action.labelEn}
