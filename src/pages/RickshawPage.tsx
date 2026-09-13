@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AlertCircle, Info } from 'lucide-react';
+import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
+import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
@@ -12,6 +14,8 @@ import { useApp } from '../context/AppContext';
 
 export const RickshawPage: React.FC = () => {
   const { language } = useApp();
+  const { getSegment } = useTaxonomy();
+  const config = getSegment('rickshaw') || SECTIONS.rickshaw;
 
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
 
@@ -57,10 +61,10 @@ export const RickshawPage: React.FC = () => {
         slides={[
           {
             id: 'rickshaw-primary',
-            titleBn: 'অননুমোদিত চার্জিং স্টেশন',
-            titleEn: 'Unsafe charging stations',
-            descriptionBn: 'অনুমোদনহীন ব্যাটারি চার্জিং স্টেশন ও ঝুঁকিপূর্ণ সংযোগের তথ্য জানান।',
-            descriptionEn: 'Report unauthorized or unsafe auto-rickshaw battery charging stations.',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
             illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.png',
           },
         ]}
@@ -71,8 +75,8 @@ export const RickshawPage: React.FC = () => {
         <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
         <span>
           {language === 'bn'
-            ? 'অবৈধ বা ঝুঁকিপূর্ণ অটোরিকশা চার্জিং স্টেশনের অবস্থান ও তথ্য জানান।'
-            : 'Report details and location of illegal or unsafe auto-rickshaw charging stations.'}
+            ? 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।'
+            : 'Share the location and details of illegal or unsafe charging stations.'}
         </span>
       </div>
 
@@ -81,7 +85,7 @@ export const RickshawPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[18px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'চার্জিং স্টেশন প্রতিবেদনসমূহ' : 'Charging station reports'}
+              {language === 'bn' ? 'চার্জিং প্রতিবেদন' : 'Charging reports'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'

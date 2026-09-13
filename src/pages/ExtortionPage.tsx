@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AlertCircle, PhoneCall } from 'lucide-react';
+import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -14,7 +15,8 @@ import { useApp } from '../context/AppContext';
 
 export const ExtortionPage: React.FC = () => {
   const { language } = useApp();
-  const { getFeedSubcategories } = useTaxonomy();
+  const { getFeedSubcategories, getSegment } = useTaxonomy();
+  const config = getSegment('extortion') || SECTIONS.extortion;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -64,10 +66,10 @@ export const ExtortionPage: React.FC = () => {
         slides={[
           {
             id: 'extortion-primary',
-            titleBn: 'চাঁদাবাজি',
-            titleEn: 'Extortion',
-            descriptionBn: 'দোকানপাট, পরিবহন বা এলাকায় অবৈধ চাঁদা দাবি ও হুমকির তথ্য জানান।',
-            descriptionEn: 'Report extortion, illegal tolls, or coercive demands.',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
             illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.png',
           },
         ]}
@@ -88,7 +90,7 @@ export const ExtortionPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'উপ-বিভাগ অনুসারে ফিল্টার' : 'Filter by subcategory'}
+              {language === 'bn' ? 'প্রতিবেদনের ধরন' : 'Report type'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'

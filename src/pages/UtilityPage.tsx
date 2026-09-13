@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AlertCircle, Info } from 'lucide-react';
+import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -14,7 +15,8 @@ import { useApp } from '../context/AppContext';
 
 export const UtilityPage: React.FC = () => {
   const { language, openReportComposer } = useApp();
-  const { getFeedSubcategories } = useTaxonomy();
+  const { getFeedSubcategories, getSegment } = useTaxonomy();
+  const config = getSegment('load_shedding') || SECTIONS.load_shedding;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -64,10 +66,10 @@ export const UtilityPage: React.FC = () => {
         slides={[
           {
             id: 'utility-primary',
-            titleBn: 'ইউটিলিটি সেবা প্রতিবেদন',
-            titleEn: 'Utility reports',
-            descriptionBn: 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত প্রতিবেদন জমা দিন।',
-            descriptionEn: 'Report load shedding, gas shortages, or electricity billing issues.',
+            titleBn: config.nameBn,
+            titleEn: config.nameEn,
+            descriptionBn: config.descriptionBn,
+            descriptionEn: config.descriptionEn,
             illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.png',
             action: {
               labelBn: 'প্রতিবেদন জমা দিন',
@@ -93,7 +95,7 @@ export const UtilityPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-ui-stroke-subtle pb-3">
           <div>
             <h2 className="text-[16px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'প্রতিবেদনের ধরন অনুসারে ফিল্টার' : 'Filter by report type'}
+              {language === 'bn' ? 'প্রতিবেদনের ধরন' : 'Report type'}
             </h2>
             <p className="text-[14px] text-ui-content-muted">
               {language === 'bn'
