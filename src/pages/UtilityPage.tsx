@@ -66,10 +66,10 @@ export const UtilityPage: React.FC = () => {
         slides={[
           {
             id: 'utility-primary',
-            titleBn: config.nameBn,
-            titleEn: config.nameEn,
-            descriptionBn: config.descriptionBn,
-            descriptionEn: config.descriptionEn,
+            titleBn: 'ইউটিলিটি সমস্যা',
+            titleEn: 'Utility Issues',
+            descriptionBn: 'বিদ্যুৎ, গ্যাস বা বিলিং সমস্যা জানান।',
+            descriptionEn: 'Report power, gas or billing issues.',
             illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.png',
             action: {
               labelBn: 'প্রতিবেদন জমা দিন',

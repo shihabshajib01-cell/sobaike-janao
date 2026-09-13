@@ -27,6 +27,13 @@ export interface CategoryHeroSliderProps {
 
 const AUTOPLAY_INTERVAL = 35_000;
 
+const HERO_ART_BACKGROUNDS: Record<string, string> = {
+  harassment: '#FEEAEC',
+  rickshaw: '#E4F8EE',
+  extortion: '#FEEADE',
+  load_shedding: '#FEEDD4',
+};
+
 export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   id = 'category-hero-slider',
   section,
@@ -45,8 +52,11 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const sliderRef = useRef<HTMLDivElement | null>(null);
 
-  // Section key for CSS variables
+  // Section key for CSS variables & art background override
   const sectionKey = section;
+  const heroBackground =
+    HERO_ART_BACKGROUNDS[sectionKey] ??
+    `var(--sec-${sectionKey}-bg)`;
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
@@ -196,9 +206,9 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     setIsSwiping(false);
   };
 
-  // Section styling via CSS variables
+  // Section styling via CSS variables & art background override
   const containerStyle: React.CSSProperties = {
-    backgroundColor: `var(--sec-${sectionKey}-bg)`,
+    backgroundColor: heroBackground,
     borderColor: `var(--sec-${sectionKey}-border)`,
     touchAction: 'pan-y',
   };
@@ -216,42 +226,31 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
         className={`w-full rounded-2xl border p-4 sm:p-5 md:p-7 shadow-2xs relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
-        <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6">
           {/* Left Text Content */}
-          <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
-            <h1 className="type-h1 text-ui-content-primary tracking-tight">
+          <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-2 sm:space-y-2.5 text-center md:text-left z-10">
+            <h1
+              className="type-h1 tracking-tight"
+              style={{ color: '#102A43' }}
+            >
               {language === 'bn' ? slide.titleBn : slide.titleEn}
             </h1>
-            <p className="type-body text-ui-content-secondary max-w-2xl">
+            <p
+              className="type-body max-w-2xl mx-auto md:mx-0"
+              style={{ color: '#667085' }}
+            >
               {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
             </p>
-            {slide.action && (
-              <div className="pt-1.5 sm:pt-2">
-                <Button
-                  id={`${id}-cta-btn`}
-                  variant="primary"
-                  size="md"
-                  onClick={slide.action.onClick}
-                  style={{
-                    backgroundColor: `var(--sec-${sectionKey}-primary)`,
-                    color: `var(--sec-${sectionKey}-on-primary)`,
-                  }}
-                  className="w-full sm:w-auto shadow-xs"
-                >
-                  {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
-                </Button>
-              </div>
-            )}
           </div>
 
-          {/* Right Illustration Safe Area (Phase 1 Quiet Placeholder) */}
-          <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+          {/* Right Illustration Safe Area */}
+          <div className={`md:col-start-2 md:row-start-1 ${slide.action ? 'md:row-span-2' : ''} w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none`}>
             {slide.illustrationSrc ? (
               <img
                 src={slide.illustrationSrc}
                 alt=""
                 aria-hidden="true"
-                className="w-full h-full max-h-[150px] sm:max-h-[170px] md:max-h-[190px] object-contain object-right"
+                className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto block"
               />
             ) : (
               <div
@@ -260,6 +259,25 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               />
             )}
           </div>
+
+          {/* CTA (if exists) */}
+          {slide.action && (
+            <div className="md:col-start-1 md:row-start-2 pt-1.5 sm:pt-2 w-full flex justify-center md:justify-start">
+              <Button
+                id={`${id}-cta-btn`}
+                variant="primary"
+                size="md"
+                onClick={slide.action.onClick}
+                style={{
+                  backgroundColor: `var(--sec-${sectionKey}-primary)`,
+                  color: `var(--sec-${sectionKey}-on-primary)`,
+                }}
+                className="w-full sm:w-auto shadow-xs"
+              >
+                {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
+              </Button>
+            </div>
+          )}
         </div>
       </section>
     );
@@ -312,52 +330,45 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
               }
               aria-hidden={!isActive}
               className="w-full shrink-0 p-4 sm:p-5 md:p-7 min-w-full"
+              style={{
+                backgroundColor: heroBackground,
+              }}
             >
-              <div className="flex items-center justify-between gap-4 md:gap-6 min-h-[130px] sm:min-h-[140px] md:min-h-[160px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-6">
                 {/* Left Text Content */}
-                <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5 text-left z-10">
+                <div className="md:col-start-1 md:row-start-1 min-w-0 space-y-2 sm:space-y-2.5 text-center md:text-left z-10">
                   {index === 0 ? (
-                    <h1 className="type-h1 text-ui-content-primary tracking-tight">
+                    <h1
+                      className="type-h1 tracking-tight"
+                      style={{ color: '#102A43' }}
+                    >
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h1>
                   ) : (
-                    <h2 className="type-h2 text-ui-content-primary tracking-tight">
+                    <h2
+                      className="type-h2 tracking-tight"
+                      style={{ color: '#102A43' }}
+                    >
                       {language === 'bn' ? slide.titleBn : slide.titleEn}
                     </h2>
                   )}
 
-                  <p className="type-body text-ui-content-secondary max-w-2xl">
+                  <p
+                    className="type-body max-w-2xl mx-auto md:mx-0"
+                    style={{ color: '#667085' }}
+                  >
                     {language === 'bn' ? slide.descriptionBn : slide.descriptionEn}
                   </p>
-
-                  {slide.action && (
-                    <div className="pt-1.5 sm:pt-2">
-                      <Button
-                        id={`${id}-cta-btn-${index}`}
-                        variant="primary"
-                        size="md"
-                        tabIndex={isActive ? 0 : -1}
-                        onClick={slide.action.onClick}
-                        style={{
-                          backgroundColor: `var(--sec-${sectionKey}-primary)`,
-                          color: `var(--sec-${sectionKey}-on-primary)`,
-                        }}
-                        className="w-full sm:w-auto shadow-xs"
-                      >
-                        {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
-                      </Button>
-                    </div>
-                  )}
                 </div>
 
                 {/* Right Illustration Safe Area */}
-                <div className="shrink-0 w-28 sm:w-40 md:w-52 lg:w-60 h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] flex items-center justify-end relative pointer-events-none select-none">
+                <div className={`md:col-start-2 md:row-start-1 ${slide.action ? 'md:row-span-2' : ''} w-full flex items-center justify-center md:justify-end relative pointer-events-none select-none`}>
                   {slide.illustrationSrc ? (
                     <img
                       src={slide.illustrationSrc}
                       alt=""
                       aria-hidden="true"
-                      className="w-full h-full max-h-[150px] sm:max-h-[170px] md:max-h-[190px] object-contain object-right"
+                      className="w-full max-w-full h-auto max-h-[220px] sm:max-h-[260px] md:max-h-[190px] object-contain object-center md:object-right mx-auto block"
                     />
                   ) : (
                     <div
@@ -366,6 +377,26 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                     />
                   )}
                 </div>
+
+                {/* CTA (if exists) */}
+                {slide.action && (
+                  <div className="md:col-start-1 md:row-start-2 pt-1.5 sm:pt-2 w-full flex justify-center md:justify-start">
+                    <Button
+                      id={`${id}-cta-btn-${index}`}
+                      variant="primary"
+                      size="md"
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={slide.action.onClick}
+                      style={{
+                        backgroundColor: `var(--sec-${sectionKey}-primary)`,
+                        color: `var(--sec-${sectionKey}-on-primary)`,
+                      }}
+                      className="w-full sm:w-auto shadow-xs"
+                    >
+                      {language === 'bn' ? slide.action.labelBn : slide.action.labelEn}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           );
