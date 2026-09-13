@@ -239,7 +239,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     return (
       <section
         id={id}
-        className={`w-full rounded-2xl border shadow-2xs relative overflow-hidden transition-colors ${className}`}
+        className={`w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-stretch min-h-[160px] md:min-h-[180px] lg:min-h-[230px] xl:min-h-[250px]">
@@ -309,7 +309,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
             ) : (
               <div
                 aria-hidden="true"
-                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
+                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
               />
             )}
           </div>
@@ -339,7 +339,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchCancel}
-      className={`group w-full rounded-2xl border shadow-2xs relative overflow-hidden transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
+      className={`group w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
       style={containerStyle}
     >
       {/* Slides Track */}
@@ -446,7 +446,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl bg-ui-surface-subtle/60 border border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
+                      className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
                     />
                   )}
                 </div>

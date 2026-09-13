@@ -233,7 +233,7 @@ export const HERO_TOKENS = {
       ctaHover: '#0D9488',
       ctaHoverText: '#050505',
     },
-  } as Record<SectionKey, HeroSectionTheme>,
+  } satisfies Record<SectionKey, HeroSectionTheme>,
 };
 
 export const getHeroCtaStyle = (section: SectionKey): React.CSSProperties => {
