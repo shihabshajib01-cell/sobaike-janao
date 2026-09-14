@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { ReportItem } from '../../types/report';
-import { BANGLADESH_DISTRICTS } from '../../data/districts';
+import { BANGLADESH_DISTRICTS, DIVISIONS } from '../../data/districts';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { toBanglaDigits, formatRankNumber } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
@@ -9,7 +9,9 @@ import { MapIcon } from './MapIcon';
 
 interface DistrictRankingPanelProps {
   reports: ReportItem[];
+  rankingReports?: ReportItem[];
   selectedDistrict: string;
+  selectedDivision?: string;
   onSelectDistrict: (district: string) => void;
   language: 'bn' | 'en';
   selectedSection?: SectionKey | 'all';
@@ -30,7 +32,9 @@ interface RankedDistrict {
 
 export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   reports,
+  rankingReports,
   selectedDistrict,
+  selectedDivision = 'all',
   onSelectDistrict,
   language,
   selectedSection = 'all',
@@ -38,7 +42,9 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   const { navigateTo } = useApp();
   const [showAllDistricts, setShowAllDistricts] = useState(false);
 
-  // Compute district level aggregations
+  // Compute district level aggregations from rankingReports (or fallback to reports)
+  const rankingSource = rankingReports || reports;
+
   const {
     rankedDistricts,
     currentDistrictInfo,
@@ -54,7 +60,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
     let extortion = 0;
     let loadShedding = 0;
 
-    reports.forEach((rep) => {
+    rankingSource.forEach((rep) => {
       if (selectedSection !== 'all' && rep.segment !== selectedSection) return;
 
       if (rep.segment === 'harassment') harass += 1;
@@ -106,7 +112,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
     const list = Array.from(map.values());
     list.sort((a, b) => b.count - a.count);
 
-    // If a district is selected, find its summary
+    // If a district is selected, find or compute its summary
     let curDist: RankedDistrict | null = null;
     if (selectedDistrict !== 'all') {
       const canonical = BANGLADESH_DISTRICTS.find(
@@ -115,14 +121,15 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           d.nameBn === selectedDistrict ||
           d.id === selectedDistrict.toLowerCase()
       );
-      const foundInList = list.find(
+      const foundInRanking = list.find(
         (d) =>
           d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
           d.nameBn === selectedDistrict ||
           d.id === selectedDistrict.toLowerCase()
       );
-      if (foundInList) {
-        curDist = foundInList;
+
+      if (foundInRanking) {
+        curDist = foundInRanking;
       } else if (canonical) {
         curDist = {
           id: canonical.id,
@@ -142,15 +149,15 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
     return {
       rankedDistricts: list,
       currentDistrictInfo: curDist,
-      totalCount: reports.length,
+      totalCount: rankingSource.length,
       totalHarass: harass,
       totalRickshaw: rickshaw,
       totalExtortion: extortion,
       totalLoadShedding: loadShedding,
     };
-  }, [reports, selectedSection, selectedDistrict]);
+  }, [rankingSource, selectedSection, selectedDistrict]);
 
-  // Recent reports for selected district or nationwide
+  // Recent reports for selected district
   const activeDistrictReports = useMemo(() => {
     if (selectedDistrict === 'all') {
       return reports.slice(0, 3);
@@ -173,6 +180,27 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
     topDistrict !== null &&
     topDistrict.count > 0 &&
     topDistrict.count === rankedDistricts[1].count;
+
+  // Truthful parent geography reset button label
+  const parentGeographyButtonLabel = useMemo(() => {
+    if (selectedDivision && selectedDivision !== 'all') {
+      const divObj = DIVISIONS.find(
+        (d) =>
+          d.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
+          d.nameBn === selectedDivision ||
+          d.id === selectedDivision.toLowerCase()
+      );
+      const divName = divObj
+        ? language === 'bn'
+          ? divObj.nameBn
+          : divObj.nameEn
+        : selectedDivision;
+      return language === 'bn'
+        ? `${divName} বিভাগের সব জেলা`
+        : `All districts in ${divName} Division`;
+    }
+    return language === 'bn' ? 'সারাদেশ দেখুন' : 'All regions';
+  }, [selectedDivision, language]);
 
   const categories = useMemo(
     () => [
@@ -321,10 +349,10 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3.5 sm:p-4 md:p-5 shadow-xs flex flex-col justify-between space-y-3 md:space-y-4"
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-ui-stroke-subtle pb-2.5 md:pb-3">
-        <div className="flex items-center gap-2">
-          <MapIcon name="map-pin" size="md" className="text-ui-content-primary" />
-          <h3 className="text-[16px] md:text-[17px] font-bold text-ui-content-primary tracking-tight">
+      <div className="flex items-center justify-between border-b border-ui-stroke-subtle pb-2.5 md:pb-3 gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <MapIcon name="map-pin" size="md" className="text-ui-content-primary shrink-0" />
+          <h3 className="text-[16px] md:text-[17px] font-bold text-ui-content-primary tracking-tight truncate">
             {language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area summary'}
           </h3>
         </div>
@@ -333,9 +361,10 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <button
             type="button"
             onClick={() => onSelectDistrict('all')}
-            className="text-[12px] font-semibold text-ui-content-secondary flex items-center gap-1 cursor-pointer px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle transition-colors min-h-[36px]"
+            className="text-[12px] font-semibold text-ui-content-secondary hover:text-ui-content-primary flex items-center gap-1 cursor-pointer px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle hover:border-ui-stroke-default transition-colors min-h-[36px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            aria-label={parentGeographyButtonLabel}
           >
-            <span>{language === 'bn' ? 'সারাদেশ দেখুন' : 'All regions'}</span>
+            <span className="truncate max-w-[140px] sm:max-w-none">{parentGeographyButtonLabel}</span>
             <MapIcon name="close" size="xs" />
           </button>
         )}
@@ -432,11 +461,36 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               </div>
             </div>
           )}
+
+          {/* Explore by district (retained below summary when district is selected) */}
+          <div className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary pt-2 border-t border-ui-stroke-subtle">
+            {language === 'bn' ? 'এলাকা অনুযায়ী দেখুন:' : 'Explore by district:'}
+          </div>
+
+          {/* District list */}
+          {rankedDistricts.length > 0 ? (
+            <>
+              {/* Mobile District List (<768px): Top 5 by default, expandable to full, natural page flow */}
+              <div className="space-y-1.5 max-h-none overflow-visible md:hidden">
+                {mobileDisplayedDistricts.map(renderDistrictItem)}
+              </div>
+
+              {/* Desktop / Tablet District List (>=768px): Always full ranking, internal vertical scroll */}
+              <div className="hidden md:block space-y-1.5 md:max-h-[260px] md:overflow-y-auto md:pr-1">
+                {rankedDistricts.map(renderDistrictItem)}
+              </div>
+            </>
+          ) : (
+            <div className="py-4 text-center text-[13px] text-ui-content-muted space-y-1">
+              <MapIcon name="map-pin" size="lg" className="mx-auto text-ui-content-muted" />
+              <p>{language === 'bn' ? 'কোনো জেলার তথ্য মেলেনি' : 'No district reports'}</p>
+            </div>
+          )}
         </div>
       ) : (
         /* Nationwide View: Top Active Districts and Overview */
         <div className="space-y-3 md:space-y-4">
-          {/* Nationwide Summary Card (Total + Most Published Area) */}
+          {/* Nationwide Summary Card (Total + Most Published Area / Top District with Tie Handling) */}
           <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3.5 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="text-[12px] md:text-[13px] font-medium text-ui-content-secondary">
@@ -453,16 +507,27 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   {isTopTie
                     ? language === 'bn'
                       ? 'শীর্ষ জেলা'
-                      : 'Top district'
+                      : 'Top districts'
                     : language === 'bn'
                     ? 'সর্বাধিক প্রকাশিত প্রতিবেদন'
                     : 'Most published reports'}
                 </div>
                 <div className="text-[13.5px] md:text-[14px] font-bold text-ui-content-primary mt-0.5">
-                  {language === 'bn' ? topDistrict.nameBn : topDistrict.nameEn} —{' '}
-                  <span className="font-mono">
-                    {language === 'bn' ? toBanglaDigits(topDistrict.count) : topDistrict.count}
-                  </span>
+                  {isTopTie ? (
+                    <span>
+                      {language === 'bn' ? 'একাধিক জেলা' : 'Multiple districts'} —{' '}
+                      <span className="font-mono">
+                        {language === 'bn' ? toBanglaDigits(topDistrict.count) : topDistrict.count}
+                      </span>
+                    </span>
+                  ) : (
+                    <span>
+                      {language === 'bn' ? topDistrict.nameBn : topDistrict.nameEn} —{' '}
+                      <span className="font-mono">
+                        {language === 'bn' ? toBanglaDigits(topDistrict.count) : topDistrict.count}
+                      </span>
+                    </span>
+                  )}
                 </div>
               </div>
             )}
@@ -520,7 +585,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       )}
 
       {/* Show All / Less Toggle for District List (Mobile only, <768px) */}
-      {!isDistrictSelected && rankedDistricts.length > 5 && (
+      {rankedDistricts.length > 5 && (
         <div className="pt-2 border-t border-ui-stroke-subtle md:hidden">
           <button
             type="button"

@@ -50,8 +50,8 @@ export const ExplorePage: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Shared Filtered Reports - single source of truth for both Heatmap and Reports modes
-  const filteredReports: ReportItem[] = useMemo(() => {
+  // Base filtered reports - applies Section, Division, and Search filters (ranking context)
+  const baseFilteredReports: ReportItem[] = useMemo(() => {
     return allReports.filter((r) => {
       // Section filter
       if (selectedSection !== 'all' && r.segment !== selectedSection) {
@@ -71,14 +71,6 @@ export const ExplorePage: React.FC = () => {
             foundDist.divisionBn === selectedDivision ||
             foundDist.divisionId === selectedDivision.toLowerCase());
         if (!matchDiv) return false;
-      }
-      // District filter
-      if (selectedDistrict !== 'all') {
-        const matchDist =
-          (r.districtEn || '').toLowerCase() === selectedDistrict.toLowerCase() ||
-          r.districtBn === selectedDistrict ||
-          (r.districtEn || '').toLowerCase() === selectedDistrict.trim().toLowerCase();
-        if (!matchDist) return false;
       }
       // Search query
       if (searchQuery.trim()) {
@@ -104,7 +96,19 @@ export const ExplorePage: React.FC = () => {
       }
       return true;
     });
-  }, [allReports, searchQuery, selectedSection, selectedDivision, selectedDistrict]);
+  }, [allReports, searchQuery, selectedSection, selectedDivision]);
+
+  // Shared Filtered Reports - single source of truth for Heatmap, Reports modes, and selected area data
+  const filteredReports: ReportItem[] = useMemo(() => {
+    if (selectedDistrict === 'all') return baseFilteredReports;
+    return baseFilteredReports.filter((r) => {
+      const matchDist =
+        (r.districtEn || '').toLowerCase() === selectedDistrict.toLowerCase() ||
+        r.districtBn === selectedDistrict ||
+        (r.districtEn || '').toLowerCase() === selectedDistrict.trim().toLowerCase();
+      return matchDist;
+    });
+  }, [baseFilteredReports, selectedDistrict]);
 
   // Available districts filtered by selected division if set
   const availableDistricts = useMemo(() => {
@@ -735,7 +739,9 @@ export const ExplorePage: React.FC = () => {
                 <div className="lg:col-span-4 w-full">
                   <DistrictRankingPanel
                     reports={filteredReports}
+                    rankingReports={baseFilteredReports}
                     selectedDistrict={selectedDistrict}
+                    selectedDivision={selectedDivision}
                     onSelectDistrict={handleSelectDistrict}
                     language={language}
                     selectedSection={selectedSection}
