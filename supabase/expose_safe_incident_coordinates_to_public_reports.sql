@@ -60,7 +60,9 @@ BEGIN
         'area', c.area,
         'location', coalesce(c.formatted_address, c.area, c.district),
         'latitude', CASE
-          WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
+          WHEN (c.publication_preferences->'showGeneralLocation')
+               IS DISTINCT FROM 'true'::jsonb
+          THEN NULL
           WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
           WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
           WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
@@ -69,7 +71,9 @@ BEGIN
           ELSE c.latitude
         END,
         'longitude', CASE
-          WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
+          WHEN (c.publication_preferences->'showGeneralLocation')
+               IS DISTINCT FROM 'true'::jsonb
+          THEN NULL
           WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
           WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
           WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
@@ -170,7 +174,9 @@ BEGIN
     'area', c.area,
     'location', coalesce(c.formatted_address, c.area, c.district),
     'latitude', CASE
-      WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
+      WHEN (c.publication_preferences->'showGeneralLocation')
+           IS DISTINCT FROM 'true'::jsonb
+      THEN NULL
       WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
       WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
       WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
@@ -179,7 +185,9 @@ BEGIN
       ELSE c.latitude
     END,
     'longitude', CASE
-      WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
+      WHEN (c.publication_preferences->'showGeneralLocation')
+           IS DISTINCT FROM 'true'::jsonb
+      THEN NULL
       WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
       WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
       WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
