@@ -325,17 +325,19 @@ export const ExplorePage: React.FC = () => {
 
   return (
     <PublicPageContainer id="explore-page-container">
-      {/* 1. Page Title & Context (Compact Spacing) */}
-      <div className="space-y-0.5 pb-0.5">
-        <h1 className="text-[22px] md:text-[26px] leading-[1.25] font-bold text-ui-content-primary tracking-tight">
-          {language === 'bn' ? 'প্রতিবেদন বিশ্লেষণ' : 'Report insights'}
-        </h1>
-        <p className="text-[13px] md:text-[14px] leading-[1.4] text-ui-content-secondary">
-          {language === 'bn'
-            ? 'এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন ও বিশ্লেষণ দেখুন'
-            : 'Explore published reports and analysis by area'}
-        </p>
-      </div>
+      {/* Top Controls & View Switcher Wrapper */}
+      <div className="space-y-3 sm:space-y-4 md:space-y-4">
+        {/* 1. Page Title & Context (Compact Spacing) */}
+        <div className="space-y-0.5 pb-0.5">
+          <h1 className="text-[22px] md:text-[26px] leading-[1.25] font-bold text-ui-content-primary tracking-tight">
+            {language === 'bn' ? 'প্রতিবেদন বিশ্লেষণ' : 'Report insights'}
+          </h1>
+          <p className="text-[13px] md:text-[14px] leading-[1.4] text-ui-content-secondary">
+            {language === 'bn'
+              ? 'এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন ও বিশ্লেষণ দেখুন'
+              : 'Explore published reports and analysis by area'}
+          </p>
+        </div>
 
       {/* 2. Control Layer (Find reports - Compact Workbench) */}
       <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3.5 sm:p-4 md:p-4.5 space-y-3 shadow-2xs">
@@ -774,6 +776,7 @@ export const ExplorePage: React.FC = () => {
             <span>{language === 'bn' ? 'প্রতিবেদন' : 'Reports'}</span>
           </button>
         </div>
+      </div>
       </div>
 
       {/* Loading Skeleton States */}

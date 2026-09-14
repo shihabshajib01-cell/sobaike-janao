@@ -138,7 +138,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         }
       }
       const rawMax = districtCounts.length > 0 ? Math.max(...districtCounts.map((dc) => dc.count)) : 1;
-      const maxVal = rawMax <= 2 ? 1 : rawMax;
+      const maxVal = Math.max(rawMax, 1);
       return { heatPoints: pts, maxHeatWeight: maxVal };
     }
 
@@ -255,7 +255,26 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     if (isInitialMount.current) {
       isInitialMount.current = false;
       if (selectedDistrict === 'all') {
-        return; // Already cleanly centered at BANGLADESH_CENTER, zoom 7.2
+        try {
+          const size = map.getSize();
+          if (!size || size.x <= 50 || size.y <= 50) {
+            map.invalidateSize();
+          }
+          map.fitBounds(BANGLADESH_BOUNDS, {
+            padding: [16, 16],
+            animate: false,
+          });
+        } catch (err) {
+          console.warn('[PublicIncidentMap] initial fitBounds error:', err);
+          try {
+            map.fitBounds(BANGLADESH_BOUNDS, { animate: false });
+          } catch {
+            try {
+              map.setView(BANGLADESH_CENTER, 7.2);
+            } catch {}
+          }
+        }
+        return;
       }
     }
 

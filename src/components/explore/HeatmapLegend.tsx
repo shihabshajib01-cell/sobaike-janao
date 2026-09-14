@@ -38,6 +38,13 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
         <span>{language === 'bn' ? 'মাঝারি' : 'Medium'}</span>
         <span>{language === 'bn' ? 'বেশি' : 'High'}</span>
       </div>
+
+      {/* Responsible Interpretation Note */}
+      <p className="text-[9.5px] sm:text-[10px] leading-tight text-ui-content-muted pt-1 border-t border-ui-stroke-subtle/50">
+        {language === 'bn'
+          ? 'এটি প্রতিবেদনের ঘনত্ব দেখায়, তীব্রতা বা যাচাই নয়।'
+          : 'Shows report concentration, not severity or verification.'}
+      </p>
     </div>
   );
 };
