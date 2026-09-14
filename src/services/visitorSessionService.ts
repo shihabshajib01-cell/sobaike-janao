@@ -276,17 +276,12 @@ export const VisitorSessionService = {
   },
 
   /**
-   * Record visit session via secure Supabase RPC
+   * Record visit session metadata via secure Supabase RPC.
+   * Phase 8 Privacy Hardening: Browse sessions NEVER transmit or store coordinates.
    */
   async recordSession(
-    status: PermissionStatus,
-    coords?: { latitude: number; longitude: number; accuracy: number } | null
+    status: PermissionStatus
   ): Promise<void> {
-    // Local storage of valid coordinates happens immediately so network/RPC failures do not drop valid location
-    if (coords) {
-      updateLocalLocation(coords);
-    }
-
     if (!isSupabaseConfigured() || !supabase) {
       // Local or demo mode, do not fail
       return;
@@ -301,9 +296,10 @@ export const VisitorSessionService = {
       p_session_id: sessionId,
       p_permission_status: status,
 
-      p_latitude: coords ? coords.latitude : null,
-      p_longitude: coords ? coords.longitude : null,
-      p_accuracy_meters: coords ? coords.accuracy : null,
+      // Phase 8: Browse visit sessions NEVER transmit or store coordinates
+      p_latitude: null,
+      p_longitude: null,
+      p_accuracy_meters: null,
 
       p_browser_name: meta.browser_name,
       p_browser_version: meta.browser_version,
@@ -324,13 +320,6 @@ export const VisitorSessionService = {
       const { error } = await supabase.rpc('record_public_visit_session', payload);
       if (error) {
         console.warn('[VisitorSessionService] Failed to record visit session:', error.message);
-      } else if (coords) {
-        lastRecordedLocation = {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          accuracy: coords.accuracy,
-          timestamp: Date.now(),
-        };
       }
     } catch (err) {
       console.warn('[VisitorSessionService] Unexpected error recording session:', err);
@@ -343,7 +332,7 @@ export const VisitorSessionService = {
   async requestAndRecordLocation(): Promise<LocationRequestResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       this.setLocationChoice('granted');
-      await this.recordSession('unavailable', null);
+      await this.recordSession('unavailable');
       return { success: false, status: 'unavailable' };
     }
 
@@ -359,7 +348,7 @@ export const VisitorSessionService = {
           // Immediately set in session memory so UI and browsing never wait on or fail from Supabase RPC
           updateLocalLocation(coords);
           this.startLocationWatch();
-          await this.recordSession('granted', coords);
+          await this.recordSession('granted');
           resolve({ success: true, status: 'granted', coords });
         },
         async (error) => {
@@ -368,7 +357,7 @@ export const VisitorSessionService = {
             status = 'denied';
           }
           this.setLocationChoice('granted'); // Record choice so we don't spam custom modal again
-          await this.recordSession(status, null);
+          await this.recordSession(status);
           resolve({ success: false, status });
         },
         {
@@ -385,7 +374,7 @@ export const VisitorSessionService = {
    */
   async handleNotNow(): Promise<void> {
     this.setLocationChoice('not_now');
-    await this.recordSession('prompt', null);
+    await this.recordSession('prompt');
   },
 
   /**
@@ -404,12 +393,12 @@ export const VisitorSessionService = {
             };
             updateLocalLocation(coords);
             this.startLocationWatch();
-            await this.recordSession('granted', coords);
+            await this.recordSession('granted');
           },
           async (err) => {
             const status: PermissionStatus =
               err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
-            await this.recordSession(status, null);
+            await this.recordSession(status);
           },
           {
             enableHighAccuracy: true,
@@ -465,11 +454,8 @@ export const VisitorSessionService = {
               longitude: newLon,
               accuracy: newAcc,
             });
-            await this.recordSession('granted', {
-              latitude: newLat,
-              longitude: newLon,
-              accuracy: newAcc,
-            });
+            // Phase 8: Browse watcher updates IN-MEMORY location only for ranking.
+            // NEVER persist browse coordinates to database.
           }
         },
         (_error) => {
@@ -657,8 +643,8 @@ export const VisitorSessionService = {
           this.setLocationChoice('granted');
           this.startLocationWatch();
 
-          // Also record session asynchronously in background
-          this.recordSession('granted', { latitude: lat, longitude: lng, accuracy }).catch(() => {});
+          // Also record session asynchronously in background (safe metadata only, no coordinates)
+          this.recordSession('granted').catch(() => {});
 
           resolve({
             success: true,

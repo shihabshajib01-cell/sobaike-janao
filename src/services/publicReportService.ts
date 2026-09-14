@@ -260,8 +260,8 @@ export const PublicReportService = {
       });
 
       if (error) {
-        console.warn('[PublicReportService.getHomeFeed] RPC error, falling back to getAll:', error);
-        return this.getAll({ district: params?.district });
+        console.warn('[PublicReportService.getHomeFeed] RPC error:', error);
+        throw error;
       } else if (data && Array.isArray(data)) {
         list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
       }
