@@ -146,6 +146,67 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   const isDistrictSelected = selectedDistrict !== 'all' && currentDistrictInfo !== null;
   const mobileDisplayedDistricts = showAllDistricts ? rankedDistricts : rankedDistricts.slice(0, 5);
 
+  const topDistrict = rankedDistricts.length > 0 ? rankedDistricts[0] : null;
+  const isTopTie =
+    rankedDistricts.length > 1 &&
+    topDistrict !== null &&
+    topDistrict.count > 0 &&
+    topDistrict.count === rankedDistricts[1].count;
+
+  const categories = useMemo(
+    () => [
+      {
+        key: 'harassment' as const,
+        label:
+          language === 'bn'
+            ? SECTIONS.harassment.shortNameBn
+            : SECTIONS.harassment.shortNameEn,
+        count: isDistrictSelected
+          ? currentDistrictInfo?.harassmentCount ?? 0
+          : totalHarass,
+      },
+      {
+        key: 'rickshaw' as const,
+        label:
+          language === 'bn'
+            ? SECTIONS.rickshaw.shortNameBn
+            : SECTIONS.rickshaw.shortNameEn,
+        count: isDistrictSelected
+          ? currentDistrictInfo?.rickshawCount ?? 0
+          : totalRickshaw,
+      },
+      {
+        key: 'extortion' as const,
+        label:
+          language === 'bn'
+            ? SECTIONS.extortion.shortNameBn
+            : SECTIONS.extortion.shortNameEn,
+        count: isDistrictSelected
+          ? currentDistrictInfo?.extortionCount ?? 0
+          : totalExtortion,
+      },
+      {
+        key: 'load_shedding' as const,
+        label:
+          language === 'bn'
+            ? SECTIONS.load_shedding.shortNameBn
+            : SECTIONS.load_shedding.shortNameEn,
+        count: isDistrictSelected
+          ? currentDistrictInfo?.loadSheddingCount ?? 0
+          : totalLoadShedding,
+      },
+    ],
+    [
+      language,
+      isDistrictSelected,
+      currentDistrictInfo,
+      totalHarass,
+      totalRickshaw,
+      totalExtortion,
+      totalLoadShedding,
+    ]
+  );
+
   const renderDistrictItem = (item: RankedDistrict, index: number) => {
     const rankDisplay = formatRankNumber(index + 1, language);
     const countDisplay =
@@ -239,19 +300,18 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       </div>
 
       {/* Main Content: District Specific or Nationwide */}
-      {isDistrictSelected ? (
+      {isDistrictSelected && currentDistrictInfo ? (
         <div className="space-y-3 md:space-y-4 animate-in fade-in duration-200">
-          {/* Selected District Card */}
-          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3 md:p-3.5 space-y-1 md:space-y-1.5">
-            <div className="flex items-center justify-between">
+          {/* Selected District Card (Total Reports & Area info) */}
+          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3 md:p-3.5 space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] md:text-[12px] text-ui-content-secondary">
               <span className="text-[10px] md:text-[11px] font-bold text-ui-content-muted uppercase tracking-wider">
                 {language === 'bn' ? 'নির্বাচিত এলাকা' : 'Selected area'}
               </span>
-              <span className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary">
+              <span>
                 {language === 'bn'
-                  ? currentDistrictInfo.divisionBn
-                  : currentDistrictInfo.divisionEn}{' '}
-                {language === 'bn' ? 'বিভাগ' : 'Division'}
+                  ? `${currentDistrictInfo.divisionBn} বিভাগ`
+                  : `${currentDistrictInfo.divisionEn} Division`}
               </span>
             </div>
 
@@ -261,71 +321,41 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   ? `${currentDistrictInfo.nameBn} জেলা`
                   : `${currentDistrictInfo.nameEn} District`}
               </h4>
-              <span className="text-[13px] md:text-[14px] font-bold text-ui-content-primary font-mono">
-                {language === 'bn'
-                  ? `${toBanglaDigits(currentDistrictInfo.count)}টি প্রতিবেদন`
-                  : `${currentDistrictInfo.count} reports`}
-              </span>
+              <div className="text-right">
+                <span className="text-[10px] md:text-[11px] font-medium text-ui-content-muted block">
+                  {language === 'bn' ? 'মোট প্রতিবেদন' : 'Total reports'}
+                </span>
+                <span className="text-[18px] md:text-[20px] font-bold text-ui-content-primary font-mono leading-none mt-0.5 block">
+                  {language === 'bn'
+                    ? toBanglaDigits(currentDistrictInfo.count)
+                    : currentDistrictInfo.count}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Category Breakdown */}
+          {/* Category Breakdown (By topic) */}
           <div className="space-y-1.5 md:space-y-2">
             <span className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary">
-              {language === 'bn' ? 'সমস্যার ধরন অনুযায়ী:' : 'By category:'}
+              {language === 'bn' ? 'বিষয় অনুযায়ী' : 'By topic'}
             </span>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-1.5 sm:gap-2 text-center">
-              {/* Harassment */}
-              <div className="bg-[var(--sec-harassment-bg)] border border-[var(--sec-harassment-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
-                <CategoryIcon section="harassment" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-harassment-text)]" />
-                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-harassment-text)] truncate max-w-full">
-                  {language === 'bn' ? 'হয়রানি' : 'Harassment'}
+            <div className="space-y-1.5">
+              {categories.map((cat) => (
+                <div
+                  key={cat.key}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] md:text-[13.5px]"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CategoryIcon section={cat.key} size="xs" />
+                    <span className="font-medium text-ui-content-primary truncate">
+                      {cat.label}
+                    </span>
+                  </div>
+                  <span className="font-bold text-ui-content-primary font-mono text-[13px] md:text-[14px] shrink-0 ml-2">
+                    {language === 'bn' ? toBanglaDigits(cat.count) : cat.count}
+                  </span>
                 </div>
-                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-harassment-text)] font-mono mt-0.5">
-                  {language === 'bn'
-                    ? toBanglaDigits(currentDistrictInfo.harassmentCount)
-                    : currentDistrictInfo.harassmentCount}
-                </div>
-              </div>
-
-              {/* Charging */}
-              <div className="bg-[var(--sec-rickshaw-bg)] border border-[var(--sec-rickshaw-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
-                <CategoryIcon section="rickshaw" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-rickshaw-text)]" />
-                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-rickshaw-text)] truncate max-w-full">
-                  {language === 'bn' ? 'চার্জিং' : 'Charging'}
-                </div>
-                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-rickshaw-text)] font-mono mt-0.5">
-                  {language === 'bn'
-                    ? toBanglaDigits(currentDistrictInfo.rickshawCount)
-                    : currentDistrictInfo.rickshawCount}
-                </div>
-              </div>
-
-              {/* Extortion */}
-              <div className="bg-[var(--sec-extortion-bg)] border border-[var(--sec-extortion-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
-                <CategoryIcon section="extortion" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-extortion-text)]" />
-                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-extortion-text)] truncate max-w-full">
-                  {language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}
-                </div>
-                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-extortion-text)] font-mono mt-0.5">
-                  {language === 'bn'
-                    ? toBanglaDigits(currentDistrictInfo.extortionCount)
-                    : currentDistrictInfo.extortionCount}
-                </div>
-              </div>
-
-              {/* Utility */}
-              <div className="bg-[var(--sec-load_shedding-bg)] border border-[var(--sec-load_shedding-border)]/50 p-2 md:p-2.5 rounded-xl flex flex-col items-center">
-                <CategoryIcon section="load_shedding" size="xs" className="mb-0.5 md:mb-1 text-[var(--sec-load_shedding-text)]" />
-                <div className="text-[11px] md:text-[12px] font-semibold text-[var(--sec-load_shedding-text)] truncate max-w-full">
-                  {language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}
-                </div>
-                <div className="text-[15px] md:text-[16px] font-bold text-[var(--sec-load_shedding-text)] font-mono mt-0.5">
-                  {language === 'bn'
-                    ? toBanglaDigits(currentDistrictInfo.loadSheddingCount)
-                    : currentDistrictInfo.loadSheddingCount}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -363,43 +393,65 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         </div>
       ) : (
         /* Nationwide View: Top Active Districts and Overview */
-        <div className="space-y-2.5 md:space-y-3">
-          {/* Nationwide Category Totals */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-1.5 sm:gap-2 text-center pb-2.5 md:pb-2 border-b border-ui-stroke-subtle">
-            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
-              <CategoryIcon section="harassment" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'হয়রানি' : 'Harassment'}</div>
-              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
-                {language === 'bn' ? toBanglaDigits(totalHarass) : totalHarass}
+        <div className="space-y-3 md:space-y-4">
+          {/* Nationwide Summary Card (Total + Most Published Area) */}
+          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3.5 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="text-[12px] md:text-[13px] font-medium text-ui-content-secondary">
+                {language === 'bn' ? 'মোট প্রতিবেদন' : 'Total reports'}
+              </div>
+              <div className="text-[24px] md:text-[28px] font-bold text-ui-content-primary font-mono leading-tight mt-0.5">
+                {language === 'bn' ? toBanglaDigits(totalCount) : totalCount}
               </div>
             </div>
 
-            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
-              <CategoryIcon section="rickshaw" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'চার্জিং' : 'Charging'}</div>
-              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
-                {language === 'bn' ? toBanglaDigits(totalRickshaw) : totalRickshaw}
+            {topDistrict && topDistrict.count > 0 && (
+              <div className="sm:text-right pt-2.5 sm:pt-0 sm:pl-3 border-t sm:border-t-0 sm:border-l border-ui-stroke-subtle">
+                <div className="text-[11px] md:text-[12px] font-medium text-ui-content-muted">
+                  {isTopTie
+                    ? language === 'bn'
+                      ? 'শীর্ষ জেলা'
+                      : 'Top district'
+                    : language === 'bn'
+                    ? 'সর্বাধিক প্রকাশিত প্রতিবেদন'
+                    : 'Most published reports'}
+                </div>
+                <div className="text-[13.5px] md:text-[14px] font-bold text-ui-content-primary mt-0.5">
+                  {language === 'bn' ? topDistrict.nameBn : topDistrict.nameEn} —{' '}
+                  <span className="font-mono">
+                    {language === 'bn' ? toBanglaDigits(topDistrict.count) : topDistrict.count}
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
+          </div>
 
-            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
-              <CategoryIcon section="extortion" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}</div>
-              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
-                {language === 'bn' ? toBanglaDigits(totalExtortion) : totalExtortion}
-              </div>
-            </div>
-
-            <div className="bg-ui-surface-subtle p-2 md:p-2.5 rounded-xl border border-ui-stroke-subtle flex flex-col items-center">
-              <CategoryIcon section="load_shedding" size="xs" className="mb-0.5 text-ui-content-secondary" />
-              <div className="text-[11px] md:text-[12px] font-medium text-ui-content-secondary truncate max-w-full">{language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}</div>
-              <div className="text-[14px] md:text-[15px] font-bold text-ui-content-primary font-mono mt-0.5">
-                {language === 'bn' ? toBanglaDigits(totalLoadShedding) : totalLoadShedding}
-              </div>
+          {/* Category Breakdown (By topic) */}
+          <div className="space-y-1.5 md:space-y-2">
+            <span className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary">
+              {language === 'bn' ? 'বিষয় অনুযায়ী' : 'By topic'}
+            </span>
+            <div className="space-y-1.5">
+              {categories.map((cat) => (
+                <div
+                  key={cat.key}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] md:text-[13.5px]"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CategoryIcon section={cat.key} size="xs" />
+                    <span className="font-medium text-ui-content-primary truncate">
+                      {cat.label}
+                    </span>
+                  </div>
+                  <span className="font-bold text-ui-content-primary font-mono text-[13px] md:text-[14px] shrink-0 ml-2">
+                    {language === 'bn' ? toBanglaDigits(cat.count) : cat.count}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary">
+          <div className="text-[12px] md:text-[13px] font-bold text-ui-content-secondary pt-1 border-t border-ui-stroke-subtle">
             {language === 'bn' ? 'এলাকা অনুযায়ী দেখুন:' : 'Explore by district:'}
           </div>
 
