@@ -12,11 +12,10 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
-import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export const ExtortionPage: React.FC = () => {
-  const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
+  const { language, openReportComposer } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('extortion') || SECTIONS.extortion;
   const bannerContent = CANONICAL_BANNER_CONTENT.extortion;
@@ -30,25 +29,11 @@ export const ExtortionPage: React.FC = () => {
 
   const subcategories = getFeedSubcategories('extortion');
 
-  // Determine valid browse location (transient request scope only)
-  const hasValidBrowseLocation =
-    browseLocationStatus === 'available' &&
-    browseLocation !== null &&
-    typeof browseLocation.latitude === 'number' &&
-    typeof browseLocation.longitude === 'number' &&
-    VisitorSessionService.isLocationFresh(browseLocation);
-
-  const visitorLat = hasValidBrowseLocation ? browseLocation.latitude : null;
-  const visitorLng = hasValidBrowseLocation ? browseLocation.longitude : null;
-
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const data = await PublicReportService.getBySegment('extortion', {
-        visitorLat,
-        visitorLng,
-      });
+      const data = await PublicReportService.getBySegment('extortion');
       setReports(data);
     } catch (err) {
       console.warn('[ExtortionPage load error]', err);
@@ -56,7 +41,7 @@ export const ExtortionPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [visitorLat, visitorLng]);
+  }, []);
 
   useEffect(() => {
     loadData();

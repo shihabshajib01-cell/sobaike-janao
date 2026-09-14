@@ -59,18 +59,9 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
             const date = language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
 
             return (
-              <div
+              <article
                 key={report.id}
-                role="article"
-                tabIndex={0}
-                onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigateTo(`/report-detail/${report.id}`);
-                  }
-                }}
-                className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3 sm:p-3.5 transition-all duration-150 flex flex-col justify-between space-y-2 shadow-2xs hover:shadow-xs group text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[148px]"
+                className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3 sm:p-3.5 flex flex-col justify-between space-y-2 shadow-2xs text-left min-h-[148px]"
               >
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
@@ -81,7 +72,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     />
                   </div>
 
-                  <h4 className="text-[14px] sm:text-[14.5px] font-bold text-ui-content-primary line-clamp-2 leading-snug group-hover:text-ui-action-bg transition-colors">
+                  <h4 className="text-[14px] sm:text-[14.5px] font-bold text-ui-content-primary line-clamp-2 leading-snug">
                     {title}
                   </h4>
 
@@ -102,12 +93,16 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     </span>
                   </div>
 
-                  <span className="shrink-0 text-[11.5px] sm:text-[12px] font-semibold text-ui-action-bg group-hover:underline flex items-center gap-0.5 min-h-[36px] sm:min-h-0 items-center">
+                  <button
+                    type="button"
+                    onClick={() => navigateTo(`/report-detail/${report.id}`)}
+                    className="group/btn shrink-0 text-[11.5px] sm:text-[12px] font-semibold text-ui-action-bg hover:underline flex items-center gap-0.5 min-h-[44px] cursor-pointer px-1 py-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                  >
                     <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
-                    <MapIcon name="arrow-right" size="sm" className="text-ui-action-bg transition-transform group-hover:translate-x-0.5" />
-                  </span>
+                    <MapIcon name="arrow-right" size="sm" className="text-ui-action-bg transition-transform group-hover/btn:translate-x-0.5" />
+                  </button>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
