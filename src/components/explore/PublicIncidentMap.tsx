@@ -417,11 +417,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             <span className="truncate sm:overflow-visible">
               {language === 'bn' ? (
                 <>
-                  <span className="sm:hidden">{toBanglaDigits(mappedCount)} / {toBanglaDigits(totalReportsCount)} প্রতিবেদন মানচিত্রে</span>
-                  <span className="hidden sm:inline">{toBanglaDigits(mappedCount)} / {toBanglaDigits(totalReportsCount)} প্রতিবেদন মানচিত্রে দেখানো হয়েছে</span>
+                  <span className="sm:hidden">{toBanglaDigits(mappedCount)} / {toBanglaDigits(totalReportsCount)}টি প্রতিবেদন মানচিত্রে</span>
+                  <span className="hidden sm:inline">{toBanglaDigits(mappedCount)}টি প্রতিবেদন মানচিত্রে দেখানো হয়েছে (মোট {toBanglaDigits(totalReportsCount)}টির মধ্যে)</span>
                 </>
               ) : (
-                `${mappedCount} of ${totalReportsCount} reports mapped`
+                `${mappedCount} of ${totalReportsCount} reports are shown on the map`
               )}
             </span>
           </div>

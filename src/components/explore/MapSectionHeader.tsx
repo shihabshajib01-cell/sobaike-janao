@@ -47,7 +47,7 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
           }`}
         >
           <MapIcon name="flame" size="md" aria-hidden="true" />
-          <span>{language === 'bn' ? 'হিটম্যাপ' : 'Heatmap'}</span>
+          <span>{language === 'bn' ? 'মানচিত্র' : 'Map'}</span>
         </button>
 
         <button
@@ -61,7 +61,7 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
           }`}
         >
           <MapIcon name="file-text" size="md" aria-hidden="true" />
-          <span>{language === 'bn' ? 'রিপোর্টস' : 'Reports'}</span>
+          <span>{language === 'bn' ? 'প্রতিবেদন' : 'Reports'}</span>
         </button>
       </div>
     </div>

@@ -35,6 +35,13 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
         <span>{language === 'bn' ? 'কম' : 'Low'}</span>
         <span>{language === 'bn' ? 'বেশি' : 'High'}</span>
       </div>
+
+      {/* Map Interpretation Note */}
+      <div className="text-[10px] text-ui-content-muted leading-tight pt-1.5 border-t border-ui-stroke-subtle/60 mt-0.5">
+        {language === 'bn'
+          ? 'রঙ একই এলাকায় প্রতিবেদনের ঘনত্ব বোঝায়—ঘটনার তীব্রতা বা সত্যতা নয়।'
+          : 'Color shows concentration of reports—not severity or truthfulness.'}
+      </div>
     </div>
   );
 };

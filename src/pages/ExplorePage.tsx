@@ -130,17 +130,99 @@ export const ExplorePage: React.FC = () => {
     selectedDivision !== 'all' ||
     selectedDistrict !== 'all';
 
+  // Dynamic Answer Heading computation
+  const dynamicAnswerHeading = useMemo(() => {
+    const categoryObj = selectedSection !== 'all' ? SECTIONS[selectedSection as SectionKey] : null;
+    const catName = categoryObj ? (language === 'bn' ? categoryObj.nameBn : categoryObj.nameEn) : null;
+
+    const districtObj = selectedDistrict !== 'all'
+      ? BANGLADESH_DISTRICTS.find(
+          (d) =>
+            d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+            d.nameBn === selectedDistrict ||
+            d.id === selectedDistrict.toLowerCase()
+        )
+      : null;
+    const distName = districtObj ? (language === 'bn' ? districtObj.nameBn : districtObj.nameEn) : selectedDistrict !== 'all' ? selectedDistrict : null;
+
+    const divObj = selectedDivision !== 'all'
+      ? DIVISIONS.find(
+          (d) =>
+            d.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
+            d.nameBn === selectedDivision ||
+            d.id === selectedDivision.toLowerCase()
+        )
+      : null;
+    const divName = divObj ? (language === 'bn' ? divObj.nameBn : divObj.nameEn) : selectedDivision !== 'all' ? selectedDivision : null;
+
+    if (language === 'bn') {
+      if (distName) {
+        if (catName) {
+          return `${distName} জেলায় ${catName} প্রতিবেদন`;
+        }
+        return `${distName} জেলার প্রকাশিত প্রতিবেদন`;
+      }
+      if (divName) {
+        if (catName) {
+          return `${divName} বিভাগে ${catName} প্রতিবেদন`;
+        }
+        return `${divName} বিভাগের প্রকাশিত প্রতিবেদন`;
+      }
+      if (catName) {
+        return `সারা বাংলাদেশের ${catName} প্রতিবেদন`;
+      }
+      return 'সারা বাংলাদেশের প্রকাশিত প্রতিবেদন';
+    } else {
+      if (distName) {
+        if (catName) {
+          return `${catName} reports in ${distName}`;
+        }
+        return `Published reports in ${distName}`;
+      }
+      if (divName) {
+        if (catName) {
+          return `${catName} reports in ${divName} Division`;
+        }
+        return `Published reports in ${divName} Division`;
+      }
+      if (catName) {
+        return `${catName} reports across Bangladesh`;
+      }
+      return 'Published reports across Bangladesh';
+    }
+  }, [selectedSection, selectedDivision, selectedDistrict, language]);
+
+  const countMessage = language === 'bn'
+    ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন পাওয়া গেছে`
+    : `${filteredReports.length} published reports found`;
+
   return (
     <PublicPageContainer id="explore-page-container">
-      {/* 1. Header with Mode Switcher (Heatmap vs Reports) */}
-      <MapSectionHeader
-        language={language}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+      {/* 1. Page Title & Context */}
+      <div className="space-y-0.5 pb-1">
+        <h1 className="text-[24px] md:text-[28px] leading-[1.3] font-bold text-ui-content-primary tracking-tight">
+          {language === 'bn' ? 'প্রতিবেদন বিশ্লেষণ' : 'Report insights'}
+        </h1>
+        <p className="text-[14px] md:text-[15px] leading-[1.5] text-ui-content-secondary">
+          {language === 'bn'
+            ? 'এলাকা অনুযায়ী প্রতিবেদন ও হটস্পট দেখুন'
+            : 'Explore reports and hotspots by area'}
+        </p>
+      </div>
 
-      {/* 2. Shared Search & Filter Controls */}
-      <div className="space-y-3 pb-3 border-b border-ui-stroke-subtle">
+      {/* 2. Control Layer (Find reports) */}
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-2xs">
+        <div className="space-y-0.5">
+          <h2 className="text-[16px] font-bold text-ui-content-primary">
+            {language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Find reports'}
+          </h2>
+          <p className="text-[13px] text-ui-content-secondary">
+            {language === 'bn'
+              ? 'এলাকা, বিষয় বা শব্দ দিয়ে প্রকাশিত প্রতিবেদন খুঁজুন।'
+              : 'Explore published reports by area, topic, or search term.'}
+          </p>
+        </div>
+
         {/* Keyword Search, Division and District Dropdowns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
           {/* Main Keyword Search */}
@@ -241,7 +323,7 @@ export const ExplorePage: React.FC = () => {
         </div>
 
         {/* Category Filter Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-1">
           <button
             type="button"
             aria-pressed={selectedSection === 'all'}
@@ -339,6 +421,51 @@ export const ExplorePage: React.FC = () => {
         </div>
       </div>
 
+      {/* 3. Dynamic Answer Block */}
+      <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl p-4 space-y-1 shadow-2xs">
+        <h3 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary">
+          {dynamicAnswerHeading}
+        </h3>
+        <p className="text-[13px] font-medium text-ui-content-secondary">
+          {countMessage}
+        </p>
+      </div>
+
+      {/* 4. Map | Reports Mode Switcher */}
+      <div
+        role="group"
+        aria-label={language === 'bn' ? 'ভিউ পরিবর্তন' : 'View mode switcher'}
+        className="flex items-center bg-ui-surface-subtle p-1 rounded-xl border border-ui-stroke-subtle w-fit shadow-2xs"
+      >
+        <button
+          type="button"
+          aria-pressed={viewMode === 'heatmap'}
+          onClick={() => setViewMode('heatmap')}
+          className={`px-4 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            viewMode === 'heatmap'
+              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
+              : 'text-ui-content-secondary hover:text-ui-content-primary'
+          }`}
+        >
+          <MapIcon name="flame" size="md" aria-hidden="true" />
+          <span>{language === 'bn' ? 'মানচিত্র' : 'Map'}</span>
+        </button>
+
+        <button
+          type="button"
+          aria-pressed={viewMode === 'reports'}
+          onClick={() => setViewMode('reports')}
+          className={`px-4 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            viewMode === 'reports'
+              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
+              : 'text-ui-content-secondary hover:text-ui-content-primary'
+          }`}
+        >
+          <MapIcon name="file-text" size="md" aria-hidden="true" />
+          <span>{language === 'bn' ? 'প্রতিবেদন' : 'Reports'}</span>
+        </button>
+      </div>
+
       {/* Loading Skeleton States */}
       {isLoading && (
         viewMode === 'heatmap' ? (
@@ -382,11 +509,11 @@ export const ExplorePage: React.FC = () => {
         </div>
       )}
 
-      {/* Main View Area */}
+      {/* 5. Selected Mode Content (Map vs Reports) */}
       {!isLoading && !fetchError && (
         <>
           {viewMode === 'heatmap' ? (
-            /* HEATMAP VIEW */
+            /* MAP VIEW */
             <div className="space-y-4 md:space-y-6">
               {/* Map & District Ranking Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
@@ -502,6 +629,18 @@ export const ExplorePage: React.FC = () => {
           )}
         </>
       )}
+
+      {/* 6. About this data disclosure */}
+      <details className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 text-[13px] text-ui-content-secondary shadow-2xs mt-6">
+        <summary className="font-semibold text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+          {language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}
+        </summary>
+        <p className="mt-2 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
+          {language === 'bn'
+            ? 'এখানে সবাইকে জানাও-এ প্রকাশিত নাগরিক প্রতিবেদন বিশ্লেষণ করা হয়েছে। এটি সরকারি অপরাধ পরিসংখ্যান নয় এবং কোনো এলাকার সামগ্রিক নিরাপত্তা বা কোনো অভিযোগের আইনগত সত্যতা নির্ধারণ করে না।'
+            : 'This analysis is based on citizen reports published on Sobaike Janao. It is not official crime statistics and does not determine the overall safety of an area or the legal truth of an allegation.'}
+        </p>
+      </details>
     </PublicPageContainer>
   );
 };
