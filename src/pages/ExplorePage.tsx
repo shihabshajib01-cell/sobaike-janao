@@ -631,7 +631,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeDivisionName} ফিল্টার সরান`
                     : `Remove ${activeDivisionName} filter`
                 }
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -650,7 +650,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeDistrictName} ফিল্টার সরান`
                     : `Remove ${activeDistrictName} filter`
                 }
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -670,7 +670,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeCategoryName} ফিল্টার সরান`
                     : `Remove ${activeCategoryName} filter`
                 }
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -693,7 +693,7 @@ export const ExplorePage: React.FC = () => {
                     ? 'অনুসন্ধান ফিল্টার সরান'
                     : 'Remove search filter'
                 }
-                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -728,11 +728,11 @@ export const ExplorePage: React.FC = () => {
           <details className="group bg-ui-surface border border-ui-stroke-subtle rounded-xl px-3.5 sm:px-4 py-1 text-[13px] text-ui-content-secondary shadow-2xs">
             <summary className="font-medium text-[13px] text-ui-content-secondary hover:text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] flex items-center justify-between gap-2 list-none">
               <span>{language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}</span>
-              <span className="w-7 h-7 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-muted group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
+              <span className="w-7 h-7 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
                 <MapIcon name="chevron-down" size="xs" ariaHidden={true} />
               </span>
             </summary>
-            <div className="pt-2 pb-3 border-t border-ui-stroke-subtle mt-1 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
+            <div className="pt-2 pb-3 border-t border-ui-stroke-subtle mt-1 text-[12px] sm:text-[13px] text-ui-content-secondary leading-relaxed">
               {language === 'bn'
                 ? 'এখানে সবাইকে জানাও-এ প্রকাশিত নাগরিক প্রতিবেদন বিশ্লেষণ করা হয়েছে। এটি সরকারি অপরাধ পরিসংখ্যান নয় এবং কোনো এলাকার সামগ্রিক নিরাপত্তা বা কোনো অভিযোগের আইনগত সত্যতা নির্ধারণ করে না।'
                 : 'This analysis is based on citizen reports published on Sobaike Janao. It is not official crime statistics and does not determine the overall safety of an area or the legal truth of an allegation.'}
@@ -834,7 +834,7 @@ export const ExplorePage: React.FC = () => {
               <MapIcon
                 name="alert-circle"
                 size="xl"
-                className="text-ui-content-muted mx-auto"
+                className="text-ui-content-secondary mx-auto"
                 ariaHidden={true}
               />
               <div className="space-y-1.5 max-w-md mx-auto">
@@ -943,53 +943,54 @@ export const ExplorePage: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* REPORTS VIEW (UX Phase 5 Progressive Disclosure Hierarchy) */
+            /* REPORTS VIEW (UX Phase 4 Hierarchy: Summary -> Actual Reports -> More Analysis) */
             <div className="space-y-6">
-              {/* 1. Overview */}
+              {/* 1. Compact Overview */}
               <ReportAnalyticsOverview
                 reports={filteredReports}
                 language={language}
               />
 
-              {/* 2. Reports in this selection (Evidence / Actual Reports) */}
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ui-stroke-subtle pb-3">
+              {/* 2. Reports in this selection (Primary Content: Actual Reports) */}
+              <div id="reports-in-selection-section" className="space-y-3.5 pt-1">
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 border-b border-ui-stroke-subtle pb-2.5">
                   <div>
-                    <h3 className="text-[17px] md:text-[18px] font-bold text-ui-content-primary">
+                    <h3 className="text-[18px] sm:text-[19px] md:text-[20px] font-bold text-ui-content-primary tracking-tight">
                       {language === 'bn' ? 'এই নির্বাচনের প্রতিবেদন' : 'Reports in this selection'}
                     </h3>
-                    <p className="text-[13px] text-ui-content-secondary mt-0.5">
+                    <p className="text-[12.5px] sm:text-[13px] text-ui-content-secondary mt-0.5">
                       {language === 'bn'
-                        ? 'উপরের বিশ্লেষণে এই প্রকাশিত প্রতিবেদনগুলো অন্তর্ভুক্ত করা হয়েছে।'
-                        : 'These published reports are included in the analysis above.'}
+                        ? 'বর্তমান নির্বাচনে অন্তর্ভুক্ত প্রকাশিত প্রতিবেদন।'
+                        : 'Published reports included in this selection.'}
                     </p>
                   </div>
-                  <div className="flex items-center shrink-0">
-                    <span className="text-[13px] font-bold text-ui-content-primary font-mono bg-ui-surface-subtle border border-ui-stroke-subtle px-2.5 py-1 rounded-lg">
-                      {language === 'bn'
-                        ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
-                        : `${filteredReports.length} published reports`}
-                    </span>
+                  <div className="text-[12.5px] sm:text-[13px] font-semibold text-ui-content-secondary shrink-0">
+                    {language === 'bn'
+                      ? `${toBanglaDigits(filteredReports.length)}টি প্রতিবেদন`
+                      : `${filteredReports.length} reports`}
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 sm:space-y-3.5">
                   {filteredReports.map((report) => (
                     <ReportCard key={report.id} report={report} />
                   ))}
                 </div>
               </div>
 
-              {/* 3. More analysis (Progressive Disclosure) */}
-              <details className="group bg-ui-surface border border-ui-stroke-subtle rounded-2xl overflow-hidden transition-all shadow-xs">
-                <summary className="w-full flex items-center justify-between p-4 sm:p-5 cursor-pointer list-none select-none min-h-[44px] hover:bg-ui-surface-subtle transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+              {/* 3. More analysis (Progressive Disclosure - Secondary) */}
+              <details
+                id="more-analysis-disclosure"
+                className="group bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs"
+              >
+                <summary className="w-full flex items-center justify-between p-3.5 sm:p-4 cursor-pointer list-none select-none min-h-[44px] hover:bg-ui-surface-subtle transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <MapIcon name="layers" size="md" className="text-ui-content-primary shrink-0" />
+                    <MapIcon name="layers" size="md" className="text-ui-content-secondary group-hover:text-ui-content-primary shrink-0 transition-colors" />
                     <div>
-                      <h3 className="text-[16px] md:text-[17px] font-bold text-ui-content-primary">
+                      <h4 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary">
                         {language === 'bn' ? 'আরও বিশ্লেষণ' : 'More analysis'}
-                      </h3>
-                      <p className="text-[12px] md:text-[13px] text-ui-content-secondary mt-0.5">
+                      </h4>
+                      <p className="text-[12px] sm:text-[12.5px] text-ui-content-secondary mt-0.5">
                         {language === 'bn'
                           ? 'বিষয়, এলাকা ও সময় অনুযায়ী আরও বিস্তারিত দেখুন।'
                           : 'Explore distribution by topic, geography, and time.'}
@@ -1001,7 +1002,7 @@ export const ExplorePage: React.FC = () => {
                   </div>
                 </summary>
 
-                <div className="p-4 sm:p-5 pt-0 border-t border-ui-stroke-subtle space-y-4">
+                <div className="p-3.5 sm:p-4 pt-3 border-t border-ui-stroke-subtle space-y-4">
                   {/* 1. Subcategory breakdown */}
                   <ReportSubcategoryBreakdown
                     reports={filteredReports}
@@ -1016,13 +1017,13 @@ export const ExplorePage: React.FC = () => {
 
                   {/* 3. Activity Timeline or Small Dataset Trend Safety Message */}
                   {filteredReports.length <= 2 ? (
-                    <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 text-left space-y-1">
-                      <div className="text-[14px] font-bold text-ui-content-primary">
+                    <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3.5 sm:p-4 text-left space-y-1">
+                      <div className="text-[13.5px] sm:text-[14px] font-bold text-ui-content-primary">
                         {language === 'bn'
                           ? 'এই নির্বাচনে প্রবণতা দেখানোর মতো পর্যাপ্ত প্রতিবেদন নেই।'
                           : 'There are not enough reports in this selection to show a meaningful trend.'}
                       </div>
-                      <div className="text-[12px] md:text-[13px] text-ui-content-secondary">
+                      <div className="text-[12px] text-ui-content-secondary">
                         {language === 'bn'
                           ? 'সময়ের সাথে পরিবর্তন অর্থপূর্ণভাবে দেখাতে আরও প্রকাশিত প্রতিবেদন প্রয়োজন।'
                           : 'More published reports are needed before changes over time can be interpreted meaningfully.'}

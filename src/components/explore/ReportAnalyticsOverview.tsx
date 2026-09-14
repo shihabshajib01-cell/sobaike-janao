@@ -133,30 +133,30 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
     <section
       id="explore-report-analytics"
       aria-label={language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
-      className="space-y-4 mb-2"
+      className="space-y-3 mb-2"
     >
-      {/* 1. Header & 4 KPI Cards */}
-      <div className="space-y-2.5">
+      {/* 1. Header & 4 Compact KPI Cards */}
+      <div className="space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5">
-          <h2 className="text-[16px] sm:text-[18px] font-bold text-ui-content-primary">
+          <h2 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary tracking-tight">
             {language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
           </h2>
-          <span className="text-[12px] sm:text-[13px] text-ui-content-muted font-normal">
+          <span className="text-[12px] text-ui-content-secondary font-normal">
             {language === 'bn' ? 'বর্তমান ফিল্টারের ভিত্তিতে' : 'Based on the current filters'}
           </span>
         </div>
 
         {/* 4 Summary Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5">
           {/* Total Reports */}
           <div
             id="metric-total-reports"
-            className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-3.5 sm:p-4 flex flex-col justify-between min-h-[82px] sm:min-h-[92px]"
+            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
           >
-            <span className="text-[12px] sm:text-[13px] font-medium text-ui-content-muted">
+            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
               {language === 'bn' ? 'মোট প্রতিবেদন' : 'Total reports'}
             </span>
-            <span className="text-[22px] sm:text-[24px] font-bold text-ui-content-primary leading-tight">
+            <span className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
               {language === 'bn' ? toBanglaDigits(totalReports) : totalReports}
             </span>
           </div>
@@ -164,12 +164,12 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           {/* Districts with reports */}
           <div
             id="metric-affected-districts"
-            className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-3.5 sm:p-4 flex flex-col justify-between min-h-[82px] sm:min-h-[92px]"
+            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
           >
-            <span className="text-[12px] sm:text-[13px] font-medium text-ui-content-muted">
+            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
               {language === 'bn' ? 'প্রতিবেদন থাকা জেলা' : 'Districts with reports'}
             </span>
-            <span className="text-[22px] sm:text-[24px] font-bold text-ui-content-primary leading-tight">
+            <span className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
               {language === 'bn' ? toBanglaDigits(districtCount) : districtCount}
             </span>
           </div>
@@ -177,12 +177,12 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           {/* Divisions with reports */}
           <div
             id="metric-affected-divisions"
-            className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-3.5 sm:p-4 flex flex-col justify-between min-h-[82px] sm:min-h-[92px]"
+            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
           >
-            <span className="text-[12px] sm:text-[13px] font-medium text-ui-content-muted">
+            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
               {language === 'bn' ? 'প্রতিবেদন থাকা বিভাগ' : 'Divisions with reports'}
             </span>
-            <span className="text-[22px] sm:text-[24px] font-bold text-ui-content-primary leading-tight">
+            <span className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
               {language === 'bn' ? toBanglaDigits(divisionCount) : divisionCount}
             </span>
           </div>
@@ -190,12 +190,12 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           {/* Most Reported Category */}
           <div
             id="metric-most-reported"
-            className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-3.5 sm:p-4 flex flex-col justify-between min-h-[82px] sm:min-h-[92px]"
+            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
           >
-            <span className="text-[12px] sm:text-[13px] font-medium text-ui-content-muted">
+            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
               {language === 'bn' ? 'সর্বাধিক প্রতিবেদন' : 'Most reported'}
             </span>
-            <span className="text-[17px] sm:text-[19px] font-bold text-ui-content-primary leading-tight truncate">
+            <span className="text-[14px] sm:text-[15px] font-bold text-ui-content-primary leading-tight truncate">
               {mostReportedLabel}
             </span>
           </div>
@@ -203,7 +203,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
 
         {/* Geographic note if any reports lack recognized district */}
         {hasUnmappedGeos && (
-          <p className="text-[11.5px] sm:text-[12px] text-ui-content-muted/90 pt-0.5">
+          <p className="text-[11px] sm:text-[11.5px] text-ui-content-secondary pt-0.5">
             {language === 'bn'
               ? 'জেলা তথ্য থাকা প্রতিবেদনগুলোর ভিত্তিতে এলাকা গণনা করা হয়েছে।'
               : 'Area counts are based on reports with recognized district data.'}
@@ -214,13 +214,13 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
       {/* 2. Category Distribution Card */}
       <div
         id="explore-category-distribution"
-        className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-4 sm:p-5 space-y-3.5"
+        className="bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-2.5 shadow-2xs"
       >
-        <h3 className="text-[14px] sm:text-[15px] font-bold text-ui-content-primary">
+        <h3 className="text-[13px] sm:text-[14px] font-bold text-ui-content-primary">
           {language === 'bn' ? 'ক্যাটাগরি অনুযায়ী প্রতিবেদন' : 'Reports by category'}
         </h3>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {categoryStats.map((item) => {
             const displayCount =
               language === 'bn' ? toBanglaDigits(item.count) : item.count;
@@ -231,17 +231,17 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
               <div
                 key={item.key}
                 id={`distribution-row-${item.key}`}
-                className="space-y-1.5"
+                className="space-y-1"
               >
                 {/* Row Header: Icon + Category Name + Count & Percentage */}
-                <div className="flex items-center justify-between text-[13px] sm:text-[14px]">
+                <div className="flex items-center justify-between text-[12.5px] sm:text-[13px]">
                   <div className="flex items-center gap-2 font-medium text-ui-content-primary min-w-0">
                     <CategoryIcon section={item.key} size="xs" />
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <div className="shrink-0 text-[12.5px] sm:text-[13px] font-medium text-ui-content-secondary ml-2">
+                  <div className="shrink-0 text-[12px] sm:text-[12.5px] font-medium text-ui-content-secondary ml-2">
                     <span className="font-semibold text-ui-content-primary">{displayCount}</span>
-                    <span className="text-ui-content-muted ml-1.5">({displayPercent}%)</span>
+                    <span className="text-ui-content-secondary ml-1.5">({displayPercent}%)</span>
                   </div>
                 </div>
 
@@ -249,7 +249,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                 <div
                   role="presentation"
                   aria-hidden="true"
-                  className="w-full h-2 rounded-full bg-ui-surface-subtle overflow-hidden"
+                  className="w-full h-1.5 rounded-full bg-ui-surface-subtle overflow-hidden"
                 >
                   <div
                     className="h-full rounded-full transition-all duration-300"
