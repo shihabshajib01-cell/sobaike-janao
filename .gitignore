@@ -35,3 +35,6 @@ lerna-debug.log*
 *.sln
 *.sw?
 Thumbs.db
+
+# Supabase CLI temporary files
+supabase/.temp/
