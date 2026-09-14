@@ -17,11 +17,12 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
 import { useApp } from '../context/AppContext';
+import { calculateDistanceKm } from '../utils/geoDistance';
 
 type FeedFilterType = 'all' | 'latest' | 'popular' | 'most_shared';
 
 export const HomePage: React.FC = () => {
-  const { language } = useApp();
+  const { language, browseLocation, browseLocationStatus } = useApp();
 
   const [allReports, setAllReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -69,7 +70,56 @@ export const HomePage: React.FC = () => {
       return matchesDistrict;
     });
 
-    if (feedFilter === 'latest') {
+    if (feedFilter === 'all') {
+      const hasValidBrowseLocation =
+        browseLocationStatus === 'available' &&
+        browseLocation !== null &&
+        typeof browseLocation.latitude === 'number' &&
+        typeof browseLocation.longitude === 'number';
+
+      if (hasValidBrowseLocation) {
+        const origin = {
+          lat: browseLocation.latitude,
+          lng: browseLocation.longitude,
+        };
+
+        const withCalculatedDistance: {
+          report: ReportItem;
+          originalIndex: number;
+          distanceKm: number | null;
+        }[] = list.map((report, originalIndex) => {
+          const distanceKm = report.coordinates
+            ? calculateDistanceKm(origin, report.coordinates)
+            : null;
+          return {
+            report,
+            originalIndex,
+            distanceKm,
+          };
+        });
+
+        const groupA: typeof withCalculatedDistance = [];
+        const groupB: typeof withCalculatedDistance = [];
+
+        for (const item of withCalculatedDistance) {
+          if (item.distanceKm !== null) {
+            groupA.push(item);
+          } else {
+            groupB.push(item);
+          }
+        }
+
+        groupA.sort((a, b) => {
+          if (a.distanceKm! !== b.distanceKm!) {
+            return a.distanceKm! - b.distanceKm!;
+          }
+          return a.originalIndex - b.originalIndex;
+        });
+
+        // Group B keeps its original relative order (already ordered by originalIndex)
+        list = [...groupA, ...groupB].map((item) => item.report);
+      }
+    } else if (feedFilter === 'latest') {
       // Sort newest published date
       list = [...list].sort((a, b) => {
         if (a.publishedAt && b.publishedAt) {
@@ -105,7 +155,7 @@ export const HomePage: React.FC = () => {
     }
 
     return list;
-  }, [allReports, feedFilter, selectedDistrict]);
+  }, [allReports, feedFilter, selectedDistrict, browseLocation, browseLocationStatus]);
 
   // Counts for the feed filter chips based on selected district
   const districtFilteredReports = useMemo(() => {
