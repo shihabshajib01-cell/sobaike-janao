@@ -18,6 +18,13 @@ export interface PublicReportFilters {
   limit?: number;
 }
 
+export interface HomeFeedParams {
+  visitorLat?: number | null;
+  visitorLng?: number | null;
+  filter?: 'all' | 'latest' | 'popular' | 'most_shared';
+  district?: string;
+}
+
 const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportItem => {
   const pv = seed.publicVersion;
   return {
@@ -226,6 +233,65 @@ export const PublicReportService = {
           }
         } catch (evErr) {
           console.warn('[PublicReportService.getAll] Evidence enrichment error:', evErr);
+        }
+      }
+    }
+
+    return list;
+  },
+
+  /**
+   * Fetch ranked Home feed reports from the shadow-ranking RPC `get_public_home_feed`.
+   * The backend returns the complete eligible report set already sorted in the shadow.
+   * Responses contain NO incident coordinates, NO visitor coordinates, and NO derived distance.
+   */
+  async getHomeFeed(params?: HomeFeedParams): Promise<ReportItem[]> {
+    let list: ReportItem[] = [];
+
+    if (!isSupabaseConfigured() || !supabase) {
+      // In mock mode or when Supabase is not configured, fallback to getAll()
+      list = await this.getAll();
+    } else {
+      const { data, error } = await supabase.rpc('get_public_home_feed', {
+        p_visitor_lat: params?.visitorLat ?? null,
+        p_visitor_lng: params?.visitorLng ?? null,
+        p_filter: params?.filter || 'all',
+        p_district: params?.district || 'all',
+      });
+
+      if (error) {
+        console.warn('[PublicReportService.getHomeFeed] RPC error, falling back to getAll:', error);
+        return this.getAll({ district: params?.district });
+      } else if (data && Array.isArray(data)) {
+        list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
+      }
+    }
+
+    // Batch enrich published reports with evidence images (single RPC call for all visible items)
+    if (isSupabaseConfigured() && supabase) {
+      const reportIds = list.map((r) => r.id);
+      if (reportIds.length > 0) {
+        try {
+          const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(reportIds);
+          for (const report of list) {
+            const reportImages =
+              evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+            report.images = reportImages;
+            report.media = {
+              type:
+                reportImages.length === 0
+                  ? 'none'
+                  : reportImages.length === 1
+                  ? 'single'
+                  : 'gallery',
+              images: reportImages,
+            };
+            if (reportImages.length > 0) {
+              report.trustIndicators.evidenceCount = reportImages.length;
+            }
+          }
+        } catch (evErr) {
+          console.warn('[PublicReportService.getHomeFeed] Evidence enrichment error:', evErr);
         }
       }
     }
