@@ -39,6 +39,13 @@ export function getGoogleMapsApiKey(): string {
 }
 
 /**
+ * Checks whether Google Places API is configured with an API key.
+ */
+export function isGooglePlacesConfigured(): boolean {
+  return Boolean(getGoogleMapsApiKey());
+}
+
+/**
  * Loads the Google Maps JavaScript API with places library dynamically.
  * Resolves to true if loaded successfully, false if key is missing or load fails.
  */

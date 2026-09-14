@@ -47,6 +47,13 @@ import {
 import { Accordion } from '../ui/Accordion';
 import { Toggle } from '../ui/Toggle';
 import { ImageAttachmentPicker, AttachedImagePreview } from '../media/ImageAttachmentPicker';
+import { GoogleMapPicker } from '../location/GoogleMapPicker';
+import { AddressSearchInput } from '../location/AddressSearchInput';
+import {
+  buildResolvedLocationData,
+  isGooglePlacesConfigured,
+  ResolvedPlaceResult,
+} from '../../services/googlePlacesService';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -243,6 +250,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Validation errors state
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    // Map centering target state (for flyTo when places are resolved)
+    const [mapCenterTarget, setMapCenterTarget] = useState<
+      { lat: number; lng: number; zoom?: number; timestamp: number } | undefined
+    >();
+
     // Reporter device location gate state
     const [reporterGateState, setReporterGateState] = useState<ReporterLocationGateState>(() => {
       if (VisitorSessionService.hasValidCurrentReporterLocation()) {
@@ -412,6 +424,63 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       if ('formattedAddress' in locUpdates && errors.formattedAddress) {
         setErrors((prev) => ({ ...prev, formattedAddress: '' }));
       }
+    };
+
+    const handleAddressSearchPlaceSelected = (place: ResolvedPlaceResult) => {
+      if (isLocationLocked) return;
+      const currentLoc = formData.location || {
+        division: '',
+        district: '',
+        upazilaOrThana: '',
+        formattedAddress: '',
+      };
+      const resolved = buildResolvedLocationData(currentLoc, place);
+      onUpdateFormData({ location: resolved });
+
+      setMapCenterTarget({
+        lat: place.lat,
+        lng: place.lng,
+        zoom: 16,
+        timestamp: Date.now(),
+      });
+
+      if (resolved.division && errors.division) setErrors((prev) => ({ ...prev, division: '' }));
+      if (resolved.district && errors.district) setErrors((prev) => ({ ...prev, district: '' }));
+      if (resolved.upazilaOrThana && errors.upazilaOrThana) setErrors((prev) => ({ ...prev, upazilaOrThana: '' }));
+      if (resolved.formattedAddress && errors.formattedAddress) setErrors((prev) => ({ ...prev, formattedAddress: '' }));
+    };
+
+    const handleMapPointChange = (lat: number, lng: number) => {
+      if (isLocationLocked) return;
+      onUpdateFormData({
+        location: {
+          ...(formData.location || {
+            division: '',
+            district: '',
+            upazilaOrThana: '',
+            formattedAddress: '',
+          }),
+          lat,
+          lng,
+        },
+      });
+    };
+
+    const handleClearMapPoint = () => {
+      if (isLocationLocked) return;
+      onUpdateFormData({
+        location: {
+          ...(formData.location || {
+            division: '',
+            district: '',
+            upazilaOrThana: '',
+            formattedAddress: '',
+          }),
+          lat: undefined,
+          lng: undefined,
+          placeId: undefined,
+        },
+      });
     };
 
     // Safe historical draft recovery: preserve old draft address parts if formattedAddress is blank (non-utility only)
@@ -1817,6 +1886,49 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   )}
                 </div>
               )}
+
+              {/* Optional Incident Location Pinning & Address Search */}
+              <div className="pt-2 space-y-3">
+                {isGooglePlacesConfigured() && (
+                  <div>
+                    <label className="block text-[13px] font-bold text-ui-content-primary mb-1">
+                      {language === 'bn' ? 'ঠিকানা দিয়ে অনুসন্ধান (ঐচ্ছিক)' : 'Search address or place (optional)'}
+                    </label>
+                    <AddressSearchInput
+                      language={language}
+                      onPlaceSelected={handleAddressSearchPlaceSelected}
+                      biasCoords={
+                        formData.location?.lat && formData.location?.lng
+                          ? { lat: formData.location.lat, lng: formData.location.lng }
+                          : resolvedDistrict
+                          ? { lat: resolvedDistrict.lat, lng: resolvedDistrict.lng }
+                          : resolvedDivision
+                          ? { lat: resolvedDivision.lat, lng: resolvedDivision.lng }
+                          : undefined
+                      }
+                      initialValue=""
+                      disabled={isLocationLocked}
+                    />
+                  </div>
+                )}
+
+                <GoogleMapPicker
+                  location={
+                    formData.location || {
+                      division: '',
+                      district: '',
+                      upazilaOrThana: '',
+                      formattedAddress: '',
+                    }
+                  }
+                  onMapPointChange={handleMapPointChange}
+                  onClearPoint={handleClearMapPoint}
+                  language={language}
+                  centerTarget={mapCenterTarget}
+                  disabled={isLocationLocked}
+                  required={false}
+                />
+              </div>
             </div>
           </div>
         </Accordion>

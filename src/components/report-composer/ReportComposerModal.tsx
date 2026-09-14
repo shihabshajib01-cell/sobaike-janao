@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionKey, ComingSoonServiceKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
-import { DraftReport, isMeaningfulMentionedParty } from '../../services/types';
+import { DraftReport, isMeaningfulMentionedParty, isValidIncidentCoordinates } from '../../services/types';
 import { DraftRepository, INITIAL_DRAFT, generateSecureIdempotencyKey } from '../../services/draftRepository';
 import { apiClient } from '../../services/apiClient';
 import { VisitorSessionService } from '../../services/visitorSessionService';
@@ -806,6 +806,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         formattedAddress: '',
       };
 
+      const hasValidIncidentCoords = isValidIncidentCoordinates(rawLoc.lat, rawLoc.lng);
+      const safeLat = hasValidIncidentCoords ? rawLoc.lat : undefined;
+      const safeLng = hasValidIncidentCoords ? rawLoc.lng : undefined;
+
       const loc = isUtility
         ? {
             division: rawLoc.division || '',
@@ -816,8 +820,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             landmark: undefined,
             placeId: undefined,
             formattedAddress: '',
-            lat: rawLoc.lat,
-            lng: rawLoc.lng,
+            lat: safeLat,
+            lng: safeLng,
           }
         : {
             division: rawLoc.division || '',
@@ -828,8 +832,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             landmark: rawLoc.landmark || undefined,
             placeId: rawLoc.placeId || undefined,
             formattedAddress: rawLoc.formattedAddress?.trim() || '',
-            lat: rawLoc.lat,
-            lng: rawLoc.lng,
+            lat: safeLat,
+            lng: safeLng,
           };
 
       const isHarassment = formData.segment === 'harassment';

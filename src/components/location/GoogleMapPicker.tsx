@@ -9,20 +9,24 @@ export interface GoogleMapPickerProps {
   location: ReportLocationData;
   onChange?: (updated: ReportLocationData) => void;
   onMapPointChange?: (lat: number, lng: number) => void;
+  onClearPoint?: () => void;
   language: 'bn' | 'en';
   error?: string;
   centerTarget?: { lat: number; lng: number; zoom?: number; timestamp: number };
   disabled?: boolean;
+  required?: boolean;
 }
 
 export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
   location,
   onChange,
   onMapPointChange,
+  onClearPoint,
   language,
   error,
   centerTarget,
   disabled = false,
+  required = false,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -39,6 +43,8 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
   onChangeRef.current = onChange;
   const onMapPointChangeRef = useRef(onMapPointChange);
   onMapPointChangeRef.current = onMapPointChange;
+  const onClearPointRef = useRef(onClearPoint);
+  onClearPointRef.current = onClearPoint;
 
   const hasValidCoordinates = isValidIncidentCoordinates(location.lat, location.lng);
 
@@ -287,6 +293,20 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
     latestSelectPointRef.current(center.lat, center.lng);
   };
 
+  const handleClearPoint = () => {
+    if (disabled) return;
+    if (onClearPointRef.current) {
+      onClearPointRef.current();
+    } else if (onChangeRef.current) {
+      onChangeRef.current({
+        ...locationRef.current,
+        lat: undefined,
+        lng: undefined,
+        placeId: undefined,
+      });
+    }
+  };
+
   return (
     <div className="space-y-2 text-left">
       {/* Header & Status Indicator */}
@@ -294,31 +314,57 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
         <label className="text-[13px] font-bold text-primary flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-accent" />
           <span>
-            {language === 'bn' ? 'ঘটনার স্থান *' : 'Incident location *'}
+            {required
+              ? language === 'bn'
+                ? 'ঘটনার স্থান *'
+                : 'Incident location *'
+              : language === 'bn'
+              ? 'ম্যাপে সুনির্দিষ্ট অবস্থান (ঐচ্ছিক)'
+              : 'Map location (optional)'}
           </span>
         </label>
 
-        {hasValidCoordinates ? (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-success-bg border border-ui-success-border text-ui-success-text text-[12px] font-semibold">
-            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-            <span>
-              {language === 'bn' ? 'স্থান নির্বাচন করা হয়েছে' : 'Location selected'}
-            </span>
-          </div>
-        ) : (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-warning-bg border border-ui-warning-border text-ui-warning-text text-[12px] font-medium">
-            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            <span>
-              {language === 'bn' ? 'ম্যাপে একটি স্থান নির্বাচন করুন' : 'Select a point on the map'}
-            </span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {hasValidCoordinates ? (
+            <>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-success-bg border border-ui-success-border text-ui-success-text text-[12px] font-semibold">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <span>
+                  {language === 'bn' ? 'স্থান চিহ্নিত হয়েছে' : 'Location pinned'}
+                </span>
+              </div>
+              {!disabled && (
+                <button
+                  type="button"
+                  onClick={handleClearPoint}
+                  className="text-[12px] text-ui-content-secondary hover:text-ui-error-text transition-colors cursor-pointer"
+                  title={language === 'bn' ? 'পিন সরিয়ে ফেলুন' : 'Remove pin'}
+                >
+                  {language === 'bn' ? 'পিন মুছুন' : 'Clear pin'}
+                </button>
+              )}
+            </>
+          ) : required ? (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-warning-bg border border-ui-warning-border text-ui-warning-text text-[12px] font-medium">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>
+                {language === 'bn' ? 'ম্যাপে একটি স্থান নির্বাচন করুন' : 'Select a point on the map'}
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-muted text-[12px]">
+              <span>
+                {language === 'bn' ? 'চিহ্নিত করা হয়নি' : 'Not pinned'}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       <p className="text-[12.5px] text-secondary leading-relaxed">
         {language === 'bn'
-          ? 'ঘটনাস্থলে ট্যাপ বা ক্লিক করুন।'
-          : 'Tap or click the incident location.'}
+          ? 'ঘটনাস্থলের সুনির্দিষ্ট পয়েন্ট চিহ্নিত করতে ম্যাপে ট্যাপ বা ক্লিক করুন।'
+          : 'Tap or click on the map to pin the incident location.'}
       </p>
 
       {/* Interactive Map Container */}
