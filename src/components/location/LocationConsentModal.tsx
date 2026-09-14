@@ -67,6 +67,9 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           setErrorMessage(msg);
         }
       } else {
+        // User intentionally pressed "Turn on location" for browse mode.
+        // Persist granted intent BEFORE starting the geolocation request.
+        VisitorSessionService.setLocationChoice('granted');
         const res = await retryBrowseLocation();
         if (res.success) {
           onSuccess?.();
