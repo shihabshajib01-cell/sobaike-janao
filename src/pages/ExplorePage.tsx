@@ -325,25 +325,25 @@ export const ExplorePage: React.FC = () => {
 
   return (
     <PublicPageContainer id="explore-page-container">
-      {/* 1. Page Title & Context */}
-      <div className="space-y-0.5 pb-1">
-        <h1 className="text-[24px] md:text-[28px] leading-[1.3] font-bold text-ui-content-primary tracking-tight">
+      {/* 1. Page Title & Context (Compact Spacing) */}
+      <div className="space-y-0.5 pb-0.5">
+        <h1 className="text-[22px] md:text-[26px] leading-[1.25] font-bold text-ui-content-primary tracking-tight">
           {language === 'bn' ? 'প্রতিবেদন বিশ্লেষণ' : 'Report insights'}
         </h1>
-        <p className="text-[14px] md:text-[15px] leading-[1.5] text-ui-content-secondary">
+        <p className="text-[13px] md:text-[14px] leading-[1.4] text-ui-content-secondary">
           {language === 'bn'
             ? 'এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন ও বিশ্লেষণ দেখুন'
             : 'Explore published reports and analysis by area'}
         </p>
       </div>
 
-      {/* 2. Control Layer (Find reports) */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-2xs">
+      {/* 2. Control Layer (Find reports - Compact Workbench) */}
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3.5 sm:p-4 md:p-4.5 space-y-3 shadow-2xs">
         <div className="space-y-0.5">
-          <h2 className="text-[16px] font-bold text-ui-content-primary">
+          <h2 className="text-[15px] font-bold text-ui-content-primary">
             {language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Find reports'}
           </h2>
-          <p className="text-[13px] text-ui-content-secondary">
+          <p className="text-[12px] sm:text-[13px] text-ui-content-secondary">
             {language === 'bn'
               ? 'এলাকা, বিষয় বা শব্দ দিয়ে প্রকাশিত প্রতিবেদন খুঁজুন।'
               : 'Explore published reports by area, topic, or search term.'}
@@ -450,7 +450,7 @@ export const ExplorePage: React.FC = () => {
         </div>
 
         {/* Desktop Category Filter Chips */}
-        <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-1">
+        <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none pt-0.5">
           <button
             type="button"
             aria-pressed={selectedSection === 'all'}
@@ -608,7 +608,7 @@ export const ExplorePage: React.FC = () => {
         <div
           role="region"
           aria-label={language === 'bn' ? 'সক্রিয় ফিল্টার' : 'Active filters'}
-          className="flex flex-wrap items-center gap-2 pt-0.5"
+          className="flex flex-wrap items-center gap-2 pt-0"
         >
           <span className="text-[13px] font-semibold text-ui-content-secondary mr-1 shrink-0">
             {language === 'bn' ? 'সক্রিয় ফিল্টার:' : 'Active filters:'}
@@ -709,64 +709,71 @@ export const ExplorePage: React.FC = () => {
         </div>
       )}
 
-      {/* 3. Dynamic Answer & About Data */}
+      {/* 3. Compact Context Strip: Dynamic Answer & Secondary About Data */}
       {!isLoading && !fetchError && (
-        <div className="space-y-4 md:space-y-6">
-          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl p-4 space-y-1 shadow-2xs">
-            <h3 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary">
+        <div className="space-y-2">
+          {/* Dynamic Result Context */}
+          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-4 py-3 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4">
+            <h3 className="text-[14px] sm:text-[15px] font-bold text-ui-content-primary leading-snug">
               {dynamicAnswerHeading}
             </h3>
-            <p className="text-[13px] font-medium text-ui-content-secondary">
+            <p className="text-[13px] font-medium text-ui-content-secondary shrink-0">
               {countMessage}
             </p>
           </div>
 
-          <details className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 text-[13px] text-ui-content-secondary shadow-2xs">
-            <summary className="font-semibold text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] flex items-center">
-              {language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}
+          {/* Secondary About This Data Disclosure */}
+          <details className="group bg-ui-surface border border-ui-stroke-subtle rounded-xl px-3.5 sm:px-4 py-1 text-[13px] text-ui-content-secondary shadow-2xs">
+            <summary className="font-medium text-[13px] text-ui-content-secondary hover:text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] flex items-center justify-between gap-2 list-none">
+              <span>{language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}</span>
+              <div className="w-7 h-7 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-muted group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
+                <MapIcon name="chevron-down" size="xs" ariaHidden={true} />
+              </div>
             </summary>
-            <p className="mt-2 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
+            <div className="pt-2 pb-3 border-t border-ui-stroke-subtle mt-1 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
               {language === 'bn'
                 ? 'এখানে সবাইকে জানাও-এ প্রকাশিত নাগরিক প্রতিবেদন বিশ্লেষণ করা হয়েছে। এটি সরকারি অপরাধ পরিসংখ্যান নয় এবং কোনো এলাকার সামগ্রিক নিরাপত্তা বা কোনো অভিযোগের আইনগত সত্যতা নির্ধারণ করে না।'
                 : 'This analysis is based on citizen reports published on Sobaike Janao. It is not official crime statistics and does not determine the overall safety of an area or the legal truth of an allegation.'}
-            </p>
+            </div>
           </details>
         </div>
       )}
 
-      {/* 4. Map | Reports Mode Switcher */}
-      <div
-        role="group"
-        aria-label={language === 'bn' ? 'ভিউ পরিবর্তন' : 'View mode switcher'}
-        className="flex items-center bg-ui-surface-subtle p-1 rounded-xl border border-ui-stroke-subtle w-fit shadow-2xs"
-      >
-        <button
-          type="button"
-          aria-pressed={viewMode === 'heatmap'}
-          onClick={() => setViewMode('heatmap')}
-          className={`px-4 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-            viewMode === 'heatmap'
-              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
-              : 'text-ui-content-secondary hover:text-ui-content-primary'
-          }`}
+      {/* 4. Map | Reports Mode Switcher (Connected to Workspace) */}
+      <div className="flex items-center justify-between gap-3 pt-1">
+        <div
+          role="group"
+          aria-label={language === 'bn' ? 'ভিউ পরিবর্তন' : 'View mode switcher'}
+          className="flex items-center bg-ui-surface-subtle p-1 rounded-xl border border-ui-stroke-subtle w-fit shadow-2xs"
         >
-          <MapIcon name="flame" size="md" aria-hidden="true" />
-          <span>{language === 'bn' ? 'মানচিত্র' : 'Map'}</span>
-        </button>
+          <button
+            type="button"
+            aria-pressed={viewMode === 'heatmap'}
+            onClick={() => setViewMode('heatmap')}
+            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              viewMode === 'heatmap'
+                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
+                : 'text-ui-content-secondary hover:text-ui-content-primary'
+            }`}
+          >
+            <MapIcon name="flame" size="md" aria-hidden="true" />
+            <span>{language === 'bn' ? 'মানচিত্র' : 'Map'}</span>
+          </button>
 
-        <button
-          type="button"
-          aria-pressed={viewMode === 'reports'}
-          onClick={() => setViewMode('reports')}
-          className={`px-4 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-            viewMode === 'reports'
-              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
-              : 'text-ui-content-secondary hover:text-ui-content-primary'
-          }`}
-        >
-          <MapIcon name="file-text" size="md" aria-hidden="true" />
-          <span>{language === 'bn' ? 'প্রতিবেদন' : 'Reports'}</span>
-        </button>
+          <button
+            type="button"
+            aria-pressed={viewMode === 'reports'}
+            onClick={() => setViewMode('reports')}
+            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              viewMode === 'reports'
+                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
+                : 'text-ui-content-secondary hover:text-ui-content-primary'
+            }`}
+          >
+            <MapIcon name="file-text" size="md" aria-hidden="true" />
+            <span>{language === 'bn' ? 'প্রতিবেদন' : 'Reports'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Loading Skeleton States */}
