@@ -18,6 +18,7 @@ import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { MapIcon } from '../components/explore/MapIcon';
+import { Modal } from '../components/ui/Modal';
 
 export const ExplorePage: React.FC = () => {
   const { language } = useApp();
@@ -27,6 +28,15 @@ export const ExplorePage: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<SectionKey | 'all'>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+
+  // Mobile UX Phase 6 Sheet States
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [isAreaSheetOpen, setIsAreaSheetOpen] = useState(false);
+
+  // Temporary local draft state for mobile filter sheet
+  const [draftSection, setDraftSection] = useState<SectionKey | 'all'>('all');
+  const [draftDivision, setDraftDivision] = useState<string>('all');
+  const [draftDistrict, setDraftDistrict] = useState<string>('all');
 
   const [allReports, setAllReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -121,12 +131,57 @@ export const ExplorePage: React.FC = () => {
     );
   }, [selectedDivision]);
 
+  // Available districts filtered by draft division in mobile filter sheet
+  const draftAvailableDistricts = useMemo(() => {
+    if (draftDivision === 'all') return BANGLADESH_DISTRICTS;
+    return BANGLADESH_DISTRICTS.filter(
+      (d) =>
+        d.divisionEn.toLowerCase() === draftDivision.toLowerCase() ||
+        d.divisionBn === draftDivision ||
+        d.divisionId === draftDivision.toLowerCase()
+    );
+  }, [draftDivision]);
+
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedSection('all');
     setSelectedDivision('all');
     setSelectedDistrict('all');
   };
+
+  const handleOpenFilterSheet = () => {
+    setDraftSection(selectedSection);
+    setDraftDivision(selectedDivision);
+    setDraftDistrict(selectedDistrict);
+    setIsAreaSheetOpen(false);
+    setIsFilterSheetOpen(true);
+  };
+
+  const handleApplyFilterSheet = () => {
+    setSelectedSection(draftSection);
+    setSelectedDivision(draftDivision);
+    setSelectedDistrict(draftDistrict);
+    setIsFilterSheetOpen(false);
+  };
+
+  const handleClearFilterSheet = () => {
+    setDraftSection('all');
+    setDraftDivision('all');
+    setDraftDistrict('all');
+  };
+
+  const handleDraftDivisionChange = (div: string) => {
+    setDraftDivision(div);
+    setDraftDistrict('all');
+  };
+
+  const mobileFilterCount = useMemo(() => {
+    let count = 0;
+    if (selectedSection !== 'all') count++;
+    if (selectedDivision !== 'all') count++;
+    if (selectedDistrict !== 'all') count++;
+    return count;
+  }, [selectedSection, selectedDivision, selectedDistrict]);
 
   const handleSelectDistrict = useCallback((districtValue: string) => {
     if (!districtValue || districtValue === 'all') {
@@ -282,10 +337,10 @@ export const ExplorePage: React.FC = () => {
           </p>
         </div>
 
-        {/* Keyword Search, Division and District Dropdowns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
+        {/* Desktop Controls (Search, Division, District) */}
+        <div className="hidden md:grid md:grid-cols-12 gap-2.5">
           {/* Main Keyword Search */}
-          <div className="sm:col-span-2 lg:col-span-6 relative flex items-center">
+          <div className="md:col-span-6 relative flex items-center">
             <MapIcon
               name="search"
               size="sm"
@@ -321,7 +376,7 @@ export const ExplorePage: React.FC = () => {
           </div>
 
           {/* Division Dropdown */}
-          <div className="sm:col-span-1 lg:col-span-3 relative flex items-center">
+          <div className="md:col-span-3 relative flex items-center">
             <select
               value={selectedDivision}
               onChange={(e) => {
@@ -343,7 +398,7 @@ export const ExplorePage: React.FC = () => {
           </div>
 
           {/* District Dropdown */}
-          <div className="sm:col-span-1 lg:col-span-3 relative flex items-center">
+          <div className="md:col-span-3 relative flex items-center">
             <MapIcon
               name="map-pin"
               size="sm"
@@ -381,8 +436,8 @@ export const ExplorePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Filter Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-1">
+        {/* Desktop Category Filter Chips */}
+        <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-1">
           <button
             type="button"
             aria-pressed={selectedSection === 'all'}
@@ -466,6 +521,70 @@ export const ExplorePage: React.FC = () => {
                 ? SECTIONS.load_shedding.shortNameBn
                 : SECTIONS.load_shedding.shortNameEn}
             </span>
+          </button>
+        </div>
+
+        {/* Mobile Control Bar (Search Input + Filters Drawer Button) */}
+        <div className="flex md:hidden items-center gap-2">
+          {/* Mobile Keyword Search */}
+          <div className="flex-1 relative flex items-center min-w-0">
+            <MapIcon
+              name="search"
+              size="sm"
+              className="text-ui-content-muted absolute left-3.5 pointer-events-none"
+              ariaHidden={true}
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label={
+                language === 'bn'
+                  ? 'এলাকা বা প্রতিবেদন খুঁজুন'
+                  : 'Search by area or report'
+              }
+              placeholder={
+                language === 'bn'
+                  ? 'এলাকা বা প্রতিবেদন খুঁজুন...'
+                  : 'Search by area or report...'
+              }
+              className="w-full pl-10 pr-10 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'}
+                className="absolute right-0.5 w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <MapIcon name="close" size="xs" ariaHidden={true} />
+              </button>
+            )}
+          </div>
+
+          {/* Mobile Filter Button */}
+          <button
+            type="button"
+            onClick={handleOpenFilterSheet}
+            aria-expanded={isFilterSheetOpen}
+            aria-label={
+              language === 'bn'
+                ? `ফিল্টার খুলুন${mobileFilterCount > 0 ? ` (${toBanglaDigits(mobileFilterCount)}টি সক্রিয়)` : ''}`
+                : `Open filters${mobileFilterCount > 0 ? ` (${mobileFilterCount} active)` : ''}`
+            }
+            className={`flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-[14px] font-semibold min-h-[44px] cursor-pointer transition-colors shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              mobileFilterCount > 0
+                ? 'bg-ui-surface-subtle border-ui-accent text-ui-content-primary shadow-2xs font-bold'
+                : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+            }`}
+          >
+            <MapIcon name="filter" size="sm" ariaHidden={true} />
+            <span>{language === 'bn' ? 'ফিল্টার' : 'Filters'}</span>
+            {mobileFilterCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-ui-accent text-ui-action-text text-[11px] font-bold flex items-center justify-center">
+                {language === 'bn' ? toBanglaDigits(mobileFilterCount) : mobileFilterCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -735,8 +854,47 @@ export const ExplorePage: React.FC = () => {
                   />
                 </div>
 
-                {/* 2. District Ranking Panel (Right on Desktop, Below Map on Mobile) */}
-                <div className="lg:col-span-4 w-full">
+                {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
+                {selectedDistrict !== 'all' && (
+                  <div className="block lg:hidden w-full">
+                    <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 shadow-2xs flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
+                          <MapIcon name="map-pin" size="md" ariaHidden={true} />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-[15px] font-bold text-ui-content-primary truncate">
+                            {activeDistrictName || selectedDistrict}
+                          </h3>
+                          <p className="text-[13px] text-ui-content-secondary truncate">
+                            {language === 'bn'
+                              ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
+                              : `${filteredReports.length} published reports`}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsFilterSheetOpen(false);
+                          setIsAreaSheetOpen(true);
+                        }}
+                        aria-label={
+                          language === 'bn'
+                            ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
+                            : `View details for ${activeDistrictName || selectedDistrict}`
+                        }
+                        className="btn-primary-action px-3.5 py-2 rounded-xl text-[13px] font-semibold min-h-[44px] flex items-center gap-1.5 shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-2xs"
+                      >
+                        <span>{language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}</span>
+                        <MapIcon name="arrow-right" size="xs" ariaHidden={true} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. District Ranking Panel (Right on Desktop, Below Map on Mobile when no district is selected) */}
+                <div className={`w-full lg:col-span-4 ${selectedDistrict !== 'all' ? 'hidden lg:block' : 'block'}`}>
                   <DistrictRankingPanel
                     reports={filteredReports}
                     rankingReports={baseFilteredReports}
@@ -749,14 +907,16 @@ export const ExplorePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* 3. Recent Area Reports Contextual Preview (Compact) */}
-              <RecentAreaReports
-                reports={filteredReports}
-                selectedDistrict={selectedDistrict}
-                selectedSection={selectedSection}
-                language={language}
-                onViewAllReports={() => setViewMode('reports')}
-              />
+              {/* 3. Recent Area Reports Contextual Preview (Desktop always, Mobile only when no district is selected to prevent duplication) */}
+              <div className={selectedDistrict !== 'all' ? 'hidden lg:block' : 'block'}>
+                <RecentAreaReports
+                  reports={filteredReports}
+                  selectedDistrict={selectedDistrict}
+                  selectedSection={selectedSection}
+                  language={language}
+                  onViewAllReports={() => setViewMode('reports')}
+                />
+              </div>
             </div>
           ) : (
             /* REPORTS VIEW (UX Phase 5 Progressive Disclosure Hierarchy) */
@@ -856,6 +1016,202 @@ export const ExplorePage: React.FC = () => {
           )}
         </>
       )}
+
+      {/* Mobile Filter Bottom Sheet */}
+      <Modal
+        id="mobile-filter-sheet"
+        isOpen={isFilterSheetOpen}
+        onClose={() => setIsFilterSheetOpen(false)}
+        title={language === 'bn' ? 'ফিল্টার' : 'Filters'}
+        maxWidth="md"
+        mobilePresentation="sheet"
+        language={language}
+        footer={
+          <div className="flex items-center justify-between w-full gap-3">
+            <button
+              type="button"
+              onClick={handleClearFilterSheet}
+              className="px-4 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-[14px] font-semibold text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              {language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
+            </button>
+            <button
+              type="button"
+              onClick={handleApplyFilterSheet}
+              className="btn-primary-action px-5 py-2.5 rounded-xl text-[14px] font-bold min-h-[44px] cursor-pointer flex-1 flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-xs"
+            >
+              {language === 'bn' ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters'}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4 py-1">
+          {/* Division */}
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-bold text-ui-content-primary block">
+              {language === 'bn' ? 'বিভাগ' : 'Division'}
+            </label>
+            <select
+              value={draftDivision}
+              onChange={(e) => handleDraftDivisionChange(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <option value="all">
+                {language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}
+              </option>
+              {DIVISIONS.map((div) => (
+                <option key={div.id} value={div.nameEn}>
+                  {language === 'bn' ? div.nameBn : div.nameEn}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* District */}
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-bold text-ui-content-primary block">
+              {language === 'bn' ? 'জেলা' : 'District'}
+            </label>
+            <select
+              value={draftDistrict}
+              onChange={(e) => setDraftDistrict(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <option value="all">
+                {language === 'bn' ? 'সকল জেলা' : 'All districts'}
+              </option>
+              {draftAvailableDistricts.map((d) => (
+                <option key={d.id} value={d.nameEn}>
+                  {language === 'bn'
+                    ? `${d.nameBn} (${d.divisionBn})`
+                    : `${d.nameEn} (${d.divisionEn})`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Topic / Category */}
+          <div className="space-y-2">
+            <label className="text-[13px] font-bold text-ui-content-primary block">
+              {language === 'bn' ? 'বিষয়' : 'Topic'}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                aria-pressed={draftSection === 'all'}
+                onClick={() => setDraftSection('all')}
+                className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  draftSection === 'all'
+                    ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg shadow-xs font-bold'
+                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+                }`}
+              >
+                {language === 'bn' ? 'সব বিষয়' : 'All topics'}
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={draftSection === 'harassment'}
+                onClick={() => setDraftSection('harassment')}
+                className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  draftSection === 'harassment'
+                    ? 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border-[var(--sec-harassment-border)] shadow-xs font-bold ring-1 ring-[var(--sec-harassment-border)]'
+                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+                }`}
+              >
+                <CategoryIcon section="harassment" size="xs" />
+                <span className="truncate">
+                  {language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={draftSection === 'rickshaw'}
+                onClick={() => setDraftSection('rickshaw')}
+                className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  draftSection === 'rickshaw'
+                    ? 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border-[var(--sec-rickshaw-border)] shadow-xs font-bold ring-1 ring-[var(--sec-rickshaw-border)]'
+                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+                }`}
+              >
+                <CategoryIcon section="rickshaw" size="xs" />
+                <span className="truncate">
+                  {language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={draftSection === 'extortion'}
+                onClick={() => setDraftSection('extortion')}
+                className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  draftSection === 'extortion'
+                    ? 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border-[var(--sec-extortion-border)] shadow-xs font-bold ring-1 ring-[var(--sec-extortion-border)]'
+                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+                }`}
+              >
+                <CategoryIcon section="extortion" size="xs" />
+                <span className="truncate">
+                  {language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={draftSection === 'load_shedding'}
+                onClick={() => setDraftSection('load_shedding')}
+                className={`col-span-2 px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  draftSection === 'load_shedding'
+                    ? 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border-[var(--sec-load_shedding-border)] shadow-xs font-bold ring-1 ring-[var(--sec-load_shedding-border)]'
+                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+                }`}
+              >
+                <CategoryIcon section="load_shedding" size="xs" />
+                <span className="truncate">
+                  {language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Mobile Selected Area Details Bottom Sheet */}
+      <Modal
+        id="mobile-area-sheet"
+        isOpen={isAreaSheetOpen}
+        onClose={() => setIsAreaSheetOpen(false)}
+        title={activeDistrictName || (language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area summary')}
+        maxWidth="md"
+        mobilePresentation="sheet"
+        language={language}
+        footer={
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode('reports');
+              setIsAreaSheetOpen(false);
+            }}
+            className="btn-primary-action w-full py-2.5 px-4 rounded-xl text-[14px] font-bold min-h-[44px] flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-xs"
+          >
+            <MapIcon name="file-text" size="sm" ariaHidden={true} />
+            <span>{language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}</span>
+          </button>
+        }
+      >
+        <div className="py-1">
+          <DistrictRankingPanel
+            reports={filteredReports}
+            rankingReports={baseFilteredReports}
+            selectedDistrict={selectedDistrict}
+            selectedDivision={selectedDivision}
+            onSelectDistrict={handleSelectDistrict}
+            language={language}
+            selectedSection={selectedSection}
+          />
+        </div>
+      </Modal>
     </PublicPageContainer>
   );
 };
