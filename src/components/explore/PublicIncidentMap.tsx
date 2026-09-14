@@ -483,7 +483,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
         {/* District-Level Fallback Notification (Top-Center / Below Top-Left on mobile) */}
         {isDistrictFallback && (
-          <div className="absolute top-3 sm:top-3.5 left-3 sm:left-1/2 sm:-translate-x-1/2 mt-16 sm:mt-0 z-[500] max-w-[240px] xs:max-w-[270px] sm:max-w-md bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-2xs text-left">
+          <div className="absolute top-3 sm:top-3.5 left-3 sm:left-1/2 sm:-translate-x-1/2 mt-16 sm:mt-0 z-[500] max-w-[260px] sm:max-w-md bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-2xs text-left">
             <div className="flex items-start gap-2">
               <span className="inline-block w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0" />
               <div className="space-y-0.5">
