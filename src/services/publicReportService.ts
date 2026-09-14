@@ -16,6 +16,8 @@ export interface PublicReportFilters {
   search?: string;
   sort?: string;
   limit?: number;
+  visitorLat?: number | null;
+  visitorLng?: number | null;
 }
 
 export interface HomeFeedParams {
@@ -404,11 +406,28 @@ export const PublicReportService = {
 
   /**
    * Fetch published reports filtered by section/segment.
+   * If visitor coordinates are provided, uses the shadow-ranked backend path.
+   * Otherwise preserves default chronological ordering.
    */
   async getBySegment(
     segment: SectionKey,
     filters?: Omit<PublicReportFilters, 'segment'>
   ): Promise<ReportItem[]> {
+    if (filters?.visitorLat != null && filters?.visitorLng != null) {
+      const ranked = await this.getHomeFeed({
+        visitorLat: filters.visitorLat,
+        visitorLng: filters.visitorLng,
+        district: filters.district || 'all',
+      });
+      let result = ranked.filter((r) => r.segment === segment);
+      if (filters.subcategory && filters.subcategory !== 'all') {
+        result = result.filter((r) => r.subcategoryId === filters.subcategory);
+      }
+      if (filters.limit && filters.limit > 0) {
+        result = result.slice(0, filters.limit);
+      }
+      return result;
+    }
     return this.getAll({ ...filters, segment });
   },
 
