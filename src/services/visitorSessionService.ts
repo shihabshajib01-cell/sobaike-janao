@@ -10,8 +10,9 @@ import { calculateDistanceMeters } from '../utils/geoDistance';
 const VISITOR_ID_KEY = 'sobaike_visitor_id_v1';
 const SESSION_ID_KEY = 'sobaike_session_id_v1';
 const LOCATION_CHOICE_KEY = 'sobaike_location_choice_v1';
+export const BROWSE_LOCATION_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes max age for in-memory browse location
 
-export type LocationChoice = 'granted' | 'not_now';
+export type LocationChoice = 'granted' | 'not_now' | 'denied';
 
 export type PermissionStatus =
   | 'granted'
@@ -42,6 +43,7 @@ export interface StoredLocation {
 export interface LocationRequestResult {
   success: boolean;
   status: PermissionStatus;
+  errorType?: 'denied' | 'timeout' | 'unavailable' | 'invalid_coordinates';
   coords?: {
     latitude: number;
     longitude: number;
@@ -51,6 +53,8 @@ export interface LocationRequestResult {
 
 let activeWatchId: number | null = null;
 let lastRecordedLocation: StoredLocation | null = null;
+let isAcquiringPosition = false;
+let permissionStatusObj: (EventTarget & { state: string }) | null = null;
 
 type LocationChangeListener = (location: StoredLocation | null) => void;
 const locationChangeListeners: Set<LocationChangeListener> = new Set();
@@ -248,13 +252,13 @@ export const VisitorSessionService = {
   },
 
   /**
-   * Get saved location choice ('granted' | 'not_now' | null)
+   * Get saved location choice ('granted' | 'not_now' | 'denied' | null)
    */
   getLocationChoice(): LocationChoice | null {
     if (typeof window === 'undefined') return null;
     try {
       const val = localStorage.getItem(LOCATION_CHOICE_KEY);
-      if (val === 'granted' || val === 'not_now') {
+      if (val === 'granted' || val === 'not_now' || val === 'denied') {
         return val;
       }
       return null;
@@ -327,18 +331,40 @@ export const VisitorSessionService = {
   },
 
   /**
+   * Check if in-memory stored location is fresh within TTL
+   */
+  isLocationFresh(loc: StoredLocation | null, maxAgeMs = BROWSE_LOCATION_MAX_AGE_MS): boolean {
+    if (!loc) return false;
+    if (!isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) return false;
+    return Date.now() - loc.timestamp <= maxAgeMs;
+  },
+
+  /**
+   * Explicitly clear all in-memory location state & stop watch
+   */
+  clearMemoryLocation(): void {
+    lastRecordedLocation = null;
+    this.stopLocationWatch();
+    notifyLocationChange(null);
+  },
+
+  /**
    * Handles user clicking "Share Location" on the consent modal
    */
-  async requestAndRecordLocation(): Promise<LocationRequestResult> {
+  async requestAndRecordLocation(purpose: 'browse' | 'report' = 'browse'): Promise<LocationRequestResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      this.setLocationChoice('granted');
+      if (purpose === 'browse') {
+        this.setLocationChoice('denied');
+      }
       await this.recordSession('unavailable');
-      return { success: false, status: 'unavailable' };
+      return { success: false, status: 'unavailable', errorType: 'unavailable' };
     }
 
     return new Promise((resolve) => {
+      isAcquiringPosition = true;
       navigator.geolocation.getCurrentPosition(
         async (position) => {
+          isAcquiringPosition = false;
           this.setLocationChoice('granted');
           const coords = {
             latitude: position.coords.latitude,
@@ -352,13 +378,27 @@ export const VisitorSessionService = {
           resolve({ success: true, status: 'granted', coords });
         },
         async (error) => {
+          isAcquiringPosition = false;
           let status: PermissionStatus = 'unavailable';
+          let errorType: 'denied' | 'timeout' | 'unavailable' = 'unavailable';
+
           if (error.code === error.PERMISSION_DENIED) {
             status = 'denied';
+            errorType = 'denied';
+            this.setLocationChoice('denied');
+            this.clearMemoryLocation();
+          } else if (error.code === error.TIMEOUT) {
+            status = 'unavailable';
+            errorType = 'timeout';
+            this.clearMemoryLocation();
+          } else {
+            status = 'unavailable';
+            errorType = 'unavailable';
+            this.clearMemoryLocation();
           }
-          this.setLocationChoice('granted'); // Record choice so we don't spam custom modal again
+
           await this.recordSession(status);
-          resolve({ success: false, status });
+          resolve({ success: false, status, errorType });
         },
         {
           enableHighAccuracy: true,
@@ -374,18 +414,33 @@ export const VisitorSessionService = {
    */
   async handleNotNow(): Promise<void> {
     this.setLocationChoice('not_now');
+    this.clearMemoryLocation();
     await this.recordSession('prompt');
   },
 
   /**
    * For returning visitors who previously granted consent, restore session tracking
    */
-  initReturningVisitor(): void {
+  async initReturningVisitor(): Promise<void> {
     const choice = this.getLocationChoice();
-    if (choice === 'granted') {
-      if (typeof navigator !== 'undefined' && navigator.geolocation) {
+    if (choice !== 'granted') {
+      return;
+    }
+
+    const perm = await this.queryPermissionStatus();
+    if (perm === 'denied') {
+      this.setLocationChoice('denied');
+      this.clearMemoryLocation();
+      await this.recordSession('denied');
+      return;
+    }
+
+    if (perm === 'granted') {
+      if (typeof navigator !== 'undefined' && navigator.geolocation && !isAcquiringPosition) {
+        isAcquiringPosition = true;
         navigator.geolocation.getCurrentPosition(
           async (pos) => {
+            isAcquiringPosition = false;
             const coords = {
               latitude: pos.coords.latitude,
               longitude: pos.coords.longitude,
@@ -396,8 +451,13 @@ export const VisitorSessionService = {
             await this.recordSession('granted');
           },
           async (err) => {
+            isAcquiringPosition = false;
             const status: PermissionStatus =
               err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
+            if (status === 'denied') {
+              this.setLocationChoice('denied');
+              this.clearMemoryLocation();
+            }
             await this.recordSession(status);
           },
           {
@@ -427,7 +487,7 @@ export const VisitorSessionService = {
 
           let shouldUpdate = false;
 
-          if (!lastRecordedLocation) {
+          if (!lastRecordedLocation || !this.isLocationFresh(lastRecordedLocation)) {
             shouldUpdate = true;
           } else {
             const elapsedMs = now - lastRecordedLocation.timestamp;
@@ -493,18 +553,25 @@ export const VisitorSessionService = {
   },
 
   /**
-   * Get the last known valid device location recorded during the session, if any.
+   * Get the last known valid device location recorded during the session, if fresh.
    */
   getLastRecordedLocation(): StoredLocation | null {
+    if (!lastRecordedLocation) return null;
+    if (!this.isLocationFresh(lastRecordedLocation)) {
+      lastRecordedLocation = null;
+      notifyLocationChange(null);
+      return null;
+    }
     return lastRecordedLocation;
   },
 
   /**
-   * Check if a valid reporter device location is currently available in session memory.
+   * Check if a valid reporter device location is currently available in session memory and fresh.
    */
   hasValidCurrentReporterLocation(): boolean {
     return Boolean(
       lastRecordedLocation &&
+        this.isLocationFresh(lastRecordedLocation) &&
         isValidReporterCoordinates(
           lastRecordedLocation.latitude,
           lastRecordedLocation.longitude,
@@ -526,11 +593,92 @@ export const VisitorSessionService = {
       return 'unavailable';
     }
     try {
-      const status = await navigator.permissions.query({ name: 'geolocation' });
-      return status.state as PermissionStatus;
+      const status = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+      return (status.state as PermissionStatus) || 'unavailable';
     } catch {
       return 'unavailable';
     }
+  },
+
+  /**
+   * Listen to permission changes if supported by browser
+   */
+  setupPermissionObserver(onChange: (perm: PermissionStatus) => void): () => void {
+    if (
+      typeof navigator === 'undefined' ||
+      !navigator.permissions ||
+      typeof navigator.permissions.query !== 'function'
+    ) {
+      return () => {};
+    }
+
+    let active = true;
+    let listener: (() => void) | null = null;
+
+    navigator.permissions
+      .query({ name: 'geolocation' as PermissionName })
+      .then((status) => {
+        if (!active) return;
+        permissionStatusObj = status;
+
+        listener = () => {
+          if (!active) return;
+          const newState = status.state as PermissionStatus;
+          if (newState === 'denied') {
+            this.clearMemoryLocation();
+            this.setLocationChoice('denied');
+          }
+          onChange(newState);
+        };
+
+        if (typeof status.addEventListener === 'function') {
+          status.addEventListener('change', listener);
+        } else {
+          (status as any).onchange = listener;
+        }
+      })
+      .catch(() => {
+        // Permissions query not supported on this platform/engine
+      });
+
+    return () => {
+      active = false;
+      if (permissionStatusObj && listener) {
+        if (typeof permissionStatusObj.removeEventListener === 'function') {
+          permissionStatusObj.removeEventListener('change', listener);
+        } else {
+          (permissionStatusObj as any).onchange = null;
+        }
+      }
+    };
+  },
+
+  /**
+   * Tab/Window recovery: safely observe visibility and focus changes
+   */
+  setupLifecycleObserver(onVisible: () => void): () => void {
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+      return () => {};
+    }
+
+    let lastCheck = 0;
+    const handleEvent = () => {
+      if (document.visibilityState === 'visible') {
+        const now = Date.now();
+        if (now - lastCheck > 1000) {
+          lastCheck = now;
+          onVisible();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleEvent);
+    window.addEventListener('focus', handleEvent);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleEvent);
+      window.removeEventListener('focus', handleEvent);
+    };
   },
 
   /**

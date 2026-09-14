@@ -18,6 +18,7 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
 import { useApp } from '../context/AppContext';
+import { VisitorSessionService } from '../services/visitorSessionService';
 
 type FeedFilterType = 'all' | 'latest' | 'popular' | 'most_shared';
 
@@ -40,7 +41,8 @@ export const HomePage: React.FC = () => {
     browseLocationStatus === 'available' &&
     browseLocation !== null &&
     typeof browseLocation.latitude === 'number' &&
-    typeof browseLocation.longitude === 'number';
+    typeof browseLocation.longitude === 'number' &&
+    VisitorSessionService.isLocationFresh(browseLocation);
 
   const visitorLat = hasValidBrowseLocation ? browseLocation.latitude : null;
   const visitorLng = hasValidBrowseLocation ? browseLocation.longitude : null;

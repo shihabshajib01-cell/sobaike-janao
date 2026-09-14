@@ -25,11 +25,14 @@ export type Language = 'bn' | 'en';
 export type LocationConsentPurpose = 'browse' | 'report';
 
 export type BrowseLocationStatus =
-  | 'checking'
+  | 'not_asked'
+  | 'requesting'
   | 'available'
+  | 'granted_unavailable'
   | 'not_now'
   | 'denied'
-  | 'unavailable';
+  | 'unavailable'
+  | 'error';
 
 export type { StoredLocation };
 
@@ -67,6 +70,7 @@ export interface AppContextType {
   browseLocationStatus: BrowseLocationStatus;
   browseLocation: StoredLocation | null;
   refreshBrowseLocation: () => Promise<void>;
+  retryBrowseLocation: () => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -92,7 +96,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [browseLocation, setBrowseLocation] = useState<StoredLocation | null>(() => {
     return VisitorSessionService.getLastRecordedLocation();
   });
-  const [browseLocationStatus, setBrowseLocationStatus] = useState<BrowseLocationStatus>('checking');
+  const [browseLocationStatus, setBrowseLocationStatus] = useState<BrowseLocationStatus>('not_asked');
 
   const refreshBrowseLocation = useCallback(async () => {
     const loc = VisitorSessionService.getLastRecordedLocation();
@@ -108,6 +112,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setBrowseLocationStatus('not_now');
       return;
     }
+    if (choice === 'denied') {
+      setBrowseLocationStatus('denied');
+      return;
+    }
 
     const perm = await VisitorSessionService.queryPermissionStatus();
     if (perm === 'denied') {
@@ -115,17 +123,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } else if (perm === 'unavailable') {
       setBrowseLocationStatus('unavailable');
     } else if (choice === 'granted') {
-      // Choice was granted but coordinates are not yet available or failed
-      setBrowseLocationStatus('unavailable');
+      // User consented previously, but coordinates are unavailable / waiting / GPS off
+      setBrowseLocationStatus('granted_unavailable');
     } else {
-      setBrowseLocationStatus('checking');
+      setBrowseLocationStatus('not_asked');
+    }
+  }, []);
+
+  const retryBrowseLocation = useCallback(async (): Promise<boolean> => {
+    setBrowseLocationStatus('requesting');
+    const result = await VisitorSessionService.requestAndRecordLocation('browse');
+    if (result.success && result.coords) {
+      setBrowseLocation({
+        latitude: result.coords.latitude,
+        longitude: result.coords.longitude,
+        accuracy: result.coords.accuracy,
+        timestamp: Date.now(),
+      });
+      setBrowseLocationStatus('available');
+      return true;
+    } else {
+      setBrowseLocation(null);
+      if (result.status === 'denied') {
+        setBrowseLocationStatus('denied');
+      } else if (result.errorType === 'timeout' || result.status === 'unavailable') {
+        setBrowseLocationStatus('error');
+      } else {
+        setBrowseLocationStatus('unavailable');
+      }
+      return false;
     }
   }, []);
 
   useEffect(() => {
     refreshBrowseLocation();
 
-    const unsubscribe = VisitorSessionService.subscribeLocationChange((loc) => {
+    // 1. Subscribe to location updates in session memory
+    const unsubscribeLocation = VisitorSessionService.subscribeLocationChange((loc) => {
       if (loc && isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) {
         setBrowseLocation(loc);
         setBrowseLocationStatus('available');
@@ -134,8 +168,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     });
 
+    // 2. Observe external browser permission changes (e.g. user changes setting in browser toolbar)
+    const unsubscribePermission = VisitorSessionService.setupPermissionObserver((perm) => {
+      if (perm === 'denied') {
+        setBrowseLocation(null);
+        setBrowseLocationStatus('denied');
+      } else if (perm === 'granted') {
+        const choice = VisitorSessionService.getLocationChoice();
+        if (choice === 'granted') {
+          VisitorSessionService.initReturningVisitor();
+        } else {
+          refreshBrowseLocation();
+        }
+      } else {
+        refreshBrowseLocation();
+      }
+    });
+
+    // 3. Observe tab visibility / focus returns to recover state without polling
+    const unsubscribeLifecycle = VisitorSessionService.setupLifecycleObserver(() => {
+      refreshBrowseLocation();
+    });
+
     return () => {
-      unsubscribe();
+      unsubscribeLocation();
+      unsubscribePermission();
+      unsubscribeLifecycle();
     };
   }, [refreshBrowseLocation]);
 
@@ -269,6 +327,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       browseLocationStatus,
       browseLocation,
       refreshBrowseLocation,
+      retryBrowseLocation,
     }),
     [
       currentRoute,
@@ -293,6 +352,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       browseLocationStatus,
       browseLocation,
       refreshBrowseLocation,
+      retryBrowseLocation,
     ]
   );
 
