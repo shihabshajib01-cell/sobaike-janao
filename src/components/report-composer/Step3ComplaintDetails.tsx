@@ -372,6 +372,18 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const handleManualLocationChange = (locUpdates: Partial<ReportLocationData>) => {
       if (isLocationLocked) return;
 
+      // Invalidate coordinates & placeId when manual text/administrative location fields change,
+      // preventing stale GPS points from sticking to newly selected/edited addresses.
+      const isManualFieldModified = Boolean(
+        'division' in locUpdates ||
+        'district' in locUpdates ||
+        'upazilaOrThana' in locUpdates ||
+        'formattedAddress' in locUpdates ||
+        'area' in locUpdates ||
+        'road' in locUpdates ||
+        'landmark' in locUpdates
+      );
+
       const updatedLoc: ReportLocationData = {
         formattedAddress: formData.location?.formattedAddress || '',
         division: formData.location?.division || '',
@@ -380,9 +392,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         area: formData.location?.area || '',
         road: formData.location?.road || '',
         landmark: formData.location?.landmark || '',
-        lat: formData.location?.lat,
-        lng: formData.location?.lng,
-        placeId: formData.location?.placeId,
+        lat: isManualFieldModified && !('lat' in locUpdates) ? undefined : formData.location?.lat,
+        lng: isManualFieldModified && !('lng' in locUpdates) ? undefined : formData.location?.lng,
+        placeId: isManualFieldModified && !('placeId' in locUpdates) ? undefined : formData.location?.placeId,
         ...locUpdates,
       };
 

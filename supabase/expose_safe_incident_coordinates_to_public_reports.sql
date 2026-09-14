@@ -17,6 +17,7 @@
 --      (public.complaint_submission_contexts.reporter_latitude / reporter_longitude)
 --      exposed, joined, or used as fallback.
 --   3. Coordinates are strictly NULL if:
+--      - publication_preferences.showGeneralLocation is NOT true (or false)
 --      - Either latitude or longitude is NULL
 --      - Coordinates are exactly 0,0
 --      - Coordinates are outside standard bounds (lat: -90..90, lng: -180..180)
@@ -58,6 +59,7 @@ BEGIN
         'area', c.area,
         'location', coalesce(c.formatted_address, c.area, c.district),
         'latitude', CASE
+          WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
           WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
           WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
           WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
@@ -66,6 +68,7 @@ BEGIN
           ELSE c.latitude
         END,
         'longitude', CASE
+          WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
           WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
           WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
           WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
@@ -166,6 +169,7 @@ BEGIN
     'area', c.area,
     'location', coalesce(c.formatted_address, c.area, c.district),
     'latitude', CASE
+      WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
       WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
       WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
       WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
@@ -174,6 +178,7 @@ BEGIN
       ELSE c.latitude
     END,
     'longitude', CASE
+      WHEN coalesce((c.publication_preferences->>'showGeneralLocation')::boolean, true) IS NOT TRUE THEN NULL
       WHEN coalesce(c.formatted_address, c.area, c.district) IS NULL THEN NULL
       WHEN c.latitude IS NULL OR c.longitude IS NULL THEN NULL
       WHEN c.latitude = 0.0 AND c.longitude = 0.0 THEN NULL
