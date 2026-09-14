@@ -124,6 +124,25 @@ export const ExplorePage: React.FC = () => {
     setSelectedDistrict('all');
   };
 
+  const handleSelectDistrict = useCallback((districtValue: string) => {
+    if (!districtValue || districtValue === 'all') {
+      setSelectedDistrict('all');
+      return;
+    }
+    const distObj = BANGLADESH_DISTRICTS.find(
+      (d) =>
+        d.nameEn.toLowerCase() === districtValue.toLowerCase() ||
+        d.nameBn === districtValue ||
+        d.id === districtValue.toLowerCase()
+    );
+    if (distObj) {
+      setSelectedDivision(distObj.divisionEn);
+      setSelectedDistrict(distObj.nameEn);
+    } else {
+      setSelectedDistrict(districtValue);
+    }
+  }, []);
+
   const hasActiveFilters =
     Boolean(searchQuery.trim()) ||
     selectedSection !== 'all' ||
@@ -707,7 +726,7 @@ export const ExplorePage: React.FC = () => {
                     language={language}
                     selectedSection={selectedSection}
                     selectedDistrict={selectedDistrict}
-                    onSelectDistrict={setSelectedDistrict}
+                    onSelectDistrict={handleSelectDistrict}
                     onResetFilters={handleResetFilters}
                   />
                 </div>
@@ -717,7 +736,7 @@ export const ExplorePage: React.FC = () => {
                   <DistrictRankingPanel
                     reports={filteredReports}
                     selectedDistrict={selectedDistrict}
-                    onSelectDistrict={setSelectedDistrict}
+                    onSelectDistrict={handleSelectDistrict}
                     language={language}
                     selectedSection={selectedSection}
                   />

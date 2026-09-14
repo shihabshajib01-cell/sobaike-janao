@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReportItem } from '../../types/report';
 import { SectionKey } from '../../theme/tokens';
+import { BANGLADESH_DISTRICTS } from '../../data/districts';
 import { useApp } from '../../context/AppContext';
 import { toBanglaDigits } from '../../utils/formatters';
 import { CategoryBadge } from '../ui/CategoryBadge';
@@ -28,11 +29,20 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
     }
     const match = reports.find(
       (r) =>
-        r.districtEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+        (r.districtEn || '').toLowerCase() === selectedDistrict.toLowerCase() ||
         r.districtBn === selectedDistrict
     );
     if (match) {
       return language === 'bn' ? match.districtBn : match.districtEn;
+    }
+    const distObj = BANGLADESH_DISTRICTS.find(
+      (d) =>
+        d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+        d.nameBn === selectedDistrict ||
+        d.id === selectedDistrict.toLowerCase()
+    );
+    if (distObj) {
+      return language === 'bn' ? distObj.nameBn : distObj.nameEn;
     }
     return selectedDistrict;
   };

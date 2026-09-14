@@ -109,13 +109,34 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
     // If a district is selected, find its summary
     let curDist: RankedDistrict | null = null;
     if (selectedDistrict !== 'all') {
-      curDist =
-        list.find(
-          (d) =>
-            d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
-            d.nameBn === selectedDistrict ||
-            d.id === selectedDistrict.toLowerCase()
-        ) || null;
+      const canonical = BANGLADESH_DISTRICTS.find(
+        (d) =>
+          d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+          d.nameBn === selectedDistrict ||
+          d.id === selectedDistrict.toLowerCase()
+      );
+      const foundInList = list.find(
+        (d) =>
+          d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+          d.nameBn === selectedDistrict ||
+          d.id === selectedDistrict.toLowerCase()
+      );
+      if (foundInList) {
+        curDist = foundInList;
+      } else if (canonical) {
+        curDist = {
+          id: canonical.id,
+          nameBn: canonical.nameBn,
+          nameEn: canonical.nameEn,
+          divisionBn: canonical.divisionBn,
+          divisionEn: canonical.divisionEn,
+          count: 0,
+          harassmentCount: 0,
+          rickshawCount: 0,
+          extortionCount: 0,
+          loadSheddingCount: 0,
+        };
+      }
     }
 
     return {
@@ -211,18 +232,35 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
     const rankDisplay = formatRankNumber(index + 1, language);
     const countDisplay =
       language === 'bn' ? toBanglaDigits(item.count) : item.count;
+    const isSelected =
+      selectedDistrict.toLowerCase() === item.nameEn.toLowerCase() ||
+      selectedDistrict.toLowerCase() === item.id.toLowerCase() ||
+      selectedDistrict === item.nameBn;
+
+    const accessibleLabel =
+      language === 'bn'
+        ? `${item.nameBn} জেলার প্রতিবেদন দেখুন${isSelected ? ' (নির্বাচিত)' : ''}`
+        : `View reports for ${item.nameEn}${isSelected ? ' (Selected)' : ''}`;
 
     return (
       <button
         key={item.id}
         type="button"
         onClick={() => onSelectDistrict(item.nameEn)}
-        className="w-full flex items-center justify-between p-2 md:p-2.5 rounded-xl text-left transition-all cursor-pointer border bg-ui-surface-subtle border-ui-stroke-subtle group min-h-[44px]"
+        aria-label={accessibleLabel}
+        aria-current={isSelected ? 'true' : undefined}
+        className={`w-full flex items-center justify-between p-2 md:p-2.5 rounded-xl text-left transition-all cursor-pointer border group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+          isSelected
+            ? 'bg-ui-accent-soft border-ui-accent/40 text-ui-content-primary ring-1 ring-ui-accent/30 font-medium shadow-2xs'
+            : 'bg-ui-surface-subtle border-ui-stroke-subtle hover:border-ui-stroke-default text-ui-content-primary'
+        }`}
       >
         <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
           <span
             className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[11px] md:text-[12px] font-bold shrink-0 border ${
-              index === 0
+              isSelected
+                ? 'bg-ui-accent text-white border-ui-accent'
+                : index === 0
                 ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
                 : index === 1
                 ? 'bg-ui-surface-elevated text-ui-content-primary border-ui-stroke-default font-bold'
@@ -241,22 +279,26 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[11px] md:text-[12px] text-ui-content-muted mt-0.5">
               {item.harassmentCount > 0 && (
                 <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="harassment" size="xs" /> {item.harassmentCount}
+                  <CategoryIcon section="harassment" size="xs" />{' '}
+                  {language === 'bn' ? toBanglaDigits(item.harassmentCount) : item.harassmentCount}
                 </span>
               )}
               {item.rickshawCount > 0 && (
                 <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="rickshaw" size="xs" /> {item.rickshawCount}
+                  <CategoryIcon section="rickshaw" size="xs" />{' '}
+                  {language === 'bn' ? toBanglaDigits(item.rickshawCount) : item.rickshawCount}
                 </span>
               )}
               {item.extortionCount > 0 && (
                 <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="extortion" size="xs" /> {item.extortionCount}
+                  <CategoryIcon section="extortion" size="xs" />{' '}
+                  {language === 'bn' ? toBanglaDigits(item.extortionCount) : item.extortionCount}
                 </span>
               )}
               {item.loadSheddingCount > 0 && (
                 <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="load_shedding" size="xs" /> {item.loadSheddingCount}
+                  <CategoryIcon section="load_shedding" size="xs" />{' '}
+                  {language === 'bn' ? toBanglaDigits(item.loadSheddingCount) : item.loadSheddingCount}
                 </span>
               )}
             </div>
