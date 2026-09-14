@@ -403,25 +403,17 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       if (language === 'bn') {
         const totalBn = toBanglaDigits(totalReportsCount);
         const mappedBn = toBanglaDigits(mappedCount);
-        return topDistrictName
-          ? `জেলা-ভিত্তিক: ${totalBn}টি প্রতিবেদনের ${mappedBn}টি মানচিত্রে। সর্বাধিক প্রতিবেদন ${topDistrictName} জেলায়।`
-          : `জেলা-ভিত্তিক: ${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে।`;
+        return `জেলা-ভিত্তিক: ${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে।`;
       }
-      return topDistrictName
-        ? `District-level: ${mappedCount} of ${totalReportsCount} reports mapped. Most in ${topDistrictName}.`
-        : `District-level: ${mappedCount} of ${totalReportsCount} reports mapped.`;
+      return `District-level: ${mappedCount} of ${totalReportsCount} reports mapped.`;
     }
 
     if (language === 'bn') {
       const totalBn = toBanglaDigits(totalReportsCount);
       const mappedBn = toBanglaDigits(mappedCount);
-      return topDistrictName
-        ? `${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে। সবচেয়ে বেশি প্রতিবেদন ${topDistrictName} জেলায়।`
-        : `${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে।`;
+      return `${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে।`;
     } else {
-      return topDistrictName
-        ? `${mappedCount} of ${totalReportsCount} reports are mapped. ${topDistrictName} has the most reports.`
-        : `${mappedCount} of ${totalReportsCount} reports are mapped.`;
+      return `${mappedCount} of ${totalReportsCount} reports are mapped.`;
     }
   }, [totalReportsCount, mappedCount, topDistrict, isDistrictFallback, selectedDistrict, language]);
 
