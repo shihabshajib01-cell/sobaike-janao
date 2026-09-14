@@ -212,7 +212,7 @@ export const HomePage: React.FC = () => {
                   onClick={handleLoadMore}
                   className="w-full sm:w-auto min-w-[200px]"
                 >
-                  {language === 'bn' ? 'আরও দেখুন' : 'Load more reports'}
+                  {language === 'bn' ? 'আরও প্রতিবেদন দেখুন' : 'Load more reports'}
                 </Button>
               </div>
             )}

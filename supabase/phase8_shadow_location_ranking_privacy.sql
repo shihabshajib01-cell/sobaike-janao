@@ -181,16 +181,12 @@ BEGIN
         -- Phase 5 & 6 Ranking Logic:
         -- CASE A: ALL Filter
         -- When visitor location available:
-        -- 1. Reports with eligible incident coordinates come first (internal_distance_km NOT NULL)
-        -- 2. Nearest to farthest (internal_distance_km ASC)
-        -- 3. Reports without eligible incident coordinates, preserving base order
-        -- When visitor location unavailable: base order
-        CASE WHEN v_clean_filter = 'all' AND v_has_visitor_loc THEN
-          CASE WHEN bc.internal_distance_km IS NOT NULL THEN 0 ELSE 1 END
-        END ASC,
+        -- 1. Reports with eligible incident coordinates come first (internal_distance_km ASC NULLS LAST)
+        -- 2. Reports without eligible incident coordinates, preserving created_at DESC
+        -- When visitor location unavailable: created_at DESC
         CASE WHEN v_clean_filter = 'all' AND v_has_visitor_loc THEN
           bc.internal_distance_km
-        END ASC,
+        END ASC NULLS LAST,
 
         -- CASE B: LATEST Filter (Primary: created_at; Secondary tie-breaker: distance; Fallback: id)
         CASE WHEN v_clean_filter = 'latest' THEN bc.created_at END DESC NULLS LAST,
