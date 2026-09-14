@@ -759,50 +759,108 @@ export const ExplorePage: React.FC = () => {
               />
             </div>
           ) : (
-            /* REPORTS VIEW (Preserves full ReportCard list browsing experience) */
-            <div className="space-y-4">
+            /* REPORTS VIEW (UX Phase 5 Progressive Disclosure Hierarchy) */
+            <div className="space-y-6">
+              {/* 1. Overview */}
               <ReportAnalyticsOverview
                 reports={filteredReports}
                 language={language}
               />
 
-              <ReportSubcategoryBreakdown
-                reports={filteredReports}
-                language={language}
-              />
-
-              <ReportActivityTimeline
-                reports={filteredReports}
-                language={language}
-              />
-
-              <ReportGeographicBreakdown
-                reports={filteredReports}
-                language={language}
-              />
-
-              <div className="flex items-center justify-between text-[13px] text-ui-content-muted font-medium">
-                <span>
-                  {language === 'bn'
-                    ? `${toBanglaDigits(filteredReports.length)}টি প্রতিবেদন`
-                    : `${filteredReports.length} reports`}
-                </span>
-                {hasActiveFilters && (
-                  <button
-                    type="button"
-                    onClick={handleResetFilters}
-                    className="text-[13px] font-semibold text-ui-content-secondary hover:text-ui-content-primary underline cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
-                  >
-                    {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
-                  </button>
-                )}
-              </div>
-
+              {/* 2. Reports in this selection (Evidence / Actual Reports) */}
               <div className="space-y-3">
-                {filteredReports.map((report) => (
-                  <ReportCard key={report.id} report={report} />
-                ))}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ui-stroke-subtle pb-3">
+                  <div>
+                    <h3 className="text-[17px] md:text-[18px] font-bold text-ui-content-primary">
+                      {language === 'bn' ? 'এই নির্বাচনের প্রতিবেদন' : 'Reports in this selection'}
+                    </h3>
+                    <p className="text-[13px] text-ui-content-secondary mt-0.5">
+                      {language === 'bn'
+                        ? 'উপরের বিশ্লেষণে এই প্রকাশিত প্রতিবেদনগুলো অন্তর্ভুক্ত করা হয়েছে।'
+                        : 'These published reports are included in the analysis above.'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-[13px] font-bold text-ui-content-primary font-mono bg-ui-surface-subtle border border-ui-stroke-subtle px-2.5 py-1 rounded-lg">
+                      {language === 'bn'
+                        ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
+                        : `${filteredReports.length} published reports`}
+                    </span>
+                    {hasActiveFilters && (
+                      <button
+                        type="button"
+                        onClick={handleResetFilters}
+                        className="text-[12px] font-semibold text-ui-content-secondary hover:text-ui-content-primary underline cursor-pointer px-2 py-1 min-h-[36px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
+                      >
+                        {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {filteredReports.map((report) => (
+                    <ReportCard key={report.id} report={report} />
+                  ))}
+                </div>
               </div>
+
+              {/* 3. More analysis (Progressive Disclosure) */}
+              <details className="group bg-ui-surface border border-ui-stroke-subtle rounded-2xl overflow-hidden transition-all shadow-xs">
+                <summary className="w-full flex items-center justify-between p-4 sm:p-5 cursor-pointer list-none select-none min-h-[44px] hover:bg-ui-surface-subtle transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <MapIcon name="layers" size="md" className="text-ui-content-primary shrink-0" />
+                    <div>
+                      <h3 className="text-[16px] md:text-[17px] font-bold text-ui-content-primary">
+                        {language === 'bn' ? 'আরও বিশ্লেষণ' : 'More analysis'}
+                      </h3>
+                      <p className="text-[12px] md:text-[13px] text-ui-content-secondary mt-0.5">
+                        {language === 'bn'
+                          ? 'বিষয়, এলাকা ও সময় অনুযায়ী আরও বিস্তারিত দেখুন।'
+                          : 'Explore distribution by topic, geography, and time.'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="w-8 h-8 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
+                    <MapIcon name="chevron-down" size="sm" ariaHidden={true} />
+                  </div>
+                </summary>
+
+                <div className="p-4 sm:p-5 pt-0 border-t border-ui-stroke-subtle space-y-4">
+                  {/* 1. Subcategory breakdown */}
+                  <ReportSubcategoryBreakdown
+                    reports={filteredReports}
+                    language={language}
+                  />
+
+                  {/* 2. Geographic breakdown */}
+                  <ReportGeographicBreakdown
+                    reports={filteredReports}
+                    language={language}
+                  />
+
+                  {/* 3. Activity Timeline or Small Dataset Trend Safety Message */}
+                  {filteredReports.length <= 2 ? (
+                    <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl p-4 sm:p-5 text-left space-y-1">
+                      <div className="text-[14px] font-bold text-ui-content-primary">
+                        {language === 'bn'
+                          ? 'এই নির্বাচনে প্রবণতা দেখানোর মতো পর্যাপ্ত প্রতিবেদন নেই।'
+                          : 'There are not enough reports in this selection to show a meaningful trend.'}
+                      </div>
+                      <div className="text-[12px] md:text-[13px] text-ui-content-secondary">
+                        {language === 'bn'
+                          ? 'সময়ের সাথে পরিবর্তন অর্থপূর্ণভাবে দেখাতে আরও প্রকাশিত প্রতিবেদন প্রয়োজন।'
+                          : 'More published reports are needed before changes over time can be interpreted meaningfully.'}
+                      </div>
+                    </div>
+                  ) : (
+                    <ReportActivityTimeline
+                      reports={filteredReports}
+                      language={language}
+                    />
+                  )}
+                </div>
+              </details>
             </div>
           )}
         </>
