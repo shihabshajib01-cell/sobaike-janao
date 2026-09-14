@@ -130,6 +130,42 @@ export const ExplorePage: React.FC = () => {
     selectedDivision !== 'all' ||
     selectedDistrict !== 'all';
 
+  // Active filter canonical display helpers
+  const activeDivisionName = useMemo(() => {
+    if (selectedDivision === 'all') return null;
+    const divObj = DIVISIONS.find(
+      (d) =>
+        d.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
+        d.nameBn === selectedDivision ||
+        d.id === selectedDivision.toLowerCase()
+    );
+    if (language === 'bn') {
+      return divObj ? `${divObj.nameBn} বিভাগ` : `${selectedDivision} বিভাগ`;
+    }
+    return divObj ? `${divObj.nameEn} Division` : `${selectedDivision} Division`;
+  }, [selectedDivision, language]);
+
+  const activeDistrictName = useMemo(() => {
+    if (selectedDistrict === 'all') return null;
+    const distObj = BANGLADESH_DISTRICTS.find(
+      (d) =>
+        d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+        d.nameBn === selectedDistrict ||
+        d.id === selectedDistrict.toLowerCase()
+    );
+    if (language === 'bn') {
+      return distObj ? `${distObj.nameBn} জেলা` : `${selectedDistrict} জেলা`;
+    }
+    return distObj ? distObj.nameEn : selectedDistrict;
+  }, [selectedDistrict, language]);
+
+  const activeCategoryName = useMemo(() => {
+    if (selectedSection === 'all') return null;
+    const sectionObj = SECTIONS[selectedSection as SectionKey];
+    if (!sectionObj) return null;
+    return language === 'bn' ? sectionObj.shortNameBn : sectionObj.shortNameEn;
+  }, [selectedSection, language]);
+
   // Dynamic Answer Heading computation
   const dynamicAnswerHeading = useMemo(() => {
     const categoryObj = selectedSection !== 'all' ? SECTIONS[selectedSection as SectionKey] : null;
@@ -408,18 +444,114 @@ export const ExplorePage: React.FC = () => {
                 : SECTIONS.load_shedding.shortNameEn}
             </span>
           </button>
-
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="text-[13px] font-semibold text-ui-content-secondary hover:text-ui-content-primary underline ml-auto shrink-0 cursor-pointer px-3 py-2 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
-            >
-              {language === 'bn' ? 'রিসেট' : 'Reset'}
-            </button>
-          )}
         </div>
       </div>
+
+      {/* 2.5 Active Filter Context Row */}
+      {hasActiveFilters && (
+        <div
+          role="region"
+          aria-label={language === 'bn' ? 'সক্রিয় ফিল্টার' : 'Active filters'}
+          className="flex flex-wrap items-center gap-2 pt-0.5"
+        >
+          <span className="text-[13px] font-semibold text-ui-content-secondary mr-1 shrink-0">
+            {language === 'bn' ? 'সক্রিয় ফিল্টার:' : 'Active filters:'}
+          </span>
+
+          {/* Division Chip */}
+          {selectedDivision !== 'all' && activeDivisionName && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+              <span>{activeDivisionName}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedDivision('all');
+                  setSelectedDistrict('all');
+                }}
+                aria-label={
+                  language === 'bn'
+                    ? `${activeDivisionName} ফিল্টার সরান`
+                    : `Remove ${activeDivisionName} filter`
+                }
+                className="w-5 h-5 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <MapIcon name="close" size="xs" ariaHidden={true} />
+              </button>
+            </span>
+          )}
+
+          {/* District Chip */}
+          {selectedDistrict !== 'all' && activeDistrictName && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+              <span>{activeDistrictName}</span>
+              <button
+                type="button"
+                onClick={() => setSelectedDistrict('all')}
+                aria-label={
+                  language === 'bn'
+                    ? `${activeDistrictName} ফিল্টার সরান`
+                    : `Remove ${activeDistrictName} filter`
+                }
+                className="w-5 h-5 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <MapIcon name="close" size="xs" ariaHidden={true} />
+              </button>
+            </span>
+          )}
+
+          {/* Category Chip */}
+          {selectedSection !== 'all' && activeCategoryName && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+              <CategoryIcon section={selectedSection as SectionKey} size="xs" />
+              <span>{activeCategoryName}</span>
+              <button
+                type="button"
+                onClick={() => setSelectedSection('all')}
+                aria-label={
+                  language === 'bn'
+                    ? `${activeCategoryName} ফিল্টার সরান`
+                    : `Remove ${activeCategoryName} filter`
+                }
+                className="w-5 h-5 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <MapIcon name="close" size="xs" ariaHidden={true} />
+              </button>
+            </span>
+          )}
+
+          {/* Search Query Chip */}
+          {searchQuery.trim() && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary max-w-full">
+              <span className="truncate max-w-[180px] sm:max-w-[240px]">
+                {language === 'bn'
+                  ? `অনুসন্ধান: “${searchQuery.trim()}”`
+                  : `Search: “${searchQuery.trim()}”`}
+              </span>
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                aria-label={
+                  language === 'bn'
+                    ? 'অনুসন্ধান ফিল্টার সরান'
+                    : 'Remove search filter'
+                }
+                className="w-5 h-5 shrink-0 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <MapIcon name="close" size="xs" ariaHidden={true} />
+              </button>
+            </span>
+          )}
+
+          {/* Clear All Button */}
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="text-[13px] font-semibold text-ui-accent hover:underline cursor-pointer px-2 py-1 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg ml-auto sm:ml-1"
+          >
+            {language === 'bn' ? 'সব মুছুন' : 'Clear all'}
+          </button>
+        </div>
+      )}
 
       {/* 3. Dynamic Answer & About Data */}
       {!isLoading && !fetchError && (
@@ -524,10 +656,46 @@ export const ExplorePage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Selected Mode Content (Map vs Reports) */}
+      {/* 5. Selected Mode Content (Map vs Reports) or Zero Result Recovery */}
       {!isLoading && !fetchError && (
         <>
-          {viewMode === 'heatmap' ? (
+          {filteredReports.length === 0 ? (
+            /* Authoritative Zero-Result Recovery State */
+            <div
+              role="status"
+              className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-8 sm:p-10 text-center space-y-4 shadow-2xs"
+            >
+              <MapIcon
+                name="alert-circle"
+                size="xl"
+                className="text-ui-content-muted mx-auto"
+                ariaHidden={true}
+              />
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <h3 className="text-[16px] sm:text-[17px] font-bold text-ui-content-primary">
+                  {language === 'bn'
+                    ? 'এই ফিল্টারে কোনো প্রতিবেদন পাওয়া যায়নি'
+                    : 'No reports found for these filters'}
+                </h3>
+                <p className="text-[13px] sm:text-[14px] text-ui-content-secondary leading-relaxed">
+                  {language === 'bn'
+                    ? 'অন্য এলাকা বা বিষয় নির্বাচন করুন, অনুসন্ধান পরিবর্তন করুন, অথবা কিছু ফিল্টার সরিয়ে আবার দেখুন।'
+                    : 'Try another area or topic, change your search, or remove some filters and try again.'}
+                </p>
+              </div>
+              {hasActiveFilters && (
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="btn-primary-action px-4 py-2.5 rounded-xl text-[14px] font-semibold min-h-[44px] cursor-pointer inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-xs"
+                  >
+                    {language === 'bn' ? 'সব ফিল্টার মুছুন' : 'Clear all filters'}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : viewMode === 'heatmap' ? (
             /* MAP VIEW */
             <div className="space-y-4 md:space-y-6">
               {/* Map & District Ranking Layout */}
@@ -605,41 +773,11 @@ export const ExplorePage: React.FC = () => {
                 )}
               </div>
 
-              {filteredReports.length > 0 ? (
-                <div className="space-y-3">
-                  {filteredReports.map((report) => (
-                    <ReportCard key={report.id} report={report} />
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3">
-                  <MapIcon
-                    name="alert-circle"
-                    size="xl"
-                    className="text-ui-content-muted mx-auto"
-                    ariaHidden={true}
-                  />
-                  <h3 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn'
-                      ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই'
-                      : 'No reports match these filters'}
-                  </h3>
-                  <p className="text-[13px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
-                    {language === 'bn'
-                      ? 'বর্তমান অনুসন্ধান বা ফিল্টারের সাথে কোনো তথ্যের মিল পাওয়া যায়নি।'
-                      : 'Try clearing filters or search to view more reports.'}
-                  </p>
-                  {hasActiveFilters && (
-                    <button
-                      type="button"
-                      onClick={handleResetFilters}
-                      className="btn-primary-action px-4 py-2 rounded-xl text-[13px] font-semibold min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                    >
-                      {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
-                    </button>
-                  )}
-                </div>
-              )}
+              <div className="space-y-3">
+                {filteredReports.map((report) => (
+                  <ReportCard key={report.id} report={report} />
+                ))}
+              </div>
             </div>
           )}
         </>
