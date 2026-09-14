@@ -65,7 +65,10 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           setErrorMessage(msg);
         }
       } else {
-        await VisitorSessionService.requestAndRecordLocation();
+        const res = await VisitorSessionService.requestAndRecordLocation();
+        if (res.success) {
+          onSuccess?.();
+        }
         onClose();
       }
     } catch {

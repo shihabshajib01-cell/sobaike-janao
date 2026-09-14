@@ -38,8 +38,45 @@ export interface StoredLocation {
   timestamp: number;
 }
 
+export interface LocationRequestResult {
+  success: boolean;
+  status: PermissionStatus;
+  coords?: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+  };
+}
+
 let activeWatchId: number | null = null;
 let lastRecordedLocation: StoredLocation | null = null;
+
+type LocationChangeListener = (location: StoredLocation | null) => void;
+const locationChangeListeners: Set<LocationChangeListener> = new Set();
+
+function notifyLocationChange(loc: StoredLocation | null): void {
+  locationChangeListeners.forEach((fn) => {
+    try {
+      fn(loc);
+    } catch (err) {
+      console.warn('[VisitorSessionService] Listener error:', err);
+    }
+  });
+}
+
+function updateLocalLocation(coords: { latitude: number; longitude: number; accuracy: number } | null): void {
+  if (coords && isValidReporterCoordinates(coords.latitude, coords.longitude, coords.accuracy)) {
+    lastRecordedLocation = {
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      accuracy: coords.accuracy,
+      timestamp: Date.now(),
+    };
+  } else if (!coords) {
+    lastRecordedLocation = null;
+  }
+  notifyLocationChange(lastRecordedLocation);
+}
 
 /**
  * Generate a cryptographically strong UUID with fallback.
@@ -267,6 +304,11 @@ export const VisitorSessionService = {
     status: PermissionStatus,
     coords?: { latitude: number; longitude: number; accuracy: number } | null
   ): Promise<void> {
+    // Local storage of valid coordinates happens immediately so network/RPC failures do not drop valid location
+    if (coords) {
+      updateLocalLocation(coords);
+    }
+
     if (!isSupabaseConfigured() || !supabase) {
       // Local or demo mode, do not fail
       return;
@@ -320,7 +362,7 @@ export const VisitorSessionService = {
   /**
    * Handles user clicking "Share Location" on the consent modal
    */
-  async requestAndRecordLocation(): Promise<{ success: boolean; status: PermissionStatus }> {
+  async requestAndRecordLocation(): Promise<LocationRequestResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       this.setLocationChoice('granted');
       await this.recordSession('unavailable', null);
@@ -336,9 +378,11 @@ export const VisitorSessionService = {
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
           };
-          await this.recordSession('granted', coords);
+          // Immediately set in session memory so UI and browsing never wait on or fail from Supabase RPC
+          updateLocalLocation(coords);
           this.startLocationWatch();
-          resolve({ success: true, status: 'granted' });
+          await this.recordSession('granted', coords);
+          resolve({ success: true, status: 'granted', coords });
         },
         async (error) => {
           let status: PermissionStatus = 'unavailable';
@@ -380,8 +424,9 @@ export const VisitorSessionService = {
               longitude: pos.coords.longitude,
               accuracy: pos.coords.accuracy,
             };
-            await this.recordSession('granted', coords);
+            updateLocalLocation(coords);
             this.startLocationWatch();
+            await this.recordSession('granted', coords);
           },
           async (err) => {
             const status: PermissionStatus =
@@ -439,6 +484,11 @@ export const VisitorSessionService = {
           }
 
           if (shouldUpdate) {
+            updateLocalLocation({
+              latitude: newLat,
+              longitude: newLon,
+              accuracy: newAcc,
+            });
             await this.recordSession('granted', {
               latitude: newLat,
               longitude: newLon,
@@ -446,7 +496,7 @@ export const VisitorSessionService = {
             });
           }
         },
-        (error) => {
+        (_error) => {
           // Temporary watch error, silent handling
         },
         {
@@ -468,6 +518,16 @@ export const VisitorSessionService = {
       navigator.geolocation.clearWatch(activeWatchId);
       activeWatchId = null;
     }
+  },
+
+  /**
+   * Subscribe to location changes in session memory
+   */
+  subscribeLocationChange(listener: (location: StoredLocation | null) => void): () => void {
+    locationChangeListeners.add(listener);
+    return () => {
+      locationChangeListeners.delete(listener);
+    };
   },
 
   /**
@@ -612,12 +672,11 @@ export const VisitorSessionService = {
           }
 
           // Successfully captured fresh location!
-          lastRecordedLocation = {
+          updateLocalLocation({
             latitude: lat,
             longitude: lng,
             accuracy,
-            timestamp: Date.now(),
-          };
+          });
 
           this.setLocationChoice('granted');
           this.startLocationWatch();

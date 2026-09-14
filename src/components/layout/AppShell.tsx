@@ -11,6 +11,7 @@ import { ViewportDebugger } from '../debug/ViewportDebugger';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
 import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
 import { LocationConsentModal } from '../location/LocationConsentModal';
+import { LocationReminderBar } from '../location/LocationReminderBar';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { HomePage } from '../../pages/HomePage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
@@ -145,6 +146,11 @@ export const AppShell: React.FC = () => {
         id="public-desktop-workspace"
         className="w-full flex-1 flex flex-col min-[1440px]:pl-[240px] min-[1536px]:pl-[250px] min-[1920px]:pl-[260px]"
       >
+        {/* Persistent Location Reminder Bar (when location is off/unavailable) */}
+        <ErrorBoundary componentName="LocationReminderBar" silent>
+          <LocationReminderBar isFirstVisitNoticeOpen={isFirstVisitNoticeOpen} />
+        </ErrorBoundary>
+
         <main
           id="main-content"
           tabIndex={-1}

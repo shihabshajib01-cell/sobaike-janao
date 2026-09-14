@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SectionKey } from '../theme/tokens';
+import { VisitorSessionService, StoredLocation } from '../services/visitorSessionService';
+import { isValidReporterCoordinates } from '../services/types';
 
 export type RoutePath =
   | '/'
@@ -21,6 +23,15 @@ export type RoutePath =
 export type Language = 'bn' | 'en';
 
 export type LocationConsentPurpose = 'browse' | 'report';
+
+export type BrowseLocationStatus =
+  | 'checking'
+  | 'available'
+  | 'not_now'
+  | 'denied'
+  | 'unavailable';
+
+export type { StoredLocation };
 
 export interface LocationConsentOptions {
   purpose?: LocationConsentPurpose;
@@ -53,6 +64,9 @@ export interface AppContextType {
   ) => void;
   closeLocationConsent: () => void;
   locationSuccessCallback: (() => void | Promise<void> | any) | null;
+  browseLocationStatus: BrowseLocationStatus;
+  browseLocation: StoredLocation | null;
+  refreshBrowseLocation: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -73,6 +87,57 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isLocationModalOpen, setIsLocationModalOpen] = useState<boolean>(false);
   const [locationModalPurpose, setLocationModalPurpose] = useState<LocationConsentPurpose>('browse');
   const [locationSuccessCallback, setLocationSuccessCallback] = useState<(() => void | Promise<void> | any) | null>(null);
+
+  // Global Browse Location State
+  const [browseLocation, setBrowseLocation] = useState<StoredLocation | null>(() => {
+    return VisitorSessionService.getLastRecordedLocation();
+  });
+  const [browseLocationStatus, setBrowseLocationStatus] = useState<BrowseLocationStatus>('checking');
+
+  const refreshBrowseLocation = useCallback(async () => {
+    const loc = VisitorSessionService.getLastRecordedLocation();
+    if (loc && isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) {
+      setBrowseLocation(loc);
+      setBrowseLocationStatus('available');
+      return;
+    }
+
+    setBrowseLocation(null);
+    const choice = VisitorSessionService.getLocationChoice();
+    if (choice === 'not_now') {
+      setBrowseLocationStatus('not_now');
+      return;
+    }
+
+    const perm = await VisitorSessionService.queryPermissionStatus();
+    if (perm === 'denied') {
+      setBrowseLocationStatus('denied');
+    } else if (perm === 'unavailable') {
+      setBrowseLocationStatus('unavailable');
+    } else if (choice === 'granted') {
+      // Choice was granted but coordinates are not yet available or failed
+      setBrowseLocationStatus('unavailable');
+    } else {
+      setBrowseLocationStatus('checking');
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshBrowseLocation();
+
+    const unsubscribe = VisitorSessionService.subscribeLocationChange((loc) => {
+      if (loc && isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) {
+        setBrowseLocation(loc);
+        setBrowseLocationStatus('available');
+      } else {
+        refreshBrowseLocation();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [refreshBrowseLocation]);
 
   const openLocationConsent = useCallback((
     purposeOrOptions?: LocationConsentPurpose | LocationConsentOptions | (() => void | Promise<void> | any),
@@ -201,6 +266,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       openLocationConsent,
       closeLocationConsent,
       locationSuccessCallback,
+      browseLocationStatus,
+      browseLocation,
+      refreshBrowseLocation,
     }),
     [
       currentRoute,
@@ -222,6 +290,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       openLocationConsent,
       closeLocationConsent,
       locationSuccessCallback,
+      browseLocationStatus,
+      browseLocation,
+      refreshBrowseLocation,
     ]
   );
 
