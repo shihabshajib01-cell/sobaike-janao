@@ -226,7 +226,7 @@ export const MorePage: React.FC = () => {
               <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'বর্তমান সক্রিয় ক্যাটাগরি ও সেবা' : 'Currently Active Categories & Services'}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
                   <span className="inline-block px-2.5 py-1 rounded-md text-[13px] font-bold bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)]">
                     {language === 'bn' ? 'হয়রানি' : 'Harassment'}
