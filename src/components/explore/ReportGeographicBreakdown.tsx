@@ -178,7 +178,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
         /* Neutral empty state for when no reports in current filter have valid district data */
         <div
           id="geographic-no-data"
-          className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-6 text-center text-[13px] sm:text-[14px] text-ui-content-muted"
+          className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-6 text-center text-[13px] sm:text-[14px] text-ui-content-secondary shadow-2xs"
         >
           {language === 'bn'
             ? 'বর্তমান প্রতিবেদনে নির্ভরযোগ্য জেলা তথ্য নেই।'
@@ -186,18 +186,18 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
         </div>
       ) : (
         /* Two-column layout on desktop (>=1024px), vertical stack on mobile/tablet */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Section A: Reports by District */}
           <div
             id="geographic-breakdown-districts"
-            className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-4 sm:p-5 space-y-3.5 flex flex-col justify-between"
+            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3.5 sm:p-4 space-y-3 flex flex-col justify-between shadow-2xs"
           >
-            <div className="space-y-3.5">
-              <h3 className="text-[14px] sm:text-[15px] font-bold text-ui-content-primary">
+            <div className="space-y-3">
+              <h3 className="text-[13.5px] sm:text-[14px] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'জেলা অনুযায়ী প্রতিবেদন' : 'Reports by district'}
               </h3>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {visibleDistricts.map((item) => {
                   const displayDistrictName =
                     language === 'bn' ? item.nameBn : item.nameEn;
@@ -216,22 +216,22 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                     <div
                       key={item.id}
                       id={`district-row-${item.id}`}
-                      className="space-y-1.5"
+                      className="space-y-1"
                     >
-                      <div className="flex items-baseline justify-between text-[13px] sm:text-[14px]">
+                      <div className="flex items-baseline justify-between text-[12.5px] sm:text-[13px]">
                         <div className="flex items-baseline gap-1.5 min-w-0 pr-2">
                           <span className="font-semibold text-ui-content-primary truncate">
                             {displayDistrictName}
                           </span>
-                          <span className="text-[11.5px] sm:text-[12px] text-ui-content-muted truncate">
+                          <span className="text-[11px] sm:text-[11.5px] text-ui-content-secondary truncate">
                             ({displayDivisionName})
                           </span>
                         </div>
-                        <div className="shrink-0 text-[12.5px] sm:text-[13px] font-medium text-ui-content-secondary">
+                        <div className="shrink-0 text-[12px] sm:text-[12.5px] font-medium text-ui-content-secondary">
                           <span className="font-semibold text-ui-content-primary">
                             {displayCount}
                           </span>
-                          <span className="text-ui-content-muted ml-1.5">
+                          <span className="text-ui-content-secondary ml-1">
                             ({displayPercent}%)
                           </span>
                         </div>
@@ -241,7 +241,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                       <div
                         role="presentation"
                         aria-hidden="true"
-                        className="w-full h-2 rounded-full bg-ui-surface-subtle overflow-hidden"
+                        className="w-full h-1.5 rounded-full bg-ui-surface-subtle overflow-hidden"
                       >
                         <div
                           className="h-full rounded-full bg-ui-accent transition-all duration-300"
@@ -263,7 +263,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                   type="button"
                   aria-expanded={isExpanded}
                   onClick={() => setIsExpanded((prev) => !prev)}
-                  className="w-full text-center text-[13px] font-semibold text-ui-content-secondary hover:text-ui-content-primary transition-colors py-2 min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl"
+                  className="w-full text-center text-[12.5px] sm:text-[13px] font-semibold text-ui-content-secondary hover:text-ui-content-primary transition-colors py-2 min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
                 >
                   {isExpanded
                     ? language === 'bn'
@@ -280,13 +280,13 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
           {/* Section B: Reports by Division */}
           <div
             id="geographic-breakdown-divisions"
-            className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-4 sm:p-5 space-y-3.5"
+            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3.5 sm:p-4 space-y-3 shadow-2xs"
           >
-            <h3 className="text-[14px] sm:text-[15px] font-bold text-ui-content-primary">
+            <h3 className="text-[13.5px] sm:text-[14px] font-bold text-ui-content-primary">
               {language === 'bn' ? 'বিভাগ অনুযায়ী প্রতিবেদন' : 'Reports by division'}
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {divisionStats.map((item) => {
                 const displayDivisionName =
                   language === 'bn'
@@ -303,17 +303,17 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                   <div
                     key={item.id}
                     id={`division-row-${item.id}`}
-                    className="space-y-1.5"
+                    className="space-y-1"
                   >
-                    <div className="flex items-baseline justify-between text-[13px] sm:text-[14px]">
+                    <div className="flex items-baseline justify-between text-[12.5px] sm:text-[13px]">
                       <div className="font-semibold text-ui-content-primary min-w-0 pr-2 truncate">
                         {displayDivisionName}
                       </div>
-                      <div className="shrink-0 text-[12.5px] sm:text-[13px] font-medium text-ui-content-secondary">
+                      <div className="shrink-0 text-[12px] sm:text-[12.5px] font-medium text-ui-content-secondary">
                         <span className="font-semibold text-ui-content-primary">
                           {displayCount}
                         </span>
-                        <span className="text-ui-content-muted ml-1.5">
+                        <span className="text-ui-content-secondary ml-1">
                           ({displayPercent}%)
                         </span>
                       </div>
@@ -323,7 +323,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                     <div
                       role="presentation"
                       aria-hidden="true"
-                      className="w-full h-2 rounded-full bg-ui-surface-subtle overflow-hidden"
+                      className="w-full h-1.5 rounded-full bg-ui-surface-subtle overflow-hidden"
                     >
                       <div
                         className="h-full rounded-full bg-ui-accent transition-all duration-300"
@@ -342,7 +342,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
 
       {/* Coverage note if any reports lack recognized district */}
       {hasUnmappedGeos && (
-        <p className="text-[11.5px] sm:text-[12px] text-ui-content-muted/90 pt-0.5">
+        <p className="text-[11px] sm:text-[11.5px] text-ui-content-secondary pt-0.5">
           {language === 'bn'
             ? 'জেলা শনাক্ত করা গেছে এমন প্রতিবেদনগুলোর ভিত্তিতে ভৌগোলিক বিশ্লেষণ দেখানো হয়েছে।'
             : 'Geographic analysis includes reports with recognized district data.'}

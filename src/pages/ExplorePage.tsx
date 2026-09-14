@@ -951,19 +951,12 @@ export const ExplorePage: React.FC = () => {
                 language={language}
               />
 
-              {/* 2. Reports in this selection (Primary Content: Actual Reports) */}
+              {/* 2. Published reports (Primary Content: Actual ReportCards) */}
               <div id="reports-in-selection-section" className="space-y-3.5 pt-1">
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 border-b border-ui-stroke-subtle pb-2.5">
-                  <div>
-                    <h3 className="text-[18px] sm:text-[19px] md:text-[20px] font-bold text-ui-content-primary tracking-tight">
-                      {language === 'bn' ? 'এই নির্বাচনের প্রতিবেদন' : 'Reports in this selection'}
-                    </h3>
-                    <p className="text-[12.5px] sm:text-[13px] text-ui-content-secondary mt-0.5">
-                      {language === 'bn'
-                        ? 'বর্তমান নির্বাচনে অন্তর্ভুক্ত প্রকাশিত প্রতিবেদন।'
-                        : 'Published reports included in this selection.'}
-                    </p>
-                  </div>
+                <div className="flex items-baseline justify-between gap-2 border-b border-ui-stroke-subtle pb-2.5">
+                  <h3 className="text-[18px] sm:text-[19px] md:text-[20px] font-bold text-ui-content-primary tracking-tight">
+                    {language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published reports'}
+                  </h3>
                   <div className="text-[12.5px] sm:text-[13px] font-semibold text-ui-content-secondary shrink-0">
                     {language === 'bn'
                       ? `${toBanglaDigits(filteredReports.length)}টি প্রতিবেদন`

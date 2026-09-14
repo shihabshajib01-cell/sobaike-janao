@@ -133,94 +133,92 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
     <section
       id="explore-report-analytics"
       aria-label={language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
-      className="space-y-3 mb-2"
+      className="bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-3 shadow-2xs"
     >
-      {/* 1. Header & 4 Compact KPI Cards */}
-      <div className="space-y-2">
-        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5">
-          <h2 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary tracking-tight">
-            {language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
-          </h2>
-          <span className="text-[12px] text-ui-content-secondary font-normal">
-            {language === 'bn' ? 'বর্তমান ফিল্টারের ভিত্তিতে' : 'Based on the current filters'}
+      {/* 1. Header & Context */}
+      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 border-b border-ui-stroke-subtle pb-2">
+        <h2 className="text-[14.5px] sm:text-[15.5px] font-bold text-ui-content-primary tracking-tight">
+          {language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
+        </h2>
+        <span className="text-[11.5px] sm:text-[12px] text-ui-content-secondary font-normal">
+          {language === 'bn' ? 'বর্তমান ফিল্টারের ভিত্তিতে' : 'Based on current filters'}
+        </span>
+      </div>
+
+      {/* 2. Compact Grouped Summary Blocks */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {/* Total Reports */}
+        <div
+          id="metric-total-reports"
+          className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
+        >
+          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary truncate">
+            {language === 'bn' ? 'মোট প্রতিবেদন' : 'Total reports'}
+          </span>
+          <span className="text-[16px] sm:text-[18px] font-bold text-ui-content-primary leading-tight">
+            {language === 'bn' ? toBanglaDigits(totalReports) : totalReports}
           </span>
         </div>
 
-        {/* 4 Summary Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5">
-          {/* Total Reports */}
-          <div
-            id="metric-total-reports"
-            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
-          >
-            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
-              {language === 'bn' ? 'মোট প্রতিবেদন' : 'Total reports'}
-            </span>
-            <span className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
-              {language === 'bn' ? toBanglaDigits(totalReports) : totalReports}
-            </span>
-          </div>
-
-          {/* Districts with reports */}
-          <div
-            id="metric-affected-districts"
-            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
-          >
-            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
-              {language === 'bn' ? 'প্রতিবেদন থাকা জেলা' : 'Districts with reports'}
-            </span>
-            <span className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
-              {language === 'bn' ? toBanglaDigits(districtCount) : districtCount}
-            </span>
-          </div>
-
-          {/* Divisions with reports */}
-          <div
-            id="metric-affected-divisions"
-            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
-          >
-            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
-              {language === 'bn' ? 'প্রতিবেদন থাকা বিভাগ' : 'Divisions with reports'}
-            </span>
-            <span className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
-              {language === 'bn' ? toBanglaDigits(divisionCount) : divisionCount}
-            </span>
-          </div>
-
-          {/* Most Reported Category */}
-          <div
-            id="metric-most-reported"
-            className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-2.5 sm:p-3 flex flex-col justify-between min-h-[64px] sm:min-h-[70px] shadow-2xs"
-          >
-            <span className="text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary truncate">
-              {language === 'bn' ? 'সর্বাধিক প্রতিবেদন' : 'Most reported'}
-            </span>
-            <span className="text-[14px] sm:text-[15px] font-bold text-ui-content-primary leading-tight truncate">
-              {mostReportedLabel}
-            </span>
-          </div>
+        {/* Districts with reports */}
+        <div
+          id="metric-affected-districts"
+          className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
+        >
+          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary truncate">
+            {language === 'bn' ? 'প্রতিবেদন থাকা জেলা' : 'Districts with reports'}
+          </span>
+          <span className="text-[16px] sm:text-[18px] font-bold text-ui-content-primary leading-tight">
+            {language === 'bn' ? toBanglaDigits(districtCount) : districtCount}
+          </span>
         </div>
 
-        {/* Geographic note if any reports lack recognized district */}
-        {hasUnmappedGeos && (
-          <p className="text-[11px] sm:text-[11.5px] text-ui-content-secondary pt-0.5">
-            {language === 'bn'
-              ? 'জেলা তথ্য থাকা প্রতিবেদনগুলোর ভিত্তিতে এলাকা গণনা করা হয়েছে।'
-              : 'Area counts are based on reports with recognized district data.'}
-          </p>
-        )}
+        {/* Divisions with reports */}
+        <div
+          id="metric-affected-divisions"
+          className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
+        >
+          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary truncate">
+            {language === 'bn' ? 'প্রতিবেদন থাকা বিভাগ' : 'Divisions with reports'}
+          </span>
+          <span className="text-[16px] sm:text-[18px] font-bold text-ui-content-primary leading-tight">
+            {language === 'bn' ? toBanglaDigits(divisionCount) : divisionCount}
+          </span>
+        </div>
+
+        {/* Most Reported Category */}
+        <div
+          id="metric-most-reported"
+          className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
+        >
+          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary truncate">
+            {language === 'bn' ? 'সর্বাধিক প্রতিবেদন' : 'Most reported'}
+          </span>
+          <span className="text-[13.5px] sm:text-[14px] font-bold text-ui-content-primary leading-tight truncate">
+            {mostReportedLabel}
+          </span>
+        </div>
       </div>
 
-      {/* 2. Category Distribution Card */}
+      {/* Geographic note if any reports lack recognized district */}
+      {hasUnmappedGeos && (
+        <p className="text-[11px] text-ui-content-secondary">
+          {language === 'bn'
+            ? 'জেলা তথ্য থাকা প্রতিবেদনগুলোর ভিত্তিতে এলাকা গণনা করা হয়েছে।'
+            : 'Area counts are based on reports with recognized district data.'}
+        </p>
+      )}
+
+      {/* 3. Category Distribution (integrated, light, compact) */}
       <div
         id="explore-category-distribution"
-        className="bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-2.5 shadow-2xs"
+        className="pt-2 border-t border-ui-stroke-subtle space-y-2"
       >
-        <h3 className="text-[13px] sm:text-[14px] font-bold text-ui-content-primary">
+        <h3 className="text-[12.5px] sm:text-[13px] font-bold text-ui-content-primary">
           {language === 'bn' ? 'ক্যাটাগরি অনুযায়ী প্রতিবেদন' : 'Reports by category'}
         </h3>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {categoryStats.map((item) => {
             const displayCount =
               language === 'bn' ? toBanglaDigits(item.count) : item.count;
@@ -234,14 +232,14 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                 className="space-y-1"
               >
                 {/* Row Header: Icon + Category Name + Count & Percentage */}
-                <div className="flex items-center justify-between text-[12.5px] sm:text-[13px]">
+                <div className="flex items-center justify-between text-[12px] sm:text-[12.5px]">
                   <div className="flex items-center gap-2 font-medium text-ui-content-primary min-w-0">
                     <CategoryIcon section={item.key} size="xs" />
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <div className="shrink-0 text-[12px] sm:text-[12.5px] font-medium text-ui-content-secondary ml-2">
+                  <div className="shrink-0 text-[11.5px] sm:text-[12px] font-medium text-ui-content-secondary ml-2">
                     <span className="font-semibold text-ui-content-primary">{displayCount}</span>
-                    <span className="text-ui-content-secondary ml-1.5">({displayPercent}%)</span>
+                    <span className="text-ui-content-secondary ml-1">({displayPercent}%)</span>
                   </div>
                 </div>
 

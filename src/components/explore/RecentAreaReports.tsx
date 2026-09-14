@@ -70,7 +70,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     navigateTo(`/report-detail/${report.id}`);
                   }
                 }}
-                className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3.5 sm:p-4 transition-all duration-150 flex flex-col justify-between space-y-2.5 shadow-2xs hover:shadow-xs group text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3 sm:p-3.5 transition-all duration-150 flex flex-col justify-between space-y-2 shadow-2xs hover:shadow-xs group text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[148px]"
               >
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
@@ -81,18 +81,18 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     />
                   </div>
 
-                  <h4 className="text-[14.5px] sm:text-[15px] font-bold text-ui-content-primary line-clamp-2 leading-snug group-hover:text-ui-action-bg transition-colors">
+                  <h4 className="text-[14px] sm:text-[14.5px] font-bold text-ui-content-primary line-clamp-2 leading-snug group-hover:text-ui-action-bg transition-colors">
                     {title}
                   </h4>
 
-                  <p className="text-[12.5px] sm:text-[13px] text-ui-content-secondary line-clamp-2 leading-relaxed">
+                  <p className="text-[12px] sm:text-[12.5px] text-ui-content-secondary line-clamp-2 leading-relaxed">
                     {shortDesc}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-ui-stroke-subtle flex items-center justify-between gap-2 text-[12px]">
-                  <div className="flex items-center gap-3 text-ui-content-secondary min-w-0">
-                    <span className="flex items-center gap-1 truncate max-w-[140px] sm:max-w-[180px]">
+                <div className="pt-2 border-t border-ui-stroke-subtle/80 flex items-center justify-between gap-2 text-[11.5px] sm:text-[12px]">
+                  <div className="flex items-center gap-2.5 text-ui-content-secondary min-w-0">
+                    <span className="flex items-center gap-1 truncate max-w-[130px] sm:max-w-[170px]">
                       <MapIcon name="map-pin" size="sm" className="text-ui-content-secondary shrink-0" />
                       <span className="truncate">{location}</span>
                     </span>
@@ -102,7 +102,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     </span>
                   </div>
 
-                  <span className="shrink-0 text-[12px] sm:text-[12.5px] font-semibold text-ui-action-bg group-hover:underline flex items-center gap-1 min-h-[44px] sm:min-h-0 items-center">
+                  <span className="shrink-0 text-[11.5px] sm:text-[12px] font-semibold text-ui-action-bg group-hover:underline flex items-center gap-0.5 min-h-[36px] sm:min-h-0 items-center">
                     <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
                     <MapIcon name="arrow-right" size="sm" className="text-ui-action-bg transition-transform group-hover:translate-x-0.5" />
                   </span>
