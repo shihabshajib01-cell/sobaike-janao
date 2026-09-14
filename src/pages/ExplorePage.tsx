@@ -60,6 +60,19 @@ export const ExplorePage: React.FC = () => {
     loadData();
   }, [loadData]);
 
+  // Responsive resize safety: automatically close mobile sheets when transitioning to tablet/desktop (>= 768px)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsFilterSheetOpen(false);
+        setIsAreaSheetOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Base filtered reports - applies Section, Division, and Search filters (ranking context)
   const baseFilteredReports: ReportItem[] = useMemo(() => {
     return allReports.filter((r) => {
@@ -548,14 +561,14 @@ export const ExplorePage: React.FC = () => {
                   ? 'এলাকা বা প্রতিবেদন খুঁজুন...'
                   : 'Search by area or report...'
               }
-              className="w-full pl-10 pr-10 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
+              className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'}
-                className="absolute right-0.5 w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -567,6 +580,7 @@ export const ExplorePage: React.FC = () => {
             type="button"
             onClick={handleOpenFilterSheet}
             aria-expanded={isFilterSheetOpen}
+            aria-controls="mobile-filter-sheet"
             aria-label={
               language === 'bn'
                 ? `ফিল্টার খুলুন${mobileFilterCount > 0 ? ` (${toBanglaDigits(mobileFilterCount)}টি সক্রিয়)` : ''}`
@@ -856,7 +870,7 @@ export const ExplorePage: React.FC = () => {
 
                 {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
                 {selectedDistrict !== 'all' && (
-                  <div className="block lg:hidden w-full">
+                  <div className="block md:hidden w-full">
                     <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 shadow-2xs flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
@@ -894,7 +908,7 @@ export const ExplorePage: React.FC = () => {
                 )}
 
                 {/* 2. District Ranking Panel (Right on Desktop, Below Map on Mobile when no district is selected) */}
-                <div className={`w-full lg:col-span-4 ${selectedDistrict !== 'all' ? 'hidden lg:block' : 'block'}`}>
+                <div className={`w-full lg:col-span-4 ${selectedDistrict !== 'all' ? 'hidden md:block' : 'block'}`}>
                   <DistrictRankingPanel
                     reports={filteredReports}
                     rankingReports={baseFilteredReports}
@@ -908,7 +922,7 @@ export const ExplorePage: React.FC = () => {
               </div>
 
               {/* 3. Recent Area Reports Contextual Preview (Desktop always, Mobile only when no district is selected to prevent duplication) */}
-              <div className={selectedDistrict !== 'all' ? 'hidden lg:block' : 'block'}>
+              <div className={selectedDistrict !== 'all' ? 'hidden md:block' : 'block'}>
                 <RecentAreaReports
                   reports={filteredReports}
                   selectedDistrict={selectedDistrict}
