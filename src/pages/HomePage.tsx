@@ -122,7 +122,7 @@ export const HomePage: React.FC = () => {
         list = [...groupA, ...groupB].map((item) => item.report);
       }
     } else if (feedFilter === 'latest') {
-      // Primary: newest published date; Secondary tie-breaker: nearest location; Fallback: ID / stable index
+      // Primary: newest published date; Secondary tie-breaker: nearest location on equal dates; Fallback: ID / stable index
       const withDistance = list.map((report, originalIndex) => ({
         report,
         originalIndex,
@@ -133,22 +133,18 @@ export const HomePage: React.FC = () => {
         const repA = a.report;
         const repB = b.report;
 
-        // Primary: publication date
+        // Primary: publication date comparison when both dates exist
         if (repA.publishedAt && repB.publishedAt) {
           const timeDiff = new Date(repB.publishedAt).getTime() - new Date(repA.publishedAt).getTime();
           if (timeDiff !== 0) return timeDiff;
-        } else if (repA.publishedAt && !repB.publishedAt) {
-          return -1;
-        } else if (!repA.publishedAt && repB.publishedAt) {
-          return 1;
+
+          // Secondary: location distance tie-breaker (only when publication dates are equal and both have valid distance)
+          if (a.distanceKm !== null && b.distanceKm !== null && a.distanceKm !== b.distanceKm) {
+            return a.distanceKm - b.distanceKm;
+          }
         }
 
-        // Secondary: location distance tie-breaker (only when both have valid distance and are tied)
-        if (a.distanceKm !== null && b.distanceKm !== null && a.distanceKm !== b.distanceKm) {
-          return a.distanceKm - b.distanceKm;
-        }
-
-        // Fallback: ID comparison
+        // Fallback: ID comparison (when dates are equal/tied or when either date is missing)
         const idA = parseInt(repA.id, 10) || 0;
         const idB = parseInt(repB.id, 10) || 0;
         if (idB !== idA) return idB - idA;
@@ -201,7 +197,7 @@ export const HomePage: React.FC = () => {
 
       list = withDistance.map((item) => item.report);
     } else if (feedFilter === 'most_shared') {
-      // Primary: published date (no fake share count); Secondary tie-breaker: nearest location; Fallback: ID
+      // Primary: published date (no fake share count); Secondary tie-breaker: nearest location on equal dates; Fallback: ID
       const withDistance = list.map((report, originalIndex) => ({
         report,
         originalIndex,
@@ -212,22 +208,18 @@ export const HomePage: React.FC = () => {
         const repA = a.report;
         const repB = b.report;
 
-        // Primary: publication date
+        // Primary: publication date comparison when both dates exist
         if (repA.publishedAt && repB.publishedAt) {
           const timeDiff = new Date(repB.publishedAt).getTime() - new Date(repA.publishedAt).getTime();
           if (timeDiff !== 0) return timeDiff;
-        } else if (repA.publishedAt && !repB.publishedAt) {
-          return -1;
-        } else if (!repA.publishedAt && repB.publishedAt) {
-          return 1;
+
+          // Secondary: location distance tie-breaker (when published dates tie and both have valid distance)
+          if (a.distanceKm !== null && b.distanceKm !== null && a.distanceKm !== b.distanceKm) {
+            return a.distanceKm - b.distanceKm;
+          }
         }
 
-        // Secondary: location distance tie-breaker (when published dates tie and both have valid distance)
-        if (a.distanceKm !== null && b.distanceKm !== null && a.distanceKm !== b.distanceKm) {
-          return a.distanceKm - b.distanceKm;
-        }
-
-        // Fallback: ID comparison
+        // Fallback: ID comparison (when dates are equal/tied or when either date is missing)
         const idA = parseInt(repA.id, 10) || 0;
         const idB = parseInt(repB.id, 10) || 0;
         if (idB !== idA) return idB - idA;
