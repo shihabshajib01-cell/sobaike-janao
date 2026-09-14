@@ -88,6 +88,18 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Close Confirmation state
   const [isConfirmCloseOpen, setIsConfirmCloseOpen] = useState(false);
 
+  useEffect(() => {
+    if (isConfirmCloseOpen) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('draft-continue-btn');
+        if (el) {
+          el.focus();
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isConfirmCloseOpen]);
+
   // Coming Soon local selection tracking for Step 1
   const [selectedComingSoon, setSelectedComingSoon] = useState<ComingSoonServiceKey | null>(null);
 
@@ -1586,7 +1598,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         id="draft-confirm-close-modal"
         isOpen={isConfirmCloseOpen}
         onClose={handleContinueEditing}
-        maxWidth="md"
+        maxWidth="lg"
         zIndexClass="z-[60]"
         showHeader={false}
         language={language}
@@ -1612,23 +1624,26 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
           {/* Action Buttons: Left: Delete draft | Right: Keep editing + Close */}
           <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-ui-stroke-subtle">
-            <button
+            <Button
               id="draft-discard-btn"
               type="button"
+              variant="ghost"
+              size="md"
+              leftIcon={<Trash2 className="w-4 h-4" />}
               onClick={handleDiscardDraft}
-              className="px-3 py-2 rounded-xl text-ui-error-text hover:bg-ui-error-bg font-semibold text-[13.5px] sm:text-[14px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-ui-focus"
+              className="text-ui-error-text hover:bg-ui-error-bg whitespace-nowrap"
             >
-              <Trash2 className="w-4 h-4" />
-              <span>{language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}</span>
-            </button>
+              {language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}
+            </Button>
 
             <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5">
               <Button
                 id="draft-continue-btn"
                 type="button"
                 variant="outline"
+                size="md"
                 onClick={handleContinueEditing}
-                className="min-h-[44px] text-[15px]"
+                className="whitespace-nowrap"
               >
                 {language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Keep editing'}
               </Button>
@@ -1637,8 +1652,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 id="draft-save-exit-btn"
                 type="button"
                 variant="primary"
+                size="md"
                 onClick={handleSaveAndExit}
-                className="min-h-[44px] text-[15px] px-6"
+                className="whitespace-nowrap"
               >
                 {language === 'bn' ? 'সংরক্ষণ করে বের হন' : 'Save and close'}
               </Button>
