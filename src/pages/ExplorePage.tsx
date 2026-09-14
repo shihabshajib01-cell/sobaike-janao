@@ -6,7 +6,7 @@ import { BANGLADESH_DISTRICTS, DIVISIONS } from '../data/districts';
 import { SECTIONS, SectionKey } from '../theme/tokens';
 import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton, MapExploreSkeleton } from '../components/ui/LoadingSkeleton';
-import { MapSectionHeader, ExploreViewMode } from '../components/explore/MapSectionHeader';
+import type { ExploreViewMode } from '../components/explore/MapSectionHeader';
 import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
 import { DistrictRankingPanel } from '../components/explore/DistrictRankingPanel';
 import { RecentAreaReports } from '../components/explore/RecentAreaReports';
@@ -205,8 +205,8 @@ export const ExplorePage: React.FC = () => {
         </h1>
         <p className="text-[14px] md:text-[15px] leading-[1.5] text-ui-content-secondary">
           {language === 'bn'
-            ? 'এলাকা অনুযায়ী প্রতিবেদন ও হটস্পট দেখুন'
-            : 'Explore reports and hotspots by area'}
+            ? 'এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন ও বিশ্লেষণ দেখুন'
+            : 'Explore published reports and analysis by area'}
         </p>
       </div>
 
@@ -421,15 +421,30 @@ export const ExplorePage: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Dynamic Answer Block */}
-      <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl p-4 space-y-1 shadow-2xs">
-        <h3 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary">
-          {dynamicAnswerHeading}
-        </h3>
-        <p className="text-[13px] font-medium text-ui-content-secondary">
-          {countMessage}
-        </p>
-      </div>
+      {/* 3. Dynamic Answer & About Data */}
+      {!isLoading && !fetchError && (
+        <div className="space-y-4 md:space-y-6">
+          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl p-4 space-y-1 shadow-2xs">
+            <h3 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary">
+              {dynamicAnswerHeading}
+            </h3>
+            <p className="text-[13px] font-medium text-ui-content-secondary">
+              {countMessage}
+            </p>
+          </div>
+
+          <details className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 text-[13px] text-ui-content-secondary shadow-2xs">
+            <summary className="font-semibold text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+              {language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}
+            </summary>
+            <p className="mt-2 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
+              {language === 'bn'
+                ? 'এখানে সবাইকে জানাও-এ প্রকাশিত নাগরিক প্রতিবেদন বিশ্লেষণ করা হয়েছে। এটি সরকারি অপরাধ পরিসংখ্যান নয় এবং কোনো এলাকার সামগ্রিক নিরাপত্তা বা কোনো অভিযোগের আইনগত সত্যতা নির্ধারণ করে না।'
+                : 'This analysis is based on citizen reports published on Sobaike Janao. It is not official crime statistics and does not determine the overall safety of an area or the legal truth of an allegation.'}
+            </p>
+          </details>
+        </div>
+      )}
 
       {/* 4. Map | Reports Mode Switcher */}
       <div
@@ -629,18 +644,6 @@ export const ExplorePage: React.FC = () => {
           )}
         </>
       )}
-
-      {/* 6. About this data disclosure */}
-      <details className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 text-[13px] text-ui-content-secondary shadow-2xs mt-6">
-        <summary className="font-semibold text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
-          {language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}
-        </summary>
-        <p className="mt-2 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
-          {language === 'bn'
-            ? 'এখানে সবাইকে জানাও-এ প্রকাশিত নাগরিক প্রতিবেদন বিশ্লেষণ করা হয়েছে। এটি সরকারি অপরাধ পরিসংখ্যান নয় এবং কোনো এলাকার সামগ্রিক নিরাপত্তা বা কোনো অভিযোগের আইনগত সত্যতা নির্ধারণ করে না।'
-            : 'This analysis is based on citizen reports published on Sobaike Janao. It is not official crime statistics and does not determine the overall safety of an area or the legal truth of an allegation.'}
-        </p>
-      </details>
     </PublicPageContainer>
   );
 };

@@ -12,7 +12,6 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
   return (
     <div
       id="heatmap-legend"
-      aria-hidden="true"
       className={`bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl p-2.5 shadow-2xs flex flex-col gap-1.5 text-[12px] max-w-[200px] select-none ${className}`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -23,6 +22,7 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
 
       {/* Continuous Gradient Bar */}
       <div
+        aria-hidden="true"
         className="h-2.5 w-full rounded-full border border-ui-stroke-subtle/50"
         style={{
           background:
