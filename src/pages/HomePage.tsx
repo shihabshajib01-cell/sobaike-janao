@@ -70,19 +70,21 @@ export const HomePage: React.FC = () => {
       return matchesDistrict;
     });
 
-    if (feedFilter === 'all') {
-      const hasValidBrowseLocation =
-        browseLocationStatus === 'available' &&
-        browseLocation !== null &&
-        typeof browseLocation.latitude === 'number' &&
-        typeof browseLocation.longitude === 'number';
+    const hasValidBrowseLocation =
+      browseLocationStatus === 'available' &&
+      browseLocation !== null &&
+      typeof browseLocation.latitude === 'number' &&
+      typeof browseLocation.longitude === 'number';
 
-      if (hasValidBrowseLocation) {
-        const origin = {
+    const origin = hasValidBrowseLocation
+      ? {
           lat: browseLocation.latitude,
           lng: browseLocation.longitude,
-        };
+        }
+      : null;
 
+    if (feedFilter === 'all') {
+      if (origin) {
         const withCalculatedDistance: {
           report: ReportItem;
           originalIndex: number;
@@ -120,38 +122,121 @@ export const HomePage: React.FC = () => {
         list = [...groupA, ...groupB].map((item) => item.report);
       }
     } else if (feedFilter === 'latest') {
-      // Sort newest published date
-      list = [...list].sort((a, b) => {
-        if (a.publishedAt && b.publishedAt) {
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      // Primary: newest published date; Secondary tie-breaker: nearest location; Fallback: ID / stable index
+      const withDistance = list.map((report, originalIndex) => ({
+        report,
+        originalIndex,
+        distanceKm: origin && report.coordinates ? calculateDistanceKm(origin, report.coordinates) : null,
+      }));
+
+      withDistance.sort((a, b) => {
+        const repA = a.report;
+        const repB = b.report;
+
+        // Primary: publication date
+        if (repA.publishedAt && repB.publishedAt) {
+          const timeDiff = new Date(repB.publishedAt).getTime() - new Date(repA.publishedAt).getTime();
+          if (timeDiff !== 0) return timeDiff;
+        } else if (repA.publishedAt && !repB.publishedAt) {
+          return -1;
+        } else if (!repA.publishedAt && repB.publishedAt) {
+          return 1;
         }
-        const idA = parseInt(a.id, 10) || 0;
-        const idB = parseInt(b.id, 10) || 0;
-        return idB - idA;
+
+        // Secondary: location distance tie-breaker (only when both have valid distance and are tied)
+        if (a.distanceKm !== null && b.distanceKm !== null && a.distanceKm !== b.distanceKm) {
+          return a.distanceKm - b.distanceKm;
+        }
+
+        // Fallback: ID comparison
+        const idA = parseInt(repA.id, 10) || 0;
+        const idB = parseInt(repB.id, 10) || 0;
+        if (idB !== idA) return idB - idA;
+
+        // Final deterministic tie-breaker: originalIndex
+        return a.originalIndex - b.originalIndex;
       });
+
+      list = withDistance.map((item) => item.report);
     } else if (feedFilter === 'popular') {
-      // If popularity/response/view data exists, sort; otherwise keep clean order without inventing fake numbers
-      list = [...list].sort((a, b) => {
-        const relA = a.relatedReportIds?.length || 0;
-        const relB = b.relatedReportIds?.length || 0;
+      // Primary: related reports count; Secondary tie-breaker: nearest location; Fallback: published date / ID
+      const withDistance = list.map((report, originalIndex) => ({
+        report,
+        originalIndex,
+        distanceKm: origin && report.coordinates ? calculateDistanceKm(origin, report.coordinates) : null,
+      }));
+
+      withDistance.sort((a, b) => {
+        const repA = a.report;
+        const repB = b.report;
+
+        // Primary: popularity (related report IDs)
+        const relA = repA.relatedReportIds?.length || 0;
+        const relB = repB.relatedReportIds?.length || 0;
         if (relB !== relA) return relB - relA;
-        if (a.publishedAt && b.publishedAt) {
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+
+        // Secondary: location distance tie-breaker (when popularity ties and both have valid distance)
+        if (a.distanceKm !== null && b.distanceKm !== null && a.distanceKm !== b.distanceKm) {
+          return a.distanceKm - b.distanceKm;
         }
-        const idA = parseInt(a.id, 10) || 0;
-        const idB = parseInt(b.id, 10) || 0;
-        return idB - idA;
+
+        // Tertiary: publication date
+        if (repA.publishedAt && repB.publishedAt) {
+          const timeDiff = new Date(repB.publishedAt).getTime() - new Date(repA.publishedAt).getTime();
+          if (timeDiff !== 0) return timeDiff;
+        } else if (repA.publishedAt && !repB.publishedAt) {
+          return -1;
+        } else if (!repA.publishedAt && repB.publishedAt) {
+          return 1;
+        }
+
+        // Fallback: ID comparison
+        const idA = parseInt(repA.id, 10) || 0;
+        const idB = parseInt(repB.id, 10) || 0;
+        if (idB !== idA) return idB - idA;
+
+        // Final deterministic tie-breaker: originalIndex
+        return a.originalIndex - b.originalIndex;
       });
+
+      list = withDistance.map((item) => item.report);
     } else if (feedFilter === 'most_shared') {
-      // UI ready without fake mock metrics
-      list = [...list].sort((a, b) => {
-        if (a.publishedAt && b.publishedAt) {
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      // Primary: published date (no fake share count); Secondary tie-breaker: nearest location; Fallback: ID
+      const withDistance = list.map((report, originalIndex) => ({
+        report,
+        originalIndex,
+        distanceKm: origin && report.coordinates ? calculateDistanceKm(origin, report.coordinates) : null,
+      }));
+
+      withDistance.sort((a, b) => {
+        const repA = a.report;
+        const repB = b.report;
+
+        // Primary: publication date
+        if (repA.publishedAt && repB.publishedAt) {
+          const timeDiff = new Date(repB.publishedAt).getTime() - new Date(repA.publishedAt).getTime();
+          if (timeDiff !== 0) return timeDiff;
+        } else if (repA.publishedAt && !repB.publishedAt) {
+          return -1;
+        } else if (!repA.publishedAt && repB.publishedAt) {
+          return 1;
         }
-        const idA = parseInt(a.id, 10) || 0;
-        const idB = parseInt(b.id, 10) || 0;
-        return idB - idA;
+
+        // Secondary: location distance tie-breaker (when published dates tie and both have valid distance)
+        if (a.distanceKm !== null && b.distanceKm !== null && a.distanceKm !== b.distanceKm) {
+          return a.distanceKm - b.distanceKm;
+        }
+
+        // Fallback: ID comparison
+        const idA = parseInt(repA.id, 10) || 0;
+        const idB = parseInt(repB.id, 10) || 0;
+        if (idB !== idA) return idB - idA;
+
+        // Final deterministic tie-breaker: originalIndex
+        return a.originalIndex - b.originalIndex;
       });
+
+      list = withDistance.map((item) => item.report);
     }
 
     return list;
