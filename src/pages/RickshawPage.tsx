@@ -11,10 +11,11 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
+import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export const RickshawPage: React.FC = () => {
-  const { language, openReportComposer } = useApp();
+  const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
   const { getSegment } = useTaxonomy();
   const config = getSegment('rickshaw') || SECTIONS.rickshaw;
   const bannerContent = CANONICAL_BANNER_CONTENT.rickshaw;
@@ -25,11 +26,25 @@ export const RickshawPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  // Determine valid browse location (transient request scope only)
+  const hasValidBrowseLocation =
+    browseLocationStatus === 'available' &&
+    browseLocation !== null &&
+    typeof browseLocation.latitude === 'number' &&
+    typeof browseLocation.longitude === 'number' &&
+    VisitorSessionService.isLocationFresh(browseLocation);
+
+  const visitorLat = hasValidBrowseLocation ? browseLocation.latitude : null;
+  const visitorLng = hasValidBrowseLocation ? browseLocation.longitude : null;
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const data = await PublicReportService.getBySegment('rickshaw');
+      const data = await PublicReportService.getBySegment('rickshaw', {
+        visitorLat,
+        visitorLng,
+      });
       setReports(data);
     } catch (err) {
       console.warn('[RickshawPage load error]', err);
@@ -37,7 +52,7 @@ export const RickshawPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [visitorLat, visitorLng]);
 
   useEffect(() => {
     loadData();

@@ -12,10 +12,11 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
+import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export const UtilityPage: React.FC = () => {
-  const { language, openReportComposer } = useApp();
+  const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('load_shedding') || SECTIONS.load_shedding;
   const bannerContent = CANONICAL_BANNER_CONTENT.load_shedding;
@@ -29,11 +30,25 @@ export const UtilityPage: React.FC = () => {
 
   const subcategories = getFeedSubcategories('load_shedding');
 
+  // Determine valid browse location (transient request scope only)
+  const hasValidBrowseLocation =
+    browseLocationStatus === 'available' &&
+    browseLocation !== null &&
+    typeof browseLocation.latitude === 'number' &&
+    typeof browseLocation.longitude === 'number' &&
+    VisitorSessionService.isLocationFresh(browseLocation);
+
+  const visitorLat = hasValidBrowseLocation ? browseLocation.latitude : null;
+  const visitorLng = hasValidBrowseLocation ? browseLocation.longitude : null;
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const data = await PublicReportService.getBySegment('load_shedding');
+      const data = await PublicReportService.getBySegment('load_shedding', {
+        visitorLat,
+        visitorLng,
+      });
       setReports(data);
     } catch (err) {
       console.warn('[UtilityPage load error]', err);
@@ -41,7 +56,7 @@ export const UtilityPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [visitorLat, visitorLng]);
 
   useEffect(() => {
     loadData();
