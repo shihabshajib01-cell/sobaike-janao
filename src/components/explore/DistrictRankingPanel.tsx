@@ -361,11 +361,11 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <button
             type="button"
             onClick={() => onSelectDistrict('all')}
-            className="text-[12px] font-semibold text-ui-content-secondary hover:text-ui-content-primary flex items-center gap-1 cursor-pointer px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle hover:border-ui-stroke-default transition-colors min-h-[36px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="text-[12px] font-semibold text-ui-content-secondary hover:text-ui-content-primary inline-flex items-center gap-1.5 cursor-pointer px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             aria-label={parentGeographyButtonLabel}
           >
-            <span className="truncate max-w-[140px] sm:max-w-none">{parentGeographyButtonLabel}</span>
-            <MapIcon name="close" size="xs" />
+            <span className="truncate max-w-[160px] sm:max-w-none">{parentGeographyButtonLabel}</span>
+            <MapIcon name="close" size="xs" ariaHidden={true} />
           </button>
         )}
       </div>
