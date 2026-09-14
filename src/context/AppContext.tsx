@@ -38,6 +38,10 @@ export interface AppContextType {
   reportComposerInitialSegment: SectionKey | null;
   openReportComposer: (segment?: SectionKey | null) => void;
   closeReportComposer: () => void;
+  isLocationModalOpen: boolean;
+  openLocationConsent: (onSuccess?: () => void) => void;
+  closeLocationConsent: () => void;
+  locationSuccessCallback: (() => void) | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -53,6 +57,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Global Report Composer Modal State
   const [isReportComposerOpen, setIsReportComposerOpen] = useState<boolean>(false);
   const [reportComposerInitialSegment, setReportComposerInitialSegment] = useState<SectionKey | null>(null);
+
+  // Global Location Consent Modal State & Callback
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState<boolean>(false);
+  const [locationSuccessCallback, setLocationSuccessCallback] = useState<(() => void) | null>(null);
+
+  const openLocationConsent = useCallback((onSuccess?: () => void) => {
+    setLocationSuccessCallback(() => onSuccess || null);
+    setIsLocationModalOpen(true);
+  }, []);
+
+  const closeLocationConsent = useCallback(() => {
+    setIsLocationModalOpen(false);
+    setLocationSuccessCallback(null);
+  }, []);
 
   // Sync document language attribute with active state
   useEffect(() => {
@@ -148,6 +166,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportComposerInitialSegment,
       openReportComposer,
       closeReportComposer,
+      isLocationModalOpen,
+      openLocationConsent,
+      closeLocationConsent,
+      locationSuccessCallback,
     }),
     [
       currentRoute,
@@ -164,6 +186,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportComposerInitialSegment,
       openReportComposer,
       closeReportComposer,
+      isLocationModalOpen,
+      openLocationConsent,
+      closeLocationConsent,
+      locationSuccessCallback,
     ]
   );
 

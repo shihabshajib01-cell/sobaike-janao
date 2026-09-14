@@ -7,12 +7,14 @@ interface LocationConsentModalProps {
   isOpen: boolean;
   language: 'bn' | 'en';
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   isOpen,
   language,
   onClose,
+  onSuccess,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const shareLocationBtnRef = useRef<HTMLButtonElement>(null);
@@ -33,7 +35,10 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   const handleShareLocation = async () => {
     setIsLoading(true);
     try {
-      await VisitorSessionService.requestAndRecordLocation();
+      const res = await VisitorSessionService.requestAndRecordLocation();
+      if (res.success) {
+        onSuccess?.();
+      }
     } catch {
       // Handled internally in service
     } finally {

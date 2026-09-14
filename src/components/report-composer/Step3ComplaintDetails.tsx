@@ -19,6 +19,7 @@ import {
   Coins,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
+import { useApp } from '../../context/AppContext';
 import { DraftReport, ReportLocationData, MentionedParty, isMeaningfulMentionedParty } from '../../services/types';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import {
@@ -297,6 +298,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       };
     }, []);
 
+    const { openLocationConsent } = useApp();
+
     const handleRequestDeviceLocation = async () => {
       setReporterGateState('requesting');
       try {
@@ -317,6 +320,35 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       } catch {
         setReporterGateState('unavailable');
       }
+    };
+
+    const handleRetryLocationClick = () => {
+      openLocationConsent(async () => {
+        if (VisitorSessionService.hasValidCurrentReporterLocation()) {
+          setReporterGateState('verified');
+          setErrors((prev) => {
+            if (!prev.reporterLocation) return prev;
+            const updated = { ...prev };
+            delete updated.reporterLocation;
+            return updated;
+          });
+        } else {
+          const res = await VisitorSessionService.captureReporterDeviceLocation();
+          if (res.success && res.coords) {
+            setReporterGateState('verified');
+            setErrors((prev) => {
+              if (!prev.reporterLocation) return prev;
+              const updated = { ...prev };
+              delete updated.reporterLocation;
+              return updated;
+            });
+          } else if (res.errorType === 'denied') {
+            setReporterGateState('denied');
+          } else {
+            setReporterGateState('unavailable');
+          }
+        }
+      });
     };
 
     const isLocationLocked = reporterGateState !== 'verified';
@@ -1566,7 +1598,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div className="flex justify-start pt-0.5">
                   <button
                     type="button"
-                    onClick={handleRequestDeviceLocation}
+                    onClick={handleRetryLocationClick}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
@@ -1587,7 +1619,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div className="flex justify-start pt-0.5">
                   <button
                     type="button"
-                    onClick={handleRequestDeviceLocation}
+                    onClick={handleRetryLocationClick}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-warning-text hover:opacity-90 text-ui-surface text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
@@ -1624,7 +1656,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <div className="flex justify-start pt-0.5">
                   <button
                     type="button"
-                    onClick={handleRequestDeviceLocation}
+                    onClick={handleRetryLocationClick}
                     className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[13px] font-semibold transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
