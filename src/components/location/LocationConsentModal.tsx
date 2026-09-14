@@ -98,11 +98,18 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
     }
   };
 
+  const handleModalClose = () => {
+    if (!isReportMode && !VisitorSessionService.getLocationChoice()) {
+      VisitorSessionService.setLocationChoice('not_now');
+    }
+    onClose();
+  };
+
   return (
     <Modal
       id="location-consent-modal"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleModalClose}
       closeOnBackdrop={false}
       showHeader={false}
       maxWidth="md"
