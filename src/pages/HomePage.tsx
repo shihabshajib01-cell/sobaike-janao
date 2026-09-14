@@ -13,6 +13,7 @@ import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
+import { Button } from '../components/ui/Button';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
@@ -20,6 +21,9 @@ import { useApp } from '../context/AppContext';
 import { calculateDistanceKm } from '../utils/geoDistance';
 
 type FeedFilterType = 'all' | 'latest' | 'popular' | 'most_shared';
+
+const INITIAL_VISIBLE_REPORT_COUNT = 10;
+const LOAD_MORE_REPORT_COUNT = 10;
 
 export const HomePage: React.FC = () => {
   const { language, browseLocation, browseLocationStatus } = useApp();
@@ -30,6 +34,7 @@ export const HomePage: React.FC = () => {
 
   const [feedFilter, setFeedFilter] = useState<FeedFilterType>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_VISIBLE_REPORT_COUNT);
 
   const loadReports = useCallback(async () => {
     setIsLoading(true);
@@ -244,6 +249,22 @@ export const HomePage: React.FC = () => {
     );
   }, [allReports, selectedDistrict]);
 
+  // Reset visibleCount whenever filtering or ranking context changes
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE_REPORT_COUNT);
+  }, [feedFilter, selectedDistrict, browseLocation, browseLocationStatus]);
+
+  // Derive visible reports progressively from the complete ranked dataset
+  const visibleReports = useMemo(() => {
+    return filteredReports.slice(0, visibleCount);
+  }, [filteredReports, visibleCount]);
+
+  const hasMoreReports = visibleCount < filteredReports.length;
+
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_REPORT_COUNT, filteredReports.length));
+  }, [filteredReports.length]);
+
   return (
     <PublicPageContainer id="home-page-container">
       {/* Semantic Page Level H1 for Screen Readers and Landmark Hierarchy */}
@@ -341,11 +362,26 @@ export const HomePage: React.FC = () => {
         )}
 
         {/* Feed List of Report Cards */}
-        {!isLoading && !fetchError && filteredReports.length > 0 && (
+        {!isLoading && !fetchError && visibleReports.length > 0 && (
           <div className="space-y-3">
-            {filteredReports.map((report) => (
+            {visibleReports.map((report) => (
               <ReportCard key={report.id} report={report} />
             ))}
+
+            {/* Progressive Load More Action */}
+            {hasMoreReports && (
+              <div className="pt-2 flex justify-center">
+                <Button
+                  id="home-feed-load-more"
+                  variant="secondary"
+                  size="md"
+                  onClick={handleLoadMore}
+                  className="w-full sm:w-auto min-w-[200px]"
+                >
+                  {language === 'bn' ? 'আরও প্রতিবেদন দেখুন' : 'Load more reports'}
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
