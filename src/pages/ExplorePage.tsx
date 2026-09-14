@@ -350,10 +350,10 @@ export const ExplorePage: React.FC = () => {
           </p>
         </div>
 
-        {/* Desktop Controls (Search, Division, District) */}
-        <div className="hidden md:grid md:grid-cols-12 gap-2.5">
+        {/* Desktop / Tablet Controls (Search, Division, District) */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-12 gap-2.5">
           {/* Main Keyword Search */}
-          <div className="md:col-span-6 relative flex items-center">
+          <div className="md:col-span-2 lg:col-span-6 relative flex items-center">
             <MapIcon
               name="search"
               size="sm"
@@ -389,7 +389,7 @@ export const ExplorePage: React.FC = () => {
           </div>
 
           {/* Division Dropdown */}
-          <div className="md:col-span-3 relative flex items-center">
+          <div className="md:col-span-1 lg:col-span-3 relative flex items-center">
             <select
               value={selectedDivision}
               onChange={(e) => {
@@ -411,7 +411,7 @@ export const ExplorePage: React.FC = () => {
           </div>
 
           {/* District Dropdown */}
-          <div className="md:col-span-3 relative flex items-center">
+          <div className="md:col-span-1 lg:col-span-3 relative flex items-center">
             <MapIcon
               name="map-pin"
               size="sm"
