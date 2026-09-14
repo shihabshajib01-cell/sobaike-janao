@@ -17,7 +17,8 @@
 --      (public.complaint_submission_contexts.reporter_latitude / reporter_longitude)
 --      exposed, joined, or used as fallback.
 --   3. Coordinates are strictly NULL if:
---      - publication_preferences.showGeneralLocation is NOT true (or false)
+--      - publication_preferences.showGeneralLocation is NOT explicit boolean true
+--        (missing key, null value, false, or unparseable value fails closed to NULL)
 --      - Either latitude or longitude is NULL
 --      - Coordinates are exactly 0,0
 --      - Coordinates are outside standard bounds (lat: -90..90, lng: -180..180)
