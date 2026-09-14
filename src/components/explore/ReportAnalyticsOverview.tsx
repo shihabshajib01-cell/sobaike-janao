@@ -165,7 +165,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           id="metric-affected-districts"
           className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
         >
-          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary truncate">
+          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary leading-tight line-clamp-2">
             {language === 'bn' ? 'প্রতিবেদন থাকা জেলা' : 'Districts with reports'}
           </span>
           <span className="text-[16px] sm:text-[18px] font-bold text-ui-content-primary leading-tight">
@@ -178,7 +178,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           id="metric-affected-divisions"
           className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
         >
-          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary truncate">
+          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary leading-tight line-clamp-2">
             {language === 'bn' ? 'প্রতিবেদন থাকা বিভাগ' : 'Divisions with reports'}
           </span>
           <span className="text-[16px] sm:text-[18px] font-bold text-ui-content-primary leading-tight">
@@ -191,10 +191,10 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           id="metric-most-reported"
           className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
         >
-          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary truncate">
+          <span className="text-[11px] sm:text-[11.5px] font-medium text-ui-content-secondary leading-tight line-clamp-2">
             {language === 'bn' ? 'সর্বাধিক প্রতিবেদন' : 'Most reported'}
           </span>
-          <span className="text-[13.5px] sm:text-[14px] font-bold text-ui-content-primary leading-tight truncate">
+          <span className="text-[13px] sm:text-[14px] font-bold text-ui-content-primary leading-tight break-words line-clamp-2">
             {mostReportedLabel}
           </span>
         </div>
@@ -232,8 +232,8 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                 className="space-y-1"
               >
                 {/* Row Header: Icon + Category Name + Count & Percentage */}
-                <div className="flex items-center justify-between text-[12px] sm:text-[12.5px]">
-                  <div className="flex items-center gap-2 font-medium text-ui-content-primary min-w-0">
+                <div className="flex items-center justify-between text-[12px] sm:text-[12.5px] gap-2">
+                  <div className="flex items-center gap-2 font-medium text-ui-content-primary min-w-0 flex-1">
                     <CategoryIcon section={item.key} size="xs" />
                     <span className="truncate">{item.label}</span>
                   </div>

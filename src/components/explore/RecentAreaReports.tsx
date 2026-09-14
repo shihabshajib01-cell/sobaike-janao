@@ -81,8 +81,8 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-ui-stroke-subtle/80 flex items-center justify-between gap-2 text-[11.5px] sm:text-[12px]">
-                  <div className="flex items-center gap-2.5 text-ui-content-secondary min-w-0">
+                <div className="pt-2 border-t border-ui-stroke-subtle/80 flex flex-wrap sm:flex-nowrap items-center justify-between gap-x-2 gap-y-1 text-[11.5px] sm:text-[12px]">
+                  <div className="flex items-center gap-2 sm:gap-2.5 text-ui-content-secondary min-w-0 flex-wrap xs:flex-nowrap">
                     <span className="flex items-center gap-1 truncate max-w-[130px] sm:max-w-[170px]">
                       <MapIcon name="map-pin" size="sm" className="text-ui-content-secondary shrink-0" />
                       <span className="truncate">{location}</span>
@@ -96,7 +96,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                   <button
                     type="button"
                     onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                    className="group/btn shrink-0 text-[11.5px] sm:text-[12px] font-semibold text-ui-action-bg hover:underline flex items-center gap-0.5 min-h-[44px] cursor-pointer px-1 py-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                    className="group/btn shrink-0 ml-auto sm:ml-0 text-[11.5px] sm:text-[12px] font-semibold text-ui-action-bg hover:underline flex items-center gap-0.5 min-h-[44px] cursor-pointer px-1 py-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                   >
                     <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
                     <MapIcon name="arrow-right" size="sm" className="text-ui-action-bg transition-transform group-hover/btn:translate-x-0.5" />
