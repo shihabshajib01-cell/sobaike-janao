@@ -728,9 +728,9 @@ export const ExplorePage: React.FC = () => {
           <details className="group bg-ui-surface border border-ui-stroke-subtle rounded-xl px-3.5 sm:px-4 py-1 text-[13px] text-ui-content-secondary shadow-2xs">
             <summary className="font-medium text-[13px] text-ui-content-secondary hover:text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] flex items-center justify-between gap-2 list-none">
               <span>{language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}</span>
-              <div className="w-7 h-7 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-muted group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
+              <span className="w-7 h-7 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-muted group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
                 <MapIcon name="chevron-down" size="xs" ariaHidden={true} />
-              </div>
+              </span>
             </summary>
             <div className="pt-2 pb-3 border-t border-ui-stroke-subtle mt-1 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
               {language === 'bn'
