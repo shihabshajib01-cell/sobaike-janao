@@ -70,6 +70,7 @@ export const AppShell: React.FC = () => {
     closeReportComposer,
     navigateTo,
     isLocationModalOpen,
+    locationModalPurpose,
     openLocationConsent,
     closeLocationConsent,
     locationSuccessCallback,
@@ -89,7 +90,7 @@ export const AppShell: React.FC = () => {
       // Notice already accepted: proceed directly with location decision
       const choice = VisitorSessionService.getLocationChoice();
       if (!choice) {
-        openLocationConsent();
+        openLocationConsent('browse');
       } else {
         // If user previously granted consent, restore session & watch
         VisitorSessionService.initReturningVisitor();
@@ -108,7 +109,7 @@ export const AppShell: React.FC = () => {
     // After notice is accepted, trigger the location decision
     const choice = VisitorSessionService.getLocationChoice();
     if (!choice) {
-      openLocationConsent();
+      openLocationConsent('browse');
     } else {
       VisitorSessionService.initReturningVisitor();
     }
@@ -226,6 +227,7 @@ export const AppShell: React.FC = () => {
         <LocationConsentModal
           isOpen={isLocationModalOpen}
           language={language}
+          purpose={locationModalPurpose}
           onClose={closeLocationConsent}
           onSuccess={() => {
             locationSuccessCallback?.();

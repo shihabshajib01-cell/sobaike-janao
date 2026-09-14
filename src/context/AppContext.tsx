@@ -20,6 +20,13 @@ export type RoutePath =
 
 export type Language = 'bn' | 'en';
 
+export type LocationConsentPurpose = 'browse' | 'report';
+
+export interface LocationConsentOptions {
+  purpose?: LocationConsentPurpose;
+  onSuccess?: () => void | Promise<void> | any;
+}
+
 export interface AppContextType {
   currentRoute: RoutePath;
   currentReportId: string | null;
@@ -39,9 +46,13 @@ export interface AppContextType {
   openReportComposer: (segment?: SectionKey | null) => void;
   closeReportComposer: () => void;
   isLocationModalOpen: boolean;
-  openLocationConsent: (onSuccess?: () => void) => void;
+  locationModalPurpose: LocationConsentPurpose;
+  openLocationConsent: (
+    purposeOrOptions?: LocationConsentPurpose | LocationConsentOptions | (() => void | Promise<void> | any),
+    onSuccess?: () => void | Promise<void> | any
+  ) => void;
   closeLocationConsent: () => void;
-  locationSuccessCallback: (() => void) | null;
+  locationSuccessCallback: (() => void | Promise<void> | any) | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -60,10 +71,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Global Location Consent Modal State & Callback
   const [isLocationModalOpen, setIsLocationModalOpen] = useState<boolean>(false);
-  const [locationSuccessCallback, setLocationSuccessCallback] = useState<(() => void) | null>(null);
+  const [locationModalPurpose, setLocationModalPurpose] = useState<LocationConsentPurpose>('browse');
+  const [locationSuccessCallback, setLocationSuccessCallback] = useState<(() => void | Promise<void> | any) | null>(null);
 
-  const openLocationConsent = useCallback((onSuccess?: () => void) => {
-    setLocationSuccessCallback(() => onSuccess || null);
+  const openLocationConsent = useCallback((
+    purposeOrOptions?: LocationConsentPurpose | LocationConsentOptions | (() => void | Promise<void> | any),
+    onSuccess?: () => void | Promise<void> | any
+  ) => {
+    let targetPurpose: LocationConsentPurpose = 'browse';
+    let targetCallback: (() => void | Promise<void> | any) | null = null;
+
+    if (typeof purposeOrOptions === 'function') {
+      targetPurpose = 'report';
+      targetCallback = purposeOrOptions;
+    } else if (typeof purposeOrOptions === 'string') {
+      targetPurpose = purposeOrOptions;
+      targetCallback = onSuccess || null;
+    } else if (purposeOrOptions && typeof purposeOrOptions === 'object') {
+      targetPurpose = purposeOrOptions.purpose || 'browse';
+      targetCallback = purposeOrOptions.onSuccess || null;
+    }
+
+    setLocationModalPurpose(targetPurpose);
+    setLocationSuccessCallback(() => targetCallback);
     setIsLocationModalOpen(true);
   }, []);
 
@@ -167,6 +197,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       openReportComposer,
       closeReportComposer,
       isLocationModalOpen,
+      locationModalPurpose,
       openLocationConsent,
       closeLocationConsent,
       locationSuccessCallback,
@@ -187,6 +218,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       openReportComposer,
       closeReportComposer,
       isLocationModalOpen,
+      locationModalPurpose,
       openLocationConsent,
       closeLocationConsent,
       locationSuccessCallback,
@@ -207,4 +239,3 @@ export const useApp = (): AppContextType => {
   }
   return context;
 };
-
