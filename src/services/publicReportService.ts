@@ -75,10 +75,7 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
     statusBn: 'প্রকাশিত',
     statusEn: 'Published',
     isHighUrgency: Boolean(pv?.isHighUrgency),
-    coordinates:
-      seed.location?.lat && seed.location?.lng
-        ? { lat: seed.location.lat, lng: seed.location.lng }
-        : undefined,
+    coordinates: undefined,
     images: [],
     media: {
       type: 'none',
