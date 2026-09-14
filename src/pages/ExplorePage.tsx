@@ -125,7 +125,7 @@ export const ExplorePage: React.FC = () => {
   };
 
   const hasActiveFilters =
-    Boolean(searchQuery) ||
+    Boolean(searchQuery.trim()) ||
     selectedSection !== 'all' ||
     selectedDivision !== 'all' ||
     selectedDistrict !== 'all';
@@ -460,7 +460,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Division Chip */}
           {selectedDivision !== 'all' && activeDivisionName && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
               <span>{activeDivisionName}</span>
               <button
                 type="button"
@@ -473,7 +473,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeDivisionName} ফিল্টার সরান`
                     : `Remove ${activeDivisionName} filter`
                 }
-                className="w-5 h-5 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -482,7 +482,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* District Chip */}
           {selectedDistrict !== 'all' && activeDistrictName && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
               <span>{activeDistrictName}</span>
               <button
                 type="button"
@@ -492,7 +492,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeDistrictName} ফিল্টার সরান`
                     : `Remove ${activeDistrictName} filter`
                 }
-                className="w-5 h-5 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -501,7 +501,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Category Chip */}
           {selectedSection !== 'all' && activeCategoryName && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
               <CategoryIcon section={selectedSection as SectionKey} size="xs" />
               <span>{activeCategoryName}</span>
               <button
@@ -512,7 +512,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeCategoryName} ফিল্টার সরান`
                     : `Remove ${activeCategoryName} filter`
                 }
-                className="w-5 h-5 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -521,7 +521,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Search Query Chip */}
           {searchQuery.trim() && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary max-w-full">
               <span className="truncate max-w-[180px] sm:max-w-[240px]">
                 {language === 'bn'
                   ? `অনুসন্ধান: “${searchQuery.trim()}”`
@@ -535,7 +535,7 @@ export const ExplorePage: React.FC = () => {
                     ? 'অনুসন্ধান ফিল্টার সরান'
                     : 'Remove search filter'
                 }
-                className="w-5 h-5 shrink-0 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -546,7 +546,7 @@ export const ExplorePage: React.FC = () => {
           <button
             type="button"
             onClick={handleResetFilters}
-            className="text-[13px] font-semibold text-ui-accent hover:underline cursor-pointer px-2 py-1 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg ml-auto sm:ml-1"
+            className="min-h-[44px] px-3 py-2 inline-flex items-center text-[13px] font-semibold text-ui-accent hover:underline cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg ml-auto sm:ml-1"
           >
             {language === 'bn' ? 'সব মুছুন' : 'Clear all'}
           </button>
