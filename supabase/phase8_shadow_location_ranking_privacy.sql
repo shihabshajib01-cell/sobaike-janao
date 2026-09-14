@@ -1,45 +1,35 @@
 -- =============================================================================
 -- MIGRATION: Phase 8 — Shadow Location Ranking + Public Coordinate Privacy Hardening
--- File: supabase/phase8_shadow_location_ranking_privacy.sql
+-- LIVE-SYNCED: 2026-09-14
 --
--- Purpose:
---   1. Implements public.get_public_home_feed(p_visitor_lat, p_visitor_lng, p_filter, p_district)
---      which performs location-aware ranking entirely in the shadow on the backend.
---   2. Updates public.get_public_published_reports() and public.get_public_published_report(text)
---      to completely remove 'latitude' and 'longitude' keys from public outputs.
---   3. Updates public.record_public_visit_session to never persist browse coordinates.
---   4. Cleanses historical browse session coordinates from public.public_visit_sessions.
---
--- Privacy & Security Guarantees:
---   - Zero incident coordinates (lat/lng), zero visitor coordinates, zero distance in public RPC outputs.
---   - Strict fail-closed coordinate eligibility: uses complaints.latitude/longitude for shadow
---     ranking ONLY when publication_preferences->'showGeneralLocation' is exact JSON boolean true.
---   - Never accesses private complaint_submission_contexts (reporter GPS) for public feeds.
---   - Preserves Phase 5 'all', Phase 6 'latest', 'popular', 'most_shared' ordering semantics.
---   - Hardened SECURITY DEFINER with fixed search_path = pg_catalog, public.
---   - All calculations performed inline without exposing public distance helpers.
+-- This file matches the migration successfully applied to production project
+-- ahiaymyqfmyyrjkwgvhi as migration: phase8_shadow_location_privacy_final
 -- =============================================================================
 
 BEGIN;
 
--- -----------------------------------------------------------------------------
--- Step 0: Ensure any previously created Haversine helper is not publicly callable
--- -----------------------------------------------------------------------------
+-- Revoke any public access to previously-created Haversine helpers, regardless of overload.
 DO $$
+DECLARE
+  r record;
 BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_proc p
-    JOIN pg_namespace n ON p.pronamespace = n.oid
-    WHERE n.nspname = 'public' AND p.proname = 'calculate_haversine_km'
-  ) THEN
-    REVOKE ALL ON FUNCTION public.calculate_haversine_km(double precision, double precision, double precision, double precision) FROM PUBLIC;
-    REVOKE ALL ON FUNCTION public.calculate_haversine_km(double precision, double precision, double precision, double precision) FROM anon;
-    REVOKE ALL ON FUNCTION public.calculate_haversine_km(double precision, double precision, double precision, double precision) FROM authenticated;
-  END IF;
+  FOR r IN
+    SELECT p.oid::regprocedure AS fn
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname = 'calculate_haversine_km'
+  LOOP
+    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC', r.fn);
+    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM anon', r.fn);
+    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM authenticated', r.fn);
+  END LOOP;
 END $$;
 
 -- -----------------------------------------------------------------------------
--- Step 1: Dedicated Shadow-Ranking Home Feed RPC
+-- Shadow-ranked Home feed. Visitor coordinates are transient inputs only.
+-- Incident coordinates are used internally only when showGeneralLocation is
+-- exact JSON boolean true. No coordinate/distance fields are returned.
 -- -----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.get_public_home_feed(
   p_visitor_lat double precision DEFAULT NULL,
@@ -59,16 +49,17 @@ DECLARE
   v_clean_filter text;
   v_clean_district text;
 BEGIN
-  -- 1. Validate visitor location parameters (fail-closed, valid non-zero finite coordinates)
-  IF p_visitor_lat IS NOT NULL AND p_visitor_lng IS NOT NULL THEN
-    IF p_visitor_lat >= -90.0 AND p_visitor_lat <= 90.0 AND
-       p_visitor_lng >= -180.0 AND p_visitor_lng <= 180.0 AND
-       NOT (p_visitor_lat = 0.0 AND p_visitor_lng = 0.0) THEN
-      v_has_visitor_loc := true;
-    END IF;
+  IF p_visitor_lat IS NOT NULL AND p_visitor_lng IS NOT NULL
+     AND p_visitor_lat >= -90.0 AND p_visitor_lat <= 90.0
+     AND p_visitor_lng >= -180.0 AND p_visitor_lng <= 180.0
+     AND NOT (p_visitor_lat = 0.0 AND p_visitor_lng = 0.0) THEN
+    v_has_visitor_loc := true;
   END IF;
 
   v_clean_filter := lower(trim(coalesce(p_filter, 'all')));
+  IF v_clean_filter NOT IN ('all', 'latest', 'popular', 'most_shared') THEN
+    v_clean_filter := 'all';
+  END IF;
   v_clean_district := lower(trim(coalesce(p_district, 'all')));
 
   WITH base_complaints AS (
@@ -91,44 +82,32 @@ BEGIN
       c.previous_bill_amount,
       party.name AS party_name,
       party.organization AS party_org,
-      -- Internal distance in km for shadow ranking only (NEVER returned to client).
-      -- Strict fail-closed rule: only when showGeneralLocation is explicit 'true'::jsonb.
       CASE
-        WHEN v_has_visitor_loc AND
-             (c.publication_preferences->'showGeneralLocation') = 'true'::jsonb AND
-             c.latitude IS NOT NULL AND c.longitude IS NOT NULL AND
-             NOT (c.latitude = 0.0 AND c.longitude = 0.0) AND
-             c.latitude >= -90.0 AND c.latitude <= 90.0 AND
-             c.longitude >= -180.0 AND c.longitude <= 180.0
-        THEN (
-          6371.0 * 2.0 * atan2(
-            sqrt(
-              sin(radians(c.latitude - p_visitor_lat) / 2.0) * sin(radians(c.latitude - p_visitor_lat) / 2.0) +
-              cos(radians(p_visitor_lat)) * cos(radians(c.latitude)) *
-              sin(radians(c.longitude - p_visitor_lng) / 2.0) * sin(radians(c.longitude - p_visitor_lng) / 2.0)
-            ),
-            sqrt(
-              greatest(0.0, 1.0 - (
-                sin(radians(c.latitude - p_visitor_lat) / 2.0) * sin(radians(c.latitude - p_visitor_lat) / 2.0) +
-                cos(radians(p_visitor_lat)) * cos(radians(c.latitude)) *
-                sin(radians(c.longitude - p_visitor_lng) / 2.0) * sin(radians(c.longitude - p_visitor_lng) / 2.0)
-              ))
-            )
-          )
+        WHEN v_has_visitor_loc
+             AND (c.publication_preferences->'showGeneralLocation') = 'true'::jsonb
+             AND c.latitude IS NOT NULL AND c.longitude IS NOT NULL
+             AND NOT (c.latitude = 0.0 AND c.longitude = 0.0)
+             AND c.latitude >= -90.0 AND c.latitude <= 90.0
+             AND c.longitude >= -180.0 AND c.longitude <= 180.0
+        THEN 6371.0 * 2.0 * atan2(
+          sqrt(
+            sin(radians(c.latitude - p_visitor_lat) / 2.0) * sin(radians(c.latitude - p_visitor_lat) / 2.0)
+            + cos(radians(p_visitor_lat)) * cos(radians(c.latitude))
+            * sin(radians(c.longitude - p_visitor_lng) / 2.0) * sin(radians(c.longitude - p_visitor_lng) / 2.0)
+          ),
+          sqrt(greatest(0.0, 1.0 - (
+            sin(radians(c.latitude - p_visitor_lat) / 2.0) * sin(radians(c.latitude - p_visitor_lat) / 2.0)
+            + cos(radians(p_visitor_lat)) * cos(radians(c.latitude))
+            * sin(radians(c.longitude - p_visitor_lng) / 2.0) * sin(radians(c.longitude - p_visitor_lng) / 2.0)
+          )))
         )
         ELSE NULL
       END AS internal_distance_km
     FROM public.complaints c
     LEFT JOIN LATERAL (
       SELECT
-        CASE
-          WHEN count(*) = 1 THEN max(nullif(trim(cp.name), ''))
-          ELSE NULL
-        END AS name,
-        CASE
-          WHEN count(*) = 1 THEN max(nullif(trim(cp.organization), ''))
-          ELSE NULL
-        END AS organization
+        CASE WHEN count(*) = 1 THEN max(nullif(trim(cp.name), '')) ELSE NULL END AS name,
+        CASE WHEN count(*) = 1 THEN max(nullif(trim(cp.organization), '')) ELSE NULL END AS organization
       FROM public.complaint_parties cp
       WHERE cp.complaint_id = c.id
         AND (
@@ -178,43 +157,18 @@ BEGIN
         'previous_bill_amount', bc.previous_bill_amount
       )
       ORDER BY
-        -- Phase 5 & 6 Ranking Logic:
-        -- CASE A: ALL Filter
-        -- When visitor location available:
-        -- 1. Reports with eligible incident coordinates come first (internal_distance_km ASC NULLS LAST)
-        -- 2. Reports without eligible incident coordinates, preserving created_at DESC
-        -- When visitor location unavailable: created_at DESC
-        CASE WHEN v_clean_filter = 'all' AND v_has_visitor_loc THEN
-          bc.internal_distance_km
-        END ASC NULLS LAST,
-
-        -- CASE B: LATEST Filter (Primary: created_at; Secondary tie-breaker: distance; Fallback: id)
+        CASE WHEN v_clean_filter = 'all' AND v_has_visitor_loc THEN bc.internal_distance_km END ASC NULLS LAST,
         CASE WHEN v_clean_filter = 'latest' THEN bc.created_at END DESC NULLS LAST,
-        CASE WHEN v_clean_filter = 'latest' AND v_has_visitor_loc THEN
-          bc.internal_distance_km
-        END ASC NULLS LAST,
-
-        -- CASE C: POPULAR Filter
-        -- In the absence of an external popularity count, all reports have an equal score;
-        -- distance breaks the genuine tie when visitor location is available, then created_at DESC
-        CASE WHEN v_clean_filter = 'popular' AND v_has_visitor_loc THEN
-          bc.internal_distance_km
-        END ASC NULLS LAST,
+        CASE WHEN v_clean_filter = 'latest' AND v_has_visitor_loc THEN bc.internal_distance_km END ASC NULLS LAST,
+        CASE WHEN v_clean_filter = 'popular' AND v_has_visitor_loc THEN bc.internal_distance_km END ASC NULLS LAST,
         CASE WHEN v_clean_filter = 'popular' THEN bc.created_at END DESC NULLS LAST,
-
-        -- CASE D: MOST SHARED Filter (Primary: created_at; Secondary tie-breaker: distance; Fallback: id)
         CASE WHEN v_clean_filter = 'most_shared' THEN bc.created_at END DESC NULLS LAST,
-        CASE WHEN v_clean_filter = 'most_shared' AND v_has_visitor_loc THEN
-          bc.internal_distance_km
-        END ASC NULLS LAST,
-
-        -- Default Base Fallback Order (Deterministic ID & creation date)
+        CASE WHEN v_clean_filter = 'most_shared' AND v_has_visitor_loc THEN bc.internal_distance_km END ASC NULLS LAST,
         bc.created_at DESC,
         bc.id DESC
     ),
     '[]'::jsonb
-  )
-  INTO v_result
+  ) INTO v_result
   FROM base_complaints bc;
 
   RETURN v_result;
@@ -222,7 +176,7 @@ END;
 $$;
 
 -- -----------------------------------------------------------------------------
--- Step 2: Update get_public_published_reports (Strip Raw Coordinates from Public List)
+-- Coordinate-free public list RPC.
 -- -----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.get_public_published_reports()
 RETURNS jsonb
@@ -262,23 +216,15 @@ BEGIN
         'recent_bill_amount', c.recent_bill_amount,
         'previous_bill_month', c.previous_bill_month,
         'previous_bill_amount', c.previous_bill_amount
-      )
-      ORDER BY c.created_at DESC, c.id DESC
+      ) ORDER BY c.created_at DESC, c.id DESC
     ),
     '[]'::jsonb
-  )
-  INTO v_result
+  ) INTO v_result
   FROM public.complaints c
   LEFT JOIN LATERAL (
     SELECT
-      CASE
-        WHEN count(*) = 1 THEN max(nullif(trim(cp.name), ''))
-        ELSE NULL
-      END AS name,
-      CASE
-        WHEN count(*) = 1 THEN max(nullif(trim(cp.organization), ''))
-        ELSE NULL
-      END AS organization
+      CASE WHEN count(*) = 1 THEN max(nullif(trim(cp.name), '')) ELSE NULL END AS name,
+      CASE WHEN count(*) = 1 THEN max(nullif(trim(cp.organization), '')) ELSE NULL END AS organization
     FROM public.complaint_parties cp
     WHERE cp.complaint_id = c.id
       AND (
@@ -293,17 +239,14 @@ BEGIN
       )
   ) party ON true
   WHERE c.status = 'published';
-
   RETURN v_result;
 END;
 $$;
 
 -- -----------------------------------------------------------------------------
--- Step 3: Update get_public_published_report (Detail RPC - Strip Raw Coordinates)
+-- Coordinate-free public detail RPC.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.get_public_published_report(
-  p_report_id text
-)
+CREATE OR REPLACE FUNCTION public.get_public_published_report(p_report_id text)
 RETURNS jsonb
 LANGUAGE plpgsql
 STABLE
@@ -315,9 +258,7 @@ DECLARE
   v_clean_id text;
 BEGIN
   v_clean_id := upper(trim(coalesce(p_report_id, '')));
-  IF v_clean_id = '' THEN
-    RETURN NULL;
-  END IF;
+  IF v_clean_id = '' THEN RETURN NULL; END IF;
 
   SELECT jsonb_build_object(
     'id', c.id,
@@ -345,19 +286,12 @@ BEGIN
     'recent_bill_amount', c.recent_bill_amount,
     'previous_bill_month', c.previous_bill_month,
     'previous_bill_amount', c.previous_bill_amount
-  )
-  INTO v_result
+  ) INTO v_result
   FROM public.complaints c
   LEFT JOIN LATERAL (
     SELECT
-      CASE
-        WHEN count(*) = 1 THEN max(nullif(trim(cp.name), ''))
-        ELSE NULL
-      END AS name,
-      CASE
-        WHEN count(*) = 1 THEN max(nullif(trim(cp.organization), ''))
-        ELSE NULL
-      END AS organization
+      CASE WHEN count(*) = 1 THEN max(nullif(trim(cp.name), '')) ELSE NULL END AS name,
+      CASE WHEN count(*) = 1 THEN max(nullif(trim(cp.organization), '')) ELSE NULL END AS organization
     FROM public.complaint_parties cp
     WHERE cp.complaint_id = c.id
       AND (
@@ -379,15 +313,25 @@ END;
 $$;
 
 -- -----------------------------------------------------------------------------
--- Step 4: Update record_public_visit_session (Zero Browse Coordinates Persisted)
+-- Browse-session RPC compatibility note:
+-- The existing live function uses NUMERIC coordinate parameters and RETURNS JSONB.
+-- Keep that identity exactly so CREATE OR REPLACE truly replaces the function
+-- instead of creating a second overload that PostgREST could resolve ambiguously.
 -- -----------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS public.record_public_visit_session(
+  text, text, text,
+  double precision, double precision, double precision,
+  text, text, text, text, text, text, text,
+  integer, integer, text
+);
+
 CREATE OR REPLACE FUNCTION public.record_public_visit_session(
   p_visitor_id text,
   p_session_id text,
   p_permission_status text,
-  p_latitude double precision DEFAULT NULL,
-  p_longitude double precision DEFAULT NULL,
-  p_accuracy_meters double precision DEFAULT NULL,
+  p_latitude numeric DEFAULT NULL,
+  p_longitude numeric DEFAULT NULL,
+  p_accuracy_meters numeric DEFAULT NULL,
   p_browser_name text DEFAULT NULL,
   p_browser_version text DEFAULT NULL,
   p_os_name text DEFAULT NULL,
@@ -399,89 +343,97 @@ CREATE OR REPLACE FUNCTION public.record_public_visit_session(
   p_screen_height integer DEFAULT NULL,
   p_user_agent text DEFAULT NULL
 )
-RETURNS void
+RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = pg_catalog, public
+SET search_path = pg_catalog, public, pg_temp
 AS $$
+DECLARE
+  v_visitor_id text;
+  v_session_id text;
+  v_permission text;
+  v_existing_visitor_id text;
 BEGIN
-  -- Strict privacy enforcement: p_latitude, p_longitude, and p_accuracy_meters
-  -- are NEVER stored in public_visit_sessions for browse sessions.
-  BEGIN
-    INSERT INTO public.public_visit_sessions (
-      visitor_id,
-      session_id,
-      permission_status,
-      latitude,
-      longitude,
-      accuracy_meters,
-      browser_name,
-      browser_version,
-      os_name,
-      device_category,
-      platform,
-      language,
-      timezone,
-      screen_width,
-      screen_height,
-      user_agent
-    )
-    VALUES (
-      p_visitor_id,
-      p_session_id,
-      p_permission_status,
-      NULL,
-      NULL,
-      NULL,
-      p_browser_name,
-      p_browser_version,
-      p_os_name,
-      p_device_category,
-      p_platform,
-      p_language,
-      p_timezone,
-      p_screen_width,
-      p_screen_height,
-      p_user_agent
-    );
-  EXCEPTION
-    WHEN unique_violation THEN
-      UPDATE public.public_visit_sessions
-      SET
-        visitor_id = p_visitor_id,
-        permission_status = p_permission_status,
-        latitude = NULL,
-        longitude = NULL,
-        accuracy_meters = NULL,
-        browser_name = coalesce(p_browser_name, browser_name),
-        browser_version = coalesce(p_browser_version, browser_version),
-        os_name = coalesce(p_os_name, os_name),
-        device_category = coalesce(p_device_category, device_category),
-        platform = coalesce(p_platform, platform),
-        language = coalesce(p_language, language),
-        timezone = coalesce(p_timezone, timezone),
-        screen_width = coalesce(p_screen_width, screen_width),
-        screen_height = coalesce(p_screen_height, screen_height),
-        user_agent = coalesce(p_user_agent, user_agent)
-      WHERE session_id = p_session_id;
-  END;
+  v_visitor_id := trim(coalesce(p_visitor_id, ''));
+  v_session_id := trim(coalesce(p_session_id, ''));
+  v_permission := lower(trim(coalesce(p_permission_status, 'prompt')));
+
+  IF v_visitor_id = '' THEN RAISE EXCEPTION 'VALIDATION_FAILED: visitor_id is required.'; END IF;
+  IF length(v_visitor_id) > 128 THEN RAISE EXCEPTION 'VALIDATION_FAILED: visitor_id is too long.'; END IF;
+  IF v_session_id = '' THEN RAISE EXCEPTION 'VALIDATION_FAILED: session_id is required.'; END IF;
+  IF length(v_session_id) > 128 THEN RAISE EXCEPTION 'VALIDATION_FAILED: session_id is too long.'; END IF;
+  IF v_permission NOT IN ('prompt','granted','denied','unavailable') THEN
+    RAISE EXCEPTION 'VALIDATION_FAILED: Invalid permission status.';
+  END IF;
+
+  SELECT visitor_id INTO v_existing_visitor_id
+  FROM public.public_visit_sessions
+  WHERE session_id = v_session_id
+  FOR UPDATE;
+
+  IF FOUND AND v_existing_visitor_id <> v_visitor_id THEN
+    RAISE EXCEPTION 'SESSION_CONFLICT: Session belongs to another visitor.';
+  END IF;
+
+  INSERT INTO public.public_visit_sessions (
+    visitor_id, session_id, permission_status,
+    latitude, longitude, accuracy_meters,
+    browser_name, browser_version, os_name, device_category, platform,
+    language, timezone, screen_width, screen_height, user_agent,
+    consented_at, first_seen_at, last_seen_at, location_updated_at, created_at
+  ) VALUES (
+    v_visitor_id, v_session_id, v_permission,
+    NULL, NULL, NULL,
+    NULLIF(trim(p_browser_name), ''), NULLIF(trim(p_browser_version), ''),
+    NULLIF(trim(p_os_name), ''), NULLIF(trim(p_device_category), ''), NULLIF(trim(p_platform), ''),
+    NULLIF(trim(p_language), ''), NULLIF(trim(p_timezone), ''),
+    p_screen_width, p_screen_height, NULLIF(left(trim(p_user_agent), 1000), ''),
+    CASE WHEN v_permission = 'granted' THEN now() ELSE NULL END,
+    now(), now(), NULL, now()
+  )
+  ON CONFLICT (session_id) DO UPDATE SET
+    permission_status = EXCLUDED.permission_status,
+    latitude = NULL,
+    longitude = NULL,
+    accuracy_meters = NULL,
+    browser_name = EXCLUDED.browser_name,
+    browser_version = EXCLUDED.browser_version,
+    os_name = EXCLUDED.os_name,
+    device_category = EXCLUDED.device_category,
+    platform = EXCLUDED.platform,
+    language = EXCLUDED.language,
+    timezone = EXCLUDED.timezone,
+    screen_width = EXCLUDED.screen_width,
+    screen_height = EXCLUDED.screen_height,
+    user_agent = EXCLUDED.user_agent,
+    consented_at = CASE
+      WHEN EXCLUDED.permission_status = 'granted'
+      THEN COALESCE(public.public_visit_sessions.consented_at, now())
+      ELSE public.public_visit_sessions.consented_at
+    END,
+    last_seen_at = now(),
+    location_updated_at = NULL;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'sessionId', v_session_id,
+    'permissionStatus', v_permission
+  );
 END;
 $$;
 
--- -----------------------------------------------------------------------------
--- Step 5: Historical Browse Coordinate Data Cleansing
--- -----------------------------------------------------------------------------
+-- Clear all historical browse-session coordinates. Preserve session rows and safe metadata.
 UPDATE public.public_visit_sessions
 SET latitude = NULL,
     longitude = NULL,
-    accuracy_meters = NULL
+    accuracy_meters = NULL,
+    location_updated_at = NULL
 WHERE latitude IS NOT NULL
    OR longitude IS NOT NULL
-   OR accuracy_meters IS NOT NULL;
+   OR accuracy_meters IS NOT NULL
+   OR location_updated_at IS NOT NULL;
 
--- -----------------------------------------------------------------------------
--- Step 6: Revoke and Grant Permissions
--- -----------------------------------------------------------------------------
+-- Explicit function privileges.
 REVOKE ALL ON FUNCTION public.get_public_home_feed(double precision, double precision, text, text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.get_public_home_feed(double precision, double precision, text, text) TO anon, authenticated, service_role;
 
@@ -491,55 +443,32 @@ GRANT EXECUTE ON FUNCTION public.get_public_published_reports() TO anon, authent
 REVOKE ALL ON FUNCTION public.get_public_published_report(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.get_public_published_report(text) TO anon, authenticated, service_role;
 
-REVOKE ALL ON FUNCTION public.record_public_visit_session(text, text, text, double precision, double precision, double precision, text, text, text, text, text, text, text, integer, integer, text) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.record_public_visit_session(text, text, text, double precision, double precision, double precision, text, text, text, text, text, text, text, integer, integer, text) TO anon, authenticated, service_role;
+REVOKE ALL ON FUNCTION public.record_public_visit_session(
+  text, text, text,
+  numeric, numeric, numeric,
+  text, text, text, text, text, text, text,
+  integer, integer, text
+) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.record_public_visit_session(
+  text, text, text,
+  numeric, numeric, numeric,
+  text, text, text, text, text, text, text,
+  integer, integer, text
+) TO anon, authenticated, service_role;
 
 COMMIT;
 
 -- =============================================================================
--- VERIFICATION QUERIES (Run these to verify live behavior after migration)
+-- Minimal verification queries
 -- =============================================================================
 
--- Query 1: Verify get_public_home_feed returns NO coordinate keys
--- Expected: has_latitude = false, has_longitude = false, has_distance = false
+-- No public coordinate/distance keys should appear in any public response.
 SELECT
-  jsonb_path_exists(feed_item, '$.latitude') AS has_latitude,
-  jsonb_path_exists(feed_item, '$.longitude') AS has_longitude,
-  jsonb_path_exists(feed_item, '$.distance') AS has_distance,
-  feed_item->>'id' AS report_id,
-  feed_item->>'district' AS district,
-  feed_item->>'publishedAt' AS published_at
-FROM (
-  SELECT jsonb_array_elements(public.get_public_home_feed(23.8103, 90.4125, 'all', 'all')) AS feed_item
-  LIMIT 5
-) q;
+  lower(public.get_public_published_reports()::text) ~ '"(latitude|longitude|lat|lng|coordinates|distance|distance_km|distance_m|proximity|visitor_lat|visitor_lng|reporter_lat|reporter_lng)"\\s*:'
+  AS list_has_sensitive_key;
 
--- Query 2: Verify get_public_published_reports returns NO coordinate keys
--- Expected: has_latitude = false, has_longitude = false
-SELECT
-  jsonb_path_exists(rep_item, '$.latitude') AS has_latitude,
-  jsonb_path_exists(rep_item, '$.longitude') AS has_longitude,
-  rep_item->>'id' AS report_id
-FROM (
-  SELECT jsonb_array_elements(public.get_public_published_reports()) AS rep_item
-  LIMIT 5
-) q;
-
--- Query 3: Verify get_public_published_report returns NO coordinate keys
--- Expected: has_latitude = false, has_longitude = false
-SELECT
-  jsonb_path_exists(detail_item, '$.latitude') AS has_latitude,
-  jsonb_path_exists(detail_item, '$.longitude') AS has_longitude,
-  detail_item->>'id' AS report_id
-FROM (
-  SELECT public.get_public_published_report((SELECT id FROM public.complaints WHERE status = 'published' LIMIT 1)) AS detail_item
-) q;
-
--- Query 4: Verify public_visit_sessions coordinate fields are completely null
--- Expected: sessions_with_lat = 0, sessions_with_lng = 0, sessions_with_acc = 0
-SELECT
-  count(*) AS total_sessions,
-  count(latitude) AS sessions_with_lat,
-  count(longitude) AS sessions_with_lng,
-  count(accuracy_meters) AS sessions_with_acc
-FROM public.public_visit_sessions;
+SELECT count(*) AS sessions_with_location
+FROM public.public_visit_sessions
+WHERE latitude IS NOT NULL
+   OR longitude IS NOT NULL
+   OR accuracy_meters IS NOT NULL;
