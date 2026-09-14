@@ -1,7 +1,6 @@
 import React from 'react';
 import { ReportItem } from '../../types/report';
 import { SectionKey } from '../../theme/tokens';
-import { BANGLADESH_DISTRICTS } from '../../data/districts';
 import { useApp } from '../../context/AppContext';
 import { toBanglaDigits } from '../../utils/formatters';
 import { CategoryBadge } from '../ui/CategoryBadge';
@@ -17,35 +16,10 @@ interface RecentAreaReportsProps {
 
 export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
   reports,
-  selectedDistrict,
   language,
   onViewAllReports,
 }) => {
   const { navigateTo } = useApp();
-
-  const getDistrictNameDisplay = () => {
-    if (selectedDistrict === 'all') {
-      return language === 'bn' ? 'সারাদেশ' : 'All Regions';
-    }
-    const match = reports.find(
-      (r) =>
-        (r.districtEn || '').toLowerCase() === selectedDistrict.toLowerCase() ||
-        r.districtBn === selectedDistrict
-    );
-    if (match) {
-      return language === 'bn' ? match.districtBn : match.districtEn;
-    }
-    const distObj = BANGLADESH_DISTRICTS.find(
-      (d) =>
-        d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
-        d.nameBn === selectedDistrict ||
-        d.id === selectedDistrict.toLowerCase()
-    );
-    if (distObj) {
-      return language === 'bn' ? distObj.nameBn : distObj.nameEn;
-    }
-    return selectedDistrict;
-  };
 
   const previewReports = reports.slice(0, 4);
 
@@ -55,11 +29,8 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ui-stroke-subtle pb-2.5">
         <div className="flex items-center gap-2">
           <h3 className="text-[17px] md:text-[18px] font-bold text-ui-content-primary tracking-tight">
-            {language === 'bn' ? 'এলাকার সাম্প্রতিক প্রতিবেদন' : 'Recent area reports'}
+            {language === 'bn' ? 'সাম্প্রতিক প্রতিবেদন' : 'Recent reports'}
           </h3>
-          <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary">
-            {getDistrictNameDisplay()}
-          </span>
         </div>
 
         {reports.length > 4 && onViewAllReports && (

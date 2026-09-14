@@ -63,8 +63,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     });
   }, [reports]);
 
-  // 2. Aggregate reports by district for fallback & top district insight
-  const { districtCounts, topDistrict, totalMappedInDistricts } = useMemo(() => {
+  // 2. Aggregate reports by district for fallback & district counts
+  const { districtCounts, totalMappedInDistricts } = useMemo(() => {
     const map = new Map<string, { district: DistrictInfo; count: number }>();
     let mappedInDist = 0;
 
@@ -91,7 +91,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
     return {
       districtCounts: list,
-      topDistrict: list.length > 0 ? list[0].district : null,
       totalMappedInDistricts: mappedInDist,
     };
   }, [reports]);
@@ -386,12 +385,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           )
         : null;
 
-    const topDistrictName = topDistrict
-      ? language === 'bn'
-        ? topDistrict.nameBn
-        : topDistrict.nameEn
-      : null;
-
     if (selectedDistrictObj) {
       if (language === 'bn') {
         return `${selectedDistrictObj.nameBn} জেলা: ${toBanglaDigits(totalReportsCount)}টি প্রতিবেদনের মধ্যে ${toBanglaDigits(mappedCount)}টি মানচিত্রে দেখানো হয়েছে।`;
@@ -415,7 +408,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     } else {
       return `${mappedCount} of ${totalReportsCount} reports are mapped.`;
     }
-  }, [totalReportsCount, mappedCount, topDistrict, isDistrictFallback, selectedDistrict, language]);
+  }, [totalReportsCount, mappedCount, isDistrictFallback, selectedDistrict, language]);
 
   // Keep Leaflet properly sized when container dimensions change
   useEffect(() => {

@@ -284,7 +284,9 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         status: 'empty' as const,
         topCategories: [],
         maxCount: 0,
-        label: language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No published reports',
+        heading: language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No published reports',
+        label: '',
+        countText: '',
       };
     }
 
@@ -294,37 +296,41 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         status: 'empty' as const,
         topCategories: [],
         maxCount: 0,
-        label: language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No published reports',
+        heading: language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No published reports',
+        label: '',
+        countText: '',
       };
     }
 
     const topCats = categories.filter((c) => c.count === maxCount);
 
     if (topCats.length === 1) {
+      const isSingleReport = activeReportCount === 1;
       return {
         status: 'single' as const,
         topCategories: topCats,
         maxCount,
+        heading: isSingleReport
+          ? (language === 'bn' ? 'প্রতিবেদন পাওয়া বিষয়' : 'Reported topic')
+          : (language === 'bn' ? 'সর্বাধিক প্রতিবেদন পাওয়া বিষয়' : 'Most reported topic'),
         label: topCats[0].label,
+        countText: language === 'bn' ? toBanglaDigits(maxCount) : String(maxCount),
       };
     }
+
+    // Multiple categories tied for highest count
+    const countDisplay = language === 'bn' ? toBanglaDigits(maxCount) : String(maxCount);
+    const countText = language === 'bn' ? `প্রতিটিতে ${countDisplay}` : `${countDisplay} each`;
 
     return {
       status: 'tie' as const,
       topCategories: topCats,
       maxCount,
-      label:
-        language === 'bn'
-          ? `${topCats.map((c) => c.label).join(', ')}`
-          : `${topCats.map((c) => c.label).join(', ')}`,
+      heading: language === 'bn' ? 'সর্বাধিক প্রতিবেদন পাওয়া বিষয়সমূহ' : 'Top reported topics',
+      label: topCats.map((c) => c.label).join(', '),
+      countText,
     };
   }, [categories, activeReportCount, language]);
-
-  // Max category count for proportion bars
-  const maxCategoryCount = useMemo(() => {
-    const counts = categories.map((c) => c.count);
-    return Math.max(...counts, 1);
-  }, [categories]);
 
   const renderDistrictItem = (item: RankedDistrict, index: number) => {
     const rankDisplay = formatRankNumber(index + 1, language);
@@ -449,40 +455,45 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       </div>
 
       {/* 2. Total Published Reports & 3. Most Reported Topic */}
-      <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3 md:p-3.5 space-y-2.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <div>
-            <span className="text-[11px] md:text-[12px] font-medium text-ui-content-muted block">
-              {language === 'bn' ? 'মোট প্রকাশিত প্রতিবেদন' : 'Total published reports'}
-            </span>
-            <span className="text-[22px] md:text-[26px] font-bold text-ui-content-primary font-mono leading-tight mt-0.5 block">
-              {language === 'bn' ? toBanglaDigits(activeReportCount) : activeReportCount}
-            </span>
-          </div>
+      <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-3 md:p-3.5 space-y-3 sm:space-y-0 sm:flex sm:items-start sm:justify-between sm:gap-3">
+        <div className="shrink-0">
+          <span className="text-[11px] md:text-[12px] font-medium text-ui-content-muted block">
+            {language === 'bn' ? 'মোট প্রকাশিত প্রতিবেদন' : 'Total published reports'}
+          </span>
+          <span className="text-[22px] md:text-[26px] font-bold text-ui-content-primary font-mono leading-tight mt-0.5 block">
+            {language === 'bn' ? toBanglaDigits(activeReportCount) : activeReportCount}
+          </span>
+        </div>
 
-          {mostReportedTopicAnalysis.status !== 'empty' && (
-            <div className="text-right min-w-0 max-w-[55%]">
-              <span className="text-[11px] md:text-[12px] font-medium text-ui-content-muted block truncate">
-                {activeReportCount === 1
-                  ? (language === 'bn' ? 'প্রতিবেদন পাওয়া বিষয়' : 'Reported topic')
-                  : (language === 'bn' ? 'সর্বাধিক প্রতিবেদন পাওয়া বিষয়' : 'Most reported topic')}
-              </span>
-              <div className="flex items-center justify-end gap-1.5 mt-0.5">
-                {mostReportedTopicAnalysis.status === 'single' && mostReportedTopicAnalysis.topCategories[0] && (
+        {mostReportedTopicAnalysis.status !== 'empty' && (
+          <div className="sm:text-right min-w-0 sm:max-w-[65%]">
+            <span className="text-[11px] md:text-[12px] font-medium text-ui-content-muted block">
+              {mostReportedTopicAnalysis.heading}
+            </span>
+            <div className="flex items-start sm:justify-end gap-1.5 mt-1 flex-wrap">
+              {mostReportedTopicAnalysis.status === 'single' && mostReportedTopicAnalysis.topCategories[0] && (
+                <span className="shrink-0 mt-0.5">
                   <CategoryIcon section={mostReportedTopicAnalysis.topCategories[0].key} size="xs" />
-                )}
-                <span className="text-[13px] md:text-[14px] font-bold text-ui-content-primary truncate block">
-                  {mostReportedTopicAnalysis.label}
-                  {mostReportedTopicAnalysis.status === 'tie' && (
-                    <span className="font-mono ml-1 font-normal text-ui-content-muted text-[12px]">
-                      ({language === 'bn' ? toBanglaDigits(mostReportedTopicAnalysis.maxCount) : mostReportedTopicAnalysis.maxCount})
-                    </span>
-                  )}
                 </span>
+              )}
+              {mostReportedTopicAnalysis.status === 'tie' && (
+                <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                  {mostReportedTopicAnalysis.topCategories.map((tc) => (
+                    <CategoryIcon key={tc.key} section={tc.key} size="xs" />
+                  ))}
+                </div>
+              )}
+              <div className="text-[13px] md:text-[14px] font-bold text-ui-content-primary break-words whitespace-normal leading-snug">
+                <span>{mostReportedTopicAnalysis.label}</span>
+                {mostReportedTopicAnalysis.status === 'tie' && (
+                  <span className="font-mono ml-1.5 font-normal text-ui-content-muted text-[12px] whitespace-nowrap">
+                    ({mostReportedTopicAnalysis.countText})
+                  </span>
+                )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* 4. Topic Distribution */}
@@ -495,34 +506,22 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         </div>
 
         <div className="space-y-1.5">
-          {categories.map((cat) => {
-            const sharePercent = activeReportCount > 0 ? (cat.count / maxCategoryCount) * 100 : 0;
-            return (
-              <div
-                key={cat.key}
-                className="relative overflow-hidden flex items-center justify-between px-3 py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] md:text-[13.5px]"
-              >
-                {/* Subtle relative share indicator bar */}
-                {cat.count > 0 && (
-                  <div
-                    className="absolute inset-y-0 left-0 bg-ui-accent/5 pointer-events-none transition-all duration-300"
-                    style={{ width: `${Math.min(Math.max(sharePercent, 4), 100)}%` }}
-                    aria-hidden="true"
-                  />
-                )}
-
-                <div className="relative z-10 flex items-center gap-2 min-w-0">
-                  <CategoryIcon section={cat.key} size="xs" />
-                  <span className="font-medium text-ui-content-primary truncate">
-                    {cat.label}
-                  </span>
-                </div>
-                <span className="relative z-10 font-bold text-ui-content-primary font-mono text-[13px] md:text-[14px] shrink-0 ml-2">
-                  {language === 'bn' ? toBanglaDigits(cat.count) : cat.count}
+          {categories.map((cat) => (
+            <div
+              key={cat.key}
+              className="flex items-center justify-between px-3 py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] md:text-[13.5px]"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <CategoryIcon section={cat.key} size="xs" />
+                <span className="font-medium text-ui-content-primary truncate">
+                  {cat.label}
                 </span>
               </div>
-            );
-          })}
+              <span className="font-bold text-ui-content-primary font-mono text-[13px] md:text-[14px] shrink-0 ml-2">
+                {language === 'bn' ? toBanglaDigits(cat.count) : cat.count}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
