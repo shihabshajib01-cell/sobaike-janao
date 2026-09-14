@@ -881,16 +881,16 @@ export const ExplorePage: React.FC = () => {
                 {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
                 {selectedDistrict !== 'all' && (
                   <div className="block md:hidden w-full">
-                    <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 shadow-2xs flex items-center justify-between gap-3">
+                    <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3.5 sm:p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
                           <MapIcon name="map-pin" size="md" ariaHidden={true} />
                         </div>
-                        <div className="min-w-0">
-                          <h3 className="text-[15px] font-bold text-ui-content-primary truncate">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-[15px] font-bold text-ui-content-primary whitespace-normal break-words line-clamp-2 leading-snug">
                             {activeDistrictName || selectedDistrict}
                           </h3>
-                          <p className="text-[13px] text-ui-content-secondary truncate">
+                          <p className="text-[13px] text-ui-content-secondary whitespace-normal break-words leading-tight mt-0.5">
                             {language === 'bn'
                               ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
                               : `${filteredReports.length} published reports`}
@@ -908,7 +908,7 @@ export const ExplorePage: React.FC = () => {
                             ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
                             : `View details for ${activeDistrictName || selectedDistrict}`
                         }
-                        className="btn-primary-action px-3.5 py-2 rounded-xl text-[13px] font-semibold min-h-[44px] flex items-center gap-1.5 shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-2xs"
+                        className="btn-primary-action px-3.5 py-2.5 rounded-xl text-[13px] font-semibold min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-2xs"
                       >
                         <span>{language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}</span>
                         <MapIcon name="arrow-right" size="xs" ariaHidden={true} />
