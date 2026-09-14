@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Loader2, AlertCircle } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
+import { useApp } from '../../context/AppContext';
 import { Modal } from '../ui/Modal';
 
 interface LocationConsentModalProps {
@@ -18,6 +19,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { retryBrowseLocation } = useApp();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const shareLocationBtnRef = useRef<HTMLButtonElement>(null);
@@ -65,11 +67,25 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           setErrorMessage(msg);
         }
       } else {
-        const res = await VisitorSessionService.requestAndRecordLocation();
+        const res = await retryBrowseLocation();
         if (res.success) {
           onSuccess?.();
+          onClose();
+        } else {
+          let msg = isBn
+            ? 'লোকেশন বর্তমানে পাওয়া যাচ্ছে না। আবার চেষ্টা করুন।'
+            : 'Location is currently unavailable. Please try again.';
+          if (res.errorType === 'denied' || res.status === 'denied') {
+            msg = isBn
+              ? 'লোকেশন অনুমতি বন্ধ আছে। ব্রাউজার বা সাইট সেটিংস থেকে অনুমতি চালু করে আবার চেষ্টা করুন।'
+              : 'Location permission is blocked. Enable it in your browser or site settings, then try again.';
+          } else if (res.errorType === 'timeout') {
+            msg = isBn
+              ? 'সময়ের মধ্যে লোকেশন পাওয়া যায়নি। আবার চেষ্টা করুন।'
+              : 'Location could not be retrieved in time. Please try again.';
+          }
+          setErrorMessage(msg);
         }
-        onClose();
       }
     } catch {
       if (isReportMode) {
@@ -79,7 +95,11 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             : 'Location could not be retrieved. Please enable GPS and try again.'
         );
       } else {
-        onClose();
+        setErrorMessage(
+          isBn
+            ? 'লোকেশন বর্তমানে পাওয়া যাচ্ছে না। আবার চেষ্টা করুন।'
+            : 'Location is currently unavailable. Please try again.'
+        );
       }
     } finally {
       setIsLoading(false);
@@ -127,7 +147,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             <h2 id="location-consent-title" className="text-lg font-bold tracking-tight">
               {isReportMode
                 ? (isBn ? 'প্রতিবেদন জমা দিতে লোকেশন চালু করুন' : 'Turn on location to submit report')
-                : (isBn ? 'কাছাকাছি প্রতিবেদন দেখুন' : 'See reports near you')}
+                : (isBn ? 'আপনার লোকেশন ব্যবহার করুন' : 'Use your location')}
             </h2>
           </div>
         </div>
@@ -140,8 +160,8 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
                   ? 'প্রতিবেদন জমা দিতে আপনার ডিভাইসের লোকেশন প্রয়োজন। লোকেশন চালু করে আবার চেষ্টা করুন।'
                   : 'Your device location is required to submit a report. Turn on location and try again.')
               : (isBn
-                  ? 'লোকেশন চালু করলে কাছাকাছি এলাকার আরও প্রতিবেদন দেখতে পারবেন।'
-                  : 'Turn on location to show more reports from nearby areas.')}
+                  ? 'আপনার ব্রাউজিং অভিজ্ঞতা উন্নত করতে লোকেশন ব্যবহারের অনুমতি দিন।'
+                  : 'Allow location access to improve your browsing experience.')}
           </p>
 
           {errorMessage && (

@@ -49,8 +49,8 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
           </div>
           <p className="text-[13.5px] sm:text-[14px] font-medium leading-snug text-ui-content-secondary">
             {isBn
-              ? 'কাছাকাছি এলাকার প্রতিবেদন আগে দেখতে লোকেশন চালু করুন।'
-              : 'Turn on location to see nearby reports first.'}
+              ? 'আপনার ব্রাউজিং অভিজ্ঞতা ব্যক্তিগতকরণ করতে লোকেশন চালু করুন।'
+              : 'Turn on location to personalize your browsing experience.'}
           </p>
         </div>
 

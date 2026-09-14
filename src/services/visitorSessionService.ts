@@ -12,7 +12,7 @@ const SESSION_ID_KEY = 'sobaike_session_id_v1';
 const LOCATION_CHOICE_KEY = 'sobaike_location_choice_v1';
 export const BROWSE_LOCATION_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes max age for in-memory browse location
 
-export type LocationChoice = 'granted' | 'not_now' | 'denied';
+export type LocationChoice = 'granted' | 'not_now';
 
 export type PermissionStatus =
   | 'granted'
@@ -252,14 +252,14 @@ export const VisitorSessionService = {
   },
 
   /**
-   * Get saved location choice ('granted' | 'not_now' | 'denied' | null)
+   * Get saved location choice ('granted' | 'not_now' | null)
    */
   getLocationChoice(): LocationChoice | null {
     if (typeof window === 'undefined') return null;
     try {
       const val = localStorage.getItem(LOCATION_CHOICE_KEY);
-      if (val === 'granted' || val === 'not_now' || val === 'denied') {
-        return val;
+      if (val === 'granted' || val === 'not_now') {
+        return val as LocationChoice;
       }
       return null;
     } catch {
@@ -351,11 +351,8 @@ export const VisitorSessionService = {
   /**
    * Handles user clicking "Share Location" on the consent modal
    */
-  async requestAndRecordLocation(purpose: 'browse' | 'report' = 'browse'): Promise<LocationRequestResult> {
+  async requestAndRecordLocation(_purpose: 'browse' | 'report' = 'browse'): Promise<LocationRequestResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      if (purpose === 'browse') {
-        this.setLocationChoice('denied');
-      }
       await this.recordSession('unavailable');
       return { success: false, status: 'unavailable', errorType: 'unavailable' };
     }
@@ -385,7 +382,6 @@ export const VisitorSessionService = {
           if (error.code === error.PERMISSION_DENIED) {
             status = 'denied';
             errorType = 'denied';
-            this.setLocationChoice('denied');
             this.clearMemoryLocation();
           } else if (error.code === error.TIMEOUT) {
             status = 'unavailable';
@@ -429,7 +425,6 @@ export const VisitorSessionService = {
 
     const perm = await this.queryPermissionStatus();
     if (perm === 'denied') {
-      this.setLocationChoice('denied');
       this.clearMemoryLocation();
       await this.recordSession('denied');
       return;
@@ -455,7 +450,6 @@ export const VisitorSessionService = {
             const status: PermissionStatus =
               err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
             if (status === 'denied') {
-              this.setLocationChoice('denied');
               this.clearMemoryLocation();
             }
             await this.recordSession(status);
@@ -626,7 +620,6 @@ export const VisitorSessionService = {
           const newState = status.state as PermissionStatus;
           if (newState === 'denied') {
             this.clearMemoryLocation();
-            this.setLocationChoice('denied');
           }
           onChange(newState);
         };
