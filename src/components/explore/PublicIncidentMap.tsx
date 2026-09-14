@@ -42,17 +42,19 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
   const [isMapReady, setIsMapReady] = useState(false);
 
+  const isInitialMount = useRef(true);
+
   // 1. Filter reports with real incident coordinates
   const reportsWithRealCoords = useMemo(() => {
     return reports.filter((r) => {
-      if (!r.coordinates) return false;
-      const lat = r.coordinates.lat;
-      const lng = r.coordinates.lng;
+      if (!r || !r.coordinates) return false;
+      const lat = Number(r.coordinates.lat);
+      const lng = Number(r.coordinates.lng);
       return (
-        typeof lat === 'number' &&
-        typeof lng === 'number' &&
         !isNaN(lat) &&
         !isNaN(lng) &&
+        isFinite(lat) &&
+        isFinite(lng) &&
         lat >= 20.0 &&
         lat <= 27.5 &&
         lng >= 88.0 &&
@@ -75,7 +77,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           d.nameBn === dBn ||
           d.id === dEn
       );
-      if (found) {
+      if (found && !isNaN(Number(found.lat)) && !isNaN(Number(found.lng))) {
         mappedInDist += 1;
         if (!map.has(found.id)) {
           map.set(found.id, { district: found, count: 0 });
@@ -109,24 +111,31 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const { heatPoints, maxHeatWeight } = useMemo(() => {
     if (hasRealCoords) {
       // Case 1: Build heat layer ONLY from real incident coordinates (base weight = 1)
-      // DO NOT mix district centers into this layer
-      const pts: Array<[number, number, number]> = reportsWithRealCoords.map((r) => [
-        r.coordinates!.lat,
-        r.coordinates!.lng,
-        1,
-      ]);
+      const pts: Array<[number, number, number]> = [];
+      for (const r of reportsWithRealCoords) {
+        const lat = Number(r.coordinates?.lat);
+        const lng = Number(r.coordinates?.lng);
+        if (!isNaN(lat) && !isNaN(lng) && isFinite(lat) && isFinite(lng)) {
+          pts.push([lat, lng, 1]);
+        }
+      }
       const maxVal = Math.max(2, Math.min(8, Math.ceil(reportsWithRealCoords.length / 5)));
       return { heatPoints: pts, maxHeatWeight: maxVal };
     }
 
     if (isDistrictFallback) {
       // Case 2: District-level fallback heatmap (ONE point per district, weighted by count)
-      // NO jitter, NO fake per-report markers
-      const pts: Array<[number, number, number]> = districtCounts.map((dc) => [
-        dc.district.lat,
-        dc.district.lng,
-        dc.count,
-      ]);
+      const pts: Array<[number, number, number]> = [];
+      for (const dc of districtCounts) {
+        if (dc.district) {
+          const lat = Number(dc.district.lat);
+          const lng = Number(dc.district.lng);
+          const count = Number(dc.count) || 1;
+          if (!isNaN(lat) && !isNaN(lng) && isFinite(lat) && isFinite(lng)) {
+            pts.push([lat, lng, count]);
+          }
+        }
+      }
       const maxVal = districtCounts.length > 0 ? Math.max(...districtCounts.map((dc) => dc.count)) : 1;
       return { heatPoints: pts, maxHeatWeight: Math.max(maxVal, 2) };
     }
@@ -174,7 +183,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
     return () => {
       if (heatLayerRef.current && mapInstanceRef.current) {
-        mapInstanceRef.current.removeLayer(heatLayerRef.current);
+        try {
+          mapInstanceRef.current.removeLayer(heatLayerRef.current);
+        } catch {}
         heatLayerRef.current = null;
       }
       map.remove();
@@ -191,17 +202,30 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
     // Clean up existing heat layer
     if (heatLayerRef.current) {
-      map.removeLayer(heatLayerRef.current);
+      try {
+        map.removeLayer(heatLayerRef.current);
+      } catch {}
       heatLayerRef.current = null;
     }
 
-    if (heatPoints.length > 0) {
+    const safePoints = heatPoints.filter(
+      (p) =>
+        Array.isArray(p) &&
+        typeof p[0] === 'number' &&
+        typeof p[1] === 'number' &&
+        !isNaN(p[0]) &&
+        !isNaN(p[1]) &&
+        isFinite(p[0]) &&
+        isFinite(p[1])
+    );
+
+    if (safePoints.length > 0 && typeof (L as any).heatLayer === 'function') {
       try {
-        const heatLayer = (L as any).heatLayer(heatPoints, {
+        const heatLayer = (L as any).heatLayer(safePoints, {
           radius: hasRealCoords ? 24 : 32,
           blur: hasRealCoords ? 15 : 22,
           maxZoom: 14,
-          max: maxHeatWeight,
+          max: maxHeatWeight || 2,
           minOpacity: 0.4,
           gradient: {
             0.2: '#2563EB',
@@ -224,11 +248,33 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   useEffect(() => {
     if (!mapInstanceRef.current || !isMapReady) return;
 
+    const map = mapInstanceRef.current;
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (selectedDistrict === 'all') {
+        return; // Already cleanly centered at BANGLADESH_CENTER, zoom 7
+      }
+    }
+
     if (selectedDistrict === 'all') {
-      mapInstanceRef.current.flyToBounds(BANGLADESH_BOUNDS, {
-        padding: [24, 24],
-        duration: 0.8,
-      });
+      try {
+        const size = map.getSize();
+        if (!size || size.x <= 50 || size.y <= 50) {
+          map.invalidateSize();
+          map.setView(BANGLADESH_CENTER, 7);
+        } else {
+          map.flyToBounds(BANGLADESH_BOUNDS, {
+            padding: [24, 24],
+            duration: 0.8,
+          });
+        }
+      } catch (err) {
+        console.warn('[PublicIncidentMap] flyToBounds error:', err);
+        try {
+          map.setView(BANGLADESH_CENTER, 7);
+        } catch {}
+      }
     } else {
       const found = BANGLADESH_DISTRICTS.find(
         (d) =>
@@ -236,29 +282,67 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           d.nameBn === selectedDistrict ||
           d.id === selectedDistrict.toLowerCase()
       );
-      if (found) {
-        mapInstanceRef.current.flyTo([found.lat, found.lng], 10, {
-          duration: 0.9,
-        });
+      if (
+        found &&
+        typeof found.lat === 'number' &&
+        typeof found.lng === 'number' &&
+        !isNaN(found.lat) &&
+        !isNaN(found.lng) &&
+        isFinite(found.lat) &&
+        isFinite(found.lng)
+      ) {
+        try {
+          const size = map.getSize();
+          if (!size || size.x <= 50 || size.y <= 50) {
+            map.invalidateSize();
+          }
+          map.flyTo([found.lat, found.lng], 10, {
+            duration: 0.9,
+          });
+        } catch (err) {
+          console.warn('[PublicIncidentMap] flyTo error:', err);
+          try {
+            map.setView([found.lat, found.lng], 10);
+          } catch {}
+        }
       }
     }
   }, [selectedDistrict, isMapReady]);
 
   // Map Controls
   const handleZoomIn = () => {
-    if (mapInstanceRef.current) mapInstanceRef.current.zoomIn();
+    if (mapInstanceRef.current) {
+      try {
+        mapInstanceRef.current.zoomIn();
+      } catch {}
+    }
   };
 
   const handleZoomOut = () => {
-    if (mapInstanceRef.current) mapInstanceRef.current.zoomOut();
+    if (mapInstanceRef.current) {
+      try {
+        mapInstanceRef.current.zoomOut();
+      } catch {}
+    }
   };
 
   const handleResetView = () => {
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyToBounds(BANGLADESH_BOUNDS, {
-        padding: [24, 24],
-        duration: 0.8,
-      });
+      try {
+        const map = mapInstanceRef.current;
+        const size = map.getSize();
+        if (!size || size.x <= 50 || size.y <= 50) {
+          map.invalidateSize();
+          map.setView(BANGLADESH_CENTER, 7);
+        } else {
+          map.flyToBounds(BANGLADESH_BOUNDS, {
+            padding: [24, 24],
+            duration: 0.8,
+          });
+        }
+      } catch {
+        mapInstanceRef.current?.setView(BANGLADESH_CENTER, 7);
+      }
     }
     onSelectDistrict('all');
   };
