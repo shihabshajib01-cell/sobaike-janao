@@ -780,21 +780,12 @@ export const ExplorePage: React.FC = () => {
                         : 'These published reports are included in the analysis above.'}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center shrink-0">
                     <span className="text-[13px] font-bold text-ui-content-primary font-mono bg-ui-surface-subtle border border-ui-stroke-subtle px-2.5 py-1 rounded-lg">
                       {language === 'bn'
                         ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
                         : `${filteredReports.length} published reports`}
                     </span>
-                    {hasActiveFilters && (
-                      <button
-                        type="button"
-                        onClick={handleResetFilters}
-                        className="text-[12px] font-semibold text-ui-content-secondary hover:text-ui-content-primary underline cursor-pointer px-2 py-1 min-h-[36px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
-                      >
-                        {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
-                      </button>
-                    )}
                   </div>
                 </div>
 
