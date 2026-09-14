@@ -101,10 +101,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     />
                   </div>
 
-                  <h4
-                    onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                    className="text-[15px] font-bold text-ui-content-primary transition-colors line-clamp-2 leading-snug cursor-pointer hover:text-ui-accent"
-                  >
+                  <h4 className="text-[15px] font-bold text-ui-content-primary line-clamp-2 leading-snug">
                     {title}
                   </h4>
 

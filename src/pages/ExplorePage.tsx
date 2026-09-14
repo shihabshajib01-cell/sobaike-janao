@@ -722,7 +722,7 @@ export const ExplorePage: React.FC = () => {
           </div>
 
           <details className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-4 text-[13px] text-ui-content-secondary shadow-2xs">
-            <summary className="font-semibold text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+            <summary className="font-semibold text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] flex items-center">
               {language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}
             </summary>
             <p className="mt-2 text-[12px] sm:text-[13px] text-ui-content-muted leading-relaxed">
@@ -1062,10 +1062,11 @@ export const ExplorePage: React.FC = () => {
         <div className="space-y-4 py-1">
           {/* Division */}
           <div className="space-y-1.5">
-            <label className="text-[13px] font-bold text-ui-content-primary block">
+            <label htmlFor="mobile-filter-division" className="text-[13px] font-bold text-ui-content-primary block">
               {language === 'bn' ? 'বিভাগ' : 'Division'}
             </label>
             <select
+              id="mobile-filter-division"
               value={draftDivision}
               onChange={(e) => handleDraftDivisionChange(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
@@ -1083,10 +1084,11 @@ export const ExplorePage: React.FC = () => {
 
           {/* District */}
           <div className="space-y-1.5">
-            <label className="text-[13px] font-bold text-ui-content-primary block">
+            <label htmlFor="mobile-filter-district" className="text-[13px] font-bold text-ui-content-primary block">
               {language === 'bn' ? 'জেলা' : 'District'}
             </label>
             <select
+              id="mobile-filter-district"
               value={draftDistrict}
               onChange={(e) => setDraftDistrict(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
@@ -1105,10 +1107,10 @@ export const ExplorePage: React.FC = () => {
           </div>
 
           {/* Topic / Category */}
-          <div className="space-y-2">
-            <label className="text-[13px] font-bold text-ui-content-primary block">
+          <fieldset className="space-y-2 border-0 p-0 m-0">
+            <legend className="text-[13px] font-bold text-ui-content-primary block p-0 mb-1">
               {language === 'bn' ? 'বিষয়' : 'Topic'}
-            </label>
+            </legend>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -1187,7 +1189,7 @@ export const ExplorePage: React.FC = () => {
                 </span>
               </button>
             </div>
-          </div>
+          </fieldset>
         </div>
       </Modal>
 

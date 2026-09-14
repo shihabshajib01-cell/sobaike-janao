@@ -161,26 +161,26 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
             </span>
           </div>
 
-          {/* Affected Districts */}
+          {/* Districts with reports */}
           <div
             id="metric-affected-districts"
             className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-3.5 sm:p-4 flex flex-col justify-between min-h-[82px] sm:min-h-[92px]"
           >
             <span className="text-[12px] sm:text-[13px] font-medium text-ui-content-muted">
-              {language === 'bn' ? 'প্রভাবিত জেলা' : 'Affected districts'}
+              {language === 'bn' ? 'প্রতিবেদন থাকা জেলা' : 'Districts with reports'}
             </span>
             <span className="text-[22px] sm:text-[24px] font-bold text-ui-content-primary leading-tight">
               {language === 'bn' ? toBanglaDigits(districtCount) : districtCount}
             </span>
           </div>
 
-          {/* Affected Divisions */}
+          {/* Divisions with reports */}
           <div
             id="metric-affected-divisions"
             className="ui-radius-card ui-border-default ui-elevation-card bg-ui-surface border-ui-stroke-subtle p-3.5 sm:p-4 flex flex-col justify-between min-h-[82px] sm:min-h-[92px]"
           >
             <span className="text-[12px] sm:text-[13px] font-medium text-ui-content-muted">
-              {language === 'bn' ? 'প্রভাবিত বিভাগ' : 'Affected divisions'}
+              {language === 'bn' ? 'প্রতিবেদন থাকা বিভাগ' : 'Divisions with reports'}
             </span>
             <span className="text-[22px] sm:text-[24px] font-bold text-ui-content-primary leading-tight">
               {language === 'bn' ? toBanglaDigits(divisionCount) : divisionCount}
