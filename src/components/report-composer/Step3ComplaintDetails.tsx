@@ -1423,7 +1423,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 htmlFor="complaint-desc-input"
                 className="block text-[14px] font-bold text-ui-content-primary"
               >
-                {language === 'bn' ? 'কী ঘটেছিল? *' : 'What happened? *'}
+                <span>{language === 'bn' ? 'কী ঘটেছিল?' : 'What happened?'}</span>
+                <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
               </label>
               <textarea
                 id="complaint-desc-input"
@@ -1472,7 +1473,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 >
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                    <span>{language === 'bn' ? 'ঘটনার তারিখ *' : 'Incident date *'}</span>
+                    <span>{language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}</span>
+                    <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
                   </div>
                 </label>
                 <input
@@ -1980,7 +1982,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           htmlFor="reporter-admin-contact"
                           className="block text-[13px] font-semibold text-ui-content-primary mb-1"
                         >
-                          {language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone number or email *'}
+                          <span>{language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল' : 'Phone number or email'}</span>
+                          <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
                         </label>
                         <input
                           id="reporter-admin-contact"

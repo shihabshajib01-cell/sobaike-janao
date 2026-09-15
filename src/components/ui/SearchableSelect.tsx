@@ -1,4 +1,5 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Search, X } from 'lucide-react';
 
 export interface SearchableSelectOption {
@@ -45,9 +46,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const controlId = id || `searchable-select-${generatedId.replace(/:/g, '')}`;
   const listboxId = `${controlId}-listbox`;
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
 
   const selected = options.find((option) => option.value === value);
 
@@ -62,51 +67,204 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     });
   }, [options, query]);
 
+  const updatePosition = useCallback(() => {
+    const trigger = triggerRef.current;
+    if (!trigger || typeof window === 'undefined') return;
+
+    const rect = trigger.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const edge = 8;
+    const gap = 6;
+    const spaceBelow = viewportHeight - rect.bottom - gap - edge;
+    const spaceAbove = rect.top - gap - edge;
+    const openAbove = spaceBelow < 220 && spaceAbove > spaceBelow;
+    const availableHeight = Math.max(96, openAbove ? spaceAbove : spaceBelow);
+    const width = Math.min(rect.width, viewportWidth - edge * 2);
+    const left = Math.min(Math.max(edge, rect.left), Math.max(edge, viewportWidth - width - edge));
+
+    setPanelStyle({
+      position: 'fixed',
+      left,
+      width,
+      maxHeight: Math.min(340, availableHeight),
+      ...(openAbove
+        ? { bottom: viewportHeight - rect.top + gap, top: 'auto' }
+        : { top: rect.bottom + gap, bottom: 'auto' }),
+    });
+  }, []);
+
+  const close = useCallback(() => {
+    setIsOpen(false);
+    setQuery('');
+    setActiveIndex(-1);
+  }, []);
+
+  const open = useCallback(() => {
+    if (disabled) return;
+    setQuery('');
+    setActiveIndex(options.findIndex((option) => !option.disabled));
+    updatePosition();
+    setIsOpen(true);
+  }, [disabled, options, updatePosition]);
+
   useEffect(() => {
     if (!isOpen) return;
 
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setQuery('');
-      }
+      const target = event.target as Node;
+      const clickedTrigger = rootRef.current?.contains(target);
+      const clickedPanel = panelRef.current?.contains(target);
+      if (!clickedTrigger && !clickedPanel) close();
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsOpen(false);
-        setQuery('');
+        event.preventDefault();
+        close();
+        triggerRef.current?.focus();
       }
     };
+
+    const handleViewportChange = () => updatePosition();
 
     document.addEventListener('mousedown', handlePointerDown);
     document.addEventListener('touchstart', handlePointerDown);
     document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('scroll', handleViewportChange, true);
+
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('touchstart', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', handleViewportChange);
+      window.removeEventListener('scroll', handleViewportChange, true);
     };
-  }, [isOpen]);
+  }, [close, isOpen, updatePosition]);
 
   useEffect(() => {
-    if (isOpen) {
-      const timer = window.setTimeout(() => searchRef.current?.focus(), 0);
-      return () => window.clearTimeout(timer);
-    }
-  }, [isOpen]);
+    if (!isOpen) return;
+    updatePosition();
+    const timer = window.setTimeout(() => searchRef.current?.focus(), 0);
+    return () => window.clearTimeout(timer);
+  }, [isOpen, updatePosition]);
 
-  const open = () => {
-    if (disabled) return;
-    setIsOpen(true);
-    setQuery('');
-  };
+  useEffect(() => {
+    if (!isOpen) return;
+    const firstEnabledIndex = filteredOptions.findIndex((option) => !option.disabled);
+    setActiveIndex(firstEnabledIndex);
+  }, [filteredOptions, isOpen]);
 
   const selectValue = (nextValue: string) => {
     onChange(nextValue);
-    setIsOpen(false);
-    setQuery('');
+    close();
+    window.setTimeout(() => triggerRef.current?.focus(), 0);
   };
+
+  const moveActive = (direction: 1 | -1) => {
+    if (filteredOptions.length === 0) return;
+
+    let next = activeIndex;
+    for (let i = 0; i < filteredOptions.length; i += 1) {
+      next = (next + direction + filteredOptions.length) % filteredOptions.length;
+      if (!filteredOptions[next]?.disabled) {
+        setActiveIndex(next);
+        document
+          .getElementById(`${listboxId}-option-${next}`)
+          ?.scrollIntoView({ block: 'nearest' });
+        return;
+      }
+    }
+  };
+
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveActive(1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveActive(-1);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const activeOption = filteredOptions[activeIndex];
+      if (activeOption && !activeOption.disabled) selectValue(activeOption.value);
+    } else if (event.key === 'Tab') {
+      close();
+    }
+  };
+
+  const dropdown =
+    isOpen && !disabled && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            ref={panelRef}
+            style={panelStyle}
+            className="z-[1000] flex flex-col overflow-hidden rounded-xl border border-ui-stroke-default bg-ui-surface shadow-xl"
+          >
+            <div className="shrink-0 p-2 border-b border-ui-stroke-subtle bg-ui-surface">
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ui-content-muted pointer-events-none"
+                  aria-hidden="true"
+                />
+                <input
+                  ref={searchRef}
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  placeholder={searchPlaceholder}
+                  aria-label={searchPlaceholder}
+                  aria-controls={listboxId}
+                  aria-activedescendant={
+                    activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
+                  }
+                  className="w-full min-h-[42px] rounded-lg border border-ui-stroke-default bg-ui-surface pl-9 pr-3 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus"
+                />
+              </div>
+            </div>
+
+            <div
+              id={listboxId}
+              role="listbox"
+              className="min-h-0 flex-1 overflow-y-auto p-1.5 overscroll-contain"
+            >
+              {filteredOptions.length === 0 ? (
+                <p className="px-3 py-4 text-[14px] text-ui-content-muted text-center">
+                  {noResultsText}
+                </p>
+              ) : (
+                filteredOptions.map((option, index) => {
+                  const isSelected = option.value === value;
+                  const isActive = index === activeIndex;
+                  return (
+                    <button
+                      id={`${listboxId}-option-${index}`}
+                      key={option.value}
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      disabled={option.disabled}
+                      onMouseEnter={() => !option.disabled && setActiveIndex(index)}
+                      onClick={() => selectValue(option.value)}
+                      className={`w-full min-h-[42px] px-3 py-2 rounded-lg flex items-center justify-between gap-3 text-left text-[14px] text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isActive ? 'bg-ui-surface-subtle' : 'hover:bg-ui-surface-subtle'
+                      }`}
+                    >
+                      <span>{option.label}</span>
+                      {isSelected && (
+                        <Check className="w-4 h-4 shrink-0 text-ui-accent" aria-hidden="true" />
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
 
   return (
     <div ref={rootRef} className={`relative w-full text-left ${className}`}>
@@ -123,6 +281,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
       <div className="relative">
         <button
+          ref={triggerRef}
           id={controlId}
           type="button"
           role="combobox"
@@ -134,7 +293,15 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${controlId}-error` : helperText ? `${controlId}-helper` : undefined}
           disabled={disabled}
-          onClick={() => (isOpen ? setIsOpen(false) : open())}
+          onClick={() => (isOpen ? close() : open())}
+          onKeyDown={(event) => {
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Enter' || event.key === ' ') {
+              if (!isOpen) {
+                event.preventDefault();
+                open();
+              }
+            }
+          }}
           className={`w-full min-h-[44px] bg-ui-surface text-left ui-border-default ui-radius-control px-3.5 pr-10 transition-colors focus:outline-none focus:ring-2 disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
             error
               ? 'border-ui-validation-border focus:ring-ui-validation-focus focus:border-ui-validation-focus'
@@ -168,51 +335,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </div>
       </div>
 
-      {isOpen && !disabled && (
-        <div className="absolute z-[80] mt-1.5 w-full min-w-[220px] overflow-hidden rounded-xl border border-ui-stroke-default bg-ui-surface shadow-xl">
-          <div className="p-2 border-b border-ui-stroke-subtle bg-ui-surface sticky top-0">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ui-content-muted pointer-events-none"
-                aria-hidden="true"
-              />
-              <input
-                ref={searchRef}
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={searchPlaceholder}
-                aria-label={searchPlaceholder}
-                className="w-full min-h-[42px] rounded-lg border border-ui-stroke-default bg-ui-surface pl-9 pr-3 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus"
-              />
-            </div>
-          </div>
-
-          <div id={listboxId} role="listbox" className="max-h-64 overflow-y-auto p-1.5 overscroll-contain">
-            {filteredOptions.length === 0 ? (
-              <p className="px-3 py-4 text-[14px] text-ui-content-muted text-center">{noResultsText}</p>
-            ) : (
-              filteredOptions.map((option) => {
-                const isSelected = option.value === value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    disabled={option.disabled}
-                    onClick={() => selectValue(option.value)}
-                    className="w-full min-h-[42px] px-3 py-2 rounded-lg flex items-center justify-between gap-3 text-left text-[14px] text-ui-content-primary hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <span>{option.label}</span>
-                    {isSelected && <Check className="w-4 h-4 shrink-0 text-ui-accent" aria-hidden="true" />}
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
+      {dropdown}
 
       {error && (
         <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-medium">
