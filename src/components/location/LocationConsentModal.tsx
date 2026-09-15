@@ -51,7 +51,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           onSuccess?.();
           onClose();
         } else {
-          // Keep modal open on failure / denied / timeout / unavailable
           let msg = isBn
             ? 'এই ব্রাউজারে লোকেশন অনুমতি বন্ধ আছে। সাইটের লোকেশন অনুমতি চালু করে আবার চেষ্টা করুন।'
             : 'Location permission is disabled in your browser. Please enable site location permission and try again.';
@@ -67,8 +66,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           setErrorMessage(msg);
         }
       } else {
-        // User intentionally pressed "Turn on location" for browse mode.
-        // Persist granted intent BEFORE starting the geolocation request.
         VisitorSessionService.setLocationChoice('granted');
         const res = await retryBrowseLocation();
         if (res.success) {
@@ -141,7 +138,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       ariaDescribedBy="location-consent-desc"
     >
       <div className="p-5 sm:p-6 flex flex-col gap-5 text-ui-content-primary text-left">
-        {/* Icon & Heading */}
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-ui-info-bg text-ui-info-text border border-ui-info-border flex items-center justify-center shrink-0">
             <MapPin className="w-6 h-6" aria-hidden="true" />
@@ -155,7 +151,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           </div>
         </div>
 
-        {/* Content Body */}
         <div id="location-consent-desc" className="text-sm text-ui-content-secondary leading-relaxed space-y-3">
           <p>
             {isReportMode
@@ -168,14 +163,13 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           </p>
 
           {errorMessage && (
-            <div className="p-3 rounded-xl border border-ui-error-border bg-ui-error-bg text-ui-error-text text-xs sm:text-sm flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
+            <div className="p-3 rounded-xl border border-ui-error-border bg-ui-error-bg text-ui-error-text text-xs sm:text-sm flex items-start gap-2" role="alert">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+              <p>{errorMessage}</p>
             </div>
           )}
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row-reverse gap-2.5 pt-2">
           <button
             ref={shareLocationBtnRef}

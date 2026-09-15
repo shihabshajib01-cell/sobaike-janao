@@ -45,12 +45,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
   return (
     <article
       id={`report-card-${report.id}`}
-      role="article"
       aria-label={title}
       onClick={handleCardClick}
       className={`group relative bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 transition-all duration-150 shadow-2xs hover:shadow-xs cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none ${className}`}
     >
-      {/* 1. Top Context Line: Service Badge */}
       <div className="flex items-center justify-between gap-2 text-[12px] sm:text-[13px] md:text-[14px]">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
           <CategoryBadge
@@ -62,45 +60,40 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         </div>
       </div>
 
-      {/* 2. Main Headline (Refined Bengali typography, max 2 lines on mobile) */}
       <h3 className="text-[16px] sm:text-[17px] md:text-[20px] leading-[1.38] sm:leading-[1.4] md:leading-[30px] font-bold md:font-semibold text-ui-content-primary transition-colors line-clamp-2 break-words">
         {title}
       </h3>
 
-      {/* 3. Reported Subject Context (Compact inline row) */}
       {report.reportedSubject && (
         <div className="text-[12px] sm:text-[13px] md:text-[14px] text-ui-content-secondary flex items-center gap-1.5 flex-wrap min-w-0">
-          <span className="text-ui-content-muted font-normal text-[11.5px] sm:text-[12px] md:text-[13px]">
+          <p className="text-ui-content-muted font-normal text-[11.5px] sm:text-[12px] md:text-[13px]">
             {language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}
-          </span>
-          <span className="font-semibold text-ui-content-primary truncate max-w-full">
+          </p>
+          <p className="font-semibold text-ui-content-primary truncate max-w-full">
             {report.reportedSubject}
-          </span>
+          </p>
         </div>
       )}
 
-      {/* 3.5 Electricity Bill Snapshot (for billing reports) */}
       {(report.subcategoryId === 'excess-electricity-bill' || report.recentBillAmount !== undefined) && (
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] bg-ui-surface-subtle border border-ui-stroke-subtle rounded-lg px-2.5 py-1 text-ui-content-secondary max-w-full flex-wrap">
-          <span className="font-semibold text-ui-content-primary">
+          <p className="font-semibold text-ui-content-primary">
             {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : (language === 'bn' ? 'সাম্প্রতিক বিল' : 'Recent bill')}: ৳{report.recentBillAmount !== undefined ? (language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()) : '-'}
-          </span>
+          </p>
           {report.previousBillAmount !== undefined && (
-            <span className="text-ui-content-muted">
+            <p className="text-ui-content-muted">
               ({language === 'bn' ? 'পূর্বে: ' : 'prev: '}৳{language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()})
-            </span>
+            </p>
           )}
         </div>
       )}
 
-      {/* 4. Description Preview (Lightened visual weight, 2 lines mobile / 3 lines desktop) */}
       {shouldShowDescription && (
         <p className="text-[13px] sm:text-[14px] md:text-[16px] leading-[1.5] sm:leading-[1.55] md:leading-[26px] text-ui-content-secondary line-clamp-2 md:line-clamp-3 font-normal break-words">
           {shortDesc}
         </p>
       )}
 
-      {/* 4.5 Supporting Media Preview (Rendered when approved public images exist, supports single and gallery) */}
       {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
         <div className="pt-0.5 md:pt-1">
           <ReportMediaGrid
@@ -111,24 +104,21 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         </div>
       )}
 
-      {/* 5. Footer Metadata & Seamless Action Area */}
       <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3 border-t border-ui-stroke-subtle text-[12px] sm:text-[13px] md:text-[14px] text-ui-content-muted">
-        {/* Location & Date */}
         <div className="flex items-center flex-wrap gap-x-2.5 sm:gap-x-3 gap-y-0.5 min-w-0 flex-1">
           <div className="flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary font-medium min-w-0">
             <AppIcon name="map-pin" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
             <AppIcon name="map-pin" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
-            <span className="truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[200px] md:max-w-xs">{location}</span>
+            <p className="truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[200px] md:max-w-xs">{location}</p>
           </div>
-          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[13px]">•</span>
+          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[13px]" aria-hidden="true">•</span>
           <div className="flex items-center gap-1 text-ui-content-muted shrink-0">
             <AppIcon name="calendar" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
             <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
-            <span className="whitespace-nowrap">{publishedDate}</span>
+            <p className="whitespace-nowrap">{publishedDate}</p>
           </div>
         </div>
 
-        {/* Quiet Integrated Actions: Share + View Details */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 text-[12.5px] sm:text-[13.5px] md:text-[16px]">
           <button
             type="button"
@@ -153,7 +143,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             )}
           </button>
 
-          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[14px]">|</span>
+          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[14px]" aria-hidden="true">|</span>
 
           <Link
             to={`/report-detail/${report.id}`}
