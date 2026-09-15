@@ -25,34 +25,8 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Clear Harassment classification filters when desktop category changes away
-        shell: bash
-        run: |
-          node <<'NODE'
-          const fs = require('fs');
-          const path = 'src/pages/ExplorePage.tsx';
-          let s = fs.readFileSync(path, 'utf8');
-          const anchor = `  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Responsive resize safety`;
-          if (!s.includes(anchor)) throw new Error('ExplorePage load effect anchor not found');
-          const replacement = `  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Prevent hidden Harassment classification filters from leaking across category changes.
-  useEffect(() => {
-    if (selectedSection !== 'harassment') {
-      setHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
-    }
-  }, [selectedSection]);
-
-  // Responsive resize safety`;
-          s = s.replace(anchor, replacement);
-          fs.writeFileSync(path, s);
-          NODE
+      - name: Apply focused Explore filter reset
+        run: node scripts/fix-explore-harassment-filter-reset.mjs
 
       - name: Install dependencies
         run: npm ci
@@ -68,7 +42,8 @@ jobs:
 
       - name: Commit verified fix
         run: |
-          git add src/pages/ExplorePage.tsx
+          rm -f scripts/fix-explore-harassment-filter-reset.mjs
+          git add src/pages/ExplorePage.tsx scripts
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
             exit 0
