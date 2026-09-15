@@ -1,5 +1,10 @@
 import { SectionKey } from '../theme/tokens';
 import { ReportItem, ReportUpdate, ReportResponse, ReportTrustIndicators, PublicReportImage } from '../types/report';
+import {
+  HarassmentAgeGroup,
+  HarassmentAbuserRelationship,
+  HarassmentReportingFor,
+} from '../data/harassmentClassification';
 
 export type { PublicReportImage };
 
@@ -141,6 +146,9 @@ export interface SubmittedReport {
   previousBillMonth?: string;
   previousBillAmount?: number | string;
   frequency: 'one-time' | 'repeated';
+  affectedPersonAgeGroup?: HarassmentAgeGroup;
+  allegedAbuserRelationship?: HarassmentAbuserRelationship;
+  reportingFor?: HarassmentReportingFor;
   relationshipContext?: string;
   intimateWhatHappened?: string;
   intimatePlatform?: string;
@@ -176,7 +184,7 @@ export interface SubmittedReport {
   }>;
 }
 
-export const CURRENT_REPORT_FLOW_VERSION = 3;
+export const CURRENT_REPORT_FLOW_VERSION = 4;
 
 export interface DraftReport {
   flowVersion?: number;
@@ -207,6 +215,9 @@ export interface DraftReport {
   previousBillMonth?: string;
   previousBillAmount?: number | string;
   frequency: 'one-time' | 'repeated';
+  affectedPersonAgeGroup: HarassmentAgeGroup | '';
+  allegedAbuserRelationship: HarassmentAbuserRelationship | '';
+  reportingFor: HarassmentReportingFor | '';
   relationshipContext: string;
   intimateWhatHappened: string;
   intimatePlatform: string;
@@ -344,4 +355,3 @@ export function isValidReporterCoordinates(
   }
   return true;
 }
-
