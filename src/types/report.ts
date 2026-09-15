@@ -1,4 +1,9 @@
 import { SectionKey } from '../theme/tokens';
+import {
+  HarassmentAgeGroup,
+  HarassmentAbuserRelationship,
+  HarassmentReportingFor,
+} from '../data/harassmentClassification';
 
 export interface ReportUpdate {
   dateBn: string;
@@ -76,6 +81,9 @@ export interface ReportItem {
   areaEn: string;
   incidentDateBn: string;
   incidentDateEn: string;
+  affectedPersonAgeGroup?: HarassmentAgeGroup;
+  allegedAbuserRelationship?: HarassmentAbuserRelationship;
+  reportingFor?: HarassmentReportingFor;
   recentBillMonth?: string;
   recentBillAmount?: number;
   previousBillMonth?: string;
