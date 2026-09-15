@@ -1,6 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
-import { saveLocalMockReport } from './publicReportService';
 
 export interface ApiError {
   code: string;
@@ -21,21 +20,12 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-      if (!isMockAllowed) {
-        const error: ApiError = {
-          code: 'SUPABASE_NOT_CONFIGURED',
-          message: 'Supabase client is not configured.',
-          messageBn: 'ডাটাবেজ সংযোগ কনফিগার করা নেই।',
-        };
-        throw error;
-      }
-      return {
-        success: true,
-        responseId: `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
-        message: 'Mock response submitted successfully.',
-        messageBn: 'আপনার তথ্য সফলভাবে জমা হয়েছে (মক মোড)।',
+      const error: ApiError = {
+        code: 'SUPABASE_NOT_CONFIGURED',
+        message: 'Supabase client is not configured.',
+        messageBn: 'ডাটাবেজ সংযোগ কনফিগার করা নেই।',
       };
+      throw error;
     }
 
     const { data, error } = await supabase.rpc('submit_public_response', {
@@ -87,21 +77,12 @@ class ApiClient {
     }
   ): Promise<{ success: boolean; message: string; messageBn: string; responseId: string }> {
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-      if (!isMockAllowed) {
-        const error: ApiError = {
-          code: 'SUPABASE_NOT_CONFIGURED',
-          message: 'Supabase client is not configured.',
-          messageBn: 'ডাটাবেজ সংযোগ কনফিগার করা নেই।',
-        };
-        throw error;
-      }
-      return {
-        success: true,
-        responseId: `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
-        message: 'Mock subject response submitted successfully.',
-        messageBn: 'প্রতিউত্তর সফলভাবে জমা হয়েছে (মক মোড)।',
+      const error: ApiError = {
+        code: 'SUPABASE_NOT_CONFIGURED',
+        message: 'Supabase client is not configured.',
+        messageBn: 'ডাটাবেজ সংযোগ কনফিগার করা নেই।',
       };
+      throw error;
     }
 
     let { data, error } = await supabase.rpc('submit_public_response', {
@@ -175,28 +156,6 @@ class ApiClient {
     }
 
     if (!isSupabaseConfigured() || !supabase) {
-      const isMockAllowed = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-      if (isMockAllowed) {
-        console.warn('[ApiClient] Supabase not configured — operating in local mock mode');
-        const randomNum = Math.floor(100000 + Math.random() * 900000);
-        const mockReportId = `SJ-${new Date().getFullYear()}-${randomNum}`;
-        const mockReportData = {
-          id: mockReportId,
-          ...payload,
-          createdAt: new Date().toISOString(),
-          status: 'submitted',
-          statusBn: 'জমা হয়েছে / পর্যালোচনার অপেক্ষায়',
-          statusEn: 'Submitted / Awaiting Review',
-        };
-        saveLocalMockReport(mockReportData);
-        return {
-          success: true,
-          reportId: mockReportId,
-          message: 'Report submitted successfully (local mock mode).',
-          report: mockReportData,
-        };
-      }
-
       const unavailableError: ApiError = {
         code: 'SERVICE_UNAVAILABLE',
         message: 'Submission service is currently unavailable. Your draft is preserved. Please try again later.',

@@ -7,7 +7,6 @@ import { Header } from './Header';
 import { MobileHeader } from './MobileHeader';
 import { BottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
-import { ViewportDebugger } from '../debug/ViewportDebugger';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
 import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
 import { LocationConsentModal } from '../location/LocationConsentModal';
@@ -253,8 +252,6 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      {/* 10. Dev-only Viewport Sizing Debugger */}
-      {import.meta.env.DEV && <ViewportDebugger />}
     </div>
   );
 };

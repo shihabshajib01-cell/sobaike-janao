@@ -66,33 +66,6 @@
           document.documentElement.classList.remove('dark');
         }
 
-        // Viewport & screen reporting diagnostic for mobile browsers
-        function logViewportStatus() {
-          var vv = window.visualViewport;
-          var report = {
-            innerWidth: window.innerWidth,
-            innerHeight: window.innerHeight,
-            outerWidth: window.outerWidth,
-            outerHeight: window.outerHeight,
-            screenWidth: window.screen ? window.screen.width : null,
-            screenHeight: window.screen ? window.screen.height : null,
-            devicePixelRatio: window.devicePixelRatio || 1,
-            visualViewport: vv ? {
-              width: Math.round(vv.width),
-              height: Math.round(vv.height),
-              scale: Number(vv.scale ? vv.scale.toFixed(2) : 1),
-              offsetTop: Math.round(vv.offsetTop || 0),
-              offsetLeft: Math.round(vv.offsetLeft || 0)
-            } : 'Not Supported'
-          };
-          console.info('[Viewport Diagnostic] Initial Screen & Viewport Metrics:', report);
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', logViewportStatus, { once: true });
-        } else {
-          logViewportStatus();
-        }
       })();
     </script>
   </head>
