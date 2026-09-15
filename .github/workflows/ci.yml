@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,6 +25,29 @@ jobs:
 
       - name: Install
         run: npm ci
+
+      - name: Dependency audit
+        run: npm audit --audit-level=moderate
+
+      - name: Security source invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -R "VITE_ENABLE_MOCK_MODE !== 'false'" src; then
+            echo "ERROR: production fail-open mock logic detected"
+            exit 1
+          fi
+          if grep -R "dangerouslySetInnerHTML\|\.innerHTML[[:space:]]*=" src; then
+            echo "ERROR: unsafe HTML sink detected; security review required"
+            exit 1
+          fi
+          if grep -R "\beval[[:space:]]*(\|new Function[[:space:]]*(\|javascript:" src; then
+            echo "ERROR: dynamic-code or javascript: sink detected; security review required"
+            exit 1
+          fi
+          test -f supabase/migrations/20260915163600_public_security_evidence_hardening.sql
+          test -f supabase/migrations/20260915164500_public_security_surface_limits.sql
+          test -f supabase/migrations/20260915165000_public_security_policy_cleanup.sql
 
       - name: Lint
         run: npm run lint
