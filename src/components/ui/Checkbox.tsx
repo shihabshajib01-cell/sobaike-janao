@@ -36,8 +36,8 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         </div>
         {(label || description) && (
           <div>
-            {label && <div className="type-label text-ui-content-primary">{label}</div>}
-            {description && <div className="type-helper text-ui-content-muted mt-0.5">{description}</div>}
+            {label && <p className="type-label text-ui-content-primary">{label}</p>}
+            {description && <p className="type-helper text-ui-content-muted mt-0.5">{description}</p>}
           </div>
         )}
       </label>
