@@ -73,6 +73,13 @@ export const ExplorePage: React.FC = () => {
     loadData();
   }, [loadData]);
 
+  // Prevent hidden Harassment classification filters from leaking across category changes.
+  useEffect(() => {
+    if (selectedSection !== 'harassment') {
+      setHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
+    }
+  }, [selectedSection]);
+
   // Responsive resize safety: automatically close mobile sheets when transitioning to tablet/desktop (>= 768px)
   useEffect(() => {
     if (typeof window === 'undefined') return;
