@@ -24,6 +24,9 @@ export const INITIAL_DRAFT: DraftReport = {
   previousBillMonth: '',
   previousBillAmount: undefined,
   frequency: 'one-time',
+  affectedPersonAgeGroup: '',
+  allegedAbuserRelationship: '',
+  reportingFor: '',
   relationshipContext: '',
   intimateWhatHappened: '',
   intimatePlatform: '',
@@ -72,7 +75,7 @@ export const DraftRepository = {
       if (!raw) return null;
       const parsed = JSON.parse(raw) as DraftReport;
 
-      // Handle V3 exact step restoration
+      // Handle current-flow exact step restoration.
       if (parsed.flowVersion === CURRENT_REPORT_FLOW_VERSION) {
         let validStep = parsed.currentStep || 1;
 
@@ -94,12 +97,13 @@ export const DraftRepository = {
         }
 
         return {
+          ...INITIAL_DRAFT,
           ...parsed,
           currentStep: validStep,
         };
       }
 
-      // Migrate legacy draft (flowVersion < 3 or undefined)
+      // Migrate legacy drafts. New fields are merged from INITIAL_DRAFT so older drafts remain safe.
       let migratedStep = 1;
       if (parsed.segment && parsed.subcategoryId && parsed.description && parsed.description.trim().length > 10) {
         migratedStep = (parsed.currentStep === 4 || (parsed as any).step === 4) ? 4 : 3;
@@ -201,6 +205,9 @@ export const DraftRepository = {
     if (draft.recentBillAmount !== undefined && draft.recentBillAmount !== '') return true;
     if (Boolean(draft.previousBillMonth?.trim())) return true;
     if (draft.previousBillAmount !== undefined && draft.previousBillAmount !== '') return true;
+    if (Boolean(draft.affectedPersonAgeGroup)) return true;
+    if (Boolean(draft.allegedAbuserRelationship)) return true;
+    if (Boolean(draft.reportingFor)) return true;
     if (Boolean(draft.intimateWhatHappened?.trim())) return true;
     if (Boolean(draft.relationshipContext?.trim())) return true;
 
