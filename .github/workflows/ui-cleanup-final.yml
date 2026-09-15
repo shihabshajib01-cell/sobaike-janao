@@ -1,0 +1,111 @@
+name: Temporary Final UI System Verification
+
+on:
+  push:
+    branches: [public-ui-system-cleanup-2]
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: public-ui-system-cleanup-2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Finish semantic media-viewer cleanup
+        shell: python
+        run: |
+          from pathlib import Path
+
+          p = Path('src/components/media/AttachmentLightboxModal.tsx')
+          text = p.read_text()
+          reps = [
+            ('bg-black/85', 'bg-ui-media-viewer-backdrop'),
+            ('bg-white/10 text-white', 'bg-ui-media-viewer-chip text-ui-media-viewer-text'),
+            ('text-white/90', 'text-ui-media-viewer-text'),
+            ('text-white/50', 'text-ui-media-viewer-muted'),
+            ('bg-white/10 hover:bg-white/20 text-white', 'bg-ui-media-viewer-chip hover:bg-ui-media-viewer-chip-hover text-ui-media-viewer-text'),
+            ('focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900', 'focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg'),
+            ('bg-black/95', 'bg-ui-media-viewer-stage'),
+            ('bg-black/40 border border-white/5', 'bg-ui-media-viewer-strip border border-ui-media-viewer-border-soft'),
+            ('focus-visible:ring-white shrink-0', 'focus-visible:ring-ui-media-viewer-focus shrink-0'),
+            ('<span className="shrink-0 px-2.5 py-1 rounded-full bg-ui-media-viewer-chip text-ui-media-viewer-text text-[12px] sm:text-[13px] font-semibold tracking-wide">', '<p className="shrink-0 px-2.5 py-1 rounded-full bg-ui-media-viewer-chip text-ui-media-viewer-text text-[12px] sm:text-[13px] font-semibold tracking-wide">'),
+            ('</span>\n\n            {/* Filename & optional size */}', '</p>\n\n            {/* Filename & optional size */}'),
+            ('<span className="font-medium text-ui-media-viewer-text truncate inline-block max-w-[200px] sm:max-w-[320px] align-middle" title={imageName}>', '<p className="font-medium text-ui-media-viewer-text truncate inline-block max-w-[200px] sm:max-w-[320px] align-middle" title={imageName}>'),
+            ('</span>\n              {imageSize ? (\n                <span className="text-ui-media-viewer-muted text-[12px] ml-2">', '</p>\n              {imageSize ? (\n                <p className="text-ui-media-viewer-muted text-[12px] ml-2 inline-block">'),
+            ('</span>\n              ) : null}', '</p>\n              ) : null}'),
+            ('<span className="text-[14px]">\n                {language === \'bn\' ? \'ছবিটি লোড করা যায়নি\' : \'Image preview unavailable\'}\n              </span>', '<p className="text-[14px]">\n                {language === \'bn\' ? \'ছবিটি লোড করা যায়নি\' : \'Image preview unavailable\'}\n              </p>'),
+          ]
+          for old,new in reps:
+              if old not in text:
+                  raise SystemExit(f'Lightbox expected pattern missing: {old}')
+              text = text.replace(old,new)
+          p.write_text(text)
+
+          p = Path('src/components/media/ImageAttachmentPicker.tsx')
+          text = p.read_text()
+          reps = [
+            ('focus-visible:ring-white', 'focus-visible:ring-ui-focus'),
+            ('<span className="leading-[22px]">{language === \'bn\' ? errorMessage.bn : errorMessage.en}</span>', '<p className="leading-[22px]">{language === \'bn\' ? errorMessage.bn : errorMessage.en}</p>'),
+            ('<span className="text-[12px] leading-tight">\n                          {language === \'bn\' ? img.compressionError.bn : img.compressionError.en}\n                        </span>', '<p className="text-[12px] leading-tight">\n                          {language === \'bn\' ? img.compressionError.bn : img.compressionError.en}\n                        </p>'),
+          ]
+          for old,new in reps:
+              if old not in text:
+                  raise SystemExit(f'Picker expected pattern missing: {old}')
+              text = text.replace(old,new)
+          p.write_text(text)
+
+          css = Path('src/index.css')
+          text = css.read_text()
+          theme_anchor = '  --color-ui-media-viewer-focus: var(--ui-media-viewer-focus);\n'
+          aliases = '''  --color-ui-media-viewer-backdrop: var(--ui-media-viewer-backdrop);\n  --color-ui-media-viewer-stage: var(--ui-media-viewer-stage);\n  --color-ui-media-viewer-chip: var(--ui-media-viewer-chip);\n  --color-ui-media-viewer-chip-hover: var(--ui-media-viewer-chip-hover);\n  --color-ui-media-viewer-strip: var(--ui-media-viewer-strip);\n  --color-ui-media-viewer-border-soft: var(--ui-media-viewer-border-soft);\n'''
+          if aliases.strip() not in text:
+              if theme_anchor not in text: raise SystemExit('Theme media anchor missing')
+              text = text.replace(theme_anchor, theme_anchor + aliases, 1)
+          root_anchor = '    --ui-media-viewer-focus: #FFFFFF;\n'
+          defs = '''    --ui-media-viewer-backdrop: rgba(0, 0, 0, 0.85);\n    --ui-media-viewer-stage: rgba(0, 0, 0, 0.95);\n    --ui-media-viewer-chip: rgba(255, 255, 255, 0.10);\n    --ui-media-viewer-chip-hover: rgba(255, 255, 255, 0.20);\n    --ui-media-viewer-strip: rgba(0, 0, 0, 0.40);\n    --ui-media-viewer-border-soft: rgba(255, 255, 255, 0.05);\n'''
+          if '--ui-media-viewer-backdrop:' not in text:
+              if root_anchor not in text: raise SystemExit('Root media anchor missing')
+              text = text.replace(root_anchor, root_anchor + defs, 1)
+          css.write_text(text)
+
+      - name: Scan component/page color escapes
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          named = re.compile(r'(?<![\w-])(?:bg|text|border|ring|outline|from|via|to|accent)-(?:white|black|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(?:-\d{2,3})?(?:/\d+)?')
+          arbitrary_hex = re.compile(r'(?:bg|text|border|ring|outline|from|via|to)-\[#[0-9a-fA-F]{3,8}\]')
+          violations=[]
+          roots=[Path('src/components'),Path('src/pages')]
+          for root in roots:
+              for p in root.rglob('*.tsx'):
+                  for i,line in enumerate(p.read_text().splitlines(),1):
+                      m=named.findall(line)+arbitrary_hex.findall(line)
+                      if m: violations.append((p,i,m,line.strip()))
+          if violations:
+              print('Direct component/page color escapes remain:')
+              for p,i,m,line in violations:
+                  print(f'{p}:{i} {m} :: {line}')
+              raise SystemExit(1)
+          print('PASS: no direct named-palette or arbitrary-hex color classes in components/pages.')
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+      - name: Commit final semantic cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/media/AttachmentLightboxModal.tsx src/components/media/ImageAttachmentPicker.tsx src/index.css
+          git commit -m "refactor: finish public UI semantic color cleanup"
+          git push origin HEAD:public-ui-system-cleanup-2
