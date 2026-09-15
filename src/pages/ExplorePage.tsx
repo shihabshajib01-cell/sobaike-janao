@@ -323,6 +323,12 @@ export const ExplorePage: React.FC = () => {
     ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন পাওয়া গেছে`
     : `${filteredReports.length} published reports found`;
 
+  // Meaningful context check: Category, Division, or District selected
+  const hasMeaningfulContext =
+    selectedSection !== 'all' ||
+    selectedDivision !== 'all' ||
+    selectedDistrict !== 'all';
+
   return (
     <PublicPageContainer id="explore-page-container">
       {/* Top Controls & View Switcher Wrapper */}
@@ -757,10 +763,10 @@ export const ExplorePage: React.FC = () => {
             type="button"
             aria-pressed={viewMode === 'heatmap'}
             onClick={() => setViewMode('heatmap')}
-            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
               viewMode === 'heatmap'
-                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
-                : 'text-ui-content-secondary hover:text-ui-content-primary'
+                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
+                : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
             }`}
           >
             <MapIcon name="flame" size="md" aria-hidden="true" />
@@ -771,10 +777,10 @@ export const ExplorePage: React.FC = () => {
             type="button"
             aria-pressed={viewMode === 'reports'}
             onClick={() => setViewMode('reports')}
-            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
               viewMode === 'reports'
-                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
-                : 'text-ui-content-secondary hover:text-ui-content-primary'
+                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
+                : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
             }`}
           >
             <MapIcon name="file-text" size="md" aria-hidden="true" />
@@ -869,85 +875,84 @@ export const ExplorePage: React.FC = () => {
           ) : viewMode === 'heatmap' ? (
             /* MAP VIEW */
             <div className="space-y-4 md:space-y-6">
-              {/* Map & District Ranking Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                {/* 1. Truthful Heatmap (Main on Desktop, Top on Mobile) */}
-                <div className="lg:col-span-8 w-full">
-                  <PublicIncidentMap
-                    reports={filteredReports}
-                    language={language}
-                    selectedSection={selectedSection}
-                    selectedDistrict={selectedDistrict}
-                    onSelectDistrict={handleSelectDistrict}
-                    onResetFilters={handleResetFilters}
-                  />
-                </div>
-
-                {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
-                {selectedDistrict !== 'all' && (
-                  <div className="block md:hidden w-full">
-                    <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3.5 sm:p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
-                          <MapIcon name="map-pin" size="md" ariaHidden={true} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-[15px] font-bold text-ui-content-primary whitespace-normal break-words line-clamp-2 leading-snug">
-                            {activeDistrictName || selectedDistrict}
-                          </h3>
-                          <p className="text-[13px] text-ui-content-secondary whitespace-normal break-words leading-tight mt-0.5">
-                            {language === 'bn'
-                              ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
-                              : `${filteredReports.length} published reports`}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsFilterSheetOpen(false);
-                          setIsAreaSheetOpen(true);
-                        }}
-                        aria-expanded={isAreaSheetOpen}
-                        aria-controls="mobile-area-sheet"
-                        aria-label={
-                          language === 'bn'
-                            ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
-                            : `View details for ${activeDistrictName || selectedDistrict}`
-                        }
-                        className="btn-primary-action px-3.5 py-2.5 rounded-xl text-[13px] font-semibold min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-2xs"
-                      >
-                        <span>{language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}</span>
-                        <MapIcon name="arrow-right" size="xs" ariaHidden={true} />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. District Ranking Panel (Right on Desktop, Below Map on Mobile when no district is selected) */}
-                <div className={`w-full lg:col-span-4 ${selectedDistrict !== 'all' ? 'hidden md:block' : 'block'}`}>
-                  <DistrictRankingPanel
-                    reports={filteredReports}
-                    rankingReports={baseFilteredReports}
-                    selectedDistrict={selectedDistrict}
-                    selectedDivision={selectedDivision}
-                    onSelectDistrict={handleSelectDistrict}
-                    language={language}
-                    selectedSection={selectedSection}
-                  />
-                </div>
-              </div>
-
-              {/* 3. Recent Area Reports Contextual Preview (Desktop always, Mobile only when no district is selected to prevent duplication) */}
-              <div className={selectedDistrict !== 'all' ? 'hidden md:block' : 'block'}>
-                <RecentAreaReports
+              {/* Row 1: Full-Width Map */}
+              <div className="w-full">
+                <PublicIncidentMap
                   reports={filteredReports}
-                  selectedDistrict={selectedDistrict}
-                  selectedSection={selectedSection}
                   language={language}
-                  onViewAllReports={() => setViewMode('reports')}
+                  selectedSection={selectedSection}
+                  selectedDistrict={selectedDistrict}
+                  onSelectDistrict={handleSelectDistrict}
+                  onResetFilters={handleResetFilters}
                 />
               </div>
+
+              {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
+              {selectedDistrict !== 'all' && (
+                <div className="block md:hidden w-full">
+                  <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3.5 sm:p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
+                        <MapIcon name="map-pin" size="md" ariaHidden={true} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-[15px] font-bold text-ui-content-primary whitespace-normal break-words line-clamp-2 leading-snug">
+                          {activeDistrictName || selectedDistrict}
+                        </h3>
+                        <p className="text-[13px] text-ui-content-secondary whitespace-normal break-words leading-tight mt-0.5">
+                          {language === 'bn'
+                            ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
+                            : `${filteredReports.length} published reports`}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsFilterSheetOpen(false);
+                        setIsAreaSheetOpen(true);
+                      }}
+                      aria-expanded={isAreaSheetOpen}
+                      aria-controls="mobile-area-sheet"
+                      aria-label={
+                        language === 'bn'
+                          ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
+                          : `View details for ${activeDistrictName || selectedDistrict}`
+                      }
+                      className="btn-primary-action px-3.5 py-2.5 rounded-xl text-[13px] font-semibold min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-2xs"
+                    >
+                      <span>{language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}</span>
+                      <MapIcon name="arrow-right" size="xs" ariaHidden={true} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Row 2: District Ranking Panel / Area Summary (Full-width below map on desktop/tablet; on mobile hidden if district selected since mobile uses bottom-sheet trigger) */}
+              <div className={`w-full ${selectedDistrict !== 'all' ? 'hidden md:block' : 'block'}`}>
+                <DistrictRankingPanel
+                  reports={filteredReports}
+                  rankingReports={baseFilteredReports}
+                  selectedDistrict={selectedDistrict}
+                  selectedDivision={selectedDivision}
+                  onSelectDistrict={handleSelectDistrict}
+                  language={language}
+                  selectedSection={selectedSection}
+                />
+              </div>
+
+              {/* Row 3: Contextual Recent Reports (Rendered ONLY when user chooses meaningful context: category, division, or district) */}
+              {hasMeaningfulContext && (
+                <div className={selectedDistrict !== 'all' ? 'hidden md:block' : 'block'}>
+                  <RecentAreaReports
+                    reports={filteredReports}
+                    selectedDistrict={selectedDistrict}
+                    selectedSection={selectedSection}
+                    language={language}
+                    onViewAllReports={() => setViewMode('reports')}
+                  />
+                </div>
+              )}
             </div>
           ) : (
             /* REPORTS VIEW (UX Phase 4 Hierarchy: Summary -> Actual Reports -> More Analysis) */

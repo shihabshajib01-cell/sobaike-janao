@@ -505,7 +505,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           </span>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 md:gap-2">
           {categories.map((cat) => (
             <div
               key={cat.key}
@@ -548,7 +548,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             </div>
 
             {/* Desktop / Tablet District List (>=768px): Always full ranking, internal vertical scroll */}
-            <div className="hidden md:block space-y-1.5 md:max-h-[240px] md:overflow-y-auto md:pr-1">
+            <div className="hidden md:grid md:grid-cols-2 gap-1.5 md:max-h-[260px] md:overflow-y-auto md:pr-1">
               {rankedDistricts.map(renderDistrictItem)}
             </div>
           </>

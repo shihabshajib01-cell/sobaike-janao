@@ -40,10 +40,10 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
           type="button"
           aria-pressed={viewMode === 'heatmap'}
           onClick={() => onViewModeChange('heatmap')}
-          className={`px-3.5 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+          className={`px-3.5 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
             viewMode === 'heatmap'
-              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
-              : 'text-ui-content-secondary hover:text-ui-content-primary'
+              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
+              : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
           }`}
         >
           <MapIcon name="flame" size="md" aria-hidden="true" />
@@ -54,10 +54,10 @@ export const MapSectionHeader: React.FC<MapSectionHeaderProps> = ({
           type="button"
           aria-pressed={viewMode === 'reports'}
           onClick={() => onViewModeChange('reports')}
-          className={`px-3.5 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+          className={`px-3.5 py-2 rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
             viewMode === 'reports'
-              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold'
-              : 'text-ui-content-secondary hover:text-ui-content-primary'
+              ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
+              : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
           }`}
         >
           <MapIcon name="file-text" size="md" aria-hidden="true" />

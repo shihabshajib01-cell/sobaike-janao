@@ -386,19 +386,25 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         : null;
 
     if (selectedDistrictObj) {
+      const fallbackSuffix = isDistrictFallback
+        ? language === 'bn'
+          ? ' সুনির্দিষ্ট অবস্থান না থাকায় জেলা অনুযায়ী প্রতিবেদন দেখানো হচ্ছে।'
+          : ' Reports are shown by district because precise incident locations are unavailable.'
+        : '';
+
       if (language === 'bn') {
-        return `${selectedDistrictObj.nameBn} জেলা: ${toBanglaDigits(totalReportsCount)}টি প্রতিবেদনের মধ্যে ${toBanglaDigits(mappedCount)}টি মানচিত্রে দেখানো হয়েছে।`;
+        return `${selectedDistrictObj.nameBn} জেলা: ${toBanglaDigits(totalReportsCount)}টি প্রতিবেদনের মধ্যে ${toBanglaDigits(mappedCount)}টি মানচিত্রে দেখানো হয়েছে।${fallbackSuffix}`;
       }
-      return `${selectedDistrictObj.nameEn}: ${mappedCount} of ${totalReportsCount} reports mapped.`;
+      return `${selectedDistrictObj.nameEn}: ${mappedCount} of ${totalReportsCount} reports mapped.${fallbackSuffix}`;
     }
 
     if (isDistrictFallback) {
       if (language === 'bn') {
         const totalBn = toBanglaDigits(totalReportsCount);
         const mappedBn = toBanglaDigits(mappedCount);
-        return `জেলা-ভিত্তিক: ${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে।`;
+        return `জেলা-ভিত্তিক: ${totalBn}টি প্রতিবেদনের মধ্যে ${mappedBn}টি মানচিত্রে দেখানো হয়েছে। সুনির্দিষ্ট অবস্থান না থাকায় জেলা অনুযায়ী প্রতিবেদন দেখানো হচ্ছে।`;
       }
-      return `District-level: ${mappedCount} of ${totalReportsCount} reports mapped.`;
+      return `District-level: ${mappedCount} of ${totalReportsCount} reports are mapped. Reports are shown by district because precise incident locations are unavailable.`;
     }
 
     if (language === 'bn') {
@@ -430,7 +436,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       >
         <div className="flex items-start sm:items-center gap-2 min-w-0 w-full">
           <MapIcon name="info" size="xs" className="text-ui-content-muted shrink-0 mt-0.5 sm:mt-0" ariaHidden={true} />
-          <span className="break-words leading-snug md:truncate md:leading-normal">{accessibleSummary}</span>
+          <span className="break-words leading-snug">{accessibleSummary}</span>
         </div>
       </div>
 
@@ -478,25 +484,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         {totalReportsCount > 0 && (
           <div className="absolute top-3.5 left-3.5 z-[500]">
             <HeatmapLegend language={language} />
-          </div>
-        )}
-
-        {/* District-Level Fallback Notification (Top-Center / Below Top-Left on mobile) */}
-        {isDistrictFallback && (
-          <div className="absolute top-3 sm:top-3.5 left-3 sm:left-1/2 sm:-translate-x-1/2 mt-16 sm:mt-0 z-[500] max-w-[260px] sm:max-w-md bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-2xs text-left">
-            <div className="flex items-start gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0" />
-              <div className="space-y-0.5">
-                <div className="text-[11px] sm:text-[12px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'জেলা-ভিত্তিক হিটম্যাপ' : 'District-level heatmap'}
-                </div>
-                <div className="text-[10px] sm:text-[11px] text-ui-content-secondary leading-tight sm:leading-snug">
-                  {language === 'bn'
-                    ? 'সুনির্দিষ্ট অবস্থান না থাকায় জেলা অনুযায়ী প্রতিবেদন দেখানো হচ্ছে।'
-                    : 'Reports are shown by district because precise incident locations are unavailable.'}
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
