@@ -307,6 +307,10 @@ export const GoogleMapPicker: React.FC<GoogleMapPickerProps> = ({
     }
   };
 
+  // The report composer only uses this picker as an optional enhancement.
+  // Optional maps are intentionally hidden; required map flows, if any, remain intact.
+  if (!required) return null;
+
   return (
     <div className="space-y-2 text-left">
       {/* Header & Status Indicator */}
