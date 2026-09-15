@@ -131,6 +131,20 @@ const isMockModeAllowed = (): boolean => {
   );
 };
 
+// In-flight request deduplication map to prevent redundant concurrent network bursts
+const inFlightRequests = new Map<string, Promise<any>>();
+
+function fetchWithDeduplication<T>(key: string, fetcher: () => PromiseLike<T>): Promise<T> {
+  if (inFlightRequests.has(key)) {
+    return inFlightRequests.get(key) as Promise<T>;
+  }
+  const promise = Promise.resolve(fetcher()).finally(() => {
+    inFlightRequests.delete(key);
+  });
+  inFlightRequests.set(key, promise);
+  return promise;
+}
+
 export const PublicReportService = {
   /**
    * Fetch all published reports matching optional criteria.
@@ -149,7 +163,9 @@ export const PublicReportService = {
         throw new Error('Public reports service is currently unavailable.');
       }
     } else {
-      const { data, error } = await supabase.rpc('get_public_published_reports');
+      const { data, error } = await fetchWithDeduplication('rpc:get_public_published_reports', () =>
+        supabase!.rpc('get_public_published_reports')
+      );
       if (error) {
         console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
         if (isMockModeAllowed()) {
@@ -251,12 +267,15 @@ export const PublicReportService = {
       // In mock mode or when Supabase is not configured, fallback to getAll()
       list = await this.getAll();
     } else {
-      const { data, error } = await supabase.rpc('get_public_home_feed', {
-        p_visitor_lat: params?.visitorLat ?? null,
-        p_visitor_lng: params?.visitorLng ?? null,
-        p_filter: params?.filter || 'all',
-        p_district: params?.district || 'all',
-      });
+      const dedupKey = `rpc:get_public_home_feed:${params?.visitorLat ?? 'null'}:${params?.visitorLng ?? 'null'}:${params?.filter || 'all'}:${params?.district || 'all'}`;
+      const { data, error } = await fetchWithDeduplication(dedupKey, () =>
+        supabase!.rpc('get_public_home_feed', {
+          p_visitor_lat: params?.visitorLat ?? null,
+          p_visitor_lng: params?.visitorLng ?? null,
+          p_filter: params?.filter || 'all',
+          p_district: params?.district || 'all',
+        })
+      );
 
       if (error) {
         console.warn('[PublicReportService.getHomeFeed] RPC error:', error);
@@ -328,9 +347,11 @@ export const PublicReportService = {
       throw new Error('Public reports service is currently unavailable.');
     }
 
-    const { data, error } = await supabase.rpc('get_public_published_report', {
-      p_report_id: cleanId,
-    });
+    const { data, error } = await fetchWithDeduplication(`rpc:get_public_published_report:${cleanId}`, () =>
+      supabase!.rpc('get_public_published_report', {
+        p_report_id: cleanId,
+      })
+    );
 
     if (error) {
       console.warn('[PublicReportService.getById] Supabase RPC error:', error);

@@ -64,11 +64,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           // Fetch related reports from backend service ONLY if explicit relatedReportIds exist
           if (res.report.relatedReportIds && Array.isArray(res.report.relatedReportIds) && res.report.relatedReportIds.length > 0) {
             try {
-              const allPublic = await PublicReportService.getAll();
-              const rel = allPublic.filter(
-                (r) => r.id !== res.report.id && res.report.relatedReportIds?.includes(r.id)
-              ).slice(0, 3);
-              setRelatedReports(rel);
+              const rel = await PublicReportService.getRelatedReports(
+                res.report.id,
+                res.report.relatedReportIds
+              );
+              setRelatedReports(rel.slice(0, 3));
             } catch (e) {
               console.warn('[ReportDetailPage related reports error]', e);
             }

@@ -21,12 +21,16 @@ import { UtilityPage } from '../../pages/UtilityPage';
 import { ComingSoonPage } from '../../pages/ComingSoonPage';
 import { ReportDetailPage } from '../../pages/ReportDetailPage';
 import { ReportPage } from '../../pages/ReportPage';
-import { ExplorePage } from '../../pages/ExplorePage';
 import { SearchPage } from '../../pages/SearchPage';
 import { MorePage } from '../../pages/MorePage';
 import { LocationPage } from '../../pages/LocationPage';
 import { SubjectPage } from '../../pages/SubjectPage';
 import { SeoManager } from '../seo/SeoManager';
+import { MapExploreSkeleton } from '../ui/LoadingSkeleton';
+
+const LazyExplorePage = React.lazy(() =>
+  import('../../pages/ExplorePage').then((m) => ({ default: m.ExplorePage }))
+);
 
 const ReportDetailRouteWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -167,7 +171,14 @@ export const AppShell: React.FC = () => {
                   <Route path="/load-shedding" element={<UtilityPage />} />
                   <Route path="/illegal-occupation" element={<ComingSoonPage serviceKey="illegal_occupation" />} />
                   <Route path="/report" element={<ReportPage />} />
-                  <Route path="/explore" element={<ExplorePage />} />
+                  <Route
+                    path="/explore"
+                    element={
+                      <React.Suspense fallback={<MapExploreSkeleton />}>
+                        <LazyExplorePage />
+                      </React.Suspense>
+                    }
+                  />
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/more" element={<MorePage />} />
                   <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
