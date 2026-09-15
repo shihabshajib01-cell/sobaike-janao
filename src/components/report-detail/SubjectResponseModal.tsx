@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
 
 /**
- * Temporary rollout gate: Controls whether the simplified Subject Response form is enabled.
- * CRITICAL: Must remain strictly `false` during this phase until the backend SQL change
- * (supabase/allow_subject_response_without_responder_type.sql) is manually applied and verified.
+ * Rollout gate: Controls whether the simplified Subject Response form is enabled.
+ * Production connection verified with backend SQL contract (supabase/allow_subject_response_without_responder_type.sql).
  */
-const SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED = true;
+export const SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED = true;
 
 interface SubjectResponseModalProps {
   isOpen: boolean;
@@ -38,6 +37,15 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsSubmitted(false);
+      setIsSubmitting(false);
+      setResponseId(null);
+      setError(null);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

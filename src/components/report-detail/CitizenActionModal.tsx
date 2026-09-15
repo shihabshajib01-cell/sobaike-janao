@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
@@ -27,6 +27,15 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (isOpen) {
+      setIsSubmitted(false);
+      setIsSubmitting(false);
+      setResponseId(null);
+      setError(null);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,6 +47,27 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
         language === 'bn'
           ? 'অন্তত ১০ অক্ষর লিখুন।'
           : 'Enter at least 10 characters.'
+      );
+      return;
+    }
+
+    if (witnessDate.trim()) {
+      const today = new Date().toISOString().split('T')[0];
+      if (witnessDate > today) {
+        setError(
+          language === 'bn'
+            ? 'ঘটনার তারিখ ভবিষ্যতের হতে পারে না।'
+            : 'Incident date cannot be in the future.'
+        );
+        return;
+      }
+    }
+
+    if (contactConsent && !contactInfo.trim()) {
+      setError(
+        language === 'bn'
+          ? 'যোগাযোগের সম্মতি দিলে অনুগ্রহ করে আপনার ফোন নম্বর বা ইমেইল লিখুন।'
+          : 'Please provide your phone number or email if you consent to follow-up.'
       );
       return;
     }
@@ -191,6 +221,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   id="citizen-witness-date-input"
                   name="witnessDate"
                   type="date"
+                  max={new Date().toISOString().split('T')[0]}
                   value={witnessDate}
                   onChange={(e) => setWitnessDate(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent focus:ring-1 focus:ring-ui-accent rounded-xl text-[15px] sm:text-[16px] text-ui-content-primary min-h-[44px]"

@@ -653,13 +653,14 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       </article>
 
       {/* 3. Citizen Participation Action Box */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-6 space-y-3 shadow-2xs">
+      <div id="report-response-action-box" className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-6 space-y-3 shadow-2xs">
         <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
           {language === 'bn' ? 'এই প্রতিবেদন সম্পর্কে কিছু জানেন?' : 'Do you know something about this report?'}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
           <button
+            id="btn-respond-citizen-info"
             type="button"
             onClick={() => setIsCitizenModalOpen(true)}
             className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
@@ -669,6 +670,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               : 'I have information / I experienced this too'}
           </button>
           <button
+            id="btn-respond-subject-party"
             type="button"
             onClick={() => setIsSubjectModalOpen(true)}
             className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"

@@ -104,11 +104,26 @@ class ApiClient {
       };
     }
 
-    const { data, error } = await supabase.rpc('submit_public_response', {
+    let { data, error } = await supabase.rpc('submit_public_response', {
       p_report_id: reportId,
       p_response_type: 'subject_response',
       p_payload: payload,
     });
+
+    // Backward compatibility: if the database has not applied allow_subject_response_without_responder_type.sql yet,
+    // and returns INVALID_RESPONDER_TYPE when responderType is omitted, retry once with legacy default 'mentioned_person'
+    if (error && error.message?.includes('INVALID_RESPONDER_TYPE') && !payload.responderType) {
+      const fallbackPayload = { ...payload, responderType: 'mentioned_person' as const };
+      const retryResult = await supabase.rpc('submit_public_response', {
+        p_report_id: reportId,
+        p_response_type: 'subject_response',
+        p_payload: fallbackPayload,
+      });
+      if (!retryResult.error) {
+        data = retryResult.data;
+        error = null;
+      }
+    }
 
     if (error) {
       const isNotPublished = error.message?.includes('INVALID_REPORT_STATUS');
