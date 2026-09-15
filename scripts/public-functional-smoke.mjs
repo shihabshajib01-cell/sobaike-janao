@@ -54,10 +54,9 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   const notice = page.locator('#first-visit-notice-modal');
   await expectVisible(notice, 'responsibility notice did not open');
-  const checkbox = page.locator('#first-visit-ack-checkbox');
   const continueBtn = page.locator('#first-visit-acknowledge-btn');
   if (!(await continueBtn.isDisabled())) throw new Error('continue button should start disabled');
-  await checkbox.check();
+  await page.locator('label[for="first-visit-ack-checkbox"]').click();
   if (await continueBtn.isDisabled()) throw new Error('continue button did not enable after acknowledgement');
   await continueBtn.click();
   const locationModal = page.locator('#location-consent-modal');
@@ -72,6 +71,31 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
     location: localStorage.getItem('sobaike_location_choice_v1'),
   }));
   if (stored.notice !== 'accepted' || stored.location !== 'not_now') throw new Error(`unexpected stored state ${JSON.stringify(stored)}`);
+  await context.close();
+});
+
+await check('Browse location grant flow works with simulated coordinates', async () => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    geolocation: { latitude: 23.7806, longitude: 90.4070 },
+  });
+  await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.removeItem('sobaike_location_choice_v1');
+  });
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-granted');
+  await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const locationModal = page.locator('#location-consent-modal');
+  await expectVisible(locationModal, 'location consent did not open for undecided visitor');
+  const modalButtons = locationModal.locator('button');
+  if ((await modalButtons.count()) < 2) throw new Error('location consent actions missing');
+  await modalButtons.nth(0).click();
+  await locationModal.waitFor({ state: 'hidden', timeout: 15000 });
+  const choice = await page.evaluate(() => localStorage.getItem('sobaike_location_choice_v1'));
+  if (choice !== 'granted') throw new Error(`expected granted location choice; got ${choice}`);
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) throw new Error('location reminder should be hidden after successful grant');
   await context.close();
 });
 
