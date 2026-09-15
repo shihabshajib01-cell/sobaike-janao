@@ -1,0 +1,96 @@
+name: Security Hardening Implementation
+
+on:
+  push:
+    branches:
+      - security/public-hardening
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout security branch
+        uses: actions/checkout@v4
+        with:
+          ref: security/public-hardening
+
+      - name: Patch production mock behavior
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          api_path = Path('src/services/apiClient.ts')
+          api = api_path.read_text()
+          old_api = "const isMockAllowed = import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';"
+          expected = 3
+          actual = api.count(old_api)
+          if actual != expected:
+              raise SystemExit(f'Expected {expected} apiClient mock-mode checks, found {actual}')
+          api = api.replace(
+              old_api,
+              "const isMockAllowed = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';",
+          )
+          api_path.write_text(api)
+
+          service_path = Path('src/services/publicReportService.ts')
+          service = service_path.read_text()
+          old_service = """const isMockModeAllowed = (): boolean => {\n  // If Supabase is not configured, automatically allow mock mode so the app works out-of-the-box in preview\n  if (!isSupabaseConfigured()) {\n    return import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';\n  }\n  return (\n    import.meta.env.DEV &&\n    import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'\n  );\n};"""
+          new_service = """const isMockModeAllowed = (): boolean => {\n  // Mock data is an explicit development-only capability. Production must fail closed\n  // if Supabase configuration is missing or unavailable.\n  return import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';\n};"""
+          if service.count(old_service) != 1:
+              raise SystemExit('Expected exactly one publicReportService mock-mode helper')
+          service_path.write_text(service.replace(old_service, new_service))
+          PY
+
+      - name: Verify mock fail-closed invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -R "VITE_ENABLE_MOCK_MODE !== 'false'" src
+          grep -q "import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'" src/services/apiClient.ts
+          grep -q "import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'" src/services/publicReportService.ts
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Capture dependency audit
+        shell: bash
+        run: |
+          npm audit --json > /tmp/npm-audit.json || true
+          node - <<'NODE'
+          const fs = require('fs');
+          const audit = JSON.parse(fs.readFileSync('/tmp/npm-audit.json', 'utf8'));
+          console.log(JSON.stringify(audit.metadata?.vulnerabilities || {}, null, 2));
+          NODE
+
+      - name: Commit verified source changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- src/services/apiClient.ts src/services/publicReportService.ts; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/services/apiClient.ts src/services/publicReportService.ts
+          git commit -m "security: fail closed outside explicit dev mock mode"
+          git push origin HEAD:security/public-hardening
