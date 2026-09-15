@@ -132,14 +132,9 @@ export function saveLocalMockReport(report: any): void {
 }
 
 const isMockModeAllowed = (): boolean => {
-  // If Supabase is not configured, automatically allow mock mode so the app works out-of-the-box in preview
-  if (!isSupabaseConfigured()) {
-    return import.meta.env.VITE_ENABLE_MOCK_MODE !== 'false';
-  }
-  return (
-    import.meta.env.DEV &&
-    import.meta.env.VITE_ENABLE_MOCK_MODE === 'true'
-  );
+  // Mock data is an explicit development-only capability. Production must fail closed
+  // if Supabase configuration is missing or unavailable.
+  return import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
 };
 
 // In-flight request deduplication map to prevent redundant concurrent network bursts
