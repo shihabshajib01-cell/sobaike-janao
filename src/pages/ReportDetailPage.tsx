@@ -30,6 +30,7 @@ import { ReportDetailSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
 import { BRAND_NAME } from '../lib/seo';
+import { HarassmentContextSummary } from '../components/report/HarassmentContextSummary';
 
 export interface ReportDetailPageProps {
   reportId: string;
@@ -402,6 +403,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             </div>
           </div>
         )}
+
+        <HarassmentContextSummary report={report} language={language} />
 
         {/* Excess Electricity Bill Context Block */}
         {(report.recentBillMonth || report.recentBillAmount !== undefined) && (

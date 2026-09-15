@@ -18,6 +18,18 @@ import { toBanglaDigits } from '../utils/formatters';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { MapIcon } from '../components/explore/MapIcon';
 import { Modal } from '../components/ui/Modal';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
+import { HarassmentClassificationFilters } from '../components/report/HarassmentClassificationFilters';
+import { HarassmentClassificationBreakdown } from '../components/explore/HarassmentClassificationBreakdown';
+import {
+  EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
+  HARASSMENT_AGE_GROUP_OPTIONS,
+  HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
+  HARASSMENT_REPORTING_FOR_OPTIONS,
+  getBilingualOptionLabel,
+  hasActiveHarassmentClassificationFilters,
+  matchesHarassmentClassification,
+} from '../data/harassmentClassification';
 
 export const ExplorePage: React.FC = () => {
   const { language } = useApp();
@@ -27,6 +39,7 @@ export const ExplorePage: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<SectionKey | 'all'>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [harassmentFilters, setHarassmentFilters] = useState(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
 
   // Mobile UX Phase 6 Sheet States
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
@@ -36,6 +49,7 @@ export const ExplorePage: React.FC = () => {
   const [draftSection, setDraftSection] = useState<SectionKey | 'all'>('all');
   const [draftDivision, setDraftDivision] = useState<string>('all');
   const [draftDistrict, setDraftDistrict] = useState<string>('all');
+  const [draftHarassmentFilters, setDraftHarassmentFilters] = useState(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
 
   const [allReports, setAllReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -94,6 +108,9 @@ export const ExplorePage: React.FC = () => {
             foundDist.divisionId === selectedDivision.toLowerCase());
         if (!matchDiv) return false;
       }
+      if (selectedSection === 'harassment' && !matchesHarassmentClassification(r, harassmentFilters)) {
+        return false;
+      }
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -118,7 +135,7 @@ export const ExplorePage: React.FC = () => {
       }
       return true;
     });
-  }, [allReports, searchQuery, selectedSection, selectedDivision]);
+  }, [allReports, searchQuery, selectedSection, selectedDivision, harassmentFilters]);
 
   // Shared Filtered Reports - single source of truth for Heatmap, Reports modes, and selected area data
   const filteredReports: ReportItem[] = useMemo(() => {
@@ -159,12 +176,14 @@ export const ExplorePage: React.FC = () => {
     setSelectedSection('all');
     setSelectedDivision('all');
     setSelectedDistrict('all');
+    setHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
   };
 
   const handleOpenFilterSheet = () => {
     setDraftSection(selectedSection);
     setDraftDivision(selectedDivision);
     setDraftDistrict(selectedDistrict);
+    setDraftHarassmentFilters(harassmentFilters);
     setIsAreaSheetOpen(false);
     setIsFilterSheetOpen(true);
   };
@@ -173,6 +192,9 @@ export const ExplorePage: React.FC = () => {
     setSelectedSection(draftSection);
     setSelectedDivision(draftDivision);
     setSelectedDistrict(draftDistrict);
+    setHarassmentFilters(
+      draftSection === 'harassment' ? draftHarassmentFilters : EMPTY_HARASSMENT_CLASSIFICATION_FILTERS
+    );
     setIsFilterSheetOpen(false);
   };
 
@@ -180,6 +202,7 @@ export const ExplorePage: React.FC = () => {
     setDraftSection('all');
     setDraftDivision('all');
     setDraftDistrict('all');
+    setDraftHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
   };
 
   const handleDraftDivisionChange = (div: string) => {
@@ -192,8 +215,13 @@ export const ExplorePage: React.FC = () => {
     if (selectedSection !== 'all') count++;
     if (selectedDivision !== 'all') count++;
     if (selectedDistrict !== 'all') count++;
+    if (selectedSection === 'harassment') {
+      if (harassmentFilters.ageGroup !== 'all') count++;
+      if (harassmentFilters.abuserRelationship !== 'all') count++;
+      if (harassmentFilters.reportingFor !== 'all') count++;
+    }
     return count;
-  }, [selectedSection, selectedDivision, selectedDistrict]);
+  }, [selectedSection, selectedDivision, selectedDistrict, harassmentFilters]);
 
   const handleSelectDistrict = useCallback((districtValue: string) => {
     if (!districtValue || districtValue === 'all') {
@@ -216,6 +244,7 @@ export const ExplorePage: React.FC = () => {
 
   const hasActiveFilters =
     Boolean(searchQuery.trim()) ||
+    (selectedSection === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) ||
     selectedSection !== 'all' ||
     selectedDivision !== 'all' ||
     selectedDistrict !== 'all';
@@ -356,105 +385,60 @@ export const ExplorePage: React.FC = () => {
               : 'Explore published reports by area, topic, or search term.'}
           </p>
         </div>
-
         {/* Desktop / Tablet Controls (Search, Division, District) */}
-        <div className="hidden md:flex items-center justify-between gap-4">
-          {/* Filters Group */}
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Division Dropdown */}
-            <div className="relative flex items-center min-w-[160px] lg:min-w-[180px]">
-              <select
-                id="desktop-select-division"
-                value={selectedDivision}
-                onChange={(e) => {
-                  setSelectedDivision(e.target.value);
-                  setSelectedDistrict('all'); // reset district when division changes
-                }}
-                aria-label={language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Select division'}
-                className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
-              >
-                <option value="all">
-                  {language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}
-                </option>
-                {DIVISIONS.map((div) => (
-                  <option key={div.id} value={div.nameEn}>
-                    {language === 'bn' ? div.nameBn : div.nameEn}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* District Dropdown */}
-            <div className="relative flex items-center min-w-[160px] lg:min-w-[180px]">
-              <MapIcon
-                name="map-pin"
-                size="sm"
-                className="text-ui-content-muted absolute left-3.5 pointer-events-none"
-                ariaHidden={true}
-              />
-              <select
-                id="desktop-select-district"
-                value={selectedDistrict}
-                onChange={(e) => setSelectedDistrict(e.target.value)}
-                aria-label={language === 'bn' ? 'জেলা নির্বাচন করুন' : 'Select district'}
-                className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
-              >
-                <option value="all">
-                  {language === 'bn' ? 'সকল জেলা' : 'All districts'}
-                </option>
-                {availableDistricts.map((d) => (
-                  <option key={d.id} value={d.nameEn}>
-                    {language === 'bn'
-                      ? `${d.nameBn} (${d.divisionBn})`
-                      : `${d.nameEn} (${d.divisionEn})`}
-                  </option>
-                ))}
-              </select>
-              {selectedDistrict !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedDistrict('all')}
-                  aria-label={language === 'bn' ? 'নির্বাচিত জেলা মুছুন' : 'Clear selected district'}
-                  title={language === 'bn' ? 'জেলা মুছুন' : 'Clear district'}
-                  className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                >
-                  <MapIcon name="close" size="xs" ariaHidden={true} />
-                </button>
-              )}
-            </div>
+        <div className="hidden md:flex items-start justify-between gap-4">
+          <div className="grid grid-cols-2 gap-2 min-w-[350px] lg:min-w-[390px]">
+            <SearchableSelect
+              id="desktop-select-division"
+              value={selectedDivision}
+              onChange={(value) => {
+                setSelectedDivision(value);
+                setSelectedDistrict('all');
+              }}
+              placeholder={language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}
+              searchPlaceholder={language === 'bn' ? 'বিভাগ খুঁজুন...' : 'Search divisions...'}
+              noResultsText={language === 'bn' ? 'কোনো বিভাগ পাওয়া যায়নি' : 'No matching division'}
+              options={[
+                { value: 'all', label: language === 'bn' ? 'সকল বিভাগ' : 'All divisions' },
+                ...DIVISIONS.map((division) => ({
+                  value: division.nameEn,
+                  label: language === 'bn' ? division.nameBn : division.nameEn,
+                  keywords: [division.nameBn, division.nameEn],
+                })),
+              ]}
+            />
+            <SearchableSelect
+              id="desktop-select-district"
+              value={selectedDistrict}
+              onChange={setSelectedDistrict}
+              placeholder={language === 'bn' ? 'সকল জেলা' : 'All districts'}
+              searchPlaceholder={language === 'bn' ? 'জেলা খুঁজুন...' : 'Search districts...'}
+              noResultsText={language === 'bn' ? 'কোনো জেলা পাওয়া যায়নি' : 'No matching district'}
+              options={[
+                { value: 'all', label: language === 'bn' ? 'সকল জেলা' : 'All districts' },
+                ...availableDistricts.map((district) => ({
+                  value: district.nameEn,
+                  label: language === 'bn'
+                    ? `${district.nameBn} (${district.divisionBn})`
+                    : `${district.nameEn} (${district.divisionEn})`,
+                  keywords: [district.nameBn, district.nameEn, district.divisionBn, district.divisionEn],
+                })),
+              ]}
+            />
           </div>
 
-          {/* Main Keyword Search */}
           <div className="relative flex items-center w-[240px] lg:w-[280px] shrink-0">
-            <MapIcon
-              name="search"
-              size="sm"
-              className="text-ui-content-muted absolute left-3.5 pointer-events-none"
-              ariaHidden={true}
-            />
+            <MapIcon name="search" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" ariaHidden={true} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label={
-                language === 'bn'
-                  ? 'এলাকা বা প্রতিবেদন খুঁজুন'
-                  : 'Search by area or report'
-              }
-              placeholder={
-                language === 'bn'
-                  ? 'এলাকা বা প্রতিবেদন খুঁজুন...'
-                  : 'Search by area or report...'
-              }
+              aria-label={language === 'bn' ? 'এলাকা বা প্রতিবেদন খুঁজুন' : 'Search by area or report'}
+              placeholder={language === 'bn' ? 'এলাকা বা প্রতিবেদন খুঁজুন...' : 'Search by area or report...'}
               className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
             />
             {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'}
-                className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
+              <button type="button" onClick={() => setSearchQuery('')} aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'} className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
             )}
@@ -548,6 +532,16 @@ export const ExplorePage: React.FC = () => {
             </span>
           </button>
         </div>
+
+        {selectedSection === 'harassment' && (
+          <div className="hidden md:block pt-1 border-t border-ui-stroke-subtle">
+            <HarassmentClassificationFilters
+              language={language}
+              value={harassmentFilters}
+              onChange={setHarassmentFilters}
+            />
+          </div>
+        )}
 
         {/* Mobile Control Bar (Search Input + Filters Drawer Button) */}
         <div className="flex md:hidden items-center gap-2">
@@ -707,6 +701,27 @@ export const ExplorePage: React.FC = () => {
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
+            </span>
+          )}
+
+
+
+          {selectedSection === 'harassment' && harassmentFilters.ageGroup !== 'all' && (
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+              <span>{getBilingualOptionLabel(HARASSMENT_AGE_GROUP_OPTIONS, harassmentFilters.ageGroup, language)}</span>
+              <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, ageGroup: 'all' }))} aria-label={language === 'bn' ? 'বয়সের ফিল্টার সরান' : 'Remove age filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
+            </span>
+          )}
+          {selectedSection === 'harassment' && harassmentFilters.abuserRelationship !== 'all' && (
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+              <span>{getBilingualOptionLabel(HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS, harassmentFilters.abuserRelationship, language)}</span>
+              <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, abuserRelationship: 'all' }))} aria-label={language === 'bn' ? 'সম্পর্কের ফিল্টার সরান' : 'Remove relationship filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
+            </span>
+          )}
+          {selectedSection === 'harassment' && harassmentFilters.reportingFor !== 'all' && (
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
+              <span>{getBilingualOptionLabel(HARASSMENT_REPORTING_FOR_OPTIONS, harassmentFilters.reportingFor, language)}</span>
+              <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, reportingFor: 'all' }))} aria-label={language === 'bn' ? 'প্রতিবেদনকারীর ফিল্টার সরান' : 'Remove reporting-for filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
             </span>
           )}
 
@@ -961,6 +976,9 @@ export const ExplorePage: React.FC = () => {
                 reports={filteredReports}
                 language={language}
               />
+              {selectedSection === 'harassment' && (
+                <HarassmentClassificationBreakdown reports={filteredReports} language={language} />
+              )}
 
               {/* 2. Detailed analysis (Directly visible by default) */}
               <div id="detailed-analysis-section" className="space-y-4 pt-1">
@@ -1044,51 +1062,31 @@ export const ExplorePage: React.FC = () => {
         }
       >
         <div className="space-y-4 py-1">
-          {/* Division */}
-          <div className="space-y-1.5">
-            <label htmlFor="mobile-filter-division" className="text-[13px] font-bold text-ui-content-primary block">
-              {language === 'bn' ? 'বিভাগ' : 'Division'}
-            </label>
-            <select
-              id="mobile-filter-division"
-              value={draftDivision}
-              onChange={(e) => handleDraftDivisionChange(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            >
-              <option value="all">
-                {language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}
-              </option>
-              {DIVISIONS.map((div) => (
-                <option key={div.id} value={div.nameEn}>
-                  {language === 'bn' ? div.nameBn : div.nameEn}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchableSelect
+            id="mobile-filter-division"
+            label={language === 'bn' ? 'বিভাগ' : 'Division'}
+            value={draftDivision}
+            onChange={handleDraftDivisionChange}
+            searchPlaceholder={language === 'bn' ? 'বিভাগ খুঁজুন...' : 'Search divisions...'}
+            noResultsText={language === 'bn' ? 'কোনো বিভাগ পাওয়া যায়নি' : 'No matching division'}
+            options={[
+              { value: 'all', label: language === 'bn' ? 'সকল বিভাগ' : 'All divisions' },
+              ...DIVISIONS.map((division) => ({ value: division.nameEn, label: language === 'bn' ? division.nameBn : division.nameEn, keywords: [division.nameBn, division.nameEn] })),
+            ]}
+          />
 
-          {/* District */}
-          <div className="space-y-1.5">
-            <label htmlFor="mobile-filter-district" className="text-[13px] font-bold text-ui-content-primary block">
-              {language === 'bn' ? 'জেলা' : 'District'}
-            </label>
-            <select
-              id="mobile-filter-district"
-              value={draftDistrict}
-              onChange={(e) => setDraftDistrict(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            >
-              <option value="all">
-                {language === 'bn' ? 'সকল জেলা' : 'All districts'}
-              </option>
-              {draftAvailableDistricts.map((d) => (
-                <option key={d.id} value={d.nameEn}>
-                  {language === 'bn'
-                    ? `${d.nameBn} (${d.divisionBn})`
-                    : `${d.nameEn} (${d.divisionEn})`}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchableSelect
+            id="mobile-filter-district"
+            label={language === 'bn' ? 'জেলা' : 'District'}
+            value={draftDistrict}
+            onChange={setDraftDistrict}
+            searchPlaceholder={language === 'bn' ? 'জেলা খুঁজুন...' : 'Search districts...'}
+            noResultsText={language === 'bn' ? 'কোনো জেলা পাওয়া যায়নি' : 'No matching district'}
+            options={[
+              { value: 'all', label: language === 'bn' ? 'সকল জেলা' : 'All districts' },
+              ...draftAvailableDistricts.map((district) => ({ value: district.nameEn, label: language === 'bn' ? district.nameBn : district.nameEn, keywords: [district.nameBn, district.nameEn, district.divisionBn, district.divisionEn] })),
+            ]}
+          />
 
           {/* Topic / Category */}
           <fieldset className="space-y-2 border-0 p-0 m-0">
@@ -1174,6 +1172,16 @@ export const ExplorePage: React.FC = () => {
               </button>
             </div>
           </fieldset>
+
+          {draftSection === 'harassment' && (
+            <div className="pt-1 border-t border-ui-stroke-subtle">
+              <HarassmentClassificationFilters
+                language={language}
+                value={draftHarassmentFilters}
+                onChange={setDraftHarassmentFilters}
+              />
+            </div>
+          )}
         </div>
       </Modal>
 

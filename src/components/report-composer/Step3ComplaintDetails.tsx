@@ -33,21 +33,24 @@ import {
 } from '../../data/reportSubjectOptions';
 import {
   DIVISIONS,
-  DivisionInfo,
-  DistrictInfo,
   getDistrictsByDivision,
   getDivisionByStoredName,
   getDistrictByStoredName,
 } from '../../data/districts';
 import {
-  UpazilaInfo,
   getUpazilasByDistrict,
   getUpazilaByStoredName,
 } from '../../data/upazilas';
 import { Accordion } from '../ui/Accordion';
 import { Toggle } from '../ui/Toggle';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { Select } from '../ui/Select';
+import {
+  HARASSMENT_AGE_GROUP_OPTIONS,
+  HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
+  HARASSMENT_REPORTING_FOR_OPTIONS,
+} from '../../data/harassmentClassification';
 import { ImageAttachmentPicker, AttachedImagePreview } from '../media/ImageAttachmentPicker';
-import { GoogleMapPicker } from '../location/GoogleMapPicker';
 import { AddressSearchInput } from '../location/AddressSearchInput';
 import {
   buildResolvedLocationData,
@@ -250,11 +253,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Validation errors state
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    // Map centering target state (for flyTo when places are resolved)
-    const [mapCenterTarget, setMapCenterTarget] = useState<
-      { lat: number; lng: number; zoom?: number; timestamp: number } | undefined
-    >();
-
     // Reporter device location gate state
     const [reporterGateState, setReporterGateState] = useState<ReporterLocationGateState>(() => {
       if (VisitorSessionService.hasValidCurrentReporterLocation()) {
@@ -437,51 +435,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       const resolved = buildResolvedLocationData(currentLoc, place);
       onUpdateFormData({ location: resolved });
 
-      setMapCenterTarget({
-        lat: place.lat,
-        lng: place.lng,
-        zoom: 16,
-        timestamp: Date.now(),
-      });
-
       if (resolved.division && errors.division) setErrors((prev) => ({ ...prev, division: '' }));
       if (resolved.district && errors.district) setErrors((prev) => ({ ...prev, district: '' }));
       if (resolved.upazilaOrThana && errors.upazilaOrThana) setErrors((prev) => ({ ...prev, upazilaOrThana: '' }));
       if (resolved.formattedAddress && errors.formattedAddress) setErrors((prev) => ({ ...prev, formattedAddress: '' }));
     };
 
-    const handleMapPointChange = (lat: number, lng: number) => {
-      if (isLocationLocked) return;
-      onUpdateFormData({
-        location: {
-          ...(formData.location || {
-            division: '',
-            district: '',
-            upazilaOrThana: '',
-            formattedAddress: '',
-          }),
-          lat,
-          lng,
-        },
-      });
-    };
-
-    const handleClearMapPoint = () => {
-      if (isLocationLocked) return;
-      onUpdateFormData({
-        location: {
-          ...(formData.location || {
-            division: '',
-            district: '',
-            upazilaOrThana: '',
-            formattedAddress: '',
-          }),
-          lat: undefined,
-          lng: undefined,
-          placeId: undefined,
-        },
-      });
-    };
 
     // Safe historical draft recovery: preserve old draft address parts if formattedAddress is blank (non-utility only)
     useEffect(() => {
@@ -883,6 +842,21 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               : 'Select today or an earlier date.';
         }
 
+        if (segment === 'harassment') {
+          if (!formData.affectedPersonAgeGroup) {
+            newErrors.affectedPersonAgeGroup =
+              language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়সের গ্রুপ নির্বাচন করুন।' : "Select the affected person's age group.";
+          }
+          if (!formData.allegedAbuserRelationship) {
+            newErrors.allegedAbuserRelationship =
+              language === 'bn' ? 'অভিযুক্ত ব্যক্তির সঙ্গে সম্পর্ক নির্বাচন করুন।' : 'Select the relationship with the alleged abuser.';
+          }
+          if (!formData.reportingFor) {
+            newErrors.reportingFor =
+              language === 'bn' ? 'কার জন্য প্রতিবেদন করছেন তা নির্বাচন করুন।' : 'Select who you are reporting for.';
+          }
+        }
+
         if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
           newErrors.reporterLocation =
             language === 'bn'
@@ -976,7 +950,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           newErrors.recentBillMonth ||
           newErrors.recentBillAmount ||
           newErrors.previousBillMonth ||
-          newErrors.previousBillAmount
+          newErrors.previousBillAmount ||
+          newErrors.affectedPersonAgeGroup ||
+          newErrors.allegedAbuserRelationship ||
+          newErrors.reportingFor
         ) {
           const elem = document.getElementById('composer-section-narrative');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1576,6 +1553,64 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               )}
             </div>
 
+            {segment === 'harassment' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle">
+                <Select
+                  id="harassment-age-group-select"
+                  label={language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়সের গ্রুপ' : "Affected person's age group"}
+                  required
+                  value={formData.affectedPersonAgeGroup || ''}
+                  onChange={(event) => {
+                    onUpdateFormData({ affectedPersonAgeGroup: event.target.value as DraftReport['affectedPersonAgeGroup'] });
+                    if (errors.affectedPersonAgeGroup) setErrors((prev) => ({ ...prev, affectedPersonAgeGroup: '' }));
+                  }}
+                  placeholder={language === 'bn' ? '-- বয়সের গ্রুপ নির্বাচন করুন --' : '-- Select age group --'}
+                  error={errors.affectedPersonAgeGroup}
+                  options={HARASSMENT_AGE_GROUP_OPTIONS.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+
+                <SearchableSelect
+                  id="harassment-abuser-relationship-select"
+                  label={language === 'bn' ? 'অভিযুক্ত ব্যক্তির সঙ্গে সম্পর্ক' : 'Relationship with alleged abuser'}
+                  required
+                  value={formData.allegedAbuserRelationship || ''}
+                  onChange={(value) => {
+                    onUpdateFormData({ allegedAbuserRelationship: value as DraftReport['allegedAbuserRelationship'] });
+                    if (errors.allegedAbuserRelationship) setErrors((prev) => ({ ...prev, allegedAbuserRelationship: '' }));
+                  }}
+                  placeholder={language === 'bn' ? 'সম্পর্ক নির্বাচন করুন' : 'Select relationship'}
+                  searchPlaceholder={language === 'bn' ? 'সম্পর্ক খুঁজুন...' : 'Search relationship...'}
+                  noResultsText={language === 'bn' ? 'কোনো মিল পাওয়া যায়নি' : 'No matching relationship'}
+                  error={errors.allegedAbuserRelationship}
+                  options={HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                    keywords: [option.labelBn, option.labelEn],
+                  }))}
+                />
+
+                <Select
+                  id="harassment-reporting-for-select"
+                  label={language === 'bn' ? 'কার জন্য প্রতিবেদন করছেন?' : 'Reporting for'}
+                  required
+                  value={formData.reportingFor || ''}
+                  onChange={(event) => {
+                    onUpdateFormData({ reportingFor: event.target.value as DraftReport['reportingFor'] });
+                    if (errors.reportingFor) setErrors((prev) => ({ ...prev, reportingFor: '' }));
+                  }}
+                  placeholder={language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}
+                  error={errors.reportingFor}
+                  options={HARASSMENT_REPORTING_FOR_OPTIONS.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+              </div>
+            )}
+
             {/* Conditional Digital Threat Questions ONLY for Digital Harassment */}
             {isDigitalHarassment && (
               <div className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3 mt-2">
@@ -1757,102 +1792,62 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Clean Manual Incident Location Form */}
             <div className="space-y-3 pt-1">
-              {/* Administrative Dropdowns (Desktop: 3 columns in 1 row; Tablet: 2 columns with Thana wrapping; Mobile: stacked) */}
+              {/* Administrative searchable selects (dependent Division → District → Thana/Upazila) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {/* Division */}
-                <div>
-                  <label
-                    htmlFor="complaint-division-select"
-                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
-                  >
-                    {language === 'bn' ? 'বিভাগ *' : 'Division *'}
-                  </label>
-                  <select
-                    id="complaint-division-select"
-                    disabled={isLocationLocked}
-                    value={resolvedDivision ? resolvedDivision.nameEn : ''}
-                    onChange={(e) => handleDivisionChange(e.target.value)}
-                    className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
-                    } ${
-                      errors.division ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                    }`}
-                  >
-                    <option value="">{language === 'bn' ? '-- বিভাগ বেছে নিন --' : '-- Select Division --'}</option>
-                    {DIVISIONS.map((div: DivisionInfo) => (
-                      <option key={div.id} value={div.nameEn}>
-                        {language === 'bn' ? div.nameBn : div.nameEn}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.division && (
-                    <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.division}</p>
-                  )}
-                </div>
+                <SearchableSelect
+                  id="complaint-division-select"
+                  label={language === 'bn' ? 'বিভাগ' : 'Division'}
+                  required
+                  disabled={isLocationLocked}
+                  value={resolvedDivision ? resolvedDivision.nameEn : ''}
+                  onChange={handleDivisionChange}
+                  placeholder={language === 'bn' ? 'বিভাগ বেছে নিন' : 'Select division'}
+                  searchPlaceholder={language === 'bn' ? 'বিভাগ খুঁজুন...' : 'Search divisions...'}
+                  noResultsText={language === 'bn' ? 'কোনো বিভাগ পাওয়া যায়নি' : 'No matching division'}
+                  error={errors.division}
+                  options={DIVISIONS.map((div) => ({
+                    value: div.nameEn,
+                    label: language === 'bn' ? div.nameBn : div.nameEn,
+                    keywords: [div.nameEn, div.nameBn],
+                  }))}
+                />
 
-                {/* District */}
-                <div>
-                  <label
-                    htmlFor="complaint-district-select"
-                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
-                  >
-                    {language === 'bn' ? 'জেলা *' : 'District *'}
-                  </label>
-                  <select
-                    id="complaint-district-select"
-                    disabled={isLocationLocked || !resolvedDivision}
-                    value={resolvedDistrict ? resolvedDistrict.nameEn : ''}
-                    onChange={(e) => handleDistrictChange(e.target.value)}
-                    className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                      isLocationLocked || !resolvedDivision ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
-                    } ${
-                      errors.district ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                    }`}
-                  >
-                    <option value="">{language === 'bn' ? '-- জেলা বেছে নিন --' : '-- Select District --'}</option>
-                    {availableDistricts.map((dst: DistrictInfo) => (
-                      <option key={dst.id} value={dst.nameEn}>
-                        {language === 'bn' ? dst.nameBn : dst.nameEn}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.district && (
-                    <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.district}</p>
-                  )}
-                </div>
+                <SearchableSelect
+                  id="complaint-district-select"
+                  label={language === 'bn' ? 'জেলা' : 'District'}
+                  required
+                  disabled={isLocationLocked || !resolvedDivision}
+                  value={resolvedDistrict ? resolvedDistrict.nameEn : ''}
+                  onChange={handleDistrictChange}
+                  placeholder={language === 'bn' ? 'জেলা বেছে নিন' : 'Select district'}
+                  searchPlaceholder={language === 'bn' ? 'জেলা খুঁজুন...' : 'Search districts...'}
+                  noResultsText={language === 'bn' ? 'কোনো জেলা পাওয়া যায়নি' : 'No matching district'}
+                  error={errors.district}
+                  options={availableDistricts.map((district) => ({
+                    value: district.nameEn,
+                    label: language === 'bn' ? district.nameBn : district.nameEn,
+                    keywords: [district.nameEn, district.nameBn],
+                  }))}
+                />
 
-                {/* Thana / Upazila */}
-                <div className="sm:col-span-2 lg:col-span-1">
-                  <label
-                    htmlFor="complaint-thana-select"
-                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
-                  >
-                    {language === 'bn' ? 'থানা / উপজেলা *' : 'Thana / upazila *'}
-                  </label>
-                  <select
-                    id="complaint-thana-select"
-                    disabled={isLocationLocked || !resolvedDistrict}
-                    value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
-                    onChange={(e) => handleUpazilaChange(e.target.value)}
-                    className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${
-                      isLocationLocked || !resolvedDistrict ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : 'cursor-pointer'
-                    } ${
-                      errors.upazilaOrThana ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                    }`}
-                  >
-                    <option value="">
-                      {language === 'bn' ? '-- থানা / উপজেলা বেছে নিন --' : '-- Select Thana / Upazila --'}
-                    </option>
-                    {availableUpazilas.map((u: UpazilaInfo) => (
-                      <option key={u.id} value={u.nameEn}>
-                        {language === 'bn' ? u.nameBn : u.nameEn}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.upazilaOrThana && (
-                    <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.upazilaOrThana}</p>
-                  )}
-                </div>
+                <SearchableSelect
+                  id="complaint-thana-select"
+                  label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / upazila'}
+                  required
+                  disabled={isLocationLocked || !resolvedDistrict}
+                  value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
+                  onChange={handleUpazilaChange}
+                  placeholder={language === 'bn' ? 'থানা / উপজেলা বেছে নিন' : 'Select thana / upazila'}
+                  searchPlaceholder={language === 'bn' ? 'থানা / উপজেলা খুঁজুন...' : 'Search thana / upazila...'}
+                  noResultsText={language === 'bn' ? 'কোনো থানা / উপজেলা পাওয়া যায়নি' : 'No matching thana / upazila'}
+                  error={errors.upazilaOrThana}
+                  className="sm:col-span-2 lg:col-span-1"
+                  options={availableUpazilas.map((upazila) => ({
+                    value: upazila.nameEn,
+                    label: language === 'bn' ? upazila.nameBn : upazila.nameEn,
+                    keywords: [upazila.nameEn, upazila.nameBn],
+                  }))}
+                />
               </div>
 
               {/* Row 3: Detailed Address (Optional for non-utility, completely omitted for utility) */}
@@ -1887,7 +1882,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
               )}
 
-              {/* Optional Incident Location Pinning & Address Search */}
+              {/* Optional address/place search; no report-input map */}
               <div className="pt-2 space-y-3">
                 {isGooglePlacesConfigured() && (
                   <div>
@@ -1911,23 +1906,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     />
                   </div>
                 )}
-
-                <GoogleMapPicker
-                  location={
-                    formData.location || {
-                      division: '',
-                      district: '',
-                      upazilaOrThana: '',
-                      formattedAddress: '',
-                    }
-                  }
-                  onMapPointChange={handleMapPointChange}
-                  onClearPoint={handleClearMapPoint}
-                  language={language}
-                  centerTarget={mapCenterTarget}
-                  disabled={isLocationLocked}
-                  required={false}
-                />
               </div>
             </div>
           </div>

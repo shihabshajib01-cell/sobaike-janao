@@ -8,6 +8,11 @@ import {
 import { PublicEvidenceService } from './publicEvidenceService';
 import { PublicResponseService } from './publicResponseService';
 import { SEED_SUBMITTED_REPORTS } from '../data/seedSubmissions';
+import {
+  HarassmentAgeGroup,
+  HarassmentAbuserRelationship,
+  HarassmentReportingFor,
+} from '../data/harassmentClassification';
 
 export interface PublicReportFilters {
   segment?: SectionKey | 'all';
@@ -18,6 +23,9 @@ export interface PublicReportFilters {
   limit?: number;
   visitorLat?: number | null;
   visitorLng?: number | null;
+  affectedPersonAgeGroup?: HarassmentAgeGroup | 'all';
+  allegedAbuserRelationship?: HarassmentAbuserRelationship | 'all';
+  reportingFor?: HarassmentReportingFor | 'all';
 }
 
 export interface HomeFeedParams {
@@ -57,6 +65,9 @@ const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportIt
     areaEn: pv?.areaEn || seed.location?.area || '',
     incidentDateBn: pv?.incidentDateBn || seed.incidentDate || '',
     incidentDateEn: pv?.incidentDateEn || seed.incidentDate || '',
+    affectedPersonAgeGroup: seed.affectedPersonAgeGroup,
+    allegedAbuserRelationship: seed.allegedAbuserRelationship,
+    reportingFor: seed.reportingFor,
     recentBillMonth: seed.recentBillMonth,
     recentBillAmount:
       seed.recentBillAmount !== undefined && seed.recentBillAmount !== null
@@ -145,6 +156,48 @@ function fetchWithDeduplication<T>(key: string, fetcher: () => PromiseLike<T>): 
   return promise;
 }
 
+interface PublicHarassmentClassificationRow {
+  id: string;
+  affectedPersonAgeGroup?: HarassmentAgeGroup | null;
+  allegedAbuserRelationship?: HarassmentAbuserRelationship | null;
+  reportingFor?: HarassmentReportingFor | null;
+}
+
+async function enrichHarassmentClassifications(list: ReportItem[]): Promise<ReportItem[]> {
+  if (!isSupabaseConfigured() || !supabase || !list.some((report) => report.segment === 'harassment')) {
+    return list;
+  }
+
+  try {
+    const { data, error } = await fetchWithDeduplication('rpc:get_public_harassment_classifications', () =>
+      supabase!.rpc('get_public_harassment_classifications')
+    );
+    if (error) {
+      console.warn('[PublicReportService] Classification enrichment error:', error);
+      return list;
+    }
+    if (!Array.isArray(data)) return list;
+
+    const byId = new Map(
+      (data as PublicHarassmentClassificationRow[]).map((row) => [row.id.toUpperCase(), row])
+    );
+
+    return list.map((report) => {
+      const row = byId.get(report.id.toUpperCase());
+      if (!row) return report;
+      return {
+        ...report,
+        affectedPersonAgeGroup: row.affectedPersonAgeGroup || undefined,
+        allegedAbuserRelationship: row.allegedAbuserRelationship || undefined,
+        reportingFor: row.reportingFor || undefined,
+      };
+    });
+  } catch (error) {
+    console.warn('[PublicReportService] Classification enrichment failed:', error);
+    return list;
+  }
+}
+
 export const PublicReportService = {
   /**
    * Fetch all published reports matching optional criteria.
@@ -179,6 +232,8 @@ export const PublicReportService = {
       }
     }
 
+    list = await enrichHarassmentClassifications(list);
+
     if (filters?.segment && filters.segment !== 'all') {
       list = list.filter((r) => r.segment === filters.segment);
     }
@@ -192,6 +247,15 @@ export const PublicReportService = {
         const dBn = (r.districtBn || '').toLowerCase();
         return dEn.includes(dist) || dBn.includes(dist);
       });
+    }
+    if (filters?.affectedPersonAgeGroup && filters.affectedPersonAgeGroup !== 'all') {
+      list = list.filter((report) => report.affectedPersonAgeGroup === filters.affectedPersonAgeGroup);
+    }
+    if (filters?.allegedAbuserRelationship && filters.allegedAbuserRelationship !== 'all') {
+      list = list.filter((report) => report.allegedAbuserRelationship === filters.allegedAbuserRelationship);
+    }
+    if (filters?.reportingFor && filters.reportingFor !== 'all') {
+      list = list.filter((report) => report.reportingFor === filters.reportingFor);
     }
     if (filters?.search) {
       const q = filters.search.toLowerCase().trim();
@@ -285,6 +349,8 @@ export const PublicReportService = {
       }
     }
 
+    list = await enrichHarassmentClassifications(list);
+
     // Batch enrich published reports with evidence images (single RPC call for all visible items)
     if (isSupabaseConfigured() && supabase) {
       const reportIds = list.map((r) => r.id);
@@ -369,7 +435,8 @@ export const PublicReportService = {
     }
 
     if (data) {
-      const report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+      let report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+      report = (await enrichHarassmentClassifications([report]))[0] || report;
 
       try {
         const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
@@ -443,6 +510,15 @@ export const PublicReportService = {
       let result = ranked.filter((r) => r.segment === segment);
       if (filters.subcategory && filters.subcategory !== 'all') {
         result = result.filter((r) => r.subcategoryId === filters.subcategory);
+      }
+      if (filters.affectedPersonAgeGroup && filters.affectedPersonAgeGroup !== 'all') {
+        result = result.filter((r) => r.affectedPersonAgeGroup === filters.affectedPersonAgeGroup);
+      }
+      if (filters.allegedAbuserRelationship && filters.allegedAbuserRelationship !== 'all') {
+        result = result.filter((r) => r.allegedAbuserRelationship === filters.allegedAbuserRelationship);
+      }
+      if (filters.reportingFor && filters.reportingFor !== 'all') {
+        result = result.filter((r) => r.reportingFor === filters.reportingFor);
       }
       if (filters.limit && filters.limit > 0) {
         result = result.slice(0, filters.limit);

@@ -22,6 +22,12 @@ import {
 } from '../../data/reportSubjectOptions';
 import { ReviewSection } from './ReviewSection';
 import { formatBillingMonth } from '../../utils/formatters';
+import {
+  HARASSMENT_AGE_GROUP_OPTIONS,
+  HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
+  HARASSMENT_REPORTING_FOR_OPTIONS,
+  getBilingualOptionLabel,
+} from '../../data/harassmentClassification';
 
 export interface Step4ReviewProps {
   segment: SectionKey;
@@ -393,6 +399,35 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 )}
               </div>
             )}
+
+            {segment === 'harassment' && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                <div className="p-2.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle">
+                  <span className="text-[12px] text-ui-content-muted block mb-0.5">
+                    {language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়স' : "Affected person's age group"}
+                  </span>
+                  <p className="text-[13.5px] font-bold text-ui-content-primary">
+                    {getBilingualOptionLabel(HARASSMENT_AGE_GROUP_OPTIONS, formData.affectedPersonAgeGroup, language) || '-'}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle">
+                  <span className="text-[12px] text-ui-content-muted block mb-0.5">
+                    {language === 'bn' ? 'অভিযুক্ত ব্যক্তির সঙ্গে সম্পর্ক' : 'Relationship with alleged abuser'}
+                  </span>
+                  <p className="text-[13.5px] font-bold text-ui-content-primary">
+                    {getBilingualOptionLabel(HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS, formData.allegedAbuserRelationship, language) || '-'}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle">
+                  <span className="text-[12px] text-ui-content-muted block mb-0.5">
+                    {language === 'bn' ? 'কার জন্য প্রতিবেদন' : 'Reporting for'}
+                  </span>
+                  <p className="text-[13.5px] font-bold text-ui-content-primary">
+                    {getBilingualOptionLabel(HARASSMENT_REPORTING_FOR_OPTIONS, formData.reportingFor, language) || '-'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </ReviewSection>
 
@@ -430,14 +465,6 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 <span className="text-ui-content-primary font-medium">{formData.location.road}</span>
                 {formData.location.landmark ? ` (${formData.location.landmark})` : ''}
               </p>
-            )}
-            {formData.location?.lat !== undefined && formData.location?.lng !== undefined && (
-              <div className="flex items-center gap-1.5 text-[12px] text-ui-accent font-medium pt-0.5">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
-                <span>
-                  {language === 'bn' ? 'ম্যাপে স্থান চিহ্নিত' : 'Location pinned on map'}
-                </span>
-              </div>
             )}
           </div>
         </ReviewSection>

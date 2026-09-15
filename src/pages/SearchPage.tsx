@@ -8,12 +8,22 @@ import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
+import { SectionKey, SECTIONS } from '../theme/tokens';
+import { Select } from '../components/ui/Select';
+import { HarassmentClassificationFilters } from '../components/report/HarassmentClassificationFilters';
+import {
+  EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
+  hasActiveHarassmentClassificationFilters,
+  matchesHarassmentClassification,
+} from '../data/harassmentClassification';
 
 export const SearchPage: React.FC = () => {
   const { language, navigateTo, queryParams } = useApp();
   const initialQuery = queryParams.q || '';
   const [query, setQuery] = useState(initialQuery);
   const [activeTab, setActiveTab] = useState<'all' | 'reports' | 'locations' | 'subjects'>('all');
+  const [selectedReportSegment, setSelectedReportSegment] = useState<SectionKey | 'all'>('all');
+  const [harassmentFilters, setHarassmentFilters] = useState(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
 
   const [allReports, setAllReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -44,11 +54,25 @@ export const SearchPage: React.FC = () => {
     }
   }, [queryParams.q]);
 
+  const hasReportFilters =
+    (selectedReportSegment === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) ||
+    selectedReportSegment !== 'all';
+  const hasSearchIntent = Boolean(query.trim()) || hasReportFilters;
+
+  useEffect(() => {
+    if (selectedReportSegment !== 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) {
+      setHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
+    }
+  }, [selectedReportSegment, harassmentFilters]);
+
   // Search through Reports
   const matchingReports = useMemo(() => {
-    if (!query.trim()) return [];
+    if (!query.trim() && !hasReportFilters) return [];
     const q = query.toLowerCase().trim();
     return allReports.filter((r) => {
+      if (selectedReportSegment !== 'all' && r.segment !== selectedReportSegment) return false;
+      if (selectedReportSegment === 'harassment' && !matchesHarassmentClassification(r, harassmentFilters)) return false;
+      if (!q) return true;
       const inTitle =
         (r.titleBn && r.titleBn.toLowerCase().includes(q)) ||
         (r.titleEn && r.titleEn.toLowerCase().includes(q));
@@ -65,7 +89,7 @@ export const SearchPage: React.FC = () => {
       const inId = r.id.toLowerCase().includes(q);
       return inTitle || inDesc || inLoc || inSub || inId;
     });
-  }, [allReports, query]);
+  }, [allReports, query, selectedReportSegment, harassmentFilters, hasReportFilters]);
 
   // Search through Locations
   const matchingLocations = useMemo(() => {
@@ -155,8 +179,29 @@ export const SearchPage: React.FC = () => {
         />
       </div>
 
+      <section className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3.5 sm:p-4 space-y-3" aria-label={language === 'bn' ? 'প্রতিবেদন ফিল্টার' : 'Report filters'}>
+        <div className="max-w-sm">
+          <Select
+            id="search-report-category"
+            label={language === 'bn' ? 'প্রতিবেদনের ধরন' : 'Report category'}
+            value={selectedReportSegment}
+            onChange={(event) => setSelectedReportSegment(event.target.value as SectionKey | 'all')}
+            options={[
+              { value: 'all', label: language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports' },
+              { value: 'harassment', label: language === 'bn' ? SECTIONS.harassment.nameBn : SECTIONS.harassment.nameEn },
+              { value: 'rickshaw', label: language === 'bn' ? SECTIONS.rickshaw.nameBn : SECTIONS.rickshaw.nameEn },
+              { value: 'extortion', label: language === 'bn' ? SECTIONS.extortion.nameBn : SECTIONS.extortion.nameEn },
+              { value: 'load_shedding', label: language === 'bn' ? SECTIONS.load_shedding.nameBn : SECTIONS.load_shedding.nameEn },
+            ]}
+          />
+        </div>
+        {selectedReportSegment === 'harassment' && (
+          <HarassmentClassificationFilters language={language} value={harassmentFilters} onChange={setHarassmentFilters} />
+        )}
+      </section>
+
       {/* Result Category Tabs */}
-      {query.trim() && (
+      {hasSearchIntent && (
         <div className="flex items-center gap-2 pb-2 border-b border-ui-stroke-subtle overflow-x-auto no-scrollbar">
           <button
             type="button"
@@ -238,14 +283,14 @@ export const SearchPage: React.FC = () => {
       )}
 
       {/* Initial Empty / Instructional State */}
-      {!isLoading && !fetchError && !query.trim() && (
+      {!isLoading && !fetchError && !hasSearchIntent && (
         <div className="py-14 text-center">
           <Search className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
         </div>
       )}
 
       {/* Results Content */}
-      {!isLoading && !fetchError && query.trim() && (
+      {!isLoading && !fetchError && hasSearchIntent && (
         <div className="space-y-6">
           {/* 1. Locations Section */}
           {(activeTab === 'all' || activeTab === 'locations') && matchingLocations.length > 0 && (

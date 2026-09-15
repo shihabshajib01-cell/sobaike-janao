@@ -1,7 +1,7 @@
 import React from 'react';
-import { MapPin, ChevronDown } from 'lucide-react';
 import { POPULAR_DISTRICTS } from '../../data/categories';
 import { useApp } from '../../context/AppContext';
+import { SearchableSelect } from '../ui/SearchableSelect';
 
 export interface LocationSelectorProps {
   selectedDistrict: string;
@@ -16,27 +16,21 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 }) => {
   const { language } = useApp();
 
-  const currentOption = POPULAR_DISTRICTS.find((d) => d.id === selectedDistrict) || POPULAR_DISTRICTS[0];
-
   return (
-    <div className={`relative inline-block text-left ${className}`}>
-      <div className="relative flex items-center">
-        <MapPin className="absolute left-3 w-4 h-4 text-ui-content-muted pointer-events-none" />
-        <select
-          id="location-filter-select"
-          value={selectedDistrict}
-          onChange={(e) => onSelectDistrict(e.target.value)}
-          aria-label={language === 'bn' ? 'জেলা নির্বাচন' : 'Filter by district'}
-          className="appearance-none pl-9 pr-8 py-2 text-[16px] leading-[24px] font-semibold bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle rounded-xl min-h-[44px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ui-focus transition-colors shadow-2xs"
-        >
-          {POPULAR_DISTRICTS.map((district) => (
-            <option key={district.id} value={district.id}>
-              {language === 'bn' ? district.nameBn : district.nameEn}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="absolute right-2.5 w-3.5 h-3.5 text-ui-content-muted pointer-events-none" />
-      </div>
+    <div className={`min-w-[180px] sm:min-w-[210px] ${className}`}>
+      <SearchableSelect
+        id="location-filter-select"
+        value={selectedDistrict}
+        onChange={onSelectDistrict}
+        placeholder={language === 'bn' ? 'জেলা নির্বাচন' : 'Filter by district'}
+        searchPlaceholder={language === 'bn' ? 'জেলা খুঁজুন...' : 'Search districts...'}
+        noResultsText={language === 'bn' ? 'কোনো জেলা পাওয়া যায়নি' : 'No matching district'}
+        options={POPULAR_DISTRICTS.map((district) => ({
+          value: district.id,
+          label: language === 'bn' ? district.nameBn : district.nameEn,
+          keywords: [district.nameBn, district.nameEn],
+        }))}
+      />
     </div>
   );
 };

@@ -512,6 +512,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         publicProfileHandle: '',
         identifyingDescription: '',
         mentionedParties: [],
+        affectedPersonAgeGroup: '',
+        allegedAbuserRelationship: '',
+        reportingFor: '',
         intimateWhatHappened: '',
         intimatePlatform: '',
         incidentTime: '',
@@ -750,6 +753,23 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       return;
     }
 
+    // Defense-in-depth: harassment classifications are mandatory before any server call.
+    if (
+      formData.segment === 'harassment' &&
+      (!formData.affectedPersonAgeGroup || !formData.allegedAbuserRelationship || !formData.reportingFor)
+    ) {
+      setFormData((prev) => ({ ...prev, currentStep: 3 }));
+      setSubmitError(
+        language === 'bn'
+          ? 'হয়রানি ও নির্যাতনের প্রতিবেদন জমা দিতে বয়সের গ্রুপ, অভিযুক্ত ব্যক্তির সঙ্গে সম্পর্ক এবং কার জন্য প্রতিবেদন করছেন—তিনটি তথ্যই নির্বাচন করুন।'
+          : 'Select the age group, relationship with the alleged abuser, and who you are reporting for before submitting a harassment report.'
+      );
+      setTimeout(() => {
+        document.getElementById('composer-section-narrative')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+      return;
+    }
+
     // Check if any image is actively preparing
     const isAnyCompressing = pendingImages.some((img) => img.isCompressing);
     if (isAnyCompressing) {
@@ -876,6 +896,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             ? Number(formData.previousBillAmount)
             : undefined,
         frequency: formData.frequency || 'one-time',
+        affectedPersonAgeGroup: isHarassment ? formData.affectedPersonAgeGroup || undefined : undefined,
+        allegedAbuserRelationship: isHarassment ? formData.allegedAbuserRelationship || undefined : undefined,
+        reportingFor: isHarassment ? formData.reportingFor || undefined : undefined,
         subjectType: isPartySegment ? (formData.subjectType || 'unknown') : undefined,
         reportedSubject: isPartySegment ? resolvedReportedSubject : undefined,
         roleOrDesignation: isPartySegment ? (formData.roleOrDesignation?.trim() || undefined) : undefined,

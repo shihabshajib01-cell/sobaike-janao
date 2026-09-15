@@ -14,6 +14,11 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { HarassmentClassificationFilters } from '../components/report/HarassmentClassificationFilters';
+import {
+  EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
+  matchesHarassmentClassification,
+} from '../data/harassmentClassification';
 
 export const HarassmentPage: React.FC = () => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
@@ -23,6 +28,7 @@ export const HarassmentPage: React.FC = () => {
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [classificationFilters, setClassificationFilters] = useState(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
 
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -70,9 +76,10 @@ export const HarassmentPage: React.FC = () => {
         selectedDistrict === 'all' ||
         (r.districtBn && r.districtBn.includes(selectedDistrict)) ||
         (r.districtEn && r.districtEn.toLowerCase().includes(selectedDistrict.toLowerCase()));
-      return matchesSubcat && matchesDistrict;
+      const matchesClassification = matchesHarassmentClassification(r, classificationFilters);
+      return matchesSubcat && matchesDistrict && matchesClassification;
     });
-  }, [reports, selectedSubcat, selectedDistrict]);
+  }, [reports, selectedSubcat, selectedDistrict, classificationFilters]);
 
   return (
     <PublicPageContainer id="harassment-page-container">
@@ -143,7 +150,7 @@ export const HarassmentPage: React.FC = () => {
               const matchesSub = subcat.id === 'all' || r.subcategoryId === subcat.id;
               const matchesDist =
                 selectedDistrict === 'all' || r.districtBn.includes(selectedDistrict);
-              return matchesSub && matchesDist;
+              return matchesSub && matchesDist && matchesHarassmentClassification(r, classificationFilters);
             }).length;
 
             return (
@@ -159,6 +166,12 @@ export const HarassmentPage: React.FC = () => {
             );
           })}
         </div>
+
+        <HarassmentClassificationFilters
+          language={language}
+          value={classificationFilters}
+          onChange={setClassificationFilters}
+        />
       </section>
 
       {/* 3. Loading State Skeleton Screen */}
@@ -208,6 +221,7 @@ export const HarassmentPage: React.FC = () => {
               onAction={() => {
                 setSelectedSubcat('all');
                 setSelectedDistrict('all');
+                setClassificationFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
               }}
             />
           )}
