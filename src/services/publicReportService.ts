@@ -7,7 +7,6 @@ import {
 } from './supabasePublicReportMapper';
 import { PublicEvidenceService } from './publicEvidenceService';
 import { PublicResponseService } from './publicResponseService';
-import { SEED_SUBMITTED_REPORTS } from '../data/seedSubmissions';
 import {
   HarassmentAgeGroup,
   HarassmentAbuserRelationship,
@@ -34,108 +33,6 @@ export interface HomeFeedParams {
   filter?: 'all' | 'latest' | 'popular' | 'most_shared';
   district?: string;
 }
-
-const mapSeedToReportItem = (seed: (typeof SEED_SUBMITTED_REPORTS)[0]): ReportItem => {
-  const pv = seed.publicVersion;
-  return {
-    id: seed.id,
-    segment: seed.segment,
-    subcategoryId: seed.subcategoryId,
-    subcategoryBn: seed.subcategoryBn || seed.subcategoryId,
-    subcategoryEn: seed.subcategoryEn || seed.subcategoryId,
-    titleBn: pv?.titleBn || seed.title || seed.id,
-    titleEn: pv?.titleEn || seed.title || seed.id,
-    shortDescriptionBn: pv?.shortDescriptionBn || seed.description || '',
-    shortDescriptionEn: pv?.shortDescriptionEn || seed.description || '',
-    fullDescriptionBn: pv?.fullDescriptionBn || seed.description || '',
-    fullDescriptionEn: pv?.fullDescriptionEn || seed.description || '',
-    reportedSubject: pv?.reportedSubjectBn || seed.reportedSubject || undefined,
-    reportedSubjectBn: pv?.reportedSubjectBn || seed.reportedSubject || undefined,
-    reportedSubjectEn: pv?.reportedSubjectEn || seed.reportedSubject || undefined,
-    subjectType:
-      seed.subjectType === 'business' || seed.subjectType === 'group'
-        ? seed.subjectType
-        : 'individual',
-    organization: pv?.organization || seed.organization || undefined,
-    locationBn: pv?.locationBn || seed.location?.formattedAddress || 'অবস্থান গোপন',
-    locationEn: pv?.locationEn || seed.location?.formattedAddress || 'Location withheld',
-    districtBn: pv?.districtBn || seed.location?.district || '',
-    districtEn: pv?.districtEn || seed.location?.district || '',
-    areaBn: pv?.areaBn || seed.location?.area || '',
-    areaEn: pv?.areaEn || seed.location?.area || '',
-    incidentDateBn: pv?.incidentDateBn || seed.incidentDate || '',
-    incidentDateEn: pv?.incidentDateEn || seed.incidentDate || '',
-    affectedPersonAgeGroup: seed.affectedPersonAgeGroup,
-    allegedAbuserRelationship: seed.allegedAbuserRelationship,
-    reportingFor: seed.reportingFor,
-    recentBillMonth: seed.recentBillMonth,
-    recentBillAmount:
-      seed.recentBillAmount !== undefined && seed.recentBillAmount !== null
-        ? Number(seed.recentBillAmount)
-        : undefined,
-    previousBillMonth: seed.previousBillMonth,
-    previousBillAmount:
-      seed.previousBillAmount !== undefined && seed.previousBillAmount !== null
-        ? Number(seed.previousBillAmount)
-        : undefined,
-    utilityEndTime: seed.utilityEndTime,
-    publishedDateBn: '২৩ ফেব্রুয়ারি ২০২৬',
-    publishedDateEn: '23 Feb 2026',
-    publishedAt: seed.createdAt,
-    evidenceSummaryBn: pv?.evidenceSummaryBn || [],
-    evidenceSummaryEn: pv?.evidenceSummaryEn || [],
-    status: 'published',
-    statusBn: 'প্রকাশিত',
-    statusEn: 'Published',
-    isHighUrgency: Boolean(pv?.isHighUrgency),
-    coordinates: undefined,
-    images: [],
-    media: {
-      type: 'none',
-      images: [],
-    },
-    trustIndicators: {
-      evidenceSubmitted: Boolean(seed.hasSupportingInfo),
-      multipleReports: false,
-      updateAvailable: false,
-      responseReceived: false,
-      evidenceCount: seed.evidenceTypes?.length || 0,
-      hasOfficialResponse: false,
-      hasRelatedReports: false,
-    },
-    relatedReportIds: [],
-    updates: [],
-  };
-};
-
-const LOCAL_MOCK_STORAGE_KEY = 'sobaike_janao_mock_reports';
-
-export function getLocalMockReports(): any[] {
-  try {
-    if (typeof window === 'undefined') return [];
-    const raw = localStorage.getItem(LOCAL_MOCK_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-export function saveLocalMockReport(report: any): void {
-  try {
-    if (typeof window === 'undefined') return;
-    const existing = getLocalMockReports();
-    existing.unshift(report);
-    localStorage.setItem(LOCAL_MOCK_STORAGE_KEY, JSON.stringify(existing));
-  } catch (err) {
-    console.warn('[PublicReportService] Failed to save mock report to localStorage', err);
-  }
-}
-
-const isMockModeAllowed = (): boolean => {
-  // Mock data is an explicit development-only capability. Production must fail closed
-  // if Supabase configuration is missing or unavailable.
-  return import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_MODE === 'true';
-};
 
 // In-flight request deduplication map to prevent redundant concurrent network bursts
 const inFlightRequests = new Map<string, Promise<any>>();
@@ -204,24 +101,14 @@ export const PublicReportService = {
     let list: ReportItem[] = [];
 
     if (!isSupabaseConfigured() || !supabase) {
-      if (isMockModeAllowed()) {
-        const local = getLocalMockReports().map(mapSeedToReportItem);
-        list = [...local, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
-      } else {
-        throw new Error('Public reports service is currently unavailable.');
-      }
+      throw new Error('Public reports service is currently unavailable.');
     } else {
       const { data, error } = await fetchWithDeduplication('rpc:get_public_published_reports', () =>
         supabase!.rpc('get_public_published_reports')
       );
       if (error) {
         console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
-        if (isMockModeAllowed()) {
-          const local = getLocalMockReports().map(mapSeedToReportItem);
-          list = [...local, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
-        } else {
-          throw new Error(error.message || 'Failed to load public reports from server.');
-        }
+        throw new Error(error.message || 'Failed to load public reports from server.');
       } else if (data && Array.isArray(data)) {
         list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
       }
@@ -323,7 +210,7 @@ export const PublicReportService = {
     let list: ReportItem[] = [];
 
     if (!isSupabaseConfigured() || !supabase) {
-      // In mock mode or when Supabase is not configured, fallback to getAll()
+      // Reuse the fail-closed published-report path when Supabase is unavailable.
       list = await this.getAll();
     } else {
       const dedupKey = `rpc:get_public_home_feed:${params?.visitorLat ?? 'null'}:${params?.visitorLng ?? 'null'}:${params?.filter || 'all'}:${params?.district || 'all'}`;
@@ -392,19 +279,6 @@ export const PublicReportService = {
     const cleanId = id.trim().toUpperCase();
 
     if (!isSupabaseConfigured() || !supabase) {
-      if (isMockModeAllowed()) {
-        const local = getLocalMockReports().map(mapSeedToReportItem);
-        const combined = [...local, ...SEED_SUBMITTED_REPORTS.map(mapSeedToReportItem)];
-        const found = combined.find((r) => r.id.toUpperCase() === cleanId);
-        if (found) {
-          return {
-            report: found,
-            responses: [],
-            responseLoadError: false,
-          };
-        }
-        return null;
-      }
       throw new Error('Public reports service is currently unavailable.');
     }
 
@@ -416,16 +290,6 @@ export const PublicReportService = {
 
     if (error) {
       console.warn('[PublicReportService.getById] Supabase RPC error:', error);
-      if (isMockModeAllowed()) {
-        const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
-        if (seed) {
-          return {
-            report: mapSeedToReportItem(seed),
-            responses: [],
-            responseLoadError: false,
-          };
-        }
-      }
       throw new Error(error.message || 'Failed to fetch report from server.');
     }
 
@@ -470,18 +334,6 @@ export const PublicReportService = {
         responses,
         responseLoadError,
       };
-    }
-
-    // Not found in database: only check seed in mock mode
-    if (isMockModeAllowed()) {
-      const seed = SEED_SUBMITTED_REPORTS.find((r) => r.id.toUpperCase() === cleanId);
-      if (seed) {
-        return {
-          report: mapSeedToReportItem(seed),
-          responses: [],
-          responseLoadError: false,
-        };
-      }
     }
 
     return null;
