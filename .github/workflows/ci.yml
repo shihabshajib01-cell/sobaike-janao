@@ -41,8 +41,13 @@ jobs:
             echo "ERROR: unsafe HTML sink detected; security review required"
             exit 1
           fi
+          if grep -R "\beval[[:space:]]*(\|new Function[[:space:]]*(\|javascript:" src; then
+            echo "ERROR: dynamic-code or javascript: sink detected; security review required"
+            exit 1
+          fi
           test -f supabase/migrations/20260915163600_public_security_evidence_hardening.sql
           test -f supabase/migrations/20260915164500_public_security_surface_limits.sql
+          test -f supabase/migrations/20260915165000_public_security_policy_cleanup.sql
 
       - name: Lint
         run: npm run lint
