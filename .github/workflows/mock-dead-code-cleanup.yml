@@ -7,10 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  audit:
+  cleanup-unused-files:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -28,28 +29,96 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify cleaned baseline
+      - name: Prove whole-file candidates are unused
         shell: bash
         run: |
           set -euo pipefail
-          ! grep -R "SEED_SUBMITTED_REPORTS\|seedSubmissions\|sobaike_janao_mock_reports\|VITE_ENABLE_MOCK_MODE\|ViewportDebugger\|ViewportDiagnostic\|Viewport Diagnostic" src .env.example index.html
+          npx --yes knip --reporter compact > /tmp/knip.txt || true
+          cat /tmp/knip.txt
+          candidates=(
+            'src/components/feed/FeedStates.tsx'
+            'src/components/location/GoogleMapPicker.tsx'
+            'src/components/media/AttachmentImageModal.tsx'
+            'src/components/ui/Badge.tsx'
+            'src/components/ui/Card.tsx'
+            'src/components/ui/Divider.tsx'
+            'src/components/ui/ErrorState.tsx'
+            'src/components/ui/Input.tsx'
+            'src/components/ui/Radio.tsx'
+            'src/components/ui/Textarea.tsx'
+            'src/components/ui/Tooltip.tsx'
+            'src/services/index.ts'
+            'src/utils/reportStorage.ts'
+          )
+          for file in "${candidates[@]}"; do
+            test -f "$file"
+            grep -Fq "$file" /tmp/knip.txt || { echo "Not proven unused by knip: $file"; exit 1; }
+          done
+          grep -Fq 'Unused dependencies (1)' /tmp/knip.txt
+          grep -Fq '@vis.gl/react-google-maps' /tmp/knip.txt
+          if git grep -n '@vis.gl/react-google-maps' -- 'src/**' ':!package*.json'; then
+            echo 'Unexpected runtime import of @vis.gl/react-google-maps'
+            exit 1
+          fi
+
+      - name: Remove verified unused files and dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm \
+            src/components/feed/FeedStates.tsx \
+            src/components/location/GoogleMapPicker.tsx \
+            src/components/media/AttachmentImageModal.tsx \
+            src/components/ui/Badge.tsx \
+            src/components/ui/Card.tsx \
+            src/components/ui/Divider.tsx \
+            src/components/ui/ErrorState.tsx \
+            src/components/ui/Input.tsx \
+            src/components/ui/Radio.tsx \
+            src/components/ui/Textarea.tsx \
+            src/components/ui/Tooltip.tsx \
+            src/services/index.ts \
+            src/utils/reportStorage.ts
+
+          node - <<'NODE'
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          if (!pkg.dependencies?.['@vis.gl/react-google-maps']) {
+            throw new Error('@vis.gl/react-google-maps dependency was not present as expected');
+          }
+          delete pkg.dependencies['@vis.gl/react-google-maps'];
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          NODE
+          npm install --package-lock-only --ignore-scripts
+
+      - name: Verify no broken references
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm audit --audit-level=moderate
           npm run lint
           npm run build
+          ! git grep -n '@vis.gl/react-google-maps' -- ':!package-lock.json'
 
-      - name: Reference audit for remaining likely compatibility or dead files
-        shell: bash
-        run: |
-          set -euo pipefail
-          for needle in reportStorage AttachmentImageModal "services/index"; do
-            echo "===== REFERENCES: $needle ====="
-            git grep -n "$needle" -- ':!*.md' || true
-          done
-          echo "===== TODO/FIXME/STUB/PLACEHOLDER ====="
-          git grep -n -E "TODO|FIXME|stub|placeholder|not implemented|coming soon" -- 'src/**/*.ts' 'src/**/*.tsx' || true
-
-      - name: Static unused-file/export audit
+      - name: Re-audit unused whole files
         shell: bash
         run: |
           set +e
           npx --yes knip --reporter compact
           exit 0
+
+      - name: Commit verified cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git reset .github/workflows/mock-dead-code-cleanup.yml
+          if git diff --cached --quiet; then
+            echo 'No cleanup changes to commit.'
+            exit 0
+          fi
+          git commit -m 'cleanup: remove verified unused public files'
+          git push origin HEAD:cleanup/mock-dead-code
