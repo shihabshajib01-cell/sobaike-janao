@@ -1,12 +1,12 @@
-name: Harassment UX Correction Verify
+name: UX Regression Verify
 
 on:
-  push:
+  pull_request:
     branches:
-      - ux/harassment-corrections
+      - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -14,66 +14,13 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ux/harassment-corrections
-          fetch-depth: 0
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Standardize required markers in Harassment composer
-        shell: python
-        run: |
-          from pathlib import Path
-
-          path = Path('src/components/report-composer/Step3ComplaintDetails.tsx')
-          text = path.read_text()
-
-          replacements = {
-              "{language === 'bn' ? 'কী ঘটেছিল? *' : 'What happened? *'}": "<span>{language === 'bn' ? 'কী ঘটেছিল?' : 'What happened?'}</span>\n                <span className=\"text-ui-validation-text ml-1\" aria-hidden=\"true\">*</span>",
-              "<span>{language === 'bn' ? 'ঘটনার তারিখ *' : 'Incident date *'}</span>": "<span>{language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}</span>\n                    <span className=\"text-ui-validation-text ml-1\" aria-hidden=\"true\">*</span>",
-              "{language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল *' : 'Phone number or email *'}": "<span>{language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল' : 'Phone number or email'}</span>\n                          <span className=\"text-ui-validation-text ml-1\" aria-hidden=\"true\">*</span>",
-          }
-
-          for old, new in replacements.items():
-              if old in text:
-                  text = text.replace(old, new, 1)
-              elif new not in text:
-                  raise SystemExit(f'Expected required-label anchor not found: {old}')
-
-          path.write_text(text)
-
-      - name: Verify scoped UX invariants
-        shell: bash
-        run: |
-          set -euo pipefail
-          if grep -q 'HarassmentClassificationFilters' src/pages/HarassmentPage.tsx; then
-            echo 'Feed classification filters still present.' >&2
-            exit 1
-          fi
-          grep -q 'createPortal' src/components/ui/SearchableSelect.tsx
-          grep -q 'text-ui-validation-text ml-1' src/components/report-composer/Step3ComplaintDetails.tsx
-
       - name: Install dependencies
         run: npm ci
-
       - name: Typecheck and production build
         run: |
           npm run typecheck --if-present
           npm run build
-
-      - name: Commit required marker fix if changed
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git diff --quiet; then
-            echo 'No composer marker changes to commit.'
-            exit 0
-          fi
-          git config user.name 'shihabshajib01-cell'
-          git config user.email 'shihabshajib01@gmail.com'
-          git add src/components/report-composer/Step3ComplaintDetails.tsx
-          git commit -m 'fix(ux): standardize required field markers'
-          git push origin HEAD:ux/harassment-corrections
