@@ -23,6 +23,18 @@ export interface BilingualOption<T extends string> {
   labelBn: string;
 }
 
+export interface HarassmentClassificationFilterState {
+  ageGroup: HarassmentAgeGroup | 'all';
+  abuserRelationship: HarassmentAbuserRelationship | 'all';
+  reportingFor: HarassmentReportingFor | 'all';
+}
+
+export const EMPTY_HARASSMENT_CLASSIFICATION_FILTERS: HarassmentClassificationFilterState = {
+  ageGroup: 'all',
+  abuserRelationship: 'all',
+  reportingFor: 'all',
+};
+
 export const HARASSMENT_AGE_GROUP_OPTIONS: BilingualOption<HarassmentAgeGroup>[] = [
   { value: 'under_18', labelEn: 'Under 18', labelBn: '১৮ বছরের কম' },
   { value: '18_29', labelEn: '18–29', labelBn: '১৮–২৯' },
@@ -96,3 +108,31 @@ export const isHarassmentAbuserRelationship = (
 
 export const isHarassmentReportingFor = (value: unknown): value is HarassmentReportingFor =>
   HARASSMENT_REPORTING_FOR_OPTIONS.some((item) => item.value === value);
+
+export const matchesHarassmentClassification = (
+  report: {
+    segment?: string | null;
+    affectedPersonAgeGroup?: string | null;
+    allegedAbuserRelationship?: string | null;
+    reportingFor?: string | null;
+  },
+  filters: HarassmentClassificationFilterState
+): boolean => {
+  if (report.segment !== 'harassment') return false;
+  if (filters.ageGroup !== 'all' && report.affectedPersonAgeGroup !== filters.ageGroup) return false;
+  if (
+    filters.abuserRelationship !== 'all' &&
+    report.allegedAbuserRelationship !== filters.abuserRelationship
+  ) {
+    return false;
+  }
+  if (filters.reportingFor !== 'all' && report.reportingFor !== filters.reportingFor) return false;
+  return true;
+};
+
+export const hasActiveHarassmentClassificationFilters = (
+  filters: HarassmentClassificationFilterState
+): boolean =>
+  filters.ageGroup !== 'all' ||
+  filters.abuserRelationship !== 'all' ||
+  filters.reportingFor !== 'all';
