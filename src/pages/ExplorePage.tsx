@@ -22,8 +22,8 @@ import { Modal } from '../components/ui/Modal';
 
 export const ExplorePage: React.FC = () => {
   const { language } = useApp();
-  // Default to 'heatmap' mode per product direction
-  const [viewMode, setViewMode] = useState<ExploreViewMode>('heatmap');
+  // Default to 'reports' mode per Phase 8 product direction
+  const [viewMode, setViewMode] = useState<ExploreViewMode>('reports');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSection, setSelectedSection] = useState<SectionKey | 'all'>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
@@ -752,27 +752,13 @@ export const ExplorePage: React.FC = () => {
         </div>
       )}
 
-      {/* 4. Map | Reports Mode Switcher (Connected to Workspace) */}
+      {/* 4. Reports | Map Mode Switcher (Connected to Workspace) */}
       <div className="flex items-center justify-between gap-3 pt-1">
         <div
           role="group"
           aria-label={language === 'bn' ? 'ভিউ পরিবর্তন' : 'View mode switcher'}
           className="flex items-center bg-ui-surface-subtle p-1 rounded-xl border border-ui-stroke-subtle w-fit shadow-2xs"
         >
-          <button
-            type="button"
-            aria-pressed={viewMode === 'heatmap'}
-            onClick={() => setViewMode('heatmap')}
-            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
-              viewMode === 'heatmap'
-                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
-                : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
-            }`}
-          >
-            <MapIcon name="flame" size="md" aria-hidden="true" />
-            <span>{language === 'bn' ? 'মানচিত্র' : 'Map'}</span>
-          </button>
-
           <button
             type="button"
             aria-pressed={viewMode === 'reports'}
@@ -785,6 +771,20 @@ export const ExplorePage: React.FC = () => {
           >
             <MapIcon name="file-text" size="md" aria-hidden="true" />
             <span>{language === 'bn' ? 'প্রতিবেদন' : 'Reports'}</span>
+          </button>
+
+          <button
+            type="button"
+            aria-pressed={viewMode === 'heatmap'}
+            onClick={() => setViewMode('heatmap')}
+            className={`px-3.5 sm:px-4 py-2 rounded-lg text-[13px] sm:text-[14px] font-semibold flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
+              viewMode === 'heatmap'
+                ? 'bg-ui-surface text-ui-content-primary shadow-2xs font-bold border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
+                : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
+            }`}
+          >
+            <MapIcon name="flame" size="md" aria-hidden="true" />
+            <span>{language === 'bn' ? 'মানচিত্র' : 'Map'}</span>
           </button>
         </div>
       </div>
