@@ -359,6 +359,7 @@ export const ExplorePage: React.FC = () => {
             {/* Division Dropdown */}
             <div className="relative flex items-center min-w-[160px] lg:min-w-[180px]">
               <select
+                id="desktop-select-division"
                 value={selectedDivision}
                 onChange={(e) => {
                   setSelectedDivision(e.target.value);
@@ -387,6 +388,7 @@ export const ExplorePage: React.FC = () => {
                 ariaHidden={true}
               />
               <select
+                id="desktop-select-district"
                 value={selectedDistrict}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
                 aria-label={language === 'bn' ? 'জেলা নির্বাচন করুন' : 'Select district'}
@@ -591,7 +593,7 @@ export const ExplorePage: React.FC = () => {
                 ? `ফিল্টার খুলুন${mobileFilterCount > 0 ? ` (${toBanglaDigits(mobileFilterCount)}টি সক্রিয়)` : ''}`
                 : `Open filters${mobileFilterCount > 0 ? ` (${mobileFilterCount} active)` : ''}`
             }
-            className={`flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-[14px] font-semibold min-h-[44px] cursor-pointer transition-colors shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2.5 sm:px-3.5 rounded-xl border text-[14px] font-semibold min-h-[44px] cursor-pointer transition-colors shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               mobileFilterCount > 0
                 ? 'bg-ui-surface-subtle border-ui-accent text-ui-content-primary shadow-2xs font-bold'
                 : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
@@ -913,7 +915,7 @@ export const ExplorePage: React.FC = () => {
                             ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
                             : `View details for ${activeDistrictName || selectedDistrict}`
                         }
-                        className="btn-primary-action px-3.5 py-2.5 rounded-xl text-[13px] font-semibold min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-2xs"
+                        className="btn-primary-action px-3.5 py-2.5 rounded-xl text-[13px] font-semibold min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-2xs"
                       >
                         <span>{language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}</span>
                         <MapIcon name="arrow-right" size="xs" ariaHidden={true} />
@@ -1054,14 +1056,14 @@ export const ExplorePage: React.FC = () => {
             <button
               type="button"
               onClick={handleClearFilterSheet}
-              className="px-4 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-[14px] font-semibold text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="px-3 sm:px-4 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-[13px] sm:text-[14px] font-semibold text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle transition-colors min-h-[44px] cursor-pointer shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               {language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
             </button>
             <button
               type="button"
               onClick={handleApplyFilterSheet}
-              className="btn-primary-action px-5 py-2.5 rounded-xl text-[14px] font-bold min-h-[44px] cursor-pointer flex-1 flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-xs"
+              className="btn-primary-action px-3.5 sm:px-5 py-2.5 rounded-xl text-[13px] sm:text-[14px] font-bold min-h-[44px] cursor-pointer flex-1 flex items-center justify-center whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-xs"
             >
               {language === 'bn' ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters'}
             </button>
