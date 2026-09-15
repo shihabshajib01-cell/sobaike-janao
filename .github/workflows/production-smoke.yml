@@ -1,0 +1,97 @@
+name: Production Smoke
+
+on:
+  workflow_run:
+    workflows: ["Deploy"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SITE_URL: https://shihabshajib01-cell.github.io/sobaike-janao/
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+    steps:
+      - name: Verify live Public site
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for attempt in {1..12}; do
+            code=$(curl -L -sS -o /tmp/public-index.html -w "%{http_code}" "$SITE_URL" || true)
+            if [ "$code" = "200" ]; then
+              ok=1
+              break
+            fi
+            echo "Attempt $attempt returned HTTP $code; retrying..."
+            sleep 10
+          done
+          test "$ok" = "1"
+          grep -Eqi '<div[^>]+id=["'"']root["'"']' /tmp/public-index.html
+          if grep -q '/src/main.tsx' /tmp/public-index.html; then
+            echo "ERROR: production page references source entry instead of bundled assets"
+            exit 1
+          fi
+          echo "Public site smoke check passed"
+
+      - name: Verify public Supabase payload privacy
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_KEY"
+
+          curl --fail-with-body -sS \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/get_public_published_reports" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}' > /tmp/published-reports.json
+
+          curl --fail-with-body -sS \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/get_public_home_feed" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"p_visitor_lat":null,"p_visitor_lng":null,"p_filter":"all","p_district":null}' > /tmp/home-feed.json
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          forbidden_exact = {
+              'latitude', 'longitude', 'lat', 'lng', 'coordinates', 'coordinate',
+              'distance', 'distance_m', 'distance_meters', 'visitor_lat', 'visitor_lng',
+              'reporter_latitude', 'reporter_longitude', 'reporter_lat', 'reporter_lng',
+              'gps', 'location_accuracy', 'location_accuracy_m', 'location_accuracy_meters'
+          }
+
+          def scan(value, path='root'):
+              leaks = []
+              if isinstance(value, dict):
+                  for key, child in value.items():
+                      normalized = str(key).lower()
+                      if normalized in forbidden_exact:
+                          leaks.append(f'{path}.{key}')
+                      leaks.extend(scan(child, f'{path}.{key}'))
+              elif isinstance(value, list):
+                  for index, child in enumerate(value):
+                      leaks.extend(scan(child, f'{path}[{index}]'))
+              return leaks
+
+          for filename in ('/tmp/published-reports.json', '/tmp/home-feed.json'):
+              data = json.loads(Path(filename).read_text())
+              leaks = scan(data)
+              if leaks:
+                  raise SystemExit(f'Public privacy regression in {filename}: {leaks[:20]}')
+
+          print('Public Supabase payload privacy check passed')
+          PY
