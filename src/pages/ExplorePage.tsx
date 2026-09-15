@@ -353,9 +353,72 @@ export const ExplorePage: React.FC = () => {
         </div>
 
         {/* Desktop / Tablet Controls (Search, Division, District) */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-12 gap-2.5">
+        <div className="hidden md:flex items-center justify-between gap-4">
+          {/* Filters Group */}
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Division Dropdown */}
+            <div className="relative flex items-center min-w-[160px] lg:min-w-[180px]">
+              <select
+                value={selectedDivision}
+                onChange={(e) => {
+                  setSelectedDivision(e.target.value);
+                  setSelectedDistrict('all'); // reset district when division changes
+                }}
+                aria-label={language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Select division'}
+                className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
+              >
+                <option value="all">
+                  {language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}
+                </option>
+                {DIVISIONS.map((div) => (
+                  <option key={div.id} value={div.nameEn}>
+                    {language === 'bn' ? div.nameBn : div.nameEn}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* District Dropdown */}
+            <div className="relative flex items-center min-w-[160px] lg:min-w-[180px]">
+              <MapIcon
+                name="map-pin"
+                size="sm"
+                className="text-ui-content-muted absolute left-3.5 pointer-events-none"
+                ariaHidden={true}
+              />
+              <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                aria-label={language === 'bn' ? 'জেলা নির্বাচন করুন' : 'Select district'}
+                className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
+              >
+                <option value="all">
+                  {language === 'bn' ? 'সকল জেলা' : 'All districts'}
+                </option>
+                {availableDistricts.map((d) => (
+                  <option key={d.id} value={d.nameEn}>
+                    {language === 'bn'
+                      ? `${d.nameBn} (${d.divisionBn})`
+                      : `${d.nameEn} (${d.divisionEn})`}
+                  </option>
+                ))}
+              </select>
+              {selectedDistrict !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDistrict('all')}
+                  aria-label={language === 'bn' ? 'নির্বাচিত জেলা মুছুন' : 'Clear selected district'}
+                  title={language === 'bn' ? 'জেলা মুছুন' : 'Clear district'}
+                  className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                >
+                  <MapIcon name="close" size="xs" ariaHidden={true} />
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Main Keyword Search */}
-          <div className="md:col-span-2 lg:col-span-6 relative flex items-center">
+          <div className="relative flex items-center w-[240px] lg:w-[280px] shrink-0">
             <MapIcon
               name="search"
               size="sm"
@@ -383,66 +446,6 @@ export const ExplorePage: React.FC = () => {
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'}
-                className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
-                <MapIcon name="close" size="xs" ariaHidden={true} />
-              </button>
-            )}
-          </div>
-
-          {/* Division Dropdown */}
-          <div className="md:col-span-1 lg:col-span-3 relative flex items-center">
-            <select
-              value={selectedDivision}
-              onChange={(e) => {
-                setSelectedDivision(e.target.value);
-                setSelectedDistrict('all'); // reset district when division changes
-              }}
-              aria-label={language === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Select division'}
-              className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
-            >
-              <option value="all">
-                {language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}
-              </option>
-              {DIVISIONS.map((div) => (
-                <option key={div.id} value={div.nameEn}>
-                  {language === 'bn' ? div.nameBn : div.nameEn}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* District Dropdown */}
-          <div className="md:col-span-1 lg:col-span-3 relative flex items-center">
-            <MapIcon
-              name="map-pin"
-              size="sm"
-              className="text-ui-content-muted absolute left-3.5 pointer-events-none"
-              ariaHidden={true}
-            />
-            <select
-              value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
-              aria-label={language === 'bn' ? 'জেলা নির্বাচন করুন' : 'Select district'}
-              className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-xl text-[14px] text-ui-content-primary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus truncate"
-            >
-              <option value="all">
-                {language === 'bn' ? 'সকল জেলা' : 'All districts'}
-              </option>
-              {availableDistricts.map((d) => (
-                <option key={d.id} value={d.nameEn}>
-                  {language === 'bn'
-                    ? `${d.nameBn} (${d.divisionBn})`
-                    : `${d.nameEn} (${d.divisionEn})`}
-                </option>
-              ))}
-            </select>
-            {selectedDistrict !== 'all' && (
-              <button
-                type="button"
-                onClick={() => setSelectedDistrict('all')}
-                aria-label={language === 'bn' ? 'নির্বাচিত জেলা মুছুন' : 'Clear selected district'}
-                title={language === 'bn' ? 'জেলা মুছুন' : 'Clear district'}
                 className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
@@ -618,8 +621,8 @@ export const ExplorePage: React.FC = () => {
 
           {/* Division Chip */}
           {selectedDivision !== 'all' && activeDivisionName && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
-              <span>{activeDivisionName}</span>
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary max-w-full">
+              <span className="truncate">{activeDivisionName}</span>
               <button
                 type="button"
                 onClick={() => {
@@ -631,7 +634,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeDivisionName} ফিল্টার সরান`
                     : `Remove ${activeDivisionName} filter`
                 }
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -640,8 +643,8 @@ export const ExplorePage: React.FC = () => {
 
           {/* District Chip */}
           {selectedDistrict !== 'all' && activeDistrictName && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
-              <span>{activeDistrictName}</span>
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary max-w-full">
+              <span className="truncate">{activeDistrictName}</span>
               <button
                 type="button"
                 onClick={() => setSelectedDistrict('all')}
@@ -650,7 +653,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeDistrictName} ফিল্টার সরান`
                     : `Remove ${activeDistrictName} filter`
                 }
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -659,9 +662,9 @@ export const ExplorePage: React.FC = () => {
 
           {/* Category Chip */}
           {selectedSection !== 'all' && activeCategoryName && (
-            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
-              <CategoryIcon section={selectedSection as SectionKey} size="xs" />
-              <span>{activeCategoryName}</span>
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary max-w-full">
+              <CategoryIcon section={selectedSection as SectionKey} size="xs" className="shrink-0" />
+              <span className="truncate">{activeCategoryName}</span>
               <button
                 type="button"
                 onClick={() => setSelectedSection('all')}
@@ -670,7 +673,7 @@ export const ExplorePage: React.FC = () => {
                     ? `${activeCategoryName} ফিল্টার সরান`
                     : `Remove ${activeCategoryName} filter`
                 }
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <MapIcon name="close" size="xs" ariaHidden={true} />
               </button>
@@ -903,6 +906,8 @@ export const ExplorePage: React.FC = () => {
                           setIsFilterSheetOpen(false);
                           setIsAreaSheetOpen(true);
                         }}
+                        aria-expanded={isAreaSheetOpen}
+                        aria-controls="mobile-area-sheet"
                         aria-label={
                           language === 'bn'
                             ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
