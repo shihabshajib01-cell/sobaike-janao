@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { PhoneCall, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { PhoneCall, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
@@ -27,6 +27,10 @@ export const HarassmentPage: React.FC = () => {
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const subcategoryScrollRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollSubcategoriesLeft, setCanScrollSubcategoriesLeft] = useState(false);
+  const [canScrollSubcategoriesRight, setCanScrollSubcategoriesRight] = useState(false);
 
   const subcategories = getFeedSubcategories('harassment');
 
@@ -61,6 +65,52 @@ export const HarassmentPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const updateSubcategoryScrollControls = useCallback(() => {
+    const container = subcategoryScrollRef.current;
+    if (!container) return;
+
+    const maxScrollLeft = Math.max(0, container.scrollWidth - container.clientWidth);
+    setCanScrollSubcategoriesLeft(container.scrollLeft > 2);
+    setCanScrollSubcategoriesRight(maxScrollLeft - container.scrollLeft > 2);
+  }, []);
+
+  useEffect(() => {
+    const container = subcategoryScrollRef.current;
+    if (!container) return;
+
+    updateSubcategoryScrollControls();
+    container.addEventListener('scroll', updateSubcategoryScrollControls, { passive: true });
+    window.addEventListener('resize', updateSubcategoryScrollControls);
+
+    return () => {
+      container.removeEventListener('scroll', updateSubcategoryScrollControls);
+      window.removeEventListener('resize', updateSubcategoryScrollControls);
+    };
+  }, [updateSubcategoryScrollControls]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(updateSubcategoryScrollControls);
+    return () => window.cancelAnimationFrame(frame);
+  }, [
+    language,
+    subcategories.length,
+    isLoading,
+    reports.length,
+    selectedDistrict,
+    updateSubcategoryScrollControls,
+  ]);
+
+  const scrollSubcategories = useCallback((direction: 'left' | 'right') => {
+    const container = subcategoryScrollRef.current;
+    if (!container) return;
+
+    const distance = Math.max(280, Math.round(container.clientWidth * 0.7));
+    container.scrollBy({
+      left: direction === 'left' ? -distance : distance,
+      behavior: 'smooth',
+    });
+  }, []);
 
   const filteredReports = useMemo(() => {
     return reports.filter((r) => {
@@ -135,29 +185,60 @@ export const HarassmentPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Horizontally scrollable subcategory chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          {subcategories.map((subcat) => {
-            const count = reports.filter((r) => {
-              if (r.segment !== 'harassment') return false;
-              const matchesSub = subcat.id === 'all' || r.subcategoryId === subcat.id;
-              const matchesDist =
-                selectedDistrict === 'all' || r.districtBn.includes(selectedDistrict);
-              return matchesSub && matchesDist;
-            }).length;
+        {/* Horizontally scrollable subcategory chips. Desktop adds YouTube-style edge controls. */}
+        <div className="relative">
+          {canScrollSubcategoriesLeft && (
+            <div className="absolute inset-y-0 left-0 z-10 hidden lg:flex items-center pr-5 bg-gradient-to-r from-ui-page via-ui-page to-transparent pointer-events-none">
+              <button
+                type="button"
+                onClick={() => scrollSubcategories('left')}
+                aria-label={language === 'bn' ? 'আগের বিভাগগুলো দেখুন' : 'Show previous categories'}
+                className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-ui-stroke-default bg-ui-surface text-ui-content-primary shadow-md transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+          )}
 
-            return (
-              <FilterChip
-                key={subcat.id}
-                id={`filter-subcat-${subcat.id}`}
-                label={language === 'bn' ? subcat.nameBn : subcat.nameEn}
-                section="harassment"
-                selected={selectedSubcat === subcat.id}
-                count={isLoading ? undefined : count}
-                onClick={() => setSelectedSubcat(subcat.id)}
-              />
-            );
-          })}
+          <div
+            ref={subcategoryScrollRef}
+            className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden"
+          >
+            {subcategories.map((subcat) => {
+              const count = reports.filter((r) => {
+                if (r.segment !== 'harassment') return false;
+                const matchesSub = subcat.id === 'all' || r.subcategoryId === subcat.id;
+                const matchesDist =
+                  selectedDistrict === 'all' || r.districtBn.includes(selectedDistrict);
+                return matchesSub && matchesDist;
+              }).length;
+
+              return (
+                <FilterChip
+                  key={subcat.id}
+                  id={`filter-subcat-${subcat.id}`}
+                  label={language === 'bn' ? subcat.nameBn : subcat.nameEn}
+                  section="harassment"
+                  selected={selectedSubcat === subcat.id}
+                  count={isLoading ? undefined : count}
+                  onClick={() => setSelectedSubcat(subcat.id)}
+                />
+              );
+            })}
+          </div>
+
+          {canScrollSubcategoriesRight && (
+            <div className="absolute inset-y-0 right-0 z-10 hidden lg:flex items-center pl-5 bg-gradient-to-l from-ui-page via-ui-page to-transparent pointer-events-none">
+              <button
+                type="button"
+                onClick={() => scrollSubcategories('right')}
+                aria-label={language === 'bn' ? 'পরের বিভাগগুলো দেখুন' : 'Show more categories'}
+                className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-ui-stroke-default bg-ui-surface text-ui-content-primary shadow-md transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <ChevronRight className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
