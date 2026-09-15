@@ -4,7 +4,6 @@ import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
 import { BANGLADESH_DISTRICTS, DIVISIONS } from '../data/districts';
 import { SECTIONS, SectionKey } from '../theme/tokens';
-import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton, MapExploreSkeleton } from '../components/ui/LoadingSkeleton';
 import type { ExploreViewMode } from '../components/explore/MapSectionHeader';
 import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
@@ -955,59 +954,28 @@ export const ExplorePage: React.FC = () => {
               )}
             </div>
           ) : (
-            /* REPORTS VIEW (UX Phase 4 Hierarchy: Summary -> Actual Reports -> More Analysis) */
+            /* REPORTS VIEW (Analytical Hierarchy: Report Summary -> Detailed Analysis) */
             <div className="space-y-6">
-              {/* 1. Compact Overview */}
+              {/* 1. Report summary */}
               <ReportAnalyticsOverview
                 reports={filteredReports}
                 language={language}
               />
 
-              {/* 2. Published reports (Primary Content: Actual ReportCards) */}
-              <div id="reports-in-selection-section" className="space-y-3.5 pt-1">
-                <div className="flex items-baseline justify-between gap-2 border-b border-ui-stroke-subtle pb-2.5">
+              {/* 2. Detailed analysis (Directly visible by default) */}
+              <div id="detailed-analysis-section" className="space-y-4 pt-1">
+                <div className="border-b border-ui-stroke-subtle pb-2.5">
                   <h3 className="text-[18px] sm:text-[19px] md:text-[20px] font-bold text-ui-content-primary tracking-tight">
-                    {language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published reports'}
+                    {language === 'bn' ? 'বিস্তারিত বিশ্লেষণ' : 'Detailed analysis'}
                   </h3>
-                  <div className="text-[12.5px] sm:text-[13px] font-semibold text-ui-content-secondary shrink-0">
+                  <p className="text-[12.5px] sm:text-[13px] text-ui-content-secondary mt-0.5">
                     {language === 'bn'
-                      ? `${toBanglaDigits(filteredReports.length)}টি প্রতিবেদন`
-                      : `${filteredReports.length} reports`}
-                  </div>
+                      ? 'বিষয়, এলাকা ও সময় অনুযায়ী বিস্তারিত বিশ্লেষণ দেখুন।'
+                      : 'Explore distribution by topic, geography and time.'}
+                  </p>
                 </div>
 
-                <div className="space-y-3 sm:space-y-3.5">
-                  {filteredReports.map((report) => (
-                    <ReportCard key={report.id} report={report} />
-                  ))}
-                </div>
-              </div>
-
-              {/* 3. More analysis (Progressive Disclosure - Secondary) */}
-              <details
-                id="more-analysis-disclosure"
-                className="group bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs"
-              >
-                <summary className="w-full flex items-center justify-between p-3.5 sm:p-4 cursor-pointer list-none select-none min-h-[44px] hover:bg-ui-surface-subtle transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <MapIcon name="layers" size="md" className="text-ui-content-secondary group-hover:text-ui-content-primary shrink-0 transition-colors" />
-                    <div>
-                      <h4 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary">
-                        {language === 'bn' ? 'আরও বিশ্লেষণ' : 'More analysis'}
-                      </h4>
-                      <p className="text-[12px] sm:text-[12.5px] text-ui-content-secondary mt-0.5">
-                        {language === 'bn'
-                          ? 'বিষয়, এলাকা ও সময় অনুযায়ী আরও বিস্তারিত দেখুন।'
-                          : 'Explore distribution by topic, geography, and time.'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="w-8 h-8 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
-                    <MapIcon name="chevron-down" size="sm" ariaHidden={true} />
-                  </div>
-                </summary>
-
-                <div className="p-3.5 sm:p-4 pt-3 border-t border-ui-stroke-subtle space-y-4">
+                <div className="space-y-4">
                   {/* 1. Subcategory breakdown */}
                   <ReportSubcategoryBreakdown
                     reports={filteredReports}
@@ -1041,7 +1009,7 @@ export const ExplorePage: React.FC = () => {
                     />
                   )}
                 </div>
-              </details>
+              </div>
             </div>
           )}
         </>
