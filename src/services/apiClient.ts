@@ -217,13 +217,14 @@ class ApiClient {
 
     const hasImages = Array.isArray(images) && images.length > 0;
 
-    // Step 1: Submit complaint via authoritative 3-argument RPC with safe reporter context
+    // Step 1: Submit complaint through the classification-aware wrapper.
+    // The existing authoritative submission function remains intact underneath this wrapper.
     const enrichedPayload = {
       ...payload,
       reporterContext,
     };
 
-    const result = await supabase.rpc('submit_public_complaint', {
+    const result = await supabase.rpc('submit_public_complaint_v2', {
       p_payload: enrichedPayload,
       p_client_submission_id: clientSubmissionId,
       p_reporter_context: reporterContext,
