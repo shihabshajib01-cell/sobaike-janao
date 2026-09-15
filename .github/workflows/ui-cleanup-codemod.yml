@@ -1,0 +1,96 @@
+name: Temporary UI Cleanup Codemod
+
+on:
+  push:
+    branches: [public-ui-system-cleanup-2]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: public-ui-system-cleanup-2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Apply scoped UI-system cleanup
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_exact(path, replacements):
+              p = Path(path)
+              text = p.read_text()
+              original = text
+              for old, new in replacements:
+                  if old not in text:
+                      raise SystemExit(f'Expected pattern not found in {path}: {old}')
+                  text = text.replace(old, new)
+              if text == original:
+                  raise SystemExit(f'No changes produced for {path}')
+              p.write_text(text)
+
+          replace_exact('src/pages/MorePage.tsx', [
+              ('bg-amber-500/10 border border-amber-500/30', 'bg-ui-warning-bg border border-ui-warning-border'),
+              ('text-amber-600 dark:text-amber-400', 'text-ui-warning-text'),
+              ('bg-blue-500/10 border border-blue-500/30', 'bg-ui-info-bg border border-ui-info-border'),
+              ('text-blue-600 dark:text-blue-400', 'text-ui-info-text'),
+              ('text-amber-500', 'text-ui-warning-text'),
+              ('<span className="text-[14px] font-semibold text-ui-content-secondary">\n              {language === \'bn\' ? \'প্রদর্শন\' : \'Appearance\'}\n            </span>', '<p className="text-[14px] font-semibold text-ui-content-secondary">\n              {language === \'bn\' ? \'প্রদর্শন\' : \'Appearance\'}\n            </p>'),
+          ])
+
+          p = Path('src/components/report-composer/ReportComposerModal.tsx')
+          text = p.read_text()
+          marker = 'id="draft-confirm-close-modal"'
+          idx = text.find(marker)
+          if idx == -1:
+              raise SystemExit('Draft close modal marker not found')
+          start = max(0, idx - 300)
+          end = min(len(text), idx + 600)
+          segment = text[start:end]
+          if 'maxWidth="lg"' not in segment:
+              raise SystemExit('Expected maxWidth="lg" near draft confirmation modal not found')
+          segment = segment.replace('maxWidth="lg"', 'maxWidth="md"', 1)
+          text = text[:start] + segment + text[end:]
+          p.write_text(text)
+
+      - name: Scan direct Tailwind palette colors
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          palette = re.compile(r'(?<![\w-])(?:bg|text|border|ring|outline|from|via|to)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}(?:/\d+)?')
+          violations = []
+          for p in Path('src').rglob('*'):
+              if p.suffix not in {'.tsx', '.ts'}:
+                  continue
+              for i, line in enumerate(p.read_text().splitlines(), 1):
+                  matches = palette.findall(line)
+                  if matches:
+                      violations.append((str(p), i, matches, line.strip()))
+          if violations:
+              print('Remaining direct palette classes:')
+              for item in violations:
+                  print(f'{item[0]}:{item[1]} {item[2]} :: {item[3]}')
+              raise SystemExit(1)
+          print('No direct Tailwind palette color classes found in src TS/TSX.')
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+      - name: Commit scoped cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/pages/MorePage.tsx src/components/report-composer/ReportComposerModal.tsx
+          git commit -m "refactor: align public UI with semantic system"
+          git push origin HEAD:public-ui-system-cleanup-2
