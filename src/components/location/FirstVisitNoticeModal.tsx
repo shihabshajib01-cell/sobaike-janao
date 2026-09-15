@@ -70,7 +70,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
 
           <ol className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-xs space-y-2 list-none">
             <li className="flex items-start gap-2.5">
-              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">১.</p>
+              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '১.' : '1.'}</p>
               <p>
                 {isBn
                   ? 'সঠিক, সত্য ও প্রাসঙ্গিক তথ্য দিয়ে প্রতিবেদন প্রকাশ করুন।'
@@ -78,7 +78,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
               </p>
             </li>
             <li className="flex items-start gap-2.5">
-              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">২.</p>
+              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '২.' : '2.'}</p>
               <p>
                 {isBn
                   ? 'কারও সুনাম নষ্ট করার অসৎ উদ্দেশ্যে ভিত্তিহীন অভিযোগ দেওয়া থেকে বিরত থাকুন।'
@@ -86,7 +86,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
               </p>
             </li>
             <li className="flex items-start gap-2.5">
-              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">৩.</p>
+              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '৩.' : '3.'}</p>
               <p>
                 {isBn
                   ? 'জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট হটলাইনে সরাসরি যোগাযোগ করুন।'
