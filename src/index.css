@@ -34,6 +34,14 @@
   --color-ui-accent-hover: var(--ui-accent-hover);
   --color-ui-focus: var(--ui-focus);
   --color-ui-overlay: var(--ui-overlay);
+  --color-ui-media-viewer-bg: var(--ui-media-viewer-bg);
+  --color-ui-media-viewer-bg-elevated: var(--ui-media-viewer-bg-elevated);
+  --color-ui-media-viewer-text: var(--ui-media-viewer-text);
+  --color-ui-media-viewer-muted: var(--ui-media-viewer-muted);
+  --color-ui-media-viewer-border: var(--ui-media-viewer-border);
+  --color-ui-media-viewer-control: var(--ui-media-viewer-control);
+  --color-ui-media-viewer-control-hover: var(--ui-media-viewer-control-hover);
+  --color-ui-media-viewer-focus: var(--ui-media-viewer-focus);
 
   /* Primary Action */
   --color-ui-action-bg: var(--ui-primary-action-bg);
@@ -291,6 +299,16 @@
     --ui-accent: #3A7CA5;
     --ui-focus: #3A7CA5;
     --ui-overlay: rgba(5, 5, 5, 0.55);
+
+    /* Media viewer semantic colors */
+    --ui-media-viewer-bg: #171717;
+    --ui-media-viewer-bg-elevated: rgba(23, 23, 23, 0.94);
+    --ui-media-viewer-text: #FFFFFF;
+    --ui-media-viewer-muted: rgba(255, 255, 255, 0.55);
+    --ui-media-viewer-border: rgba(255, 255, 255, 0.16);
+    --ui-media-viewer-control: rgba(23, 23, 23, 0.82);
+    --ui-media-viewer-control-hover: #171717;
+    --ui-media-viewer-focus: #FFFFFF;
 
     --ui-primary-action-bg: #1B4D6B;
     --ui-primary-action-hover: #163B52;

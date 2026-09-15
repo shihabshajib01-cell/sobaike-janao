@@ -187,11 +187,11 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
       {/* Modal Dialog Card: Full screen on mobile, centered card on md+ */}
       <div
         ref={modalRef}
-        className="relative w-full max-w-4xl h-full md:h-auto max-h-none md:max-h-[92vh] flex flex-col rounded-none md:rounded-2xl md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-white/15 bg-neutral-900 text-white shadow-2xl overflow-hidden z-10"
+        className="relative w-full max-w-4xl h-full md:h-auto max-h-none md:max-h-[92vh] flex flex-col rounded-none md:rounded-2xl md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-ui-media-viewer-border bg-ui-media-viewer-bg text-ui-media-viewer-text shadow-2xl overflow-hidden z-10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-4 sm:px-6 pb-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] md:pt-3.5 border-b border-white/10 bg-neutral-900/90 backdrop-blur-md flex items-center justify-between gap-3 shrink-0">
+        <div className="px-4 sm:px-6 pb-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] md:pt-3.5 border-b border-ui-media-viewer-border bg-ui-media-viewer-bg-elevated backdrop-blur-md flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Image Counter Badge */}
             <span className="shrink-0 px-2.5 py-1 rounded-full bg-white/10 text-white text-[12px] sm:text-[13px] font-semibold tracking-wide">
@@ -263,7 +263,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                 type="button"
                 onClick={handlePrev}
                 aria-label={language === 'bn' ? 'পূর্ববর্তী ছবি' : 'Previous image'}
-                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-neutral-900/80 hover:bg-neutral-900 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-lg z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-media-viewer-control hover:bg-ui-media-viewer-control-hover text-ui-media-viewer-text border border-ui-media-viewer-border flex items-center justify-center cursor-pointer transition-all shadow-lg z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
@@ -272,7 +272,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                 type="button"
                 onClick={handleNext}
                 aria-label={language === 'bn' ? 'পরবর্তী ছবি' : 'Next image'}
-                className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-neutral-900/80 hover:bg-neutral-900 text-white border border-white/20 flex items-center justify-center cursor-pointer transition-all shadow-lg z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-media-viewer-control hover:bg-ui-media-viewer-control-hover text-ui-media-viewer-text border border-ui-media-viewer-border flex items-center justify-center cursor-pointer transition-all shadow-lg z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
@@ -282,7 +282,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
 
         {/* Modal Footer: Thumbnail strip when multiple images */}
         {images.length > 1 && (
-          <div className="px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] md:pb-2.5 bg-neutral-900/95 border-t border-white/10 flex items-center justify-center gap-2 overflow-x-auto shrink-0">
+          <div className="px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] md:pb-2.5 bg-ui-media-viewer-bg-elevated border-t border-ui-media-viewer-border flex items-center justify-center gap-2 overflow-x-auto shrink-0">
             <div className="flex gap-2 p-1 rounded-xl bg-black/40 border border-white/5">
               {images.map((img, idx) => {
                 const thumbUrl = img.previewUrl || img.url || '';
@@ -299,7 +299,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                     }
                     className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white shrink-0 ${
                       isSelected
-                        ? 'border-emerald-500 scale-105 opacity-100 ring-2 ring-emerald-500/30'
+                        ? 'border-ui-success-border scale-105 opacity-100 ring-2 ring-ui-success-border'
                         : 'border-transparent opacity-50 hover:opacity-80'
                     }`}
                   >
@@ -313,7 +313,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="w-full h-full bg-neutral-800 flex items-center justify-center text-[11px] text-white/50">
+                      <div className="w-full h-full bg-ui-media-viewer-control flex items-center justify-center text-[11px] text-ui-media-viewer-muted">
                         #{idx + 1}
                       </div>
                     )}

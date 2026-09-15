@@ -61,9 +61,9 @@ export const MorePage: React.FC = () => {
         <div className="pt-3 border-t border-ui-stroke-subtle md:hidden space-y-2">
           <div className="flex items-center gap-2">
             <Palette className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-            <span className="text-[14px] font-semibold text-ui-content-secondary">
+            <p className="text-[14px] font-semibold text-ui-content-secondary">
               {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
-            </span>
+            </p>
           </div>
           <ThemeSelector variant="segmented" />
         </div>
@@ -178,8 +178,8 @@ export const MorePage: React.FC = () => {
 
             {/* Crucial Positionings Callout */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div className="p-5 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2">
-                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-[16px]">
+              <div className="p-5 bg-ui-warning-bg border border-ui-warning-border rounded-xl space-y-2">
+                <div className="flex items-center gap-2 text-ui-warning-text font-bold text-[16px]">
                   <ShieldAlert className="w-5 h-5 shrink-0" />
                   <span>{language === 'bn' ? 'এটি কোনো সরকারি ওয়েবসাইট নয়' : 'Not a Government Website'}</span>
                 </div>
@@ -190,8 +190,8 @@ export const MorePage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-5 bg-blue-500/10 border border-blue-500/30 rounded-xl space-y-2">
-                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-[16px]">
+              <div className="p-5 bg-ui-info-bg border border-ui-info-border rounded-xl space-y-2">
+                <div className="flex items-center gap-2 text-ui-info-text font-bold text-[16px]">
                   <Scale className="w-5 h-5 shrink-0" />
                   <span>{language === 'bn' ? 'আইন প্রয়োগকারী সংস্থা নয়' : 'Not Law Enforcement or Court'}</span>
                 </div>
@@ -206,7 +206,7 @@ export const MorePage: React.FC = () => {
             {/* Publication notice */}
             <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
               <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+                <AlertTriangle className="w-5 h-5 text-ui-warning-text shrink-0" />
                 <span>{language === 'bn' ? 'প্রকাশিত প্রতিবেদন ও আইনি অবস্থান' : 'Published Reports & Legal Position'}</span>
               </h3>
               <p className="text-[16px] leading-[26px] text-ui-content-secondary font-medium">
@@ -264,7 +264,7 @@ export const MorePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[13px] font-bold bg-[var(--sec-utility-bg)] text-[var(--sec-utility-bg)] text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                  <span className="inline-block px-2.5 py-1 rounded-md text-[13px] font-bold bg-ui-warning-bg text-ui-warning-text border border-ui-warning-border">
                     {language === 'bn' ? 'ইউটিলিটি' : 'Utility'}
                   </span>
                   <h4 className="text-[16px] font-bold text-ui-content-primary">
@@ -406,8 +406,8 @@ export const MorePage: React.FC = () => {
       {activeTab === 'helplines' && (
         <div className="space-y-6">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
-            <div className="p-5 bg-red-500/10 border border-red-500/30 rounded-xl space-y-2">
-              <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold text-[18px]">
+            <div className="p-5 bg-ui-error-bg border border-ui-error-border rounded-xl space-y-2">
+              <div className="flex items-center gap-2 text-ui-error-text font-bold text-[18px]">
                 <ShieldAlert className="w-6 h-6 shrink-0" />
                 <span>{language === 'bn' ? 'জরুরি পরিস্থিতিতে কী করবেন?' : 'What to Do in an Emergency'}</span>
               </div>
