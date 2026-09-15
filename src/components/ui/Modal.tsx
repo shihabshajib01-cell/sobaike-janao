@@ -183,10 +183,14 @@ export const Modal: React.FC<ModalProps> = ({
     full: defaultMaxWidthClasses.full,
   };
 
+  // The report-draft confirmation has three actions with longer Bengali labels.
+  // Give only this dialog one wider responsive size so actions never clip horizontally.
+  const resolvedMaxWidth = id === 'draft-confirm-close-modal' && maxWidth === 'md' ? 'lg' : maxWidth;
+
   const maxWidthClass =
     effectiveMobilePresentation === 'sheet'
-      ? sheetMaxWidthClasses[maxWidth] || sheetMaxWidthClasses.md
-      : defaultMaxWidthClasses[maxWidth] || defaultMaxWidthClasses.md;
+      ? sheetMaxWidthClasses[resolvedMaxWidth] || sheetMaxWidthClasses.md
+      : defaultMaxWidthClasses[resolvedMaxWidth] || defaultMaxWidthClasses.md;
 
   const rootPositionClasses =
     effectiveMobilePresentation === 'sheet'
