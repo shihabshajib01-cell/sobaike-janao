@@ -1,4 +1,4 @@
-name: Harassment Feature Implementation
+name: Harassment Feature Verification
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  implement-and-verify:
+  verify-and-fix:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -25,8 +25,34 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Apply deterministic source patch
-        run: node scripts/run-harassment-feature-codemod.mjs
+      - name: Clear Harassment classification filters when desktop category changes away
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'src/pages/ExplorePage.tsx';
+          let s = fs.readFileSync(path, 'utf8');
+          const anchor = `  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Responsive resize safety`;
+          if (!s.includes(anchor)) throw new Error('ExplorePage load effect anchor not found');
+          const replacement = `  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Prevent hidden Harassment classification filters from leaking across category changes.
+  useEffect(() => {
+    if (selectedSection !== 'harassment') {
+      setHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
+    }
+  }, [selectedSection]);
+
+  // Responsive resize safety`;
+          s = s.replace(anchor, replacement);
+          fs.writeFileSync(path, s);
+          NODE
 
       - name: Install dependencies
         run: npm ci
@@ -37,15 +63,17 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Commit verified source changes
+      - name: Diff check
+        run: git diff --check
+
+      - name: Commit verified fix
         run: |
-          rm -f scripts/apply-harassment-classification-feature.mjs scripts/run-harassment-feature-codemod.mjs
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src scripts supabase
+          git add src/pages/ExplorePage.tsx
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
             exit 0
           fi
-          git commit -m "feat(harassment): implement classification and searchable filters"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(harassment): clear explore classification filters on category change"
           git push origin HEAD:harassment-classification-impl
