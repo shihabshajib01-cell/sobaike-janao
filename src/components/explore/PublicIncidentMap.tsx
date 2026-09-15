@@ -445,7 +445,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         id="public-heatmap-card"
         role="region"
         aria-label={language === 'bn' ? 'প্রতিবেদন হিটম্যাপ' : 'Reports heatmap'}
-        className="relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col h-[330px] sm:h-[370px] md:h-[520px] md:min-h-[520px]"
+        className="relative isolate z-0 rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col h-[330px] sm:h-[370px] md:h-[520px] md:min-h-[520px]"
       >
         {/* Zoom & Recenter Controls (Top-Right) */}
         <div className="absolute top-3.5 right-3.5 z-[500] flex flex-col gap-1.5 shadow-sm">
