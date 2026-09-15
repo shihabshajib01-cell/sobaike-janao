@@ -30,3 +30,21 @@ source = source.replace(oldHelper, newHelper);
 fs.writeFileSync(target, source);
 
 await import(`${pathToFileURL(process.cwd() + '/' + target).href}?run=${Date.now()}`);
+
+// Avoid TypeScript's short-circuit literal narrowing: check the harassment-specific branch
+// before the generic "not all" condition.
+const explorePath = 'src/pages/ExplorePage.tsx';
+let explore = fs.readFileSync(explorePath, 'utf8');
+const exploreOld = `  const hasActiveFilters =\n    Boolean(searchQuery.trim()) ||\n    selectedSection !== 'all' ||\n    selectedDivision !== 'all' ||\n    selectedDistrict !== 'all' ||\n    (selectedSection === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters));`;
+const exploreNew = `  const hasActiveFilters =\n    Boolean(searchQuery.trim()) ||\n    (selectedSection === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) ||\n    selectedSection !== 'all' ||\n    selectedDivision !== 'all' ||\n    selectedDistrict !== 'all';`;
+if (!explore.includes(exploreOld)) throw new Error('Missing generated Explore hasActiveFilters block.');
+explore = explore.replace(exploreOld, exploreNew);
+fs.writeFileSync(explorePath, explore);
+
+const searchPath = 'src/pages/SearchPage.tsx';
+let search = fs.readFileSync(searchPath, 'utf8');
+const searchOld = `  const hasReportFilters =\n    selectedReportSegment !== 'all' ||\n    (selectedReportSegment === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters));`;
+const searchNew = `  const hasReportFilters =\n    (selectedReportSegment === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) ||\n    selectedReportSegment !== 'all';`;
+if (!search.includes(searchOld)) throw new Error('Missing generated Search hasReportFilters block.');
+search = search.replace(searchOld, searchNew);
+fs.writeFileSync(searchPath, search);
