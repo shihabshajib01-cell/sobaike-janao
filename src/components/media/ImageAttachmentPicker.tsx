@@ -249,7 +249,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
       {errorMessage && (
         <div className="p-3.5 bg-ui-error-bg border border-ui-error-border rounded-xl flex items-start gap-2.5 text-[14px] text-ui-error-text">
           <AlertCircle className="w-5 h-5 text-ui-error-text shrink-0 mt-0.5" />
-          <span className="leading-[22px]">{language === 'bn' ? errorMessage.bn : errorMessage.en}</span>
+          <p className="leading-[22px]">{language === 'bn' ? errorMessage.bn : errorMessage.en}</p>
         </div>
       )}
 
@@ -380,22 +380,22 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
 
                     {/* Expand overlay on hover */}
                     {img.previewUrl && !img.isCompressing && (
-                      <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/25 transition-colors flex items-center justify-center pointer-events-none">
-                        <div className="opacity-0 group-hover/thumb:opacity-100 transition-all transform scale-90 group-hover/thumb:scale-100 p-2 rounded-full bg-black/60 text-white backdrop-blur-xs shadow-md">
+                      <div className="absolute inset-0 bg-transparent group-hover/thumb:bg-ui-media-overlay-soft transition-colors flex items-center justify-center pointer-events-none">
+                        <div className="opacity-0 group-hover/thumb:opacity-100 transition-all transform scale-90 group-hover/thumb:scale-100 p-2 rounded-full bg-ui-media-overlay-strong text-ui-media-viewer-text backdrop-blur-xs shadow-md">
                           <Maximize2 className="w-4 h-4" />
                         </div>
                       </div>
                     )}
 
                     {/* Order indicator */}
-                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-md bg-black/75 text-white text-[12px] font-bold tracking-wide pointer-events-none">
+                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-md bg-ui-media-overlay-label text-ui-media-viewer-text text-[12px] font-bold tracking-wide pointer-events-none">
                       #{index + 1}
                     </div>
 
                     {/* Preparing Spinner Overlay */}
                     {img.isCompressing && (
-                      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-white text-center p-3 pointer-events-none">
-                        <Loader2 className="w-6 h-6 animate-spin text-white" />
+                      <div className="absolute inset-0 bg-ui-media-viewer-strip backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-ui-media-viewer-text text-center p-3 pointer-events-none">
+                        <Loader2 className="w-6 h-6 animate-spin text-ui-media-viewer-text" />
                         <span className="text-[13px] font-semibold">
                           {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing image…'}
                         </span>
@@ -406,9 +406,9 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     {img.compressionError && !img.isCompressing && (
                       <div className="absolute inset-0 bg-ui-error-text/90 p-3 flex flex-col items-center justify-center text-center text-ui-content-inverse gap-1 pointer-events-none">
                         <AlertCircle className="w-5 h-5 text-ui-content-inverse" />
-                        <span className="text-[12px] leading-tight">
+                        <p className="text-[12px] leading-tight">
                           {language === 'bn' ? img.compressionError.bn : img.compressionError.en}
-                        </span>
+                        </p>
                       </div>
                     )}
 
@@ -420,7 +420,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                         handleRemoveImage(img.id);
                       }}
                       aria-label={language === 'bn' ? `ছবি ${index + 1} মুছুন` : `Remove image ${index + 1}`}
-                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-ui-destructive-bg hover:bg-ui-destructive-hover text-ui-destructive-text flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      className="absolute top-2 right-2 min-w-[44px] min-h-[44px] rounded-full bg-ui-destructive-bg hover:bg-ui-destructive-hover text-ui-destructive-text flex items-center justify-center shadow-xs cursor-pointer transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                     >
                       <X className="w-5 h-5" />
                     </button>

@@ -26,13 +26,13 @@ export const ViewportDebugger: React.FC = () => {
   return (
     <div
       id="viewport-debugger"
-      className="fixed bottom-20 right-3 md:bottom-4 md:right-4 z-[9999] pointer-events-none select-none bg-black/80 text-white font-mono text-xs px-2.5 py-1.5 rounded-lg border border-white/20 shadow-lg backdrop-blur-sm"
+      className="fixed bottom-20 right-3 md:bottom-4 md:right-4 z-[9999] pointer-events-none select-none bg-ui-debug-overlay text-ui-debug-text font-mono text-xs px-2.5 py-1.5 rounded-lg border border-ui-debug-border shadow-lg backdrop-blur-sm"
       style={{ willChange: 'transform' }}
     >
       <span className="font-semibold text-ui-success-text">{dimensions.width}</span>
-      <span className="text-white/60 mx-1">×</span>
+      <span className="text-ui-debug-muted mx-1">×</span>
       <span className="font-semibold text-ui-accent">{dimensions.height}</span>
-      <span className="ml-1.5 text-[10px] text-white/50 font-sans uppercase">px</span>
+      <span className="ml-1.5 text-[10px] text-ui-debug-muted font-sans uppercase">px</span>
     </div>
   );
 };

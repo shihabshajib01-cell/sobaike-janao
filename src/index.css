@@ -42,6 +42,22 @@
   --color-ui-media-viewer-control: var(--ui-media-viewer-control);
   --color-ui-media-viewer-control-hover: var(--ui-media-viewer-control-hover);
   --color-ui-media-viewer-focus: var(--ui-media-viewer-focus);
+  --color-ui-media-viewer-backdrop: var(--ui-media-viewer-backdrop);
+  --color-ui-media-viewer-stage: var(--ui-media-viewer-stage);
+  --color-ui-media-viewer-chip: var(--ui-media-viewer-chip);
+  --color-ui-media-viewer-chip-hover: var(--ui-media-viewer-chip-hover);
+  --color-ui-media-viewer-strip: var(--ui-media-viewer-strip);
+  --color-ui-media-viewer-border-soft: var(--ui-media-viewer-border-soft);
+  --color-ui-media-viewer-border-strong: var(--ui-media-viewer-border-strong);
+  --color-ui-media-overlay-soft: var(--ui-media-overlay-soft);
+  --color-ui-media-overlay-strong: var(--ui-media-overlay-strong);
+  --color-ui-media-overlay-label: var(--ui-media-overlay-label);
+  --color-ui-media-overlay-max: var(--ui-media-overlay-max);
+  --color-ui-media-gradient: var(--ui-media-gradient);
+  --color-ui-debug-overlay: var(--ui-debug-overlay);
+  --color-ui-debug-text: var(--ui-debug-text);
+  --color-ui-debug-muted: var(--ui-debug-muted);
+  --color-ui-debug-border: var(--ui-debug-border);
 
   /* Primary Action */
   --color-ui-action-bg: var(--ui-primary-action-bg);
@@ -309,6 +325,22 @@
     --ui-media-viewer-control: rgba(23, 23, 23, 0.82);
     --ui-media-viewer-control-hover: #171717;
     --ui-media-viewer-focus: #FFFFFF;
+    --ui-media-viewer-backdrop: rgba(0, 0, 0, 0.85);
+    --ui-media-viewer-stage: rgba(0, 0, 0, 0.95);
+    --ui-media-viewer-chip: rgba(255, 255, 255, 0.10);
+    --ui-media-viewer-chip-hover: rgba(255, 255, 255, 0.20);
+    --ui-media-viewer-strip: rgba(0, 0, 0, 0.40);
+    --ui-media-viewer-border-soft: rgba(255, 255, 255, 0.05);
+    --ui-media-viewer-border-strong: rgba(255, 255, 255, 0.20);
+    --ui-media-overlay-soft: rgba(0, 0, 0, 0.25);
+    --ui-media-overlay-strong: rgba(0, 0, 0, 0.60);
+    --ui-media-overlay-label: rgba(0, 0, 0, 0.75);
+    --ui-media-overlay-max: rgba(0, 0, 0, 0.90);
+    --ui-media-gradient: rgba(0, 0, 0, 0.80);
+    --ui-debug-overlay: rgba(0, 0, 0, 0.80);
+    --ui-debug-text: #FFFFFF;
+    --ui-debug-muted: rgba(255, 255, 255, 0.55);
+    --ui-debug-border: rgba(255, 255, 255, 0.20);
 
     --ui-primary-action-bg: #1B4D6B;
     --ui-primary-action-hover: #163B52;

@@ -179,7 +179,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/85 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-ui-media-viewer-backdrop backdrop-blur-sm transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -194,21 +194,21 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
         <div className="px-4 sm:px-6 pb-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] md:pt-3.5 border-b border-ui-media-viewer-border bg-ui-media-viewer-bg-elevated backdrop-blur-md flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Image Counter Badge */}
-            <span className="shrink-0 px-2.5 py-1 rounded-full bg-white/10 text-white text-[12px] sm:text-[13px] font-semibold tracking-wide">
+            <p className="shrink-0 px-2.5 py-1 rounded-full bg-ui-media-viewer-chip text-ui-media-viewer-text text-[12px] sm:text-[13px] font-semibold tracking-wide">
               {language === 'bn'
                 ? `ছবি ${toBanglaDigits(safeIndex + 1)} / ${toBanglaDigits(images.length)}`
                 : `Image ${safeIndex + 1} of ${images.length}`}
-            </span>
+            </p>
 
             {/* Filename & optional size */}
             <div className="min-w-0 truncate text-[13px] sm:text-[14px]">
-              <span className="font-medium text-white/90 truncate inline-block max-w-[200px] sm:max-w-[320px] align-middle" title={imageName}>
+              <p className="font-medium text-ui-media-viewer-text truncate inline-block max-w-[200px] sm:max-w-[320px] align-middle" title={imageName}>
                 {imageName || (language === 'bn' ? 'সংযুক্ত ছবি' : 'Attached image')}
-              </span>
+              </p>
               {imageSize ? (
-                <span className="text-white/50 text-[12px] ml-2">
+                <p className="text-ui-media-viewer-muted text-[12px] ml-2 inline-block">
                   ({formatFileSize(imageSize, language)})
-                </span>
+                </p>
               ) : null}
             </div>
           </div>
@@ -219,7 +219,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
             type="button"
             onClick={onClose}
             aria-label={language === 'bn' ? 'ভিউয়ার বন্ধ করুন' : 'Close image viewer'}
-            className="min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
+            className="min-w-[44px] min-h-[44px] rounded-full bg-ui-media-viewer-chip hover:bg-ui-media-viewer-chip-hover text-ui-media-viewer-text flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
           >
             <X className="w-5 h-5" />
           </button>
@@ -227,7 +227,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
 
         {/* Modal Body: Image Stage Preserving Aspect Ratio */}
         <div
-          className="relative flex-1 min-h-[240px] max-h-none md:max-h-[calc(88vh-130px)] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/95 overflow-hidden touch-pan-y"
+          className="relative flex-1 min-h-[240px] max-h-none md:max-h-[calc(88vh-130px)] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-ui-media-viewer-stage overflow-hidden touch-pan-y"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -248,11 +248,11 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="flex flex-col items-center justify-center text-white/50 gap-2 p-6">
+            <div className="flex flex-col items-center justify-center text-ui-media-viewer-muted gap-2 p-6">
               <ZoomIn className="w-8 h-8 opacity-40" />
-              <span className="text-[14px]">
+              <p className="text-[14px]">
                 {language === 'bn' ? 'ছবিটি লোড করা যায়নি' : 'Image preview unavailable'}
-              </span>
+              </p>
             </div>
           )}
 
@@ -283,7 +283,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
         {/* Modal Footer: Thumbnail strip when multiple images */}
         {images.length > 1 && (
           <div className="px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] md:pb-2.5 bg-ui-media-viewer-bg-elevated border-t border-ui-media-viewer-border flex items-center justify-center gap-2 overflow-x-auto shrink-0">
-            <div className="flex gap-2 p-1 rounded-xl bg-black/40 border border-white/5">
+            <div className="flex gap-2 p-1 rounded-xl bg-ui-media-viewer-strip border border-ui-media-viewer-border-soft">
               {images.map((img, idx) => {
                 const thumbUrl = img.previewUrl || img.url || '';
                 const isSelected = idx === safeIndex;
@@ -297,7 +297,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                         ? `ছবি ${toBanglaDigits(idx + 1)}-এ যান`
                         : `Go to image ${idx + 1}`
                     }
-                    className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white shrink-0 ${
+                    className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus shrink-0 ${
                       isSelected
                         ? 'border-ui-success-border scale-105 opacity-100 ring-2 ring-ui-success-border'
                         : 'border-transparent opacity-50 hover:opacity-80'

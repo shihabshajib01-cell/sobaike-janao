@@ -301,7 +301,7 @@ export const MorePage: React.FC = () => {
             <div className="space-y-4">
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-ui-accent text-white flex items-center justify-center font-bold text-[15px]">১</span>
+                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">১</p>
                   <h3 className="text-[18px] font-bold text-ui-content-primary">
                     {language === 'bn' ? 'সেবা বা ক্যাটাগরি নির্বাচন' : 'Choose Category'}
                   </h3>
@@ -315,7 +315,7 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-ui-accent text-white flex items-center justify-center font-bold text-[15px]">২</span>
+                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">২</p>
                   <h3 className="text-[18px] font-bold text-ui-content-primary">
                     {language === 'bn' ? 'ঘটনার ধরন ও বিবরণ দিন' : 'Provide Details & Context'}
                   </h3>
@@ -329,7 +329,7 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-ui-accent text-white flex items-center justify-center font-bold text-[15px]">৩</span>
+                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">৩</p>
                   <h3 className="text-[18px] font-bold text-ui-content-primary">
                     {language === 'bn' ? 'অবস্থান নির্ধারণ করুন' : 'Specify Incident Location'}
                   </h3>
@@ -343,7 +343,7 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-ui-accent text-white flex items-center justify-center font-bold text-[15px]">৪</span>
+                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">৪</p>
                   <h3 className="text-[18px] font-bold text-ui-content-primary">
                     {language === 'bn' ? 'প্রমাণ বা ছবি যুক্ত করুন (ঐচ্ছিক)' : 'Attach Evidence (Optional)'}
                   </h3>
@@ -357,7 +357,7 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-ui-accent text-white flex items-center justify-center font-bold text-[15px]">৫</span>
+                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">৫</p>
                   <h3 className="text-[18px] font-bold text-ui-content-primary">
                     {language === 'bn' ? 'যাচাই ও জমা দিন' : 'Review & Submit'}
                   </h3>

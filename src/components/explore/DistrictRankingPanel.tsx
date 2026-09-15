@@ -363,7 +363,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <span
             className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-[11px] md:text-[12px] font-bold shrink-0 border ${
               isSelected
-                ? 'bg-ui-accent text-white border-ui-accent'
+                ? 'bg-ui-accent text-ui-content-inverse border-ui-accent'
                 : index === 0
                 ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
                 : index === 1
