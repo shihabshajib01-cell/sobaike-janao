@@ -56,7 +56,7 @@ jobs:
           done
           grep -Fq 'Unused dependencies (1)' /tmp/knip.txt
           grep -Fq '@vis.gl/react-google-maps' /tmp/knip.txt
-          if git grep -n '@vis.gl/react-google-maps' -- 'src/**' ':!package*.json'; then
+          if git grep -n '@vis.gl/react-google-maps' -- 'src/**'; then
             echo 'Unexpected runtime import of @vis.gl/react-google-maps'
             exit 1
           fi
@@ -99,7 +99,7 @@ jobs:
           npm audit --audit-level=moderate
           npm run lint
           npm run build
-          ! git grep -n '@vis.gl/react-google-maps' -- ':!package-lock.json'
+          ! git grep -n '@vis.gl/react-google-maps' -- 'src/**' package.json
 
       - name: Re-audit unused whole files
         shell: bash
