@@ -8,6 +8,17 @@ let source = fs.readFileSync(target, 'utf8');
 source = source.replaceAll('\\\\${className}', '\\${className}');
 source = source.replaceAll('\\\\${district.', '\\${district.');
 
+// The current Explore source has the analytics summary indented at 14 spaces.
+// Align the exact codemod anchor/output with the verified current source.
+source = source.replaceAll(
+  '                    <ReportAnalyticsOverview\\n                      reports={filteredReports}\\n                      language={language}\\n                    />',
+  '              <ReportAnalyticsOverview\\n                reports={filteredReports}\\n                language={language}\\n              />'
+);
+source = source.replaceAll(
+  "                    {selectedSection === 'harassment' && (\\n                      <HarassmentClassificationBreakdown reports={filteredReports} language={language} />\\n                    )}",
+  "              {selectedSection === 'harassment' && (\\n                <HarassmentClassificationBreakdown reports={filteredReports} language={language} />\\n              )}"
+);
+
 // A few intentionally short anchors occur twice. Resolve them by named operation,
 // while keeping every other replacement strict and fail-fast.
 const oldHelper = `  if (content.indexOf(from, first + from.length) !== -1) {\n    throw new Error(\`Anchor is not unique: \${label}\`);\n  }\n  return content.slice(0, first) + to + content.slice(first + from.length);`;
