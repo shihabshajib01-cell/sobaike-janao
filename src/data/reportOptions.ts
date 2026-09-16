@@ -55,15 +55,6 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       categoryGroup: 'relationship_scam',
     },
   ],
-  rickshaw: [
-    {
-      id: 'charging-station-location',
-      nameBn: 'অবৈধ অটো চার্জিং',
-      nameEn: 'Illegal auto-rickshaw charging',
-      descriptionBn: 'অবৈধ বিদ্যুৎ সংযোগ বা অগ্নিঝুঁকিপূর্ণ ব্যাটারি চার্জিং স্পট',
-      descriptionEn: 'Report illegal power connections or hazardous battery charging points',
-    },
-  ],
   extortion: [
     {
       id: 'shop-business',
@@ -101,6 +92,8 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       descriptionEn: 'Any other extortion or coercive money collection',
     },
   ],
+  public_safety: [],
+  road_transport: [],
   load_shedding: [
     {
       id: 'load-shedding-outage',
@@ -122,6 +115,16 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       nameEn: 'Excess Electricity Bill',
       descriptionBn: 'অস্বাভাবিক বা অসঙ্গতিপূর্ণ ভুতুড়ে বিদ্যুৎ বিলের অভিযোগ',
       descriptionEn: 'Abnormal, inflated or unexplained electricity bill charges',
+    },
+  ],
+  illegal_occupation: [],
+  rickshaw: [
+    {
+      id: 'charging-station-location',
+      nameBn: 'অবৈধ অটো চার্জিং',
+      nameEn: 'Illegal auto-rickshaw charging',
+      descriptionBn: 'অবৈধ বিদ্যুৎ সংযোগ বা অগ্নিঝুঁকিপূর্ণ ব্যাটারি চার্জিং স্পট',
+      descriptionEn: 'Report illegal power connections or hazardous battery charging points',
     },
   ],
 };
@@ -199,4 +202,3 @@ export const BANGLADESH_HELPLINES = [
     descEn: 'Emergency care, protection, and advocacy for minors.',
   },
 ];
-
