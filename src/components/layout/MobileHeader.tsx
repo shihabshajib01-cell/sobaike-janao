@@ -18,6 +18,7 @@ export const MobileHeader: React.FC = () => {
   const { currentRoute, navigateTo, language, setIsTabletMenuOpen } = useApp();
   const activeCategoryKey = CATEGORY_BY_ROUTE[currentRoute];
   const activeCategory = activeCategoryKey ? SECTIONS[activeCategoryKey] : null;
+  const isHarassmentCategory = activeCategoryKey === 'harassment';
 
   const handleCategoryFilterClick = () => {
     if (!activeCategoryKey) return;
@@ -50,15 +51,23 @@ export const MobileHeader: React.FC = () => {
             {language === 'bn' ? activeCategory.nameBn : activeCategory.nameEn}
           </h1>
 
-          <button
-            id="mobile-category-filter-btn"
-            type="button"
-            onClick={handleCategoryFilterClick}
-            aria-label={language === 'bn' ? 'ফিল্টারে যান' : 'Go to filters'}
-            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <Filter className="h-5 w-5" aria-hidden="true" />
-          </button>
+          {isHarassmentCategory ? (
+            <button
+              id="mobile-category-filter-btn"
+              type="button"
+              onClick={handleCategoryFilterClick}
+              aria-label={language === 'bn' ? 'ফিল্টারে যান' : 'Go to filters'}
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <Filter className="h-5 w-5" aria-hidden="true" />
+            </button>
+          ) : (
+            <div
+              id="mobile-category-location-slot"
+              className="shrink-0"
+              aria-label={language === 'bn' ? 'এলাকা ফিল্টার' : 'Location filter'}
+            />
+          )}
         </div>
       </header>
     );
