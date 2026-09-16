@@ -15,12 +15,18 @@ export interface CategoryBannerContent {
   primaryCtaEn: string;
 }
 
+export type HeroBannerSectionKey =
+  | 'harassment'
+  | 'extortion'
+  | 'load_shedding'
+  | 'rickshaw';
+
 /**
  * Canonical hero content is intentionally limited to services that already have
  * approved production illustration assets. New Phase 1 complaint categories are
- * still active in reporting/navigation/taxonomy without reusing misleading art.
+ * active in reporting/navigation/taxonomy without reusing misleading art.
  */
-export const CANONICAL_BANNER_CONTENT: Partial<Record<SectionKey, CategoryBannerContent>> = {
+export const CANONICAL_BANNER_CONTENT: Record<HeroBannerSectionKey, CategoryBannerContent> = {
   harassment: {
     section: 'harassment',
     titleBn: 'হয়রানি ও নির্যাতন',
