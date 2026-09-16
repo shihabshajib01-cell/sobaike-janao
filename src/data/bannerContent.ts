@@ -18,9 +18,8 @@ export interface CategoryBannerContent {
 /**
  * CANONICAL_BANNER_CONTENT
  * Single source of truth for standalone category pages and the Home service carousel.
- * Existing illustrations are preserved. Newly introduced categories intentionally use
- * an empty illustration source until category-specific artwork is approved, avoiding
- * misleading reuse of another complaint category's visual.
+ * Category-specific artwork lives under public/illustrations/services and is shared by
+ * standalone category pages and the Home carousel to preserve one visual source of truth.
  */
 export const CANONICAL_BANNER_CONTENT: Record<SectionKey, CategoryBannerContent> = {
   harassment: {
@@ -61,7 +60,7 @@ export const CANONICAL_BANNER_CONTENT: Record<SectionKey, CategoryBannerContent>
     tabletDescriptionEn: 'Report theft, robbery, snatching, and related public-safety incidents.',
     desktopDescriptionBn: 'চুরি, ডাকাতি বা ছিনতাইয়ের ঘটনা, স্থান, সময় এবং প্রাসঙ্গিক তথ্য নিরাপদভাবে জানান।',
     desktopDescriptionEn: 'Report the place, time, and relevant details of theft, robbery, or snatching incidents.',
-    illustrationSrc: '',
+    illustrationSrc: '/illustrations/services/public-safety-hero-rickshaw-snatching-v01.avif',
     primaryCtaBn: 'রিপোর্ট করুন',
     primaryCtaEn: 'Report now',
   },
@@ -75,7 +74,7 @@ export const CANONICAL_BANNER_CONTENT: Record<SectionKey, CategoryBannerContent>
     tabletDescriptionEn: 'Report delayed road repairs, road accidents, or travel obstructions.',
     desktopDescriptionBn: 'রাস্তা মেরামতে বিলম্ব, সড়ক দুর্ঘটনা, অবরোধ বা চলাচলে বাধার স্থান ও বিস্তারিত তথ্য জানান।',
     desktopDescriptionEn: 'Report locations and details of delayed road repairs, road accidents, blocks, or travel obstructions.',
-    illustrationSrc: '',
+    illustrationSrc: '/illustrations/services/road-transport-hero-broken-road-rickshaw-v01.avif',
     primaryCtaBn: 'রিপোর্ট করুন',
     primaryCtaEn: 'Report now',
   },
@@ -103,7 +102,7 @@ export const CANONICAL_BANNER_CONTENT: Record<SectionKey, CategoryBannerContent>
     tabletDescriptionEn: 'Report illegal occupation of public space, private land, or government property.',
     desktopDescriptionBn: 'রাস্তা, ফুটপাত, ফুটওভার ব্রিজ, ব্যক্তিগত জমি বা সরকারি সম্পত্তির অবৈধ দখলের তথ্য জানান।',
     desktopDescriptionEn: 'Report illegal occupation of roads, footpaths, foot-over-bridges, private land, or government property.',
-    illustrationSrc: '',
+    illustrationSrc: '/illustrations/services/illegal-occupation-hero-footpath-encroachment-v01.avif',
     primaryCtaBn: 'রিপোর্ট করুন',
     primaryCtaEn: 'Report now',
   },
