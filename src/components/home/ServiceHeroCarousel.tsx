@@ -44,12 +44,13 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const sliderRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const slides: ServiceSlide[] = [
+  const availableSlides: ServiceSlide[] = [
     { key: 'harassment', path: '/harassment' },
     { key: 'rickshaw', path: '/rickshaw' },
     { key: 'extortion', path: '/extortion' },
     { key: 'load_shedding', path: '/load-shedding' },
-  ].filter((slide) => Boolean(segments[slide.key]));
+  ];
+  const slides = availableSlides.filter((slide) => Boolean(segments[slide.key]));
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
