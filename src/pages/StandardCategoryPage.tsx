@@ -6,6 +6,7 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
+import { MobileCategoryLocationPortal } from '../components/feed/MobileCategoryLocationPortal';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
@@ -18,10 +19,6 @@ export interface StandardCategoryPageProps {
   section: SectionKey;
 }
 
-/**
- * Reuses the established public category-page system for newly introduced
- * complaint sections. Existing specialized pages stay untouched.
- */
 export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ section }) => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
@@ -85,6 +82,11 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
 
   return (
     <PublicPageContainer id={`${section}-page-container`}>
+      <MobileCategoryLocationPortal
+        selectedDistrict={selectedDistrict}
+        onSelectDistrict={setSelectedDistrict}
+      />
+
       <CategoryHeroSlider
         id={`${section}-header-banner`}
         section={section}
@@ -121,7 +123,7 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
             </p>
           </div>
 
-          <div className="shrink-0">
+          <div className="hidden md:block shrink-0">
             <LocationSelector
               selectedDistrict={selectedDistrict}
               onSelectDistrict={setSelectedDistrict}
