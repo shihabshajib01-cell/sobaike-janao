@@ -55,6 +55,8 @@ export interface AppContextType {
   setIsSearchModalOpen: (open: boolean) => void;
   isTabletMenuOpen: boolean;
   setIsTabletMenuOpen: (open: boolean) => void;
+  isHarassmentFilterOpen: boolean;
+  setIsHarassmentFilterOpen: (open: boolean) => void;
   isReportComposerOpen: boolean;
   reportComposerInitialSegment: SectionKey | null;
   openReportComposer: (segment?: SectionKey | null) => void;
@@ -82,6 +84,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [language, setLanguage] = useState<Language>('bn');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
   const [isTabletMenuOpen, setIsTabletMenuOpen] = useState<boolean>(false);
+  const [isHarassmentFilterOpen, setIsHarassmentFilterOpen] = useState<boolean>(false);
 
   // Global Report Composer Modal State
   const [isReportComposerOpen, setIsReportComposerOpen] = useState<boolean>(false);
@@ -273,6 +276,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     navigate(cleanRoute);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     setIsTabletMenuOpen(false);
+    setIsHarassmentFilterOpen(false);
   }, [navigate]);
 
   // Sync report composer state when visiting /report (open modal with no pre-selected segment)
@@ -316,6 +320,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsSearchModalOpen,
       isTabletMenuOpen,
       setIsTabletMenuOpen,
+      isHarassmentFilterOpen,
+      setIsHarassmentFilterOpen,
       isReportComposerOpen,
       reportComposerInitialSegment,
       openReportComposer,
@@ -341,6 +347,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       toggleLanguage,
       isSearchModalOpen,
       isTabletMenuOpen,
+      isHarassmentFilterOpen,
       isReportComposerOpen,
       reportComposerInitialSegment,
       openReportComposer,

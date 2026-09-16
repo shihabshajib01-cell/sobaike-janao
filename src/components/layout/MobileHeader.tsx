@@ -15,20 +15,16 @@ const CATEGORY_BY_ROUTE: Record<string, SectionKey> = {
 };
 
 export const MobileHeader: React.FC = () => {
-  const { currentRoute, navigateTo, language, setIsTabletMenuOpen } = useApp();
+  const {
+    currentRoute,
+    navigateTo,
+    language,
+    setIsTabletMenuOpen,
+    setIsHarassmentFilterOpen,
+  } = useApp();
   const activeCategoryKey = CATEGORY_BY_ROUTE[currentRoute];
   const activeCategory = activeCategoryKey ? SECTIONS[activeCategoryKey] : null;
   const isHarassmentCategory = activeCategoryKey === 'harassment';
-
-  const handleCategoryFilterClick = () => {
-    if (!activeCategoryKey) return;
-    const targetId =
-      activeCategoryKey === 'load_shedding'
-        ? 'utility-filter-section'
-        : `${activeCategoryKey}-filter-section`;
-    const target = document.getElementById(targetId);
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   if (activeCategory) {
     return (
@@ -58,8 +54,9 @@ export const MobileHeader: React.FC = () => {
             <button
               id="mobile-category-filter-btn"
               type="button"
-              onClick={handleCategoryFilterClick}
-              aria-label={language === 'bn' ? 'ফিল্টারে যান' : 'Go to filters'}
+              onClick={() => setIsHarassmentFilterOpen(true)}
+              aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
+              aria-haspopup="dialog"
               className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <Filter className="h-5 w-5" aria-hidden="true" />
