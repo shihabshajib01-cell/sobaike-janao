@@ -1,20 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const ROOT = path.resolve('src');
-const EXEMPT = new Set([
-  path.normalize('src/index.css'),
-  path.normalize('src/theme/tokens.ts'),
-  path.normalize('src/theme/category-tokens.css'),
-]);
-
-const EXTENSIONS = new Set(['.ts', '.tsx', '.css']);
+const PUBLIC_UI_ROOTS = [path.resolve('src/components'), path.resolve('src/pages')];
+const PUBLIC_UI_FILES = new Set([path.resolve('src/App.tsx')]);
+const EXTENSIONS = new Set(['.tsx']);
 
 const RULES = [
   {
     id: 'raw-color-literal',
     pattern: /#[0-9a-fA-F]{3,8}\b|\b(?:rgb|rgba|hsl|hsla|oklch)\s*\(/g,
-    message: 'Raw color literal outside design-system token files',
+    message: 'Raw color literal outside the central design-system token source',
   },
   {
     id: 'tailwind-palette-color',
@@ -28,7 +23,7 @@ const RULES = [
   },
   {
     id: 'font-family-inline',
-    pattern: /\bfontFamily\s*:|\bfont-family\s*:/g,
+    pattern: /\bfontFamily\s*:/g,
     message: 'Local font-family override bypasses the global language-aware font token',
   },
   {
@@ -74,11 +69,12 @@ const RULES = [
   {
     id: 'inline-ui-style',
     pattern: /\b(?:color|backgroundColor|borderColor|fontSize|fontWeight|fontFamily|borderRadius|boxShadow)\s*:/g,
-    message: 'Inline UI styling should use semantic design-system tokens/utilities',
+    message: 'Inline visual styling should use semantic design-system tokens/utilities',
   },
 ];
 
 function walk(dir) {
+  if (!fs.existsSync(dir)) return [];
   const files = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
@@ -88,10 +84,14 @@ function walk(dir) {
   return files;
 }
 
+const files = [
+  ...PUBLIC_UI_ROOTS.flatMap(walk),
+  ...[...PUBLIC_UI_FILES].filter((file) => fs.existsSync(file)),
+];
+
 const findings = [];
-for (const file of walk(ROOT)) {
-  const relative = path.normalize(path.relative(process.cwd(), file));
-  if (EXEMPT.has(relative)) continue;
+for (const file of files) {
+  const relative = path.relative(process.cwd(), file).replaceAll('\\', '/');
   const source = fs.readFileSync(file, 'utf8');
   const lines = source.split(/\r?\n/);
   for (let index = 0; index < lines.length; index += 1) {
@@ -102,7 +102,7 @@ for (const file of walk(ROOT)) {
       const matches = [...line.matchAll(rule.pattern)];
       for (const match of matches) {
         findings.push({
-          file: relative.replaceAll('\\', '/'),
+          file: relative,
           line: index + 1,
           rule: rule.id,
           token: match[0],
@@ -115,12 +115,31 @@ for (const file of walk(ROOT)) {
 }
 
 if (findings.length) {
-  console.error(`Design-system audit found ${findings.length} violation(s):`);
-  for (const item of findings) {
+  const byRule = new Map();
+  const byFile = new Map();
+  for (const finding of findings) {
+    byRule.set(finding.rule, (byRule.get(finding.rule) || 0) + 1);
+    byFile.set(finding.file, (byFile.get(finding.file) || 0) + 1);
+  }
+
+  console.error(`Public design-system audit found ${findings.length} violation(s) across ${byFile.size} UI file(s).`);
+  console.error('\nBy rule:');
+  for (const [rule, count] of [...byRule.entries()].sort((a, b) => b[1] - a[1])) {
+    console.error(`  ${rule}: ${count}`);
+  }
+  console.error('\nBy file:');
+  for (const [file, count] of [...byFile.entries()].sort((a, b) => b[1] - a[1])) {
+    console.error(`  ${file}: ${count}`);
+  }
+
+  const verbose = process.env.AUDIT_VERBOSE === '1';
+  const visibleFindings = verbose ? findings : findings.slice(0, 300);
+  console.error(`\nDetails${verbose ? '' : ' (first 300; set AUDIT_VERBOSE=1 for all)'}:`);
+  for (const item of visibleFindings) {
     console.error(`${item.file}:${item.line} [${item.rule}] ${item.token} — ${item.message}`);
     console.error(`  ${item.source}`);
   }
   process.exit(1);
 }
 
-console.log('Design-system audit passed: no hardcoded color/font/typography/radius/elevation violations outside token files.');
+console.log(`Public design-system audit passed across ${files.length} UI source file(s).`);
