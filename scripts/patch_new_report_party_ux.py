@@ -78,7 +78,8 @@ step3 = replace_exact(
     step3,
     "                      {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}",
     "                      {language === 'bn'\n                        ? subjectConfig.nameLabelBn || 'নাম / পরিচিতি'\n                        : subjectConfig.nameLabelEn || 'Name / known identity'}",
-    'Step3 primary name label',
+    'Step3 contextual name labels',
+    2,
 )
 
 step3 = replace_exact(
@@ -92,7 +93,8 @@ step3 = replace_exact(
     step3,
     "                      {language === 'bn' ? 'ভূমিকা / পদবি' : 'Role / designation'}",
     "                      {language === 'bn'\n                        ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'\n                        : subjectConfig.roleLabelEn || 'Role / designation'}",
-    'Step3 primary role label',
+    'Step3 contextual role labels',
+    2,
 )
 
 step3 = replace_exact(
@@ -106,7 +108,8 @@ step3 = replace_exact(
     step3,
     "                      {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / organization / association'}",
     "                      {language === 'bn'\n                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'\n                        : subjectConfig.organizationLabelEn || 'Group / organization'}",
-    'Step3 organization label',
+    'Step3 contextual organization labels',
+    2,
 )
 
 step3 = replace_exact(
