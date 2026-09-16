@@ -7,19 +7,27 @@ export interface LocationSelectorProps {
   selectedDistrict: string;
   onSelectDistrict: (district: string) => void;
   className?: string;
+  id?: string;
+  variant?: 'default' | 'compact';
 }
 
 export const LocationSelector: React.FC<LocationSelectorProps> = ({
   selectedDistrict,
   onSelectDistrict,
   className = '',
+  id = 'location-filter-select',
+  variant = 'default',
 }) => {
   const { language } = useApp();
+  const sizingClass =
+    variant === 'compact'
+      ? 'w-[132px] min-w-[132px] min-[390px]:w-[148px] min-[390px]:min-w-[148px]'
+      : 'min-w-[180px] sm:min-w-[210px]';
 
   return (
-    <div className={`min-w-[180px] sm:min-w-[210px] ${className}`}>
+    <div className={`${sizingClass} ${className}`}>
       <SearchableSelect
-        id="location-filter-select"
+        id={id}
         value={selectedDistrict}
         onChange={onSelectDistrict}
         placeholder={language === 'bn' ? 'জেলা নির্বাচন' : 'Filter by district'}

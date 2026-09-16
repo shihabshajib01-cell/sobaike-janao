@@ -115,7 +115,7 @@ await check('Desktop routes render without runtime crashes', async () => {
   await context.close();
 });
 
-await check('Mobile bottom navigation works across Home, Issues, Explore and category drill-down', async () => {
+await check('Mobile navigation, issue rows and category controls follow the approved contract', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
@@ -135,16 +135,34 @@ await check('Mobile bottom navigation works across Home, Issues, Explore and cat
     await expectVisible(page.locator('#main-content'), `${selector} destination did not render`);
   }
 
-  await page.locator('#bottom-nav-issues').click();
-  await expectVisible(page.locator('#issues-category-grid'), 'Issues category grid did not render');
+  await page.goto(routeUrl('/issues'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#issues-category-grid'), 'Issues category list did not render');
+  const firstCard = await page.locator('#issues-card-harassment').boundingBox();
+  const secondCard = await page.locator('#issues-card-extortion').boundingBox();
+  if (!firstCard || !secondCard) throw new Error('Issue category cards are not measurable');
+  if (secondCard.y <= firstCard.y + firstCard.height - 2) throw new Error('Issue categories are not stacked one per row');
+
   await page.locator('#issues-card-harassment').click();
   await page.waitForTimeout(350);
   if (!page.url().includes('#/harassment')) throw new Error(`Issue card did not navigate to harassment; got ${page.url()}`);
   await expectVisible(page.locator('#mobile-category-header'), 'contextual category header missing');
-  await expectVisible(page.locator('#mobile-category-filter-btn'), 'category filter action missing');
+  await expectVisible(page.locator('#mobile-category-filter-btn'), 'Harassment category filter action missing');
+  if ((await page.locator('#bottom-nav').count()) !== 0) throw new Error('Bottom navigation should be hidden on category pages');
+  if ((await page.locator('#mobile-category-location-filter-select').count()) !== 0) throw new Error('Harassment should keep its existing filter behavior');
+
   await page.locator('#mobile-category-back-btn').click();
   await page.waitForTimeout(350);
   if (!page.url().includes('#/issues')) throw new Error(`category back did not return to Issues; got ${page.url()}`);
+
+  await page.locator('#issues-card-extortion').click();
+  await page.waitForTimeout(350);
+  if (!page.url().includes('#/extortion')) throw new Error(`Issue card did not navigate to extortion; got ${page.url()}`);
+  await expectVisible(page.locator('#mobile-category-location-filter-select'), 'mobile category location filter missing');
+  const locationText = (await page.locator('#mobile-category-location-filter-select').innerText()).trim();
+  if (!locationText.includes('সারা বাংলাদেশ')) throw new Error(`default mobile location filter is incorrect: ${locationText}`);
+  if ((await page.locator('#bottom-nav').count()) !== 0) throw new Error('Bottom navigation should be hidden on extortion category page');
+  if ((await page.getByText('জরুরি সহায়তার জন্য ৯৯৯', { exact: false }).count()) !== 0) throw new Error('Removed emergency assistance strip is still visible');
+
   await context.close();
 });
 

@@ -6,6 +6,7 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
+import { MobileCategoryLocationPortal } from '../components/feed/MobileCategoryLocationPortal';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
@@ -26,7 +27,6 @@ export const RickshawPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Determine valid browse location (transient request scope only)
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
     browseLocation !== null &&
@@ -71,7 +71,11 @@ export const RickshawPage: React.FC = () => {
 
   return (
     <PublicPageContainer id="rickshaw-page-container">
-      {/* 1. Category Hero Slider */}
+      <MobileCategoryLocationPortal
+        selectedDistrict={selectedDistrict}
+        onSelectDistrict={setSelectedDistrict}
+      />
+
       <CategoryHeroSlider
         id="rickshaw-header-banner"
         section="rickshaw"
@@ -96,7 +100,6 @@ export const RickshawPage: React.FC = () => {
         ]}
       />
 
-      {/* Quiet Information Strip */}
       <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
         <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
         <span>
@@ -106,14 +109,11 @@ export const RickshawPage: React.FC = () => {
         </span>
       </div>
 
-      {/* 2. Location Filter Controls */}
       <section id="rickshaw-filter-section" className="space-y-3">
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
             <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
-              {language === 'bn'
-                ? 'সকল প্রতিবেদন'
-                : 'All reports'}
+              {language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports'}
             </h2>
             <p className="text-[14px] text-ui-content-muted mt-0.5">
               {language === 'bn'
@@ -122,7 +122,7 @@ export const RickshawPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="shrink-0">
+          <div className="hidden md:block shrink-0">
             <LocationSelector
               selectedDistrict={selectedDistrict}
               onSelectDistrict={setSelectedDistrict}
@@ -131,7 +131,6 @@ export const RickshawPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Loading State Skeleton Screen */}
       {isLoading && (
         <ReportFeedSkeleton
           count={3}
@@ -140,14 +139,11 @@ export const RickshawPage: React.FC = () => {
         />
       )}
 
-      {/* 4. Error State */}
       {!isLoading && fetchError && (
         <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
           <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-ui-error-text">
-            {language === 'bn'
-              ? 'প্রতিবেদন লোড করা যায়নি।'
-              : "Couldn't load reports."}
+            {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি।' : "Couldn't load reports."}
           </p>
           <button
             type="button"
@@ -159,13 +155,10 @@ export const RickshawPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Reports Feed */}
       {!isLoading && !fetchError && (
         <div className="space-y-3">
           {filteredReports.length > 0 ? (
-            filteredReports.map((report) => (
-              <ReportCard key={report.id} report={report} />
-            ))
+            filteredReports.map((report) => <ReportCard key={report.id} report={report} />)
           ) : (
             <EmptyState
               title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
@@ -175,9 +168,7 @@ export const RickshawPage: React.FC = () => {
                   : 'There are currently no published reports under this subcategory.'
               }
               actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
-              onAction={() => {
-                setSelectedDistrict('all');
-              }}
+              onAction={() => setSelectedDistrict('all')}
             />
           )}
         </div>
