@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { AlertCircle, PhoneCall } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
+import { MobileCategoryLocationPortal } from '../components/feed/MobileCategoryLocationPortal';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
@@ -30,7 +31,6 @@ export const ExtortionPage: React.FC = () => {
 
   const subcategories = getFeedSubcategories('extortion');
 
-  // Determine valid browse location (transient request scope only)
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
     browseLocation !== null &&
@@ -76,7 +76,11 @@ export const ExtortionPage: React.FC = () => {
 
   return (
     <PublicPageContainer id="extortion-page-container">
-      {/* 1. Category Hero Slider */}
+      <MobileCategoryLocationPortal
+        selectedDistrict={selectedDistrict}
+        onSelectDistrict={setSelectedDistrict}
+      />
+
       <CategoryHeroSlider
         id="extortion-header-banner"
         section="extortion"
@@ -101,24 +105,11 @@ export const ExtortionPage: React.FC = () => {
         ]}
       />
 
-      {/* Quiet Information Strip */}
-      <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-        <PhoneCall className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-        <span>
-          {language === 'bn'
-            ? 'জরুরি সহায়তার জন্য ৯৯৯ অথবা নাগরিক তথ্য সেবা ৩৩৩-এ যোগাযোগ করুন।'
-            : 'For emergency assistance, contact National Emergency 999 or Citizen Hotline 333.'}
-        </span>
-      </div>
-
-      {/* 2. Subcategory & Location Filter Controls */}
       <section id="extortion-filter-section" className="space-y-3">
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
             <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
-              {language === 'bn'
-                ? 'সকল প্রতিবেদন'
-                : 'All reports'}
+              {language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports'}
             </h2>
             <p className="text-[14px] text-ui-content-muted mt-0.5">
               {language === 'bn'
@@ -127,7 +118,7 @@ export const ExtortionPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="shrink-0">
+          <div className="hidden md:block shrink-0">
             <LocationSelector
               selectedDistrict={selectedDistrict}
               onSelectDistrict={setSelectedDistrict}
@@ -135,14 +126,13 @@ export const ExtortionPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Horizontally scrollable subcategory chips */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {subcategories.map((subcat) => {
             const count = reports.filter((r) => {
               if (r.segment !== 'extortion') return false;
               const matchesSub = subcat.id === 'all' || r.subcategoryId === subcat.id;
               const matchesDist =
-                selectedDistrict === 'all' || r.districtBn.includes(selectedDistrict);
+                selectedDistrict === 'all' || (r.districtBn && r.districtBn.includes(selectedDistrict));
               return matchesSub && matchesDist;
             }).length;
 
@@ -161,7 +151,6 @@ export const ExtortionPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Loading State Skeleton Screen */}
       {isLoading && (
         <ReportFeedSkeleton
           count={3}
@@ -170,14 +159,11 @@ export const ExtortionPage: React.FC = () => {
         />
       )}
 
-      {/* 4. Error State */}
       {!isLoading && fetchError && (
         <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
           <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
           <p className="text-[16px] font-semibold text-ui-error-text">
-            {language === 'bn'
-              ? 'প্রতিবেদন লোড করা যায়নি।'
-              : "Couldn't load reports."}
+            {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি।' : "Couldn't load reports."}
           </p>
           <button
             type="button"
@@ -189,13 +175,10 @@ export const ExtortionPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Reports Feed */}
       {!isLoading && !fetchError && (
         <div className="space-y-3">
           {filteredReports.length > 0 ? (
-            filteredReports.map((report) => (
-              <ReportCard key={report.id} report={report} />
-            ))
+            filteredReports.map((report) => <ReportCard key={report.id} report={report} />)
           ) : (
             <EmptyState
               title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
