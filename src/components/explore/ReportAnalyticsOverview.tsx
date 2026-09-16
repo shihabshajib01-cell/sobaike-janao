@@ -10,12 +10,7 @@ export interface ReportAnalyticsOverviewProps {
   language: 'bn' | 'en';
 }
 
-const CANONICAL_CATEGORIES: SectionKey[] = [
-  'harassment',
-  'rickshaw',
-  'extortion',
-  'load_shedding',
-];
+const CANONICAL_CATEGORIES = Object.keys(SECTIONS) as SectionKey[];
 
 export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = ({
   reports,
@@ -44,20 +39,15 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
     const matchedDivisions = new Set<string>();
     let geoMappedCount = 0;
 
-    const counts: Record<SectionKey, number> = {
-      harassment: 0,
-      rickshaw: 0,
-      extortion: 0,
-      load_shedding: 0,
-    };
+    const counts = Object.fromEntries(
+      CANONICAL_CATEGORIES.map((key) => [key, 0])
+    ) as Record<SectionKey, number>;
 
     reports.forEach((rep) => {
-      // Category count
       if (rep.segment in counts) {
-        counts[rep.segment as SectionKey] += 1;
+        counts[rep.segment] += 1;
       }
 
-      // District & Division mapping
       const dEn = (rep.districtEn || '').toLowerCase().trim();
       const dBn = (rep.districtBn || '').trim();
       if (!dBn && !dEn) return;
@@ -76,7 +66,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
       }
     });
 
-    // Most reported category calculation with tie handling
     const categoryEntries = CANONICAL_CATEGORIES.map((key) => ({
       key,
       count: counts[key],
@@ -98,7 +87,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
       }
     }
 
-    // Category distribution stats
     const stats = CANONICAL_CATEGORIES.map((key) => {
       const count = counts[key];
       const percentage =
@@ -135,7 +123,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
       aria-label={language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
       className="bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-3 shadow-2xs"
     >
-      {/* 1. Header & Context */}
       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 border-b border-ui-stroke-subtle pb-2">
         <h2 className="text-[14.5px] sm:text-[15.5px] font-bold text-ui-content-primary tracking-tight">
           {language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
@@ -145,9 +132,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
         </span>
       </div>
 
-      {/* 2. Compact Grouped Summary Blocks */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {/* Total Reports */}
         <div
           id="metric-total-reports"
           className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
@@ -160,7 +145,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           </span>
         </div>
 
-        {/* Districts with reports */}
         <div
           id="metric-affected-districts"
           className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
@@ -173,7 +157,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           </span>
         </div>
 
-        {/* Divisions with reports */}
         <div
           id="metric-affected-divisions"
           className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
@@ -186,7 +169,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           </span>
         </div>
 
-        {/* Most Reported Category */}
         <div
           id="metric-most-reported"
           className="bg-ui-surface-subtle/80 rounded-lg p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
@@ -200,7 +182,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
         </div>
       </div>
 
-      {/* Geographic note if any reports lack recognized district */}
       {hasUnmappedGeos && (
         <p className="text-[11px] text-ui-content-secondary">
           {language === 'bn'
@@ -209,7 +190,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
         </p>
       )}
 
-      {/* 3. Category Distribution (integrated, light, compact) */}
       <div
         id="explore-category-distribution"
         className="pt-2 border-t border-ui-stroke-subtle space-y-2"
@@ -231,7 +211,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                 id={`distribution-row-${item.key}`}
                 className="space-y-1"
               >
-                {/* Row Header: Icon + Category Name + Count & Percentage */}
                 <div className="flex items-center justify-between text-[12px] sm:text-[12.5px] gap-2">
                   <div className="flex items-center gap-2 font-medium text-ui-content-primary min-w-0 flex-1">
                     <CategoryIcon section={item.key} size="xs" />
@@ -243,7 +222,6 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                   </div>
                 </div>
 
-                {/* Proportional Bar */}
                 <div
                   role="presentation"
                   aria-hidden="true"
