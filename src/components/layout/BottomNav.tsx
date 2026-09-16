@@ -9,6 +9,8 @@ const CATEGORY_ROUTES = Object.values(SECTIONS).map((section) => section.slug);
 export const BottomNav: React.FC = () => {
   const { currentRoute, navigateTo, language, openReportComposer } = useApp();
 
+  if (CATEGORY_ROUTES.includes(currentRoute)) return null;
+
   const navItems: Array<{
     id: string;
     path: RoutePath;
@@ -31,7 +33,7 @@ export const BottomNav: React.FC = () => {
       nameBn: 'বিষয়সমূহ',
       nameEn: 'Issues',
       iconName: 'layers',
-      isActive: currentRoute === '/issues' || CATEGORY_ROUTES.includes(currentRoute),
+      isActive: currentRoute === '/issues',
     },
     {
       id: 'bottom-nav-explore',
