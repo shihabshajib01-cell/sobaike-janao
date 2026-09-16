@@ -6,6 +6,7 @@ on:
       - fix/bribery-single-subcategory-details
     paths:
       - scripts/apply_bribery_contract.py
+      - scripts/run_bribery_contract_patch.py
       - .github/workflows/apply-bribery-contract.yml
 
 permissions:
@@ -22,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Apply exact guarded replacements
-        run: python scripts/apply_bribery_contract.py
+        run: python scripts/run_bribery_contract_patch.py
 
       - name: Commit production source changes
         run: |
