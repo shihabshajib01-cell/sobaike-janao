@@ -59,7 +59,7 @@ export const BottomNav: React.FC = () => {
             aria-current={item.isActive ? 'page' : undefined}
             className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-xl px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               item.isActive
-                ? 'bg-ui-surface-subtle text-ui-content-primary'
+                ? 'bg-ui-surface-subtle text-ui-content-primary dark:bg-ui-accent-soft dark:ring-1 dark:ring-ui-accent-border'
                 : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
             }`}
           >
