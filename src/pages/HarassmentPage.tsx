@@ -14,15 +14,73 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { BANGLADESH_DISTRICTS } from '../data/districts';
+import {
+  EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
+  HarassmentClassificationFilterState,
+  matchesHarassmentClassification,
+} from '../data/harassmentClassification';
+import {
+  HarassmentFilterSheet,
+  HarassmentFilterValue,
+  HarassmentSubjectFilter,
+} from '../components/report/HarassmentFilterSheet';
+
+const normalizeDistrictName = (value?: string) =>
+  value
+    ?.trim()
+    .toLocaleLowerCase()
+    .replace('chittagong', 'chattogram')
+    .replace('barisal', 'barishal');
+
+const resolveReportDistrict = (report: ReportItem) => {
+  const districtBn = report.districtBn?.trim();
+  const districtEn = normalizeDistrictName(report.districtEn);
+
+  return BANGLADESH_DISTRICTS.find((district) => {
+    const optionEn = normalizeDistrictName(district.nameEn);
+    return (
+      (districtBn && (districtBn === district.nameBn || districtBn.includes(district.nameBn))) ||
+      (districtEn && optionEn && (districtEn === optionEn || districtEn.includes(optionEn)))
+    );
+  });
+};
+
+const matchesLocationFilters = (
+  report: ReportItem,
+  divisionId: string,
+  districtId: string
+) => {
+  if (divisionId === 'all' && districtId === 'all') return true;
+
+  const district = resolveReportDistrict(report);
+  if (!district) return false;
+  if (divisionId !== 'all' && district.divisionId !== divisionId) return false;
+  if (districtId !== 'all' && district.id !== districtId) return false;
+  return true;
+};
 
 export const HarassmentPage: React.FC = () => {
-  const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
+  const {
+    language,
+    openReportComposer,
+    browseLocation,
+    browseLocationStatus,
+    navigateTo,
+    isHarassmentFilterOpen,
+    setIsHarassmentFilterOpen,
+  } = useApp();
   const { getFeedSubcategories, getSegment } = useTaxonomy();
   const config = getSegment('harassment') || SECTIONS.harassment;
   const bannerContent = CANONICAL_BANNER_CONTENT.harassment;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
+  const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [classificationFilters, setClassificationFilters] =
+    useState<HarassmentClassificationFilterState>({
+      ...EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
+    });
 
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,6 +91,14 @@ export const HarassmentPage: React.FC = () => {
   const [canScrollSubcategoriesRight, setCanScrollSubcategoriesRight] = useState(false);
 
   const subcategories = getFeedSubcategories('harassment');
+
+  const harassmentDistrictOptions = useMemo(
+    () => [
+      { id: 'all', nameBn: 'সারা বাংলাদেশ', nameEn: 'All Bangladesh' },
+      ...BANGLADESH_DISTRICTS.map(({ id, nameBn, nameEn }) => ({ id, nameBn, nameEn })),
+    ],
+    []
+  );
 
   // Determine valid browse location (transient request scope only)
   const hasValidBrowseLocation =
@@ -113,16 +179,56 @@ export const HarassmentPage: React.FC = () => {
   }, []);
 
   const filteredReports = useMemo(() => {
-    return reports.filter((r) => {
-      if (r.segment !== 'harassment') return false;
-      const matchesSubcat = selectedSubcat === 'all' || r.subcategoryId === selectedSubcat;
-      const matchesDistrict =
-        selectedDistrict === 'all' ||
-        (r.districtBn && r.districtBn.includes(selectedDistrict)) ||
-        (r.districtEn && r.districtEn.toLowerCase().includes(selectedDistrict.toLowerCase()));
-      return matchesSubcat && matchesDistrict;
+    return reports.filter((report) => {
+      if (report.segment !== 'harassment') return false;
+      const matchesSubcat =
+        selectedSubcat === 'all' || report.subcategoryId === selectedSubcat;
+      return (
+        matchesSubcat &&
+        matchesLocationFilters(report, selectedDivision, selectedDistrict) &&
+        matchesHarassmentClassification(report, classificationFilters)
+      );
     });
-  }, [reports, selectedSubcat, selectedDistrict]);
+  }, [
+    reports,
+    selectedSubcat,
+    selectedDivision,
+    selectedDistrict,
+    classificationFilters,
+  ]);
+
+  const handleDistrictChange = useCallback((districtId: string) => {
+    setSelectedDistrict(districtId);
+    if (districtId === 'all') {
+      setSelectedDivision('all');
+      return;
+    }
+
+    const district = BANGLADESH_DISTRICTS.find((item) => item.id === districtId);
+    setSelectedDivision(district?.divisionId || 'all');
+  }, []);
+
+  const handleApplyFilterSheet = useCallback(
+    (next: HarassmentFilterValue, subject: HarassmentSubjectFilter) => {
+      if (subject === 'all') {
+        setIsHarassmentFilterOpen(false);
+        navigateTo('/issues');
+        return;
+      }
+
+      if (subject !== 'harassment') {
+        setIsHarassmentFilterOpen(false);
+        navigateTo(SECTIONS[subject].slug);
+        return;
+      }
+
+      setSelectedDivision(next.divisionId);
+      setSelectedDistrict(next.districtId);
+      setClassificationFilters({ ...next.classification });
+      setIsHarassmentFilterOpen(false);
+    },
+    [navigateTo, setIsHarassmentFilterOpen]
+  );
 
   return (
     <PublicPageContainer id="harassment-page-container">
@@ -170,7 +276,8 @@ export const HarassmentPage: React.FC = () => {
           <div className="shrink-0">
             <LocationSelector
               selectedDistrict={selectedDistrict}
-              onSelectDistrict={setSelectedDistrict}
+              onSelectDistrict={handleDistrictChange}
+              options={harassmentDistrictOptions}
             />
           </div>
         </div>
@@ -195,12 +302,15 @@ export const HarassmentPage: React.FC = () => {
             className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden"
           >
             {subcategories.map((subcat) => {
-              const count = reports.filter((r) => {
-                if (r.segment !== 'harassment') return false;
-                const matchesSub = subcat.id === 'all' || r.subcategoryId === subcat.id;
-                const matchesDist =
-                  selectedDistrict === 'all' || r.districtBn.includes(selectedDistrict);
-                return matchesSub && matchesDist;
+              const count = reports.filter((report) => {
+                if (report.segment !== 'harassment') return false;
+                const matchesSub =
+                  subcat.id === 'all' || report.subcategoryId === subcat.id;
+                return (
+                  matchesSub &&
+                  matchesLocationFilters(report, selectedDivision, selectedDistrict) &&
+                  matchesHarassmentClassification(report, classificationFilters)
+                );
               }).length;
 
               return (
@@ -272,18 +382,32 @@ export const HarassmentPage: React.FC = () => {
               title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               description={
                 language === 'bn'
-                  ? 'এই উপ-বিভাগ বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
-                  : 'There are currently no published reports under this subcategory.'
+                  ? 'এই ফিল্টারগুলোর জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
+                  : 'There are currently no published reports for these filters.'
               }
               actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               onAction={() => {
                 setSelectedSubcat('all');
+                setSelectedDivision('all');
                 setSelectedDistrict('all');
+                setClassificationFilters({ ...EMPTY_HARASSMENT_CLASSIFICATION_FILTERS });
               }}
             />
           )}
         </div>
       )}
+
+      <HarassmentFilterSheet
+        isOpen={isHarassmentFilterOpen}
+        language={language}
+        value={{
+          divisionId: selectedDivision,
+          districtId: selectedDistrict,
+          classification: classificationFilters,
+        }}
+        onClose={() => setIsHarassmentFilterOpen(false)}
+        onApply={handleApplyFilterSheet}
+      />
     </PublicPageContainer>
   );
 };
