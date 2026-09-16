@@ -1,10 +1,68 @@
 import React from 'react';
-import { Menu, Search } from 'lucide-react';
+import { ArrowLeft, Filter, Menu, Search } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { BrandLogo } from '../branding/BrandLogo';
 
+const CATEGORY_BY_ROUTE: Record<string, SectionKey> = {
+  '/harassment': 'harassment',
+  '/extortion': 'extortion',
+  '/public-safety': 'public_safety',
+  '/road-transport': 'road_transport',
+  '/load-shedding': 'load_shedding',
+  '/illegal-occupation': 'illegal_occupation',
+  '/rickshaw': 'rickshaw',
+};
+
 export const MobileHeader: React.FC = () => {
-  const { navigateTo, language, setIsTabletMenuOpen } = useApp();
+  const { currentRoute, navigateTo, language, setIsTabletMenuOpen } = useApp();
+  const activeCategoryKey = CATEGORY_BY_ROUTE[currentRoute];
+  const activeCategory = activeCategoryKey ? SECTIONS[activeCategoryKey] : null;
+
+  const handleCategoryFilterClick = () => {
+    if (!activeCategoryKey) return;
+    const targetId =
+      activeCategoryKey === 'load_shedding'
+        ? 'utility-filter-section'
+        : `${activeCategoryKey}-filter-section`;
+    const target = document.getElementById(targetId);
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  if (activeCategory) {
+    return (
+      <header
+        id="mobile-category-header"
+        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
+      >
+        <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
+          <button
+            id="mobile-category-back-btn"
+            type="button"
+            onClick={() => navigateTo('/issues')}
+            aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+
+          <h1 className="min-w-0 flex-1 truncate text-[16px] font-bold leading-tight text-ui-content-primary">
+            {language === 'bn' ? activeCategory.nameBn : activeCategory.nameEn}
+          </h1>
+
+          <button
+            id="mobile-category-filter-btn"
+            type="button"
+            onClick={handleCategoryFilterClick}
+            aria-label={language === 'bn' ? 'ফিল্টারে যান' : 'Go to filters'}
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            <Filter className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header
@@ -12,7 +70,6 @@ export const MobileHeader: React.FC = () => {
       className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
     >
       <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
-        {/* Left: Flex cluster containing Menu button and Brand Logo */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             id="mobile-header-menu-btn"
@@ -32,7 +89,6 @@ export const MobileHeader: React.FC = () => {
           />
         </div>
 
-        {/* Right: Search Button navigating to /search */}
         <button
           id="mobile-header-search-btn"
           type="button"
