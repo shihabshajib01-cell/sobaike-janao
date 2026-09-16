@@ -599,7 +599,9 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {formData.reportedSubject?.trim() && (
                       <div>
                         <span className="text-ui-content-secondary font-medium">
-                          {language === 'bn' ? 'নাম / পরিচিতি: ' : 'Name / Known Identity: '}
+                          {language === 'bn'
+                            ? `${subjectConfig?.nameLabelBn || 'নাম / পরিচিতি'}: `
+                            : `${subjectConfig?.nameLabelEn || 'Name / known identity'}: `}
                         </span>
                         <span className="text-ui-content-primary font-bold">
                           {formData.reportedSubject.trim()}
@@ -611,7 +613,9 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {formData.roleOrDesignation?.trim() && (
                       <div className="pt-0.5">
                         <span className="text-ui-content-secondary font-medium">
-                          {language === 'bn' ? 'ভূমিকা / পদবি: ' : 'Role / Designation: '}
+                          {language === 'bn'
+                            ? `${subjectConfig?.roleLabelBn || 'ভূমিকা / পদবি'}: `
+                            : `${subjectConfig?.roleLabelEn || 'Role / designation'}: `}
                         </span>
                         <span className="text-ui-content-primary font-medium">
                           {formData.roleOrDesignation.trim()}
@@ -623,7 +627,9 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {formData.organization?.trim() && (
                       <div className="pt-0.5">
                         <span className="text-ui-content-secondary font-medium">
-                          {language === 'bn' ? 'দল / সংগঠন / সমিতি: ' : 'Group / Organization / Association: '}
+                          {language === 'bn'
+                            ? `${subjectConfig?.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'}: `
+                            : `${subjectConfig?.organizationLabelEn || 'Group / organization'}: `}
                         </span>
                         <span className="text-ui-content-primary font-medium">
                           {formData.organization.trim()}
@@ -678,13 +684,21 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                           </div>
                           {p.roleOrDesignation?.trim() && (
                             <p>
-                              <span className="font-medium text-ui-content-secondary">{language === 'bn' ? 'ভূমিকা / পদবি: ' : 'Role: '}</span>
+                              <span className="font-medium text-ui-content-secondary">
+                                {language === 'bn'
+                                  ? `${subjectConfig?.roleLabelBn || 'ভূমিকা / পদবি'}: `
+                                  : `${subjectConfig?.roleLabelEn || 'Role'}: `}
+                              </span>
                               <span className="text-ui-content-primary font-medium">{p.roleOrDesignation.trim()}</span>
                             </p>
                           )}
                           {p.organization?.trim() && (
                             <p>
-                              <span className="font-medium text-ui-content-secondary">{language === 'bn' ? 'দল / সমিতি: ' : 'Group / Org: '}</span>
+                              <span className="font-medium text-ui-content-secondary">
+                                {language === 'bn'
+                                  ? `${subjectConfig?.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'}: `
+                                  : `${subjectConfig?.organizationLabelEn || 'Group / organization'}: `}
+                              </span>
                               <span className="text-ui-content-primary font-medium">{p.organization.trim()}</span>
                             </p>
                           )}
