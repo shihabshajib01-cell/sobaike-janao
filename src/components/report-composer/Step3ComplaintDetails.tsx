@@ -1210,7 +1210,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         className="block text-[13px] font-bold text-ui-content-primary mb-1"
                       >
                         <div className="flex items-center gap-1.5">
-                          <Coins className="w-3.5 h-3.5 text-ui-content-secondary" />
+                          <Calendar className="w-3.5 h-3.5 text-ui-content-secondary" />
                           <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous bill amount (BDT) *'}</span>
                         </div>
                       </label>
@@ -1489,7 +1489,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             </div>
 
             {isBriberyReport && (
-              <div className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3">
+              <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
                 <h4 className="text-[13px] font-bold text-ui-content-primary">
                   {language === 'bn' ? 'ঘুষ সংক্রান্ত তথ্য' : 'Bribery details'}
                 </h4>
@@ -2561,7 +2561,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 ? `${pendingImages.length} ${language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}`
                 : language === 'bn'
                 ? 'কোনো ছবি সংযুক্ত নেই'
-                : 'No images attached'
+                : 'No attachments'
             }
             badge={
               pendingImages.length > 0 ? (
