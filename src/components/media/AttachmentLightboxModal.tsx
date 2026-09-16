@@ -194,7 +194,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
         <div className="px-4 sm:px-6 pb-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] md:pt-3.5 border-b border-ui-media-viewer-border bg-ui-media-viewer-bg-elevated backdrop-blur-md flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Image Counter Badge */}
-            <p className="shrink-0 px-2.5 py-1 rounded-[var(--radius-pill)] bg-ui-media-viewer-chip text-ui-media-viewer-text text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] font-semibold tracking-wide">
+            <p className="shrink-0 px-2.5 py-1 rounded-[var(--radius-pill)] bg-ui-media-viewer-chip text-ui-media-viewer-text text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] tracking-wide">
               {language === 'bn'
                 ? `ছবি ${toBanglaDigits(safeIndex + 1)} / ${toBanglaDigits(images.length)}`
                 : `Image ${safeIndex + 1} of ${images.length}`}
@@ -202,7 +202,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
 
             {/* Filename & optional size */}
             <div className="min-w-0 truncate text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)]">
-              <p className="font-medium text-ui-media-viewer-text truncate inline-block max-w-[200px] sm:max-w-[320px] align-middle" title={imageName}>
+              <p className="font-[var(--font-weight-medium)] text-ui-media-viewer-text truncate inline-block max-w-[200px] sm:max-w-[320px] align-middle" title={imageName}>
                 {imageName || (language === 'bn' ? 'সংযুক্ত ছবি' : 'Attached image')}
               </p>
               {imageSize ? (

@@ -27,9 +27,9 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
   const label = language === 'bn' ? config.shortNameBn : config.shortNameEn;
 
   const sizeClasses = {
-    sm: 'text-[var(--type-fixed-13)] px-2.5 py-1 rounded-[var(--radius-badge-sm)] gap-1.5 font-semibold min-h-[26px]',
-    md: 'text-[var(--type-fixed-14)] px-3 py-1.5 rounded-[var(--radius-badge-md)] gap-2 font-semibold min-h-[30px]',
-    lg: 'text-[var(--type-fixed-15)] px-3.5 py-2 rounded-[var(--radius-control)] gap-2 font-semibold min-h-[36px]',
+    sm: 'text-[var(--type-fixed-13)] px-2.5 py-1 rounded-[var(--radius-badge-sm)] gap-1.5 font-[var(--font-weight-semibold)] min-h-[26px]',
+    md: 'text-[var(--type-fixed-14)] px-3 py-1.5 rounded-[var(--radius-badge-md)] gap-2 font-[var(--font-weight-semibold)] min-h-[30px]',
+    lg: 'text-[var(--type-fixed-15)] px-3.5 py-2 rounded-[var(--radius-control)] gap-2 font-[var(--font-weight-semibold)] min-h-[36px]',
   };
 
   const iconSizeMap: Record<'sm' | 'md' | 'lg', 'xs' | 'sm' | 'md'> = {

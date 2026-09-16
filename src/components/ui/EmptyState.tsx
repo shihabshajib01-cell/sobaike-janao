@@ -29,7 +29,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <div className="w-14 h-14 rounded-[var(--radius-card)] bg-ui-surface-subtle flex items-center justify-center text-ui-content-muted mb-4 shrink-0">
         {icon || <Inbox className="w-7 h-7 stroke-[1.5]" />}
       </div>
-      <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary mb-1.5">{title}</h3>
+      <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary mb-1.5">{title}</h3>
       {description && <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-muted max-w-xs mb-5">{description}</p>}
       {actionLabel && onAction && (
         <Button size="md" variant="outline" onClick={onAction}>

@@ -124,10 +124,10 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
       className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] sm:rounded-[var(--radius-card)] p-3 sm:p-4 space-y-3 shadow-[var(--elevation-2xs)]"
     >
       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 border-b border-ui-stroke-subtle pb-2">
-        <h2 className="text-[var(--type-fixed-145)] sm:text-[var(--type-fixed-155)] font-bold text-ui-content-primary tracking-tight">
+        <h2 className="text-[var(--type-fixed-145)] sm:text-[var(--type-fixed-155)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
           {language === 'bn' ? 'প্রতিবেদন সারসংক্ষেপ' : 'Report summary'}
         </h2>
-        <span className="text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] text-ui-content-secondary font-normal">
+        <span className="text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] text-ui-content-secondary font-[var(--font-weight-regular)]">
           {language === 'bn' ? 'বর্তমান ফিল্টারের ভিত্তিতে' : 'Based on current filters'}
         </span>
       </div>
@@ -137,10 +137,10 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           id="metric-total-reports"
           className="bg-ui-surface-subtle/80 rounded-[var(--radius-badge-md)] p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
         >
-          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-medium text-ui-content-secondary truncate">
+          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-[var(--font-weight-medium)] text-ui-content-secondary truncate">
             {language === 'bn' ? 'মোট প্রতিবেদন' : 'Total reports'}
           </span>
-          <span className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-tight">
+          <span className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
             {language === 'bn' ? toBanglaDigits(totalReports) : totalReports}
           </span>
         </div>
@@ -149,10 +149,10 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           id="metric-affected-districts"
           className="bg-ui-surface-subtle/80 rounded-[var(--radius-badge-md)] p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
         >
-          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-medium text-ui-content-secondary leading-tight line-clamp-2">
+          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-[var(--font-weight-medium)] text-ui-content-secondary leading-tight line-clamp-2">
             {language === 'bn' ? 'প্রতিবেদন থাকা জেলা' : 'Districts with reports'}
           </span>
-          <span className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-tight">
+          <span className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
             {language === 'bn' ? toBanglaDigits(districtCount) : districtCount}
           </span>
         </div>
@@ -161,10 +161,10 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           id="metric-affected-divisions"
           className="bg-ui-surface-subtle/80 rounded-[var(--radius-badge-md)] p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
         >
-          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-medium text-ui-content-secondary leading-tight line-clamp-2">
+          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-[var(--font-weight-medium)] text-ui-content-secondary leading-tight line-clamp-2">
             {language === 'bn' ? 'প্রতিবেদন থাকা বিভাগ' : 'Divisions with reports'}
           </span>
-          <span className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-tight">
+          <span className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
             {language === 'bn' ? toBanglaDigits(divisionCount) : divisionCount}
           </span>
         </div>
@@ -173,10 +173,10 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
           id="metric-most-reported"
           className="bg-ui-surface-subtle/80 rounded-[var(--radius-badge-md)] p-2 sm:p-2.5 flex flex-col justify-between min-h-[56px] sm:min-h-[60px]"
         >
-          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-medium text-ui-content-secondary leading-tight line-clamp-2">
+          <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-[var(--font-weight-medium)] text-ui-content-secondary leading-tight line-clamp-2">
             {language === 'bn' ? 'সর্বাধিক প্রতিবেদন' : 'Most reported'}
           </span>
-          <span className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-bold text-ui-content-primary leading-tight break-words line-clamp-2">
+          <span className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight break-words line-clamp-2">
             {mostReportedLabel}
           </span>
         </div>
@@ -194,7 +194,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
         id="explore-category-distribution"
         className="pt-2 border-t border-ui-stroke-subtle space-y-2"
       >
-        <h3 className="text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)] font-bold text-ui-content-primary">
+        <h3 className="text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'ক্যাটাগরি অনুযায়ী প্রতিবেদন' : 'Reports by category'}
         </h3>
 
@@ -212,12 +212,12 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                 className="space-y-1"
               >
                 <div className="flex items-center justify-between text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] gap-2">
-                  <div className="flex items-center gap-2 font-medium text-ui-content-primary min-w-0 flex-1">
+                  <div className="flex items-center gap-2 font-[var(--font-weight-medium)] text-ui-content-primary min-w-0 flex-1">
                     <CategoryIcon section={item.key} size="xs" />
                     <span className="truncate">{item.label}</span>
                   </div>
-                  <div className="shrink-0 text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] font-medium text-ui-content-secondary ml-2">
-                    <span className="font-semibold text-ui-content-primary">{displayCount}</span>
+                  <div className="shrink-0 text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] font-[var(--font-weight-medium)] text-ui-content-secondary ml-2">
+                    <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{displayCount}</span>
                     <span className="text-ui-content-secondary ml-1">({displayPercent}%)</span>
                   </div>
                 </div>

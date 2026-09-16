@@ -338,7 +338,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       {dropdown}
 
       {error && (
-        <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-medium">
+        <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-[var(--font-weight-medium)]">
           {error}
         </p>
       )}

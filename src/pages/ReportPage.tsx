@@ -20,7 +20,7 @@ export const ReportPage: React.FC<ReportPageProps> = () => {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-[var(--type-fixed-24)] font-bold text-ui-content-primary">
+          <h1 className="text-[var(--type-fixed-24)] font-[var(--font-weight-bold)] text-ui-content-primary">
             {language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
           </h1>
           <p className="text-[var(--type-fixed-16)] text-ui-content-muted max-w-[480px] mx-auto">

@@ -51,7 +51,7 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
       {/* 3. Reported Subject Context */}
       <div className="flex items-center gap-2 pt-0.5">
         <Skeleton className="w-20 sm:w-24 h-3.5 sm:h-4 rounded" />
-        <Skeleton className="w-28 sm:w-36 h-3.5 sm:h-4 rounded font-medium" />
+        <Skeleton className="w-28 sm:w-36 h-3.5 sm:h-4 rounded font-[var(--font-weight-medium)]" />
       </div>
 
       {/* 4. Description Preview (2-3 lines) */}

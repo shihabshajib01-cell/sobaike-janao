@@ -143,7 +143,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             <MapPin className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="flex-1">
-            <h2 id="location-consent-title" className="text-[var(--type-fixed-18)] font-bold tracking-tight">
+            <h2 id="location-consent-title" className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] tracking-tight">
               {isReportMode
                 ? (isBn ? 'প্রতিবেদন জমা দিতে লোকেশন চালু করুন' : 'Turn on location to submit report')
                 : (isBn ? 'আপনার লোকেশন ব্যবহার করুন' : 'Use your location')}
@@ -176,7 +176,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             type="button"
             onClick={handleShareLocation}
             disabled={isLoading}
-            className="w-full sm:flex-1 h-11 px-5 rounded-[var(--radius-control)] font-medium text-[var(--type-fixed-14)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="w-full sm:flex-1 h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] text-[var(--type-fixed-14)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {isLoading ? (
               <>
@@ -191,7 +191,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             type="button"
             onClick={handleNotNow}
             disabled={isLoading}
-            className="w-full sm:flex-1 h-11 px-5 rounded-[var(--radius-control)] font-medium text-[var(--type-fixed-14)] bg-ui-surface-subtle hover:bg-ui-surface-subtle/80 text-ui-content-secondary border border-ui-stroke-subtle transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="w-full sm:flex-1 h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] text-[var(--type-fixed-14)] bg-ui-surface-subtle hover:bg-ui-surface-subtle/80 text-ui-content-secondary border border-ui-stroke-subtle transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <span>{isBn ? 'এখন নয়' : 'Not now'}</span>
           </button>

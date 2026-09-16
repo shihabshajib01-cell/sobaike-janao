@@ -65,7 +65,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-[var(--type-fixed-24)] leading-[var(--type-line-34)] font-bold text-primary">
+              <h2 className="text-[var(--type-fixed-24)] leading-[var(--type-line-34)] font-[var(--font-weight-bold)] text-primary">
                 {isBn ? 'কিছু সমস্যা হয়েছে' : 'Something went wrong'}
               </h2>
               <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-secondary">

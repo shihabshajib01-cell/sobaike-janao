@@ -158,7 +158,7 @@ export const SearchPage: React.FC = () => {
   return (
     <PublicPageContainer id="search-page-container">
       <div className="space-y-1">
-        <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-bold text-ui-content-primary tracking-tight">
+        <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
           {language === 'bn' ? 'অনুসন্ধান' : 'Search'}
         </h1>
       </div>
@@ -204,9 +204,9 @@ export const SearchPage: React.FC = () => {
             type="button"
             aria-pressed={activeTab === 'all'}
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'all'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
@@ -216,9 +216,9 @@ export const SearchPage: React.FC = () => {
             type="button"
             aria-pressed={activeTab === 'reports'}
             onClick={() => setActiveTab('reports')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'reports'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
@@ -228,9 +228,9 @@ export const SearchPage: React.FC = () => {
             type="button"
             aria-pressed={activeTab === 'locations'}
             onClick={() => setActiveTab('locations')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'locations'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
@@ -240,9 +240,9 @@ export const SearchPage: React.FC = () => {
             type="button"
             aria-pressed={activeTab === 'subjects'}
             onClick={() => setActiveTab('subjects')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] cursor-pointer transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'subjects'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary'
             }`}
           >
@@ -262,7 +262,7 @@ export const SearchPage: React.FC = () => {
       {!isLoading && fetchError && (
         <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-control)] p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
-          <p className="text-[var(--type-fixed-16)] font-semibold text-ui-error-text">
+          <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-ui-error-text">
             {language === 'bn'
               ? 'অনুসন্ধান লোড করা যায়নি।'
               : "Couldn't load search."}
@@ -270,7 +270,7 @@ export const SearchPage: React.FC = () => {
           <button
             type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
+            className="btn-primary-action px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
           </button>
@@ -287,7 +287,7 @@ export const SearchPage: React.FC = () => {
         <div className="space-y-6">
           {(activeTab === 'all' || activeTab === 'locations') && matchingLocations.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[var(--type-fixed-14)] font-bold text-ui-content-secondary uppercase tracking-wider">
+              <h2 className="text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'এলাকা' : 'Locations'}
               </h2>
               <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] divide-y divide-ui-stroke-subtle overflow-hidden shadow-[var(--elevation-2xs)]">
@@ -303,7 +303,7 @@ export const SearchPage: React.FC = () => {
                         <MapPin className="w-4 h-4" aria-hidden="true" />
                       </div>
                       <div>
-                        <div className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                        <div className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                           {language === 'bn' ? loc.nameBn : loc.nameEn}
                         </div>
                         <div className="text-[var(--type-fixed-14)] text-ui-content-muted">
@@ -311,7 +311,7 @@ export const SearchPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[var(--type-fixed-14)] font-semibold text-ui-content-secondary">
+                    <div className="flex items-center gap-2 text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-secondary">
                       <span>{language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}</span>
                       <ArrowRight className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                     </div>
@@ -323,7 +323,7 @@ export const SearchPage: React.FC = () => {
 
           {(activeTab === 'all' || activeTab === 'subjects') && matchingSubjects.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[var(--type-fixed-14)] font-bold text-ui-content-secondary uppercase tracking-wider">
+              <h2 className="text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'ব্যক্তি ও প্রতিষ্ঠান' : 'People & organizations'}
               </h2>
               <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] divide-y divide-ui-stroke-subtle overflow-hidden shadow-[var(--elevation-2xs)]">
@@ -339,7 +339,7 @@ export const SearchPage: React.FC = () => {
                         <UserX className="w-4 h-4" aria-hidden="true" />
                       </div>
                       <div>
-                        <div className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                        <div className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                           {language === 'bn' ? sub.nameBn : sub.nameEn}
                         </div>
                         <div className="text-[var(--type-fixed-14)] text-ui-content-muted">
@@ -349,7 +349,7 @@ export const SearchPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[var(--type-fixed-14)] font-semibold text-ui-content-secondary">
+                    <div className="flex items-center gap-2 text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-secondary">
                       <span>{language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}</span>
                       <ArrowRight className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                     </div>
@@ -361,7 +361,7 @@ export const SearchPage: React.FC = () => {
 
           {(activeTab === 'all' || activeTab === 'reports') && matchingReports.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[var(--type-fixed-14)] font-bold text-ui-content-secondary uppercase tracking-wider">
+              <h2 className="text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'প্রতিবেদন' : 'Reports'}
               </h2>
               <div className="space-y-3">
@@ -375,7 +375,7 @@ export const SearchPage: React.FC = () => {
           {totalResults === 0 && (
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-10 text-center space-y-3 shadow-[var(--elevation-2xs)]">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
-              <h3 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+              <h3 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                 {language === 'bn' ? 'কোনো ফল পাওয়া যায়নি।' : 'No results found.'}
               </h3>
               <p className="text-[var(--type-fixed-14)] text-ui-content-muted max-w-sm mx-auto leading-relaxed">

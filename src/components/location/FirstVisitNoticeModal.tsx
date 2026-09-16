@@ -50,7 +50,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             <ShieldCheck className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="flex-1">
-            <h2 id="first-visit-notice-title" className="text-[var(--type-fixed-18)] font-bold tracking-tight">
+            <h2 id="first-visit-notice-title" className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] tracking-tight">
               {isBn
                 ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
                 : 'Independence & Responsible Use Notice'}
@@ -70,7 +70,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
 
           <ol className="p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-12)] space-y-2 list-none">
             <li className="flex items-start gap-2.5">
-              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '১.' : '1.'}</p>
+              <p className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '১.' : '1.'}</p>
               <p>
                 {isBn
                   ? 'সঠিক, সত্য ও প্রাসঙ্গিক তথ্য দিয়ে প্রতিবেদন প্রকাশ করুন।'
@@ -78,7 +78,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
               </p>
             </li>
             <li className="flex items-start gap-2.5">
-              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '২.' : '2.'}</p>
+              <p className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '২.' : '2.'}</p>
               <p>
                 {isBn
                   ? 'কারও সুনাম নষ্ট করার অসৎ উদ্দেশ্যে ভিত্তিহীন অভিযোগ দেওয়া থেকে বিরত থাকুন।'
@@ -86,7 +86,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
               </p>
             </li>
             <li className="flex items-start gap-2.5">
-              <p className="font-bold text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '৩.' : '3.'}</p>
+              <p className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '৩.' : '3.'}</p>
               <p>
                 {isBn
                   ? 'জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট হটলাইনে সরাসরি যোগাযোগ করুন।'
@@ -116,7 +116,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             type="button"
             onClick={handleContinue}
             disabled={!isChecked}
-            className="w-full h-11 px-5 rounded-[var(--radius-control)] font-medium text-[var(--type-fixed-14)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
+            className="w-full h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] text-[var(--type-fixed-14)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
           >
             <span>{isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}</span>
           </button>

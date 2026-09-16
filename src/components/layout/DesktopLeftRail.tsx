@@ -105,9 +105,9 @@ export const DesktopLeftRail: React.FC = () => {
 
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
     if (!sectionKey) {
-      return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
+      return 'bg-ui-surface-elevated text-ui-content-primary font-[var(--font-weight-semibold)] border border-ui-stroke-default';
     }
-    return 'font-semibold border';
+    return 'font-[var(--font-weight-semibold)] border';
   };
 
   return (
@@ -132,7 +132,7 @@ export const DesktopLeftRail: React.FC = () => {
             fullWidth
             leftIcon={<AppIcon name="plus-circle" size="lg" className="text-ui-content-inverse" />}
             onClick={() => openReportComposer()}
-            className="shadow-[var(--elevation-2xs)] font-semibold py-2.5 min-h-[44px] text-[var(--type-fixed-16)]"
+            className="shadow-[var(--elevation-2xs)] font-[var(--font-weight-semibold)] py-2.5 min-h-[44px] text-[var(--type-fixed-16)]"
           >
             {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
           </Button>
@@ -149,7 +149,7 @@ export const DesktopLeftRail: React.FC = () => {
                 id={item.id}
                 onClick={() => navigateTo(item.path)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isActive
                     ? getSectionActiveStyles(item.sectionKey)
                     : 'text-ui-content-secondary'
@@ -206,14 +206,14 @@ export const DesktopLeftRail: React.FC = () => {
           }
           className="w-full flex items-center justify-between px-3.5 py-2.5 text-[var(--type-fixed-14)] rounded-[var(--radius-control)] border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
-          <span className="font-medium">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
-          <span className="font-semibold text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-badge-md)] text-[var(--type-fixed-13)]">
+          <span className="font-[var(--font-weight-medium)]">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
+          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-badge-md)] text-[var(--type-fixed-13)]">
             {language === 'bn' ? 'English' : 'বাংলা'}
           </span>
         </button>
 
         <div className="px-2 pt-1 text-[var(--type-fixed-13)] text-ui-content-muted leading-tight">
-          <p className="font-medium text-ui-content-secondary">
+          <p className="font-[var(--font-weight-medium)] text-ui-content-secondary">
             {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
           </p>
           <p className="text-[var(--type-fixed-12)] opacity-80">

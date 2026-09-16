@@ -292,7 +292,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
             <UploadCloud className="w-6 h-6 text-ui-success-text" />
           </div>
           <div className="space-y-1">
-            <p className="text-[var(--type-fixed-14)] font-semibold text-primary">
+            <p className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-primary">
               {language === 'bn' ? 'সহায়ক ছবি সংযুক্ত করুন' : 'Attach supporting images'}
             </p>
             <p className="text-[var(--type-fixed-14)] text-secondary">
@@ -307,7 +307,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
       {/* Image Previews Grid */}
       {images.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-[var(--type-fixed-14)] font-semibold text-primary">
+          <div className="flex items-center justify-between text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-primary">
             <span className="flex items-center gap-2">
               <span>
                 {language === 'bn'
@@ -315,7 +315,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                   : `Attached Evidence (${images.length}/${maxImages})`}
               </span>
               {hasAnyCompressing && (
-                <span className="flex items-center gap-1 text-[var(--type-fixed-12)] font-medium text-ui-success-text bg-ui-success-bg px-2 py-0.5 rounded-[var(--radius-pill)]">
+                <span className="flex items-center gap-1 text-[var(--type-fixed-12)] font-[var(--font-weight-medium)] text-ui-success-text bg-ui-success-bg px-2 py-0.5 rounded-[var(--radius-pill)]">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing…'}
                 </span>
@@ -388,7 +388,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     )}
 
                     {/* Order indicator */}
-                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-[var(--radius-badge-sm)] bg-ui-media-overlay-label text-ui-media-viewer-text text-[var(--type-fixed-12)] font-bold tracking-wide pointer-events-none">
+                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-[var(--radius-badge-sm)] bg-ui-media-overlay-label text-ui-media-viewer-text text-[var(--type-fixed-12)] font-[var(--font-weight-bold)] tracking-wide pointer-events-none">
                       #{index + 1}
                     </div>
 
@@ -396,7 +396,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     {img.isCompressing && (
                       <div className="absolute inset-0 bg-ui-media-viewer-strip backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-ui-media-viewer-text text-center p-3 pointer-events-none">
                         <Loader2 className="w-6 h-6 animate-spin text-ui-media-viewer-text" />
-                        <span className="text-[var(--type-fixed-13)] font-semibold">
+                        <span className="text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)]">
                           {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing image…'}
                         </span>
                       </div>
@@ -429,7 +429,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                   {/* File info bar & Reorder controls */}
                   <div className="p-2.5 bg-surface border-t border-subtle flex items-center justify-between gap-2">
                     <div className="truncate text-[var(--type-fixed-13)] text-primary flex-1 min-w-0">
-                      <p className="truncate font-medium" title={img.file.name}>
+                      <p className="truncate font-[var(--font-weight-medium)]" title={img.file.name}>
                         {img.originalName || img.file.name}
                       </p>
                     </div>

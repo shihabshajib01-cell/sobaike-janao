@@ -68,9 +68,9 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
         >
           <div className="flex items-center gap-2">
             <CurrentDisplayIcon className="w-4 h-4 text-ui-content-muted" />
-            <span className="font-medium">{language === 'bn' ? 'প্রদর্শন' : 'Appearance'}</span>
+            <span className="font-[var(--font-weight-medium)]">{language === 'bn' ? 'প্রদর্শন' : 'Appearance'}</span>
           </div>
-          <div className="flex items-center gap-1 font-semibold text-[var(--type-fixed-14)] text-ui-content-primary">
+          <div className="flex items-center gap-1 font-[var(--font-weight-semibold)] text-[var(--type-fixed-14)] text-ui-content-primary">
             <span>{language === 'bn' ? currentOption.nameBn : currentOption.nameEn}</span>
             <ChevronDown className={`w-3.5 h-3.5 text-ui-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
@@ -95,9 +95,9 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
                     setThemePreference(opt.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[var(--radius-badge-md)] text-[var(--type-fixed-14)] font-medium transition-colors cursor-pointer min-h-[44px] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[var(--radius-badge-md)] text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] transition-colors cursor-pointer min-h-[44px] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     isSelected
-                      ? 'bg-ui-surface-subtle text-ui-content-primary font-bold'
+                      ? 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)]'
                       : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
                   }`}
                 >
@@ -134,7 +134,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
               onClick={() => setThemePreference(opt.id)}
               className={`flex flex-col items-center justify-center p-3 rounded-[var(--radius-card)] border transition-all cursor-pointer min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isSelected
-                  ? 'border-ui-stroke-strong bg-ui-surface-elevated text-ui-content-primary font-bold shadow-[var(--elevation-2xs)]'
+                  ? 'border-ui-stroke-strong bg-ui-surface-elevated text-ui-content-primary font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                   : 'border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface'
               }`}
             >
@@ -166,9 +166,9 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
             role="radio"
             aria-checked={isSelected}
             onClick={() => setThemePreference(opt.id)}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-medium transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isSelected
-                ? 'bg-ui-surface text-ui-content-primary font-bold shadow-[var(--elevation-2xs)] border border-ui-stroke-subtle'
+                ? 'bg-ui-surface text-ui-content-primary font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)] border border-ui-stroke-subtle'
                 : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface/50'
             }`}
           >

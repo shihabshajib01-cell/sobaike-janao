@@ -250,7 +250,7 @@ export const Modal: React.FC<ModalProps> = ({
           <div className="flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 border-b border-ui-stroke-subtle bg-ui-surface shrink-0 gap-3">
             <div className="min-w-0 flex-1">
               {title && (
-                <h2 id={`${id}-title`} className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-bold text-ui-content-primary leading-snug">
+                <h2 id={`${id}-title`} className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
                   {title}
                 </h2>
               )}

@@ -92,18 +92,18 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   const textStyles = {
     sm: {
-      bangla: 'text-[var(--type-fixed-14)] xs:text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-bold leading-tight text-ui-content-primary tracking-tight whitespace-nowrap',
-      english: 'hidden min-[380px]:block text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] leading-tight font-medium text-ui-content-secondary tracking-normal whitespace-nowrap',
+      bangla: 'text-[var(--type-fixed-14)] xs:text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] leading-tight text-ui-content-primary tracking-tight whitespace-nowrap',
+      english: 'hidden min-[380px]:block text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] leading-tight font-[var(--font-weight-medium)] text-ui-content-secondary tracking-normal whitespace-nowrap',
       gap: 'gap-1.5 sm:gap-2.5',
     },
     md: {
-      bangla: 'text-[var(--type-fixed-18)] leading-[var(--type-line-24)] font-bold text-ui-content-primary tracking-tight whitespace-nowrap',
-      english: 'text-[var(--type-fixed-14)] leading-tight font-medium text-ui-content-secondary tracking-normal whitespace-nowrap',
+      bangla: 'text-[var(--type-fixed-18)] leading-[var(--type-line-24)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight whitespace-nowrap',
+      english: 'text-[var(--type-fixed-14)] leading-tight font-[var(--font-weight-medium)] text-ui-content-secondary tracking-normal whitespace-nowrap',
       gap: 'gap-3',
     },
     lg: {
-      bangla: 'text-[var(--type-fixed-20)] leading-[var(--type-line-26)] font-bold text-ui-content-primary tracking-tight whitespace-nowrap',
-      english: 'text-[var(--type-fixed-15)] leading-tight font-medium text-ui-content-secondary tracking-normal whitespace-nowrap',
+      bangla: 'text-[var(--type-fixed-20)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight whitespace-nowrap',
+      english: 'text-[var(--type-fixed-15)] leading-tight font-[var(--font-weight-medium)] text-ui-content-secondary tracking-normal whitespace-nowrap',
       gap: 'gap-3.5',
     },
   };

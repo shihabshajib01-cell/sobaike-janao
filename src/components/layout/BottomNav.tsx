@@ -68,7 +68,7 @@ export const BottomNav: React.FC = () => {
             <AppIcon name={item.iconName} size="lg" strokeWidth={item.isActive ? 2.4 : 2} />
             <span
               className={`mt-1 w-full truncate text-center text-[var(--type-fixed-105)] min-[390px]:text-[var(--type-fixed-115)] leading-tight ${
-                item.isActive ? 'font-bold' : 'font-medium'
+                item.isActive ? 'font-[var(--font-weight-bold)]' : 'font-[var(--font-weight-medium)]'
               }`}
             >
               {language === 'bn' ? item.nameBn : item.nameEn}

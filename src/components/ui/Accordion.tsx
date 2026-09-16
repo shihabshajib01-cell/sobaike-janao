@@ -73,12 +73,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[var(--type-fixed-16)] md:text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-tight">
+                <span className="text-[var(--type-fixed-16)] md:text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 text-[var(--type-fixed-14)] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
+                  <span className="inline-flex items-center gap-1 text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>ত্রুটি / Error</span>
                   </span>
@@ -123,12 +123,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[var(--type-fixed-16)] md:text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-tight">
+                <span className="text-[var(--type-fixed-16)] md:text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 text-[var(--type-fixed-14)] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
+                  <span className="inline-flex items-center gap-1 text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>ত্রুটি / Error</span>
                   </span>

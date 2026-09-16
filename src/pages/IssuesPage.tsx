@@ -46,7 +46,7 @@ export const IssuesPage: React.FC = () => {
   return (
     <PublicPageContainer id="issues-page-container" className="md:hidden">
       <section aria-labelledby="issues-page-title" className="space-y-1">
-        <h1 id="issues-page-title" className="text-[var(--type-fixed-24)] font-bold leading-tight text-ui-content-primary">
+        <h1 id="issues-page-title" className="text-[var(--type-fixed-24)] font-[var(--font-weight-bold)] leading-tight text-ui-content-primary">
           {language === 'bn' ? 'বিষয়সমূহ' : 'Issues'}
         </h1>
         <p className="text-[var(--type-fixed-14)] leading-relaxed text-ui-content-secondary">
@@ -60,7 +60,7 @@ export const IssuesPage: React.FC = () => {
         <button
           type="button"
           onClick={loadCounts}
-          className="flex w-full items-center gap-2 rounded-[var(--radius-control)] border border-ui-warning-border bg-ui-warning-bg px-3 py-2.5 text-left text-[var(--type-fixed-13)] font-medium text-ui-warning-text cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="flex w-full items-center gap-2 rounded-[var(--radius-control)] border border-ui-warning-border bg-ui-warning-bg px-3 py-2.5 text-left text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-warning-text cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>
@@ -95,11 +95,11 @@ export const IssuesPage: React.FC = () => {
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
 
-                <h2 className="min-w-0 flex-1 text-[var(--type-fixed-15)] font-bold leading-snug text-ui-content-primary">
+                <h2 className="min-w-0 flex-1 text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] leading-snug text-ui-content-primary">
                   {language === 'bn' ? config.nameBn : config.nameEn}
                 </h2>
 
-                <p className="shrink-0 text-right text-[var(--type-fixed-125)] font-medium text-ui-content-secondary">
+                <p className="shrink-0 text-right text-[var(--type-fixed-125)] font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {isLoading
                     ? language === 'bn'
                       ? 'গণনা হচ্ছে...'

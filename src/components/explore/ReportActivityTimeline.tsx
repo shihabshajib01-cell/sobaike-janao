@@ -228,10 +228,10 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
     >
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5">
-        <h2 className="text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+        <h2 className="text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'সময় অনুযায়ী প্রতিবেদন' : 'Reports over time'}
         </h2>
-        <span className="text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] text-ui-content-secondary font-normal">
+        <span className="text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] text-ui-content-secondary font-[var(--font-weight-regular)]">
           {language === 'bn'
             ? 'সর্বশেষ প্রকাশিত প্রতিবেদনের মাস পর্যন্ত ৬ মাস'
             : 'Six months ending with the latest published report'}
@@ -255,7 +255,7 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
           className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 space-y-3.5 shadow-[var(--elevation-2xs)]"
         >
           {summaryText && (
-            <p className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] text-ui-content-secondary font-medium">
+            <p className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] text-ui-content-secondary font-[var(--font-weight-medium)]">
               {summaryText}
             </p>
           )}
@@ -303,7 +303,7 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                   >
                     {/* Numeric count above bar */}
                     <span
-                      className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-semibold text-ui-content-primary mb-1.5 tabular-nums text-center select-none"
+                      className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-[var(--font-weight-semibold)] text-ui-content-primary mb-1.5 tabular-nums text-center select-none"
                       aria-hidden="true"
                     >
                       {displayCount}
@@ -331,7 +331,7 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                       className="flex flex-col items-center mt-1.5 text-center select-none"
                       aria-hidden="true"
                     >
-                      <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] font-medium text-ui-content-primary leading-tight truncate">
+                      <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] font-[var(--font-weight-medium)] text-ui-content-primary leading-tight truncate">
                         {shortLabel}
                       </span>
                       <span className="text-[var(--type-fixed-095)] sm:text-[var(--type-fixed-10)] text-ui-content-secondary leading-tight mt-0.5">

@@ -43,11 +43,11 @@ export const MorePage: React.FC = () => {
       {/* Page Header */}
       <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 space-y-4 shadow-[var(--elevation-2xs)]">
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[var(--radius-pill)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-medium text-ui-content-secondary">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[var(--radius-pill)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-secondary">
             <Info className="w-3.5 h-3.5 text-ui-accent" />
             <span>{language === 'bn' ? 'ব্যবহারকারী নির্দেশিকা ও জ্ঞান কেন্দ্র' : 'User Guide & Knowledge Hub'}</span>
           </div>
-          <h1 className="text-[var(--type-fixed-28)] md:text-[var(--type-fixed-32)] leading-[var(--type-line-38)] md:leading-[var(--type-line-42)] font-bold text-ui-content-primary tracking-tight">
+          <h1 className="text-[var(--type-fixed-28)] md:text-[var(--type-fixed-32)] leading-[var(--type-line-38)] md:leading-[var(--type-line-42)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
             {language === 'bn' ? 'তথ্য ও সহায়তা' : 'Information & Support'}
           </h1>
           <p className="text-[var(--type-fixed-15)] md:text-[var(--type-fixed-16)] leading-[var(--type-line-24)] text-ui-content-secondary max-w-3xl">
@@ -61,7 +61,7 @@ export const MorePage: React.FC = () => {
         <div className="pt-3 border-t border-ui-stroke-subtle md:hidden space-y-2">
           <div className="flex items-center gap-2">
             <Palette className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-            <p className="text-[var(--type-fixed-14)] font-semibold text-ui-content-secondary">
+            <p className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-secondary">
               {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
             </p>
           </div>
@@ -77,9 +77,9 @@ export const MorePage: React.FC = () => {
             aria-pressed={activeTab === 'about'}
             type="button"
             onClick={() => setActiveTab('about')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-[var(--font-weight-semibold)] whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'about'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-[var(--elevation-2xs)]'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
             }`}
           >
@@ -91,9 +91,9 @@ export const MorePage: React.FC = () => {
             aria-pressed={activeTab === 'guide'}
             type="button"
             onClick={() => setActiveTab('guide')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-[var(--font-weight-semibold)] whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'guide'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-[var(--elevation-2xs)]'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
             }`}
           >
@@ -105,9 +105,9 @@ export const MorePage: React.FC = () => {
             aria-pressed={activeTab === 'helplines'}
             type="button"
             onClick={() => setActiveTab('helplines')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-[var(--font-weight-semibold)] whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'helplines'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-[var(--elevation-2xs)]'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
             }`}
           >
@@ -119,9 +119,9 @@ export const MorePage: React.FC = () => {
             aria-pressed={activeTab === 'principles'}
             type="button"
             onClick={() => setActiveTab('principles')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-[var(--font-weight-semibold)] whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'principles'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-[var(--elevation-2xs)]'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
             }`}
           >
@@ -133,9 +133,9 @@ export const MorePage: React.FC = () => {
             aria-pressed={activeTab === 'response'}
             type="button"
             onClick={() => setActiveTab('response')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-[var(--font-weight-semibold)] whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'response'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-[var(--elevation-2xs)]'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
             }`}
           >
@@ -147,9 +147,9 @@ export const MorePage: React.FC = () => {
             aria-pressed={activeTab === 'faq'}
             type="button"
             onClick={() => setActiveTab('faq')}
-            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-15)] leading-[var(--type-line-22)] font-[var(--font-weight-semibold)] whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               activeTab === 'faq'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-[var(--elevation-2xs)]'
+                ? 'bg-ui-action-bg text-ui-action-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                 : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
             }`}
           >
@@ -166,7 +166,7 @@ export const MorePage: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-6 md:p-8 space-y-6 shadow-[var(--elevation-2xs)]">
             <div className="space-y-3">
-              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-bold text-ui-content-primary">
+              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-[var(--font-weight-bold)] text-ui-content-primary">
                 {language === 'bn' ? 'সবাইকে জানাও কী?' : 'What is Sobaike Janao?'}
               </h2>
               <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary">
@@ -179,7 +179,7 @@ export const MorePage: React.FC = () => {
             {/* Crucial Positionings Callout */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div className="p-5 bg-ui-warning-bg border border-ui-warning-border rounded-[var(--radius-control)] space-y-2">
-                <div className="flex items-center gap-2 text-ui-warning-text font-bold text-[var(--type-fixed-16)]">
+                <div className="flex items-center gap-2 text-ui-warning-text font-[var(--font-weight-bold)] text-[var(--type-fixed-16)]">
                   <ShieldAlert className="w-5 h-5 shrink-0" />
                   <span>{language === 'bn' ? 'এটি কোনো সরকারি ওয়েবসাইট নয়' : 'Not a Government Website'}</span>
                 </div>
@@ -191,7 +191,7 @@ export const MorePage: React.FC = () => {
               </div>
 
               <div className="p-5 bg-ui-info-bg border border-ui-info-border rounded-[var(--radius-control)] space-y-2">
-                <div className="flex items-center gap-2 text-ui-info-text font-bold text-[var(--type-fixed-16)]">
+                <div className="flex items-center gap-2 text-ui-info-text font-[var(--font-weight-bold)] text-[var(--type-fixed-16)]">
                   <Scale className="w-5 h-5 shrink-0" />
                   <span>{language === 'bn' ? 'আইন প্রয়োগকারী সংস্থা নয়' : 'Not Law Enforcement or Court'}</span>
                 </div>
@@ -205,11 +205,11 @@ export const MorePage: React.FC = () => {
 
             {/* Publication notice */}
             <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-2">
-              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary flex items-center gap-2">
+              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-ui-warning-text shrink-0" />
                 <span>{language === 'bn' ? 'প্রকাশিত প্রতিবেদন ও আইনি অবস্থান' : 'Published Reports & Legal Position'}</span>
               </h3>
-              <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary font-medium">
+              <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary font-[var(--font-weight-medium)]">
                 {language === 'bn'
                   ? '“প্রকাশিত প্রতিবেদন কোনো ব্যক্তি বা প্রতিষ্ঠানকে আইনগতভাবে দোষী প্রমাণ করে না।”'
                   : '"A published report does not legally prove guilt of any person or organization."'}
@@ -223,15 +223,15 @@ export const MorePage: React.FC = () => {
 
             {/* Active Categories */}
             <div className="space-y-4 pt-4 border-t border-ui-stroke-subtle">
-              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary">
+              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary">
                 {language === 'bn' ? 'বর্তমান সক্রিয় ক্যাটাগরি ও সেবা' : 'Currently Active Categories & Services'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-bold bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)]">
+                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)]">
                     {language === 'bn' ? 'হয়রানি' : 'Harassment'}
                   </span>
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'হয়রানি ও নির্যাতন' : 'Harassment & Abuse'}
                   </h4>
                   <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary">
@@ -240,10 +240,10 @@ export const MorePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-bold bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)]">
+                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)]">
                     {language === 'bn' ? 'অটো চার্জিং' : 'Auto-Charging'}
                   </span>
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'অবৈধ অটো চার্জিং' : 'Illegal Auto Charging'}
                   </h4>
                   <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary">
@@ -252,10 +252,10 @@ export const MorePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-bold bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)]">
+                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)]">
                     {language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}
                   </span>
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'চাঁদাবাজি ও জোরপূর্বক আদায়' : 'Extortion & Coercion'}
                   </h4>
                   <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary">
@@ -264,10 +264,10 @@ export const MorePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-bold bg-ui-warning-bg text-ui-warning-text border border-ui-warning-border">
+                  <span className="inline-block px-2.5 py-1 rounded-[var(--radius-badge-sm)] text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] bg-ui-warning-bg text-ui-warning-text border border-ui-warning-border">
                     {language === 'bn' ? 'ইউটিলিটি' : 'Utility'}
                   </span>
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'ইউটিলিটি ও বিদ্যুৎ সমস্যা' : 'Utility & Load Shedding'}
                   </h4>
                   <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary">
@@ -287,7 +287,7 @@ export const MorePage: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-6 md:p-8 space-y-6 shadow-[var(--elevation-2xs)]">
             <div className="space-y-2">
-              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-bold text-ui-content-primary flex items-center gap-2">
+              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                 <BookOpen className="w-6 h-6 text-ui-accent" />
                 <span>{language === 'bn' ? 'প্রতিবেদন করার ধাপসমূহ' : 'Step-by-Step Reporting Guide'}</span>
               </h2>
@@ -301,8 +301,8 @@ export const MorePage: React.FC = () => {
             <div className="space-y-4">
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-2">
                 <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[var(--type-fixed-15)]">১</p>
-                  <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-[var(--font-weight-bold)] text-[var(--type-fixed-15)]">১</p>
+                  <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'সেবা বা ক্যাটাগরি নির্বাচন' : 'Choose Category'}
                   </h3>
                 </div>
@@ -315,8 +315,8 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-2">
                 <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[var(--type-fixed-15)]">২</p>
-                  <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-[var(--font-weight-bold)] text-[var(--type-fixed-15)]">২</p>
+                  <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'ঘটনার ধরন ও বিবরণ দিন' : 'Provide Details & Context'}
                   </h3>
                 </div>
@@ -329,8 +329,8 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-2">
                 <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[var(--type-fixed-15)]">৩</p>
-                  <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-[var(--font-weight-bold)] text-[var(--type-fixed-15)]">৩</p>
+                  <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'অবস্থান নির্ধারণ করুন' : 'Specify Incident Location'}
                   </h3>
                 </div>
@@ -343,8 +343,8 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-2">
                 <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[var(--type-fixed-15)]">৪</p>
-                  <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-[var(--font-weight-bold)] text-[var(--type-fixed-15)]">৪</p>
+                  <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'প্রমাণ বা ছবি যুক্ত করুন (ঐচ্ছিক)' : 'Attach Evidence (Optional)'}
                   </h3>
                 </div>
@@ -357,8 +357,8 @@ export const MorePage: React.FC = () => {
 
               <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-2">
                 <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[var(--type-fixed-15)]">৫</p>
-                  <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+                  <p className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-accent text-ui-content-inverse flex items-center justify-center font-[var(--font-weight-bold)] text-[var(--type-fixed-15)]">৫</p>
+                  <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'যাচাই ও জমা দিন' : 'Review & Submit'}
                   </h3>
                 </div>
@@ -373,7 +373,7 @@ export const MorePage: React.FC = () => {
             {/* Draft & Good Report tips */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-ui-stroke-subtle">
               <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary flex items-center gap-2">
+                <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                   <Clock className="w-4 h-4 text-ui-accent" />
                   <span>{language === 'bn' ? 'ড্রাফট ও অসমাপ্ত প্রতিবেদন' : 'Drafts & Resuming'}</span>
                 </h4>
@@ -385,7 +385,7 @@ export const MorePage: React.FC = () => {
               </div>
 
               <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary flex items-center gap-2">
+                <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-ui-accent" />
                   <span>{language === 'bn' ? 'কার্যকর প্রতিবেদন লেখার টিপস' : 'Tips for a Good Report'}</span>
                 </h4>
@@ -407,7 +407,7 @@ export const MorePage: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-6 md:p-8 space-y-6 shadow-[var(--elevation-2xs)]">
             <div className="p-5 bg-ui-error-bg border border-ui-error-border rounded-[var(--radius-control)] space-y-2">
-              <div className="flex items-center gap-2 text-ui-error-text font-bold text-[var(--type-fixed-18)]">
+              <div className="flex items-center gap-2 text-ui-error-text font-[var(--font-weight-bold)] text-[var(--type-fixed-18)]">
                 <ShieldAlert className="w-6 h-6 shrink-0" />
                 <span>{language === 'bn' ? 'জরুরি পরিস্থিতিতে কী করবেন?' : 'What to Do in an Emergency'}</span>
               </div>
@@ -419,7 +419,7 @@ export const MorePage: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              <h2 className="text-[var(--type-fixed-20)] leading-[var(--type-line-30)] font-bold text-ui-content-primary flex items-center gap-2">
+              <h2 className="text-[var(--type-fixed-20)] leading-[var(--type-line-30)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                 <Phone className="w-5 h-5 text-ui-accent" />
                 <span>{language === 'bn' ? 'জরুরি ও সরকারি সহায়তা নম্বরসমূহ' : 'Official Emergency & Support Hotlines'}</span>
               </h2>
@@ -437,17 +437,17 @@ export const MorePage: React.FC = () => {
                   className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-5 flex items-center justify-between gap-4 shadow-[var(--elevation-2xs)]"
                 >
                   <div className="space-y-1 min-w-0">
-                    <span className="text-[var(--type-fixed-14)] text-ui-content-secondary font-medium">
+                    <span className="text-[var(--type-fixed-14)] text-ui-content-secondary font-[var(--font-weight-medium)]">
                       {language === 'bn' ? hl.labelBn : hl.labelEn}
                     </span>
-                    <div className="text-[var(--type-fixed-24)] leading-tight tabular-nums font-bold text-ui-content-primary">{hl.number}</div>
+                    <div className="text-[var(--type-fixed-24)] leading-tight tabular-nums font-[var(--font-weight-bold)] text-ui-content-primary">{hl.number}</div>
                     <span className="text-[var(--type-fixed-14)] text-ui-content-muted block truncate">
                       {language === 'bn' ? hl.descBn : hl.descEn}
                     </span>
                   </div>
                   <a
                     href={`tel:${hl.number}`}
-                    className="btn-primary-action px-5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold flex items-center gap-2 shrink-0 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                    className="btn-primary-action px-5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] flex items-center gap-2 shrink-0 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                   >
                     <Phone className="w-4 h-4" aria-hidden="true" />
                     <span>{language === 'bn' ? 'কল করুন' : 'Call'}</span>
@@ -458,12 +458,12 @@ export const MorePage: React.FC = () => {
 
             {/* Platform vs Official comparison */}
             <div className="space-y-4 pt-6 border-t border-ui-stroke-subtle">
-              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary">
+              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary">
                 {language === 'bn' ? 'সবাইকে জানাও বনাম সরকারি/আইনি প্রক্রিয়া' : 'Sobaike Janao vs. Official Legal Process'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'সবাইকে জানাও প্ল্যাটফর্ম' : 'Sobaike Janao Platform'}
                   </h4>
                   <ul className="space-y-1.5 text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary list-disc pl-4">
@@ -474,7 +474,7 @@ export const MorePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'সরকারি / আইনি প্রক্রিয়া' : 'Official / Legal Process'}
                   </h4>
                   <ul className="space-y-1.5 text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary list-disc pl-4">
@@ -496,7 +496,7 @@ export const MorePage: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-6 md:p-8 space-y-6 shadow-[var(--elevation-2xs)]">
             <div className="space-y-2">
-              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-bold text-ui-content-primary flex items-center gap-2">
+              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                 <Shield className="w-6 h-6 text-ui-accent" />
                 <span>{language === 'bn' ? 'সুরক্ষা, গোপনীয়তা ও মডারেশন নীতি' : 'Privacy, Safety & Moderation Policy'}</span>
               </h2>
@@ -509,7 +509,7 @@ export const MorePage: React.FC = () => {
 
             <div className="space-y-4">
               <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary flex items-center gap-2">
+                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                   <Lock className="w-5 h-5 text-ui-accent" />
                   <span>{language === 'bn' ? '১. প্রতিবেদকের পরিচয় ও গোপনীয়তা' : '1. Complainant Privacy'}</span>
                 </h3>
@@ -521,7 +521,7 @@ export const MorePage: React.FC = () => {
               </div>
 
               <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary flex items-center gap-2">
+                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                   <FileText className="w-5 h-5 text-ui-accent" />
                   <span>{language === 'bn' ? '২. প্রমাণ ও ছবি সংক্রান্ত নীতি' : '2. Evidence & Image Policy'}</span>
                 </h3>
@@ -533,7 +533,7 @@ export const MorePage: React.FC = () => {
               </div>
 
               <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary flex items-center gap-2">
+                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-ui-accent" />
                   <span>{language === 'bn' ? '৩. লোকেশন বা অবস্থান নীতি' : '3. Location Privacy'}</span>
                 </h3>
@@ -545,7 +545,7 @@ export const MorePage: React.FC = () => {
               </div>
 
               <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary flex items-center gap-2">
+                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-ui-accent" />
                   <span>{language === 'bn' ? '৪. পর্যালোচনার মানদণ্ড ও সীমানা' : '4. Moderation Standards'}</span>
                 </h3>
@@ -557,7 +557,7 @@ export const MorePage: React.FC = () => {
               </div>
 
               <div className="p-5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary flex items-center gap-2">
+                <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                   <Users className="w-5 h-5 text-ui-accent" />
                   <span>{language === 'bn' ? '৫. নাগরিক দায়িত্ব' : '5. Citizen Responsibility'}</span>
                 </h3>
@@ -579,7 +579,7 @@ export const MorePage: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-6 md:p-8 space-y-6 shadow-[var(--elevation-2xs)]">
             <div className="space-y-2">
-              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-bold text-ui-content-primary flex items-center gap-2">
+              <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                 <Scale className="w-6 h-6 text-ui-accent" />
                 <span>{language === 'bn' ? 'প্রতিউত্তর ও নাগরিক অংশগ্রহণের নিয়মাবলী' : 'Response & Participation Guidelines'}</span>
               </h2>
@@ -592,10 +592,10 @@ export const MorePage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="p-6 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-3">
-                <div className="w-10 h-10 rounded-[var(--radius-control)] bg-ui-accent-soft text-ui-accent flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-[var(--radius-control)] bg-ui-accent-soft text-ui-accent flex items-center justify-center font-[var(--font-weight-bold)]">
                   <UserCheck className="w-5 h-5" />
                 </div>
-                <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+                <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
                   {language === 'bn' ? 'আমার কাছে তথ্য আছে বা আমিও ভুক্তভোগী' : 'I Have Info or Am a Victim'}
                 </h3>
                 <p className="text-[var(--type-fixed-15)] leading-[var(--type-line-24)] text-ui-content-secondary">
@@ -606,10 +606,10 @@ export const MorePage: React.FC = () => {
               </div>
 
               <div className="p-6 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] space-y-3">
-                <div className="w-10 h-10 rounded-[var(--radius-control)] bg-ui-accent-soft text-ui-accent flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-[var(--radius-control)] bg-ui-accent-soft text-ui-accent flex items-center justify-center font-[var(--font-weight-bold)]">
                   <MessageSquare className="w-5 h-5" />
                 </div>
-                <h3 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+                <h3 className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
                   {language === 'bn' ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ' : 'I Am the Mentioned Person or Party'}
                 </h3>
                 <p className="text-[var(--type-fixed-15)] leading-[var(--type-line-24)] text-ui-content-secondary">
@@ -622,14 +622,14 @@ export const MorePage: React.FC = () => {
 
             {/* Information discovery guide */}
             <div className="space-y-4 pt-6 border-t border-ui-stroke-subtle">
-              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary flex items-center gap-2">
+              <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
                 <FileSearch className="w-5 h-5 text-ui-accent" />
                 <span>{language === 'bn' ? 'তথ্য ও প্রতিবেদন অনুসন্ধানের উপায়' : 'How to Discover Information'}</span>
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-1.5">
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'মূলপাতা ও ক্যাটাগরি' : 'Home & Categories'}
                   </h4>
                   <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary">
@@ -638,7 +638,7 @@ export const MorePage: React.FC = () => {
                 </div>
 
                 <div className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-1.5">
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'অনুসন্ধান (Search)' : 'Search'}
                   </h4>
                   <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary">
@@ -647,7 +647,7 @@ export const MorePage: React.FC = () => {
                 </div>
 
                 <div className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-1.5">
-                  <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'এক্সপ্লোর ও ম্যাপ' : 'Explore & Map'}
                   </h4>
                   <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-22)] text-ui-content-secondary">
@@ -666,7 +666,7 @@ export const MorePage: React.FC = () => {
       {activeTab === 'faq' && (
         <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-6 md:p-8 space-y-6 shadow-[var(--elevation-2xs)]">
           <div className="space-y-2">
-            <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-bold text-ui-content-primary flex items-center gap-2">
+            <h2 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
               <HelpCircle className="w-6 h-6 text-ui-accent" />
               <span>{language === 'bn' ? 'সাধারণ জিজ্ঞাসা ও প্রশ্নাবলী (FAQ)' : 'Frequently Asked Questions'}</span>
             </h2>

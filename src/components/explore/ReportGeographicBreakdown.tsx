@@ -166,10 +166,10 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
     >
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5">
-        <h2 className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
+        <h2 className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'এলাকা অনুযায়ী বিশ্লেষণ' : 'Geographic breakdown'}
         </h2>
-        <span className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] text-ui-content-muted font-normal">
+        <span className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] text-ui-content-muted font-[var(--font-weight-regular)]">
           {language === 'bn' ? 'বর্তমান ফিল্টারের ভিত্তিতে' : 'Based on the current filters'}
         </span>
       </div>
@@ -193,7 +193,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
             className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 space-y-3 flex flex-col justify-between shadow-[var(--elevation-2xs)]"
           >
             <div className="space-y-3">
-              <h3 className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-bold text-ui-content-primary">
+              <h3 className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary">
                 {language === 'bn' ? 'জেলা অনুযায়ী প্রতিবেদন' : 'Reports by district'}
               </h3>
 
@@ -220,15 +220,15 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                     >
                       <div className="flex items-baseline justify-between text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)]">
                         <div className="flex items-baseline gap-1.5 min-w-0 pr-2">
-                          <span className="font-semibold text-ui-content-primary truncate">
+                          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary truncate">
                             {displayDistrictName}
                           </span>
                           <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] text-ui-content-secondary truncate">
                             ({displayDivisionName})
                           </span>
                         </div>
-                        <div className="shrink-0 text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] font-medium text-ui-content-secondary">
-                          <span className="font-semibold text-ui-content-primary">
+                        <div className="shrink-0 text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] font-[var(--font-weight-medium)] text-ui-content-secondary">
+                          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
                             {displayCount}
                           </span>
                           <span className="text-ui-content-secondary ml-1">
@@ -263,7 +263,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                   type="button"
                   aria-expanded={isExpanded}
                   onClick={() => setIsExpanded((prev) => !prev)}
-                  className="w-full text-center text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)] font-semibold text-ui-content-secondary hover:text-ui-content-primary transition-colors py-2 min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
+                  className="w-full text-center text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary transition-colors py-2 min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
                 >
                   {isExpanded
                     ? language === 'bn'
@@ -282,7 +282,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
             id="geographic-breakdown-divisions"
             className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 space-y-3 shadow-[var(--elevation-2xs)]"
           >
-            <h3 className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-bold text-ui-content-primary">
+            <h3 className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary">
               {language === 'bn' ? 'বিভাগ অনুযায়ী প্রতিবেদন' : 'Reports by division'}
             </h3>
 
@@ -306,11 +306,11 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                     className="space-y-1"
                   >
                     <div className="flex items-baseline justify-between text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)]">
-                      <div className="font-semibold text-ui-content-primary min-w-0 pr-2 truncate">
+                      <div className="font-[var(--font-weight-semibold)] text-ui-content-primary min-w-0 pr-2 truncate">
                         {displayDivisionName}
                       </div>
-                      <div className="shrink-0 text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] font-medium text-ui-content-secondary">
-                        <span className="font-semibold text-ui-content-primary">
+                      <div className="shrink-0 text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] font-[var(--font-weight-medium)] text-ui-content-secondary">
+                        <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
                           {displayCount}
                         </span>
                         <span className="text-ui-content-secondary ml-1">

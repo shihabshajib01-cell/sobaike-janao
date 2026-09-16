@@ -167,7 +167,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
     <div ref={containerRef} className="relative w-full text-left space-y-1">
       <label
         htmlFor="address-search-input"
-        className="block text-[var(--type-fixed-13)] font-bold text-primary"
+        className="block text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] text-primary"
       >
         {language === 'bn' ? 'ঠিকানা বা এলাকা' : 'Address or area'}
       </label>
@@ -249,7 +249,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
                 >
                   <MapPin className="w-4 h-4 mt-0.5 text-ui-accent shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[var(--type-fixed-135)] font-semibold text-ui-content-primary truncate">
+                    <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-semibold)] text-ui-content-primary truncate">
                       {suggestion.mainText}
                     </p>
                     {suggestion.secondaryText && (

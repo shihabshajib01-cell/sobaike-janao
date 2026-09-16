@@ -247,7 +247,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
       {/* Clean Step Header without redundant explanations */}
       <div className="text-left">
-        <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-bold text-ui-content-primary">
+        <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'প্রতিবেদন যাচাই' : 'Review report'}
         </h3>
       </div>
@@ -270,7 +270,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">
                 {language === 'bn' ? 'বিভাগ / সেবা' : 'Service Domain'}
               </span>
-              <p className="text-[var(--type-fixed-145)] font-bold text-ui-content-primary">
+              <p className="text-[var(--type-fixed-145)] font-[var(--font-weight-bold)] text-ui-content-primary">
                 {language === 'bn' ? SECTIONS[segment].nameBn : SECTIONS[segment].nameEn}
               </p>
             </div>
@@ -279,7 +279,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">
                 {language === 'bn' ? 'অভিযোগের ধরন' : 'Complaint Type'}
               </span>
-              <p className="text-[var(--type-fixed-145)] font-bold text-ui-content-primary">
+              <p className="text-[var(--type-fixed-145)] font-[var(--font-weight-bold)] text-ui-content-primary">
                 {language === 'bn'
                   ? currentSubcategoryOption?.nameBn || formData.subcategoryId
                   : currentSubcategoryOption?.nameEn || formData.subcategoryId}
@@ -322,7 +322,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           <div className="space-y-2.5 text-[var(--type-fixed-13)] pt-0.5">
             <div>
               <span className="text-ui-content-muted block text-[var(--type-fixed-12)]">{language === 'bn' ? 'শিরোনাম:' : 'Headline:'}</span>
-              <p className="font-bold text-ui-content-primary text-[var(--type-fixed-15)]">{formData.title || '-'}</p>
+              <p className="font-[var(--font-weight-bold)] text-ui-content-primary text-[var(--type-fixed-15)]">{formData.title || '-'}</p>
             </div>
 
             <div className="p-3 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
@@ -337,19 +337,19 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {formData.briberyDepartment && (
                   <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle">
                     <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">{language === 'bn' ? 'দপ্তর' : 'Department'}</span>
-                    <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">{getBriberyDepartmentLabel(formData.briberyDepartment, language)}</p>
+                    <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">{getBriberyDepartmentLabel(formData.briberyDepartment, language)}</p>
                   </div>
                 )}
                 {formData.briberyService && (
                   <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle">
                     <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">{language === 'bn' ? 'সেবা বা প্রক্রিয়া' : 'Service or process'}</span>
-                    <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">{formData.briberyService}</p>
+                    <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">{formData.briberyService}</p>
                   </div>
                 )}
                 {formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== '' && (
                   <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle">
                     <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">{language === 'bn' ? 'টাকার পরিমাণ' : 'Amount (BDT)'}</span>
-                    <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">৳{Number(formData.briberyAmount).toLocaleString()}</p>
+                    <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">৳{Number(formData.briberyAmount).toLocaleString()}</p>
                   </div>
                 )}
               </div>
@@ -362,7 +362,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {language === 'bn' ? 'সাম্প্রতিক বিলের তথ্য' : 'Recent Bill Info'}
                   </span>
                   <div className="space-y-0.5">
-                    <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">
+                    <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">
                       {formData.recentBillMonth ? formatBillingMonth(formData.recentBillMonth, language) : '-'}
                     </p>
                     <p className="text-[var(--type-fixed-13)] text-ui-content-secondary">
@@ -376,7 +376,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {language === 'bn' ? 'আগের বিলের তথ্য' : 'Previous Bill Info'}
                   </span>
                   <div className="space-y-0.5">
-                    <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">
+                    <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">
                       {formData.previousBillMonth ? formatBillingMonth(formData.previousBillMonth, language) : '-'}
                     </p>
                     <p className="text-[var(--type-fixed-13)] text-ui-content-secondary">
@@ -444,7 +444,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">
                     {language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়স' : "Affected person's age group"}
                   </span>
-                  <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">
+                  <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {getBilingualOptionLabel(HARASSMENT_AGE_GROUP_OPTIONS, formData.affectedPersonAgeGroup, language) || '-'}
                   </p>
                 </div>
@@ -452,7 +452,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">
                     {language === 'bn' ? 'অভিযুক্ত ব্যক্তির সঙ্গে সম্পর্ক' : 'Relationship with alleged abuser'}
                   </span>
-                  <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">
+                  <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {getBilingualOptionLabel(HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS, formData.allegedAbuserRelationship, language) || '-'}
                   </p>
                 </div>
@@ -460,7 +460,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   <span className="text-[var(--type-fixed-12)] text-ui-content-muted block mb-0.5">
                     {language === 'bn' ? 'কার জন্য প্রতিবেদন' : 'Reporting for'}
                   </span>
-                  <p className="text-[var(--type-fixed-135)] font-bold text-ui-content-primary">
+                  <p className="text-[var(--type-fixed-135)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {getBilingualOptionLabel(HARASSMENT_REPORTING_FOR_OPTIONS, formData.reportingFor, language) || '-'}
                   </p>
                 </div>
@@ -481,7 +481,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           editLabel={editLabel}
         >
           <div className="p-3 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-14)] pt-1 space-y-1.5">
-            <p className="font-semibold text-ui-content-primary">
+            <p className="font-[var(--font-weight-semibold)] text-ui-content-primary">
               {[
                 !isUtilityReport ? formData.location?.area : undefined,
                 formData.location?.upazilaOrThana,
@@ -494,13 +494,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
             {!isUtilityReport && formData.location?.formattedAddress?.trim() && (
               <p className="text-ui-content-secondary text-[var(--type-fixed-13)]">
                 {language === 'bn' ? 'ঠিকানা: ' : 'Address: '}
-                <span className="text-ui-content-primary font-medium">{formData.location.formattedAddress.trim()}</span>
+                <span className="text-ui-content-primary font-[var(--font-weight-medium)]">{formData.location.formattedAddress.trim()}</span>
               </p>
             )}
             {!isUtilityReport && formData.location?.road && (
               <p className="text-ui-content-secondary text-[var(--type-fixed-13)]">
                 {language === 'bn' ? 'রাস্তা / লেন: ' : 'Road / Lane: '}
-                <span className="text-ui-content-primary font-medium">{formData.location.road}</span>
+                <span className="text-ui-content-primary font-[var(--font-weight-medium)]">{formData.location.road}</span>
                 {formData.location.landmark ? ` (${formData.location.landmark})` : ''}
               </p>
             )}
@@ -520,7 +520,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
             editLabel={editLabel}
           >
             <div className="p-3 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] space-y-1 pt-1">
-              <div className="flex items-center gap-2 font-bold text-ui-content-primary">
+              <div className="flex items-center gap-2 font-[var(--font-weight-bold)] text-ui-content-primary">
                 <Lock className="w-3.5 h-3.5" />
                 <span>
                   {formData.privacyChoice === 'anonymous'
@@ -577,10 +577,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {/* Name / Known Identity (ONLY when value exists) */}
                 {(formData.reportedSubject?.trim() || formData.organization?.trim()) && (
                   <div>
-                    <span className="text-ui-content-secondary font-medium">
+                    <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                       {language === 'bn' ? 'নাম / পরিচিতি: ' : 'Name / Known Identity: '}
                     </span>
-                    <span className="text-ui-content-primary font-bold">
+                    <span className="text-ui-content-primary font-[var(--font-weight-bold)]">
                       {formData.reportedSubject?.trim() || formData.organization?.trim()}
                     </span>
                   </div>
@@ -589,10 +589,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {/* Role / Responsibility (ONLY when value exists) */}
                 {formData.roleOrDesignation?.trim() && (
                   <div className="pt-0.5">
-                    <span className="text-ui-content-secondary font-medium">
+                    <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                       {language === 'bn' ? 'ভূমিকা / দায়িত্ব: ' : 'Role / Responsibility: '}
                     </span>
-                    <span className="text-ui-content-primary font-medium">
+                    <span className="text-ui-content-primary font-[var(--font-weight-medium)]">
                       {formData.roleOrDesignation.trim()}
                     </span>
                   </div>
@@ -601,10 +601,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {/* Phone / Contact (ONLY when value exists) */}
                 {formData.publicProfileHandle?.trim() && (
                   <div className="pt-0.5">
-                    <span className="text-ui-content-secondary font-medium">
+                    <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                       {language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Phone / Contact: '}
                     </span>
-                    <span className="text-ui-content-primary tabular-nums font-medium">
+                    <span className="text-ui-content-primary tabular-nums font-[var(--font-weight-medium)]">
                       {formData.publicProfileHandle.trim()}
                     </span>
                   </div>
@@ -613,7 +613,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {/* Other Identifying Details (ONLY when value exists) */}
                 {formData.identifyingDescription?.trim() && (
                   <div className="pt-1 border-t border-ui-stroke-subtle/50">
-                    <span className="text-ui-content-secondary font-medium block mb-0.5">
+                    <span className="text-ui-content-secondary font-[var(--font-weight-medium)] block mb-0.5">
                       {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য: ' : 'Other Identifying Details: '}
                     </span>
                     <p className="text-ui-content-primary italic whitespace-pre-wrap">
@@ -630,12 +630,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {/* Name / Known Identity */}
                     {formData.reportedSubject?.trim() && (
                       <div>
-                        <span className="text-ui-content-secondary font-medium">
+                        <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                           {language === 'bn'
                             ? `${subjectConfig?.nameLabelBn || 'নাম / পরিচিতি'}: `
                             : `${subjectConfig?.nameLabelEn || 'Name / known identity'}: `}
                         </span>
-                        <span className="text-ui-content-primary font-bold">
+                        <span className="text-ui-content-primary font-[var(--font-weight-bold)]">
                           {formData.reportedSubject.trim()}
                         </span>
                       </div>
@@ -644,12 +644,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {/* Role / Designation */}
                     {formData.roleOrDesignation?.trim() && (
                       <div className="pt-0.5">
-                        <span className="text-ui-content-secondary font-medium">
+                        <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                           {language === 'bn'
                             ? `${subjectConfig?.roleLabelBn || 'ভূমিকা / পদবি'}: `
                             : `${subjectConfig?.roleLabelEn || 'Role / designation'}: `}
                         </span>
-                        <span className="text-ui-content-primary font-medium">
+                        <span className="text-ui-content-primary font-[var(--font-weight-medium)]">
                           {formData.roleOrDesignation.trim()}
                         </span>
                       </div>
@@ -658,12 +658,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {/* Group / Organization / Association */}
                     {formData.organization?.trim() && (
                       <div className="pt-0.5">
-                        <span className="text-ui-content-secondary font-medium">
+                        <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                           {language === 'bn'
                             ? `${subjectConfig?.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'}: `
                             : `${subjectConfig?.organizationLabelEn || 'Group / organization'}: `}
                         </span>
-                        <span className="text-ui-content-primary font-medium">
+                        <span className="text-ui-content-primary font-[var(--font-weight-medium)]">
                           {formData.organization.trim()}
                         </span>
                       </div>
@@ -672,10 +672,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {/* Phone / Contact */}
                     {formData.publicProfileHandle?.trim() && (
                       <div className="pt-0.5">
-                        <span className="text-ui-content-secondary font-medium">
+                        <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                           {language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Phone / Contact: '}
                         </span>
-                        <span className="text-ui-content-primary tabular-nums font-medium">
+                        <span className="text-ui-content-primary tabular-nums font-[var(--font-weight-medium)]">
                           {formData.publicProfileHandle.trim()}
                         </span>
                       </div>
@@ -684,7 +684,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {/* Other Identifying Details */}
                     {formData.identifyingDescription?.trim() && (
                       <div className="pt-1 border-t border-ui-stroke-subtle/50">
-                        <span className="text-ui-content-secondary font-medium block mb-0.5">
+                        <span className="text-ui-content-secondary font-[var(--font-weight-medium)] block mb-0.5">
                           {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য: ' : 'Other Identifying Details: '}
                         </span>
                         <p className="text-ui-content-primary italic whitespace-pre-wrap">
@@ -698,7 +698,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {/* Additional Mentioned Parties */}
                 {meaningfulMentionedParties.length > 0 && (
                   <div className={`space-y-2 text-[var(--type-fixed-13)] ${hasExtortionPrimaryPartyData ? 'pt-2 border-t border-ui-stroke-subtle/50' : ''}`}>
-                    <span className="font-bold text-ui-content-primary block">
+                    <span className="font-[var(--font-weight-bold)] text-ui-content-primary block">
                       {language === 'bn'
                         ? `অতিরিক্ত পক্ষ (${meaningfulMentionedParties.length}টি):`
                         : `Additional Parties (${meaningfulMentionedParties.length}):`}
@@ -710,39 +710,39 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                           className="p-2.5 rounded-[var(--radius-badge-md)] bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary space-y-1"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-ui-content-primary">
+                            <span className="font-[var(--font-weight-bold)] text-ui-content-primary">
                               {p.name?.trim() || (language === 'bn' ? `পক্ষ #${idx + 2}` : `Party #${idx + 2}`)}
                             </span>
                           </div>
                           {p.roleOrDesignation?.trim() && (
                             <p>
-                              <span className="font-medium text-ui-content-secondary">
+                              <span className="font-[var(--font-weight-medium)] text-ui-content-secondary">
                                 {language === 'bn'
                                   ? `${subjectConfig?.roleLabelBn || 'ভূমিকা / পদবি'}: `
                                   : `${subjectConfig?.roleLabelEn || 'Role'}: `}
                               </span>
-                              <span className="text-ui-content-primary font-medium">{p.roleOrDesignation.trim()}</span>
+                              <span className="text-ui-content-primary font-[var(--font-weight-medium)]">{p.roleOrDesignation.trim()}</span>
                             </p>
                           )}
                           {p.organization?.trim() && (
                             <p>
-                              <span className="font-medium text-ui-content-secondary">
+                              <span className="font-[var(--font-weight-medium)] text-ui-content-secondary">
                                 {language === 'bn'
                                   ? `${subjectConfig?.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'}: `
                                   : `${subjectConfig?.organizationLabelEn || 'Group / organization'}: `}
                               </span>
-                              <span className="text-ui-content-primary font-medium">{p.organization.trim()}</span>
+                              <span className="text-ui-content-primary font-[var(--font-weight-medium)]">{p.organization.trim()}</span>
                             </p>
                           )}
                           {(p.phoneOrContact?.trim() || p.publicProfileHandle?.trim()) && (
                             <p>
-                              <span className="font-medium text-ui-content-secondary">{language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Contact: '}</span>
-                              <span className="text-ui-content-primary tabular-nums font-medium">{(p.phoneOrContact || p.publicProfileHandle || '').trim()}</span>
+                              <span className="font-[var(--font-weight-medium)] text-ui-content-secondary">{language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Contact: '}</span>
+                              <span className="text-ui-content-primary tabular-nums font-[var(--font-weight-medium)]">{(p.phoneOrContact || p.publicProfileHandle || '').trim()}</span>
                             </p>
                           )}
                           {p.identifyingDescription?.trim() && (
                             <div className="pt-0.5">
-                              <span className="font-medium text-ui-content-secondary block mb-0.5">{language === 'bn' ? 'অন্যান্য বিবরণ: ' : 'Other Details: '}</span>
+                              <span className="font-[var(--font-weight-medium)] text-ui-content-secondary block mb-0.5">{language === 'bn' ? 'অন্যান্য বিবরণ: ' : 'Other Details: '}</span>
                               <p className="text-ui-content-primary italic whitespace-pre-wrap">{p.identifyingDescription.trim()}</p>
                             </div>
                           )}
@@ -759,7 +759,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     <span className="text-ui-content-muted block text-[var(--type-fixed-12)]">
                       {language === 'bn' ? 'ধরন ও নাম:' : 'Type & Name:'}
                     </span>
-                    <p className="font-bold text-ui-content-primary text-[var(--type-fixed-145)]">
+                    <p className="font-[var(--font-weight-bold)] text-ui-content-primary text-[var(--type-fixed-145)]">
                       {formData.reportedSubject ||
                         formData.organization ||
                         (formData.subjectType === 'unknown'
@@ -771,7 +771,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                           : 'Unspecified name')}
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-[var(--radius-badge-md)] bg-ui-surface border border-ui-stroke-subtle text-[var(--type-fixed-12)] font-semibold text-ui-content-secondary">
+                  <span className="px-2.5 py-1 rounded-[var(--radius-badge-md)] bg-ui-surface border border-ui-stroke-subtle text-[var(--type-fixed-12)] font-[var(--font-weight-semibold)] text-ui-content-secondary">
                     {getSubjectOptionLabel(segment, formData.subcategoryId, formData.subjectType, language)}
                   </span>
                 </div>
@@ -809,7 +809,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
                 {formData.mentionedParties && formData.mentionedParties.length > 0 && (
                   <div className="pt-2 border-t border-ui-stroke-subtle/50 text-[var(--type-fixed-13)]">
-                    <span className="font-bold text-ui-content-primary block mb-1">
+                    <span className="font-[var(--font-weight-bold)] text-ui-content-primary block mb-1">
                       {language === 'bn'
                         ? `অতিরিক্ত পক্ষ (${formData.mentionedParties.length} জন):`
                         : `Additional Parties (${formData.mentionedParties.length}):`}
@@ -859,7 +859,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   <div className="flex items-start gap-2.5">
                     <Info className="w-4 h-4 text-ui-warning-text shrink-0 mt-0.5" />
                     <div className="space-y-1">
-                      <p className="font-semibold">
+                      <p className="font-[var(--font-weight-semibold)]">
                         {language === 'bn'
                           ? 'পূর্বে সংযুক্ত ছবিগুলো পুনরায় যুক্ত করা প্রয়োজন'
                           : 'Previously attached images must be reattached'}
@@ -875,7 +875,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     <button
                       type="button"
                       onClick={() => onEditStep(3, 'attachments')}
-                      className="text-[var(--type-fixed-125)] font-bold text-ui-warning-text hover:underline cursor-pointer"
+                      className="text-[var(--type-fixed-125)] font-[var(--font-weight-bold)] text-ui-warning-text hover:underline cursor-pointer"
                     >
                       {language === 'bn'
                         ? '৩ নং ধাপে সংযুক্তি যোগ করুন →'
@@ -885,7 +885,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 </div>
               ) : pendingImages.length > 0 ? (
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="font-bold text-ui-content-primary">
+                  <span className="font-[var(--font-weight-bold)] text-ui-content-primary">
                     {pendingImages.length} {language === 'bn' ? 'টি ছবি সংযুক্ত' : 'images attached'}
                   </span>
                   <div className="flex gap-1.5">
@@ -919,7 +919,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                             ? `আরও ${pendingImages.length - 4}টি ছবি বড় করে দেখুন`
                             : `Expand ${pendingImages.length - 4} more images`
                         }
-                        className="w-9 h-9 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center font-bold text-ui-content-primary text-[var(--type-fixed-13)] hover:border-ui-accent hover:opacity-90 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
+                        className="w-9 h-9 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center font-[var(--font-weight-bold)] text-ui-content-primary text-[var(--type-fixed-13)] hover:border-ui-accent hover:opacity-90 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-focus)]"
                       >
                         +{pendingImages.length - 4}
                       </button>

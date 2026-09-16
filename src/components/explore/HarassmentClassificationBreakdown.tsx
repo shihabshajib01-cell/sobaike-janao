@@ -34,13 +34,13 @@ const BreakdownColumn: React.FC<BreakdownColumnProps> = ({ title, options, value
 
   return (
     <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface p-4 space-y-3">
-      <h3 className="text-[var(--type-fixed-14)] font-bold text-ui-content-primary">{title}</h3>
+      <h3 className="text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary">{title}</h3>
       {rows.length > 0 ? (
         <ul className="space-y-2">
           {rows.map((row) => (
             <li key={row.value} className="flex items-center justify-between gap-3 text-[var(--type-fixed-13)]">
               <span className="text-ui-content-secondary min-w-0">{row.label}</span>
-              <span className="font-bold text-ui-content-primary shrink-0">
+              <span className="font-[var(--font-weight-bold)] text-ui-content-primary shrink-0">
                 {language === 'bn' ? toBanglaDigits(row.count) : row.count}
               </span>
             </li>
@@ -66,7 +66,7 @@ export const HarassmentClassificationBreakdown: React.FC<HarassmentClassificatio
   return (
     <section aria-labelledby="harassment-breakdown-heading" className="space-y-3">
       <div className="space-y-0.5">
-        <h2 id="harassment-breakdown-heading" className="text-[var(--type-fixed-17)] font-bold text-ui-content-primary">
+        <h2 id="harassment-breakdown-heading" className="text-[var(--type-fixed-17)] font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'হয়রানি ও নির্যাতন: প্রেক্ষাপট বিশ্লেষণ' : 'Harassment & abuse context'}
         </h2>
         <p className="text-[var(--type-fixed-13)] text-ui-content-muted">

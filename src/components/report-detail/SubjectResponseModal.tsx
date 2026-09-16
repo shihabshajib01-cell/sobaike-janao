@@ -150,7 +150,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
           <div className="space-y-1">
             {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
               <div
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-badge-md)] text-[var(--type-fixed-14)] font-semibold border"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-badge-md)] text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] border"
                 style={{
                   backgroundColor: 'var(--ui-info-bg)',
                   borderColor: 'var(--ui-info-border)',
@@ -161,7 +161,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার (Right of Response)' : 'Formal Right of Response'}</span>
               </div>
             )}
-            <h3 id="subject-modal-title" className="text-[var(--type-fixed-20)] leading-[var(--type-line-28)] font-bold text-ui-content-primary">
+            <h3 id="subject-modal-title" className="text-[var(--type-fixed-20)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary">
               {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                 ? (language === 'bn' ? 'এই প্রতিবেদনের জবাব দিন' : 'Respond to this report')
                 : (language === 'bn'
@@ -170,7 +170,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             </h3>
             <p className="text-[var(--type-fixed-14)] text-ui-content-secondary">
               {language === 'bn' ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠান:' : 'Mentioned person or organization:'}{' '}
-              <span className="font-semibold text-ui-content-primary">{subjectName}</span>
+              <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subjectName}</span>
             </p>
           </div>
 
@@ -191,7 +191,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div className="space-y-1.5">
-                <h4 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary">
+                <h4 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'জবাব জমা হয়েছে' : 'Response submitted')
                     : (language === 'bn' ? 'প্রতিউত্তর জমা সম্পন্ন হয়েছে' : 'Response Received')}
@@ -211,7 +211,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   <span className="text-[var(--type-fixed-13)] text-ui-content-muted block">
                     {language === 'bn' ? 'রেসপন্স আইডি' : 'Response ID'}
                   </span>
-                  <span className="tabular-nums text-[var(--type-fixed-15)] font-bold text-ui-content-primary">
+                  <span className="tabular-nums text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {responseId}
                   </span>
                 </div>
@@ -221,7 +221,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
               </button>
@@ -231,7 +231,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible space-y-4">
             {error && (
-              <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-medium">
+              <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-[var(--font-weight-medium)]">
                 {error}
               </div>
             )}
@@ -239,16 +239,16 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             {/* Responder Identity Category - only rendered in legacy form */}
             {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
               <div className="space-y-1.5">
-                <label className="block text-[var(--type-fixed-16)] font-medium text-ui-content-primary">
+                <label className="block text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-primary">
                   {language === 'bn' ? 'আপনার পরিচয় বা ভূমিকা *' : 'Your Relationship to This Report *'}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setResponderType('mentioned_person')}
-                    className={`px-3 py-2.5 text-[var(--type-fixed-14)] font-medium rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                    className={`px-3 py-2.5 text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                       responderType === 'mentioned_person'
-                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
+                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-[var(--font-weight-bold)]'
                         : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
                     }`}
                   >
@@ -257,9 +257,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setResponderType('organization_rep')}
-                    className={`px-3 py-2.5 text-[var(--type-fixed-14)] font-medium rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                    className={`px-3 py-2.5 text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                       responderType === 'organization_rep'
-                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
+                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-[var(--font-weight-bold)]'
                         : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
                     }`}
                   >
@@ -268,9 +268,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setResponderType('legal_rep')}
-                    className={`px-3 py-2.5 text-[var(--type-fixed-14)] font-medium rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                    className={`px-3 py-2.5 text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                       responderType === 'legal_rep'
-                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-bold'
+                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-[var(--font-weight-bold)]'
                         : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
                     }`}
                   >
@@ -283,7 +283,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             {/* Name and Contact */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label htmlFor="subject-responder-name-input" className="block text-[var(--type-fixed-16)] font-medium text-ui-content-secondary">
+                <label htmlFor="subject-responder-name-input" className="block text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'পূর্ণ নাম *' : 'Full name *')
                     : (language === 'bn' ? 'আপনার পূর্ণ নাম *' : 'Full Legal Name *')}
@@ -302,7 +302,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="subject-contact-email-phone-input" className="block text-[var(--type-fixed-16)] font-medium text-ui-content-secondary">
+                <label htmlFor="subject-contact-email-phone-input" className="block text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'ইমেইল বা ফোন *' : 'Email or phone *')
                     : (language === 'bn' ? 'যাচাইযোগ্য ইমেইল বা ফোন *' : 'Contact Email or Phone *')}
@@ -324,7 +324,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             {/* Role & Org */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label htmlFor="subject-designation-input" className="block text-[var(--type-fixed-16)] font-medium text-ui-content-secondary">
+                <label htmlFor="subject-designation-input" className="block text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'পদবী / ভূমিকা' : 'Role / designation')
                     : (language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)')}
@@ -341,7 +341,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="subject-org-name-input" className="block text-[var(--type-fixed-16)] font-medium text-ui-content-secondary">
+                <label htmlFor="subject-org-name-input" className="block text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization')
                     : (language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)')}
@@ -360,7 +360,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
             {/* Statement / Clarification */}
             <div className="space-y-1">
-              <label htmlFor="subject-official-statement-input" className="block text-[var(--type-fixed-16)] font-medium text-ui-content-primary">
+              <label htmlFor="subject-official-statement-input" className="block text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-primary">
                 {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                   ? (language === 'bn' ? 'আপনার জবাব বা ব্যাখ্যা *' : 'Your response or clarification *')
                   : (language === 'bn' ? 'আপনার বক্তব্য বা স্পষ্টীকরণ *' : 'Statement or Clarification *')}
@@ -393,7 +393,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                     onChange={(e) => setRequestCorrectionOrRemoval(e.target.checked)}
                     className="mt-1 rounded border-ui-stroke-subtle text-[var(--ui-accent)] focus:ring-ui-focus accent-[var(--ui-accent)] min-h-[16px] min-w-[16px]"
                   />
-                  <span className="font-semibold">
+                  <span className="font-[var(--font-weight-semibold)]">
                     {language === 'bn'
                       ? 'আমি প্রতিবেদনে অনিচ্ছাকৃত ভুল তথ্যের সংশোধন বা পুনঃনিরীক্ষণের আবেদন করছি'
                       : 'I request formal factual correction or editorial review of this report.'}
@@ -443,7 +443,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 type="button"
                 onClick={handleResetAndClose}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] cursor-pointer min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
               </button>
@@ -451,7 +451,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover disabled:opacity-50 disabled:cursor-not-allowed text-ui-action-text text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover disabled:opacity-50 disabled:cursor-not-allowed text-ui-action-text text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {isSubmitting ? (
                   <>

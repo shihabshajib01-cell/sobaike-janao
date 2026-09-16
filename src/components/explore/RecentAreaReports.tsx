@@ -28,7 +28,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ui-stroke-subtle pb-2.5">
         <div className="flex items-center gap-2">
-          <h3 className="text-[var(--type-fixed-17)] md:text-[var(--type-fixed-18)] font-bold text-ui-content-primary tracking-tight">
+          <h3 className="text-[var(--type-fixed-17)] md:text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
             {language === 'bn' ? 'সাম্প্রতিক প্রতিবেদন' : 'Recent reports'}
           </h3>
         </div>
@@ -37,7 +37,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
           <button
             type="button"
             onClick={onViewAllReports}
-            className="text-[var(--type-fixed-13)] font-bold text-ui-action-bg hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto min-h-[44px] sm:min-h-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
+            className="text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] text-ui-action-bg hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto min-h-[44px] sm:min-h-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
           >
             <span>
               {language === 'bn'
@@ -72,7 +72,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                     />
                   </div>
 
-                  <h4 className="text-[var(--type-fixed-14)] sm:text-[var(--type-fixed-145)] font-bold text-ui-content-primary line-clamp-2 leading-snug">
+                  <h4 className="text-[var(--type-fixed-14)] sm:text-[var(--type-fixed-145)] font-[var(--font-weight-bold)] text-ui-content-primary line-clamp-2 leading-snug">
                     {title}
                   </h4>
 
@@ -96,7 +96,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                   <button
                     type="button"
                     onClick={() => navigateTo(`/report-detail/${report.id}`)}
-                    className="group/btn shrink-0 ml-auto sm:ml-0 text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] font-semibold text-ui-action-bg hover:underline flex items-center gap-0.5 min-h-[44px] cursor-pointer px-1 py-1 rounded-[var(--radius-badge-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                    className="group/btn shrink-0 ml-auto sm:ml-0 text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] font-[var(--font-weight-semibold)] text-ui-action-bg hover:underline flex items-center gap-0.5 min-h-[44px] cursor-pointer px-1 py-1 rounded-[var(--radius-badge-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                   >
                     <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
                     <MapIcon name="arrow-right" size="sm" className="text-ui-action-bg transition-transform group-hover/btn:translate-x-0.5" />
@@ -109,7 +109,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
       ) : (
         <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-6 text-center space-y-2 shadow-[var(--elevation-2xs)]">
           <MapIcon name="alert-circle" size="xl" className="text-ui-content-secondary mx-auto" />
-          <h4 className="text-[var(--type-fixed-15)] font-bold text-ui-content-primary">
+          <h4 className="text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] text-ui-content-primary">
             {language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই' : 'No reports in this area'}
           </h4>
           <p className="text-[var(--type-fixed-13)] text-ui-content-secondary max-w-sm mx-auto">

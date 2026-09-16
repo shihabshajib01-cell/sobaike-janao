@@ -1226,7 +1226,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-bold text-ui-content-primary">
+                  <h2 className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? 'সংরক্ষিত খসড়া' : 'Saved draft'}
                   </h2>
                   <p className="text-[var(--type-fixed-14)] text-ui-content-muted">
@@ -1253,7 +1253,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   {savedDraftAvailable.segment && (
                     <CategoryBadge section={savedDraftAvailable.segment} language={language} size="sm" />
                   )}
-                  <span className="text-[var(--type-fixed-14)] font-semibold text-ui-content-primary">
+                  <span className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-primary">
                     {language === 'bn'
                       ? `ধাপ ${savedDraftAvailable.currentStep} পর্যন্ত পূরণকৃত`
                       : `Filled up to Step ${savedDraftAvailable.currentStep}`}
@@ -1273,7 +1273,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
               <div className="space-y-1.5">
                 {savedDraftAvailable.title && (
-                  <div className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                  <div className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {savedDraftAvailable.title}
                   </div>
                 )}
@@ -1282,7 +1282,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     <span className="text-ui-content-muted">
                       {language === 'bn' ? 'অভিযুক্ত পক্ষ: ' : 'Subject: '}
                     </span>
-                    <span className="font-semibold">{savedDraftAvailable.reportedSubject}</span>
+                    <span className="font-[var(--font-weight-semibold)]">{savedDraftAvailable.reportedSubject}</span>
                   </div>
                 )}
                 {savedDraftAvailable.location?.district && (
@@ -1319,7 +1319,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 id="draft-recovery-delete-btn"
                 type="button"
                 onClick={handleDeleteSavedDraft}
-                className="px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-error-border bg-ui-surface text-ui-error-text font-semibold text-[var(--type-fixed-15)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 hover:bg-ui-error-bg"
+                className="px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-error-border bg-ui-surface text-ui-error-text font-[var(--font-weight-semibold)] text-[var(--type-fixed-15)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 hover:bg-ui-error-bg"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>{language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}</span>
@@ -1331,7 +1331,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   id="draft-recovery-new-btn"
                   type="button"
                   onClick={handleStartNewComplaint}
-                  className="px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary font-semibold text-[var(--type-fixed-15)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
+                  className="px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary font-[var(--font-weight-semibold)] text-[var(--type-fixed-15)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   <span>{language === 'bn' ? 'নতুন প্রতিবেদন শুরু করুন' : 'Start new report'}</span>
@@ -1343,7 +1343,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   type="button"
                   onClick={handleContinueSavedDraft}
                   disabled={isRestoringEvidence}
-                  className={`bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover px-5 py-2.5 rounded-[var(--radius-control)] font-bold text-[var(--type-fixed-16)] min-h-[44px] cursor-pointer shadow-[var(--elevation-xs)] flex items-center justify-center gap-2 ${
+                  className={`bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover px-5 py-2.5 rounded-[var(--radius-control)] font-[var(--font-weight-bold)] text-[var(--type-fixed-16)] min-h-[44px] cursor-pointer shadow-[var(--elevation-xs)] flex items-center justify-center gap-2 ${
                     isRestoringEvidence ? 'opacity-70 cursor-not-allowed' : ''
                   }`}
                 >
@@ -1400,7 +1400,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
                     )}
                     <div>
-                      <p className="font-bold">
+                      <p className="font-[var(--font-weight-bold)]">
                         {isLocationError
                           ? language === 'bn'
                             ? 'ডিভাইসের অবস্থান আবশ্যক'
@@ -1570,7 +1570,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               <Shield className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] font-bold text-ui-content-primary leading-tight">
+              <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'প্রতিবেদন শুরুর আগে' : 'Before you begin'}
               </h3>
             </div>
@@ -1601,7 +1601,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 onChange={(e) => setRapeConsentCheckbox(e.target.checked)}
                 className="mt-1 w-4 h-4 rounded border-ui-stroke-subtle text-ui-accent focus:ring-2 focus:ring-ui-focus shrink-0 cursor-pointer"
               />
-              <span className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-semibold text-ui-content-primary leading-snug">
+              <span className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
                 {language === 'bn'
                   ? 'আমি এই প্রকাশনা নীতি পড়েছি এবং সম্মত।'
                   : 'I have read and agree to this publishing policy.'}
@@ -1652,7 +1652,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               <Save className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-[var(--type-fixed-19)] sm:text-[var(--type-fixed-20)] font-bold text-ui-content-primary leading-tight">
+              <h3 className="text-[var(--type-fixed-19)] sm:text-[var(--type-fixed-20)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'খসড়া সংরক্ষণ করবেন?' : 'Save draft and exit?'}
               </h3>
               <p className="text-[var(--type-fixed-14)] sm:text-[var(--type-fixed-145)] leading-relaxed text-ui-content-secondary">

@@ -124,7 +124,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
         {/* Header */}
         <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-0 pb-3.5 sm:pb-4 md:pb-3.5 border-b border-ui-stroke-subtle">
           <div className="space-y-1">
-            <h3 id="citizen-modal-title" className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] leading-[var(--type-line-26)] sm:leading-[var(--type-line-28)] font-bold text-ui-content-primary">
+            <h3 id="citizen-modal-title" className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] leading-[var(--type-line-26)] sm:leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary">
               {language === 'bn'
                 ? 'তথ্য দিন'
                 : 'Share information'}
@@ -151,7 +151,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-bold text-ui-content-primary">
+                <h4 className="text-[var(--type-fixed-18)] leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary">
                   {language === 'bn' ? 'তথ্য জমা হয়েছে' : 'Information submitted'}
                 </h4>
                 <p className="text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] leading-[var(--type-line-22)] sm:leading-[var(--type-line-24)] text-ui-content-secondary max-w-sm mx-auto">
@@ -165,7 +165,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   <span className="text-[var(--type-fixed-13)] text-ui-content-muted block">
                     {language === 'bn' ? 'রেসপন্স আইডি' : 'Response ID'}
                   </span>
-                  <span className="tabular-nums text-[var(--type-fixed-15)] font-bold text-ui-content-primary">
+                  <span className="tabular-nums text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] text-ui-content-primary">
                     {responseId}
                   </span>
                 </div>
@@ -175,7 +175,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'সম্পন্ন করুন' : 'Done'}
               </button>
@@ -185,13 +185,13 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible space-y-4">
               {error && (
-                <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-medium">
+                <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-[var(--font-weight-medium)]">
                   {error}
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label htmlFor="citizen-description-input" className="block text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-medium text-ui-content-primary">
+                <label htmlFor="citizen-description-input" className="block text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-primary">
                   {language === 'bn'
                     ? 'আপনি কী তথ্য দিতে চান? *'
                     : 'What would you like to share? *'}
@@ -214,7 +214,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="citizen-witness-date-input" className="block text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-medium text-ui-content-secondary">
+                <label htmlFor="citizen-witness-date-input" className="block text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {language === 'bn' ? 'ঘটনার তারিখ (ঐচ্ছিক)' : 'Incident date (optional)'}
                 </label>
                 <input
@@ -268,7 +268,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                 type="button"
                 onClick={handleResetAndClose}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] cursor-pointer min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
               </button>
@@ -276,7 +276,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover disabled:opacity-50 disabled:cursor-not-allowed text-ui-action-text text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover disabled:opacity-50 disabled:cursor-not-allowed text-ui-action-text text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {isSubmitting ? (
                   <>

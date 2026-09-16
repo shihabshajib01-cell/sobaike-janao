@@ -108,7 +108,7 @@ export const ExtortionPage: React.FC = () => {
       <section id="extortion-filter-section" className="space-y-3">
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] font-bold leading-[var(--type-line-ratio-130)] text-ui-content-primary">
+            <h2 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] font-[var(--font-weight-bold)] leading-[var(--type-line-ratio-130)] text-ui-content-primary">
               {language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports'}
             </h2>
             <p className="text-[var(--type-fixed-14)] text-ui-content-muted mt-0.5">
@@ -162,13 +162,13 @@ export const ExtortionPage: React.FC = () => {
       {!isLoading && fetchError && (
         <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-card)] p-6 text-center space-y-3">
           <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
-          <p className="text-[var(--type-fixed-16)] font-semibold text-ui-error-text">
+          <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-ui-error-text">
             {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি।' : "Couldn't load reports."}
           </p>
           <button
             type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2 text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
+            className="btn-primary-action px-4 py-2 text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
           </button>

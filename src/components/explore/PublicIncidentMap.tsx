@@ -493,7 +493,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         {totalReportsCount === 0 && (
           <div className="absolute inset-0 z-[550] bg-ui-surface/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-3">
             <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
-            <h4 className="text-[var(--type-fixed-17)] font-bold text-ui-content-primary">
+            <h4 className="text-[var(--type-fixed-17)] font-[var(--font-weight-bold)] text-ui-content-primary">
               {language === 'bn' ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই' : 'No reports match these filters'}
             </h4>
             <p className="text-[var(--type-fixed-13)] text-ui-content-muted max-w-xs">
@@ -505,7 +505,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
               <button
                 type="button"
                 onClick={onResetFilters}
-                className="btn-primary-action px-4 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-semibold min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="btn-primary-action px-4 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               </button>

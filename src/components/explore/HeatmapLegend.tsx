@@ -18,7 +18,7 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
       className={`bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-[var(--radius-control)] p-2 sm:p-2.5 shadow-[var(--elevation-2xs)] flex flex-col gap-1 text-[var(--type-fixed-11)] max-w-[170px] sm:max-w-[190px] select-none ${className}`}
     >
       <div className="flex items-center justify-between">
-        <span className="font-bold text-ui-content-primary text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-11)] uppercase tracking-wider">
+        <span className="font-[var(--font-weight-bold)] text-ui-content-primary text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-11)] uppercase tracking-wider">
           {language === 'bn' ? 'প্রতিবেদনের ঘনত্ব' : 'Report density'}
         </span>
       </div>
@@ -34,7 +34,7 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
       />
 
       {/* Range Labels */}
-      <div className="flex items-center justify-between text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-11)] font-semibold text-ui-content-secondary px-0.5">
+      <div className="flex items-center justify-between text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-11)] font-[var(--font-weight-semibold)] text-ui-content-secondary px-0.5">
         <span>{language === 'bn' ? 'কম' : 'Low'}</span>
         <span>{language === 'bn' ? 'মাঝারি' : 'Medium'}</span>
         <span>{language === 'bn' ? 'বেশি' : 'High'}</span>

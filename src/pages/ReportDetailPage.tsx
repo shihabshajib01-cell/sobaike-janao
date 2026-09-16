@@ -145,7 +145,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-bold text-ui-content-primary">
+            <h1 className="text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-[var(--font-weight-bold)] text-ui-content-primary">
               {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি' : "Couldn't load report"}
             </h1>
           </div>
@@ -154,7 +154,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <button
               type="button"
               onClick={fetchReport}
-              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}</span>
             </button>
@@ -167,7 +167,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   navigateTo('/');
                 }
               }}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
@@ -188,7 +188,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-bold text-ui-content-primary">
+            <h1 className="text-[var(--type-fixed-24)] leading-[var(--type-line-32)] font-[var(--font-weight-bold)] text-ui-content-primary">
               {language === 'bn' ? 'প্রতিবেদন পাওয়া যায়নি' : 'Report not found'}
             </h1>
             <div className="max-w-[720px] mx-auto">
@@ -210,7 +210,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   navigateTo('/');
                 }
               }}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
@@ -219,7 +219,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <button
               type="button"
               onClick={() => navigateTo('/')}
-              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <Home className="w-4 h-4" aria-hidden="true" />
               <span>{language === 'bn' ? 'মূল পাতায় ফিরুন' : 'Back to home'}</span>
@@ -285,7 +285,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               navigateTo('/');
             }
           }}
-          className="inline-flex items-center gap-2 text-[var(--type-fixed-16)] leading-[var(--type-line-24)] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-[var(--radius-control)] transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="inline-flex items-center gap-2 text-[var(--type-fixed-16)] leading-[var(--type-line-24)] font-[var(--font-weight-medium)] text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-[var(--radius-control)] transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>{language === 'bn' ? 'তালিকায় ফিরুন' : 'Back to reports'}</span>
@@ -295,12 +295,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         <button
           type="button"
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 text-[var(--type-fixed-16)] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-[var(--radius-control)] transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="inline-flex items-center gap-1.5 text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-[var(--radius-control)] transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           {isCopied ? (
             <>
               <Check className="w-4 h-4 text-ui-success-text" aria-hidden="true" />
-              <span className="text-ui-success-text font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link copied'}</span>
+              <span className="text-ui-success-text font-[var(--font-weight-semibold)]">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link copied'}</span>
             </>
           ) : (
             <>
@@ -317,13 +317,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         <div className="flex flex-wrap items-center gap-2 text-[var(--type-fixed-14)]">
           <CategoryBadge section={report.segment} language={language} size="md" />
           <span className="text-ui-content-muted">·</span>
-          <span className="font-semibold text-ui-content-primary">
+          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
             {subcategory}
           </span>
         </div>
 
         {/* Main Headline */}
-        <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-bold text-ui-content-primary tracking-tight">
+        <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
           {title}
         </h1>
 
@@ -332,7 +332,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <button
             type="button"
             onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
-            className="flex items-center gap-1.5 font-medium text-ui-content-primary hover:text-ui-content-primary transition-colors cursor-pointer min-h-[44px] px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
+            className="flex items-center gap-1.5 font-[var(--font-weight-medium)] text-ui-content-primary hover:text-ui-content-primary transition-colors cursor-pointer min-h-[44px] px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
           >
             <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
             <span className="underline decoration-ui-stroke-subtle">{location}</span>
@@ -379,7 +379,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {report.reportedSubject && (
           <div className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-1.5">
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-1.5 font-medium text-ui-content-secondary text-[var(--type-fixed-14)]">
+              <div className="flex items-center gap-1.5 font-[var(--font-weight-medium)] text-ui-content-secondary text-[var(--type-fixed-14)]">
                 <UserX className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                 <span>{language === 'bn' ? 'প্রতিবেদনে উল্লেখিত পক্ষ:' : 'Mentioned party:'}</span>
               </div>
@@ -387,13 +387,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <button
                   type="button"
                   onClick={() => navigateTo(`/subject/${encodeURIComponent(subjectTargetName)}`)}
-                  className="text-[var(--type-fixed-14)] font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[44px] flex items-center px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
+                  className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline cursor-pointer min-h-[44px] flex items-center px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
                 >
                   {language === 'bn' ? 'এই নামে প্রকাশিত প্রতিবেদন দেখুন →' : 'View reports mentioning this party →'}
                 </button>
               )}
             </div>
-            <div className="text-ui-content-primary font-semibold text-[var(--type-fixed-16)]">
+            <div className="text-ui-content-primary font-[var(--font-weight-semibold)] text-[var(--type-fixed-16)]">
               {report.reportedSubject}
             </div>
             {report.organization && (
@@ -405,7 +405,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {/* Summary */}
         {shortDesc && (
           <div className="p-4 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle space-y-1.5">
-            <h2 className="text-[var(--type-fixed-14)] font-semibold text-ui-content-secondary">
+            <h2 className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-secondary">
               {language === 'bn' ? 'সারসংক্ষেপ' : 'Summary'}
             </h2>
             <div className="max-w-[720px]">
@@ -421,7 +421,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {/* Excess Electricity Bill Context Block */}
         {(report.recentBillMonth || report.recentBillAmount !== undefined) && (
           <div className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-3">
-            <h2 className="text-[var(--type-fixed-14)] font-semibold text-ui-content-secondary flex items-center gap-2">
+            <h2 className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-secondary flex items-center gap-2">
               <Zap className="w-4 h-4 text-ui-content-muted" />
               <span>{language === 'bn' ? 'বিদ্যুৎ বিল সংক্রান্ত বিবরণ' : 'Electricity billing details'}</span>
             </h2>
@@ -431,10 +431,10 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <span className="text-[var(--type-fixed-12)] text-ui-content-muted block">
                   {language === 'bn' ? 'সাম্প্রতিক বিলের মাস ও পরিমাণ' : 'Recent bill month & amount'}
                 </span>
-                <p className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                   {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : '-'}
                 </p>
-                <p className="text-[var(--type-fixed-16)] font-semibold text-ui-error-text">
+                <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-ui-error-text">
                   {report.recentBillAmount !== undefined
                     ? `৳ ${language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()}`
                     : '-'}
@@ -445,10 +445,10 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <span className="text-[var(--type-fixed-12)] text-ui-content-muted block">
                   {language === 'bn' ? 'পূর্ববর্তী বিলের মাস ও পরিমাণ' : 'Previous bill month & amount'}
                 </span>
-                <p className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
+                <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
                   {report.previousBillMonth ? formatBillingMonth(report.previousBillMonth, language) : '-'}
                 </p>
-                <p className="text-[var(--type-fixed-16)] font-semibold text-ui-content-secondary">
+                <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-ui-content-secondary">
                   {report.previousBillAmount !== undefined
                     ? `৳ ${language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()}`
                     : '-'}
@@ -462,12 +462,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <span className="text-ui-content-muted">
                   {language === 'bn' ? 'পার্থক্য বা বৃদ্ধি:' : 'Difference / increase:'}
                 </span>
-                <span className="font-semibold text-ui-error-text">
+                <span className="font-[var(--font-weight-semibold)] text-ui-error-text">
                   +৳ {language === 'bn'
                     ? toBanglaDigits(Math.max(0, report.recentBillAmount - report.previousBillAmount))
                     : Math.max(0, report.recentBillAmount - report.previousBillAmount).toLocaleString()}
                   {report.previousBillAmount > 0 && (
-                    <span className="ml-1 text-[var(--type-fixed-12)] font-normal text-ui-content-muted">
+                    <span className="ml-1 text-[var(--type-fixed-12)] font-[var(--font-weight-regular)] text-ui-content-muted">
                       ({Math.round(((report.recentBillAmount - report.previousBillAmount) / report.previousBillAmount) * 100)}% {language === 'bn' ? 'বৃদ্ধি' : 'increase'})
                     </span>
                   )}
@@ -479,7 +479,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
         {/* Full Report Body */}
         <div className="pt-2 space-y-3">
-          <h2 className="text-[var(--type-fixed-20)] leading-[var(--type-line-30)] font-bold text-ui-content-primary flex items-center gap-2">
+          <h2 className="text-[var(--type-fixed-20)] leading-[var(--type-line-30)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
             <FileText className="w-4 h-4 text-ui-content-muted" />
             <span>{language === 'bn' ? 'প্রতিবেদনের বিবরণ' : 'Report details'}</span>
           </h2>
@@ -496,7 +496,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {/* Supporting Information Section */}
         {evidenceList && evidenceList.length > 0 && (
           <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
-            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary flex items-center gap-2">
+            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-ui-content-secondary" />
               <span>{language === 'bn' ? 'সহায়ক তথ্য' : 'Supporting information'}</span>
             </h3>
@@ -504,7 +504,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               {evidenceList.map((item, idx) => (
                 <li key={idx} className="flex items-center gap-2.5 bg-ui-surface-subtle p-3 rounded-[var(--radius-badge-md)] border border-ui-stroke-subtle">
                   <span className="w-1.5 h-1.5 rounded-[var(--radius-pill)] bg-ui-stroke-strong shrink-0" />
-                  <span className="font-medium">{item}</span>
+                  <span className="font-[var(--font-weight-medium)]">{item}</span>
                 </li>
               ))}
             </ul>
@@ -519,14 +519,14 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {/* Updates Timeline Section */}
         {report.updates && report.updates.length > 0 && (
           <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
-            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary flex items-center gap-2">
+            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
               <Clock className="w-4 h-4 text-ui-content-muted" />
               <span>{language === 'bn' ? 'আপডেট' : 'Updates'}</span>
             </h3>
             <div className="space-y-3">
               {report.updates.map((update, idx) => (
                 <div key={idx} className="p-3.5 bg-ui-surface-subtle rounded-[var(--radius-badge-md)] border border-ui-stroke-subtle space-y-1">
-                  <div className="flex items-center justify-between text-[var(--type-fixed-14)] font-semibold text-ui-content-primary">
+                  <div className="flex items-center justify-between text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-primary">
                     <span>{language === 'bn' ? update.titleBn : update.titleEn}</span>
                     <span className="text-ui-content-muted">{language === 'bn' ? update.dateBn : update.dateEn}</span>
                   </div>
@@ -544,7 +544,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {/* Published Responses Section */}
         {((report.response || storedResponses.length > 0) || (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError)) && (
           <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
-            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary flex items-center gap-2">
+            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
               <Scale className="w-4 h-4 text-ui-content-secondary" />
               <span>{language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}</span>
             </h3>
@@ -560,7 +560,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <button
                   type="button"
                   onClick={fetchReport}
-                  className="min-h-[44px] px-3.5 py-2 text-[var(--type-fixed-14)] font-semibold text-ui-content-primary bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-badge-md)] hover:bg-ui-surface-subtle transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                  className="min-h-[44px] px-3.5 py-2 text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-primary bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-badge-md)] hover:bg-ui-surface-subtle transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
                 </button>
@@ -570,7 +570,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             {/* Legacy report.response Card */}
             {report.response && (
               <div className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <div className="flex items-center justify-between text-[var(--type-fixed-14)] text-ui-content-primary font-semibold">
+                <div className="flex items-center justify-between text-[var(--type-fixed-14)] text-ui-content-primary font-[var(--font-weight-semibold)]">
                   <span>
                     {language === 'bn' ? report.response.respondentBn : report.response.respondentEn}
                   </span>
@@ -592,7 +592,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 return (
                   <div key={resp.id} className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2.5">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-[var(--type-fixed-14)]">
-                      <span className="font-semibold text-ui-content-primary">
+                      <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
                         {language === 'bn' ? 'তথ্য বা অভিজ্ঞতা' : 'Information / experience'}
                       </span>
                       <div className="flex flex-wrap items-center gap-3 text-ui-content-muted text-[var(--type-fixed-13)]">
@@ -628,14 +628,14 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <div key={resp.id} className="p-4 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2.5">
                   <div className="flex flex-wrap items-start justify-between gap-2 text-[var(--type-fixed-14)]">
                     <div className="space-y-0.5">
-                      <div className="font-semibold text-ui-content-primary">
+                      <div className="font-[var(--font-weight-semibold)] text-ui-content-primary">
                         {language === 'bn' ? 'উল্লেখিত ব্যক্তি বা পক্ষ' : 'Mentioned person / party'}
                       </div>
                       {resp.responderName && (
-                        <div className="text-[var(--type-fixed-14)] font-medium text-ui-content-secondary break-words">
+                        <div className="text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] text-ui-content-secondary break-words">
                           {resp.responderName}
                           {subtitleParts.length > 0 && (
-                            <span className="text-ui-content-muted font-normal"> ({subtitleParts.join(', ')})</span>
+                            <span className="text-ui-content-muted font-[var(--font-weight-regular)]"> ({subtitleParts.join(', ')})</span>
                           )}
                         </div>
                       )}
@@ -669,7 +669,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
       {/* 3. Citizen Participation Action Box */}
       <div id="report-response-action-box" className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-6 space-y-3 shadow-[var(--elevation-2xs)]">
-        <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary">
+        <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'এই প্রতিবেদন সম্পর্কে কিছু জানেন?' : 'Do you know something about this report?'}
         </h3>
 
@@ -678,7 +678,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             id="btn-respond-citizen-info"
             type="button"
             onClick={() => setIsCitizenModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="px-3.5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn'
               ? 'আমার কাছে তথ্য আছে বা আমিও ভুক্তভোগী'
@@ -688,7 +688,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             id="btn-respond-subject-party"
             type="button"
             onClick={() => setIsSubjectModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="px-3.5 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             {language === 'bn' ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ' : 'I’m the person or party mentioned'}
           </button>
@@ -699,7 +699,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       {relatedReports.length > 0 && (
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary flex items-center gap-1.5">
+            <h3 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-1.5">
               <Layers className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'সম্পর্কিত প্রতিবেদন' : 'Related reports'}</span>
             </h3>
@@ -726,7 +726,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     {language === 'bn' ? relReport.publishedDateBn : relReport.publishedDateEn}
                   </span>
                 </div>
-                <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary line-clamp-2 leading-snug">
+                <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary line-clamp-2 leading-snug">
                   {language === 'bn' ? relReport.titleBn : relReport.titleEn}
                 </h4>
                 <p className="text-[var(--type-fixed-14)] text-ui-content-secondary line-clamp-2">

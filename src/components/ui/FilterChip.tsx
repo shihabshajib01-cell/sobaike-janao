@@ -42,9 +42,9 @@ export const FilterChip: React.FC<FilterChipProps> = ({
             }
           : undefined
       }
-      className={`inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-medium ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 active:scale-95 ${
+      className={`inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 active:scale-95 ${
         selected && !config
-          ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg font-semibold ui-elevation-selected'
+          ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg font-[var(--font-weight-semibold)] ui-elevation-selected'
           : !selected
           ? 'bg-ui-surface text-ui-content-secondary hover:text-ui-content-primary border-ui-stroke-default hover:border-ui-stroke-strong hover:bg-ui-surface-hover'
           : ''
@@ -54,7 +54,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       <span className="truncate">{label}</span>
       {count !== undefined && (
         <span
-          className={`ml-0.5 text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] px-1.5 py-0.2 rounded-[var(--radius-pill)] font-semibold leading-none ${
+          className={`ml-0.5 text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] px-1.5 py-0.2 rounded-[var(--radius-pill)] font-[var(--font-weight-semibold)] leading-none ${
             selected
               ? 'bg-current/20 text-current'
               : 'bg-ui-surface-subtle text-ui-content-muted'

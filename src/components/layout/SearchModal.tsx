@@ -45,7 +45,7 @@ export const SearchModal: React.FC = () => {
 
         {/* Quick Category Filters */}
         <div className="space-y-2.5">
-          <p className="text-[var(--type-fixed-14)] font-bold text-ui-content-muted uppercase tracking-wider">
+          <p className="text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-muted uppercase tracking-wider">
             {language === 'bn' ? 'বিভাগ' : 'Categories'}
           </p>
           <div className="flex flex-wrap gap-2">

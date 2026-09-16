@@ -83,7 +83,7 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
         {/* +N Overlay for 5+ images on the 4th cell */}
         {overlayCount && overlayCount > 0 ? (
           <div className="absolute inset-0 bg-ui-media-overlay-strong backdrop-blur-[2px] flex items-center justify-center text-ui-media-viewer-text">
-            <span className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-24)] font-bold tracking-tight">
+            <span className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-24)] font-[var(--font-weight-bold)] tracking-tight">
               +{overlayCount}
             </span>
           </div>
@@ -95,8 +95,8 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
   return (
     <div className="space-y-2 select-none" onClick={(e) => e.stopPropagation()}>
       {!isCompact && (
-        <div className="flex items-center justify-between text-[var(--type-fixed-14)] text-ui-content-secondary font-medium">
-          <span className="font-semibold text-ui-content-primary">
+        <div className="flex items-center justify-between text-[var(--type-fixed-14)] text-ui-content-secondary font-[var(--font-weight-medium)]">
+          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
             {language === 'bn' ? 'সহায়ক ছবি' : 'Supporting images'} ({count})
           </span>
           <span className="text-ui-content-muted">

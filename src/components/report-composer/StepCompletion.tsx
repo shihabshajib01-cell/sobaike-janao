@@ -29,7 +29,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] font-bold text-ui-content-primary">
+        <h3 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'প্রতিবেদন জমা হয়েছে' : 'Report submitted'}
         </h3>
         <p className="text-[var(--type-fixed-14)] md:text-[var(--type-fixed-16)] text-ui-content-secondary max-w-lg mx-auto leading-relaxed">
