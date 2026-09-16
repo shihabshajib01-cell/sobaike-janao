@@ -13,6 +13,7 @@ import { LocationConsentModal } from '../location/LocationConsentModal';
 import { LocationReminderBar } from '../location/LocationReminderBar';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { HomePage } from '../../pages/HomePage';
+import { IssuesPage } from '../../pages/IssuesPage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
 import { RickshawPage } from '../../pages/RickshawPage';
 import { ExtortionPage } from '../../pages/ExtortionPage';
@@ -151,6 +152,7 @@ export const AppShell: React.FC = () => {
               <ErrorBoundary componentName="MainRoutes">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
+                  <Route path="/issues" element={<IssuesPage />} />
                   <Route path="/harassment" element={<HarassmentPage />} />
                   <Route path="/extortion" element={<ExtortionPage />} />
                   <Route path="/public-safety" element={<StandardCategoryPage section="public_safety" />} />

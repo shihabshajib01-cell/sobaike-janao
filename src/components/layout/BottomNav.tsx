@@ -1,7 +1,10 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
+import { SECTIONS } from '../../theme/tokens';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
+
+const CATEGORY_ROUTES = Object.values(SECTIONS).map((section) => section.slug);
 
 export const BottomNav: React.FC = () => {
   const { currentRoute, navigateTo, language, openReportComposer } = useApp();
@@ -12,109 +15,77 @@ export const BottomNav: React.FC = () => {
     nameBn: string;
     nameEn: string;
     iconName: AppIconName;
-    activeColor: string;
+    isActive: boolean;
   }> = [
     {
       id: 'bottom-nav-home',
-      path: '/' as RoutePath,
+      path: '/',
       nameBn: 'মূলপাতা',
       nameEn: 'Home',
       iconName: 'home',
-      activeColor: 'var(--ui-text-primary)',
+      isActive: currentRoute === '/',
     },
     {
-      id: 'bottom-nav-harassment',
-      path: '/harassment' as RoutePath,
-      nameBn: 'হয়রানি',
-      nameEn: 'Harassment',
-      iconName: 'harassment',
-      activeColor: 'var(--sec-harassment-primary)',
+      id: 'bottom-nav-issues',
+      path: '/issues',
+      nameBn: 'বিষয়সমূহ',
+      nameEn: 'Issues',
+      iconName: 'layers',
+      isActive: currentRoute === '/issues' || CATEGORY_ROUTES.includes(currentRoute),
     },
     {
-      id: 'bottom-nav-charging',
-      path: '/rickshaw' as RoutePath,
-      nameBn: 'চার্জিং',
-      nameEn: 'Charging',
-      iconName: 'rickshaw',
-      activeColor: 'var(--sec-rickshaw-primary)',
-    },
-    {
-      id: 'bottom-nav-extortion',
-      path: '/extortion' as RoutePath,
-      nameBn: 'চাঁদাবাজি',
-      nameEn: 'Extortion',
-      iconName: 'extortion',
-      activeColor: 'var(--sec-extortion-primary)',
-    },
-    {
-      id: 'bottom-nav-utility',
-      path: '/load-shedding' as RoutePath,
-      nameBn: 'ইউটিলিটি',
-      nameEn: 'Utility',
-      iconName: 'load-shedding',
-      activeColor: 'var(--sec-load_shedding-primary)',
+      id: 'bottom-nav-explore',
+      path: '/explore',
+      nameBn: 'এক্সপ্লোর',
+      nameEn: 'Explore',
+      iconName: 'compass',
+      isActive: currentRoute === '/explore',
     },
   ];
 
   return (
-    <>
-      {/* Mobile Floating Action Button (FAB) - Report Incident */}
-      <button
-        id="mobile-fab-report"
-        type="button"
-        onClick={() => openReportComposer()}
-        aria-label={language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
-        className="md:hidden fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom,0px)+12px)] z-40 w-14 h-14 min-w-[56px] min-h-[56px] rounded-full bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover active:scale-95 shadow-lg flex items-center justify-center cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
-      >
-        <Plus className="w-6 h-6 stroke-[2.5]" aria-hidden="true" />
-      </button>
+    <nav
+      id="bottom-nav"
+      aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
+      className="md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)]"
+    >
+      <div className="pointer-events-auto mx-auto grid max-w-[420px] grid-cols-[1fr_1fr_1fr_auto] items-center gap-1 rounded-2xl border border-ui-stroke-subtle bg-ui-surface/95 p-1.5 shadow-lg backdrop-blur-md">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            id={item.id}
+            type="button"
+            onClick={() => navigateTo(item.path)}
+            aria-current={item.isActive ? 'page' : undefined}
+            className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-xl px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              item.isActive
+                ? 'bg-ui-surface-subtle text-ui-content-primary'
+                : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
+            }`}
+          >
+            <AppIcon name={item.iconName} size="lg" strokeWidth={item.isActive ? 2.4 : 2} />
+            <span
+              className={`mt-1 w-full truncate text-center text-[10.5px] min-[390px]:text-[11.5px] leading-tight ${
+                item.isActive ? 'font-bold' : 'font-medium'
+              }`}
+            >
+              {language === 'bn' ? item.nameBn : item.nameEn}
+            </span>
+          </button>
+        ))}
 
-      {/* Mobile Fixed Bottom Navigation (< 768px) */}
-      <nav
-        id="bottom-nav"
-        aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-ui-surface border-t border-ui-stroke-subtle pb-safe"
-      >
-        <div className="grid grid-cols-5 items-center h-16 px-1">
-          {navItems.map((item) => {
-            const isActive = currentRoute === item.path;
-
-            return (
-              <button
-                key={item.id}
-                id={item.id}
-                onClick={() => navigateTo(item.path)}
-                aria-current={isActive ? 'page' : undefined}
-                className="flex flex-col items-center justify-center min-h-[48px] py-1 px-0.5 transition-colors cursor-pointer select-none rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                style={{
-                  color: isActive ? item.activeColor : 'var(--ui-text-muted)',
-                }}
-              >
-                <div className="relative flex items-center justify-center">
-                  <AppIcon name={item.iconName} size="lg" />
-                  {isActive && (
-                    <span
-                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                      style={{ backgroundColor: item.activeColor }}
-                    />
-                  )}
-                </div>
-                <span
-                  className={`text-[10px] min-[360px]:text-[11px] min-[390px]:text-[12px] mt-1 leading-tight tracking-tight text-center truncate w-full px-0.5 ${
-                    isActive ? 'font-bold' : 'font-normal'
-                  }`}
-                >
-                  {language === 'bn' ? item.nameBn : item.nameEn}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
-    </>
+        <button
+          id="mobile-nav-report"
+          type="button"
+          onClick={() => openReportComposer()}
+          aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
+          className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-ui-action-bg text-ui-action-text shadow-sm transition-all hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
+        >
+          <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+        </button>
+      </div>
+    </nav>
   );
 };
 
 export default BottomNav;
-
-
