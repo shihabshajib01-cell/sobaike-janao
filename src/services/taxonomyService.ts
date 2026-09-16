@@ -46,7 +46,7 @@ export interface SegmentTaxonomyItem {
   sortOrder?: number;
 }
 
-// In-memory cache initialized with robust local fallbacks
+// In-memory cache initialized with robust local fallbacks until a successful backend read
 let cachedSegments: Record<string, SegmentTaxonomyItem> = {
   harassment: { ...SECTIONS.harassment, id: 'harassment' },
   rickshaw: { ...SECTIONS.rickshaw, id: 'rickshaw' },
@@ -96,8 +96,8 @@ export const TaxonomyService = {
         return cachedSegments;
       }
 
-      if (data && Array.isArray(data) && data.length > 0) {
-        const nextSegments: Record<string, SegmentTaxonomyItem> = { ...cachedSegments };
+      if (data && Array.isArray(data)) {
+        const nextSegments: Record<string, SegmentTaxonomyItem> = {};
 
         data.forEach((row: SupabaseSegmentRow) => {
           const key = row.id as SectionKey;
@@ -165,10 +165,10 @@ export const TaxonomyService = {
         return cachedSubcategories;
       }
 
-      if (data && Array.isArray(data) && data.length > 0) {
+      if (data && Array.isArray(data)) {
         const nextSubcategories: Record<string, SubcategoryOption[]> = {};
 
-        // Initialize with empty arrays for known keys
+        // Initialize with empty arrays for known keys so successful backend reads stay authoritative
         (['harassment', 'rickshaw', 'extortion', 'load_shedding'] as SectionKey[]).forEach((sec) => {
           nextSubcategories[sec] = [];
         });
@@ -193,13 +193,6 @@ export const TaxonomyService = {
             categoryGroup: row.category_group || localMatch?.categoryGroup,
             isSensitive: typeof row.is_sensitive === 'boolean' ? row.is_sensitive : localMatch?.isSensitive,
           });
-        });
-
-        // Ensure each known segment has at least fallback items if none returned from query
-        (['harassment', 'rickshaw', 'extortion', 'load_shedding'] as SectionKey[]).forEach((sec) => {
-          if (!nextSubcategories[sec] || nextSubcategories[sec].length === 0) {
-            nextSubcategories[sec] = [...SEGMENT_SUBCATEGORIES[sec]];
-          }
         });
 
         cachedSubcategories = nextSubcategories;
