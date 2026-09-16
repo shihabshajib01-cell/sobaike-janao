@@ -17,8 +17,7 @@ export const SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
   ],
   extortion: [
     { id: 'all', nameBn: 'সকল রিপোর্ট', nameEn: 'All Reports' },
-    { id: 'bribe-demanded-service', nameBn: 'সেবা পেতে ঘুষ দাবি', nameEn: 'Bribe Demanded for a Service' },
-    { id: 'bribe-paid', nameBn: 'ঘুষ প্রদান', nameEn: 'Bribe Paid' },
+    { id: 'bribe-demanded-service', nameBn: 'ঘুষ', nameEn: 'Bribery' },
     { id: 'shop-business', nameBn: 'দোকান ও ব্যবসা প্রতিষ্ঠানে চাঁদা দাবি', nameEn: 'Shops & Businesses' },
     { id: 'transport-movement', nameBn: 'পরিবহন বা চলাচলে চাঁদা দাবি', nameEn: 'Transport & Transit' },
     { id: 'construction-property', nameBn: 'নির্মাণ/সম্পত্তি সংক্রান্ত চাঁদা দাবি', nameEn: 'Construction & Property' },

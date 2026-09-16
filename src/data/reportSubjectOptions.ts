@@ -72,10 +72,10 @@ export const REPORT_SUBJECT_CONFIGS: Record<string, ReportSubjectConfig> = {
 
   // Bribery
   'extortion:bribe-demanded-service': {
-    sectionTitleBn: 'ঘুষ দাবিকারী ব্যক্তি / দপ্তরের তথ্য',
-    sectionTitleEn: 'Person / office demanding the bribe',
-    questionBn: 'কে ঘুষ দাবি করেছে বা কোন দপ্তর / সেবা প্রদানকারীর সঙ্গে ঘটনাটি ঘটেছে?',
-    questionEn: 'Who demanded the bribe, or which office / service provider was involved?',
+    sectionTitleBn: 'ঘুষের সঙ্গে সংশ্লিষ্ট ব্যক্তি / দপ্তরের তথ্য',
+    sectionTitleEn: 'Person / office involved in the bribery',
+    questionBn: 'ঘুষের সঙ্গে কোন ব্যক্তি, কর্মকর্তা বা দপ্তর জড়িত ছিল?',
+    questionEn: 'Which person, officer, or office was involved in the bribery?',
     nameLabelBn: 'ব্যক্তি / কর্মকর্তা / দপ্তরের নাম',
     nameLabelEn: 'Person / officer / office name',
     namePlaceholderBn: 'নাম বা পরিচিতি জানা থাকলে লিখুন',

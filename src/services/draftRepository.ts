@@ -23,6 +23,9 @@ export const INITIAL_DRAFT: DraftReport = {
   recentBillAmount: undefined,
   previousBillMonth: '',
   previousBillAmount: undefined,
+  briberyDepartment: '',
+  briberyService: '',
+  briberyAmount: undefined,
   frequency: 'one-time',
   affectedPersonAgeGroup: '',
   allegedAbuserRelationship: '',
@@ -205,6 +208,9 @@ export const DraftRepository = {
     if (draft.recentBillAmount !== undefined && draft.recentBillAmount !== '') return true;
     if (Boolean(draft.previousBillMonth?.trim())) return true;
     if (draft.previousBillAmount !== undefined && draft.previousBillAmount !== '') return true;
+    if (Boolean(draft.briberyDepartment?.trim())) return true;
+    if (Boolean(draft.briberyService?.trim())) return true;
+    if (draft.briberyAmount !== undefined && draft.briberyAmount !== '') return true;
     if (Boolean(draft.affectedPersonAgeGroup)) return true;
     if (Boolean(draft.allegedAbuserRelationship)) return true;
     if (Boolean(draft.reportingFor)) return true;
