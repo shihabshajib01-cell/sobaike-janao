@@ -32,6 +32,11 @@ const RULES = [
     message: 'Tailwind font-family utility bypasses the global font token',
   },
   {
+    id: 'tailwind-font-weight',
+    pattern: /\bfont-(?:normal|medium|semibold|bold)\b/g,
+    message: 'Framework font-weight utility bypasses central typography weight tokens',
+  },
+  {
     id: 'arbitrary-type-size',
     pattern: /\btext-\[\d+(?:\.\d+)?(?:px|rem)\]/g,
     message: 'Hardcoded font size bypasses semantic typography tokens',
