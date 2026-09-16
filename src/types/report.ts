@@ -73,6 +73,7 @@ export interface ReportItem {
   reportedSubjectEn?: string;
   subjectType?: 'individual' | 'business' | 'group' | 'location';
   organization?: string;
+  reporterName?: string;
   locationBn: string;
   locationEn: string;
   districtBn: string;
