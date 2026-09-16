@@ -30,7 +30,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   const selectedComingSoon =
     controlledComingSoon !== undefined ? controlledComingSoon : internalComingSoon;
 
-  const activeServices: Array<{
+  const allServices: Array<{
     key: SectionKey;
     titleBn: string;
     titleEn: string;
@@ -85,7 +85,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       borderVar: 'var(--sec-load_shedding-border)',
       primaryVar: 'var(--sec-load_shedding-primary)',
     },
-  ].filter((service) => Boolean(segments[service.key]));
+  ];
+  const activeServices = allServices.filter((service) => Boolean(segments[service.key]));
 
   const comingSoonList = Object.values(COMING_SOON_SERVICES).filter(
     (cs) => cs.key !== 'illegal_occupation'
