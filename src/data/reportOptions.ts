@@ -55,16 +55,23 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       categoryGroup: 'relationship_scam',
     },
   ],
-  rickshaw: [
-    {
-      id: 'charging-station-location',
-      nameBn: 'অবৈধ অটো চার্জিং',
-      nameEn: 'Illegal auto-rickshaw charging',
-      descriptionBn: 'অবৈধ বিদ্যুৎ সংযোগ বা অগ্নিঝুঁকিপূর্ণ ব্যাটারি চার্জিং স্পট',
-      descriptionEn: 'Report illegal power connections or hazardous battery charging points',
-    },
-  ],
   extortion: [
+    {
+      id: 'bribe-demanded-service',
+      nameBn: 'সেবা পেতে ঘুষ দাবি',
+      nameEn: 'Bribe Demanded for a Service',
+      descriptionBn: 'সরকারি বা বেসরকারি সেবা, অনুমোদন বা সুবিধার জন্য ঘুষ দাবি',
+      descriptionEn: 'Bribe demanded in exchange for a service, approval, or benefit',
+      isSensitive: true,
+    },
+    {
+      id: 'bribe-paid',
+      nameBn: 'ঘুষ প্রদান',
+      nameEn: 'Bribe Paid',
+      descriptionBn: 'সেবা বা সুবিধা পেতে ঘুষ বা অবৈধ অর্থ প্রদান করা হয়েছে',
+      descriptionEn: 'A bribe or illegal payment was made to receive a service or benefit',
+      isSensitive: true,
+    },
     {
       id: 'shop-business',
       nameBn: 'দোকান ও ব্যবসা প্রতিষ্ঠানে চাঁদা দাবি',
@@ -101,6 +108,56 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       descriptionEn: 'Any other extortion or coercive money collection',
     },
   ],
+  public_safety: [
+    {
+      id: 'theft',
+      nameBn: 'চুরি',
+      nameEn: 'Theft',
+      descriptionBn: 'চুরি বা সম্পদ হারানোর ঘটনা জানান',
+      descriptionEn: 'Report theft or stolen property incidents',
+      isSensitive: true,
+    },
+    {
+      id: 'robbery',
+      nameBn: 'ডাকাতি',
+      nameEn: 'Robbery / Dacoity',
+      descriptionBn: 'ডাকাতি বা সংঘবদ্ধভাবে সম্পদ লুটের ঘটনা জানান',
+      descriptionEn: 'Report robbery or organized dacoity incidents',
+      isSensitive: true,
+    },
+    {
+      id: 'snatching',
+      nameBn: 'ছিনতাই',
+      nameEn: 'Snatching',
+      descriptionBn: 'রাস্তায় বা জনসমাগমে ছিনতাইয়ের ঘটনা জানান',
+      descriptionEn: 'Report snatching incidents in streets or public places',
+      isSensitive: true,
+    },
+  ],
+  road_transport: [
+    {
+      id: 'road-repair-delay',
+      nameBn: 'রাস্তা মেরামতে বিলম্ব',
+      nameEn: 'Road Repair Delay',
+      descriptionBn: 'দীর্ঘদিন মেরামত না হওয়া বা অসম্পূর্ণ রাস্তার কাজ জানান',
+      descriptionEn: 'Report delayed, stalled, or incomplete road repairs',
+    },
+    {
+      id: 'road-accident',
+      nameBn: 'সড়ক দুর্ঘটনা',
+      nameEn: 'Road Accident',
+      descriptionBn: 'সড়ক দুর্ঘটনার স্থান ও ঘটনার তথ্য জানান',
+      descriptionEn: 'Report the location and details of a road accident',
+      isSensitive: true,
+    },
+    {
+      id: 'road-block',
+      nameBn: 'সড়ক অবরোধ',
+      nameEn: 'Road Block / Obstruction',
+      descriptionBn: 'প্রতিবাদ, দুর্ঘটনা, নির্মাণকাজ বা অন্য কারণে চলাচলে বাধার তথ্য জানান',
+      descriptionEn: 'Report road blocks or obstructions caused by demonstrations, crashes, roadworks, or other causes',
+    },
+  ],
   load_shedding: [
     {
       id: 'load-shedding-outage',
@@ -122,6 +179,40 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       nameEn: 'Excess Electricity Bill',
       descriptionBn: 'অস্বাভাবিক বা অসঙ্গতিপূর্ণ ভুতুড়ে বিদ্যুৎ বিলের অভিযোগ',
       descriptionEn: 'Abnormal, inflated or unexplained electricity bill charges',
+    },
+  ],
+  illegal_occupation: [
+    {
+      id: 'road-public-space-encroachment',
+      nameBn: 'রাস্তা / ফুটপাত / ফুটওভার ব্রিজ দখল',
+      nameEn: 'Road / Footpath / Foot-over-bridge Encroachment',
+      descriptionBn: 'দোকান, স্থাপনা বা অন্যভাবে রাস্তা, ফুটপাত বা ফুটওভার ব্রিজ দখলের তথ্য জানান',
+      descriptionEn: 'Report shops, structures, or other occupation of roads, footpaths, or foot-over-bridges',
+    },
+    {
+      id: 'private-property-occupation',
+      nameBn: 'ব্যক্তিগত জমি/সম্পত্তি অবৈধ দখল',
+      nameEn: 'Illegal Occupation of Private Land / Property',
+      descriptionBn: 'ব্যক্তিগত জমি বা সম্পত্তি অবৈধভাবে দখলের অভিযোগ জানান',
+      descriptionEn: 'Report alleged illegal occupation of private land or property',
+      isSensitive: true,
+    },
+    {
+      id: 'government-property-occupation',
+      nameBn: 'সরকারি জমি/সম্পত্তি অবৈধ দখল',
+      nameEn: 'Illegal Occupation of Government Land / Property',
+      descriptionBn: 'সরকারি জমি বা সম্পত্তি অবৈধ দখলের তথ্য জানান',
+      descriptionEn: 'Report alleged illegal occupation of government land or property',
+      isSensitive: true,
+    },
+  ],
+  rickshaw: [
+    {
+      id: 'charging-station-location',
+      nameBn: 'অবৈধ অটো চার্জিং',
+      nameEn: 'Illegal auto-rickshaw charging',
+      descriptionBn: 'অবৈধ বিদ্যুৎ সংযোগ বা অগ্নিঝুঁকিপূর্ণ ব্যাটারি চার্জিং স্পট',
+      descriptionEn: 'Report illegal power connections or hazardous battery charging points',
     },
   ],
 };
@@ -199,4 +290,3 @@ export const BANGLADESH_HELPLINES = [
     descEn: 'Emergency care, protection, and advocacy for minors.',
   },
 ];
-
