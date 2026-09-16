@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Check, ArrowRight } from 'lucide-react';
 import { SectionKey, SECTIONS, COMING_SOON_SERVICES, ComingSoonServiceKey } from '../../theme/tokens';
 import { CategoryIcon } from '../branding/CategoryIcon';
@@ -30,67 +30,39 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   const selectedComingSoon =
     controlledComingSoon !== undefined ? controlledComingSoon : internalComingSoon;
 
-  const allServices: Array<{
-    key: SectionKey;
-    titleBn: string;
-    titleEn: string;
-    descBn: string;
-    descEn: string;
-    bgVar: string;
-    textVar: string;
-    borderVar: string;
-    primaryVar: string;
-  }> = [
-    {
-      key: 'harassment',
-      titleBn: segments.harassment?.nameBn || SECTIONS.harassment.nameBn,
-      titleEn: segments.harassment?.nameEn || SECTIONS.harassment.nameEn,
-      descBn: 'যৌন হয়রানি, নির্যাতন, প্রতারণা বা অনলাইন হয়রানি সম্পর্কিত অভিযোগ।',
-      descEn: 'Report sexual harassment, abuse, relationship deception, or online harassment.',
-      bgVar: 'var(--sec-harassment-bg)',
-      textVar: 'var(--sec-harassment-text)',
-      borderVar: 'var(--sec-harassment-border)',
-      primaryVar: 'var(--sec-harassment-primary)',
-    },
-    {
-      key: 'rickshaw',
-      titleBn: segments.rickshaw?.nameBn || SECTIONS.rickshaw.nameBn,
-      titleEn: segments.rickshaw?.nameEn || SECTIONS.rickshaw.nameEn,
-      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।',
-      descEn: 'Share the location and details of illegal or unsafe charging stations.',
-      bgVar: 'var(--sec-rickshaw-bg)',
-      textVar: 'var(--sec-rickshaw-text)',
-      borderVar: 'var(--sec-rickshaw-border)',
-      primaryVar: 'var(--sec-rickshaw-primary)',
-    },
-    {
-      key: 'extortion',
-      titleBn: segments.extortion?.nameBn || SECTIONS.extortion.nameBn,
-      titleEn: segments.extortion?.nameEn || SECTIONS.extortion.nameEn,
-      descBn: 'চাঁদা দাবি, জোরপূর্বক অর্থ আদায় বা চাপ প্রয়োগের ঘটনা জানান।',
-      descEn: 'Report extortion, coercive collections, or pressure.',
-      bgVar: 'var(--sec-extortion-bg)',
-      textVar: 'var(--sec-extortion-text)',
-      borderVar: 'var(--sec-extortion-border)',
-      primaryVar: 'var(--sec-extortion-primary)',
-    },
-    {
-      key: 'load_shedding',
-      titleBn: segments.load_shedding?.nameBn || SECTIONS.load_shedding.nameBn,
-      titleEn: segments.load_shedding?.nameEn || SECTIONS.load_shedding.nameEn,
-      descBn: 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ।',
-      descEn: 'Report load shedding, gas shortages, or excess electricity bill issues.',
-      bgVar: 'var(--sec-load_shedding-bg)',
-      textVar: 'var(--sec-load_shedding-text)',
-      borderVar: 'var(--sec-load_shedding-border)',
-      primaryVar: 'var(--sec-load_shedding-primary)',
-    },
-  ];
-  const activeServices = allServices.filter((service) => Boolean(segments[service.key]));
-
-  const comingSoonList = Object.values(COMING_SOON_SERVICES).filter(
-    (cs) => cs.key !== 'illegal_occupation'
+  // The report selector now derives from the same unified section contract used by
+  // navigation, badges and taxonomy. This prevents category drift between surfaces.
+  const activeServices = useMemo(
+    () =>
+      (Object.keys(SECTIONS) as SectionKey[])
+        .filter((key) => Boolean(segments[key]))
+        .map((key) => {
+          const local = SECTIONS[key];
+          const remote = segments[key];
+          return {
+            key,
+            titleBn: remote?.nameBn || local.nameBn,
+            titleEn: remote?.nameEn || local.nameEn,
+            descBn: local.descriptionBn,
+            descEn: local.descriptionEn,
+            primaryColor: local.primaryColor,
+            bgColor: local.bgColor,
+            borderColor: local.borderColor,
+            textColor: local.textColor,
+            sortOrder: remote?.sortOrder,
+          };
+        })
+        .sort((a, b) => {
+          if (typeof a.sortOrder === 'number' && typeof b.sortOrder === 'number') {
+            return a.sortOrder - b.sortOrder;
+          }
+          return (Object.keys(SECTIONS) as SectionKey[]).indexOf(a.key) -
+            (Object.keys(SECTIONS) as SectionKey[]).indexOf(b.key);
+        }),
+    [segments]
   );
+
+  const comingSoonList = Object.values(COMING_SOON_SERVICES);
 
   const handleActiveSelect = (key: SectionKey) => {
     setInternalComingSoon(null);
@@ -107,14 +79,12 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Single Question Header */}
       <div className="text-left">
         <h3 className="text-[20px] md:text-[22px] font-bold text-ui-content-primary">
           {language === 'bn' ? 'কোন বিষয়ে জানাতে চান?' : 'What would you like to report?'}
         </h3>
       </div>
 
-      {/* Active Service Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {activeServices.map((srv) => {
           const isSelected = selectedSegment === srv.key && !selectedComingSoon;
@@ -132,19 +102,18 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   : 'bg-ui-surface border-ui-stroke-subtle shadow-2xs'
               }`}
               style={{
-                backgroundColor: isSelected ? srv.bgVar : undefined,
-                borderColor: isSelected ? srv.primaryVar : undefined,
+                backgroundColor: isSelected ? srv.bgColor : undefined,
+                borderColor: isSelected ? srv.primaryColor : undefined,
               }}
             >
               <div className="space-y-3 w-full">
-                {/* Header Icon + Selection Indicator */}
                 <div className="flex items-center justify-between">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-colors border shadow-2xs"
                     style={{
-                      backgroundColor: `var(--sec-${srv.key}-bg)`,
-                      color: `var(--sec-${srv.key}-text)`,
-                      borderColor: `var(--sec-${srv.key}-border)`,
+                      backgroundColor: srv.bgColor,
+                      color: srv.textColor,
+                      borderColor: srv.borderColor,
                     }}
                   >
                     <CategoryIcon section={srv.key} size="md" />
@@ -161,7 +130,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   </div>
                 </div>
 
-                {/* Title & Description */}
                 <div>
                   <h4 className="text-[18px] font-bold text-ui-content-primary leading-snug">
                     {language === 'bn' ? srv.titleBn : srv.titleEn}
@@ -176,7 +144,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
         })}
       </div>
 
-      {/* Upcoming / Coming Soon Services Section */}
       {comingSoonList.length > 0 && (
         <div className="pt-2 space-y-3">
           <div className="flex items-center gap-2">
@@ -232,7 +199,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
             })}
           </div>
 
-          {/* Informative state when a Coming Soon option is selected */}
           {activeComingSoonData && (
             <div
               id="coming-soon-selection-notice"
@@ -260,7 +226,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                 <button
                   type="button"
                   id={`coming-soon-learn-more-${activeComingSoonData.key}`}
-                  onClick={() => onNavigateToComingSoon(activeComingSoonData.slug)}
+                  onClick={() => onNavigateToComingSoon(activeComingSoonData.slug as RoutePath)}
                   className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-bold bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'Learn more'}</span>
@@ -274,4 +240,3 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
     </div>
   );
 };
-
