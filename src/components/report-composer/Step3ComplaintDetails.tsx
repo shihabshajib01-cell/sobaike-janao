@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
-import { DraftReport, ReportLocationData, MentionedParty, isMeaningfulMentionedParty } from '../../services/types';
+import { ReportFormData, ReportLocationData, MentionedParty, isMeaningfulMentionedParty } from '../../services/types';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import {
   SEGMENT_SUBCATEGORIES,
@@ -73,10 +73,10 @@ export type ReporterLocationGateState =
 
 export interface Step3ComplaintDetailsProps {
   segment: SectionKey;
-  formData: DraftReport;
+  formData: ReportFormData;
   pendingImages: AttachedImagePreview[];
   onPendingImagesChange: (images: AttachedImagePreview[]) => void;
-  onUpdateFormData: (updates: Partial<DraftReport>) => void;
+  onUpdateFormData: (updates: Partial<ReportFormData>) => void;
   onBack?: () => void;
   onNext?: () => void;
   initialOpenSection?: 'narrative' | 'location' | 'identity' | 'parties' | 'attachments';
@@ -1647,7 +1647,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   required
                   value={formData.affectedPersonAgeGroup || ''}
                   onChange={(event) => {
-                    onUpdateFormData({ affectedPersonAgeGroup: event.target.value as DraftReport['affectedPersonAgeGroup'] });
+                    onUpdateFormData({ affectedPersonAgeGroup: event.target.value as ReportFormData['affectedPersonAgeGroup'] });
                     if (errors.affectedPersonAgeGroup) setErrors((prev) => ({ ...prev, affectedPersonAgeGroup: '' }));
                   }}
                   placeholder={language === 'bn' ? '-- বয়সের গ্রুপ নির্বাচন করুন --' : '-- Select age group --'}
@@ -1664,7 +1664,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   required
                   value={formData.allegedAbuserRelationship || ''}
                   onChange={(value) => {
-                    onUpdateFormData({ allegedAbuserRelationship: value as DraftReport['allegedAbuserRelationship'] });
+                    onUpdateFormData({ allegedAbuserRelationship: value as ReportFormData['allegedAbuserRelationship'] });
                     if (errors.allegedAbuserRelationship) setErrors((prev) => ({ ...prev, allegedAbuserRelationship: '' }));
                   }}
                   placeholder={language === 'bn' ? 'সম্পর্ক নির্বাচন করুন' : 'Select relationship'}
@@ -1684,7 +1684,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   required
                   value={formData.reportingFor || ''}
                   onChange={(event) => {
-                    onUpdateFormData({ reportingFor: event.target.value as DraftReport['reportingFor'] });
+                    onUpdateFormData({ reportingFor: event.target.value as ReportFormData['reportingFor'] });
                     if (errors.reportingFor) setErrors((prev) => ({ ...prev, reportingFor: '' }));
                   }}
                   placeholder={language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}
@@ -2582,31 +2582,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   ? 'অভিযোগ বুঝতে সহায়ক ছবি বা স্ক্রিনশট থাকলে সংযুক্ত করুন। এটি সম্পূর্ণ ঐচ্ছিক।'
                   : 'Attach images or screenshots if they help explain the complaint. This is completely optional.'}
               </p>
-
-              {formData.pendingEvidenceRecovery &&
-                formData.pendingEvidenceRecovery.expectedCount > 0 &&
-                pendingImages.length === 0 && (
-                  <div
-                    id="pending-evidence-recovery-warning"
-                    className="p-3.5 rounded-xl border border-ui-warning-border bg-ui-warning-bg text-ui-warning-text space-y-2 text-[13px]"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <Info className="w-4 h-4 text-ui-warning-text shrink-0 mt-0.5" />
-                      <div className="space-y-1">
-                        <p className="font-semibold">
-                          {language === 'bn'
-                            ? 'পূর্বে সংযুক্ত প্রমাণাদি পুনরায় নির্বাচন করুন'
-                            : 'Please reattach your previous evidence images'}
-                        </p>
-                        <p className="text-[12.5px] opacity-90 leading-relaxed">
-                          {language === 'bn'
-                            ? `আপনার সংরক্ষিত খসড়ায় ${formData.pendingEvidenceRecovery.expectedCount}টি ছবি সংযুক্ত ছিল। জমা সম্পন্ন করতে নিচের ফাইল পিকার থেকে ছবিগুলো পুনরায় নির্বাচন করুন। আপনি চাইলে খসড়া বাতিল করে নতুন অভিযোগও শুরু করতে পারেন।`
-                            : `Your saved draft had ${formData.pendingEvidenceRecovery.expectedCount} image(s) attached. Please reattach the files below to complete your submission, or discard the draft to start a new complaint.`}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
               {/* Image Attachment Picker - max 6 images */}
               <ImageAttachmentPicker

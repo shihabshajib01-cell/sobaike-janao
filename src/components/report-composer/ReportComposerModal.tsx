@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionKey, ComingSoonServiceKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
-import { DraftReport, isMeaningfulMentionedParty, isValidIncidentCoordinates } from '../../services/types';
-import { DraftRepository, INITIAL_DRAFT, generateSecureIdempotencyKey } from '../../services/draftRepository';
+import { ReportFormData, isMeaningfulMentionedParty, isValidIncidentCoordinates } from '../../services/types';
+import {
+  INITIAL_REPORT_FORM,
+  clearLegacyReportDraftStorage,
+  generateSecureIdempotencyKey,
+  hasMeaningfulReportInput,
+  revokePreviewUrls,
+} from '../../services/reportFormState';
 import { apiClient } from '../../services/apiClient';
 import { VisitorSessionService } from '../../services/visitorSessionService';
-import { EvidenceDraftStorage } from '../../services/evidenceDraftStorage';
 import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { ReportComposerHeader } from './ReportComposerHeader';
 import { ReportComposerFooter } from './ReportComposerFooter';
@@ -15,20 +20,7 @@ import { Step3ComplaintDetails, Step3Handle } from './Step3ComplaintDetails';
 import { Step4Review } from './Step4Review';
 import { StepCompletion } from './StepCompletion';
 import { SubcategoryOption } from '../../data/reportOptions';
-import {
-  AlertCircle,
-  FileText,
-  Trash2,
-  Plus,
-  ArrowRight,
-  Clock,
-  MapPin,
-  X,
-  Save,
-  Shield,
-  RotateCcw,
-  Paperclip,
-} from 'lucide-react';
+import { AlertCircle, MapPin, Shield, RotateCcw } from 'lucide-react';
 
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -49,12 +41,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 }) => {
   const { navigateTo } = useApp();
 
-  // Saved draft available for explicit recovery prompt
-  const [savedDraftAvailable, setSavedDraftAvailable] = useState<DraftReport | null>(null);
 
   // Main form state - always start on Step 1 with no pre-selected segment unless specified
-  const [formData, setFormData] = useState<DraftReport>(() => ({
-    ...INITIAL_DRAFT,
+  const [formData, setFormData] = useState<ReportFormData>(() => ({
+    ...INITIAL_REPORT_FORM,
     segment: initialSegment,
     currentStep: initialSegment ? 2 : 1,
   }));
@@ -77,7 +67,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const [submissionResult, setSubmissionResult] = useState<{
     reportId: string;
   } | null>(null);
-  const [isRestoringEvidence, setIsRestoringEvidence] = useState(false);
 
   // Rape Pre-Report Publishing & Privacy Consent (session-level only - not stored in draft, storage or db)
   const [rapePublishingConsentAccepted, setRapePublishingConsentAccepted] = useState(false);
@@ -91,7 +80,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   useEffect(() => {
     if (isConfirmCloseOpen) {
       const timer = setTimeout(() => {
-        const el = document.getElementById('draft-continue-btn');
+        const el = document.getElementById('report-continue-editing-btn');
         if (el) {
           el.focus();
         }
@@ -121,32 +110,27 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     }
   }, [isOpen, formData.currentStep, rapeConsentMissing, isRapeConsentModalOpen]);
 
-  // Check for saved draft whenever the modal is opened
+  // Each composer session starts fresh. Legacy persisted drafts are removed and never restored.
   useEffect(() => {
     if (isOpen) {
+      clearLegacyReportDraftStorage();
       setSelectedComingSoon(null);
       setRapePublishingConsentAccepted(false);
       setRapeConsentCheckbox(false);
       setIsRapeConsentModalOpen(false);
       pendingTargetStepRef.current = null;
-
-      const saved = DraftRepository.getDraft();
-      if (saved && DraftRepository.hasMeaningfulDraft(saved)) {
-        setSavedDraftAvailable(saved);
-        if (saved.clientSubmissionId) {
-          retryCredentialsRef.current = {
-            clientSubmissionId: saved.clientSubmissionId,
-          };
-        }
-      } else {
-        setSavedDraftAvailable(null);
-        retryCredentialsRef.current = null;
-        setFormData({
-          ...INITIAL_DRAFT,
-          segment: initialSegment,
-          currentStep: initialSegment ? 2 : 1,
-        });
-      }
+      retryCredentialsRef.current = null;
+      setSubmitError(null);
+      setIsLocationError(false);
+      setPendingImages((previous) => {
+        revokePreviewUrls(previous);
+        return [];
+      });
+      setFormData({
+        ...INITIAL_REPORT_FORM,
+        segment: initialSegment,
+        currentStep: initialSegment ? 2 : 1,
+      });
     } else {
       setSelectedComingSoon(null);
       setSubmitError(null);
@@ -157,188 +141,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     }
   }, [isOpen, initialSegment]);
 
-  // Persist draft to local storage on state change once actively editing
-  useEffect(() => {
-    if (isOpen && !submissionResult && !savedDraftAvailable && DraftRepository.hasMeaningfulDraft(formData)) {
-      const idToSave = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-      const pendingRecovery =
-        formData.pendingEvidenceRecovery ||
-        (pendingImages.length > 0
-          ? {
-              expectedCount: pendingImages.length,
-              fileNames: pendingImages.map((i) => i.originalName || i.file.name),
-              status: 'pending' as const,
-              lastUpdated: new Date().toISOString(),
-            }
-          : undefined);
-
-      DraftRepository.saveDraft({
-        ...formData,
-        ...(idToSave && { clientSubmissionId: idToSave }),
-        ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
-      });
-    }
-  }, [formData, isOpen, submissionResult, savedDraftAvailable, pendingImages]);
-
-  // Draft Recovery Handlers
-  const handleContinueSavedDraft = useCallback(async () => {
-    if (savedDraftAvailable) {
-      const subId = savedDraftAvailable.clientSubmissionId;
-      if (subId) {
-        retryCredentialsRef.current = {
-          clientSubmissionId: subId,
-        };
-      }
-      setRapePublishingConsentAccepted(false);
-      setRapeConsentCheckbox(false);
-      setSubmitError(null);
-      setIsLocationError(false);
-
-      setIsRestoringEvidence(true);
-      let restoredImages: AttachedImagePreview[] = [];
-      if (subId) {
-        try {
-          restoredImages = await EvidenceDraftStorage.getPendingEvidence(subId);
-        } catch (e) {
-          console.warn('Failed to restore evidence from storage:', e);
-        }
-      }
-      setIsRestoringEvidence(false);
-
-      const expectedCount = savedDraftAvailable.pendingEvidenceRecovery?.expectedCount || 0;
-      let updatedDraft: DraftReport = { ...savedDraftAvailable };
-
-      if (
-        savedDraftAvailable.serverSubmissionState === 'attempted' ||
-        savedDraftAvailable.pendingEvidenceRecovery?.status === 'failed'
-      ) {
-        updatedDraft.serverSubmissionState = 'attempted';
-      }
-
-      if (restoredImages.length > 0) {
-        setPendingImages(restoredImages);
-        if (savedDraftAvailable.pendingEvidenceRecovery) {
-          updatedDraft = {
-            ...updatedDraft,
-            hasSupportingInfo: true,
-            pendingEvidenceRecovery: {
-              ...savedDraftAvailable.pendingEvidenceRecovery,
-              status: 'pending',
-              lastUpdated: new Date().toISOString(),
-            },
-          };
-        }
-      } else if (expectedCount > 0) {
-        setPendingImages([]);
-        updatedDraft = {
-          ...updatedDraft,
-          pendingEvidenceRecovery: {
-            expectedCount,
-            fileNames: savedDraftAvailable.pendingEvidenceRecovery?.fileNames || [],
-            status: 'failed',
-            lastUpdated: new Date().toISOString(),
-          },
-        };
-      } else {
-        setPendingImages([]);
-      }
-
-      const isUtilityDraft =
-        (updatedDraft.segment as string) === 'utility' || updatedDraft.segment === 'load_shedding';
-      if (isUtilityDraft && updatedDraft.location) {
-        updatedDraft = {
-          ...updatedDraft,
-          location: {
-            ...updatedDraft.location,
-            formattedAddress: '',
-            area: '',
-            road: '',
-            landmark: '',
-            placeId: undefined,
-          },
-        };
-      }
-
-      // If draft was saved on rape subcategory at step 3 or 4, require consent before displaying step 3/4
-      if (
-        savedDraftAvailable.subcategoryId === 'rape-sexual-violence' &&
-        savedDraftAvailable.currentStep >= 3
-      ) {
-        setFormData(updatedDraft);
-        setSavedDraftAvailable(null);
-        pendingTargetStepRef.current = { step: savedDraftAvailable.currentStep };
-        setIsRapeConsentModalOpen(true);
-      } else {
-        setFormData(updatedDraft);
-        setSavedDraftAvailable(null);
-      }
-    }
-  }, [savedDraftAvailable]);
-
-  const handleStartNewComplaint = useCallback(async () => {
-    const subId = savedDraftAvailable?.clientSubmissionId || retryCredentialsRef.current?.clientSubmissionId;
-    if (subId) {
-      try {
-        await EvidenceDraftStorage.deletePendingEvidence(subId);
-      } catch {
-        // ignore
-      }
-    }
-    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
-    retryCredentialsRef.current = null;
-    setRapePublishingConsentAccepted(false);
-    setRapeConsentCheckbox(false);
-    setIsRapeConsentModalOpen(false);
-    pendingTargetStepRef.current = null;
-    setSubmitError(null);
-    setIsLocationError(false);
-    DraftRepository.clearDraft();
-    setFormData({
-      ...INITIAL_DRAFT,
-      segment: null,
-      currentStep: 1,
-    });
-    setPendingImages([]);
-    setSavedDraftAvailable(null);
-  }, [pendingImages, savedDraftAvailable]);
-
-  const handleDeleteSavedDraft = useCallback(async () => {
-    const subId = savedDraftAvailable?.clientSubmissionId || retryCredentialsRef.current?.clientSubmissionId;
-    if (subId) {
-      try {
-        await EvidenceDraftStorage.deletePendingEvidence(subId);
-      } catch {
-        // ignore
-      }
-    }
-    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
-    retryCredentialsRef.current = null;
-    setRapePublishingConsentAccepted(false);
-    setRapeConsentCheckbox(false);
-    setIsRapeConsentModalOpen(false);
-    pendingTargetStepRef.current = null;
-    setSubmitError(null);
-    setIsLocationError(false);
-    DraftRepository.clearDraft();
-    setFormData({
-      ...INITIAL_DRAFT,
-      segment: null,
-      currentStep: 1,
-    });
-    setPendingImages([]);
-    setSavedDraftAvailable(null);
-  }, [pendingImages, savedDraftAvailable]);
-
   // Helper to update form data
-  const handleUpdateFormData = useCallback((updates: Partial<DraftReport>) => {
+  const handleUpdateFormData = useCallback((updates: Partial<ReportFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  // Attached images update handler: persists to IndexedDB and synchronizes pendingEvidenceRecovery
+  // Attached images remain in memory for the current composer session only.
   const handlePendingImagesChange = useCallback(
-    async (images: AttachedImagePreview[]) => {
-      // Revoke any removed object URLs to prevent browser memory leaks
-      const nextUrls = new Set(images.map((i) => i.previewUrl));
+    (images: AttachedImagePreview[]) => {
+      const nextUrls = new Set(images.map((image) => image.previewUrl));
       pendingImages.forEach((old) => {
         if (old.previewUrl && !nextUrls.has(old.previewUrl) && old.previewUrl.startsWith('blob:')) {
           try {
@@ -350,62 +161,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       });
 
       setPendingImages(images);
-
-      let subId =
-        retryCredentialsRef.current?.clientSubmissionId ||
-        formData.clientSubmissionId ||
-        DraftRepository.getSubmissionId();
-
-      if (!subId) {
-        subId = generateSecureIdempotencyKey();
-        retryCredentialsRef.current = { clientSubmissionId: subId };
-        setFormData((prev) => ({ ...prev, clientSubmissionId: subId }));
-      }
-
-      if (images.length > 0) {
-        await EvidenceDraftStorage.savePendingEvidence(subId, images);
-
-        const recovery = {
-          expectedCount: images.length,
-          fileNames: images.map((i) => i.originalName || i.file.name),
-          status: 'pending' as const,
-          lastUpdated: new Date().toISOString(),
-        };
-
-        setFormData((prev) => ({
-          ...prev,
-          clientSubmissionId: subId,
-          hasSupportingInfo: true,
-          pendingEvidenceRecovery: recovery,
-        }));
-
-        DraftRepository.saveDraft({
-          ...formData,
-          clientSubmissionId: subId,
-          hasSupportingInfo: true,
-          pendingEvidenceRecovery: recovery,
-        });
-      } else {
-        await EvidenceDraftStorage.savePendingEvidence(subId, []);
-
-        const wasFailed = formData.pendingEvidenceRecovery?.status === 'failed';
-
-        setFormData((prev) => ({
-          ...prev,
-          clientSubmissionId: subId,
-          hasSupportingInfo: wasFailed ? prev.hasSupportingInfo : false,
-          pendingEvidenceRecovery: wasFailed ? prev.pendingEvidenceRecovery : undefined,
-        }));
-
-        DraftRepository.saveDraft({
-          ...formData,
-          clientSubmissionId: subId,
-          hasSupportingInfo: wasFailed ? formData.hasSupportingInfo : false,
-          pendingEvidenceRecovery: wasFailed ? formData.pendingEvidenceRecovery : undefined,
-        });
-      }
+      setFormData((prev) => ({
+        ...prev,
+        hasSupportingInfo:
+          images.length > 0 ||
+          (prev.evidenceTypes || []).length > 0 ||
+          Boolean(prev.evidenceDescription?.trim()),
+      }));
     },
-    [formData, pendingImages]
+    [pendingImages]
   );
 
   // Step Navigation Handlers
@@ -459,8 +223,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       if (formData.serverSubmissionState === 'attempted') {
         setSubmitError(
           language === 'bn'
-            ? 'পূর্ববর্তী জমা প্রচেষ্টার কারণে বিভাগ পরিবর্তন করা সম্ভব নয়। অন্য অভিযোগ করতে খসড়াটি মুছুন অথবা নতুন অভিযোগ শুরু করুন।'
-            : 'Cannot change category after submission attempt. Please discard this draft or start a new complaint.'
+            ? 'পূর্ববর্তী জমা প্রচেষ্টার কারণে বিভাগ পরিবর্তন করা সম্ভব নয়। অন্য প্রতিবেদন করতে বর্তমান প্রতিবেদন বাতিল করে নতুনভাবে শুরু করুন।'
+            : 'Cannot change category after submission attempt. Cancel this report and start a new one to change category.'
         );
         return;
       }
@@ -469,15 +233,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       // State A: pre-submit category switch
       // Cleanly discard old local evidence attachments and old clientSubmissionId
-      const oldSubId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-      if (oldSubId) {
-        try {
-          await EvidenceDraftStorage.deletePendingEvidence(oldSubId);
-        } catch {
-          // ignore
-        }
-      }
-      EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+      revokePreviewUrls(pendingImages);
       setPendingImages([]);
       retryCredentialsRef.current = null;
 
@@ -499,7 +255,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             : prev.location,
         clientSubmissionId: undefined,
         serverSubmissionState: 'not_attempted',
-        pendingEvidenceRecovery: undefined,
         hasSupportingInfo: false,
         evidenceTypes: [],
         evidenceDescription: '',
@@ -538,8 +293,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       if (formData.serverSubmissionState === 'attempted') {
         setSubmitError(
           language === 'bn'
-            ? 'পূর্ববর্তী জমা প্রচেষ্টার কারণে উপবিভাগ পরিবর্তন করা সম্ভব নয়। অন্য অভিযোগ করতে খসড়াটি মুছুন অথবা নতুন অভিযোগ শুরু করুন।'
-            : 'Cannot change subcategory after submission attempt. Please discard this draft or start a new complaint.'
+            ? 'পূর্ববর্তী জমা প্রচেষ্টার কারণে উপবিভাগ পরিবর্তন করা সম্ভব নয়। অন্য প্রতিবেদন করতে বর্তমান প্রতিবেদন বাতিল করে নতুনভাবে শুরু করুন।'
+            : 'Cannot change subcategory after submission attempt. Cancel this report and start a new one to change category.'
         );
         return;
       }
@@ -548,15 +303,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       // State A: pre-submit subcategory switch
       // Cleanly discard old local evidence attachments and reset idempotency key
-      const oldSubId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-      if (oldSubId) {
-        try {
-          await EvidenceDraftStorage.deletePendingEvidence(oldSubId);
-        } catch {
-          // ignore
-        }
-      }
-      EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+      revokePreviewUrls(pendingImages);
       setPendingImages([]);
       retryCredentialsRef.current = null;
 
@@ -578,8 +325,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           subcategoryId,
           clientSubmissionId: undefined,
           serverSubmissionState: 'not_attempted',
-          pendingEvidenceRecovery: undefined,
-          hasSupportingInfo: false,
+            hasSupportingInfo: false,
           evidenceTypes: [],
           evidenceDescription: '',
           title: updatedTitle,
@@ -664,25 +410,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     });
   }, []);
 
-  // Close attempt handler - confirms if meaningful draft exists
+  // Confirm before discarding meaningful in-memory report input.
   const handleRequestClose = useCallback(() => {
     if (isSubmitting) return;
 
-    // If on draft recovery screen, close directly
-    if (savedDraftAvailable) {
+    if (submissionResult || !hasMeaningfulReportInput(formData, pendingImages.length)) {
       onClose();
       return;
     }
 
-    // If completed or no meaningful input, close immediately
-    if (submissionResult || !DraftRepository.hasMeaningfulDraft(formData)) {
-      onClose();
-      return;
-    }
-
-    // Meaningful input exists, prompt user with confirmation
     setIsConfirmCloseOpen(true);
-  }, [isSubmitting, savedDraftAvailable, submissionResult, formData, onClose]);
+  }, [isSubmitting, submissionResult, formData, pendingImages.length, onClose]);
 
   const handleFooterNext = useCallback(() => {
     if (formData.currentStep === 1) handleNextFromStep1();
@@ -698,40 +436,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     }
   }, [formData.currentStep, handleGoToStep, handleRequestClose]);
 
-  // Secure Idempotency key helper
-  const generateSecureIdempotencyKey = (): string => {
-    try {
-      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-      }
-    } catch {
-      // fallback
-    }
-    return `idem_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-  };
 
   // Submission handler
   const handleSubmitReport = useCallback(async () => {
     if (!formData.segment || !formData.subcategoryId) return;
-
-    // Guard against attempting to complete a complaint with missing required evidence
-    const isMissingExpectedEvidence =
-      pendingImages.length === 0 &&
-      Boolean(formData.pendingEvidenceRecovery && formData.pendingEvidenceRecovery.expectedCount > 0);
-
-    if (isMissingExpectedEvidence) {
-      setFormData((prev) => ({ ...prev, currentStep: 3 }));
-      setSubmitError(
-        language === 'bn'
-          ? 'পূর্বে সংযুক্ত প্রমাণাদি আপলোড করা আবশ্যক। জমা সম্পন্ন করতে ৩ নং ধাপে ছবিগুলো পুনরায় সংযুক্ত করুন।'
-          : 'Previously attached evidence is required to complete submission. Please reattach the images in Step 3.'
-      );
-      setTimeout(() => {
-        const elem = document.getElementById('composer-section-attachments');
-        if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-      return;
-    }
 
     // Rape pre-report consent defense guard
     if (
@@ -952,47 +660,21 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         website: (formData as any).website || '', // Honeypot anti-bot
       };
 
-      // Ensure stable idempotency key across submission retries and persist before server submission
+      // Keep a stable idempotency key for retries while this composer session remains open.
       let clientSubmissionId =
         retryCredentialsRef.current?.clientSubmissionId ||
-        formData.clientSubmissionId ||
-        DraftRepository.getSubmissionId();
+        formData.clientSubmissionId;
 
       if (!clientSubmissionId) {
         clientSubmissionId = generateSecureIdempotencyKey();
       }
 
-      // Update ref and in-memory formData
       retryCredentialsRef.current = { clientSubmissionId };
       setFormData((prev) => ({
         ...prev,
         clientSubmissionId,
         serverSubmissionState: 'attempted',
       }));
-
-      // Persist evidence to IndexedDB before server call if any images exist
-      if (pendingImages.length > 0) {
-        await EvidenceDraftStorage.savePendingEvidence(clientSubmissionId, pendingImages);
-      }
-
-      const pendingRecovery =
-        pendingImages.length > 0
-          ? {
-              expectedCount: pendingImages.length,
-              fileNames: pendingImages.map((img) => img.originalName || img.file.name),
-              status: 'pending' as const,
-              lastUpdated: new Date().toISOString(),
-            }
-          : formData.pendingEvidenceRecovery;
-
-      // Immediately persist draft with clientSubmissionId and serverSubmissionState BEFORE making server submission
-      DraftRepository.saveDraft({
-        ...formData,
-        clientSubmissionId,
-        serverSubmissionState: 'attempted',
-        hasSupportingInfo: Boolean(formData.hasSupportingInfo || pendingImages.length > 0),
-        ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
-      });
 
       const filesToUpload = pendingImages.map((img) => img.file);
 
@@ -1011,21 +693,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       if (response && response.reportId) {
         // FULL SUCCESS: Both complaint row AND required evidence uploads/registration succeeded
-        try {
-          await EvidenceDraftStorage.deletePendingEvidence(clientSubmissionId);
-        } catch {
-          // ignore
-        }
-        EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+        revokePreviewUrls(pendingImages);
 
         // Reset retry credentials on success
         retryCredentialsRef.current = null;
         setPendingImages([]);
         setRapePublishingConsentAccepted(false);
-        // Clear saved draft on success
-        DraftRepository.clearDraft();
         setFormData({
-          ...INITIAL_DRAFT,
+          ...INITIAL_REPORT_FORM,
           segment: initialSegment,
           currentStep: 1,
         });
@@ -1045,52 +720,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setIsLocationError(true);
       }
 
-      // If evidence upload/registration failed OR if complaint was created but evidence threw:
-      // We must mark recovery status as 'failed' and preserve draft + submission ID!
-      const isEvidenceError =
-        err?.code === 'EVIDENCE_UPLOAD_FAILED' ||
-        err?.code === 'EVIDENCE_REGISTRATION_FAILED';
-
-      const expectedCount =
-        pendingImages.length > 0
-          ? pendingImages.length
-          : formData.pendingEvidenceRecovery?.expectedCount || 0;
-
-      if (isEvidenceError || expectedCount > 0) {
-        const subId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-        const failedRecovery = {
-          expectedCount,
-          fileNames:
-            pendingImages.length > 0
-              ? pendingImages.map((img) => img.originalName || img.file.name)
-              : formData.pendingEvidenceRecovery?.fileNames || [],
-          status: 'failed' as const,
-          lastUpdated: new Date().toISOString(),
-        };
-
-        if (subId && pendingImages.length > 0) {
-          try {
-            await EvidenceDraftStorage.savePendingEvidence(subId, pendingImages);
-          } catch {
-            // ignore
-          }
-        }
-
+      const subId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
+      if (subId) {
         setFormData((prev) => ({
           ...prev,
-          ...(subId && { clientSubmissionId: subId }),
+          clientSubmissionId: subId,
           serverSubmissionState: 'attempted',
-          hasSupportingInfo: true,
-          pendingEvidenceRecovery: failedRecovery,
         }));
-
-        DraftRepository.saveDraft({
-          ...formData,
-          ...(subId && { clientSubmissionId: subId }),
-          serverSubmissionState: 'attempted',
-          hasSupportingInfo: true,
-          pendingEvidenceRecovery: failedRecovery,
-        });
       }
 
       const displayMsg =
@@ -1104,95 +740,45 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   }, [formData, pendingImages, language, rapePublishingConsentAccepted]);
 
-  const handleStartAnother = useCallback(async () => {
-    const subId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-    if (subId) {
-      try {
-        await EvidenceDraftStorage.deletePendingEvidence(subId);
-      } catch {
-        // ignore
-      }
-    }
-    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+  const handleStartAnother = useCallback(() => {
+    revokePreviewUrls(pendingImages);
     retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
-    DraftRepository.clearDraft();
     setFormData({
-      ...INITIAL_DRAFT,
+      ...INITIAL_REPORT_FORM,
       segment: initialSegment,
       currentStep: initialSegment ? 2 : 1,
     });
     setPendingImages([]);
     setSubmissionResult(null);
     setSubmitError(null);
-  }, [formData.clientSubmissionId, initialSegment, pendingImages]);
+    setIsLocationError(false);
+  }, [initialSegment, pendingImages]);
 
-  // Discard draft action
-  const handleDiscardDraft = useCallback(async () => {
-    const subId = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-    if (subId) {
-      try {
-        await EvidenceDraftStorage.deletePendingEvidence(subId);
-      } catch {
-        // ignore
-      }
-    }
-    EvidenceDraftStorage.revokePreviewUrls(pendingImages);
+  const handleCancelReport = useCallback(() => {
+    revokePreviewUrls(pendingImages);
+    clearLegacyReportDraftStorage();
     retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
-    DraftRepository.clearDraft();
+    setIsRapeConsentModalOpen(false);
+    pendingTargetStepRef.current = null;
+    setSubmitError(null);
+    setIsLocationError(false);
     setFormData({
-      ...INITIAL_DRAFT,
+      ...INITIAL_REPORT_FORM,
       segment: initialSegment,
-      currentStep: 1,
+      currentStep: initialSegment ? 2 : 1,
     });
     setPendingImages([]);
     setIsConfirmCloseOpen(false);
     onClose();
-  }, [formData.clientSubmissionId, initialSegment, onClose, pendingImages]);
+  }, [initialSegment, onClose, pendingImages]);
 
-  // Continue editing action
   const handleContinueEditing = useCallback(() => {
     setIsConfirmCloseOpen(false);
   }, []);
-
-  // Save & exit modal action
-  const handleSaveAndExit = useCallback(async () => {
-    let idToSave = retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-    if (!idToSave) {
-      idToSave = generateSecureIdempotencyKey();
-      retryCredentialsRef.current = { clientSubmissionId: idToSave };
-    }
-
-    if (pendingImages.length > 0) {
-      try {
-        await EvidenceDraftStorage.savePendingEvidence(idToSave, pendingImages);
-      } catch {
-        // ignore
-      }
-    }
-
-    const pendingRecovery =
-      formData.pendingEvidenceRecovery ||
-      (pendingImages.length > 0
-        ? {
-            expectedCount: pendingImages.length,
-            fileNames: pendingImages.map((i) => i.originalName || i.file.name),
-            status: 'pending' as const,
-            lastUpdated: new Date().toISOString(),
-          }
-        : undefined);
-
-    DraftRepository.saveDraft({
-      ...formData,
-      clientSubmissionId: idToSave,
-      ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
-    });
-    setIsConfirmCloseOpen(false);
-    onClose();
-  }, [formData, onClose, pendingImages]);
 
   if (!isOpen) return null;
 
@@ -1216,154 +802,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         language={language}
         ariaLabel={language === 'bn' ? 'অভিযোগ জমা দেওয়ার ফর্ম' : 'Report submission form'}
       >
-        {/* Case 1: Draft Recovery Prompt Screen */}
-        {savedDraftAvailable ? (
-          <div className="p-6 md:p-8 space-y-6 flex flex-col justify-between">
-            {/* Header with Close */}
-            <div className="flex items-center justify-between border-b border-ui-stroke-subtle pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-primary">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-[20px] md:text-[22px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'সংরক্ষিত খসড়া' : 'Saved draft'}
-                  </h2>
-                  <p className="text-[14px] text-ui-content-muted">
-                    {language === 'bn'
-                      ? 'এই ডিভাইসে আপনার পূর্বে তৈরি করা একটি খসড়া সংরক্ষিত রয়েছে।'
-                      : 'You have a saved report draft on this device.'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-9 h-9 rounded-lg border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary cursor-pointer transition-colors"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Draft Summary Card */}
-            <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl space-y-3.5 text-left">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ui-stroke-subtle pb-3">
-                <div className="flex items-center gap-2">
-                  {savedDraftAvailable.segment && (
-                    <CategoryBadge section={savedDraftAvailable.segment} language={language} size="sm" />
-                  )}
-                  <span className="text-[14px] font-semibold text-ui-content-primary">
-                    {language === 'bn'
-                      ? `ধাপ ${savedDraftAvailable.currentStep} পর্যন্ত পূরণকৃত`
-                      : `Filled up to Step ${savedDraftAvailable.currentStep}`}
-                  </span>
-                </div>
-                {savedDraftAvailable.lastSavedAt && (
-                  <div className="flex items-center gap-1.5 text-[12px] text-ui-content-muted">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>
-                      {new Date(savedDraftAvailable.lastSavedAt).toLocaleString(
-                        language === 'bn' ? 'bn-BD' : 'en-US'
-                      )}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                {savedDraftAvailable.title && (
-                  <div className="text-[16px] font-bold text-ui-content-primary">
-                    {savedDraftAvailable.title}
-                  </div>
-                )}
-                {savedDraftAvailable.reportedSubject && (
-                  <div className="text-[14px] text-ui-content-secondary">
-                    <span className="text-ui-content-muted">
-                      {language === 'bn' ? 'অভিযুক্ত পক্ষ: ' : 'Subject: '}
-                    </span>
-                    <span className="font-semibold">{savedDraftAvailable.reportedSubject}</span>
-                  </div>
-                )}
-                {savedDraftAvailable.location?.district && (
-                  <div className="flex items-center gap-1 text-[14px] text-ui-content-muted">
-                    <MapPin className="w-3.5 h-3.5 shrink-0" />
-                    <span>
-                      {savedDraftAvailable.location.district}{' '}
-                      {savedDraftAvailable.location.area ? `(${savedDraftAvailable.location.area})` : ''}
-                    </span>
-                  </div>
-                )}
-                {savedDraftAvailable.pendingEvidenceRecovery && savedDraftAvailable.pendingEvidenceRecovery.expectedCount > 0 && (
-                  <div className="flex items-center gap-1.5 text-[13px] text-ui-content-muted">
-                    <Paperclip className="w-3.5 h-3.5 shrink-0" />
-                    <span>
-                      {language === 'bn'
-                        ? `${savedDraftAvailable.pendingEvidenceRecovery.expectedCount}টি প্রমাণ সংযুক্ত রয়েছে`
-                        : `${savedDraftAvailable.pendingEvidenceRecovery.expectedCount} evidence item(s) attached`}
-                    </span>
-                  </div>
-                )}
-                {savedDraftAvailable.description && (
-                  <p className="text-[14px] text-ui-content-secondary line-clamp-2 italic pt-1">
-                    "{savedDraftAvailable.description}"
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Actions: Continue Draft | Start New Complaint | Delete Draft */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
-              {/* Delete Draft */}
-              <button
-                id="draft-recovery-delete-btn"
-                type="button"
-                onClick={handleDeleteSavedDraft}
-                className="px-4 py-2.5 rounded-xl border border-ui-error-border bg-ui-surface text-ui-error-text font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 hover:bg-ui-error-bg"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>{language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}</span>
-              </button>
-
-              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5">
-                {/* Start New Complaint */}
-                <button
-                  id="draft-recovery-new-btn"
-                  type="button"
-                  onClick={handleStartNewComplaint}
-                  className="px-4 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>{language === 'bn' ? 'নতুন প্রতিবেদন শুরু করুন' : 'Start new report'}</span>
-                </button>
-
-                {/* Continue Draft */}
-                <button
-                  id="draft-recovery-continue-btn"
-                  type="button"
-                  onClick={handleContinueSavedDraft}
-                  disabled={isRestoringEvidence}
-                  className={`bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover px-5 py-2.5 rounded-xl font-bold text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center gap-2 ${
-                    isRestoringEvidence ? 'opacity-70 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <span>
-                    {isRestoringEvidence
-                      ? language === 'bn'
-                        ? 'লোড হচ্ছে...'
-                        : 'Loading...'
-                      : language === 'bn'
-                      ? 'খসড়া চালু রাখুন'
-                      : 'Continue draft'}
-                  </span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Case 2: Standard Step-by-Step Composer Flow */
-          <>
+        <>
             {/* Step Header */}
             {!submissionResult && (
               <ReportComposerHeader
@@ -1413,8 +852,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       {isLocationError && (
                         <p className="mt-2 text-[12.5px] opacity-90">
                           {language === 'bn'
-                            ? 'ব্রাউজারে লোকেশন অনুমতি বন্ধ থাকলে অ্যাড্রেস বারের তালার আইকন বা সেটিংসে গিয়ে অনুমতি চালু করুন, তারপর পুনরায় চেষ্টা করুন। আপনার সম্পূর্ণ খসড়াটি সংরক্ষিত রয়েছে।'
-                            : 'If permission is blocked, please click the lock/settings icon in your browser address bar to allow location access, then retry. Your completed draft is safely preserved.'}
+                            ? 'ব্রাউজারে লোকেশন অনুমতি বন্ধ থাকলে অ্যাড্রেস বারের তালার আইকন বা সেটিংসে গিয়ে অনুমতি চালু করুন, তারপর পুনরায় চেষ্টা করুন। এই স্ক্রিনে দেওয়া তথ্য সম্পাদনা চালিয়ে যাওয়া পর্যন্ত থাকবে।'
+                            : 'If permission is blocked, please click the lock/settings icon in your browser address bar to allow location access, then retry. The information on this screen remains available while you continue editing.'}
                         </p>
                       )}
                     </div>
@@ -1454,26 +893,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       selectedComingSoon={selectedComingSoon}
                       onSelectComingSoon={setSelectedComingSoon}
                       onNavigateToComingSoon={(path) => {
-                        if (DraftRepository.hasMeaningfulDraft(formData)) {
-                          const idToSave =
-                            retryCredentialsRef.current?.clientSubmissionId || formData.clientSubmissionId;
-                          const pendingRecovery =
-                            formData.pendingEvidenceRecovery ||
-                            (pendingImages.length > 0
-                              ? {
-                                  expectedCount: pendingImages.length,
-                                  fileNames: pendingImages.map((i) => i.originalName || i.file.name),
-                                  status: 'pending' as const,
-                                  lastUpdated: new Date().toISOString(),
-                                }
-                              : undefined);
-
-                          DraftRepository.saveDraft({
-                            ...formData,
-                            ...(idToSave && { clientSubmissionId: idToSave }),
-                            ...(pendingRecovery && { pendingEvidenceRecovery: pendingRecovery }),
-                          });
-                        }
+                        revokePreviewUrls(pendingImages);
+                        retryCredentialsRef.current = null;
+                        setPendingImages([]);
                         onClose();
                         navigateTo(path);
                       }}
@@ -1538,19 +960,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                     ? canContinueStep2
                     : true
                 }
-                canSubmit={
-                  !isSubmitting &&
-                  !(
-                    pendingImages.length === 0 &&
-                    Boolean(formData.pendingEvidenceRecovery && formData.pendingEvidenceRecovery.expectedCount > 0)
-                  )
-                }
+                canSubmit={!isSubmitting}
                 isSubmitting={isSubmitting}
               />
 
             )}
-          </>
-        )}
+        </>
       </Modal>
 
       {/* Mandatory Rape Pre-Report Consent Modal */}
@@ -1634,72 +1049,56 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         </div>
       </Modal>
 
-      {/* Exit Draft Confirmation Dialog - Clean, Clear Hierarchy */}
+      {/* Cancel report confirmation: no draft saving or recovery. */}
       <Modal
-        id="draft-confirm-close-modal"
+        id="report-cancel-confirm-modal"
         isOpen={isConfirmCloseOpen}
         onClose={handleContinueEditing}
         maxWidth="md"
         zIndexClass="z-[60]"
         showHeader={false}
         language={language}
-        ariaLabel={language === 'bn' ? 'খসড়া সংরক্ষণ ও বন্ধ করার বিকল্প' : 'Save draft or close options'}
+        ariaLabel={language === 'bn' ? 'প্রতিবেদন বাতিল করার নিশ্চিতকরণ' : 'Cancel report confirmation'}
       >
         <div className="p-6 md:p-8 space-y-5 text-left">
-          {/* Icon + Title Header */}
           <div className="flex items-start gap-3.5">
             <div className="w-10 h-10 rounded-2xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary mt-0.5">
-              <Save className="w-5 h-5" />
+              <AlertCircle className="w-5 h-5" />
             </div>
             <div className="space-y-1">
               <h3 className="text-[19px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
-                {language === 'bn' ? 'খসড়া সংরক্ষণ করবেন?' : 'Save draft and exit?'}
+                {language === 'bn' ? 'প্রতিবেদন বাতিল করবেন?' : 'Cancel this report?'}
               </h3>
               <p className="text-[14px] sm:text-[14.5px] leading-relaxed text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'আপনার বর্তমান তথ্য এই ডিভাইসে সংরক্ষিত থাকবে। পরে আবার চালু করতে পারবেন।'
-                  : 'Your draft is saved on this device. You can continue later.'}
+                  ? 'এখন বাতিল করলে এই প্রতিবেদনে দেওয়া তথ্য সংরক্ষিত থাকবে না।'
+                  : 'If you cancel now, the information entered in this report will not be saved.'}
               </p>
             </div>
           </div>
 
-          {/* Action Buttons: Left: Delete draft | Right: Keep editing + Close */}
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-ui-stroke-subtle">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-3 border-t border-ui-stroke-subtle">
             <Button
-              id="draft-discard-btn"
+              id="report-continue-editing-btn"
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={handleContinueEditing}
+              className="whitespace-nowrap"
+            >
+              {language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Continue editing'}
+            </Button>
+
+            <Button
+              id="report-cancel-btn"
               type="button"
               variant="ghost"
               size="md"
-              leftIcon={<Trash2 className="w-4 h-4" />}
-              onClick={handleDiscardDraft}
+              onClick={handleCancelReport}
               className="text-ui-error-text hover:bg-ui-error-bg whitespace-nowrap"
             >
-              {language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}
+              {language === 'bn' ? 'প্রতিবেদন বাতিল করুন' : 'Cancel reporting'}
             </Button>
-
-            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5">
-              <Button
-                id="draft-continue-btn"
-                type="button"
-                variant="outline"
-                size="md"
-                onClick={handleContinueEditing}
-                className="whitespace-nowrap"
-              >
-                {language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Keep editing'}
-              </Button>
-
-              <Button
-                id="draft-save-exit-btn"
-                type="button"
-                variant="primary"
-                size="md"
-                onClick={handleSaveAndExit}
-                className="whitespace-nowrap"
-              >
-                {language === 'bn' ? 'সংরক্ষণ করে বের হন' : 'Save and close'}
-              </Button>
-            </div>
           </div>
         </div>
       </Modal>

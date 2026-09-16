@@ -158,8 +158,8 @@ class ApiClient {
     if (!isSupabaseConfigured() || !supabase) {
       const unavailableError: ApiError = {
         code: 'SERVICE_UNAVAILABLE',
-        message: 'Submission service is currently unavailable. Your draft is preserved. Please try again later.',
-        messageBn: 'অভিযোগ জমা দেওয়ার সেবা এই মুহূর্তে সাময়িকভাবে অনুপলব্ধ। আপনার খসড়াটি সংরক্ষিত রয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
+        message: 'Submission service is currently unavailable. Please keep this report open and try again later.',
+        messageBn: 'অভিযোগ জমা দেওয়ার সেবা এই মুহূর্তে সাময়িকভাবে অনুপলব্ধ। এই প্রতিবেদনটি খোলা রেখে কিছুক্ষণ পর আবার চেষ্টা করুন।',
       };
       throw unavailableError;
     }
@@ -199,10 +199,10 @@ class ApiClient {
       const apiError: ApiError = {
         code: isOutdatedSchema ? 'OUTDATED_SERVER_SCHEMA' : (error.code || 'RPC_ERROR'),
         message: isOutdatedSchema
-          ? 'Submission service is undergoing updates. Your draft is preserved, please try again in a few moments.'
+          ? 'Submission service is undergoing updates. Please keep this report open and try again in a few moments.'
           : (error.message || 'Supabase submission failed.'),
         messageBn: isOutdatedSchema
-          ? 'সার্ভার হালনাগাদ হচ্ছে। আপনার খসড়াটি সংরক্ষিত রয়েছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।'
+          ? 'সার্ভার হালনাগাদ হচ্ছে। এই প্রতিবেদনটি খোলা রেখে অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।'
           : 'প্রতিবেদন জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
       };
       throw apiError;
