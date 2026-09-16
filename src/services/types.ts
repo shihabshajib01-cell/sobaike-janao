@@ -187,18 +187,9 @@ export interface SubmittedReport {
   }>;
 }
 
-export const CURRENT_REPORT_FLOW_VERSION = 5;
-
-export interface DraftReport {
-  flowVersion?: number;
+export interface ReportFormData {
   clientSubmissionId?: string;
   serverSubmissionState?: 'not_attempted' | 'attempted';
-  pendingEvidenceRecovery?: {
-    expectedCount: number;
-    fileNames: string[];
-    status?: 'pending' | 'failed' | 'completed';
-    lastUpdated?: string;
-  };
   segment: SectionKey | null;
   currentStep: number;
   subcategoryId: string;
@@ -243,7 +234,6 @@ export interface DraftReport {
     showGeneralLocation: boolean;
     showDescription: boolean;
   };
-  lastSavedAt: string;
 }
 
 export interface SubjectResponseRequest {

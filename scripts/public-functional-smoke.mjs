@@ -38,6 +38,7 @@ async function seedReturningVisitor(context) {
     localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
     localStorage.setItem('sobaike_location_choice_v1', 'not_now');
     localStorage.removeItem('sobaike_report_draft_v1');
+    localStorage.removeItem('sobaike_janao_draft_report');
   });
 }
 async function expectVisible(locator, message) {
@@ -166,9 +167,12 @@ await check('Mobile navigation, issue rows and category controls follow the appr
   await context.close();
 });
 
-await check('Report composer opens from the mobile bottom dock without submitting data', async () => {
+await check('Report composer has no draft persistence and uses the approved two-action cancel flow', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_janao_draft_report', JSON.stringify({ segment: 'harassment', currentStep: 4, title: 'legacy draft' }));
+  });
   const page = await context.newPage();
   attachRuntimeGuards(page, 'report-composer');
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -176,6 +180,32 @@ await check('Report composer opens from the mobile bottom dock without submittin
   await expectVisible(page.locator('#report-composer-modal'), 'report composer did not open');
   const dialog = page.locator('#report-composer-modal');
   if ((await dialog.getAttribute('role')) !== 'dialog') throw new Error('report composer is missing dialog semantics');
+  if ((await page.getByText('সংরক্ষিত খসড়া', { exact: true }).count()) !== 0) throw new Error('legacy saved-draft recovery UI is still present');
+  const legacyDraft = await page.evaluate(() => localStorage.getItem('sobaike_janao_draft_report'));
+  if (legacyDraft !== null) throw new Error('legacy draft localStorage was not cleared');
+
+  await page.locator('#service-select-card-harassment').click();
+  await page.locator('#report-composer-close-btn').click();
+  const confirm = page.locator('#report-cancel-confirm-modal');
+  await expectVisible(confirm, 'cancel-report confirmation did not open');
+  await expectVisible(page.locator('#report-continue-editing-btn'), 'Continue editing action is missing');
+  await expectVisible(page.locator('#report-cancel-btn'), 'Cancel reporting action is missing');
+  if ((await confirm.locator('button').count()) !== 2) throw new Error('cancel-report confirmation must contain exactly two buttons');
+  if ((await page.locator('#draft-save-exit-btn, #draft-discard-btn, [id^="draft-recovery-"]').count()) !== 0) throw new Error('removed draft actions are still present');
+
+  await page.locator('#report-continue-editing-btn').click();
+  await confirm.waitFor({ state: 'hidden', timeout: 10000 });
+  await expectVisible(page.locator('#report-composer-modal'), 'composer should remain open after Continue editing');
+
+  await page.locator('#report-composer-close-btn').click();
+  await expectVisible(confirm, 'cancel-report confirmation did not reopen');
+  await page.locator('#report-cancel-btn').click();
+  await page.locator('#report-composer-modal').waitFor({ state: 'hidden', timeout: 10000 });
+  const storedDrafts = await page.evaluate(() => ({
+    current: localStorage.getItem('sobaike_janao_draft_report'),
+    legacy: localStorage.getItem('sobaike_report_draft_v1'),
+  }));
+  if (storedDrafts.current !== null || storedDrafts.legacy !== null) throw new Error('draft storage exists after cancellation: ' + JSON.stringify(storedDrafts));
   await context.close();
 });
 
