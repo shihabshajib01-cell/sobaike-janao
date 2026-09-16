@@ -48,13 +48,13 @@
   /* Compact shape token required by chart/progress details. */
   --radius-compact: 4px;
 
-  /* Named elevation aliases. Low remains the established design-system elevation;
-     higher levels preserve existing modal/drawer hierarchy through central tokens. */
+  /* Central elevation scale. Values intentionally preserve the existing public UI
+     hierarchy while removing direct framework shadow primitives from components. */
   --elevation-2xs: var(--elevation-low);
-  --elevation-xs: var(--shadow-xs);
-  --elevation-sm: var(--shadow-sm);
-  --elevation-md: var(--shadow-md);
-  --elevation-lg: var(--shadow-lg);
-  --elevation-xl: var(--shadow-xl);
-  --elevation-2xl: var(--shadow-2xl);
+  --elevation-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --elevation-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --elevation-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --elevation-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --elevation-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --elevation-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 }
