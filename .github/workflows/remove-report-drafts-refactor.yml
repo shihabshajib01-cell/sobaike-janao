@@ -26,7 +26,14 @@ jobs:
           cache: npm
 
       - name: Apply scoped refactor
-        run: node scripts/remove-report-draft-refactor.mjs
+        run: node scripts/remove-report-draft-refactor.mjs > refactor.log 2>&1
+
+      - name: Upload refactor diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-draft-refactor-log
+          path: refactor.log
 
       - name: Install dependencies
         run: npm ci
@@ -44,6 +51,7 @@ jobs:
           ! grep -R "DraftRepository\|EvidenceDraftStorage\|pendingEvidenceRecovery\|draft-save-exit-btn\|draft-recovery-" src --include='*.ts' --include='*.tsx'
           rm scripts/remove-report-draft-refactor.mjs
           rm .github/workflows/remove-report-drafts-refactor.yml
+          rm -f refactor.log
 
       - name: Commit product changes only
         run: |
