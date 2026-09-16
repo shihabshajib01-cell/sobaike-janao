@@ -25,6 +25,19 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Normalize one-time script literal
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/remove-report-draft-refactor.mjs')
+          text = path.read_text()
+          old = "throw new Error(`draft storage exists after cancellation: ${JSON.stringify(storedDrafts)}`);"
+          new = "throw new Error('draft storage exists after cancellation: ' + JSON.stringify(storedDrafts));"
+          if old not in text:
+              raise SystemExit('expected diagnostic literal not found')
+          path.write_text(text.replace(old, new))
+          PY
+
       - name: Apply scoped refactor
         run: node scripts/remove-report-draft-refactor.mjs > refactor.log 2>&1
 
