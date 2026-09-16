@@ -143,6 +143,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
     const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
     const isBriberyReport = segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
+    const isIllegalOccupation = segment === 'illegal_occupation';
 
     // Determine active subcategory option & context
     const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
@@ -156,9 +157,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Contextual subject configuration for categories that benefit from optional party details
     const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
 
-    // Conditional: hide frequency for Illegal Charging Station reports
+    // Conditional timeline controls: Illegal Occupation is date-only; charging-station reports hide frequency.
+    const hideIncidentTime = isIllegalOccupation;
     const hideFrequency =
-      segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location';
+      isIllegalOccupation ||
+      (segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location');
 
     // Charging station unified operator party logic
     const isChargingStationOperator =
@@ -1543,8 +1546,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               </div>
             )}
 
-            {/* Incident Date, Time & Frequency */}
-            <div className={`grid grid-cols-1 ${hideFrequency ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3`}>
+            {/* Incident timeline */}
+            <div className={`grid grid-cols-1 ${hideIncidentTime && hideFrequency ? 'sm:grid-cols-1' : hideFrequency ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3`}>
               <div>
                 <label
                   htmlFor="complaint-date-input"
@@ -1585,24 +1588,26 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 )}
               </div>
 
-              <div>
-                <label
-                  htmlFor="complaint-time-input"
-                  className="block text-[13px] font-bold text-ui-content-primary mb-1"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                    <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}</span>
-                  </div>
-                </label>
-                <input
-                  id="complaint-time-input"
-                  type="time"
-                  value={formData.incidentTime || ''}
-                  onChange={(e) => onUpdateFormData({ incidentTime: e.target.value })}
-                  className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px]"
-                />
-              </div>
+              {!hideIncidentTime && (
+                <div>
+                  <label
+                    htmlFor="complaint-time-input"
+                    className="block text-[13px] font-bold text-ui-content-primary mb-1"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
+                      <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}</span>
+                    </div>
+                  </label>
+                  <input
+                    id="complaint-time-input"
+                    type="time"
+                    value={formData.incidentTime || ''}
+                    onChange={(e) => onUpdateFormData({ incidentTime: e.target.value })}
+                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px]"
+                  />
+                </div>
+              )}
 
               {!hideFrequency && (
                 <div>

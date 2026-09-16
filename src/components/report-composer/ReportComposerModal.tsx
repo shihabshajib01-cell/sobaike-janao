@@ -864,6 +864,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       const isHarassment = formData.segment === 'harassment';
       const isBribery = formData.segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
+      const isIllegalOccupation = formData.segment === 'illegal_occupation';
       const isPartySegment = formData.segment === 'rickshaw' || formData.segment === 'extortion';
       const isChargingStation = isPartySegment && formData.segment === 'rickshaw' && (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
@@ -885,7 +886,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             ? formData.incidentDate || (formData.recentBillMonth ? `${formData.recentBillMonth}-01` : new Date().toISOString().split('T')[0])
             : formData.incidentDate || undefined,
         incidentTime:
-          formData.subcategoryId === 'excess-electricity-bill'
+          formData.subcategoryId === 'excess-electricity-bill' || isIllegalOccupation
             ? undefined
             : formData.incidentTime || undefined,
         utilityEndTime:
@@ -908,7 +909,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           isBribery && formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== ''
             ? Number(formData.briberyAmount)
             : undefined,
-        frequency: formData.frequency || 'one-time',
+        frequency: isIllegalOccupation ? 'one-time' : formData.frequency || 'one-time',
         affectedPersonAgeGroup: isHarassment ? formData.affectedPersonAgeGroup || undefined : undefined,
         allegedAbuserRelationship: isHarassment ? formData.allegedAbuserRelationship || undefined : undefined,
         reportingFor: isHarassment ? formData.reportingFor || undefined : undefined,

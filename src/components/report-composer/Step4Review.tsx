@@ -60,6 +60,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
   const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
   const isBriberyReport = segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
+  const isIllegalOccupation = segment === 'illegal_occupation';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -99,8 +100,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
 
-  // Conditional: hide frequency for Illegal Charging Station reports & Utility complaints
+  // Conditional timeline controls: Illegal Occupation is date-only.
+  const hideIncidentTime = isIllegalOccupation;
   const hideFrequency =
+    isIllegalOccupation ||
     (segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location') ||
     isUtilityReport;
 
@@ -303,6 +306,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 : language === 'bn'
                 ? '১. গ্যাস সংকটের সময় ও বিবরণ'
                 : '1. Gas Shortage Timing & Details'
+              : isIllegalOccupation
+              ? language === 'bn'
+                ? '১. ঘটনার বিবরণ'
+                : '1. What Happened'
               : language === 'bn'
               ? '১. ঘটনার বিবরণ ও সময়কাল'
               : '1. What Happened & Timeline'
@@ -388,7 +395,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   </span>
                 </div>
 
-                {formData.incidentTime && (
+                {!hideIncidentTime && formData.incidentTime && (
                   <div>
                     <span>
                       {isUtilityReport
