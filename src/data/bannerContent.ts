@@ -21,12 +21,16 @@ export type HeroBannerSectionKey =
   | 'load_shedding'
   | 'rickshaw';
 
+type CanonicalBannerContentMap =
+  Record<HeroBannerSectionKey, CategoryBannerContent> &
+  Partial<Record<SectionKey, CategoryBannerContent>>;
+
 /**
  * Canonical hero content is intentionally limited to services that already have
- * approved production illustration assets. New Phase 1 complaint categories are
- * active in reporting/navigation/taxonomy without reusing misleading art.
+ * approved production illustration assets. Existing hero pages remain guaranteed,
+ * while dynamic SectionKey lookups safely allow newer categories to have no hero art.
  */
-export const CANONICAL_BANNER_CONTENT: Record<HeroBannerSectionKey, CategoryBannerContent> = {
+export const CANONICAL_BANNER_CONTENT: CanonicalBannerContentMap = {
   harassment: {
     section: 'harassment',
     titleBn: 'হয়রানি ও নির্যাতন',
