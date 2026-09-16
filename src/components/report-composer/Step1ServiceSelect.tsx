@@ -53,26 +53,37 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       primaryVar: 'var(--sec-harassment-primary)',
     },
     {
-      key: 'rickshaw',
-      titleBn: segments.rickshaw?.nameBn || SECTIONS.rickshaw.nameBn,
-      titleEn: segments.rickshaw?.nameEn || SECTIONS.rickshaw.nameEn,
-      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।',
-      descEn: 'Share the location and details of illegal or unsafe charging stations.',
-      bgVar: 'var(--sec-rickshaw-bg)',
-      textVar: 'var(--sec-rickshaw-text)',
-      borderVar: 'var(--sec-rickshaw-border)',
-      primaryVar: 'var(--sec-rickshaw-primary)',
-    },
-    {
       key: 'extortion',
       titleBn: segments.extortion?.nameBn || SECTIONS.extortion.nameBn,
       titleEn: segments.extortion?.nameEn || SECTIONS.extortion.nameEn,
-      descBn: 'চাঁদা দাবি, জোরপূর্বক অর্থ আদায় বা চাপ প্রয়োগের ঘটনা জানান।',
-      descEn: 'Report extortion, coercive collections, or pressure.',
+      descBn: 'ঘুষ দাবি, ঘুষ প্রদান, চাঁদা দাবি বা জোরপূর্বক অর্থ আদায়ের ঘটনা জানান।',
+      descEn: 'Report bribery, extortion, coercive collections, or illegal payment demands.',
       bgVar: 'var(--sec-extortion-bg)',
       textVar: 'var(--sec-extortion-text)',
       borderVar: 'var(--sec-extortion-border)',
       primaryVar: 'var(--sec-extortion-primary)',
+    },
+    {
+      key: 'public_safety',
+      titleBn: segments.public_safety?.nameBn || SECTIONS.public_safety.nameBn,
+      titleEn: segments.public_safety?.nameEn || SECTIONS.public_safety.nameEn,
+      descBn: 'চুরি, ডাকাতি বা ছিনতাইয়ের ঘটনা ও অবস্থান জানান।',
+      descEn: 'Report theft, robbery, snatching, and related public-safety incidents.',
+      bgVar: 'var(--sec-public_safety-bg)',
+      textVar: 'var(--sec-public_safety-text)',
+      borderVar: 'var(--sec-public_safety-border)',
+      primaryVar: 'var(--sec-public_safety-primary)',
+    },
+    {
+      key: 'road_transport',
+      titleBn: segments.road_transport?.nameBn || SECTIONS.road_transport.nameBn,
+      titleEn: segments.road_transport?.nameEn || SECTIONS.road_transport.nameEn,
+      descBn: 'রাস্তা মেরামতে বিলম্ব, দুর্ঘটনা বা সড়ক অবরোধের তথ্য জানান।',
+      descEn: 'Report road repair delays, accidents, road blocks, or other transport issues.',
+      bgVar: 'var(--sec-road_transport-bg)',
+      textVar: 'var(--sec-road_transport-text)',
+      borderVar: 'var(--sec-road_transport-border)',
+      primaryVar: 'var(--sec-road_transport-primary)',
     },
     {
       key: 'load_shedding',
@@ -84,6 +95,28 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       textVar: 'var(--sec-load_shedding-text)',
       borderVar: 'var(--sec-load_shedding-border)',
       primaryVar: 'var(--sec-load_shedding-primary)',
+    },
+    {
+      key: 'illegal_occupation',
+      titleBn: segments.illegal_occupation?.nameBn || SECTIONS.illegal_occupation.nameBn,
+      titleEn: segments.illegal_occupation?.nameEn || SECTIONS.illegal_occupation.nameEn,
+      descBn: 'রাস্তা, ফুটপাত, ব্যক্তিগত বা সরকারি জমি ও সম্পত্তির অবৈধ দখল জানান।',
+      descEn: 'Report illegal occupation of public space, private land, or government property.',
+      bgVar: 'var(--sec-illegal_occupation-bg)',
+      textVar: 'var(--sec-illegal_occupation-text)',
+      borderVar: 'var(--sec-illegal_occupation-border)',
+      primaryVar: 'var(--sec-illegal_occupation-primary)',
+    },
+    {
+      key: 'rickshaw',
+      titleBn: segments.rickshaw?.nameBn || SECTIONS.rickshaw.nameBn,
+      titleEn: segments.rickshaw?.nameEn || SECTIONS.rickshaw.nameEn,
+      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।',
+      descEn: 'Share the location and details of illegal or unsafe charging stations.',
+      bgVar: 'var(--sec-rickshaw-bg)',
+      textVar: 'var(--sec-rickshaw-text)',
+      borderVar: 'var(--sec-rickshaw-border)',
+      primaryVar: 'var(--sec-rickshaw-primary)',
     },
   ];
   const activeServices = allServices.filter((service) => Boolean(segments[service.key]));
@@ -107,14 +140,12 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Single Question Header */}
       <div className="text-left">
         <h3 className="text-[20px] md:text-[22px] font-bold text-ui-content-primary">
           {language === 'bn' ? 'কোন বিষয়ে জানাতে চান?' : 'What would you like to report?'}
         </h3>
       </div>
 
-      {/* Active Service Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {activeServices.map((srv) => {
           const isSelected = selectedSegment === srv.key && !selectedComingSoon;
@@ -137,7 +168,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               }}
             >
               <div className="space-y-3 w-full">
-                {/* Header Icon + Selection Indicator */}
                 <div className="flex items-center justify-between">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-colors border shadow-2xs"
@@ -161,7 +191,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   </div>
                 </div>
 
-                {/* Title & Description */}
                 <div>
                   <h4 className="text-[18px] font-bold text-ui-content-primary leading-snug">
                     {language === 'bn' ? srv.titleBn : srv.titleEn}
@@ -176,7 +205,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
         })}
       </div>
 
-      {/* Upcoming / Coming Soon Services Section */}
       {comingSoonList.length > 0 && (
         <div className="pt-2 space-y-3">
           <div className="flex items-center gap-2">
@@ -232,7 +260,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
             })}
           </div>
 
-          {/* Informative state when a Coming Soon option is selected */}
           {activeComingSoonData && (
             <div
               id="coming-soon-selection-notice"
@@ -274,4 +301,3 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
     </div>
   );
 };
-
