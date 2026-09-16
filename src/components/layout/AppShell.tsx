@@ -17,7 +17,7 @@ import { HarassmentPage } from '../../pages/HarassmentPage';
 import { RickshawPage } from '../../pages/RickshawPage';
 import { ExtortionPage } from '../../pages/ExtortionPage';
 import { UtilityPage } from '../../pages/UtilityPage';
-import { ComingSoonPage } from '../../pages/ComingSoonPage';
+import { StandardCategoryPage } from '../../pages/StandardCategoryPage';
 import { ReportDetailPage } from '../../pages/ReportDetailPage';
 import { ReportPage } from '../../pages/ReportPage';
 import { SearchPage } from '../../pages/SearchPage';
@@ -72,7 +72,6 @@ export const AppShell: React.FC = () => {
     isReportComposerOpen,
     reportComposerInitialSegment,
     closeReportComposer,
-    navigateTo,
     isLocationModalOpen,
     locationModalPurpose,
     openLocationConsent,
@@ -83,20 +82,15 @@ export const AppShell: React.FC = () => {
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
 
   useEffect(() => {
-    // Check if visitor has accepted the responsibility notice
     const hasNoticeAccepted = hasAcceptedResponsibilityNotice();
 
     if (!hasNoticeAccepted) {
-      // First visit: Show responsibility notice first.
-      // Do NOT trigger location modal or geolocation permission yet.
       setIsFirstVisitNoticeOpen(true);
     } else {
-      // Notice already accepted: proceed directly with location decision
       const choice = VisitorSessionService.getLocationChoice();
       if (!choice) {
         openLocationConsent('browse');
       } else {
-        // If user previously granted consent, restore session & watch
         VisitorSessionService.initReturningVisitor();
       }
     }
@@ -110,7 +104,6 @@ export const AppShell: React.FC = () => {
     setAcceptedResponsibilityNotice();
     setIsFirstVisitNoticeOpen(false);
 
-    // After notice is accepted, trigger the location decision
     const choice = VisitorSessionService.getLocationChoice();
     if (!choice) {
       openLocationConsent('browse');
@@ -121,7 +114,6 @@ export const AppShell: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-ui-page text-ui-content-primary flex flex-col">
-      {/* Skip Link for Keyboard & Screen Reader Accessibility */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-ui-action-bg focus:text-ui-action-text focus:rounded-xl focus:shadow-lg focus:font-semibold focus:outline-none focus:ring-2 focus:ring-ui-focus text-[15px]"
@@ -129,27 +121,22 @@ export const AppShell: React.FC = () => {
         {language === 'bn' ? 'মূল বিষয়বস্তুতে যান' : 'Skip to main content'}
       </a>
 
-      {/* 1. Desktop Left Navigation Rail (fixed viewport left on >= 1440px) */}
       <ErrorBoundary componentName="DesktopLeftRail" silent>
         <DesktopLeftRail />
       </ErrorBoundary>
 
-      {/* 2. Tablet & Compact Desktop Header (768px - 1439px) */}
       <ErrorBoundary componentName="Header" silent>
         <Header />
       </ErrorBoundary>
 
-      {/* 3. Mobile Header (< 768px) */}
       <ErrorBoundary componentName="MobileHeader" fallback={null}>
         <MobileHeader />
       </ErrorBoundary>
 
-      {/* 4. Desktop-Workspace-Centered Main Public Content */}
       <div
         id="public-desktop-workspace"
         className="w-full flex-1 flex flex-col min-[1440px]:pl-[240px] min-[1536px]:pl-[250px] min-[1920px]:pl-[260px]"
       >
-        {/* Persistent Location Reminder Bar (when location is off/unavailable) */}
         <ErrorBoundary componentName="LocationReminderBar" silent>
           <LocationReminderBar isFirstVisitNoticeOpen={isFirstVisitNoticeOpen} />
         </ErrorBoundary>
@@ -165,10 +152,12 @@ export const AppShell: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/harassment" element={<HarassmentPage />} />
-                  <Route path="/rickshaw" element={<RickshawPage />} />
                   <Route path="/extortion" element={<ExtortionPage />} />
+                  <Route path="/public-safety" element={<StandardCategoryPage section="public_safety" />} />
+                  <Route path="/road-transport" element={<StandardCategoryPage section="road_transport" />} />
                   <Route path="/load-shedding" element={<UtilityPage />} />
-                  <Route path="/illegal-occupation" element={<ComingSoonPage serviceKey="illegal_occupation" />} />
+                  <Route path="/illegal-occupation" element={<StandardCategoryPage section="illegal_occupation" />} />
+                  <Route path="/rickshaw" element={<RickshawPage />} />
                   <Route path="/report" element={<ReportPage />} />
                   <Route
                     path="/explore"
@@ -189,7 +178,6 @@ export const AppShell: React.FC = () => {
             </SeoManager>
           </div>
 
-          {/* Minimal Informational Trust Footer */}
           <footer className="pt-8 pb-6 border-t border-ui-stroke-subtle mt-10 text-[14px] text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
@@ -209,17 +197,14 @@ export const AppShell: React.FC = () => {
         </main>
       </div>
 
-      {/* 5. Mobile Fixed Bottom Navigation (< 768px) */}
       <ErrorBoundary componentName="BottomNav" fallback={null}>
         <BottomNav />
       </ErrorBoundary>
 
-      {/* 6. Global Search Dialog Modal */}
       <ErrorBoundary componentName="SearchModal" silent>
         <SearchModal />
       </ErrorBoundary>
 
-      {/* 7. Unified Global Report Composer Modal */}
       <ErrorBoundary componentName="ReportComposerModal" silent>
         <ReportComposerModal
           isOpen={isReportComposerOpen}
@@ -229,7 +214,6 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      {/* 8. First-Visit Responsibility & Independence Notice Modal */}
       <ErrorBoundary componentName="FirstVisitNoticeModal" silent>
         <FirstVisitNoticeModal
           isOpen={isFirstVisitNoticeOpen}
@@ -238,7 +222,6 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      {/* 9. First-Visit Location Sharing Consent Modal */}
       <ErrorBoundary componentName="LocationConsentModal" silent>
         <LocationConsentModal
           isOpen={isLocationModalOpen}
@@ -251,7 +234,6 @@ export const AppShell: React.FC = () => {
           }}
         />
       </ErrorBoundary>
-
     </div>
   );
 };
