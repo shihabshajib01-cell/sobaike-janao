@@ -1489,7 +1489,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             </div>
 
             {isBriberyReport && (
-              <div className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3">
+              <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
                 <h4 className="text-[13px] font-bold text-ui-content-primary">
                   {language === 'bn' ? 'ঘুষ সংক্রান্ত তথ্য' : 'Bribery details'}
                 </h4>
