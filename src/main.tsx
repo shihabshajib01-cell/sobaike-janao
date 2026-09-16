@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
+import './theme/category-tokens.css';
 
 const rootElement = document.getElementById('root');
 

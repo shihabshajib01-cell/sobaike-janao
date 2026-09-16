@@ -31,6 +31,8 @@ import {
   matchesHarassmentClassification,
 } from '../data/harassmentClassification';
 
+const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
+
 export const ExplorePage: React.FC = () => {
   const { language } = useApp();
   // Default to 'reports' mode per Phase 8 product direction
@@ -467,77 +469,32 @@ export const ExplorePage: React.FC = () => {
             {language === 'bn' ? 'সব' : 'All'}
           </button>
 
-          <button
-            type="button"
-            aria-pressed={selectedSection === 'harassment'}
-            onClick={() => setSelectedSection('harassment')}
-            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              selectedSection === 'harassment'
-                ? 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border-[var(--sec-harassment-border)] shadow-xs font-bold ring-1 ring-[var(--sec-harassment-border)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-            }`}
-          >
-            <CategoryIcon section="harassment" size="xs" />
-            <span>
-              {language === 'bn'
-                ? SECTIONS.harassment.shortNameBn
-                : SECTIONS.harassment.shortNameEn}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            aria-pressed={selectedSection === 'rickshaw'}
-            onClick={() => setSelectedSection('rickshaw')}
-            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              selectedSection === 'rickshaw'
-                ? 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border-[var(--sec-rickshaw-border)] shadow-xs font-bold ring-1 ring-[var(--sec-rickshaw-border)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-            }`}
-          >
-            <CategoryIcon section="rickshaw" size="xs" />
-            <span>
-              {language === 'bn'
-                ? SECTIONS.rickshaw.shortNameBn
-                : SECTIONS.rickshaw.shortNameEn}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            aria-pressed={selectedSection === 'extortion'}
-            onClick={() => setSelectedSection('extortion')}
-            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              selectedSection === 'extortion'
-                ? 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border-[var(--sec-extortion-border)] shadow-xs font-bold ring-1 ring-[var(--sec-extortion-border)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-            }`}
-          >
-            <CategoryIcon section="extortion" size="xs" />
-            <span>
-              {language === 'bn'
-                ? SECTIONS.extortion.shortNameBn
-                : SECTIONS.extortion.shortNameEn}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            aria-pressed={selectedSection === 'load_shedding'}
-            onClick={() => setSelectedSection('load_shedding')}
-            className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              selectedSection === 'load_shedding'
-                ? 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border-[var(--sec-load_shedding-border)] shadow-xs font-bold ring-1 ring-[var(--sec-load_shedding-border)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-            }`}
-          >
-            <CategoryIcon section="load_shedding" size="xs" />
-            <span>
-              {language === 'bn'
-                ? SECTIONS.load_shedding.shortNameBn
-                : SECTIONS.load_shedding.shortNameEn}
-            </span>
-          </button>
+          {CATEGORY_KEYS.map((sectionKey) => {
+            const section = SECTIONS[sectionKey];
+            const selected = selectedSection === sectionKey;
+            return (
+              <button
+                type="button"
+                key={sectionKey}
+                aria-pressed={selected}
+                onClick={() => setSelectedSection(sectionKey)}
+                className={`px-3.5 py-2 rounded-xl text-[13px] font-semibold shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  selected
+                    ? 'shadow-xs font-bold ring-1'
+                    : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+                }`}
+                style={selected ? {
+                  backgroundColor: `var(--sec-${sectionKey}-bg)`,
+                  color: `var(--sec-${sectionKey}-text)`,
+                  borderColor: `var(--sec-${sectionKey}-border)`,
+                  ['--tw-ring-color' as any]: `var(--sec-${sectionKey}-border)`,
+                } : undefined}
+              >
+                <CategoryIcon section={sectionKey} size="xs" />
+                <span>{language === 'bn' ? section.shortNameBn : section.shortNameEn}</span>
+              </button>
+            );
+          })}
         </div>
 
         {selectedSection === 'harassment' && (
@@ -710,8 +667,6 @@ export const ExplorePage: React.FC = () => {
               </button>
             </span>
           )}
-
-
 
           {selectedSection === 'harassment' && harassmentFilters.ageGroup !== 'all' && (
             <span className="inline-flex items-center gap-1 pl-3 pr-0.5 rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-primary">
@@ -1114,69 +1069,34 @@ export const ExplorePage: React.FC = () => {
                 {language === 'bn' ? 'সব বিষয়' : 'All topics'}
               </button>
 
-              <button
-                type="button"
-                aria-pressed={draftSection === 'harassment'}
-                onClick={() => setDraftSection('harassment')}
-                className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                  draftSection === 'harassment'
-                    ? 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border-[var(--sec-harassment-border)] shadow-xs font-bold ring-1 ring-[var(--sec-harassment-border)]'
-                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-                }`}
-              >
-                <CategoryIcon section="harassment" size="xs" />
-                <span className="truncate">
-                  {language === 'bn' ? SECTIONS.harassment.shortNameBn : SECTIONS.harassment.shortNameEn}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={draftSection === 'rickshaw'}
-                onClick={() => setDraftSection('rickshaw')}
-                className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                  draftSection === 'rickshaw'
-                    ? 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border-[var(--sec-rickshaw-border)] shadow-xs font-bold ring-1 ring-[var(--sec-rickshaw-border)]'
-                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-                }`}
-              >
-                <CategoryIcon section="rickshaw" size="xs" />
-                <span className="truncate">
-                  {language === 'bn' ? SECTIONS.rickshaw.shortNameBn : SECTIONS.rickshaw.shortNameEn}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={draftSection === 'extortion'}
-                onClick={() => setDraftSection('extortion')}
-                className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                  draftSection === 'extortion'
-                    ? 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border-[var(--sec-extortion-border)] shadow-xs font-bold ring-1 ring-[var(--sec-extortion-border)]'
-                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-                }`}
-              >
-                <CategoryIcon section="extortion" size="xs" />
-                <span className="truncate">
-                  {language === 'bn' ? SECTIONS.extortion.shortNameBn : SECTIONS.extortion.shortNameEn}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={draftSection === 'load_shedding'}
-                onClick={() => setDraftSection('load_shedding')}
-                className={`col-span-2 px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                  draftSection === 'load_shedding'
-                    ? 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border-[var(--sec-load_shedding-border)] shadow-xs font-bold ring-1 ring-[var(--sec-load_shedding-border)]'
-                    : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-                }`}
-              >
-                <CategoryIcon section="load_shedding" size="xs" />
-                <span className="truncate">
-                  {language === 'bn' ? SECTIONS.load_shedding.shortNameBn : SECTIONS.load_shedding.shortNameEn}
-                </span>
-              </button>
+              {CATEGORY_KEYS.map((sectionKey) => {
+                const section = SECTIONS[sectionKey];
+                const selected = draftSection === sectionKey;
+                return (
+                  <button
+                    type="button"
+                    key={sectionKey}
+                    aria-pressed={selected}
+                    onClick={() => setDraftSection(sectionKey)}
+                    className={`px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                      selected
+                        ? 'shadow-xs font-bold ring-1'
+                        : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+                    }`}
+                    style={selected ? {
+                      backgroundColor: `var(--sec-${sectionKey}-bg)`,
+                      color: `var(--sec-${sectionKey}-text)`,
+                      borderColor: `var(--sec-${sectionKey}-border)`,
+                      ['--tw-ring-color' as any]: `var(--sec-${sectionKey}-border)`,
+                    } : undefined}
+                  >
+                    <CategoryIcon section={sectionKey} size="xs" />
+                    <span className="truncate">
+                      {language === 'bn' ? section.shortNameBn : section.shortNameEn}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </fieldset>
 

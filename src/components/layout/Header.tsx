@@ -1,14 +1,13 @@
 import React from 'react';
-import { Search, Menu, PlusCircle, Home, HeartHandshake, ZapOff, ShieldAlert, Compass, PhoneCall, Globe } from 'lucide-react';
-import { EvStationIcon } from '../branding/EvStationIcon';
+import { Search, Menu, PlusCircle, Home, Compass, PhoneCall, Globe } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { IconButton } from '../ui/IconButton';
 import { Drawer } from '../ui/Drawer';
 import { ThemeSelector } from '../ui/ThemeSelector';
-import { getContextualReportRoute } from '../../utils/reportRoutes';
 import { BrandLogo } from '../branding/BrandLogo';
+import { CategoryIcon } from '../branding/CategoryIcon';
 
 export const Header: React.FC = () => {
   const {
@@ -27,9 +26,6 @@ export const Header: React.FC = () => {
     nameEn: string;
     sectionKey?: SectionKey;
     icon: React.ReactNode;
-    isComingSoon?: boolean;
-    badgeBn?: string;
-    badgeEn?: string;
   }> = [
     {
       path: '/',
@@ -37,34 +33,23 @@ export const Header: React.FC = () => {
       nameEn: 'Home',
       icon: <Home className="w-4 h-4" aria-hidden="true" />,
     },
-    {
-      path: '/harassment',
-      nameBn: SECTIONS.harassment.shortNameBn,
-      nameEn: SECTIONS.harassment.shortNameEn,
-      sectionKey: 'harassment',
-      icon: <HeartHandshake className="w-4 h-4" aria-hidden="true" />,
-    },
-    {
-      path: '/rickshaw',
-      nameBn: SECTIONS.rickshaw.shortNameBn,
-      nameEn: SECTIONS.rickshaw.shortNameEn,
-      sectionKey: 'rickshaw',
-      icon: <EvStationIcon className="w-4 h-4" aria-hidden="true" />,
-    },
-    {
-      path: '/extortion',
-      nameBn: SECTIONS.extortion.shortNameBn,
-      nameEn: SECTIONS.extortion.shortNameEn,
-      sectionKey: 'extortion',
-      icon: <ShieldAlert className="w-4 h-4" aria-hidden="true" />,
-    },
-    {
-      path: '/load-shedding',
-      nameBn: SECTIONS.load_shedding.shortNameBn,
-      nameEn: SECTIONS.load_shedding.shortNameEn,
-      sectionKey: 'load_shedding',
-      icon: <ZapOff className="w-4 h-4" aria-hidden="true" />,
-    },
+    ...(
+      [
+        'harassment',
+        'extortion',
+        'public_safety',
+        'road_transport',
+        'load_shedding',
+        'illegal_occupation',
+        'rickshaw',
+      ] as SectionKey[]
+    ).map((sectionKey) => ({
+      path: SECTIONS[sectionKey].slug,
+      nameBn: SECTIONS[sectionKey].shortNameBn,
+      nameEn: SECTIONS[sectionKey].shortNameEn,
+      sectionKey,
+      icon: <CategoryIcon section={sectionKey} size="md" />,
+    })),
     {
       path: '/explore',
       nameBn: 'এক্সপ্লোর',
@@ -74,20 +59,10 @@ export const Header: React.FC = () => {
   ];
 
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
-    if (!sectionKey) return 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle';
-    if (sectionKey === 'harassment') {
-      return 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)] font-bold';
+    if (!sectionKey) {
+      return 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle';
     }
-    if (sectionKey === 'rickshaw') {
-      return 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)] font-bold';
-    }
-    if (sectionKey === 'extortion') {
-      return 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)] font-bold';
-    }
-    if (sectionKey === 'load_shedding') {
-      return 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border border-[var(--sec-load_shedding-border)] font-bold';
-    }
-    return 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle';
+    return 'font-bold border';
   };
 
   return (
@@ -98,7 +73,6 @@ export const Header: React.FC = () => {
       >
         <div className="w-full max-w-[900px] mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
-            {/* Brand Logo */}
             <BrandLogo
               id="tablet-brand-logo"
               size="sm"
@@ -106,9 +80,7 @@ export const Header: React.FC = () => {
               englishClassName="hidden min-[900px]:block text-[14px] leading-tight text-ui-content-secondary font-medium"
             />
 
-            {/* Right Action Cluster for Tablet: ONLY Report CTA + Menu */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              {/* Primary Action Button: Contextual Report CTA */}
               <Button
                 id="tablet-report-cta"
                 variant="primary"
@@ -120,7 +92,6 @@ export const Header: React.FC = () => {
                 {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
               </Button>
 
-              {/* Menu Drawer Button */}
               <IconButton
                 id="tablet-menu-button"
                 icon={<Menu className="w-5 h-5 text-ui-content-primary" />}
@@ -134,7 +105,6 @@ export const Header: React.FC = () => {
         </div>
       </header>
 
-      {/* Slide-over Drawer for Tablet and Mobile Menu */}
       <Drawer
         id="tablet-drawer"
         isOpen={isTabletMenuOpen}
@@ -149,7 +119,6 @@ export const Header: React.FC = () => {
         }
       >
         <div className="space-y-4">
-          {/* Navigation Section */}
           <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu navigation'}>
             <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-3 mb-2">
               {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & pages'}
@@ -171,6 +140,15 @@ export const Header: React.FC = () => {
                       ? getSectionActiveStyles(item.sectionKey)
                       : 'text-ui-content-secondary'
                   }`}
+                  style={
+                    isActive && item.sectionKey
+                      ? {
+                          backgroundColor: `var(--sec-${item.sectionKey}-bg)`,
+                          color: `var(--sec-${item.sectionKey}-text)`,
+                          borderColor: `var(--sec-${item.sectionKey}-border)`,
+                        }
+                      : undefined
+                  }
                 >
                   <div className="flex items-center gap-3">
                     <span className={isActive && !secConfig ? 'text-ui-content-primary' : 'text-ui-content-muted'}>
@@ -184,17 +162,11 @@ export const Header: React.FC = () => {
                       style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
                     />
                   )}
-                  {item.isComingSoon && (
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-muted shrink-0 leading-tight">
-                      {language === 'bn' ? item.badgeBn : item.badgeEn}
-                    </span>
-                  )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Secondary Utilities */}
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-1">
             <button
               onClick={() => {
@@ -229,13 +201,11 @@ export const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Settings Section: Appearance / Theme & Language Switcher */}
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-3">
             <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-1">
               {language === 'bn' ? 'সেটিংস' : 'Settings'}
             </p>
 
-            {/* Appearance / Theme Selector */}
             <div className="space-y-1.5">
               <span className="text-[14px] text-ui-content-secondary font-medium px-1">
                 {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
@@ -243,7 +213,6 @@ export const Header: React.FC = () => {
               <ThemeSelector variant="segmented" />
             </div>
 
-            {/* Language Switcher in Drawer */}
             <div className="space-y-1.5">
               <span className="text-[14px] text-ui-content-secondary font-medium px-1">
                 {language === 'bn' ? 'ভাষা' : 'Language'}

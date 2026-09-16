@@ -47,7 +47,6 @@ export const SearchPage: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Update query state if queryParams changes
   useEffect(() => {
     if (queryParams.q !== undefined && queryParams.q !== query) {
       setQuery(queryParams.q);
@@ -65,7 +64,6 @@ export const SearchPage: React.FC = () => {
     }
   }, [selectedReportSegment, harassmentFilters]);
 
-  // Search through Reports
   const matchingReports = useMemo(() => {
     if (!query.trim() && !hasReportFilters) return [];
     const q = query.toLowerCase().trim();
@@ -91,7 +89,6 @@ export const SearchPage: React.FC = () => {
     });
   }, [allReports, query, selectedReportSegment, harassmentFilters, hasReportFilters]);
 
-  // Search through Locations
   const matchingLocations = useMemo(() => {
     if (!query.trim()) return [];
     const q = query.toLowerCase().trim();
@@ -105,7 +102,6 @@ export const SearchPage: React.FC = () => {
     });
   }, [query]);
 
-  // Search through Reported Subjects
   const matchingSubjects = useMemo(() => {
     if (!query.trim()) return [];
     const q = query.toLowerCase().trim();
@@ -115,7 +111,6 @@ export const SearchPage: React.FC = () => {
       const subjectBn = r.reportedSubjectBn || r.reportedSubject || '';
       const subjectEn = r.reportedSubjectEn || r.reportedSubject || '';
 
-      // Skip withheld subjects
       if (
         !subjectBn ||
         subjectBn.includes('গোপন') ||
@@ -149,16 +144,25 @@ export const SearchPage: React.FC = () => {
 
   const totalResults = matchingReports.length + matchingLocations.length + matchingSubjects.length;
 
+  const categoryOptions = useMemo(
+    () => [
+      { value: 'all', label: language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports' },
+      ...(Object.values(SECTIONS) as Array<(typeof SECTIONS)[SectionKey]>).map((section) => ({
+        value: section.key,
+        label: language === 'bn' ? section.nameBn : section.nameEn,
+      })),
+    ],
+    [language]
+  );
+
   return (
     <PublicPageContainer id="search-page-container">
-      {/* Editorial Header */}
       <div className="space-y-1">
         <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
           {language === 'bn' ? 'অনুসন্ধান' : 'Search'}
         </h1>
       </div>
 
-      {/* Search Input Box */}
       <div className="relative flex items-center">
         <Search className="w-4 h-4 text-ui-content-muted absolute left-3.5 pointer-events-none" aria-hidden="true" />
         <input
@@ -186,13 +190,7 @@ export const SearchPage: React.FC = () => {
             label={language === 'bn' ? 'প্রতিবেদনের ধরন' : 'Report category'}
             value={selectedReportSegment}
             onChange={(event) => setSelectedReportSegment(event.target.value as SectionKey | 'all')}
-            options={[
-              { value: 'all', label: language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports' },
-              { value: 'harassment', label: language === 'bn' ? SECTIONS.harassment.nameBn : SECTIONS.harassment.nameEn },
-              { value: 'rickshaw', label: language === 'bn' ? SECTIONS.rickshaw.nameBn : SECTIONS.rickshaw.nameEn },
-              { value: 'extortion', label: language === 'bn' ? SECTIONS.extortion.nameBn : SECTIONS.extortion.nameEn },
-              { value: 'load_shedding', label: language === 'bn' ? SECTIONS.load_shedding.nameBn : SECTIONS.load_shedding.nameEn },
-            ]}
+            options={categoryOptions}
           />
         </div>
         {selectedReportSegment === 'harassment' && (
@@ -200,7 +198,6 @@ export const SearchPage: React.FC = () => {
         )}
       </section>
 
-      {/* Result Category Tabs */}
       {hasSearchIntent && (
         <div className="flex items-center gap-2 pb-2 border-b border-ui-stroke-subtle overflow-x-auto no-scrollbar">
           <button
@@ -254,7 +251,6 @@ export const SearchPage: React.FC = () => {
         </div>
       )}
 
-      {/* Loading State Skeleton Screen */}
       {isLoading && (
         <ReportFeedSkeleton
           count={3}
@@ -263,7 +259,6 @@ export const SearchPage: React.FC = () => {
         />
       )}
 
-      {/* Error State */}
       {!isLoading && fetchError && (
         <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
@@ -282,17 +277,14 @@ export const SearchPage: React.FC = () => {
         </div>
       )}
 
-      {/* Initial Empty / Instructional State */}
       {!isLoading && !fetchError && !hasSearchIntent && (
         <div className="py-14 text-center">
           <Search className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
         </div>
       )}
 
-      {/* Results Content */}
       {!isLoading && !fetchError && hasSearchIntent && (
         <div className="space-y-6">
-          {/* 1. Locations Section */}
           {(activeTab === 'all' || activeTab === 'locations') && matchingLocations.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
@@ -329,7 +321,6 @@ export const SearchPage: React.FC = () => {
             </div>
           )}
 
-          {/* 2. Subjects Section */}
           {(activeTab === 'all' || activeTab === 'subjects') && matchingSubjects.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
@@ -368,7 +359,6 @@ export const SearchPage: React.FC = () => {
             </div>
           )}
 
-          {/* 3. Reports Section */}
           {(activeTab === 'all' || activeTab === 'reports') && matchingReports.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-[14px] font-bold text-ui-content-secondary uppercase tracking-wider">
@@ -382,7 +372,6 @@ export const SearchPage: React.FC = () => {
             </div>
           )}
 
-          {/* Empty State */}
           {totalResults === 0 && (
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-10 text-center space-y-3 shadow-2xs">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
