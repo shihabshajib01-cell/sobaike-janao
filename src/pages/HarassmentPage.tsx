@@ -5,7 +5,6 @@ import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
-import { LocationSelector } from '../components/feed/LocationSelector';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
@@ -23,7 +22,6 @@ import {
 import {
   HarassmentFilterSheet,
   HarassmentFilterValue,
-  HarassmentSubjectFilter,
 } from '../components/report/HarassmentFilterSheet';
 
 const normalizeDistrictName = (value?: string) =>
@@ -66,7 +64,6 @@ export const HarassmentPage: React.FC = () => {
     openReportComposer,
     browseLocation,
     browseLocationStatus,
-    navigateTo,
     isHarassmentFilterOpen,
     setIsHarassmentFilterOpen,
   } = useApp();
@@ -91,14 +88,6 @@ export const HarassmentPage: React.FC = () => {
   const [canScrollSubcategoriesRight, setCanScrollSubcategoriesRight] = useState(false);
 
   const subcategories = getFeedSubcategories('harassment');
-
-  const harassmentDistrictOptions = useMemo(
-    () => [
-      { id: 'all', nameBn: 'সারা বাংলাদেশ', nameEn: 'All Bangladesh' },
-      ...BANGLADESH_DISTRICTS.map(({ id, nameBn, nameEn }) => ({ id, nameBn, nameEn })),
-    ],
-    []
-  );
 
   // Determine valid browse location (transient request scope only)
   const hasValidBrowseLocation =
@@ -197,37 +186,14 @@ export const HarassmentPage: React.FC = () => {
     classificationFilters,
   ]);
 
-  const handleDistrictChange = useCallback((districtId: string) => {
-    setSelectedDistrict(districtId);
-    if (districtId === 'all') {
-      setSelectedDivision('all');
-      return;
-    }
-
-    const district = BANGLADESH_DISTRICTS.find((item) => item.id === districtId);
-    setSelectedDivision(district?.divisionId || 'all');
-  }, []);
-
   const handleApplyFilterSheet = useCallback(
-    (next: HarassmentFilterValue, subject: HarassmentSubjectFilter) => {
-      if (subject === 'all') {
-        setIsHarassmentFilterOpen(false);
-        navigateTo('/issues');
-        return;
-      }
-
-      if (subject !== 'harassment') {
-        setIsHarassmentFilterOpen(false);
-        navigateTo(SECTIONS[subject].slug);
-        return;
-      }
-
+    (next: HarassmentFilterValue) => {
       setSelectedDivision(next.divisionId);
       setSelectedDistrict(next.districtId);
       setClassificationFilters({ ...next.classification });
       setIsHarassmentFilterOpen(false);
     },
-    [navigateTo, setIsHarassmentFilterOpen]
+    [setIsHarassmentFilterOpen]
   );
 
   return (
@@ -257,10 +223,10 @@ export const HarassmentPage: React.FC = () => {
         ]}
       />
 
-      {/* 2. Subcategory & Location Filter Controls */}
+      {/* 2. Subcategory filter controls */}
       <section id="harassment-filter-section" className="space-y-3">
-        <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
-          <div className="min-w-0 flex-1">
+        <div className="border-b border-ui-stroke-subtle pb-3">
+          <div className="min-w-0">
             <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
               {language === 'bn'
                 ? 'সকল প্রতিবেদন'
@@ -271,14 +237,6 @@ export const HarassmentPage: React.FC = () => {
                 ? `${filteredReports.length}টি প্রকাশিত প্রতিবেদন`
                 : `${filteredReports.length} published reports`}
             </p>
-          </div>
-
-          <div className="shrink-0">
-            <LocationSelector
-              selectedDistrict={selectedDistrict}
-              onSelectDistrict={handleDistrictChange}
-              options={harassmentDistrictOptions}
-            />
           </div>
         </div>
 
