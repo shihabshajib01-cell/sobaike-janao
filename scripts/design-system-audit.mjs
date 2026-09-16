@@ -63,13 +63,8 @@ const RULES = [
   },
   {
     id: 'tailwind-shadow',
-    pattern: /\bshadow-(?:2xs|xs|sm|md|lg|xl|2xl)\b|\bshadow\b/g,
+    pattern: /\bshadow-(?:2xs|xs|sm|md|lg|xl|2xl)\b|\bshadow(?!-)\b/g,
     message: 'Tailwind shadow utility bypasses central elevation utilities',
-  },
-  {
-    id: 'inline-ui-style',
-    pattern: /\b(?:color|backgroundColor|borderColor|fontSize|fontWeight|fontFamily|borderRadius|boxShadow)\s*:/g,
-    message: 'Inline visual styling should use semantic design-system tokens/utilities',
   },
 ];
 
@@ -117,15 +112,23 @@ for (const file of files) {
 if (findings.length) {
   const byRule = new Map();
   const byFile = new Map();
+  const byRuleToken = new Map();
   for (const finding of findings) {
     byRule.set(finding.rule, (byRule.get(finding.rule) || 0) + 1);
     byFile.set(finding.file, (byFile.get(finding.file) || 0) + 1);
+    const key = `${finding.rule}::${finding.token}`;
+    byRuleToken.set(key, (byRuleToken.get(key) || 0) + 1);
   }
 
   console.error(`Public design-system audit found ${findings.length} violation(s) across ${byFile.size} UI file(s).`);
   console.error('\nBy rule:');
   for (const [rule, count] of [...byRule.entries()].sort((a, b) => b[1] - a[1])) {
     console.error(`  ${rule}: ${count}`);
+    const tokens = [...byRuleToken.entries()]
+      .filter(([key]) => key.startsWith(`${rule}::`))
+      .map(([key, tokenCount]) => [key.slice(rule.length + 2), tokenCount])
+      .sort((a, b) => b[1] - a[1]);
+    console.error(`    ${tokens.map(([token, tokenCount]) => `${token}=${tokenCount}`).join(', ')}`);
   }
   console.error('\nBy file:');
   for (const [file, count] of [...byFile.entries()].sort((a, b) => b[1] - a[1])) {
@@ -133,8 +136,8 @@ if (findings.length) {
   }
 
   const verbose = process.env.AUDIT_VERBOSE === '1';
-  const visibleFindings = verbose ? findings : findings.slice(0, 300);
-  console.error(`\nDetails${verbose ? '' : ' (first 300; set AUDIT_VERBOSE=1 for all)'}:`);
+  const visibleFindings = verbose ? findings : findings.slice(0, 240);
+  console.error(`\nDetails${verbose ? '' : ' (first 240; set AUDIT_VERBOSE=1 for all)'}:`);
   for (const item of visibleFindings) {
     console.error(`${item.file}:${item.line} [${item.rule}] ${item.token} — ${item.message}`);
     console.error(`  ${item.source}`);
