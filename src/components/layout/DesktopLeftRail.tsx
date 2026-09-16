@@ -1,103 +1,78 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { BrandLogo } from '../branding/BrandLogo';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
 
+const SECTION_ICON_MAP: Record<SectionKey, AppIconName> = {
+  harassment: 'harassment',
+  extortion: 'extortion',
+  public_safety: 'public-safety',
+  road_transport: 'road-transport',
+  load_shedding: 'load-shedding',
+  illegal_occupation: 'illegal-occupation',
+  rickshaw: 'rickshaw',
+};
+
 export const DesktopLeftRail: React.FC = () => {
   const { currentRoute, navigateTo, language, toggleLanguage, openReportComposer } = useApp();
+  const { segments } = useTaxonomy();
 
-  const navItems: Array<{
-    id: string;
-    path: RoutePath;
-    nameBn: string;
-    nameEn: string;
-    iconName: AppIconName;
-    sectionKey?: SectionKey;
-    isComingSoon?: boolean;
-    badgeBn?: string;
-    badgeEn?: string;
-  }> = [
-    {
-      id: 'rail-home',
-      path: '/',
-      nameBn: 'মূলপাতা',
-      nameEn: 'Home',
-      iconName: 'home',
-    },
-    {
-      id: 'rail-harassment',
-      path: '/harassment',
-      nameBn: SECTIONS.harassment.shortNameBn,
-      nameEn: SECTIONS.harassment.shortNameEn,
-      iconName: 'harassment',
-      sectionKey: 'harassment',
-    },
-    {
-      id: 'rail-rickshaw',
-      path: '/rickshaw',
-      nameBn: SECTIONS.rickshaw.shortNameBn,
-      nameEn: SECTIONS.rickshaw.shortNameEn,
-      iconName: 'rickshaw',
-      sectionKey: 'rickshaw',
-    },
-    {
-      id: 'rail-extortion',
-      path: '/extortion',
-      nameBn: SECTIONS.extortion.shortNameBn,
-      nameEn: SECTIONS.extortion.shortNameEn,
-      iconName: 'extortion',
-      sectionKey: 'extortion',
-    },
-    {
-      id: 'rail-load-shedding',
-      path: '/load-shedding',
-      nameBn: SECTIONS.load_shedding.shortNameBn,
-      nameEn: SECTIONS.load_shedding.shortNameEn,
-      iconName: 'zap-off',
-      sectionKey: 'load_shedding',
-    },
-    {
-      id: 'rail-explore',
-      path: '/explore',
-      nameBn: 'এক্সপ্লোর',
-      nameEn: 'Explore',
-      iconName: 'compass',
-    },
-    {
-      id: 'rail-search',
-      path: '/search',
-      nameBn: 'অনুসন্ধান',
-      nameEn: 'Search',
-      iconName: 'search',
-    },
-    {
-      id: 'rail-more',
-      path: '/more',
-      nameBn: 'তথ্য ও নীতিমালা',
-      nameEn: 'Info & guidelines',
-      iconName: 'info',
-    },
-  ];
+  const navItems = useMemo(() => {
+    const categoryItems = (Object.keys(SECTIONS) as SectionKey[])
+      .filter((key) => Boolean(segments[key]))
+      .map((key) => ({
+        id: `rail-${key.replace(/_/g, '-')}`,
+        path: SECTIONS[key].slug as RoutePath,
+        nameBn: segments[key]?.shortNameBn || SECTIONS[key].shortNameBn,
+        nameEn: segments[key]?.shortNameEn || SECTIONS[key].shortNameEn,
+        iconName: SECTION_ICON_MAP[key],
+        sectionKey: key,
+        sortOrder: segments[key]?.sortOrder,
+      }))
+      .sort((a, b) => {
+        if (typeof a.sortOrder === 'number' && typeof b.sortOrder === 'number') {
+          return a.sortOrder - b.sortOrder;
+        }
+        return (Object.keys(SECTIONS) as SectionKey[]).indexOf(a.sectionKey) -
+          (Object.keys(SECTIONS) as SectionKey[]).indexOf(b.sectionKey);
+      });
 
-  const getSectionActiveStyles = (sectionKey?: SectionKey) => {
-    if (!sectionKey) return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
-    if (sectionKey === 'harassment') {
-      return 'bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)] font-semibold';
-    }
-    if (sectionKey === 'rickshaw') {
-      return 'bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)] font-semibold';
-    }
-    if (sectionKey === 'extortion') {
-      return 'bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)] font-semibold';
-    }
-    if (sectionKey === 'load_shedding') {
-      return 'bg-[var(--sec-load_shedding-bg)] text-[var(--sec-load_shedding-text)] border border-[var(--sec-load_shedding-border)] font-semibold';
-    }
-    return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
-  };
+    return [
+      {
+        id: 'rail-home',
+        path: '/' as RoutePath,
+        nameBn: 'মূলপাতা',
+        nameEn: 'Home',
+        iconName: 'home' as AppIconName,
+      },
+      ...categoryItems,
+      {
+        id: 'rail-explore',
+        path: '/explore' as RoutePath,
+        nameBn: 'এক্সপ্লোর',
+        nameEn: 'Explore',
+        iconName: 'compass' as AppIconName,
+      },
+      {
+        id: 'rail-search',
+        path: '/search' as RoutePath,
+        nameBn: 'অনুসন্ধান',
+        nameEn: 'Search',
+        iconName: 'search' as AppIconName,
+      },
+      {
+        id: 'rail-more',
+        path: '/more' as RoutePath,
+        nameBn: 'তথ্য ও নীতিমালা',
+        nameEn: 'Info & guidelines',
+        iconName: 'info' as AppIconName,
+      },
+    ];
+  }, [segments]);
 
   return (
     <aside
@@ -105,9 +80,7 @@ export const DesktopLeftRail: React.FC = () => {
       aria-label={language === 'bn' ? 'ডেস্কটপ নেভিগেশন' : 'Desktop navigation'}
       className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 h-[100dvh] overflow-y-auto w-[240px] min-[1536px]:w-[250px] min-[1920px]:w-[260px] px-4 min-[1920px]:px-5 py-5 bg-ui-surface border-r border-ui-stroke-subtle justify-between select-none z-30"
     >
-      {/* Top: Brand Header & Primary Nav items */}
       <div className="space-y-5">
-        {/* Brand Logo & Wordmark */}
         <BrandLogo
           id="rail-brand-logo"
           size="md"
@@ -115,7 +88,6 @@ export const DesktopLeftRail: React.FC = () => {
           className="transition-colors rounded-xl px-1 py-1 w-full"
         />
 
-        {/* Primary Action Button: Contextual Report CTA */}
         <div>
           <Button
             id="rail-primary-report-cta"
@@ -130,11 +102,11 @@ export const DesktopLeftRail: React.FC = () => {
           </Button>
         </div>
 
-        {/* Nav Links List */}
         <nav className="space-y-1" aria-label={language === 'bn' ? 'প্রধান বিভাগ' : 'Main sections'}>
           {navItems.map((item) => {
             const isActive = currentRoute === item.path;
-            const secConfig = item.sectionKey ? SECTIONS[item.sectionKey] : null;
+            const sectionKey = 'sectionKey' in item ? item.sectionKey : undefined;
+            const secConfig = sectionKey ? SECTIONS[sectionKey] : null;
 
             return (
               <button
@@ -144,9 +116,18 @@ export const DesktopLeftRail: React.FC = () => {
                 aria-current={isActive ? 'page' : undefined}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isActive
-                    ? getSectionActiveStyles(item.sectionKey)
+                    ? 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default'
                     : 'text-ui-content-secondary'
                 }`}
+                style={
+                  isActive && secConfig
+                    ? {
+                        backgroundColor: secConfig.bgColor,
+                        color: secConfig.textColor,
+                        borderColor: secConfig.borderColor,
+                      }
+                    : undefined
+                }
               >
                 <div className="flex items-center gap-3 truncate">
                   <AppIcon
@@ -163,22 +144,13 @@ export const DesktopLeftRail: React.FC = () => {
                   <span className="truncate">{language === 'bn' ? item.nameBn : item.nameEn}</span>
                 </div>
 
-                {item.sectionKey && (
+                {sectionKey && secConfig && (
                   <span
                     className={`w-2.5 h-2.5 rounded-full shrink-0 transition-opacity ${
                       isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'
                     }`}
-                    style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
+                    style={{ backgroundColor: secConfig.primaryColor }}
                   />
-                )}
-
-                {item.isComingSoon && (
-                  <span
-                    id={`${item.id}-badge`}
-                    className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-muted shrink-0 leading-tight"
-                  >
-                    {language === 'bn' ? item.badgeBn : item.badgeEn}
-                  </span>
                 )}
               </button>
             );
@@ -186,12 +158,9 @@ export const DesktopLeftRail: React.FC = () => {
         </nav>
       </div>
 
-      {/* Bottom: Appearance / Theme, Language toggle & Platform Note */}
       <div className="pt-4 border-t border-ui-stroke-subtle space-y-2.5">
-        {/* Desktop Theme Control */}
         <ThemeSelector variant="compact" />
 
-        {/* Language Switcher Pill */}
         <button
           id="rail-lang-toggle"
           onClick={toggleLanguage}
@@ -208,7 +177,6 @@ export const DesktopLeftRail: React.FC = () => {
           </span>
         </button>
 
-        {/* Minimal Platform Signature */}
         <div className="px-2 pt-1 text-[13px] text-ui-content-muted leading-tight">
           <p className="font-medium text-ui-content-secondary">
             {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
