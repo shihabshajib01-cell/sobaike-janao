@@ -54,34 +54,11 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
 
   const currentStepInfo = stepTitles[currentStep - 1] || stepTitles[0];
 
-  const getSegmentStyles = (sec: SectionKey) => {
-    switch (sec) {
-      case 'harassment':
-        return {
-          bg: 'var(--sec-harassment-bg)',
-          color: 'var(--sec-harassment-text)',
-          border: 'var(--sec-harassment-border)',
-        };
-      case 'rickshaw':
-        return {
-          bg: 'var(--sec-rickshaw-bg)',
-          color: 'var(--sec-rickshaw-text)',
-          border: 'var(--sec-rickshaw-border)',
-        };
-      case 'extortion':
-        return {
-          bg: 'var(--sec-extortion-bg)',
-          color: 'var(--sec-extortion-text)',
-          border: 'var(--sec-extortion-border)',
-        };
-      case 'load_shedding':
-        return {
-          bg: 'var(--sec-load_shedding-bg)',
-          color: 'var(--sec-load_shedding-text)',
-          border: 'var(--sec-load_shedding-border)',
-        };
-    }
-  };
+  const getSegmentStyles = (sec: SectionKey) => ({
+    bg: `var(--sec-${sec}-bg)`,
+    color: `var(--sec-${sec}-text)`,
+    border: `var(--sec-${sec}-border)`,
+  });
 
   const progressPercentage = Math.round((currentStep / totalSteps) * 100);
 
