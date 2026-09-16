@@ -81,6 +81,7 @@ export interface ReportItem {
   areaEn: string;
   incidentDateBn: string;
   incidentDateEn: string;
+  incidentTime?: string;
   affectedPersonAgeGroup?: HarassmentAgeGroup;
   allegedAbuserRelationship?: HarassmentAbuserRelationship;
   reportingFor?: HarassmentReportingFor;
