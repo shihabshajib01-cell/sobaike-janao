@@ -58,18 +58,10 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
   extortion: [
     {
       id: 'bribe-demanded-service',
-      nameBn: 'সেবা পেতে ঘুষ দাবি',
-      nameEn: 'Bribe Demanded for a Service',
-      descriptionBn: 'সরকারি বা বেসরকারি সেবা, অনুমোদন বা সুবিধার জন্য ঘুষ দাবি',
-      descriptionEn: 'Bribe demanded in exchange for a service, approval, or benefit',
-      isSensitive: true,
-    },
-    {
-      id: 'bribe-paid',
-      nameBn: 'ঘুষ প্রদান',
-      nameEn: 'Bribe Paid',
-      descriptionBn: 'সেবা বা সুবিধা পেতে ঘুষ বা অবৈধ অর্থ প্রদান করা হয়েছে',
-      descriptionEn: 'A bribe or illegal payment was made to receive a service or benefit',
+      nameBn: 'ঘুষ',
+      nameEn: 'Bribery',
+      descriptionBn: 'সেবা, অনুমোদন, প্রক্রিয়া বা সুবিধার সঙ্গে সংশ্লিষ্ট ঘুষের ঘটনা জানান',
+      descriptionEn: 'Report bribery connected to a service, approval, process, or benefit',
       isSensitive: true,
     },
     {

@@ -51,6 +51,7 @@ import {
   HARASSMENT_REPORTING_FOR_OPTIONS,
 } from '../../data/harassmentClassification';
 import { ImageAttachmentPicker, AttachedImagePreview } from '../media/ImageAttachmentPicker';
+import { BRIBERY_DEPARTMENT_OPTIONS } from '../../data/briberyOptions';
 import { AddressSearchInput } from '../location/AddressSearchInput';
 import {
   buildResolvedLocationData,
@@ -141,6 +142,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
     const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
     const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
+    const isBriberyReport = segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
 
     // Determine active subcategory option & context
     const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
@@ -669,6 +671,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       const newErrors: Record<string, string> = {};
 
       if (isUtilityReport) {
+        if (isBriberyReport && formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== '') {
+          const amount = Number(formData.briberyAmount);
+          if (!Number.isFinite(amount) || amount <= 0) {
+            newErrors.briberyAmount = language === 'bn' ? 'শূন্যের বেশি টাকার পরিমাণ লিখুন।' : 'Enter an amount greater than 0.';
+          }
+        }
+
         // Auto-populate title if empty before validating
         let effectiveTitle = formData.title?.trim();
         if (!effectiveTitle && currentSubcategoryOption) {
@@ -809,6 +818,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           }
         }
       } else {
+        if (isBriberyReport && formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== '') {
+          const amount = Number(formData.briberyAmount);
+          if (!Number.isFinite(amount) || amount <= 0) {
+            newErrors.briberyAmount = language === 'bn' ? 'শূন্যের বেশি টাকার পরিমাণ লিখুন।' : 'Enter an amount greater than 0.';
+          }
+        }
+
         // Auto-populate title if empty before validating
         let effectiveTitle = formData.title?.trim();
         if (!effectiveTitle && currentSubcategoryOption) {
@@ -1028,7 +1044,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             errors.recentBillMonth ||
             errors.recentBillAmount ||
             errors.previousBillMonth ||
-            errors.previousBillAmount
+            errors.previousBillAmount ||
+            errors.briberyAmount
           )}
           icon={<FileText className="w-5 h-5" />}
         >
@@ -1467,6 +1484,64 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 )}
               </div>
             </div>
+
+            {isBriberyReport && (
+              <div className="p-3.5 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3">
+                <h4 className="text-[13px] font-bold text-ui-content-primary">
+                  {language === 'bn' ? 'ঘুষ সংক্রান্ত তথ্য' : 'Bribery details'}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <SearchableSelect
+                    id="bribery-department-select"
+                    label={language === 'bn' ? 'দপ্তর (ঐচ্ছিক)' : 'Department (optional)'}
+                    value={formData.briberyDepartment || ''}
+                    onChange={(value) => onUpdateFormData({ briberyDepartment: value })}
+                    placeholder={language === 'bn' ? 'দপ্তর নির্বাচন করুন' : 'Select department'}
+                    searchPlaceholder={language === 'bn' ? 'দপ্তর খুঁজুন...' : 'Search department...'}
+                    noResultsText={language === 'bn' ? 'কোনো মিল পাওয়া যায়নি' : 'No matching department'}
+                    clearable
+                    options={BRIBERY_DEPARTMENT_OPTIONS.map((option) => ({
+                      value: option.value,
+                      label: language === 'bn' ? option.labelBn : option.labelEn,
+                      keywords: [option.labelBn, option.labelEn],
+                    }))}
+                  />
+                  <div>
+                    <label htmlFor="bribery-service-input" className="block text-[13px] font-bold text-ui-content-primary mb-1">
+                      {language === 'bn' ? 'সেবা বা প্রক্রিয়া (ঐচ্ছিক)' : 'Service or process (optional)'}
+                    </label>
+                    <input
+                      id="bribery-service-input"
+                      type="text"
+                      value={formData.briberyService || ''}
+                      onChange={(e) => onUpdateFormData({ briberyService: e.target.value })}
+                      placeholder={language === 'bn' ? 'যেমন: মিউটেশন, পাসপোর্ট নবায়ন, লাইসেন্স' : 'e.g. mutation, passport renewal, licence'}
+                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px]"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="bribery-amount-input" className="block text-[13px] font-bold text-ui-content-primary mb-1">
+                      {language === 'bn' ? 'টাকার পরিমাণ (ঐচ্ছিক)' : 'Amount (BDT) (optional)'}
+                    </label>
+                    <input
+                      id="bribery-amount-input"
+                      type="number"
+                      min="1"
+                      step="any"
+                      value={formData.briberyAmount !== undefined && formData.briberyAmount !== null ? formData.briberyAmount : ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        onUpdateFormData({ briberyAmount: value === '' ? undefined : Number(value) });
+                        if (errors.briberyAmount) setErrors((prev) => ({ ...prev, briberyAmount: '' }));
+                      }}
+                      placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
+                      className={`w-full px-3 py-2 bg-ui-surface border rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[42px] ${errors.briberyAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'}`}
+                    />
+                    {errors.briberyAmount && <p className="text-[12px] text-ui-error-text mt-1 font-semibold">{errors.briberyAmount}</p>}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Incident Date, Time & Frequency */}
             <div className={`grid grid-cols-1 ${hideFrequency ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3`}>

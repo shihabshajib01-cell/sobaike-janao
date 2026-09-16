@@ -22,6 +22,7 @@ import {
 } from '../../data/reportSubjectOptions';
 import { ReviewSection } from './ReviewSection';
 import { formatBillingMonth } from '../../utils/formatters';
+import { getBriberyDepartmentLabel } from '../../data/briberyOptions';
 import {
   HARASSMENT_AGE_GROUP_OPTIONS,
   HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
@@ -58,6 +59,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
   const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
   const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
+  const isBriberyReport = segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -322,6 +324,29 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {formData.description || '-'}
               </p>
             </div>
+
+            {isBriberyReport && (formData.briberyDepartment || formData.briberyService || formData.briberyAmount) && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-0.5">
+                {formData.briberyDepartment && (
+                  <div className="p-2.5 rounded-xl bg-ui-surface border border-ui-stroke-subtle">
+                    <span className="text-[12px] text-ui-content-muted block mb-0.5">{language === 'bn' ? 'দপ্তর' : 'Department'}</span>
+                    <p className="text-[13.5px] font-bold text-ui-content-primary">{getBriberyDepartmentLabel(formData.briberyDepartment, language)}</p>
+                  </div>
+                )}
+                {formData.briberyService && (
+                  <div className="p-2.5 rounded-xl bg-ui-surface border border-ui-stroke-subtle">
+                    <span className="text-[12px] text-ui-content-muted block mb-0.5">{language === 'bn' ? 'সেবা বা প্রক্রিয়া' : 'Service or process'}</span>
+                    <p className="text-[13.5px] font-bold text-ui-content-primary">{formData.briberyService}</p>
+                  </div>
+                )}
+                {formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== '' && (
+                  <div className="p-2.5 rounded-xl bg-ui-surface border border-ui-stroke-subtle">
+                    <span className="text-[12px] text-ui-content-muted block mb-0.5">{language === 'bn' ? 'টাকার পরিমাণ' : 'Amount (BDT)'}</span>
+                    <p className="text-[13.5px] font-bold text-ui-content-primary">৳{Number(formData.briberyAmount).toLocaleString()}</p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {isExcessElectricityBill ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">

@@ -523,6 +523,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         recentBillAmount: undefined,
         previousBillMonth: '',
         previousBillAmount: undefined,
+        briberyDepartment: '',
+        briberyService: '',
+        briberyAmount: undefined,
       }));
     },
     [formData.segment, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
@@ -591,6 +594,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 recentBillAmount: undefined,
                 previousBillMonth: '',
                 previousBillAmount: undefined,
+                briberyDepartment: '',
+                briberyService: '',
+                briberyAmount: undefined,
               }
             : {}),
         };
@@ -857,6 +863,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           };
 
       const isHarassment = formData.segment === 'harassment';
+      const isBribery = formData.segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
       const isPartySegment = formData.segment === 'rickshaw' || formData.segment === 'extortion';
       const isChargingStation = isPartySegment && formData.segment === 'rickshaw' && (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
@@ -894,6 +901,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         previousBillAmount:
           formData.subcategoryId === 'excess-electricity-bill' && formData.previousBillAmount !== undefined && formData.previousBillAmount !== null && String(formData.previousBillAmount).trim() !== ''
             ? Number(formData.previousBillAmount)
+            : undefined,
+        briberyDepartment: isBribery ? formData.briberyDepartment?.trim() || undefined : undefined,
+        briberyService: isBribery ? formData.briberyService?.trim() || undefined : undefined,
+        briberyAmount:
+          isBribery && formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== ''
+            ? Number(formData.briberyAmount)
             : undefined,
         frequency: formData.frequency || 'one-time',
         affectedPersonAgeGroup: isHarassment ? formData.affectedPersonAgeGroup || undefined : undefined,

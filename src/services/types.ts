@@ -145,6 +145,9 @@ export interface SubmittedReport {
   recentBillAmount?: number | string;
   previousBillMonth?: string;
   previousBillAmount?: number | string;
+  briberyDepartment?: string;
+  briberyService?: string;
+  briberyAmount?: number | string;
   frequency: 'one-time' | 'repeated';
   affectedPersonAgeGroup?: HarassmentAgeGroup;
   allegedAbuserRelationship?: HarassmentAbuserRelationship;
@@ -184,7 +187,7 @@ export interface SubmittedReport {
   }>;
 }
 
-export const CURRENT_REPORT_FLOW_VERSION = 4;
+export const CURRENT_REPORT_FLOW_VERSION = 5;
 
 export interface DraftReport {
   flowVersion?: number;
@@ -214,6 +217,9 @@ export interface DraftReport {
   recentBillAmount?: number | string;
   previousBillMonth?: string;
   previousBillAmount?: number | string;
+  briberyDepartment: string;
+  briberyService: string;
+  briberyAmount?: number | string;
   frequency: 'one-time' | 'repeated';
   affectedPersonAgeGroup: HarassmentAgeGroup | '';
   allegedAbuserRelationship: HarassmentAbuserRelationship | '';
