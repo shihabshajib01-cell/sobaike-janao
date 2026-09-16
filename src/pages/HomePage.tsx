@@ -3,8 +3,6 @@ import {
   AlertCircle,
   Sparkles,
   LayoutGrid,
-  Flame,
-  Share2,
 } from 'lucide-react';
 import { SectionKey } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
@@ -20,7 +18,7 @@ import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 
-type FeedFilterType = 'all' | 'latest' | 'popular' | 'most_shared';
+type FeedFilterType = 'all' | 'latest';
 
 const INITIAL_VISIBLE_REPORT_COUNT = 10;
 const LOAD_MORE_REPORT_COUNT = 10;
@@ -136,7 +134,7 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Feed Control Chips: সব | সর্বশেষ | জনপ্রিয় | সর্বাধিক শেয়ার */}
+        {/* Feed Control Chips: সব | সর্বশেষ */}
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
           <FilterChip
             id="filter-chip-all"
@@ -152,20 +150,6 @@ export const HomePage: React.FC = () => {
             icon={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'latest'}
             onClick={() => setFeedFilter('latest')}
-          />
-          <FilterChip
-            id="filter-chip-popular"
-            label={language === 'bn' ? 'জনপ্রিয়' : 'Popular'}
-            icon={<Flame className="w-3.5 h-3.5" aria-hidden="true" />}
-            selected={feedFilter === 'popular'}
-            onClick={() => setFeedFilter('popular')}
-          />
-          <FilterChip
-            id="filter-chip-most-shared"
-            label={language === 'bn' ? 'সর্বাধিক শেয়ার' : 'Most shared'}
-            icon={<Share2 className="w-3.5 h-3.5" aria-hidden="true" />}
-            selected={feedFilter === 'most_shared'}
-            onClick={() => setFeedFilter('most_shared')}
           />
         </div>
 

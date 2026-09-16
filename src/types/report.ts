@@ -73,6 +73,7 @@ export interface ReportItem {
   reportedSubjectEn?: string;
   subjectType?: 'individual' | 'business' | 'group' | 'location';
   organization?: string;
+  reporterName?: string;
   locationBn: string;
   locationEn: string;
   districtBn: string;
@@ -81,6 +82,7 @@ export interface ReportItem {
   areaEn: string;
   incidentDateBn: string;
   incidentDateEn: string;
+  incidentTime?: string;
   affectedPersonAgeGroup?: HarassmentAgeGroup;
   allegedAbuserRelationship?: HarassmentAbuserRelationship;
   reportingFor?: HarassmentReportingFor;
