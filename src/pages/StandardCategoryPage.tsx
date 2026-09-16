@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AlertCircle } from 'lucide-react';
-import { SectionKey, SECTIONS } from '../theme/tokens';
+import { SectionKey } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -14,6 +14,7 @@ import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 
 export interface StandardCategoryPageProps {
   section: SectionKey;
@@ -21,8 +22,8 @@ export interface StandardCategoryPageProps {
 
 export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ section }) => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
-  const { getFeedSubcategories, getSegment } = useTaxonomy();
-  const config = getSegment(section) || SECTIONS[section];
+  const { getFeedSubcategories } = useTaxonomy();
+  const bannerContent = CANONICAL_BANNER_CONTENT[section];
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
@@ -93,17 +94,18 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
         slides={[
           {
             id: `${section}-primary`,
-            titleBn: config.nameBn,
-            titleEn: config.nameEn,
-            mobileDescriptionBn: config.descriptionBn,
-            mobileDescriptionEn: config.descriptionEn,
-            descriptionBn: config.descriptionBn,
-            descriptionEn: config.descriptionEn,
-            desktopDescriptionBn: config.descriptionBn,
-            desktopDescriptionEn: config.descriptionEn,
+            titleBn: bannerContent.titleBn,
+            titleEn: bannerContent.titleEn,
+            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
+            descriptionBn: bannerContent.tabletDescriptionBn,
+            descriptionEn: bannerContent.tabletDescriptionEn,
+            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            illustrationSrc: bannerContent.illustrationSrc,
             action: {
-              labelBn: 'ঘটনা জানান',
-              labelEn: 'Report incident',
+              labelBn: bannerContent.primaryCtaBn,
+              labelEn: bannerContent.primaryCtaEn,
               onClick: () => openReportComposer(section),
             },
           },
