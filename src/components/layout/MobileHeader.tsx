@@ -47,9 +47,12 @@ export const MobileHeader: React.FC = () => {
             <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           </button>
 
-          <h1 className="min-w-0 flex-1 truncate text-[16px] font-bold leading-tight text-ui-content-primary">
+          <p
+            id="mobile-category-title"
+            className="min-w-0 flex-1 truncate type-h3 text-ui-content-primary"
+          >
             {language === 'bn' ? activeCategory.nameBn : activeCategory.nameEn}
-          </h1>
+          </p>
 
           {isHarassmentCategory ? (
             <button
