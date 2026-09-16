@@ -345,6 +345,18 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}${incidentDate}`}
             </span>
           </div>
+          {report.incidentTime &&
+            report.segment === 'load_shedding' &&
+            (report.subcategoryId === 'load-shedding-outage' || report.subcategoryId === 'gas-shortage') && (
+              <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
+                <Clock className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+                <span>
+                  {language === 'bn'
+                    ? `বিভ্রাটের শুরু: ${report.incidentTime}`
+                    : `Outage started: ${report.incidentTime}`}
+                </span>
+              </div>
+            )}
           {report.utilityEndTime && (
             <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
               <Clock className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
