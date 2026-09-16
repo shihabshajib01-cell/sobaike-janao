@@ -34,7 +34,7 @@ const RULES = [
   {
     id: 'arbitrary-type-size',
     pattern: /\btext-\[\d+(?:\.\d+)?(?:px|rem)\]/g,
-    message: 'Arbitrary font size bypasses semantic typography tokens',
+    message: 'Hardcoded font size bypasses semantic typography tokens',
   },
   {
     id: 'tailwind-type-scale',
@@ -43,8 +43,8 @@ const RULES = [
   },
   {
     id: 'arbitrary-line-height',
-    pattern: /\bleading-\[[^\]]+\]/g,
-    message: 'Arbitrary line-height bypasses semantic typography tokens',
+    pattern: /\bleading-\[(?!var\()[^\]]+\]/g,
+    message: 'Hardcoded line-height bypasses semantic typography tokens',
   },
   {
     id: 'arbitrary-font-weight',
@@ -58,13 +58,18 @@ const RULES = [
   },
   {
     id: 'arbitrary-radius',
-    pattern: /\brounded-\[[^\]]+\]/g,
-    message: 'Arbitrary radius bypasses central radius utilities',
+    pattern: /\brounded-\[(?!var\()[^\]]+\]/g,
+    message: 'Hardcoded radius bypasses central radius tokens',
   },
   {
     id: 'tailwind-shadow',
     pattern: /\bshadow-(?:2xs|xs|sm|md|lg|xl|2xl)\b|\bshadow(?!-)\b/g,
-    message: 'Tailwind shadow utility bypasses central elevation utilities',
+    message: 'Tailwind shadow utility bypasses central elevation tokens',
+  },
+  {
+    id: 'arbitrary-shadow',
+    pattern: /\bshadow-\[(?!var\()[^\]]+\]/g,
+    message: 'Hardcoded shadow bypasses central elevation tokens',
   },
 ];
 
