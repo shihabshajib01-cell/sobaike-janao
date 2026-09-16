@@ -14,12 +14,16 @@ export interface SupabasePublicReportRPC {
   descriptionEn?: string;
   reportedSubject?: string | null;
   organization?: string | null;
+  reporterName?: string | null;
   district?: string | null;
   area?: string | null;
   location?: string | null;
   incidentDate?: string | null;
   incidentTime?: string | null;
   incident_time?: string | null;
+  affectedPersonAgeGroup?: ReportItem['affectedPersonAgeGroup'] | null;
+  allegedAbuserRelationship?: ReportItem['allegedAbuserRelationship'] | null;
+  reportingFor?: ReportItem['reportingFor'] | null;
   publishedAt?: string | null;
   priority?: string | null;
   hasSupportingInfo?: boolean | null;
@@ -142,6 +146,7 @@ export const mapSupabasePublicReportToItem = (
     reportedSubjectEn: rpc.reportedSubject || undefined,
     subjectType: 'individual',
     organization: rpc.organization || undefined,
+    reporterName: rpc.reporterName || undefined,
     locationBn,
     locationEn,
     districtBn,
@@ -151,6 +156,9 @@ export const mapSupabasePublicReportToItem = (
     incidentDateBn,
     incidentDateEn,
     incidentTime: rpc.incidentTime || rpc.incident_time || undefined,
+    affectedPersonAgeGroup: rpc.affectedPersonAgeGroup || undefined,
+    allegedAbuserRelationship: rpc.allegedAbuserRelationship || undefined,
+    reportingFor: rpc.reportingFor || undefined,
     recentBillMonth: rpc.recentBillMonth || rpc.recent_bill_month || undefined,
     recentBillAmount:
       rpc.recentBillAmount !== undefined && rpc.recentBillAmount !== null

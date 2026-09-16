@@ -18,7 +18,10 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
 }) => {
   if (
     report.segment !== 'harassment' ||
-    (!report.affectedPersonAgeGroup && !report.allegedAbuserRelationship && !report.reportingFor)
+    (!report.affectedPersonAgeGroup &&
+      !report.allegedAbuserRelationship &&
+      !report.reportingFor &&
+      !report.reporterName)
   ) {
     return null;
   }
@@ -56,8 +59,6 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
       : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 
-  if (rows.length === 0) return null;
-
   return (
     <section
       aria-labelledby="harassment-context-heading"
@@ -66,14 +67,29 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
       <h2 id="harassment-context-heading" className="text-[16px] font-bold text-ui-content-primary">
         {language === 'bn' ? 'ঘটনার প্রেক্ষাপট' : 'Incident context'}
       </h2>
-      <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {rows.map((row) => (
-          <div key={row.label} className="rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle p-3">
-            <dt className="text-[12px] font-semibold text-ui-content-muted">{row.label}</dt>
-            <dd className="mt-1 text-[14px] font-semibold text-ui-content-primary">{row.value}</dd>
-          </div>
-        ))}
-      </dl>
+      {rows.length > 0 && (
+        <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {rows.map((row) => (
+            <div key={row.label} className="rounded-lg bg-ui-surface-subtle border border-ui-stroke-subtle p-3">
+              <dt className="text-[12px] font-semibold text-ui-content-muted">{row.label}</dt>
+              <dd className="mt-1 text-[14px] font-semibold text-ui-content-primary">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {report.reporterName && (
+        <div className="pt-3 border-t border-ui-stroke-subtle space-y-1">
+          <p className="text-[12px] font-semibold text-ui-content-muted">
+            {language === 'bn' ? 'প্রকাশ্য প্রতিবেদকের নাম' : 'Public reporter name'}
+          </p>
+          <p className="text-[14px] font-semibold text-ui-content-primary">{report.reporterName}</p>
+          <p className="text-[12px] leading-relaxed text-ui-content-secondary">
+            {language === 'bn'
+              ? 'প্রতিবেদক প্রকাশ্য পরিচয়ের অনুরোধ ও সম্মতি দেওয়ায় শুধু নামটি দেখানো হচ্ছে; যোগাযোগের তথ্য ব্যক্তিগত থাকে।'
+              : 'Only the reporter name is shown because public identity was requested and confirmed; contact information remains private.'}
+          </p>
+        </div>
+      )}
     </section>
   );
 };

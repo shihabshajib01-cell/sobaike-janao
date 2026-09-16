@@ -7,6 +7,7 @@ import {
   getHeroSliderCssVars,
 } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryHeroBanner } from './CategoryHeroBanner';
 import { IconButton } from '../ui/IconButton';
 
@@ -47,6 +48,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   className = '',
 }) => {
   const { language } = useApp();
+  const { segments } = useTaxonomy();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -60,6 +62,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
   // Section key for CSS variables & art background override
   const sectionKey = section;
+  const isSectionActive = Boolean(segments[sectionKey]);
   const heroBackground =
     HERO_TOKENS.sections[sectionKey]?.background ??
     `var(--sec-${sectionKey}-bg)`;
@@ -250,7 +253,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
           desktopMediaPosition={slide.desktopMediaPosition}
           desktopMediaScale={slide.desktopMediaScale}
           desktopMediaTranslateY={slide.desktopMediaTranslateY}
-          action={slide.action}
+          action={isSectionActive ? slide.action : undefined}
           headingLevel="h1"
           active={true}
           ctaId={`${id}-cta-btn`}
@@ -326,7 +329,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
                 desktopMediaPosition={slide.desktopMediaPosition}
                 desktopMediaScale={slide.desktopMediaScale}
                 desktopMediaTranslateY={slide.desktopMediaTranslateY}
-                action={slide.action}
+                action={isSectionActive ? slide.action : undefined}
                 headingLevel={index === 0 ? 'h1' : 'h2'}
                 active={isActive}
                 ctaId={`${id}-cta-btn-${index}`}

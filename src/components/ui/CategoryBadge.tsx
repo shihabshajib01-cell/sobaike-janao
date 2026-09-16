@@ -1,5 +1,6 @@
 import React from 'react';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryIcon } from '../branding/CategoryIcon';
 
 export interface CategoryBadgeProps {
@@ -19,7 +20,8 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
   showIcon = true,
   className = '',
 }) => {
-  const config = SECTIONS[section];
+  const { getSegment } = useTaxonomy();
+  const config = getSegment(section) || SECTIONS[section];
   if (!config) return null;
 
   const label = language === 'bn' ? config.shortNameBn : config.shortNameEn;
