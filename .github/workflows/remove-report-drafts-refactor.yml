@@ -25,7 +25,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Normalize one-time script literal
+      - name: Normalize one-time script
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -35,7 +35,64 @@ jobs:
           new = "throw new Error('draft storage exists after cancellation: ' + JSON.stringify(storedDrafts));"
           if old not in text:
               raise SystemExit('expected diagnostic literal not found')
-          path.write_text(text.replace(old, new))
+          text = text.replace(old, new)
+
+          marker = "// 7) Remove obsolete persisted-draft modules."
+          if marker not in text:
+              raise SystemExit('refactor insertion marker not found')
+          extra = r'''
+// Remove attachment UI that existed only to recover persisted evidence drafts.
+{
+  const path = 'src/components/report-composer/Step3ComplaintDetails.tsx';
+  let text = read(path);
+  const startMarker = '              {formData.pendingEvidenceRecovery &&';
+  const endMarker = '              {/* Image Attachment Picker - max 6 images */}';
+  const start = text.indexOf(startMarker);
+  const end = text.indexOf(endMarker, start);
+  if (start === -1 || end === -1) throw new Error('Could not locate Step 3 evidence recovery warning');
+  text = text.slice(0, start) + text.slice(end);
+  write(path, text);
+}
+
+{
+  const path = 'src/components/report-composer/Step4Review.tsx';
+  let text = read(path);
+  const oldSummary = `  const hasMissingEvidence =
+    pendingImages.length === 0 &&
+    Boolean(formData.pendingEvidenceRecovery && formData.pendingEvidenceRecovery.expectedCount > 0);
+
+  const attachmentsSummary = hasMissingEvidence
+    ? language === 'bn'
+      ? 'পুনরায় সংযুক্তি আবশ্যক'
+      : 'Reattachment required'
+    : pendingImages.length > 0
+    ? language === 'bn'
+      ? \`${pendingImages.length} টি ছবি সংযুক্ত\`
+      : \`${pendingImages.length} images attached\`
+    : language === 'bn'
+    ? 'কোনো ছবি সংযুক্ত নেই'
+    : 'No attachments';`;
+  const newSummary = `  const attachmentsSummary = pendingImages.length > 0
+    ? language === 'bn'
+      ? \`${pendingImages.length} টি ছবি সংযুক্ত\`
+      : \`${pendingImages.length} images attached\`
+    : language === 'bn'
+    ? 'কোনো ছবি সংযুক্ত নেই'
+    : 'No attachments';`;
+  text = replaceOnce(text, oldSummary, newSummary, 'Step 4 attachment summary');
+
+  const warningStartMarker = '              {hasMissingEvidence ? (';
+  const warningEndMarker = '              ) : pendingImages.length > 0 ? (';
+  const warningStart = text.indexOf(warningStartMarker);
+  const warningEnd = text.indexOf(warningEndMarker, warningStart);
+  if (warningStart === -1 || warningEnd === -1) throw new Error('Could not locate Step 4 evidence recovery warning');
+  text = text.slice(0, warningStart) + '              {pendingImages.length > 0 ? (' + text.slice(warningEnd + warningEndMarker.length);
+  write(path, text);
+}
+
+'''
+          text = text.replace(marker, extra + marker)
+          path.write_text(text)
           PY
 
       - name: Apply scoped refactor
