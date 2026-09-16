@@ -74,7 +74,7 @@ export const IssuesPage: React.FC = () => {
       <section
         id="issues-category-grid"
         aria-label={language === 'bn' ? 'অভিযোগের বিষয়সমূহ' : 'Issue categories'}
-        className="grid grid-cols-2 gap-3"
+        className="grid grid-cols-1 gap-2.5"
       >
         {cards.map(({ key, config }) => {
           const displayCount = language === 'bn' ? toBanglaDigits(counts[key]) : counts[key];
@@ -84,31 +84,30 @@ export const IssuesPage: React.FC = () => {
               id={`issues-card-${key}`}
               type="button"
               onClick={() => navigateTo(config.slug)}
-              className="min-h-[132px] rounded-2xl border bg-ui-surface p-4 text-left shadow-2xs transition-all hover:bg-ui-surface-hover active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="min-h-[84px] rounded-2xl border bg-ui-surface px-3.5 py-3 text-left shadow-2xs transition-all hover:bg-ui-surface-hover active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               style={{ borderColor: `var(--sec-${key}-border)` }}
             >
-              <div className="flex h-full flex-col justify-between gap-4">
+              <div className="flex items-center gap-3">
                 <CategoryIcon
                   section={key}
-                  size="lg"
+                  size="md"
                   withContainer
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
 
-                <div className="min-w-0">
-                  <h2 className="text-[15px] font-bold leading-snug text-ui-content-primary">
-                    {language === 'bn' ? config.nameBn : config.nameEn}
-                  </h2>
-                  <p className="mt-1 text-[12.5px] font-medium text-ui-content-secondary">
-                    {isLoading
-                      ? language === 'bn'
-                        ? 'গণনা হচ্ছে...'
-                        : 'Counting...'
-                      : language === 'bn'
-                      ? `${displayCount}টি প্রতিবেদন`
-                      : `${displayCount} reports`}
-                  </p>
-                </div>
+                <h2 className="min-w-0 flex-1 text-[15px] font-bold leading-snug text-ui-content-primary">
+                  {language === 'bn' ? config.nameBn : config.nameEn}
+                </h2>
+
+                <p className="shrink-0 text-right text-[12.5px] font-medium text-ui-content-secondary">
+                  {isLoading
+                    ? language === 'bn'
+                      ? 'গণনা হচ্ছে...'
+                      : 'Counting...'
+                    : language === 'bn'
+                    ? `${displayCount}টি প্রতিবেদন`
+                    : `${displayCount} reports`}
+                </p>
               </div>
             </button>
           );
