@@ -94,7 +94,6 @@ export const HarassmentFilterSheet: React.FC<HarassmentFilterSheetProps> = ({
       title={isBn ? 'ফিল্টার' : 'Filter'}
       maxWidth="lg"
       mobilePresentation="sheet"
-      contentClassName="space-y-5"
       footer={
         <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 w-full">
           <Button
@@ -187,9 +186,18 @@ export const HarassmentFilterSheet: React.FC<HarassmentFilterSheetProps> = ({
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setDraftSubject(sectionKey)}
+                  style={
+                    selected
+                      ? {
+                          backgroundColor: `var(--sec-${sectionKey}-bg)`,
+                          borderColor: `var(--sec-${sectionKey}-border)`,
+                          color: `var(--sec-${sectionKey}-text)`,
+                        }
+                      : undefined
+                  }
                   className={`min-h-[48px] px-3 py-2 ui-radius-control ui-border-default type-action inline-flex items-center justify-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer ${
                     selected
-                      ? 'border-ui-accent-border bg-ui-accent-soft text-ui-content-primary'
+                      ? ''
                       : 'border-ui-stroke-default bg-ui-surface text-ui-content-secondary hover:bg-ui-surface-hover'
                   }`}
                 >
