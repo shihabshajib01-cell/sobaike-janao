@@ -1,7 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { SectionKey, SECTIONS } from '../theme/tokens';
 import { SubcategoryOption, SEGMENT_SUBCATEGORIES } from '../data/reportOptions';
-import { SUBCATEGORIES } from '../data/categories';
 import { useState, useEffect } from 'react';
 
 export interface SupabaseSegmentRow {
@@ -46,20 +45,17 @@ export interface SegmentTaxonomyItem {
   sortOrder?: number;
 }
 
-// In-memory cache initialized with robust local fallbacks until a successful backend read
-let cachedSegments: Record<string, SegmentTaxonomyItem> = {
-  harassment: { ...SECTIONS.harassment, id: 'harassment' },
-  rickshaw: { ...SECTIONS.rickshaw, id: 'rickshaw' },
-  extortion: { ...SECTIONS.extortion, id: 'extortion' },
-  load_shedding: { ...SECTIONS.load_shedding, id: 'load_shedding' },
-};
+const sectionKeys = Object.keys(SECTIONS) as SectionKey[];
 
-let cachedSubcategories: Record<string, SubcategoryOption[]> = {
-  harassment: [...SEGMENT_SUBCATEGORIES.harassment],
-  rickshaw: [...SEGMENT_SUBCATEGORIES.rickshaw],
-  extortion: [...SEGMENT_SUBCATEGORIES.extortion],
-  load_shedding: [...SEGMENT_SUBCATEGORIES.load_shedding],
-};
+// In-memory cache initialized from the unified local section registry. This keeps
+// local fallbacks and backend taxonomy aligned without duplicating a hard-coded list.
+let cachedSegments: Record<string, SegmentTaxonomyItem> = Object.fromEntries(
+  sectionKeys.map((key) => [key, { ...SECTIONS[key], id: key }])
+) as Record<string, SegmentTaxonomyItem>;
+
+let cachedSubcategories: Record<string, SubcategoryOption[]> = Object.fromEntries(
+  sectionKeys.map((key) => [key, [...(SEGMENT_SUBCATEGORIES[key] || [])]])
+);
 
 let isFetched = false;
 let isFetching = false;
@@ -168,8 +164,8 @@ export const TaxonomyService = {
       if (data && Array.isArray(data)) {
         const nextSubcategories: Record<string, SubcategoryOption[]> = {};
 
-        // Initialize with empty arrays for known keys so successful backend reads stay authoritative
-        (['harassment', 'rickshaw', 'extortion', 'load_shedding'] as SectionKey[]).forEach((sec) => {
+        // Successful backend reads stay authoritative for every known active section.
+        sectionKeys.forEach((sec) => {
           nextSubcategories[sec] = [];
         });
 
@@ -179,7 +175,6 @@ export const TaxonomyService = {
             nextSubcategories[segKey] = [];
           }
 
-          // Check if local description or metadata exists for enrichment
           const localMatch = (SEGMENT_SUBCATEGORIES[segKey as SectionKey] || []).find(
             (s) => s.id === row.id
           );
@@ -204,9 +199,6 @@ export const TaxonomyService = {
     return cachedSubcategories;
   },
 
-  /**
-   * Fetch all taxonomy data (both segments and subcategories) and notify subscribers.
-   */
   async fetchTaxonomy(): Promise<{
     segments: Record<string, SegmentTaxonomyItem>;
     subcategories: Record<string, SubcategoryOption[]>;
@@ -227,30 +219,18 @@ export const TaxonomyService = {
     return { segments: cachedSegments, subcategories: cachedSubcategories };
   },
 
-  /**
-   * Synchronous accessor for currently cached segments.
-   */
   getSegments(): Record<string, SegmentTaxonomyItem> {
     return cachedSegments;
   },
 
-  /**
-   * Synchronous accessor for a specific segment.
-   */
   getSegment(key: SectionKey): SegmentTaxonomyItem {
     return cachedSegments[key] || { ...SECTIONS[key], id: key };
   },
 
-  /**
-   * Synchronous accessor for currently cached subcategories for a given segment.
-   */
   getSubcategories(segment: SectionKey): SubcategoryOption[] {
     return cachedSubcategories[segment] || SEGMENT_SUBCATEGORIES[segment] || [];
   },
 
-  /**
-   * Subcategories formatted for public feed filters (including the 'all' option).
-   */
   getFeedSubcategories(segment: SectionKey): SubcategoryOption[] {
     const list = this.getSubcategories(segment);
     const allOption: SubcategoryOption = {
@@ -261,16 +241,10 @@ export const TaxonomyService = {
     return [allOption, ...list];
   },
 
-  /**
-   * Synchronous accessor for all cached subcategories across all segments.
-   */
   getAllSubcategories(): Record<string, SubcategoryOption[]> {
     return cachedSubcategories;
   },
 
-  /**
-   * Subscribe to taxonomy updates.
-   */
   subscribe(listener: () => void): () => void {
     listeners.add(listener);
     return () => {
@@ -279,14 +253,10 @@ export const TaxonomyService = {
   },
 };
 
-// Initiate background fetch on module load
 if (typeof window !== 'undefined' && !isFetched) {
   TaxonomyService.fetchTaxonomy().catch(() => {});
 }
 
-/**
- * Custom React Hook to consume taxonomy data reactively.
- */
 export function useTaxonomy() {
   const [, setTick] = useState(0);
 
