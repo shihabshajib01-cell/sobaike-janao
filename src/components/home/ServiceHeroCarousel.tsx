@@ -44,13 +44,18 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const sliderRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Keep the established home hero restricted to categories with approved illustration assets.
+  // New Phase 1 categories are introduced through reporting/navigation/filter/search/map without
+  // borrowing misleading artwork from unrelated services.
   const availableSlides: ServiceSlide[] = [
     { key: 'harassment', path: '/harassment' },
-    { key: 'rickshaw', path: '/rickshaw' },
     { key: 'extortion', path: '/extortion' },
     { key: 'load_shedding', path: '/load-shedding' },
+    { key: 'rickshaw', path: '/rickshaw' },
   ];
-  const slides = availableSlides.filter((slide) => Boolean(segments[slide.key]));
+  const slides = availableSlides.filter(
+    (slide) => Boolean(segments[slide.key]) && Boolean(CANONICAL_BANNER_CONTENT[slide.key])
+  );
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
@@ -62,7 +67,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     }
   }, [currentIndex, safeIndex]);
 
-  // Check prefers-reduced-motion
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -73,7 +77,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
-  // Track document visibility
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const handleVisibilityChange = () => {
@@ -93,7 +96,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     setCurrentIndex((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
   }, [isMultiSlide, totalSlides]);
 
-  // Autoplay management
   useEffect(() => {
     if (timerRef.current) {
       window.clearTimeout(timerRef.current);
@@ -132,11 +134,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     handleNext,
   ]);
 
-  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isMultiSlide) return;
 
-    // Do not trigger carousel navigation when event originates from an interactive child
     const target = e.target as HTMLElement | null;
     if (target && target !== sliderRef.current) {
       const isInteractive =
@@ -157,7 +157,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     }
   };
 
-  // Pointer-safe hover handling (ignores touch / coarse pointers)
   const handlePointerEnter = (e: React.PointerEvent) => {
     if (e.pointerType !== 'mouse') return;
     if (
@@ -174,7 +173,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     }
   };
 
-  // Focus handling with inner containment check
   const handleFocus = () => {
     setIsFocused(true);
   };
@@ -189,7 +187,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     setIsFocused(false);
   };
 
-  // Touch / Pointer gestures for swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!isMultiSlide) return;
     setIsHovered(false);
@@ -208,7 +205,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     const diffX = touch.clientX - touchStartRef.current.x;
     const diffY = touch.clientY - touchStartRef.current.y;
 
-    // Minimum swipe threshold and predominantly horizontal
     if (
       Math.abs(diffX) > HERO_SLIDER_BEHAVIOR.swipeThresholdPx &&
       Math.abs(diffX) > Math.abs(diffY) * HERO_SLIDER_BEHAVIOR.swipeDominanceRatio
@@ -240,7 +236,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const containerStyle: React.CSSProperties = {
     ...getHeroSliderCssVars(),
     backgroundColor: activeHeroBg,
-    borderColor: `var(--sec-${activeKey}-border)`,
+    borderColor: `var(--sec-${activeKey}-border, ${HERO_TOKENS.sections[activeKey].ctaBorder})`,
     touchAction: 'pan-y',
   };
 
@@ -274,7 +270,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         className="w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         style={containerStyle}
       >
-        {/* Slides Track */}
         <div
           className={`hero-slider-track ${
             prefersReducedMotion ? '!transition-none' : ''
@@ -287,6 +282,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
           {slides.map((slide, index) => {
             const isActive = index === safeIndex;
             const content = CANONICAL_BANNER_CONTENT[slide.key];
+            if (!content) return null;
 
             return (
               <div
@@ -331,7 +327,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         </div>
       </section>
 
-      {/* Large-Desktop (>=1440px) / Fine-Pointer Hover Arrows */}
       {isMultiSlide && (
         <>
           <IconButton
@@ -360,4 +355,3 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     </div>
   );
 };
-
