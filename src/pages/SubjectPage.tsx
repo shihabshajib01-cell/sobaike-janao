@@ -120,7 +120,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   return (
     <PublicPageContainer id="subject-page-container">
       {/* Back button & Breadcrumb */}
-      <div className="flex items-center gap-2 text-[14px] text-ui-content-muted">
+      <div className="flex items-center gap-2 text-[var(--type-fixed-14)] text-ui-content-muted">
         <button
           type="button"
           onClick={() => {
@@ -130,7 +130,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
               navigateTo('/explore');
             }
           }}
-          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}</span>
@@ -138,20 +138,20 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       </div>
 
       {/* Subject Header */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 space-y-4 shadow-[var(--elevation-2xs)]">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
+            <div className="w-12 h-12 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
               <UserX className="w-6 h-6" aria-hidden="true" />
             </div>
             <div className="space-y-1.5">
-              <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
+              <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-bold text-ui-content-primary tracking-tight">
                 {displayName}
               </h1>
               {primaryReport?.organization && (
-                <p className="text-[16px] text-ui-content-secondary font-medium">{primaryReport.organization}</p>
+                <p className="text-[var(--type-fixed-16)] text-ui-content-secondary font-medium">{primaryReport.organization}</p>
               )}
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary">
+              <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary">
                 {language === 'bn'
                   ? `${toBanglaDigits(reports.length)}টি প্রকাশিত প্রতিবেদনে উল্লেখ রয়েছে।`
                   : `Mentioned in ${reports.length} published reports.`}
@@ -163,7 +163,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           <button
             type="button"
             onClick={() => setIsResponseModalOpen(true)}
-            className="px-4 py-2.5 bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-primary text-[16px] font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="px-4 py-2.5 bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-primary text-[var(--type-fixed-16)] font-semibold rounded-[var(--radius-control)] transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <Scale className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
             <span>{language === 'bn' ? 'জবাব দিন' : 'Submit response'}</span>
@@ -182,9 +182,9 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
+        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-control)] p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
-          <p className="text-[16px] font-semibold text-ui-error-text">
+          <p className="text-[var(--type-fixed-16)] font-semibold text-ui-error-text">
             {language === 'bn'
               ? 'প্রতিবেদন লোড করা যায়নি।'
               : "Couldn't load reports."}
@@ -192,7 +192,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           <button
             type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
+            className="btn-primary-action px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
           </button>
@@ -202,7 +202,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       {/* Formal Responses Section if any */}
       {!isLoading && !fetchError && storedResponses.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
+          <h2 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary flex items-center gap-2">
             <Scale className="w-5 h-5 text-ui-accent" aria-hidden="true" />
             <span>{language === 'bn' ? 'জবাব' : 'Responses'}</span>
           </h2>
@@ -210,20 +210,20 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
             {storedResponses.map((res, rIdx) => (
               <div
                 key={rIdx}
-                className="p-4 sm:p-5 border rounded-xl space-y-2"
+                className="p-4 sm:p-5 border rounded-[var(--radius-control)] space-y-2"
                 style={{
                   backgroundColor: 'var(--ui-info-bg)',
                   borderColor: 'var(--ui-info-border)',
                 }}
               >
                 <div
-                  className="flex items-center justify-between text-[14px] font-semibold"
+                  className="flex items-center justify-between text-[var(--type-fixed-14)] font-semibold"
                   style={{ color: 'var(--ui-info-text)' }}
                 >
                   <span>{language === 'bn' ? res.respondentBn : res.respondentEn}</span>
-                  <span className="text-ui-content-muted font-mono text-[14px]">{language === 'bn' ? res.dateBn : res.dateEn}</span>
+                  <span className="text-ui-content-muted tabular-nums text-[var(--type-fixed-14)]">{language === 'bn' ? res.dateBn : res.dateEn}</span>
                 </div>
-                <p className="text-[16px] leading-[26px] text-ui-content-secondary">
+                <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary">
                   {language === 'bn' ? res.statementBn : res.statementEn}
                 </p>
               </div>
@@ -236,7 +236,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       {!isLoading && !fetchError && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
+            <h2 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary flex items-center gap-2">
               <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>
                 {language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published reports'}
@@ -251,12 +251,12 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
               ))}
             </div>
           ) : (
-            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-8 text-center space-y-3">
+            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-8 text-center space-y-3">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
-              <h3 className="text-[16px] font-bold text-ui-content-primary">
+              <h3 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               </h3>
-              <p className="text-[14px] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
+              <p className="text-[var(--type-fixed-14)] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
                 {language === 'bn'
                   ? 'এই নামে কোনো প্রকাশিত প্রতিবেদন নেই বা নাম গোপনীয়তার জন্য লুকানো থাকতে পারে।'
                   : 'No published reports are available for this name, or the name may be hidden for privacy.'}

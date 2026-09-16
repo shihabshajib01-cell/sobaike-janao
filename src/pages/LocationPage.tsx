@@ -132,7 +132,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
   return (
     <PublicPageContainer id="location-page-container">
       {/* Back button & Breadcrumb */}
-      <div className="flex items-center gap-2 text-[14px] text-ui-content-muted">
+      <div className="flex items-center gap-2 text-[var(--type-fixed-14)] text-ui-content-muted">
         <button
           type="button"
           onClick={() => {
@@ -142,7 +142,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               navigateTo('/explore');
             }
           }}
-          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="flex items-center gap-2 font-medium transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}</span>
@@ -152,19 +152,19 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
       </div>
 
       {/* District Header Card */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 space-y-4 shadow-[var(--elevation-2xs)]">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
+            <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-bold text-ui-content-primary tracking-tight">
               {districtDisplayName}
             </h1>
             {divisionDisplayName && (
-              <span className="text-[14px] px-2.5 py-0.5 rounded-lg bg-ui-surface-subtle text-ui-content-secondary font-medium border border-ui-stroke-subtle">
+              <span className="text-[var(--type-fixed-14)] px-2.5 py-0.5 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle text-ui-content-secondary font-medium border border-ui-stroke-subtle">
                 {language === 'bn' ? `${divisionDisplayName} বিভাগ` : `${divisionDisplayName} division`}
               </span>
             )}
           </div>
-          <p className="text-[16px] leading-[26px] text-ui-content-secondary">
+          <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary">
             {language === 'bn'
               ? 'এই এলাকার প্রতিবেদন'
               : 'Reports from this area'}
@@ -172,7 +172,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         </div>
 
         {/* Quiet Inline Summary */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 border-t border-ui-stroke-subtle text-[14px] text-ui-content-secondary font-medium">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 border-t border-ui-stroke-subtle text-[var(--type-fixed-14)] text-ui-content-secondary font-medium">
           <span>
             {language === 'bn' ? `${toBanglaDigits(reports.length)}টি প্রতিবেদন` : `${reports.length} reports`}
           </span>
@@ -206,9 +206,9 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
 
       {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-xl p-8 text-center space-y-4">
+        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-control)] p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
-          <p className="text-[16px] font-semibold text-ui-error-text">
+          <p className="text-[var(--type-fixed-16)] font-semibold text-ui-error-text">
             {language === 'bn'
               ? 'এই এলাকার প্রতিবেদন লোড করা যায়নি।'
               : "Couldn't load reports for this area."}
@@ -216,7 +216,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
           <button
             type="button"
             onClick={loadData}
-            className="btn-primary-action px-4 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
+            className="btn-primary-action px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-semibold min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
           >
             {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
           </button>
@@ -227,7 +227,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
       {!isLoading && !fetchError && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
+            <h2 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-bold text-ui-content-primary flex items-center gap-2">
               <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>
                 {language === 'bn'
@@ -244,9 +244,9 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               ))}
             </div>
           ) : (
-            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-8 text-center space-y-2">
+            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-8 text-center space-y-2">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
-              <h3 className="text-[16px] font-bold text-ui-content-primary">
+              <h3 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
                 {language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই।' : 'No reports in this area.'}
               </h3>
             </div>

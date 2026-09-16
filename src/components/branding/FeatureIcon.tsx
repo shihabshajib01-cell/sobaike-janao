@@ -42,11 +42,11 @@ const SIZE_CLASSES: Record<FeatureIconSize, string> = {
 };
 
 const CONTAINER_SIZE_CLASSES: Record<FeatureIconSize, string> = {
-  xs: 'w-5 h-5 rounded-md p-1',
-  sm: 'w-6 h-6 rounded-lg p-1.2',
-  md: 'w-8 h-8 rounded-lg p-1.5',
-  lg: 'w-10 h-10 rounded-xl p-2.5',
-  xl: 'w-12 h-12 rounded-2xl p-3',
+  xs: 'w-5 h-5 rounded-[var(--radius-badge-sm)] p-1',
+  sm: 'w-6 h-6 rounded-[var(--radius-badge-md)] p-1.2',
+  md: 'w-8 h-8 rounded-[var(--radius-badge-md)] p-1.5',
+  lg: 'w-10 h-10 rounded-[var(--radius-control)] p-2.5',
+  xl: 'w-12 h-12 rounded-[var(--radius-card)] p-3',
 };
 
 /**
@@ -68,7 +68,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   if (variant === 'marker') {
     return (
       <div
-        className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-full flex items-center justify-center text-ui-content-inverse border-2 border-ui-surface shadow-md transition-all shrink-0 ${className}`}
+        className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-[var(--radius-pill)] flex items-center justify-center text-ui-content-inverse border-2 border-ui-surface shadow-[var(--elevation-md)] transition-all shrink-0 ${className}`}
         style={{
           backgroundColor: `var(--sec-${section}-primary)`,
         }}
@@ -84,7 +84,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   if (variant === 'container' || variant === 'badge') {
     return (
       <div
-        className={`inline-flex items-center justify-center shrink-0 border shadow-2xs transition-colors ${CONTAINER_SIZE_CLASSES[size]} ${className}`}
+        className={`inline-flex items-center justify-center shrink-0 border shadow-[var(--elevation-2xs)] transition-colors ${CONTAINER_SIZE_CLASSES[size]} ${className}`}
         style={{
           backgroundColor: `var(--sec-${section}-bg)`,
           color: `var(--sec-${section}-text)`,

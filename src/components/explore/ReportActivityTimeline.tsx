@@ -228,10 +228,10 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
     >
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5">
-        <h2 className="text-[15px] sm:text-[16px] font-bold text-ui-content-primary">
+        <h2 className="text-[var(--type-fixed-15)] sm:text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
           {language === 'bn' ? 'সময় অনুযায়ী প্রতিবেদন' : 'Reports over time'}
         </h2>
-        <span className="text-[11.5px] sm:text-[12px] text-ui-content-secondary font-normal">
+        <span className="text-[var(--type-fixed-115)] sm:text-[var(--type-fixed-12)] text-ui-content-secondary font-normal">
           {language === 'bn'
             ? 'সর্বশেষ প্রকাশিত প্রতিবেদনের মাস পর্যন্ত ৬ মাস'
             : 'Six months ending with the latest published report'}
@@ -242,7 +242,7 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
         /* Neutral empty state for when reports have no valid publication dates */
         <div
           id="activity-timeline-no-data"
-          className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-6 text-center text-[13px] sm:text-[14px] text-ui-content-secondary shadow-2xs"
+          className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-6 text-center text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] text-ui-content-secondary shadow-[var(--elevation-2xs)]"
         >
           {language === 'bn'
             ? 'বর্তমান প্রতিবেদনগুলোর জন্য নির্ভরযোগ্য প্রকাশের তারিখ পাওয়া যায়নি।'
@@ -252,10 +252,10 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
         /* Accessible 6-month Timeline Column Chart Card */
         <div
           id="activity-timeline-card"
-          className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3.5 sm:p-4 space-y-3.5 shadow-2xs"
+          className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 space-y-3.5 shadow-[var(--elevation-2xs)]"
         >
           {summaryText && (
-            <p className="text-[12px] sm:text-[12.5px] text-ui-content-secondary font-medium">
+            <p className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] text-ui-content-secondary font-medium">
               {summaryText}
             </p>
           )}
@@ -303,7 +303,7 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                   >
                     {/* Numeric count above bar */}
                     <span
-                      className="text-[11px] sm:text-[11.5px] font-semibold text-ui-content-primary mb-1.5 tabular-nums text-center select-none"
+                      className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] font-semibold text-ui-content-primary mb-1.5 tabular-nums text-center select-none"
                       aria-hidden="true"
                     >
                       {displayCount}
@@ -314,10 +314,10 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                     <div
                       role="presentation"
                       aria-hidden="true"
-                      className="w-full max-w-[32px] sm:max-w-[44px] h-20 sm:h-24 bg-ui-surface-subtle rounded-md flex flex-col justify-end p-0.5 border border-ui-stroke-subtle/50"
+                      className="w-full max-w-[32px] sm:max-w-[44px] h-20 sm:h-24 bg-ui-surface-subtle rounded-[var(--radius-badge-sm)] flex flex-col justify-end p-0.5 border border-ui-stroke-subtle/50"
                     >
                       {isZero ? (
-                        <div className="w-full h-1 bg-ui-stroke-subtle rounded-sm" />
+                        <div className="w-full h-1 bg-ui-stroke-subtle rounded-[var(--radius-compact)]" />
                       ) : (
                         <div
                           className="w-full bg-ui-accent rounded-t-sm transition-all duration-300 min-h-[4px]"
@@ -331,10 +331,10 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                       className="flex flex-col items-center mt-1.5 text-center select-none"
                       aria-hidden="true"
                     >
-                      <span className="text-[11px] sm:text-[12px] font-medium text-ui-content-primary leading-tight truncate">
+                      <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] font-medium text-ui-content-primary leading-tight truncate">
                         {shortLabel}
                       </span>
-                      <span className="text-[9.5px] sm:text-[10px] text-ui-content-secondary leading-tight mt-0.5">
+                      <span className="text-[var(--type-fixed-095)] sm:text-[var(--type-fixed-10)] text-ui-content-secondary leading-tight mt-0.5">
                         {yearLabel}
                       </span>
                     </div>
@@ -348,7 +348,7 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
 
       {/* Coverage note if any reports lack valid publication dates */}
       {hasUnmappedDates && (
-        <p className="text-[11px] sm:text-[11.5px] text-ui-content-secondary pt-0.5">
+        <p className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] text-ui-content-secondary pt-0.5">
           {language === 'bn'
             ? 'বৈধ প্রকাশের তারিখ থাকা প্রতিবেদনগুলোর ভিত্তিতে সময়ভিত্তিক বিশ্লেষণ দেখানো হয়েছে।'
             : 'Activity analysis includes reports with valid publication dates.'}

@@ -8,6 +8,7 @@ import 'leaflet.heat';
 
 import { ReportItem } from '../../types/report';
 import { SectionKey } from '../../theme/tokens';
+import { HEATMAP_TOKENS } from '../../theme/data-viz-tokens';
 import { BANGLADESH_DISTRICTS, DistrictInfo } from '../../data/districts';
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
@@ -228,13 +229,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           maxZoom: 14,
           max: maxHeatWeight || 1,
           minOpacity: 0.55,
-          gradient: {
-            0.2: '#2563EB',
-            0.4: '#06B6D4',
-            0.6: '#10B981',
-            0.8: '#F59E0B',
-            1.0: '#EF4444',
-          },
+          gradient: HEATMAP_TOKENS.leafletGradient,
         });
 
         heatLayer.addTo(map);
@@ -432,7 +427,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       <div
         role="status"
         aria-live="polite"
-        className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[12px] sm:text-[13px] text-ui-content-secondary flex items-start sm:items-center justify-between gap-2 shadow-2xs"
+        className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] text-ui-content-secondary flex items-start sm:items-center justify-between gap-2 shadow-[var(--elevation-2xs)]"
       >
         <div className="flex items-start sm:items-center gap-2 min-w-0 w-full">
           <MapIcon name="info" size="xs" className="text-ui-content-muted shrink-0 mt-0.5 sm:mt-0" ariaHidden={true} />
@@ -445,16 +440,16 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         id="public-heatmap-card"
         role="region"
         aria-label={language === 'bn' ? 'প্রতিবেদন হিটম্যাপ' : 'Reports heatmap'}
-        className="relative isolate z-0 rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col h-[330px] sm:h-[370px] md:h-[520px] md:min-h-[520px]"
+        className="relative isolate z-0 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface shadow-[var(--elevation-xs)] overflow-hidden flex flex-col h-[330px] sm:h-[370px] md:h-[520px] md:min-h-[520px]"
       >
         {/* Zoom & Recenter Controls (Top-Right) */}
-        <div className="absolute top-3.5 right-3.5 z-[500] flex flex-col gap-1.5 shadow-sm">
+        <div className="absolute top-3.5 right-3.5 z-[500] flex flex-col gap-1.5 shadow-[var(--elevation-sm)]">
           <button
             type="button"
             onClick={handleZoomIn}
             title={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
             aria-label={language === 'bn' ? 'জুম ইন' : 'Zoom In'}
-            className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+            className="min-w-[44px] min-h-[44px] rounded-[var(--radius-control)] bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-[var(--elevation-2xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
           >
             <MapIcon name="plus" size="sm" />
           </button>
@@ -464,7 +459,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             onClick={handleZoomOut}
             title={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
             aria-label={language === 'bn' ? 'জুম আউট' : 'Zoom Out'}
-            className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+            className="min-w-[44px] min-h-[44px] rounded-[var(--radius-control)] bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-[var(--elevation-2xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
           >
             <MapIcon name="minus" size="sm" />
           </button>
@@ -474,7 +469,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             onClick={handleResetView}
             title={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
             aria-label={language === 'bn' ? 'সারাদেশ ভিউ' : 'Reset View'}
-            className="min-w-[44px] min-h-[44px] rounded-xl bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+            className="min-w-[44px] min-h-[44px] rounded-[var(--radius-control)] bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle text-ui-content-primary flex items-center justify-center cursor-pointer transition-all shadow-[var(--elevation-2xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
           >
             <MapIcon name="reset" size="sm" />
           </button>
@@ -498,10 +493,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         {totalReportsCount === 0 && (
           <div className="absolute inset-0 z-[550] bg-ui-surface/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-3">
             <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
-            <h4 className="text-[17px] font-bold text-ui-content-primary">
+            <h4 className="text-[var(--type-fixed-17)] font-bold text-ui-content-primary">
               {language === 'bn' ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই' : 'No reports match these filters'}
             </h4>
-            <p className="text-[13px] text-ui-content-muted max-w-xs">
+            <p className="text-[var(--type-fixed-13)] text-ui-content-muted max-w-xs">
               {language === 'bn'
                 ? 'বর্তমান অনুসন্ধান বা ফিল্টারের সাথে কোনো তথ্যের মিল পাওয়া যায়নি।'
                 : 'No reports found matching your current filter selection.'}
@@ -510,7 +505,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
               <button
                 type="button"
                 onClick={onResetFilters}
-                className="btn-primary-action px-4 py-2 rounded-xl text-[13px] font-semibold min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="btn-primary-action px-4 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-semibold min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               </button>

@@ -167,7 +167,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
     <div ref={containerRef} className="relative w-full text-left space-y-1">
       <label
         htmlFor="address-search-input"
-        className="block text-[13px] font-bold text-primary"
+        className="block text-[var(--type-fixed-13)] font-bold text-primary"
       >
         {language === 'bn' ? 'ঠিকানা বা এলাকা' : 'Address or area'}
       </label>
@@ -208,7 +208,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
               ? 'এলাকা বা রাস্তার নাম লিখুন'
               : 'Enter area or street name'
           }
-          className="w-full pl-10 pr-10 py-2.5 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-ui-accent min-h-[42px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-ui-surface-subtle"
+          className="w-full pl-10 pr-10 py-2.5 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] text-[var(--type-fixed-14)] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-ui-accent min-h-[42px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-ui-surface-subtle"
         />
 
         {/* Clear Button */}
@@ -216,7 +216,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 p-1 text-ui-content-secondary hover:text-ui-content-primary rounded-full hover:bg-ui-surface-subtle cursor-pointer transition-colors"
+            className="absolute right-3 p-1 text-ui-content-secondary hover:text-ui-content-primary rounded-[var(--radius-pill)] hover:bg-ui-surface-subtle cursor-pointer transition-colors"
             title={language === 'bn' ? 'মুছুন' : 'Clear'}
             aria-label={language === 'bn' ? 'ঠিকানা মুছুন' : 'Clear address'}
           >
@@ -230,7 +230,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
         <div
           id="address-suggestions-list"
           role="listbox"
-          className="absolute left-0 right-0 z-50 mt-1 max-h-64 overflow-y-auto rounded-xl bg-ui-surface border border-ui-stroke-subtle shadow-lg py-1.5 focus:outline-none divide-y divide-ui-stroke-subtle/40"
+          className="absolute left-0 right-0 z-50 mt-1 max-h-64 overflow-y-auto rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle shadow-[var(--elevation-lg)] py-1.5 focus:outline-none divide-y divide-ui-stroke-subtle/40"
         >
           {suggestions.length > 0 &&
             suggestions.map((suggestion, idx) => {
@@ -249,11 +249,11 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
                 >
                   <MapPin className="w-4 h-4 mt-0.5 text-ui-accent shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13.5px] font-semibold text-ui-content-primary truncate">
+                    <p className="text-[var(--type-fixed-135)] font-semibold text-ui-content-primary truncate">
                       {suggestion.mainText}
                     </p>
                     {suggestion.secondaryText && (
-                      <p className="text-[12px] text-ui-content-secondary truncate">
+                      <p className="text-[var(--type-fixed-12)] text-ui-content-secondary truncate">
                         {suggestion.secondaryText}
                       </p>
                     )}
@@ -263,13 +263,13 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
             })}
 
           {hasNoResults && !isLoading && (
-            <div className="px-3.5 py-3 text-center text-[13px] text-ui-content-secondary">
+            <div className="px-3.5 py-3 text-center text-[var(--type-fixed-13)] text-ui-content-secondary">
               {language === 'bn' ? 'কোনো ফলাফল পাওয়া যায়নি' : 'No results found'}
             </div>
           )}
 
           {hasError && !isLoading && (
-            <div className="flex items-center justify-center gap-1.5 px-3.5 py-3 text-center text-[13px] text-ui-warning-text">
+            <div className="flex items-center justify-center gap-1.5 px-3.5 py-3 text-center text-[var(--type-fixed-13)] text-ui-warning-text">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>
                 {language === 'bn'

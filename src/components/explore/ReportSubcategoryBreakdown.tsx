@@ -118,10 +118,10 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
     >
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5">
-        <h2 className="text-[16px] sm:text-[18px] font-bold text-ui-content-primary">
+        <h2 className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-18)] font-bold text-ui-content-primary">
           {language === 'bn' ? 'সাবক্যাটাগরি অনুযায়ী বিশ্লেষণ' : 'Subcategory breakdown'}
         </h2>
-        <span className="text-[12px] sm:text-[13px] text-ui-content-muted font-normal">
+        <span className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] text-ui-content-muted font-normal">
           {language === 'bn' ? 'বর্তমান ফিল্টারের ভিত্তিতে' : 'Based on the current filters'}
         </span>
       </div>
@@ -129,7 +129,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
       {noData ? (
         <div
           id="subcategory-no-data"
-          className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-6 text-center text-[13px] sm:text-[14px] text-ui-content-secondary shadow-2xs"
+          className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-6 text-center text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] text-ui-content-secondary shadow-[var(--elevation-2xs)]"
         >
           {language === 'bn'
             ? 'বর্তমান প্রতিবেদনগুলোর জন্য নির্ভরযোগ্য সাবক্যাটাগরি তথ্য পাওয়া যায়নি।'
@@ -138,7 +138,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
       ) : (
         <div
           id="subcategory-breakdown-card"
-          className="bg-ui-surface border border-ui-stroke-subtle rounded-xl p-3.5 sm:p-4 space-y-3.5 shadow-2xs"
+          className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 space-y-3.5 shadow-[var(--elevation-2xs)]"
         >
           <div className="space-y-2.5">
             {visibleSubcategories.map((item) => {
@@ -156,7 +156,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                   id={`subcategory-row-${item.compositeKey}`}
                   className="space-y-1"
                 >
-                  <div className="flex items-baseline justify-between text-[12.5px] sm:text-[13px]">
+                  <div className="flex items-baseline justify-between text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)]">
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                       <div className="shrink-0">
                         <CategoryIcon section={item.segment} size="xs" />
@@ -165,12 +165,12 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                         <span className="font-semibold text-ui-content-primary truncate">
                           {displayName}
                         </span>
-                        <span className="text-[11px] sm:text-[11.5px] text-ui-content-secondary truncate">
+                        <span className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] text-ui-content-secondary truncate">
                           ({parentName})
                         </span>
                       </div>
                     </div>
-                    <div className="shrink-0 text-[12px] sm:text-[12.5px] font-medium text-ui-content-secondary">
+                    <div className="shrink-0 text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-125)] font-medium text-ui-content-secondary">
                       <span className="font-semibold text-ui-content-primary">
                         {displayCount}
                       </span>
@@ -184,10 +184,10 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                   <div
                     role="presentation"
                     aria-hidden="true"
-                    className="w-full h-1.5 rounded-full bg-ui-surface-subtle overflow-hidden"
+                    className="w-full h-1.5 rounded-[var(--radius-pill)] bg-ui-surface-subtle overflow-hidden"
                   >
                     <div
-                      className="h-full rounded-full transition-all duration-300"
+                      className="h-full rounded-[var(--radius-pill)] transition-all duration-300"
                       style={{
                         width: `${item.percentage}%`,
                         backgroundColor: item.primaryColor,
@@ -206,7 +206,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                 type="button"
                 aria-expanded={isExpanded}
                 onClick={() => setIsExpanded((prev) => !prev)}
-                className="w-full text-center text-[12.5px] sm:text-[13px] font-semibold text-ui-content-secondary hover:text-ui-content-primary transition-colors py-2 min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
+                className="w-full text-center text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)] font-semibold text-ui-content-secondary hover:text-ui-content-primary transition-colors py-2 min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)]"
               >
                 {isExpanded
                   ? language === 'bn'
@@ -223,7 +223,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
 
       {/* Coverage note if any reports lack recognized subcategory */}
       {hasUnmapped && (
-        <p className="text-[11px] sm:text-[11.5px] text-ui-content-secondary pt-0.5">
+        <p className="text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-115)] text-ui-content-secondary pt-0.5">
           {language === 'bn'
             ? 'সাবক্যাটাগরি শনাক্ত করা গেছে এমন প্রতিবেদনগুলোর ভিত্তিতে এই বিশ্লেষণ দেখানো হয়েছে।'
             : 'Subcategory analysis includes reports with recognized subcategory data.'}

@@ -69,13 +69,13 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
         <div className="flex items-center gap-3 min-w-0">
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="text-[20px] font-bold text-ui-content-primary leading-tight">
+              <h2 className="text-[var(--type-fixed-20)] font-bold text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
               </h2>
 
               {segment && (
                 <div
-                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[13px] font-semibold border"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[var(--radius-pill)] text-[var(--type-fixed-13)] font-semibold border"
                   style={{
                     backgroundColor: getSegmentStyles(segment).bg,
                     color: getSegmentStyles(segment).color,
@@ -88,7 +88,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               )}
             </div>
 
-            <p className="text-[13px] sm:text-[14px] text-ui-content-muted leading-tight mt-1">
+            <p className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] text-ui-content-muted leading-tight mt-1">
               <span>
                 {language === 'bn'
                   ? `ধাপ ${currentStep} / ${totalSteps}: ${currentStepInfo.titleBn}`
@@ -122,16 +122,16 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               disabled={!isAccessible}
               aria-current={isCurrent ? 'step' : undefined}
               onClick={() => isAccessible && onSelectStep && onSelectStep(st.step)}
-              className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-2 rounded-xl text-[12px] sm:text-[13px] md:text-[14px] font-medium transition-all whitespace-nowrap cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] md:text-[var(--type-fixed-14)] font-medium transition-all whitespace-nowrap cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isCurrent
-                  ? 'bg-ui-accent text-ui-content-inverse font-bold shadow-2xs'
+                  ? 'bg-ui-accent text-ui-content-inverse font-bold shadow-[var(--elevation-2xs)]'
                   : isCompleted
                   ? 'bg-ui-accent-soft text-ui-content-primary border font-semibold'
                   : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
               <span
-                className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] font-bold ${
+                className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 rounded-[var(--radius-pill)] flex items-center justify-center text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] font-bold ${
                   isCurrent
                     ? 'bg-ui-content-inverse/25 text-ui-content-inverse'
                     : isCompleted

@@ -120,7 +120,7 @@ export const HomePage: React.FC = () => {
         {/* Feed Header & District Filter */}
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
+            <h2 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] font-bold leading-[var(--type-line-ratio-130)] text-ui-content-primary">
               {language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports'}
             </h2>
           </div>
@@ -164,9 +164,9 @@ export const HomePage: React.FC = () => {
 
         {/* Error State */}
         {!isLoading && fetchError && (
-          <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
+          <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-card)] p-6 text-center space-y-3">
             <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
-            <p className="text-[16px] font-semibold text-ui-error-text">
+            <p className="text-[var(--type-fixed-16)] font-semibold text-ui-error-text">
               {language === 'bn'
                 ? 'প্রতিবেদন লোড করা যায়নি।'
                 : 'Couldn’t load reports.'}
@@ -174,7 +174,7 @@ export const HomePage: React.FC = () => {
             <button
               type="button"
               onClick={loadReports}
-              className="btn-primary-action px-4 py-2 text-[14px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
+              className="btn-primary-action px-4 py-2 text-[var(--type-fixed-14)] font-semibold rounded-[var(--radius-control)] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
             >
               {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
             </button>

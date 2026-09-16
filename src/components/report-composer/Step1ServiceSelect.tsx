@@ -141,7 +141,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   return (
     <div className="space-y-6">
       <div className="text-left">
-        <h3 className="text-[20px] md:text-[22px] font-bold text-ui-content-primary">
+        <h3 className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-bold text-ui-content-primary">
           {language === 'bn' ? 'কোন বিষয়ে জানাতে চান?' : 'What would you like to report?'}
         </h3>
       </div>
@@ -157,10 +157,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               id={`service-select-card-${srv.key}`}
               onClick={() => handleActiveSelect(srv.key)}
               aria-pressed={isSelected}
-              className={`relative rounded-2xl p-5 md:p-6 transition-all duration-150 cursor-pointer flex flex-col justify-between text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
+              className={`relative rounded-[var(--radius-card)] p-5 md:p-6 transition-all duration-150 cursor-pointer flex flex-col justify-between text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
                 isSelected
-                  ? 'border-2 shadow-sm'
-                  : 'bg-ui-surface border-ui-stroke-subtle shadow-2xs'
+                  ? 'border-2 shadow-[var(--elevation-sm)]'
+                  : 'bg-ui-surface border-ui-stroke-subtle shadow-[var(--elevation-2xs)]'
               }`}
               style={{
                 backgroundColor: isSelected ? srv.bgVar : undefined,
@@ -170,7 +170,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               <div className="space-y-3 w-full">
                 <div className="flex items-center justify-between">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-colors border shadow-2xs"
+                    className="w-12 h-12 rounded-[var(--radius-control)] flex items-center justify-center transition-colors border shadow-[var(--elevation-2xs)]"
                     style={{
                       backgroundColor: `var(--sec-${srv.key}-bg)`,
                       color: `var(--sec-${srv.key}-text)`,
@@ -181,7 +181,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   </div>
 
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${
+                    className={`w-6 h-6 rounded-[var(--radius-pill)] flex items-center justify-center border transition-all ${
                       isSelected
                         ? 'border-transparent bg-ui-accent text-ui-content-inverse'
                         : 'border-ui-stroke-subtle bg-ui-surface text-transparent'
@@ -192,10 +192,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                 </div>
 
                 <div>
-                  <h4 className="text-[18px] font-bold text-ui-content-primary leading-snug">
+                  <h4 className="text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-snug">
                     {language === 'bn' ? srv.titleBn : srv.titleEn}
                   </h4>
-                  <p className="text-[14px] leading-relaxed text-ui-content-secondary mt-1.5">
+                  <p className="text-[var(--type-fixed-14)] leading-relaxed text-ui-content-secondary mt-1.5">
                     {language === 'bn' ? srv.descBn : srv.descEn}
                   </p>
                 </div>
@@ -208,7 +208,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       {comingSoonList.length > 0 && (
         <div className="pt-2 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-[12px] font-bold text-ui-content-muted uppercase tracking-wider">
+            <span className="text-[var(--type-fixed-12)] font-bold text-ui-content-muted uppercase tracking-wider">
               {language === 'bn' ? 'আসন্ন সেবাসমূহ' : 'Upcoming services'}
             </span>
             <span className="h-px flex-1" />
@@ -225,32 +225,32 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   id={`service-select-coming-soon-${cs.key}`}
                   onClick={() => handleComingSoonSelect(cs.key)}
                   aria-pressed={isSelected}
-                  className={`relative rounded-2xl p-4 sm:p-5 transition-all duration-150 cursor-pointer flex flex-col justify-between text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
+                  className={`relative rounded-[var(--radius-card)] p-4 sm:p-5 transition-all duration-150 cursor-pointer flex flex-col justify-between text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
                     isSelected
-                      ? 'border-2 border-ui-stroke-strong bg-ui-surface-subtle shadow-sm'
-                      : 'bg-ui-surface border-ui-stroke-subtle shadow-2xs'
+                      ? 'border-2 border-ui-stroke-strong bg-ui-surface-subtle shadow-[var(--elevation-sm)]'
+                      : 'bg-ui-surface border-ui-stroke-subtle shadow-[var(--elevation-2xs)]'
                   }`}
                 >
                   <div className="space-y-3 w-full">
                     <div className="flex items-center justify-between">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary shadow-2xs">
+                      <div className="w-10 h-10 rounded-[var(--radius-control)] flex items-center justify-center border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary shadow-[var(--elevation-2xs)]">
                         <AppIcon name={cs.iconName} size="lg" />
                       </div>
 
                       <span
                         id={`service-select-badge-${cs.key}`}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[12px] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[var(--radius-pill)] text-[var(--type-fixed-12)] font-semibold bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-ui-warning-text animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-[var(--radius-pill)] bg-ui-warning-text animate-pulse" />
                         <span>{language === 'bn' ? cs.badgeBn : cs.badgeEn}</span>
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="text-[16px] font-bold text-ui-content-primary leading-snug">
+                      <h4 className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary leading-snug">
                         {language === 'bn' ? cs.nameBn : cs.nameEn}
                       </h4>
-                      <p className="text-[13.5px] leading-relaxed text-ui-content-secondary mt-1">
+                      <p className="text-[var(--type-fixed-135)] leading-relaxed text-ui-content-secondary mt-1">
                         {language === 'bn' ? cs.descriptionBn : cs.descriptionEn}
                       </p>
                     </div>
@@ -265,18 +265,18 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               id="coming-soon-selection-notice"
               role="status"
               aria-live="polite"
-              className="p-4 rounded-2xl bg-ui-surface-subtle border border-ui-stroke-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left transition-all"
+              className="p-4 rounded-[var(--radius-card)] bg-ui-surface-subtle border border-ui-stroke-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left transition-all"
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[14px] font-bold text-ui-content-primary">
+                  <span className="text-[var(--type-fixed-14)] font-bold text-ui-content-primary">
                     {language === 'bn' ? activeComingSoonData.nameBn : activeComingSoonData.nameEn}
                   </span>
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-ui-surface border border-ui-stroke-subtle text-ui-content-muted">
+                  <span className="text-[var(--type-fixed-11)] font-semibold px-2 py-0.5 rounded-[var(--radius-badge-sm)] bg-ui-surface border border-ui-stroke-subtle text-ui-content-muted">
                     {language === 'bn' ? activeComingSoonData.badgeBn : activeComingSoonData.badgeEn}
                   </span>
                 </div>
-                <p className="text-[13.5px] text-ui-content-secondary leading-relaxed">
+                <p className="text-[var(--type-fixed-135)] text-ui-content-secondary leading-relaxed">
                   {language === 'bn'
                     ? 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি। অনুগ্রহ করে চালুকৃত সেবা নির্বাচন করুন অথবা বিস্তারিত দেখুন।'
                     : 'This reporting service is being prepared and is not available yet. Please select an active service or read more details.'}
@@ -288,7 +288,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   type="button"
                   id={`coming-soon-learn-more-${activeComingSoonData.key}`}
                   onClick={() => onNavigateToComingSoon(activeComingSoonData.slug)}
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-bold bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-bold bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'Learn more'}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-ui-content-muted" />

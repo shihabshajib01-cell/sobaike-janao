@@ -33,12 +33,12 @@ const BreakdownColumn: React.FC<BreakdownColumnProps> = ({ title, options, value
   }, [options, values, language]);
 
   return (
-    <div className="rounded-xl border border-ui-stroke-subtle bg-ui-surface p-4 space-y-3">
-      <h3 className="text-[14px] font-bold text-ui-content-primary">{title}</h3>
+    <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface p-4 space-y-3">
+      <h3 className="text-[var(--type-fixed-14)] font-bold text-ui-content-primary">{title}</h3>
       {rows.length > 0 ? (
         <ul className="space-y-2">
           {rows.map((row) => (
-            <li key={row.value} className="flex items-center justify-between gap-3 text-[13px]">
+            <li key={row.value} className="flex items-center justify-between gap-3 text-[var(--type-fixed-13)]">
               <span className="text-ui-content-secondary min-w-0">{row.label}</span>
               <span className="font-bold text-ui-content-primary shrink-0">
                 {language === 'bn' ? toBanglaDigits(row.count) : row.count}
@@ -47,7 +47,7 @@ const BreakdownColumn: React.FC<BreakdownColumnProps> = ({ title, options, value
           ))}
         </ul>
       ) : (
-        <p className="text-[13px] text-ui-content-muted">
+        <p className="text-[var(--type-fixed-13)] text-ui-content-muted">
           {language === 'bn' ? 'এই ফিল্টারে পর্যাপ্ত তথ্য নেই।' : 'No classified reports in this view.'}
         </p>
       )}
@@ -66,10 +66,10 @@ export const HarassmentClassificationBreakdown: React.FC<HarassmentClassificatio
   return (
     <section aria-labelledby="harassment-breakdown-heading" className="space-y-3">
       <div className="space-y-0.5">
-        <h2 id="harassment-breakdown-heading" className="text-[17px] font-bold text-ui-content-primary">
+        <h2 id="harassment-breakdown-heading" className="text-[var(--type-fixed-17)] font-bold text-ui-content-primary">
           {language === 'bn' ? 'হয়রানি ও নির্যাতন: প্রেক্ষাপট বিশ্লেষণ' : 'Harassment & abuse context'}
         </h2>
-        <p className="text-[13px] text-ui-content-muted">
+        <p className="text-[var(--type-fixed-13)] text-ui-content-muted">
           {language === 'bn'
             ? 'শুধু প্রকাশিত প্রতিবেদনের বিস্তৃত শ্রেণিভিত্তিক তথ্য দেখানো হচ্ছে; কোনো ব্যক্তির সুনির্দিষ্ট বয়স বা পরিচয় নয়।'
             : 'Broad classifications from published reports only; exact age and victim identity are not shown.'}
