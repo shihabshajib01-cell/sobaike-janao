@@ -25,83 +25,27 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Normalize one-time script
+      - name: Normalize one-time refactor diagnostics
         run: |
           python - <<'PY'
           from pathlib import Path
           path = Path('scripts/remove-report-draft-refactor.mjs')
           text = path.read_text()
-          old = "throw new Error(`draft storage exists after cancellation: ${JSON.stringify(storedDrafts)}`);"
-          new = "throw new Error('draft storage exists after cancellation: ' + JSON.stringify(storedDrafts));"
-          if old not in text:
-              raise SystemExit('expected diagnostic literal not found')
-          text = text.replace(old, new)
-
-          marker = "// 7) Remove obsolete persisted-draft modules."
-          if marker not in text:
-              raise SystemExit('refactor insertion marker not found')
-          extra = r'''
-// Remove attachment UI that existed only to recover persisted evidence drafts.
-{
-  const path = 'src/components/report-composer/Step3ComplaintDetails.tsx';
-  let text = read(path);
-  const startMarker = '              {formData.pendingEvidenceRecovery &&';
-  const endMarker = '              {/* Image Attachment Picker - max 6 images */}';
-  const start = text.indexOf(startMarker);
-  const end = text.indexOf(endMarker, start);
-  if (start === -1 || end === -1) throw new Error('Could not locate Step 3 evidence recovery warning');
-  text = text.slice(0, start) + text.slice(end);
-  write(path, text);
-}
-
-{
-  const path = 'src/components/report-composer/Step4Review.tsx';
-  let text = read(path);
-  const oldSummary = `  const hasMissingEvidence =
-    pendingImages.length === 0 &&
-    Boolean(formData.pendingEvidenceRecovery && formData.pendingEvidenceRecovery.expectedCount > 0);
-
-  const attachmentsSummary = hasMissingEvidence
-    ? language === 'bn'
-      ? 'পুনরায় সংযুক্তি আবশ্যক'
-      : 'Reattachment required'
-    : pendingImages.length > 0
-    ? language === 'bn'
-      ? \`${pendingImages.length} টি ছবি সংযুক্ত\`
-      : \`${pendingImages.length} images attached\`
-    : language === 'bn'
-    ? 'কোনো ছবি সংযুক্ত নেই'
-    : 'No attachments';`;
-  const newSummary = `  const attachmentsSummary = pendingImages.length > 0
-    ? language === 'bn'
-      ? \`${pendingImages.length} টি ছবি সংযুক্ত\`
-      : \`${pendingImages.length} images attached\`
-    : language === 'bn'
-    ? 'কোনো ছবি সংযুক্ত নেই'
-    : 'No attachments';`;
-  text = replaceOnce(text, oldSummary, newSummary, 'Step 4 attachment summary');
-
-  const warningStartMarker = '              {hasMissingEvidence ? (';
-  const warningEndMarker = '              ) : pendingImages.length > 0 ? (';
-  const warningStart = text.indexOf(warningStartMarker);
-  const warningEnd = text.indexOf(warningEndMarker, warningStart);
-  if (warningStart === -1 || warningEnd === -1) throw new Error('Could not locate Step 4 evidence recovery warning');
-  text = text.slice(0, warningStart) + '              {pendingImages.length > 0 ? (' + text.slice(warningEnd + warningEndMarker.length);
-  write(path, text);
-}
-
-'''
-          text = text.replace(marker, extra + marker)
+          replacements = {
+              "throw new Error(`draft storage exists after cancellation: ${JSON.stringify(storedDrafts)}`);": "throw new Error('draft storage exists after cancellation: ' + JSON.stringify(storedDrafts));",
+              "throw new Error(`Draft persistence residue remains in source: ${forbidden}`);": "console.warn('Draft persistence residue pending scoped cleanup: ' + forbidden);",
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit('expected one-time refactor diagnostic target not found')
+              text = text.replace(old, new)
           path.write_text(text)
           PY
 
       - name: Apply scoped refactor
         run: |
-          if ! node scripts/remove-report-draft-refactor.mjs > refactor.log 2>&1; then
-            echo "--- residual draft references after failed transform ---" >> refactor.log
-            grep -R -n "pendingEvidenceRecovery\|DraftRepository\|EvidenceDraftStorage\|CURRENT_REPORT_FLOW_VERSION\|interface DraftReport" src --include='*.ts' --include='*.tsx' >> refactor.log || true
-            exit 1
-          fi
+          node scripts/remove-report-draft-refactor.mjs > refactor.log 2>&1
+          node scripts/remove-report-recovery-ui-patch.mjs >> refactor.log 2>&1
 
       - name: Upload refactor diagnostics
         if: always()
@@ -123,8 +67,12 @@ jobs:
         run: |
           test ! -f src/services/draftRepository.ts
           test ! -f src/services/evidenceDraftStorage.ts
-          ! grep -R "DraftRepository\|EvidenceDraftStorage\|pendingEvidenceRecovery\|draft-save-exit-btn\|draft-recovery-" src --include='*.ts' --include='*.tsx'
+          ! grep -R "DraftRepository\|EvidenceDraftStorage\|pendingEvidenceRecovery\|draft-save-exit-btn\|draft-recovery-\|interface DraftReport\|CURRENT_REPORT_FLOW_VERSION" src --include='*.ts' --include='*.tsx'
+          grep -q 'id="report-continue-editing-btn"' src/components/report-composer/ReportComposerModal.tsx
+          grep -q 'id="report-cancel-btn"' src/components/report-composer/ReportComposerModal.tsx
+          grep -q 'id="report-cancel-confirm-modal"' src/components/report-composer/ReportComposerModal.tsx
           rm scripts/remove-report-draft-refactor.mjs
+          rm scripts/remove-report-recovery-ui-patch.mjs
           rm .github/workflows/remove-report-drafts-refactor.yml
           rm -f refactor.log
 
