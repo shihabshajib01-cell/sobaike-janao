@@ -39,7 +39,12 @@ jobs:
           PY
 
       - name: Apply scoped refactor
-        run: node scripts/remove-report-draft-refactor.mjs > refactor.log 2>&1
+        run: |
+          if ! node scripts/remove-report-draft-refactor.mjs > refactor.log 2>&1; then
+            echo "--- residual draft references after failed transform ---" >> refactor.log
+            grep -R -n "pendingEvidenceRecovery\|DraftRepository\|EvidenceDraftStorage\|CURRENT_REPORT_FLOW_VERSION\|interface DraftReport" src --include='*.ts' --include='*.tsx' >> refactor.log || true
+            exit 1
+          fi
 
       - name: Upload refactor diagnostics
         if: always()
