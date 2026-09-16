@@ -11,6 +11,11 @@ new_second = "old = \"  previousBillAmount?: number | string;\\n  frequency: 'on
 
 if source.count(old_first) != 1 or source.count(old_second) != 1:
     raise RuntimeError('Type patch wrapper guard failed')
-
 source = source.replace(old_first, new_first).replace(old_second, new_second)
+
+validation_guard = "'step3 bribery validation')"
+if source.count(validation_guard) != 1:
+    raise RuntimeError('Validation patch wrapper guard failed')
+source = source.replace(validation_guard, "'step3 bribery validation', expected=2)", 1)
+
 exec(compile(source, str(path), 'exec'), {'__name__': '__main__'})
