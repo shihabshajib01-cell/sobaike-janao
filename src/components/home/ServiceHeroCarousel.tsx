@@ -7,6 +7,7 @@ import {
   getHeroSliderCssVars,
 } from '../../theme/tokens';
 import { useApp, RoutePath } from '../../context/AppContext';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 import { CANONICAL_BANNER_CONTENT } from '../../data/bannerContent';
 import { IconButton } from '../ui/IconButton';
@@ -30,6 +31,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   className = '',
 }) => {
   const { language, openReportComposer } = useApp();
+  const { segments } = useTaxonomy();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -47,10 +49,17 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     { key: 'rickshaw', path: '/rickshaw' },
     { key: 'extortion', path: '/extortion' },
     { key: 'load_shedding', path: '/load-shedding' },
-  ];
+  ].filter((slide) => Boolean(segments[slide.key]));
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
+  const safeIndex = totalSlides > 0 ? Math.min(currentIndex, totalSlides - 1) : 0;
+
+  useEffect(() => {
+    if (currentIndex !== safeIndex) {
+      setCurrentIndex(safeIndex);
+    }
+  }, [currentIndex, safeIndex]);
 
   // Check prefers-reduced-motion
   useEffect(() => {
@@ -113,7 +122,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     };
   }, [
     isMultiSlide,
-    currentIndex,
+    safeIndex,
     prefersReducedMotion,
     isHovered,
     isFocused,
@@ -219,7 +228,11 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     setIsSwiping(false);
   };
 
-  const currentSlide = slides[currentIndex];
+  if (totalSlides === 0) {
+    return null;
+  }
+
+  const currentSlide = slides[safeIndex];
   const activeKey = currentSlide.key;
   const activeHeroBg = HERO_TOKENS.sections[activeKey]?.background ?? `var(--sec-${activeKey}-bg)`;
 
@@ -266,12 +279,12 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             prefersReducedMotion ? '!transition-none' : ''
           }`}
           style={{
-            transform: `translateX(-${currentIndex * 100}%)`,
+            transform: `translateX(-${safeIndex * 100}%)`,
             ...(prefersReducedMotion ? { transitionDuration: '0ms' } : {}),
           }}
         >
           {slides.map((slide, index) => {
-            const isActive = index === currentIndex;
+            const isActive = index === safeIndex;
             const content = CANONICAL_BANNER_CONTENT[slide.key];
 
             return (
