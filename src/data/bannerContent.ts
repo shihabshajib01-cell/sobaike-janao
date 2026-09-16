@@ -16,17 +16,11 @@ export interface CategoryBannerContent {
 }
 
 /**
- * CANONICAL_BANNER_CONTENT
- * Single source of truth for both standalone category pages and the Home service carousel.
- * Normalized character lengths across all 4 categories for balanced rhythm and line consistency:
- *
- * QA Length Analysis:
- * - BN Desktop: 77, 81, 78, 77 chars (~77-81 chars, within ±5%)
- * - EN Desktop: 86, 91, 88, 88 chars (~86-91 chars, within ±6%)
- * - BN Mobile:  63, 62, 60, 60 chars (~60-63 chars, within ±5%)
- * - EN Mobile:  58, 62, 59, 58 chars (~58-62 chars, within ±7%)
+ * Canonical hero content is intentionally limited to services that already have
+ * approved production illustration assets. New Phase 1 complaint categories are
+ * still active in reporting/navigation/taxonomy without reusing misleading art.
  */
-export const CANONICAL_BANNER_CONTENT: Record<SectionKey, CategoryBannerContent> = {
+export const CANONICAL_BANNER_CONTENT: Partial<Record<SectionKey, CategoryBannerContent>> = {
   harassment: {
     section: 'harassment',
     titleBn: 'হয়রানি ও নির্যাতন',
@@ -41,30 +35,16 @@ export const CANONICAL_BANNER_CONTENT: Record<SectionKey, CategoryBannerContent>
     primaryCtaBn: 'রিপোর্ট করুন',
     primaryCtaEn: 'Report now',
   },
-  rickshaw: {
-    section: 'rickshaw',
-    titleBn: 'অবৈধ চার্জিং স্টেশন',
-    titleEn: 'Expose Illegal Charging Stations',
-    mobileDescriptionBn: 'আপনার এলাকায় কি কোনো অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশন রয়েছে?',
-    mobileDescriptionEn: 'Is there an illegal or unsafe vehicle charging station nearby?',
-    tabletDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ বিদ্যুৎ সংযোগের তথ্য দিন।',
-    tabletDescriptionEn: 'Report unsafe battery charging and risky electrical connections.',
-    desktopDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার বা ঝুঁকিপূর্ণ বিদ্যুৎ সংযোগের তথ্য জানান।',
-    desktopDescriptionEn: 'Report unsafe battery charging stations, exposed wiring, or risky power connections.',
-    illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.jpg',
-    primaryCtaBn: 'রিপোর্ট করুন',
-    primaryCtaEn: 'Report now',
-  },
   extortion: {
     section: 'extortion',
-    titleBn: 'চাঁদাবাজি',
-    titleEn: 'Extortion',
-    mobileDescriptionBn: 'আপনার কাছে কি অবৈধ চাঁদা দাবি করা হয়েছে বা কোনো হুমকি দেওয়া হয়েছে?',
-    mobileDescriptionEn: 'Have you faced illegal extortion demands or coercive threats?',
-    tabletDescriptionBn: 'অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ আদায়ের তথ্য জানান।',
-    tabletDescriptionEn: 'Report illegal demands, threats, or forced payment collection.',
-    desktopDescriptionBn: 'দোকানপাট, পরিবহন বা এলাকায় অবৈধ অর্থ দাবি, হুমকি বা জোরপূর্বক আদায়ের তথ্য জানান।',
-    desktopDescriptionEn: 'Report illegal payment demands, threats, or forced collections in local areas.',
+    titleBn: 'ঘুষ ও চাঁদাবাজি',
+    titleEn: 'Bribery & Extortion',
+    mobileDescriptionBn: 'আপনার কাছে কি ঘুষ বা অবৈধ অর্থ দাবি করা হয়েছে, অথবা চাঁদাবাজির শিকার হয়েছেন?',
+    mobileDescriptionEn: 'Have you faced bribery, illegal payment demands, or extortion?',
+    tabletDescriptionBn: 'ঘুষ, অবৈধ চাঁদা, হুমকি বা জোরপূর্বক অর্থ আদায়ের তথ্য জানান।',
+    tabletDescriptionEn: 'Report bribery, illegal demands, threats, or forced payment collection.',
+    desktopDescriptionBn: 'সেবা, ব্যবসা, পরিবহন বা এলাকায় ঘুষ, অবৈধ অর্থ দাবি, হুমকি বা জোরপূর্বক আদায়ের তথ্য জানান।',
+    desktopDescriptionEn: 'Report bribery, illegal payment demands, threats, or forced collections in services and local areas.',
     illustrationSrc: '/illustrations/services/extortion-hero-shopkeeper-coercion-v02.jpg',
     primaryCtaBn: 'রিপোর্ট করুন',
     primaryCtaEn: 'Report now',
@@ -80,6 +60,20 @@ export const CANONICAL_BANNER_CONTENT: Record<SectionKey, CategoryBannerContent>
     desktopDescriptionBn: 'ঘন ঘন লোডশেডিং, তীব্র গ্যাস সংকট, বিদ্যুৎ বিপর্যয় বা ভুল বিলিং সমস্যার তথ্য জানান।',
     desktopDescriptionEn: 'Report chronic load shedding, gas shortages, power failures, or incorrect bills.',
     illustrationSrc: '/illustrations/services/load-shedding-hero-family-blackout-v01.jpg',
+    primaryCtaBn: 'রিপোর্ট করুন',
+    primaryCtaEn: 'Report now',
+  },
+  rickshaw: {
+    section: 'rickshaw',
+    titleBn: 'অবৈধ চার্জিং স্টেশন',
+    titleEn: 'Expose Illegal Charging Stations',
+    mobileDescriptionBn: 'আপনার এলাকায় কি কোনো অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশন রয়েছে?',
+    mobileDescriptionEn: 'Is there an illegal or unsafe vehicle charging station nearby?',
+    tabletDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং ও ঝুঁকিপূর্ণ বিদ্যুৎ সংযোগের তথ্য দিন।',
+    tabletDescriptionEn: 'Report unsafe battery charging and risky electrical connections.',
+    desktopDescriptionBn: 'অনিরাপদ ব্যাটারি চার্জিং স্টেশন, খোলা তার বা ঝুঁকিপূর্ণ বিদ্যুৎ সংযোগের তথ্য জানান।',
+    desktopDescriptionEn: 'Report unsafe battery charging stations, exposed wiring, or risky power connections.',
+    illustrationSrc: '/illustrations/services/rickshaw-hero-illegal-charging-station-v02.jpg',
     primaryCtaBn: 'রিপোর্ট করুন',
     primaryCtaEn: 'Report now',
   },
