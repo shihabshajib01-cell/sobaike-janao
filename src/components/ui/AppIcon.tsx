@@ -26,7 +26,6 @@ import {
   Eye,
   FileText,
   HeartHandshake,
-  Zap,
   ZapOff,
   Building,
   ShieldAlert,
@@ -39,7 +38,6 @@ import {
   LucideIcon,
 } from 'lucide-react';
 import { EvStationIcon } from '../branding/EvStationIcon';
-import { SectionKey } from '../../theme/tokens';
 
 export type AppIconName =
   | 'home'
@@ -76,6 +74,8 @@ export type AppIconName =
   | 'harassment'
   | 'rickshaw'
   | 'extortion'
+  | 'public-safety'
+  | 'road-transport'
   | 'zap-off'
   | 'building'
   | 'load-shedding'
@@ -127,6 +127,8 @@ const ICON_REGISTRY: Record<AppIconName, LucideIcon | React.ComponentType<any>> 
   harassment: HeartHandshake,
   rickshaw: EvStationIcon,
   extortion: ShieldAlert,
+  'public-safety': Shield,
+  'road-transport': MapPin,
   'zap-off': ZapOff,
   building: Building,
   'load-shedding': ZapOff,
@@ -134,11 +136,11 @@ const ICON_REGISTRY: Record<AppIconName, LucideIcon | React.ComponentType<any>> 
 };
 
 const SIZE_MAP: Record<AppIconSize, string> = {
-  xs: 'w-3 h-3', // 12px
-  sm: 'w-3.5 h-3.5', // 14px
-  md: 'w-4 h-4', // 16px
-  lg: 'w-5 h-5', // 20px
-  xl: 'w-6 h-6', // 24px
+  xs: 'w-3 h-3',
+  sm: 'w-3.5 h-3.5',
+  md: 'w-4 h-4',
+  lg: 'w-5 h-5',
+  xl: 'w-6 h-6',
 };
 
 export const AppIcon: React.FC<AppIconProps> = ({
