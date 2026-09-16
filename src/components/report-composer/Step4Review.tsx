@@ -67,7 +67,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     formData.identifyingDescription?.trim()
   );
 
-  const hasExtortionPrimaryPartyData = Boolean(
+  const hasPrimaryPartyData = Boolean(
     formData.reportedSubject?.trim() ||
     formData.roleOrDesignation?.trim() ||
     formData.organization?.trim() ||
@@ -76,20 +76,17 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   );
 
   const meaningfulMentionedParties = (formData.mentionedParties || []).filter(isMeaningfulMentionedParty);
-
-  const hasExtortionPartyData =
-    hasExtortionPrimaryPartyData || meaningfulMentionedParties.length > 0;
-
-  const showsPartySection =
-    (segment === 'extortion' && hasExtortionPartyData) ||
-    (segment === 'rickshaw' && hasRickshawOperatorData);
-  const showsIdentitySection = segment === 'harassment';
+  const hasPartyData = hasPrimaryPartyData || meaningfulMentionedParties.length > 0;
 
   const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
     (s) => s.id === formData.subcategoryId
   );
 
   const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
+  const showsPartySection =
+    (isRickshawChargingStation && hasRickshawOperatorData) ||
+    (!isRickshawChargingStation && Boolean(subjectConfig) && hasPartyData);
+  const showsIdentitySection = segment === 'harassment';
 
   // Conditional: hide frequency for Illegal Charging Station reports & Utility complaints
   const hideFrequency =
@@ -182,7 +179,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         formData.publicProfileHandle?.trim() ||
         (language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added')
       )
-    : segment === 'extortion'
+    : subjectConfig
     ? (
         formData.reportedSubject?.trim() ||
         formData.organization?.trim() ||
@@ -520,14 +517,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               language === 'bn'
                 ? isRickshawChargingStation
                   ? '৩. চার্জিং স্টেশন / পরিচালনাকারীর তথ্য (ঐচ্ছিক)'
-                  : segment === 'extortion'
-                  ? '৩. চাঁদা দাবিকারীর তথ্য (ঐচ্ছিক)'
-                  : subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষ'
+                  : `${subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষের তথ্য'} (ঐচ্ছিক)`
                 : isRickshawChargingStation
                   ? '3. Charging Station / Operator Information (Optional)'
-                  : segment === 'extortion'
-                  ? '3. Extortion Party Information (Optional)'
-                  : subjectConfig?.sectionTitleEn || '3. Target Details'
+                  : `${subjectConfig?.sectionTitleEn || '3. Involved Party Information'} (Optional)`
             }
             summary={targetSummary}
             icon={<Users className="w-4 h-4" />}
@@ -584,10 +577,10 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   </div>
                 )}
               </div>
-            ) : segment === 'extortion' ? (
+            ) : subjectConfig ? (
               <div className="p-3 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] space-y-2.5 pt-1">
-                {/* Primary Extortion Party (only if primary data exists) */}
-                {hasExtortionPrimaryPartyData && (
+                {/* Primary Involved Party (only if primary data exists) */}
+                {hasPrimaryPartyData && (
                   <div className="space-y-1.5">
                     {/* Name / Known Identity */}
                     {formData.reportedSubject?.trim() && (
@@ -617,7 +610,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {formData.organization?.trim() && (
                       <div className="pt-0.5">
                         <span className="text-ui-content-secondary font-medium">
-                          {language === 'bn' ? 'দল / সংগঠন / সমিতি: ' : 'Group / Organization / Association: '}
+                          {language === 'bn' ? 'প্রতিষ্ঠান / দল / সংগঠন: ' : 'Organization / Group: '}
                         </span>
                         <span className="text-ui-content-primary font-medium">
                           {formData.organization.trim()}
@@ -653,7 +646,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
                 {/* Additional Mentioned Parties */}
                 {meaningfulMentionedParties.length > 0 && (
-                  <div className={`space-y-2 text-[13px] ${hasExtortionPrimaryPartyData ? 'pt-2 border-t border-ui-stroke-subtle/50' : ''}`}>
+                  <div className={`space-y-2 text-[13px] ${hasPrimaryPartyData ? 'pt-2 border-t border-ui-stroke-subtle/50' : ''}`}>
                     <span className="font-bold text-ui-content-primary block">
                       {language === 'bn'
                         ? `অতিরিক্ত পক্ষ (${meaningfulMentionedParties.length}টি):`

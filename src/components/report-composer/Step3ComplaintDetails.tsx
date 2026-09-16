@@ -130,7 +130,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const todayLocal = getLocalToday();
 
     // Segment structure conditions
-    const showsPartySection = segment === 'rickshaw' || segment === 'extortion';
     const showsIdentitySection = segment === 'harassment';
     const isUtilityReport = (segment as string) === 'utility' || segment === 'load_shedding';
     const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
@@ -146,8 +145,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       (currentSubcategoryOption?.categoryGroup === 'digital_intimate' ||
         currentSubcategoryOption?.id === 'blackmail-coercion');
 
-    // Contextual subject configuration for Rickshaw & Extortion
+    // Contextual subject configuration is the single source of truth for optional
+    // person / party collection across all supported report categories.
     const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
+    const showsPartySection = Boolean(subjectConfig);
 
     // Conditional: hide frequency for Illegal Charging Station reports
     const hideFrequency =
@@ -166,16 +167,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       formData.organization?.trim()
     );
 
-    const hasExtortionPrimaryPartyData = Boolean(
+    const hasPartyData = Boolean(
       formData.reportedSubject?.trim() ||
       formData.roleOrDesignation?.trim() ||
       formData.organization?.trim() ||
       formData.publicProfileHandle?.trim() ||
-      formData.identifyingDescription?.trim()
-    );
-
-    const hasExtortionPartyData = Boolean(
-      hasExtortionPrimaryPartyData ||
+      formData.identifyingDescription?.trim() ||
       (formData.mentionedParties && formData.mentionedParties.some(isMeaningfulMentionedParty))
     );
 
@@ -212,9 +209,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       identity: showsIdentitySection,
       parties: isChargingStationOperator
         ? (hasChargingStationOperatorData || initialOpenSection === 'parties')
-        : segment === 'extortion'
-        ? (hasExtortionPartyData || initialOpenSection === 'parties')
-        : showsPartySection,
+        : (hasPartyData || initialOpenSection === 'parties'),
       attachments: isUtilityReport && !isExcessElectricityBill ? false : initialOpenSection === 'attachments',
     }));
 
@@ -227,14 +222,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       prevHasOperatorDataRef.current = hasChargingStationOperatorData;
     }, [isChargingStationOperator, hasChargingStationOperatorData]);
 
-    // Auto-expand extortion parties if data is restored/loaded asynchronously
-    const prevHasExtortionDataRef = React.useRef(hasExtortionPartyData);
+    // Auto-expand contextual party details if data is restored/loaded asynchronously.
+    const prevHasPartyDataRef = React.useRef(hasPartyData);
     useEffect(() => {
-      if (segment === 'extortion' && !prevHasExtortionDataRef.current && hasExtortionPartyData) {
+      if (showsPartySection && !isChargingStationOperator && !prevHasPartyDataRef.current && hasPartyData) {
         setOpenSections((prev) => ({ ...prev, parties: true }));
       }
-      prevHasExtortionDataRef.current = hasExtortionPartyData;
-    }, [segment, hasExtortionPartyData]);
+      prevHasPartyDataRef.current = hasPartyData;
+    }, [showsPartySection, isChargingStationOperator, hasPartyData]);
 
     // Auto-open specific accordion if requested (e.g. from Review edit link)
     useEffect(() => {
@@ -370,7 +365,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Toggle specific accordion
     const toggleSection = (secKey: string) => {
       if (secKey === 'narrative' || secKey === 'location') return;
-      if (showsPartySection && secKey === 'parties' && !isChargingStationOperator && segment !== 'extortion') return;
       if (showsIdentitySection && secKey === 'identity') return;
       setOpenSections((prev) => ({
         ...prev,
@@ -518,7 +512,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       }
     };
 
-    // Mentioned Parties Handlers (Extortion only)
+    // Mentioned Parties Handlers (optional people / organizations)
     const handleAddAdditionalParty = () => {
       const newParty: MentionedParty = {
         id: `party-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -982,12 +976,13 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       validateAndProceed,
     }));
 
-    // Check if extortion has primary party data
+    // Primary party details gate the optional "add another party" action.
     const hasPrimaryPartyData = Boolean(
       formData.reportedSubject?.trim() ||
+      formData.roleOrDesignation?.trim() ||
       formData.organization?.trim() ||
-      formData.identifyingDescription?.trim() ||
-      (formData.mentionedParties && formData.mentionedParties.length > 0)
+      formData.publicProfileHandle?.trim() ||
+      formData.identifyingDescription?.trim()
     );
 
     return (
@@ -2045,7 +2040,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </Accordion>
         )}
 
-        {/* SECTION 3 (RICKSHAW & EXTORTION): Contextual Target / Party Info - NON-COLLAPSIBLE */}
+        {/* SECTION 3: Contextual Target / Party Info */}
         {/* SECTION 3 (RICKSHAW): Contextual Target / Operator Info - COLLAPSIBLE (DEFAULT: COLLAPSED UNLESS DATA EXISTS) */}
         {showsPartySection && isChargingStationOperator && (
           <Accordion
@@ -2166,8 +2161,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           </Accordion>
         )}
 
-        {/* SECTION 3 (EXTORTION): Party Info - COLLAPSIBLE (DEFAULT: COLLAPSED UNLESS DATA EXISTS) */}
-        {showsPartySection && segment === 'extortion' && (
+        {/* SECTION 3: Contextual Party Info - COLLAPSIBLE (DEFAULT: COLLAPSED UNLESS DATA EXISTS) */}
+        {showsPartySection && !isChargingStationOperator && subjectConfig && (
           <Accordion
             id="composer-section-parties"
             isOpen={Boolean(openSections.parties)}
@@ -2175,11 +2170,11 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             onToggle={() => toggleSection('parties')}
             title={
               language === 'bn'
-                ? '৩. চাঁদা দাবিকারীর তথ্য (ঐচ্ছিক)'
-                : '3. Extortion party information (optional)'
+                ? `${subjectConfig.sectionTitleBn} (ঐচ্ছিক)`
+                : `${subjectConfig.sectionTitleEn} (optional)`
             }
             summary={
-              hasExtortionPartyData ? (
+              hasPartyData ? (
                 <span className="inline-flex items-center gap-1.5 text-ui-accent font-medium text-[13px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-ui-accent inline-block" />
                   {language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added'}
@@ -2194,6 +2189,24 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             icon={<Users className="w-5 h-5" />}
           >
             <div className="space-y-4 pt-1 text-left">
+              <p className="text-[13px] text-ui-content-secondary leading-relaxed">
+                {language === 'bn' ? subjectConfig.questionBn : subjectConfig.questionEn}
+              </p>
+
+              <Select
+                id="contextual-party-type-select"
+                label={language === 'bn' ? 'সংশ্লিষ্ট পক্ষের ধরন' : 'Involved party type'}
+                value={formData.subjectType || ''}
+                onChange={(event) =>
+                  onUpdateFormData({ subjectType: event.target.value as SubjectTypeValue })
+                }
+                placeholder={language === 'bn' ? '-- ধরন নির্বাচন করুন --' : '-- Select type --'}
+                options={subjectConfig.options.map((option) => ({
+                  value: option.value,
+                  label: language === 'bn' ? option.labelBn : option.labelEn,
+                }))}
+              />
+
               <div className="space-y-3 sm:space-y-3.5">
                 {/* Row 1: Name / Known Identity (col 1) + Phone / Contact (col 2) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2211,7 +2224,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       onChange={(e) => onUpdateFormData({ reportedSubject: e.target.value })}
                       placeholder={
                         language === 'bn'
-                          ? 'চাঁদা দাবিকারীর নাম বা পরিচিত নাম জানা থাকলে লিখুন'
+                          ? 'নাম বা পরিচিত পরিচয় জানা থাকলে লিখুন'
                           : "Enter the person's or party's name if known"
                       }
                       className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
@@ -2256,8 +2269,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
                       placeholder={
                         language === 'bn'
-                          ? 'যেমন: লাইনম্যান, ম্যানেজার, স্থানীয় প্রতিনিধি'
-                          : 'e.g. Lineman, Manager, Local Representative'
+                          ? 'যেমন: কর্মকর্তা, কর্মচারী, চালক, ঠিকাদার, প্রতিনিধি'
+                          : 'e.g. Officer, Employee, Driver, Contractor, Representative'
                       }
                       className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                     />
@@ -2268,7 +2281,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       htmlFor="extortion-org"
                       className="block text-[13px] font-semibold text-ui-content-secondary mb-1"
                     >
-                      {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / organization / association'}
+                      {language === 'bn' ? 'প্রতিষ্ঠান / দল / সংগঠন' : 'Organization / group'}
                     </label>
                     <input
                       id="extortion-org"
@@ -2277,8 +2290,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       onChange={(e) => onUpdateFormData({ organization: e.target.value })}
                       placeholder={
                         language === 'bn'
-                          ? 'সংশ্লিষ্ট দল, সিন্ডিকেট, সমিতি বা প্রতিষ্ঠানের নাম'
-                          : 'Related group, syndicate, association, or organization'
+                          ? 'সংশ্লিষ্ট অফিস, প্রতিষ্ঠান, কোম্পানি, দল বা সংগঠনের নাম'
+                          : 'Related office, organization, company, group, or agency'
                       }
                       className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                     />
@@ -2300,7 +2313,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
                     placeholder={
                       language === 'bn'
-                        ? 'চেহারা, গাড়ির নম্বর, অবস্থান সূত্র বা অন্য কোনো পরিচিত তথ্য'
+                        ? 'চেহারা, যানবাহনের নম্বর, অবস্থান সূত্র বা অন্য কোনো শনাক্তকারী তথ্য'
                         : 'Appearance, vehicle number, location clues, or any other identifying information'
                     }
                     className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-xl text-[14px] text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed min-h-[44px]"
@@ -2385,7 +2398,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           </div>
                           <div>
                             <label className="block text-[12px] font-semibold text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'দল / সংগঠন / সমিতি' : 'Group / organization / association'}
+                              {language === 'bn' ? 'প্রতিষ্ঠান / দল / সংগঠন' : 'Organization / group'}
                             </label>
                             <input
                               type="text"
@@ -2420,7 +2433,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 )}
 
                 {/* Add Another Party Action - Only visible after primary party has at least one meaningful info */}
-                {hasExtortionPrimaryPartyData && (
+                {hasPrimaryPartyData && (
                   <div>
                     <button
                       type="button"
