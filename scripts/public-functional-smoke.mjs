@@ -115,36 +115,46 @@ await check('Desktop routes render without runtime crashes', async () => {
   await context.close();
 });
 
-await check('Mobile bottom navigation works across all five primary sections', async () => {
+await check('Mobile bottom navigation works across Home, Issues, Explore and category drill-down', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'mobile-nav');
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#bottom-nav'), 'mobile bottom navigation missing');
+
   const cases = [
     ['#bottom-nav-home', '#/'],
-    ['#bottom-nav-harassment', '#/harassment'],
-    ['#bottom-nav-charging', '#/rickshaw'],
-    ['#bottom-nav-extortion', '#/extortion'],
-    ['#bottom-nav-utility', '#/load-shedding'],
+    ['#bottom-nav-issues', '#/issues'],
+    ['#bottom-nav-explore', '#/explore'],
   ];
   for (const [selector, hash] of cases) {
     await page.locator(selector).click();
-    await page.waitForTimeout(350);
+    await page.waitForTimeout(hash === '#/explore' ? 900 : 350);
     if (!page.url().includes(hash)) throw new Error(`${selector} did not navigate to ${hash}; got ${page.url()}`);
     await expectVisible(page.locator('#main-content'), `${selector} destination did not render`);
   }
+
+  await page.locator('#bottom-nav-issues').click();
+  await expectVisible(page.locator('#issues-category-grid'), 'Issues category grid did not render');
+  await page.locator('#issues-card-harassment').click();
+  await page.waitForTimeout(350);
+  if (!page.url().includes('#/harassment')) throw new Error(`Issue card did not navigate to harassment; got ${page.url()}`);
+  await expectVisible(page.locator('#mobile-category-header'), 'contextual category header missing');
+  await expectVisible(page.locator('#mobile-category-filter-btn'), 'category filter action missing');
+  await page.locator('#mobile-category-back-btn').click();
+  await page.waitForTimeout(350);
+  if (!page.url().includes('#/issues')) throw new Error(`category back did not return to Issues; got ${page.url()}`);
   await context.close();
 });
 
-await check('Report composer opens on mobile without submitting data', async () => {
+await check('Report composer opens from the mobile bottom dock without submitting data', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'report-composer');
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
-  await page.locator('#mobile-fab-report').click();
+  await page.locator('#mobile-nav-report').click();
   await expectVisible(page.locator('#report-composer-modal'), 'report composer did not open');
   const dialog = page.locator('#report-composer-modal');
   if ((await dialog.getAttribute('role')) !== 'dialog') throw new Error('report composer is missing dialog semantics');
