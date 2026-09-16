@@ -55,39 +55,18 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
   const currentStepInfo = stepTitles[currentStep - 1] || stepTitles[0];
 
   const getSegmentStyles = (sec: SectionKey) => {
-    switch (sec) {
-      case 'harassment':
-        return {
-          bg: 'var(--sec-harassment-bg)',
-          color: 'var(--sec-harassment-text)',
-          border: 'var(--sec-harassment-border)',
-        };
-      case 'rickshaw':
-        return {
-          bg: 'var(--sec-rickshaw-bg)',
-          color: 'var(--sec-rickshaw-text)',
-          border: 'var(--sec-rickshaw-border)',
-        };
-      case 'extortion':
-        return {
-          bg: 'var(--sec-extortion-bg)',
-          color: 'var(--sec-extortion-text)',
-          border: 'var(--sec-extortion-border)',
-        };
-      case 'load_shedding':
-        return {
-          bg: 'var(--sec-load_shedding-bg)',
-          color: 'var(--sec-load_shedding-text)',
-          border: 'var(--sec-load_shedding-border)',
-        };
-    }
+    const config = SECTIONS[sec];
+    return {
+      bg: config.bgColor,
+      color: config.textColor,
+      border: config.borderColor,
+    };
   };
 
   const progressPercentage = Math.round((currentStep / totalSteps) * 100);
 
   return (
     <div className="border-b border-ui-stroke-subtle bg-ui-surface sticky top-0 z-20">
-      {/* Main Title Bar */}
       <div className="flex items-center justify-between px-4 md:px-8 py-3.5 md:py-4">
         <div className="flex items-center gap-3 min-w-0">
           <div>
@@ -131,7 +110,6 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
         />
       </div>
 
-      {/* Interactive Step Indicator Chips (clickable for previous/accessible steps) */}
       <div className="px-3 sm:px-4 md:px-8 pb-3 pt-0.5 grid grid-cols-4 gap-1.5 sm:gap-2 md:gap-3 w-full">
         {stepTitles.map((st) => {
           const isCompleted = st.step < currentStep;
@@ -171,7 +149,6 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
         })}
       </div>
 
-      {/* Subtle Progress Track */}
       <div
         role="progressbar"
         aria-valuenow={progressPercentage}
