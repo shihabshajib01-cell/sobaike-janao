@@ -18,6 +18,8 @@ export interface SupabasePublicReportRPC {
   area?: string | null;
   location?: string | null;
   incidentDate?: string | null;
+  incidentTime?: string | null;
+  incident_time?: string | null;
   publishedAt?: string | null;
   priority?: string | null;
   hasSupportingInfo?: boolean | null;
@@ -148,6 +150,7 @@ export const mapSupabasePublicReportToItem = (
     areaEn,
     incidentDateBn,
     incidentDateEn,
+    incidentTime: rpc.incidentTime || rpc.incident_time || undefined,
     recentBillMonth: rpc.recentBillMonth || rpc.recent_bill_month || undefined,
     recentBillAmount:
       rpc.recentBillAmount !== undefined && rpc.recentBillAmount !== null
