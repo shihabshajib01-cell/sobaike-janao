@@ -77,7 +77,7 @@ export const Header: React.FC = () => {
               id="tablet-brand-logo"
               size="sm"
               onClick={() => navigateTo('/')}
-              englishClassName="hidden min-[900px]:block text-[14px] leading-tight text-ui-content-secondary font-medium"
+              englishClassName="hidden min-[900px]:block text-[var(--type-fixed-14)] leading-tight text-ui-content-secondary font-medium"
             />
 
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -87,7 +87,7 @@ export const Header: React.FC = () => {
                 size="md"
                 leftIcon={<PlusCircle className="w-4 h-4 text-ui-content-inverse" />}
                 onClick={() => openReportComposer()}
-                className="shadow-2xs font-semibold text-[16px] min-h-[44px]"
+                className="shadow-[var(--elevation-2xs)] font-semibold text-[var(--type-fixed-16)] min-h-[44px]"
               >
                 {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
               </Button>
@@ -98,7 +98,7 @@ export const Header: React.FC = () => {
                 aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
                 size="md"
                 onClick={() => setIsTabletMenuOpen(true)}
-                className="border border-ui-stroke-subtle rounded-xl bg-ui-surface-subtle min-h-[44px] min-w-[44px]"
+                className="border border-ui-stroke-subtle rounded-[var(--radius-control)] bg-ui-surface-subtle min-h-[44px] min-w-[44px]"
               />
             </div>
           </div>
@@ -120,7 +120,7 @@ export const Header: React.FC = () => {
       >
         <div className="space-y-4">
           <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu navigation'}>
-            <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-3 mb-2">
+            <p className="text-[var(--type-fixed-14)] font-semibold text-ui-content-muted uppercase tracking-wide px-3 mb-2">
               {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & pages'}
             </p>
             {navItems.map((item) => {
@@ -135,7 +135,7 @@ export const Header: React.FC = () => {
                     navigateTo(item.path);
                   }}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-[16px] font-medium transition-colors text-left cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-medium transition-colors text-left cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     isActive
                       ? getSectionActiveStyles(item.sectionKey)
                       : 'text-ui-content-secondary'
@@ -158,7 +158,7 @@ export const Header: React.FC = () => {
                   </div>
                   {item.sectionKey && (
                     <span
-                      className="w-2.5 h-2.5 rounded-full"
+                      className="w-2.5 h-2.5 rounded-[var(--radius-pill)]"
                       style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
                     />
                   )}
@@ -174,7 +174,7 @@ export const Header: React.FC = () => {
                 navigateTo('/search');
               }}
               aria-current={currentRoute === '/search' ? 'page' : undefined}
-              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[16px] font-medium text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-medium text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/search'
                   ? 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle'
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
@@ -190,7 +190,7 @@ export const Header: React.FC = () => {
                 navigateTo('/more');
               }}
               aria-current={currentRoute === '/more' ? 'page' : undefined}
-              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[16px] font-medium text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-medium text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/more'
                   ? 'bg-ui-surface-subtle text-ui-content-primary font-bold border border-ui-stroke-subtle'
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
@@ -202,19 +202,19 @@ export const Header: React.FC = () => {
           </div>
 
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-3">
-            <p className="text-[14px] font-semibold text-ui-content-muted uppercase tracking-wide px-1">
+            <p className="text-[var(--type-fixed-14)] font-semibold text-ui-content-muted uppercase tracking-wide px-1">
               {language === 'bn' ? 'সেটিংস' : 'Settings'}
             </p>
 
             <div className="space-y-1.5">
-              <span className="text-[14px] text-ui-content-secondary font-medium px-1">
+              <span className="text-[var(--type-fixed-14)] text-ui-content-secondary font-medium px-1">
                 {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
               </span>
               <ThemeSelector variant="segmented" />
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[14px] text-ui-content-secondary font-medium px-1">
+              <span className="text-[var(--type-fixed-14)] text-ui-content-secondary font-medium px-1">
                 {language === 'bn' ? 'ভাষা' : 'Language'}
               </span>
               <button
@@ -225,13 +225,13 @@ export const Header: React.FC = () => {
                     ? 'ইংরেজিতে পরিবর্তন করুন'
                     : 'Switch to Bangla'
                 }
-                className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 text-[var(--type-fixed-14)] rounded-[var(--radius-control)] border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                   <span className="font-medium">{language === 'bn' ? 'বাংলা / English' : 'English / বাংলা'}</span>
                 </div>
-                <div className="flex items-center font-semibold text-[14px]">
+                <div className="flex items-center font-semibold text-[var(--type-fixed-14)]">
                   <span className={language === 'bn' ? 'text-ui-content-primary font-bold' : 'text-ui-content-muted'}>
                     বাং
                   </span>

@@ -39,7 +39,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   return (
     <div
       id={id}
-      className={`border rounded-2xl transition-colors duration-150 overflow-hidden ${
+      className={`border rounded-[var(--radius-card)] transition-colors duration-150 overflow-hidden ${
         hasError
           ? 'border-ui-error-border bg-ui-error-bg'
           : isExpanded
@@ -59,7 +59,7 @@ export const Accordion: React.FC<AccordionProps> = ({
           <div className="flex items-center gap-3 min-w-0 pr-2">
             {icon && (
               <div
-                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                className={`w-9 h-9 rounded-[var(--radius-control)] flex items-center justify-center shrink-0 transition-colors ${
                   hasError
                     ? 'bg-ui-error-bg text-ui-error-text'
                     : isExpanded
@@ -73,12 +73,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[16px] md:text-[18px] font-bold text-ui-content-primary leading-tight">
+                <span className="text-[var(--type-fixed-16)] md:text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-md">
+                  <span className="inline-flex items-center gap-1 text-[var(--type-fixed-14)] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>ত্রুটি / Error</span>
                   </span>
@@ -86,7 +86,7 @@ export const Accordion: React.FC<AccordionProps> = ({
               </div>
 
               {summary && !isExpanded && (
-                <div className="text-[14px] leading-snug text-ui-content-muted mt-1 truncate">
+                <div className="text-[var(--type-fixed-14)] leading-snug text-ui-content-muted mt-1 truncate">
                   {summary}
                 </div>
               )}
@@ -95,7 +95,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
           <div className="flex items-center gap-2 shrink-0">
             <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center text-ui-content-muted transition-transform duration-200 ${
+              className={`w-8 h-8 rounded-[var(--radius-badge-md)] flex items-center justify-center text-ui-content-muted transition-transform duration-200 ${
                 isExpanded ? 'rotate-180 bg-ui-surface-subtle' : ''
               }`}
             >
@@ -111,7 +111,7 @@ export const Accordion: React.FC<AccordionProps> = ({
           <div className="flex items-center gap-3 min-w-0 pr-2">
             {icon && (
               <div
-                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                className={`w-9 h-9 rounded-[var(--radius-control)] flex items-center justify-center shrink-0 transition-colors ${
                   hasError
                     ? 'bg-ui-error-bg text-ui-error-text'
                     : 'bg-ui-accent-soft text-ui-accent'
@@ -123,12 +123,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[16px] md:text-[18px] font-bold text-ui-content-primary leading-tight">
+                <span className="text-[var(--type-fixed-16)] md:text-[var(--type-fixed-18)] font-bold text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-md">
+                  <span className="inline-flex items-center gap-1 text-[var(--type-fixed-14)] font-semibold text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>ত্রুটি / Error</span>
                   </span>

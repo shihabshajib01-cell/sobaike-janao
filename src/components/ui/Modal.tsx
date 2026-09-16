@@ -169,7 +169,7 @@ export const Modal: React.FC<ModalProps> = ({
     lg: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-2xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
     xl: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-3xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
     '2xl': 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-5xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
-    composer: 'w-full max-w-full h-[100dvh] max-h-[100dvh] rounded-none md:w-[calc(100vw-48px)] md:max-w-[1040px] md:h-auto md:max-h-[90vh] md:rounded-3xl md:my-auto',
+    composer: 'w-full max-w-full h-[100dvh] max-h-[100dvh] rounded-none md:w-[calc(100vw-48px)] md:max-w-[1040px] md:h-auto md:max-h-[90vh] md:rounded-[var(--radius-modal)] md:my-auto',
     full: 'w-full max-w-full h-full',
   };
 
@@ -201,10 +201,10 @@ export const Modal: React.FC<ModalProps> = ({
 
   const cardShapeClasses =
     effectiveMobilePresentation === 'sheet'
-      ? 'rounded-t-2xl rounded-b-none md:rounded-2xl border-t border-x-0 border-b-0 md:border animate-sheet-slide-up'
+      ? 'rounded-t-2xl rounded-b-none md:rounded-[var(--radius-card)] border-t border-x-0 border-b-0 md:border animate-sheet-slide-up'
       : maxWidth === 'composer'
-      ? 'rounded-none md:rounded-3xl border-0 md:border'
-      : 'rounded-2xl border';
+      ? 'rounded-none md:rounded-[var(--radius-modal)] border-0 md:border'
+      : 'rounded-[var(--radius-card)] border';
 
   const isHidden = !isOpen && keepMounted;
 
@@ -236,12 +236,12 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className={`relative ${maxWidthClass} ${cardShapeClasses} bg-ui-surface border-ui-stroke-subtle shadow-2xl flex flex-col overflow-hidden z-10 text-left outline-none ${containerClassName}`}
+        className={`relative ${maxWidthClass} ${cardShapeClasses} bg-ui-surface border-ui-stroke-subtle shadow-[var(--elevation-2xl)] flex flex-col overflow-hidden z-10 text-left outline-none ${containerClassName}`}
       >
         {/* Grab handle for bottom sheet on mobile */}
         {effectiveMobilePresentation === 'sheet' && (
           <div className="w-full flex justify-center pt-3 pb-1 md:hidden shrink-0" aria-hidden="true">
-            <div className="w-10 h-1.5 rounded-full bg-ui-surface-hover" />
+            <div className="w-10 h-1.5 rounded-[var(--radius-pill)] bg-ui-surface-hover" />
           </div>
         )}
 
@@ -250,12 +250,12 @@ export const Modal: React.FC<ModalProps> = ({
           <div className="flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 border-b border-ui-stroke-subtle bg-ui-surface shrink-0 gap-3">
             <div className="min-w-0 flex-1">
               {title && (
-                <h2 id={`${id}-title`} className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-ui-content-primary leading-snug">
+                <h2 id={`${id}-title`} className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-bold text-ui-content-primary leading-snug">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id={`${id}-desc`} className="text-[13px] sm:text-[14px] text-ui-content-muted mt-0.5 leading-normal">{description}</p>
+                <p id={`${id}-desc`} className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] text-ui-content-muted mt-0.5 leading-normal">{description}</p>
               )}
             </div>
             <IconButton

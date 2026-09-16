@@ -42,7 +42,7 @@ export const MobileHeader: React.FC = () => {
             type="button"
             onClick={() => navigateTo('/issues')}
             aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
-            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-[var(--radius-control)] text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -60,7 +60,7 @@ export const MobileHeader: React.FC = () => {
               type="button"
               onClick={handleCategoryFilterClick}
               aria-label={language === 'bn' ? 'ফিল্টারে যান' : 'Go to filters'}
-              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <Filter className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -88,7 +88,7 @@ export const MobileHeader: React.FC = () => {
             type="button"
             onClick={() => setIsTabletMenuOpen(true)}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-            className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
+            className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
           >
             <Menu className="w-5 h-5 text-ui-content-primary" aria-hidden="true" />
           </button>
@@ -106,7 +106,7 @@ export const MobileHeader: React.FC = () => {
           type="button"
           onClick={() => navigateTo('/search')}
           aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-          className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
+          className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
         >
           <Search className="w-5 h-5 text-ui-content-primary" aria-hidden="true" />
         </button>

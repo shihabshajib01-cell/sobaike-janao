@@ -121,7 +121,7 @@ export const DesktopLeftRail: React.FC = () => {
           id="rail-brand-logo"
           size="md"
           onClick={() => navigateTo('/')}
-          className="transition-colors rounded-xl px-1 py-1 w-full"
+          className="transition-colors rounded-[var(--radius-control)] px-1 py-1 w-full"
         />
 
         <div>
@@ -132,7 +132,7 @@ export const DesktopLeftRail: React.FC = () => {
             fullWidth
             leftIcon={<AppIcon name="plus-circle" size="lg" className="text-ui-content-inverse" />}
             onClick={() => openReportComposer()}
-            className="shadow-2xs font-semibold py-2.5 min-h-[44px] text-[16px]"
+            className="shadow-[var(--elevation-2xs)] font-semibold py-2.5 min-h-[44px] text-[var(--type-fixed-16)]"
           >
             {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
           </Button>
@@ -149,7 +149,7 @@ export const DesktopLeftRail: React.FC = () => {
                 id={item.id}
                 onClick={() => navigateTo(item.path)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[16px] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-medium transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isActive
                     ? getSectionActiveStyles(item.sectionKey)
                     : 'text-ui-content-secondary'
@@ -181,7 +181,7 @@ export const DesktopLeftRail: React.FC = () => {
 
                 {item.sectionKey && (
                   <span
-                    className={`w-2.5 h-2.5 rounded-full shrink-0 transition-opacity ${
+                    className={`w-2.5 h-2.5 rounded-[var(--radius-pill)] shrink-0 transition-opacity ${
                       isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'
                     }`}
                     style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
@@ -204,19 +204,19 @@ export const DesktopLeftRail: React.FC = () => {
               ? 'ইংরেজিতে পরিবর্তন করুন'
               : 'Switch to Bangla'
           }
-          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[14px] rounded-xl border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="w-full flex items-center justify-between px-3.5 py-2.5 text-[var(--type-fixed-14)] rounded-[var(--radius-control)] border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <span className="font-medium">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
-          <span className="font-semibold text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-lg text-[13px]">
+          <span className="font-semibold text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-badge-md)] text-[var(--type-fixed-13)]">
             {language === 'bn' ? 'English' : 'বাংলা'}
           </span>
         </button>
 
-        <div className="px-2 pt-1 text-[13px] text-ui-content-muted leading-tight">
+        <div className="px-2 pt-1 text-[var(--type-fixed-13)] text-ui-content-muted leading-tight">
           <p className="font-medium text-ui-content-secondary">
             {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
           </p>
-          <p className="text-[12px] opacity-80">
+          <p className="text-[var(--type-fixed-12)] opacity-80">
             {language === 'bn' ? 'বাংলাদেশ ২০২৬' : 'Bangladesh 2026'}
           </p>
         </div>

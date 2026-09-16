@@ -1222,14 +1222,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             {/* Header with Close */}
             <div className="flex items-center justify-between border-b border-ui-stroke-subtle pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-primary">
+                <div className="w-10 h-10 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-primary">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-[20px] md:text-[22px] font-bold text-ui-content-primary">
+                  <h2 className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-bold text-ui-content-primary">
                     {language === 'bn' ? 'সংরক্ষিত খসড়া' : 'Saved draft'}
                   </h2>
-                  <p className="text-[14px] text-ui-content-muted">
+                  <p className="text-[var(--type-fixed-14)] text-ui-content-muted">
                     {language === 'bn'
                       ? 'এই ডিভাইসে আপনার পূর্বে তৈরি করা একটি খসড়া সংরক্ষিত রয়েছে।'
                       : 'You have a saved report draft on this device.'}
@@ -1239,7 +1239,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-9 h-9 rounded-lg border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary cursor-pointer transition-colors"
+                className="w-9 h-9 rounded-[var(--radius-badge-md)] border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary cursor-pointer transition-colors"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
@@ -1247,20 +1247,20 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             </div>
 
             {/* Draft Summary Card */}
-            <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-2xl space-y-3.5 text-left">
+            <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-card)] space-y-3.5 text-left">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ui-stroke-subtle pb-3">
                 <div className="flex items-center gap-2">
                   {savedDraftAvailable.segment && (
                     <CategoryBadge section={savedDraftAvailable.segment} language={language} size="sm" />
                   )}
-                  <span className="text-[14px] font-semibold text-ui-content-primary">
+                  <span className="text-[var(--type-fixed-14)] font-semibold text-ui-content-primary">
                     {language === 'bn'
                       ? `ধাপ ${savedDraftAvailable.currentStep} পর্যন্ত পূরণকৃত`
                       : `Filled up to Step ${savedDraftAvailable.currentStep}`}
                   </span>
                 </div>
                 {savedDraftAvailable.lastSavedAt && (
-                  <div className="flex items-center gap-1.5 text-[12px] text-ui-content-muted">
+                  <div className="flex items-center gap-1.5 text-[var(--type-fixed-12)] text-ui-content-muted">
                     <Clock className="w-3.5 h-3.5" />
                     <span>
                       {new Date(savedDraftAvailable.lastSavedAt).toLocaleString(
@@ -1273,12 +1273,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
               <div className="space-y-1.5">
                 {savedDraftAvailable.title && (
-                  <div className="text-[16px] font-bold text-ui-content-primary">
+                  <div className="text-[var(--type-fixed-16)] font-bold text-ui-content-primary">
                     {savedDraftAvailable.title}
                   </div>
                 )}
                 {savedDraftAvailable.reportedSubject && (
-                  <div className="text-[14px] text-ui-content-secondary">
+                  <div className="text-[var(--type-fixed-14)] text-ui-content-secondary">
                     <span className="text-ui-content-muted">
                       {language === 'bn' ? 'অভিযুক্ত পক্ষ: ' : 'Subject: '}
                     </span>
@@ -1286,7 +1286,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   </div>
                 )}
                 {savedDraftAvailable.location?.district && (
-                  <div className="flex items-center gap-1 text-[14px] text-ui-content-muted">
+                  <div className="flex items-center gap-1 text-[var(--type-fixed-14)] text-ui-content-muted">
                     <MapPin className="w-3.5 h-3.5 shrink-0" />
                     <span>
                       {savedDraftAvailable.location.district}{' '}
@@ -1295,7 +1295,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   </div>
                 )}
                 {savedDraftAvailable.pendingEvidenceRecovery && savedDraftAvailable.pendingEvidenceRecovery.expectedCount > 0 && (
-                  <div className="flex items-center gap-1.5 text-[13px] text-ui-content-muted">
+                  <div className="flex items-center gap-1.5 text-[var(--type-fixed-13)] text-ui-content-muted">
                     <Paperclip className="w-3.5 h-3.5 shrink-0" />
                     <span>
                       {language === 'bn'
@@ -1305,7 +1305,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   </div>
                 )}
                 {savedDraftAvailable.description && (
-                  <p className="text-[14px] text-ui-content-secondary line-clamp-2 italic pt-1">
+                  <p className="text-[var(--type-fixed-14)] text-ui-content-secondary line-clamp-2 italic pt-1">
                     "{savedDraftAvailable.description}"
                   </p>
                 )}
@@ -1319,7 +1319,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 id="draft-recovery-delete-btn"
                 type="button"
                 onClick={handleDeleteSavedDraft}
-                className="px-4 py-2.5 rounded-xl border border-ui-error-border bg-ui-surface text-ui-error-text font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 hover:bg-ui-error-bg"
+                className="px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-error-border bg-ui-surface text-ui-error-text font-semibold text-[var(--type-fixed-15)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 hover:bg-ui-error-bg"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>{language === 'bn' ? 'খসড়া মুছুন' : 'Delete draft'}</span>
@@ -1331,7 +1331,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   id="draft-recovery-new-btn"
                   type="button"
                   onClick={handleStartNewComplaint}
-                  className="px-4 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary font-semibold text-[15px] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
+                  className="px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary font-semibold text-[var(--type-fixed-15)] transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   <span>{language === 'bn' ? 'নতুন প্রতিবেদন শুরু করুন' : 'Start new report'}</span>
@@ -1343,7 +1343,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   type="button"
                   onClick={handleContinueSavedDraft}
                   disabled={isRestoringEvidence}
-                  className={`bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover px-5 py-2.5 rounded-xl font-bold text-[16px] min-h-[44px] cursor-pointer shadow-xs flex items-center justify-center gap-2 ${
+                  className={`bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover px-5 py-2.5 rounded-[var(--radius-control)] font-bold text-[var(--type-fixed-16)] min-h-[44px] cursor-pointer shadow-[var(--elevation-xs)] flex items-center justify-center gap-2 ${
                     isRestoringEvidence ? 'opacity-70 cursor-not-allowed' : ''
                   }`}
                 >
@@ -1386,7 +1386,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   id="composer-submit-error-banner"
                   role="alert"
                   aria-live="assertive"
-                  className="p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-start justify-between gap-4 text-[14px]"
+                  className="p-4 sm:p-5 rounded-[var(--radius-card)] border flex flex-col sm:flex-row items-start justify-between gap-4 text-[var(--type-fixed-14)]"
                   style={{
                     backgroundColor: 'var(--ui-error-bg)',
                     borderColor: 'var(--ui-error-border)',
@@ -1411,7 +1411,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       </p>
                       <p className="mt-1 leading-relaxed">{submitError}</p>
                       {isLocationError && (
-                        <p className="mt-2 text-[12.5px] opacity-90">
+                        <p className="mt-2 text-[var(--type-fixed-125)] opacity-90">
                           {language === 'bn'
                             ? 'ব্রাউজারে লোকেশন অনুমতি বন্ধ থাকলে অ্যাড্রেস বারের তালার আইকন বা সেটিংসে গিয়ে অনুমতি চালু করুন, তারপর পুনরায় চেষ্টা করুন। আপনার সম্পূর্ণ খসড়াটি সংরক্ষিত রয়েছে।'
                             : 'If permission is blocked, please click the lock/settings icon in your browser address bar to allow location access, then retry. Your completed draft is safely preserved.'}
@@ -1429,7 +1429,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       disabled={isSubmitting}
                       onClick={handleSubmitReport}
                       leftIcon={<RotateCcw className="w-4 h-4" />}
-                      className="shrink-0 min-h-[44px] text-[14px] px-4 self-stretch sm:self-auto justify-center"
+                      className="shrink-0 min-h-[44px] text-[var(--type-fixed-14)] px-4 self-stretch sm:self-auto justify-center"
                     >
                       {language === 'bn' ? 'অবস্থান যাচাই ও পুনরায় জমা' : 'Retry Location & Submit'}
                     </Button>
@@ -1566,17 +1566,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       >
         <div className="p-5 sm:p-6 md:p-8 space-y-4 sm:space-y-5 text-left">
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-ui-accent-soft text-ui-accent flex items-center justify-center shrink-0 border border-ui-accent/20 mt-0.5">
+            <div className="w-10 h-10 rounded-[var(--radius-card)] bg-ui-accent-soft text-ui-accent flex items-center justify-center shrink-0 border border-ui-accent/20 mt-0.5">
               <Shield className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-[18px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
+              <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] font-bold text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'প্রতিবেদন শুরুর আগে' : 'Before you begin'}
               </h3>
             </div>
           </div>
 
-          <div className="space-y-3 text-[13.5px] sm:text-[14px] leading-relaxed text-ui-content-secondary bg-ui-surface-subtle p-3.5 sm:p-4 rounded-2xl border border-ui-stroke-subtle max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
+          <div className="space-y-3 text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] leading-relaxed text-ui-content-secondary bg-ui-surface-subtle p-3.5 sm:p-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
             <p>
               {language === 'bn'
                 ? 'এই প্ল্যাটফর্ম কোনো আইনি বা বিচারিক সেবা নয়। এখানে প্রতিবেদন প্রকাশের উদ্দেশ্য জনস্বার্থে তথ্য তুলে ধরা—কারও অপরাধ প্রমাণ করা নয়।'
@@ -1601,7 +1601,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 onChange={(e) => setRapeConsentCheckbox(e.target.checked)}
                 className="mt-1 w-4 h-4 rounded border-ui-stroke-subtle text-ui-accent focus:ring-2 focus:ring-ui-focus shrink-0 cursor-pointer"
               />
-              <span className="text-[13.5px] sm:text-[14px] font-semibold text-ui-content-primary leading-snug">
+              <span className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-semibold text-ui-content-primary leading-snug">
                 {language === 'bn'
                   ? 'আমি এই প্রকাশনা নীতি পড়েছি এবং সম্মত।'
                   : 'I have read and agree to this publishing policy.'}
@@ -1615,7 +1615,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               type="button"
               variant="outline"
               onClick={handleCancelRapeConsent}
-              className="min-h-[44px] text-[15px]"
+              className="min-h-[44px] text-[var(--type-fixed-15)]"
             >
               {language === 'bn' ? 'ফিরে যান' : 'Go back'}
             </Button>
@@ -1626,7 +1626,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               variant="primary"
               disabled={!rapeConsentCheckbox}
               onClick={handleAgreeRapeConsent}
-              className="min-h-[44px] text-[15px] px-5"
+              className="min-h-[44px] text-[var(--type-fixed-15)] px-5"
             >
               {language === 'bn' ? 'সম্মত হয়ে এগিয়ে যান' : 'Agree and continue'}
             </Button>
@@ -1648,14 +1648,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         <div className="p-6 md:p-8 space-y-5 text-left">
           {/* Icon + Title Header */}
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary mt-0.5">
+            <div className="w-10 h-10 rounded-[var(--radius-card)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary mt-0.5">
               <Save className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-[19px] sm:text-[20px] font-bold text-ui-content-primary leading-tight">
+              <h3 className="text-[var(--type-fixed-19)] sm:text-[var(--type-fixed-20)] font-bold text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'খসড়া সংরক্ষণ করবেন?' : 'Save draft and exit?'}
               </h3>
-              <p className="text-[14px] sm:text-[14.5px] leading-relaxed text-ui-content-secondary">
+              <p className="text-[var(--type-fixed-14)] sm:text-[var(--type-fixed-145)] leading-relaxed text-ui-content-secondary">
                 {language === 'bn'
                   ? 'আপনার বর্তমান তথ্য এই ডিভাইসে সংরক্ষিত থাকবে। পরে আবার চালু করতে পারবেন।'
                   : 'Your draft is saved on this device. You can continue later.'}

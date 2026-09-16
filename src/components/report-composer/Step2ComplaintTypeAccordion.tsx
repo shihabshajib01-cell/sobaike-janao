@@ -35,10 +35,10 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
     <div className="space-y-4 sm:space-y-5">
       {/* 1. Minimal Header: Title + Short Helper Text */}
       <div className="space-y-1 text-left">
-        <h3 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-ui-content-primary leading-tight">
+        <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-bold text-ui-content-primary leading-tight">
           {headerTitle}
         </h3>
-        <p className="text-[13px] sm:text-[14px] md:text-[15px] leading-normal text-ui-content-secondary">
+        <p className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] md:text-[var(--type-fixed-15)] leading-normal text-ui-content-secondary">
           {helperText}
         </p>
       </div>
@@ -68,35 +68,35 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
                   onSelectSubcategory(item.id, item);
                 }
               }}
-              className={`p-3 sm:p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus:ring-2 focus:ring-ui-focus select-none ${
+              className={`p-3 sm:p-3.5 rounded-[var(--radius-control)] border text-left cursor-pointer transition-all flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus:ring-2 focus:ring-ui-focus select-none ${
                 isSingleOption ? 'col-span-full w-full' : ''
               } ${
                 isSelected
-                  ? 'border-2 border-ui-accent bg-ui-accent-soft shadow-2xs'
+                  ? 'border-2 border-ui-accent bg-ui-accent-soft shadow-[var(--elevation-2xs)]'
                   : 'border-ui-stroke-subtle bg-ui-surface'
               }`}
             >
               <div className="flex items-start justify-between gap-2.5">
-                <h4 className="text-[14.5px] sm:text-[15.5px] font-semibold text-ui-content-primary leading-snug">
+                <h4 className="text-[var(--type-fixed-145)] sm:text-[var(--type-fixed-155)] font-semibold text-ui-content-primary leading-snug">
                   {itemName}
                 </h4>
 
                 {/* Radio Selection Visual Indicator */}
                 <div
-                  className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full flex items-center justify-center border shrink-0 mt-0.5 transition-colors ${
+                  className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-[var(--radius-pill)] flex items-center justify-center border shrink-0 mt-0.5 transition-colors ${
                     isSelected
                       ? 'border-ui-accent bg-ui-accent text-ui-content-inverse'
                       : 'border-ui-stroke-subtle bg-ui-surface text-transparent'
                   }`}
                 >
                   {isSelected ? (
-                    <div className="w-1.5 h-1.5 rounded-full bg-ui-content-inverse" />
+                    <div className="w-1.5 h-1.5 rounded-[var(--radius-pill)] bg-ui-content-inverse" />
                   ) : null}
                 </div>
               </div>
 
               {itemDesc && (
-                <p className="text-[12px] sm:text-[13px] leading-[1.4] text-ui-content-secondary font-normal">
+                <p className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] leading-[var(--type-line-ratio-140)] text-ui-content-secondary font-normal">
                   {itemDesc}
                 </p>
               )}

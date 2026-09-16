@@ -187,26 +187,26 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
       {/* Modal Dialog Card: Full screen on mobile, centered card on md+ */}
       <div
         ref={modalRef}
-        className="relative w-full max-w-4xl h-full md:h-auto max-h-none md:max-h-[92vh] flex flex-col rounded-none md:rounded-2xl md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-ui-media-viewer-border bg-ui-media-viewer-bg text-ui-media-viewer-text shadow-2xl overflow-hidden z-10"
+        className="relative w-full max-w-4xl h-full md:h-auto max-h-none md:max-h-[92vh] flex flex-col rounded-none md:rounded-[var(--radius-card)] md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-ui-media-viewer-border bg-ui-media-viewer-bg text-ui-media-viewer-text shadow-[var(--elevation-2xl)] overflow-hidden z-10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="px-4 sm:px-6 pb-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] md:pt-3.5 border-b border-ui-media-viewer-border bg-ui-media-viewer-bg-elevated backdrop-blur-md flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Image Counter Badge */}
-            <p className="shrink-0 px-2.5 py-1 rounded-full bg-ui-media-viewer-chip text-ui-media-viewer-text text-[12px] sm:text-[13px] font-semibold tracking-wide">
+            <p className="shrink-0 px-2.5 py-1 rounded-[var(--radius-pill)] bg-ui-media-viewer-chip text-ui-media-viewer-text text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] font-semibold tracking-wide">
               {language === 'bn'
                 ? `ছবি ${toBanglaDigits(safeIndex + 1)} / ${toBanglaDigits(images.length)}`
                 : `Image ${safeIndex + 1} of ${images.length}`}
             </p>
 
             {/* Filename & optional size */}
-            <div className="min-w-0 truncate text-[13px] sm:text-[14px]">
+            <div className="min-w-0 truncate text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)]">
               <p className="font-medium text-ui-media-viewer-text truncate inline-block max-w-[200px] sm:max-w-[320px] align-middle" title={imageName}>
                 {imageName || (language === 'bn' ? 'সংযুক্ত ছবি' : 'Attached image')}
               </p>
               {imageSize ? (
-                <p className="text-ui-media-viewer-muted text-[12px] ml-2 inline-block">
+                <p className="text-ui-media-viewer-muted text-[var(--type-fixed-12)] ml-2 inline-block">
                   ({formatFileSize(imageSize, language)})
                 </p>
               ) : null}
@@ -219,7 +219,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
             type="button"
             onClick={onClose}
             aria-label={language === 'bn' ? 'ভিউয়ার বন্ধ করুন' : 'Close image viewer'}
-            className="min-w-[44px] min-h-[44px] rounded-full bg-ui-media-viewer-chip hover:bg-ui-media-viewer-chip-hover text-ui-media-viewer-text flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
+            className="min-w-[44px] min-h-[44px] rounded-[var(--radius-pill)] bg-ui-media-viewer-chip hover:bg-ui-media-viewer-chip-hover text-ui-media-viewer-text flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
           >
             <X className="w-5 h-5" />
           </button>
@@ -244,13 +244,13 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                   ? `সংযুক্ত ছবি ${toBanglaDigits(safeIndex + 1)}`
                   : `Attached image ${safeIndex + 1}`)
               }
-              className="max-w-full max-h-full w-auto h-auto object-contain rounded-xl shadow-2xl transition-all duration-200 pointer-events-none select-none"
+              className="max-w-full max-h-full w-auto h-auto object-contain rounded-[var(--radius-control)] shadow-[var(--elevation-2xl)] transition-all duration-200 pointer-events-none select-none"
               referrerPolicy="no-referrer"
             />
           ) : (
             <div className="flex flex-col items-center justify-center text-ui-media-viewer-muted gap-2 p-6">
               <ZoomIn className="w-8 h-8 opacity-40" />
-              <p className="text-[14px]">
+              <p className="text-[var(--type-fixed-14)]">
                 {language === 'bn' ? 'ছবিটি লোড করা যায়নি' : 'Image preview unavailable'}
               </p>
             </div>
@@ -263,7 +263,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                 type="button"
                 onClick={handlePrev}
                 aria-label={language === 'bn' ? 'পূর্ববর্তী ছবি' : 'Previous image'}
-                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-media-viewer-control hover:bg-ui-media-viewer-control-hover text-ui-media-viewer-text border border-ui-media-viewer-border flex items-center justify-center cursor-pointer transition-all shadow-lg z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
+                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-[var(--radius-pill)] bg-ui-media-viewer-control hover:bg-ui-media-viewer-control-hover text-ui-media-viewer-text border border-ui-media-viewer-border flex items-center justify-center cursor-pointer transition-all shadow-[var(--elevation-lg)] z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
@@ -272,7 +272,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                 type="button"
                 onClick={handleNext}
                 aria-label={language === 'bn' ? 'পরবর্তী ছবি' : 'Next image'}
-                className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-media-viewer-control hover:bg-ui-media-viewer-control-hover text-ui-media-viewer-text border border-ui-media-viewer-border flex items-center justify-center cursor-pointer transition-all shadow-lg z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
+                className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-[var(--radius-pill)] bg-ui-media-viewer-control hover:bg-ui-media-viewer-control-hover text-ui-media-viewer-text border border-ui-media-viewer-border flex items-center justify-center cursor-pointer transition-all shadow-[var(--elevation-lg)] z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
@@ -283,7 +283,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
         {/* Modal Footer: Thumbnail strip when multiple images */}
         {images.length > 1 && (
           <div className="px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] md:pb-2.5 bg-ui-media-viewer-bg-elevated border-t border-ui-media-viewer-border flex items-center justify-center gap-2 overflow-x-auto shrink-0">
-            <div className="flex gap-2 p-1 rounded-xl bg-ui-media-viewer-strip border border-ui-media-viewer-border-soft">
+            <div className="flex gap-2 p-1 rounded-[var(--radius-control)] bg-ui-media-viewer-strip border border-ui-media-viewer-border-soft">
               {images.map((img, idx) => {
                 const thumbUrl = img.previewUrl || img.url || '';
                 const isSelected = idx === safeIndex;
@@ -297,7 +297,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                         ? `ছবি ${toBanglaDigits(idx + 1)}-এ যান`
                         : `Go to image ${idx + 1}`
                     }
-                    className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus shrink-0 ${
+                    className={`relative w-12 h-12 rounded-[var(--radius-badge-md)] overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus shrink-0 ${
                       isSelected
                         ? 'border-ui-success-border scale-105 opacity-100 ring-2 ring-ui-success-border'
                         : 'border-transparent opacity-50 hover:opacity-80'
@@ -313,7 +313,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="w-full h-full bg-ui-media-viewer-control flex items-center justify-center text-[11px] text-ui-media-viewer-muted">
+                      <div className="w-full h-full bg-ui-media-viewer-control flex items-center justify-center text-[var(--type-fixed-11)] text-ui-media-viewer-muted">
                         #{idx + 1}
                       </div>
                     )}
