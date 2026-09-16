@@ -14,6 +14,7 @@ export interface SupabasePublicReportRPC {
   descriptionEn?: string;
   reportedSubject?: string | null;
   organization?: string | null;
+  reporterName?: string | null;
   district?: string | null;
   area?: string | null;
   location?: string | null;
@@ -140,6 +141,7 @@ export const mapSupabasePublicReportToItem = (
     reportedSubjectEn: rpc.reportedSubject || undefined,
     subjectType: 'individual',
     organization: rpc.organization || undefined,
+    reporterName: rpc.reporterName || undefined,
     locationBn,
     locationEn,
     districtBn,
