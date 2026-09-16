@@ -1,5 +1,5 @@
 import React from 'react';
-import { HeartHandshake, ShieldAlert, ZapOff, LucideIcon } from 'lucide-react';
+import { HeartHandshake, ShieldAlert, ZapOff, MapPin, Building2, LucideIcon } from 'lucide-react';
 import { EvStationIcon } from './EvStationIcon';
 import { SectionKey } from '../../theme/tokens';
 
@@ -17,9 +17,12 @@ export interface FeatureIconProps {
 
 const ICON_MAP: Record<SectionKey, LucideIcon | React.ComponentType<any>> = {
   harassment: HeartHandshake,
-  rickshaw: EvStationIcon,
   extortion: ShieldAlert,
+  public_safety: ShieldAlert,
+  road_transport: MapPin,
   load_shedding: ZapOff,
+  illegal_occupation: Building2,
+  rickshaw: EvStationIcon,
 };
 
 const SIZE_CLASSES: Record<FeatureIconSize, string> = {
@@ -59,7 +62,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
       <div
         className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-full flex items-center justify-center text-ui-content-inverse border-2 border-ui-surface shadow-md transition-all shrink-0 ${className}`}
         style={{
-          backgroundColor: `var(--sec-${section}-primary)`,
+          backgroundColor: `var(--sec-${section}-primary, ${section ? '#3A7CA5' : '#3A7CA5'})`,
         }}
         role={isAccessible ? 'img' : undefined}
         aria-label={ariaLabel}
@@ -75,9 +78,9 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
       <div
         className={`inline-flex items-center justify-center shrink-0 border shadow-2xs transition-colors ${CONTAINER_SIZE_CLASSES[size]} ${className}`}
         style={{
-          backgroundColor: `var(--sec-${section}-bg)`,
-          color: `var(--sec-${section}-text)`,
-          borderColor: `var(--sec-${section}-border)`,
+          backgroundColor: `var(--sec-${section}-bg, var(--ui-surface-subtle))`,
+          color: `var(--sec-${section}-text, var(--ui-text-primary))`,
+          borderColor: `var(--sec-${section}-border, var(--ui-border-subtle))`,
         }}
         role={isAccessible ? 'img' : undefined}
         aria-label={ariaLabel}
