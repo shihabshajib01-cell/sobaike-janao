@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { PhoneCall, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SECTIONS } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
@@ -150,16 +150,6 @@ export const HarassmentPage: React.FC = () => {
           },
         ]}
       />
-
-      {/* Quiet Helpline Information Strip */}
-      <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-        <PhoneCall className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-        <span>
-          {language === 'bn'
-            ? 'জরুরি সহায়তার জন্য: জাতীয় জরুরি সেবা ৯৯৯ | নারী ও শিশু নির্যাতন প্রতিরোধ ১০৯'
-            : 'Emergency Hotlines: National Emergency 999 | Women & Children Helpline 109'}
-        </span>
-      </div>
 
       {/* 2. Subcategory & Location Filter Controls */}
       <section id="harassment-filter-section" className="space-y-3">
