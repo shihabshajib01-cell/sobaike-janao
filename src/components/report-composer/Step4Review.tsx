@@ -80,8 +80,14 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const hasExtortionPartyData =
     hasExtortionPrimaryPartyData || meaningfulMentionedParties.length > 0;
 
+  const supportsContextualPartySection =
+    segment === 'extortion' ||
+    segment === 'public_safety' ||
+    segment === 'road_transport' ||
+    segment === 'illegal_occupation';
+
   const showsPartySection =
-    (segment === 'extortion' && hasExtortionPartyData) ||
+    (supportsContextualPartySection && hasExtortionPartyData) ||
     (segment === 'rickshaw' && hasRickshawOperatorData);
   const showsIdentitySection = segment === 'harassment';
 
@@ -182,7 +188,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         formData.publicProfileHandle?.trim() ||
         (language === 'bn' ? 'তথ্য যোগ করা হয়েছে' : 'Information added')
       )
-    : segment === 'extortion'
+    : supportsContextualPartySection
     ? (
         formData.reportedSubject?.trim() ||
         formData.organization?.trim() ||
@@ -510,7 +516,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
           </ReviewSection>
         )}
 
-        {/* Section 4 (RICKSHAW & EXTORTION): 3. Contextual Target Details */}
+        {/* Section 4: 3. Contextual Target / Party Details */}
         {showsPartySection && (
           <ReviewSection
             id="review-section-parties"
@@ -520,14 +526,14 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               language === 'bn'
                 ? isRickshawChargingStation
                   ? '৩. চার্জিং স্টেশন / পরিচালনাকারীর তথ্য (ঐচ্ছিক)'
-                  : segment === 'extortion'
-                  ? '৩. চাঁদা দাবিকারীর তথ্য (ঐচ্ছিক)'
-                  : subjectConfig?.sectionTitleBn || '৩. সংশ্লিষ্ট পক্ষ'
+                  : subjectConfig
+                  ? `৩. ${subjectConfig.sectionTitleBn} (ঐচ্ছিক)`
+                  : '৩. সংশ্লিষ্ট পক্ষের তথ্য (ঐচ্ছিক)'
                 : isRickshawChargingStation
                   ? '3. Charging Station / Operator Information (Optional)'
-                  : segment === 'extortion'
-                  ? '3. Extortion Party Information (Optional)'
-                  : subjectConfig?.sectionTitleEn || '3. Target Details'
+                  : subjectConfig
+                  ? `3. ${subjectConfig.sectionTitleEn} (optional)`
+                  : '3. Related party information (optional)'
             }
             summary={targetSummary}
             icon={<Users className="w-4 h-4" />}
@@ -584,7 +590,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                   </div>
                 )}
               </div>
-            ) : segment === 'extortion' ? (
+            ) : supportsContextualPartySection ? (
               <div className="p-3 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] space-y-2.5 pt-1">
                 {/* Primary Extortion Party (only if primary data exists) */}
                 {hasExtortionPrimaryPartyData && (
