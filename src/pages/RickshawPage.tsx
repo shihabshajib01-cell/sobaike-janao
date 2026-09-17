@@ -6,14 +6,20 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
-import { MobileCategoryLocationPortal } from '../components/feed/MobileCategoryLocationPortal';
+import { MobileCategoryFilterPortal } from '../components/feed/MobileCategoryFilterPortal';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
+import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import {
+  CategoryFeedFilterState,
+  EMPTY_CATEGORY_FEED_FILTERS,
+  matchesCategoryFeedFilters,
+} from '../data/categoryFeedFilters';
 
 export const RickshawPage: React.FC = () => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
@@ -21,7 +27,10 @@ export const RickshawPage: React.FC = () => {
   const config = getSegment('rickshaw') || SECTIONS.rickshaw;
   const bannerContent = CANONICAL_BANNER_CONTENT.rickshaw;
 
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
+    ...EMPTY_CATEGORY_FEED_FILTERS,
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -59,21 +68,25 @@ export const RickshawPage: React.FC = () => {
   }, [loadData]);
 
   const filteredReports = useMemo(() => {
-    return reports.filter((r) => {
-      if (r.segment !== 'rickshaw') return false;
-      const matchesDistrict =
-        selectedDistrict === 'all' ||
-        (r.districtBn && r.districtBn.includes(selectedDistrict)) ||
-        (r.districtEn && r.districtEn.toLowerCase().includes(selectedDistrict.toLowerCase()));
-      return matchesDistrict;
+    return reports.filter((report) => {
+      if (report.segment !== 'rickshaw') return false;
+      return matchesCategoryFeedFilters(report, 'rickshaw', feedFilters);
     });
-  }, [reports, selectedDistrict]);
+  }, [reports, feedFilters]);
+
+  const handleDesktopDistrictChange = (districtId: string) => {
+    setFeedFilters((current) => ({
+      ...current,
+      divisionId: 'all',
+      districtId,
+    }));
+  };
 
   return (
     <PublicPageContainer id="rickshaw-page-container">
-      <MobileCategoryLocationPortal
-        selectedDistrict={selectedDistrict}
-        onSelectDistrict={setSelectedDistrict}
+      <MobileCategoryFilterPortal
+        language={language}
+        onOpen={() => setIsFilterOpen(true)}
       />
 
       <CategoryHeroSlider
@@ -124,8 +137,8 @@ export const RickshawPage: React.FC = () => {
 
           <div className="hidden md:block shrink-0">
             <LocationSelector
-              selectedDistrict={selectedDistrict}
-              onSelectDistrict={setSelectedDistrict}
+              selectedDistrict={feedFilters.districtId}
+              onSelectDistrict={handleDesktopDistrictChange}
             />
           </div>
         </div>
@@ -164,15 +177,27 @@ export const RickshawPage: React.FC = () => {
               title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               description={
                 language === 'bn'
-                  ? 'এই উপ-বিভাগ বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
-                  : 'There are currently no published reports under this subcategory.'
+                  ? 'এই ফিল্টারগুলোর জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
+                  : 'There are currently no published reports for these filters.'
               }
               actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
-              onAction={() => setSelectedDistrict('all')}
+              onAction={() => setFeedFilters({ ...EMPTY_CATEGORY_FEED_FILTERS })}
             />
           )}
         </div>
       )}
+
+      <CategoryFilterSheet
+        section="rickshaw"
+        isOpen={isFilterOpen}
+        language={language}
+        value={feedFilters}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={(next) => {
+          setFeedFilters(next);
+          setIsFilterOpen(false);
+        }}
+      />
     </PublicPageContainer>
   );
 };
