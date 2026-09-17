@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Loader2, AlertCircle } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { useApp } from '../../context/AppContext';
@@ -22,16 +22,11 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   const { retryBrowseLocation } = useApp();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const shareLocationBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       setIsLoading(false);
       setErrorMessage(null);
-      const timer = setTimeout(() => {
-        shareLocationBtnRef.current?.focus();
-      }, 50);
-      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -172,7 +167,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
 
         <div className="flex flex-col sm:flex-row-reverse gap-2.5 pt-2">
           <button
-            ref={shareLocationBtnRef}
             type="button"
             onClick={handleShareLocation}
             disabled={isLoading}
