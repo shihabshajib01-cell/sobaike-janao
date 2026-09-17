@@ -58,6 +58,7 @@ import {
   isGooglePlacesConfigured,
   ResolvedPlaceResult,
 } from '../../services/googlePlacesService';
+import { ReportTitleField, REPORT_TITLE_MAX_LENGTH } from './ReportTitleField';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -374,7 +375,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const isLocationLocked = reporterGateState !== 'verified';
 
     // Progressive disclosure states
-    const [showTitleField, setShowTitleField] = useState<boolean>(false);
     const [showIdentifyingDetails, setShowIdentifyingDetails] = useState<boolean>(false);
 
     // Toggle specific accordion
@@ -673,6 +673,17 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const validateAndProceed = (): boolean => {
       const newErrors: Record<string, string> = {};
 
+      const normalizedTitle = formData.title?.trim() || '';
+      if (!normalizedTitle) {
+        newErrors.title =
+          language === 'bn' ? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.';
+      } else if (normalizedTitle.length > REPORT_TITLE_MAX_LENGTH) {
+        newErrors.title =
+          language === 'bn'
+            ? 'শিরোনাম ১০০ অক্ষরের মধ্যে রাখুন।'
+            : 'Keep the report title within 100 characters.';
+      }
+
       if (isUtilityReport) {
         if (isBriberyReport && formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== '') {
           const amount = Number(formData.briberyAmount);
@@ -681,20 +692,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           }
         }
 
-        // Auto-populate title if empty before validating
-        let effectiveTitle = formData.title?.trim();
-        if (!effectiveTitle && currentSubcategoryOption) {
-          effectiveTitle = language === 'bn' ? currentSubcategoryOption.nameBn : currentSubcategoryOption.nameEn;
-          onUpdateFormData({ title: effectiveTitle });
-        }
-        if (!effectiveTitle) {
-          effectiveTitle = isExcessElectricityBill
-            ? (language === 'bn' ? 'অতিরিক্ত বিদ্যুৎ বিল' : 'Excess Electricity Bill')
-            : isLoadShedding
-            ? (language === 'bn' ? 'লোডশেডিং' : 'Load Shedding')
-            : (language === 'bn' ? 'গ্যাস সংকট' : 'Gas Shortage');
-          onUpdateFormData({ title: effectiveTitle });
-        }
 
         if (isExcessElectricityBill) {
           // 1. Validate Recent Bill Month (Required)
@@ -828,17 +825,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           }
         }
 
-        // Auto-populate title if empty before validating
-        let effectiveTitle = formData.title?.trim();
-        if (!effectiveTitle && currentSubcategoryOption) {
-          effectiveTitle = language === 'bn' ? currentSubcategoryOption.nameBn : currentSubcategoryOption.nameEn;
-          onUpdateFormData({ title: effectiveTitle });
-        }
-
-        if (!effectiveTitle) {
-          newErrors.title =
-            language === 'bn' ? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.';
-        }
 
         if (!formData.description?.trim()) {
           newErrors.description =
@@ -1054,61 +1040,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         >
           {isUtilityReport ? (
             <div className="space-y-4 pt-1 text-left">
-              {/* Title / Headline: Compact with secondary action */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[var(--type-fixed-13)] text-ui-content-secondary">
-                  <span className="font-[var(--font-weight-semibold)] text-ui-content-primary truncate max-w-[70%]">
-                    {formData.title ||
-                      (isExcessElectricityBill
-                        ? language === 'bn'
-                          ? 'অতিরিক্ত বিদ্যুৎ বিল'
-                          : 'Excess Electricity Bill'
-                        : isLoadShedding
-                        ? language === 'bn'
-                          ? 'লোডশেডিং'
-                          : 'Load Shedding'
-                        : language === 'bn'
-                        ? 'গ্যাস সংকট'
-                        : 'Gas Shortage')}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowTitleField(!showTitleField)}
-                    className="text-ui-content-primary hover:underline cursor-pointer font-[var(--font-weight-medium)] shrink-0 ml-2 min-h-[44px] inline-flex items-center px-2 py-1 rounded-[var(--radius-badge-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                  >
-                    {showTitleField
-                      ? language === 'bn'
-                        ? 'বাতিল'
-                        : 'Cancel'
-                      : language === 'bn'
-                      ? 'শিরোনাম পরিবর্তন'
-                      : 'Change title'}
-                  </button>
-                </div>
-
-                {showTitleField && (
-                  <div className="space-y-1 pt-1">
-                    <input
-                      id="complaint-title-input"
-                      type="text"
-                      value={formData.title || ''}
-                      onChange={(e) => {
-                        onUpdateFormData({ title: e.target.value });
-                        if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
-                      }}
-                      placeholder={
-                        language === 'bn' ? 'সংক্ষিপ্ত শিরোনাম' : 'Short headline'
-                      }
-                      className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-[var(--radius-control)] text-[var(--type-fixed-15)] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.title ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.title && (
-                      <p className="text-[var(--type-fixed-13)] text-ui-error-text font-[var(--font-weight-semibold)]">{errors.title}</p>
-                    )}
-                  </div>
-                )}
-              </div>
+              <ReportTitleField
+                value={formData.title || ''}
+                error={errors.title}
+                language={language}
+                onChange={(value) => {
+                  onUpdateFormData({ title: value });
+                  if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
+                }}
+              />
 
               {isExcessElectricityBill ? (
                 <div className="space-y-3">
@@ -1396,50 +1336,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             </div>
           ) : (
           <div className="space-y-4 pt-1 text-left">
-            {/* Title / Headline: Compact with secondary action */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[var(--type-fixed-13)] text-ui-content-secondary">
-                <span className="font-[var(--font-weight-semibold)] text-ui-content-primary truncate max-w-[70%]">
-                  {formData.title || (language === 'bn' ? currentSubcategoryOption?.nameBn : currentSubcategoryOption?.nameEn) || (language === 'bn' ? 'অভিযোগ' : 'Complaint')}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowTitleField(!showTitleField)}
-                  className="text-ui-content-primary hover:underline cursor-pointer font-[var(--font-weight-medium)] shrink-0 ml-2 min-h-[44px] inline-flex items-center px-2 py-1 rounded-[var(--radius-badge-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                >
-                  {showTitleField
-                    ? language === 'bn'
-                      ? 'বাতিল'
-                      : 'Cancel'
-                    : language === 'bn'
-                    ? 'শিরোনাম পরিবর্তন'
-                    : 'Change title'}
-                </button>
-              </div>
-
-              {showTitleField && (
-                <div className="space-y-1 pt-1">
-                  <input
-                    id="complaint-title-input"
-                    type="text"
-                    value={formData.title || ''}
-                    onChange={(e) => {
-                      onUpdateFormData({ title: e.target.value });
-                      if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
-                    }}
-                    placeholder={
-                      language === 'bn' ? 'সংক্ষিপ্ত শিরোনাম' : 'Short headline'
-                    }
-                    className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-[var(--radius-control)] text-[var(--type-fixed-15)] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                      errors.title ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                    }`}
-                  />
-                  {errors.title && (
-                    <p className="text-[var(--type-fixed-13)] text-ui-error-text font-[var(--font-weight-semibold)]">{errors.title}</p>
-                  )}
-                </div>
-              )}
-            </div>
+            <ReportTitleField
+              value={formData.title || ''}
+              error={errors.title}
+              language={language}
+              onChange={(value) => {
+                onUpdateFormData({ title: value });
+                if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
+              }}
+            />
 
             {/* Incident Narrative */}
             <div className="space-y-1">
