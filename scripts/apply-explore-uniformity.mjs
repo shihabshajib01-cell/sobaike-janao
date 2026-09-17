@@ -23,8 +23,8 @@ replaceOnce(
                       aria-controls="mobile-area-sheet"
                       aria-label={
                         language === 'bn'
-                          ? \`${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন\`
-                          : \`View details for ${activeDistrictName || selectedDistrict}\`
+                          ? \`\${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন\`
+                          : \`View details for \${activeDistrictName || selectedDistrict}\`
                       }
                       className="btn-primary-action px-3.5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-2xs)]"
                     >
@@ -43,8 +43,8 @@ replaceOnce(
                       aria-controls="mobile-area-sheet"
                       aria-label={
                         language === 'bn'
-                          ? \`${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন\`
-                          : \`View details for ${activeDistrictName || selectedDistrict}\`
+                          ? \`\${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন\`
+                          : \`View details for \${activeDistrictName || selectedDistrict}\`
                       }
                       rightIcon={<MapIcon name="arrow-right" size="xs" ariaHidden={true} />}
                       className="w-full sm:w-auto shrink-0"
