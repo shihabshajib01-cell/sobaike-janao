@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { SectionKey, SECTIONS, COMING_SOON_SERVICES, ComingSoonServiceKey } from '../../theme/tokens';
 import { CategoryIcon } from '../branding/CategoryIcon';
 import { AppIcon } from '../ui/AppIcon';
@@ -146,7 +146,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
         {activeServices.map((srv) => {
           const isSelected = selectedSegment === srv.key && !selectedComingSoon;
 
@@ -157,7 +157,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               id={`service-select-card-${srv.key}`}
               onClick={() => handleActiveSelect(srv.key)}
               aria-pressed={isSelected}
-              className={`relative rounded-2xl p-5 md:p-6 transition-all duration-150 cursor-pointer flex flex-col justify-between text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
+              className={`relative rounded-2xl px-4 py-3.5 md:px-5 md:py-4 transition-all duration-150 cursor-pointer flex items-center gap-3 text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
                 isSelected
                   ? 'border-2 shadow-sm'
                   : 'bg-ui-surface border-ui-stroke-subtle shadow-2xs'
@@ -167,38 +167,39 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                 borderColor: isSelected ? srv.primaryVar : undefined,
               }}
             >
-              <div className="space-y-3 w-full">
-                <div className="flex items-center justify-between">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-colors border shadow-2xs"
-                    style={{
-                      backgroundColor: `var(--sec-${srv.key}-bg)`,
-                      color: `var(--sec-${srv.key}-text)`,
-                      borderColor: `var(--sec-${srv.key}-border)`,
-                    }}
-                  >
-                    <CategoryIcon section={srv.key} size="md" />
-                  </div>
+              <div
+                className="w-11 h-11 md:w-12 md:h-12 shrink-0 rounded-xl flex items-center justify-center transition-colors border shadow-2xs"
+                style={{
+                  backgroundColor: `var(--sec-${srv.key}-bg)`,
+                  color: `var(--sec-${srv.key}-text)`,
+                  borderColor: `var(--sec-${srv.key}-border)`,
+                }}
+              >
+                <CategoryIcon section={srv.key} size="md" />
+              </div>
 
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${
-                      isSelected
-                        ? 'border-transparent bg-ui-accent text-ui-content-inverse'
-                        : 'border-ui-stroke-subtle bg-ui-surface text-transparent'
-                    }`}
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="type-h4 text-ui-content-primary">
+                  {language === 'bn' ? srv.titleBn : srv.titleEn}
+                </h4>
+                <p className="type-meta text-ui-content-secondary mt-1">
+                  {language === 'bn' ? srv.descBn : srv.descEn}
+                </p>
+              </div>
 
-                <div>
-                  <h4 className="text-[18px] font-bold text-ui-content-primary leading-snug">
-                    {language === 'bn' ? srv.titleBn : srv.titleEn}
-                  </h4>
-                  <p className="text-[14px] leading-relaxed text-ui-content-secondary mt-1.5">
-                    {language === 'bn' ? srv.descBn : srv.descEn}
-                  </p>
-                </div>
+              <div
+                aria-hidden="true"
+                className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center border-2 transition-all ${
+                  isSelected
+                    ? 'border-ui-accent bg-ui-surface'
+                    : 'border-ui-stroke-subtle bg-ui-surface'
+                }`}
+              >
+                <span
+                  className={`w-2.5 h-2.5 rounded-full bg-ui-accent transition-transform ${
+                    isSelected ? 'scale-100' : 'scale-0'
+                  }`}
+                />
               </div>
             </button>
           );
