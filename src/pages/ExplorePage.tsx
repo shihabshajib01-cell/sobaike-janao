@@ -19,6 +19,9 @@ import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { MapIcon } from '../components/explore/MapIcon';
 import { Modal } from '../components/ui/Modal';
 import { SearchableSelect } from '../components/ui/SearchableSelect';
+import { SearchInput } from '../components/ui/SearchInput';
+import { Button } from '../components/ui/Button';
+import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { HarassmentClassificationFilters } from '../components/report/HarassmentClassificationFilters';
 import { HarassmentClassificationBreakdown } from '../components/explore/HarassmentClassificationBreakdown';
 import {
@@ -372,10 +375,10 @@ export const ExplorePage: React.FC = () => {
       <div className="space-y-3 sm:space-y-4 md:space-y-4">
         {/* 1. Page Title & Context (Compact Spacing) */}
         <div className="space-y-0.5 pb-0.5">
-          <h1 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-26)] leading-[var(--type-line-ratio-125)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
+          <h1 className="type-h1 text-ui-content-primary">
             {language === 'bn' ? 'প্রতিবেদন বিশ্লেষণ' : 'Report insights'}
           </h1>
-          <p className="text-[var(--type-fixed-13)] md:text-[var(--type-fixed-14)] leading-[var(--type-line-ratio-140)] text-ui-content-secondary">
+          <p className="type-body text-ui-content-secondary">
             {language === 'bn'
               ? 'এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন ও বিশ্লেষণ দেখুন'
               : 'Explore published reports and analysis by area'}
@@ -385,10 +388,10 @@ export const ExplorePage: React.FC = () => {
       {/* 2. Control Layer (Find reports - Compact Workbench) */}
       <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-3.5 sm:p-4 md:p-4.5 space-y-3 shadow-[var(--elevation-2xs)]">
         <div className="space-y-0.5">
-          <h2 className="text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] text-ui-content-primary">
+          <h2 className="type-h4 text-ui-content-primary">
             {language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Find reports'}
           </h2>
-          <p className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] text-ui-content-secondary">
+          <p className="type-meta text-ui-content-secondary">
             {language === 'bn'
               ? 'এলাকা, বিষয় বা শব্দ দিয়ে প্রকাশিত প্রতিবেদন খুঁজুন।'
               : 'Explore published reports by area, topic, or search term.'}
@@ -436,65 +439,64 @@ export const ExplorePage: React.FC = () => {
             />
           </div>
 
-          <div className="relative flex items-center w-[240px] lg:w-[280px] shrink-0">
-            <MapIcon name="search" size="sm" className="text-ui-content-muted absolute left-3.5 pointer-events-none" ariaHidden={true} />
-            <input
-              type="text"
+          <div className="w-[240px] lg:w-[280px] shrink-0">
+            <SearchInput
+              id="explore-desktop-search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label={language === 'bn' ? 'এলাকা বা প্রতিবেদন খুঁজুন' : 'Search by area or report'}
+              onChange={setSearchQuery}
+              language={language}
+              ariaLabel={language === 'bn' ? 'এলাকা বা প্রতিবেদন খুঁজুন' : 'Search by area or report'}
               placeholder={language === 'bn' ? 'এলাকা বা প্রতিবেদন খুঁজুন...' : 'Search by area or report...'}
-              className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-[var(--radius-control)] text-[var(--type-fixed-14)] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
             />
-            {searchQuery && (
-              <button type="button" onClick={() => setSearchQuery('')} aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'} className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-[var(--radius-control)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
-                <MapIcon name="close" size="xs" ariaHidden={true} />
-              </button>
-            )}
           </div>
         </div>
 
         {/* Desktop Category Filter Chips */}
-        <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none pt-0.5">
-          <button
-            type="button"
-            aria-pressed={selectedSection === 'all'}
-            onClick={() => setSelectedSection('all')}
-            className={`px-3.5 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] shrink-0 cursor-pointer border transition-all min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              selectedSection === 'all'
-                ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg shadow-[var(--elevation-xs)] font-[var(--font-weight-bold)]'
-                : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-            }`}
+        <div className="hidden md:block pt-0.5">
+          <HorizontalScrollRail
+            ariaLabel={language === 'bn' ? 'প্রতিবেদনের বিষয়' : 'Report topics'}
+            previousLabel={language === 'bn' ? 'আগের বিষয়গুলো দেখুন' : 'Show previous topics'}
+            nextLabel={language === 'bn' ? 'পরের বিষয়গুলো দেখুন' : 'Show more topics'}
           >
-            {language === 'bn' ? 'সব' : 'All'}
-          </button>
+            <Button
+              type="button"
+              size="sm"
+              variant={selectedSection === 'all' ? 'primary' : 'secondary'}
+              aria-pressed={selectedSection === 'all'}
+              onClick={() => setSelectedSection('all')}
+              className="shrink-0"
+            >
+              {language === 'bn' ? 'সব' : 'All'}
+            </Button>
 
-          {CATEGORY_KEYS.map((sectionKey) => {
-            const section = SECTIONS[sectionKey];
-            const selected = selectedSection === sectionKey;
-            return (
-              <button
-                type="button"
-                key={sectionKey}
-                aria-pressed={selected}
-                onClick={() => setSelectedSection(sectionKey)}
-                className={`px-3.5 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                  selected
-                    ? 'shadow-[var(--elevation-xs)] font-[var(--font-weight-bold)] ring-1'
-                    : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
-                }`}
-                style={selected ? {
-                  backgroundColor: `var(--sec-${sectionKey}-bg)`,
-                  color: `var(--sec-${sectionKey}-text)`,
-                  borderColor: `var(--sec-${sectionKey}-border)`,
-                  ['--tw-ring-color' as any]: `var(--sec-${sectionKey}-border)`,
-                } : undefined}
-              >
-                <CategoryIcon section={sectionKey} size="xs" />
-                <span>{language === 'bn' ? section.shortNameBn : section.shortNameEn}</span>
-              </button>
-            );
-          })}
+            {CATEGORY_KEYS.map((sectionKey) => {
+              const section = SECTIONS[sectionKey];
+              const selected = selectedSection === sectionKey;
+              return (
+                <button
+                  type="button"
+                  key={sectionKey}
+                  aria-pressed={selected}
+                  onClick={() => setSelectedSection(sectionKey)}
+                  className={
+                    'px-3.5 py-2 rounded-[var(--radius-control)] type-label shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ' +
+                    (selected
+                      ? 'shadow-[var(--elevation-xs)] ring-1'
+                      : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary')
+                  }
+                  style={selected ? {
+                    backgroundColor: `var(--sec-${sectionKey}-bg)`,
+                    color: `var(--sec-${sectionKey}-text)`,
+                    borderColor: `var(--sec-${sectionKey}-border)`,
+                    ['--tw-ring-color' as any]: `var(--sec-${sectionKey}-border)`,
+                  } : undefined}
+                >
+                  <CategoryIcon section={sectionKey} size="xs" />
+                  <span>{language === 'bn' ? section.shortNameBn : section.shortNameEn}</span>
+                </button>
+              );
+            })}
+          </HorizontalScrollRail>
         </div>
 
         {selectedSection === 'harassment' && (
@@ -510,39 +512,15 @@ export const ExplorePage: React.FC = () => {
         {/* Mobile Control Bar (Search Input + Filters Drawer Button) */}
         <div className="flex md:hidden items-center gap-2">
           {/* Mobile Keyword Search */}
-          <div className="flex-1 relative flex items-center min-w-0">
-            <MapIcon
-              name="search"
-              size="sm"
-              className="text-ui-content-muted absolute left-3.5 pointer-events-none"
-              ariaHidden={true}
-            />
-            <input
-              type="text"
+          <div className="flex-1 min-w-0">
+            <SearchInput
+              id="explore-mobile-search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label={
-                language === 'bn'
-                  ? 'এলাকা বা প্রতিবেদন খুঁজুন'
-                  : 'Search by area or report'
-              }
-              placeholder={
-                language === 'bn'
-                  ? 'এলাকা বা প্রতিবেদন খুঁজুন...'
-                  : 'Search by area or report...'
-              }
-              className="w-full pl-10 pr-11 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent rounded-[var(--radius-control)] text-[var(--type-fixed-14)] text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px]"
+              onChange={setSearchQuery}
+              language={language}
+              ariaLabel={language === 'bn' ? 'এলাকা বা প্রতিবেদন খুঁজুন' : 'Search by area or report'}
+              placeholder={language === 'bn' ? 'এলাকা বা প্রতিবেদন খুঁজুন...' : 'Search by area or report...'}
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                aria-label={language === 'bn' ? 'অনুসন্ধান মুছুন' : 'Clear search'}
-                className="absolute right-0.5 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-ui-content-muted hover:text-ui-content-primary rounded-[var(--radius-control)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
-                <MapIcon name="close" size="xs" ariaHidden={true} />
-              </button>
-            )}
           </div>
 
           {/* Mobile Filter Button */}
@@ -799,13 +777,9 @@ export const ExplorePage: React.FC = () => {
               ? 'প্রতিবেদন লোড করা যায়নি।'
               : 'Couldn’t load reports.'}
           </p>
-          <button
-            type="button"
-            onClick={loadData}
-            className="btn-primary-action px-4 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
-          >
+          <Button type="button" variant="primary" size="md" onClick={loadData}>
             {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -838,13 +812,9 @@ export const ExplorePage: React.FC = () => {
               </div>
               {hasActiveFilters && (
                 <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleResetFilters}
-                    className="btn-primary-action px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] min-h-[44px] cursor-pointer inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
-                  >
+                  <Button type="button" variant="primary" size="md" onClick={handleResetFilters}>
                     {language === 'bn' ? 'সব ফিল্টার মুছুন' : 'Clear all filters'}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -882,8 +852,10 @@ export const ExplorePage: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      variant="primary"
+                      size="md"
                       onClick={() => {
                         setIsFilterSheetOpen(false);
                         setIsAreaSheetOpen(true);
@@ -895,11 +867,11 @@ export const ExplorePage: React.FC = () => {
                           ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
                           : `View details for ${activeDistrictName || selectedDistrict}`
                       }
-                      className="btn-primary-action px-3.5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-2xs)]"
+                      rightIcon={<MapIcon name="arrow-right" size="xs" ariaHidden={true} />}
+                      className="w-full sm:w-auto shrink-0"
                     >
-                      <span>{language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}</span>
-                      <MapIcon name="arrow-right" size="xs" ariaHidden={true} />
-                    </button>
+                      {language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}
+                    </Button>
                   </div>
                 </div>
               )}
@@ -945,10 +917,10 @@ export const ExplorePage: React.FC = () => {
               {/* 2. Detailed analysis (Directly visible by default) */}
               <div id="detailed-analysis-section" className="space-y-4 pt-1">
                 <div className="border-b border-ui-stroke-subtle pb-2.5">
-                  <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-19)] md:text-[var(--type-fixed-20)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
+                  <h3 className="type-h2 text-ui-content-primary">
                     {language === 'bn' ? 'বিস্তারিত বিশ্লেষণ' : 'Detailed analysis'}
                   </h3>
-                  <p className="text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)] text-ui-content-secondary mt-0.5">
+                  <p className="type-meta text-ui-content-secondary mt-0.5">
                     {language === 'bn'
                       ? 'বিষয়, এলাকা ও সময় অনুযায়ী বিস্তারিত বিশ্লেষণ দেখুন।'
                       : 'Explore distribution by topic, geography and time.'}
@@ -1006,20 +978,12 @@ export const ExplorePage: React.FC = () => {
         language={language}
         footer={
           <div className="flex items-center justify-between w-full gap-3">
-            <button
-              type="button"
-              onClick={handleClearFilterSheet}
-              className="px-3 sm:px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle transition-colors min-h-[44px] cursor-pointer shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            >
+            <Button type="button" variant="secondary" size="md" onClick={handleClearFilterSheet} className="shrink-0">
               {language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
-            </button>
-            <button
-              type="button"
-              onClick={handleApplyFilterSheet}
-              className="btn-primary-action px-3.5 sm:px-5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] min-h-[44px] cursor-pointer flex-1 flex items-center justify-center whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
-            >
+            </Button>
+            <Button type="button" variant="primary" size="md" onClick={handleApplyFilterSheet} className="flex-1">
               {language === 'bn' ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters'}
-            </button>
+            </Button>
           </div>
         }
       >
@@ -1122,17 +1086,19 @@ export const ExplorePage: React.FC = () => {
         mobilePresentation="sheet"
         language={language}
         footer={
-          <button
+          <Button
             type="button"
+            variant="primary"
+            size="md"
+            fullWidth
             onClick={() => {
               setViewMode('reports');
               setIsAreaSheetOpen(false);
             }}
-            className="btn-primary-action w-full py-2.5 px-4 rounded-[var(--radius-control)] text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] min-h-[44px] flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
+            leftIcon={<MapIcon name="file-text" size="sm" ariaHidden={true} />}
           >
-            <MapIcon name="file-text" size="sm" ariaHidden={true} />
-            <span>{language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}</span>
-          </button>
+            {language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}
+          </Button>
         }
       >
         <div className="py-1">
