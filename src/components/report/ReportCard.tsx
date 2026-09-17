@@ -62,7 +62,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
           <p className="type-helper text-ui-content-muted">
             {language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}
           </p>
-          <p className="type-helper font-semibold text-ui-content-primary truncate max-w-full">
+          <p className="type-helper font-[var(--font-weight-semibold)] text-ui-content-primary truncate max-w-full">
             {report.reportedSubject}
           </p>
         </div>
@@ -70,7 +70,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
       {(report.subcategoryId === 'excess-electricity-bill' || report.recentBillAmount !== undefined) && (
         <div className="flex items-center gap-2 type-helper bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-badge-md px-2.5 py-1 text-ui-content-secondary max-w-full flex-wrap">
-          <p className="type-helper font-semibold text-ui-content-primary">
+          <p className="type-helper font-[var(--font-weight-semibold)] text-ui-content-primary">
             {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : (language === 'bn' ? 'সাম্প্রতিক বিল' : 'Recent bill')}: ৳{report.recentBillAmount !== undefined ? (language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()) : '-'}
           </p>
           {report.previousBillAmount !== undefined && (
@@ -95,7 +95,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
       <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-muted">
         <div className="flex items-center flex-wrap gap-x-2.5 sm:gap-x-3 gap-y-0.5 min-w-0 flex-1">
-          <div className="flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary font-medium min-w-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary font-[var(--font-weight-medium)] min-w-0">
             <AppIcon name="map-pin" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
             <AppIcon name="map-pin" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <p className="type-meta truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[200px] md:max-w-xs">{location}</p>
@@ -119,7 +119,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
               <span className="inline-flex items-center gap-1" aria-live="polite">
                 <AppIcon name="check" size="xs" className="text-ui-success-text md:hidden" />
                 <AppIcon name="check" size="sm" className="text-ui-success-text hidden md:inline-block" />
-                <span className="text-ui-success-text font-semibold">{language === 'bn' ? 'কপি হয়েছে' : 'Copied'}</span>
+                <span className="text-ui-success-text font-[var(--font-weight-semibold)]">{language === 'bn' ? 'কপি হয়েছে' : 'Copied'}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1">
@@ -136,7 +136,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             to={`/report-detail/${report.id}`}
             onClick={(e) => e.stopPropagation()}
             aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
-            className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+            className="inline-flex items-center gap-1 sm:gap-1.5 font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
           >
             <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
             <AppIcon name="arrow-right" size="xs" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform md:hidden" />

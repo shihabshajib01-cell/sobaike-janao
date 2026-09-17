@@ -41,7 +41,7 @@ export const MobJusticeDetailsFields: React.FC<MobJusticeDetailsFieldsProps> = (
       hasError={Boolean(errors.trigger || errors.outcome || errors.targetedCount || errors.ongoingStatus)}
     >
       <div className="space-y-4 pt-1 text-left">
-        <p className="text-[13px] sm:text-[14px] leading-relaxed text-ui-content-secondary">
+        <p className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] leading-relaxed text-ui-content-secondary">
           {language === 'bn'
             ? 'ঘটনাটি কীভাবে শুরু হয়েছিল এবং কী ফলাফল হয়েছে—জানা তথ্য দিন। নিশ্চিত না হলে প্রযোজ্য ক্ষেত্রে “জানা নেই” নির্বাচন করুন।'
             : 'Add what is known about how the incident started and what happened. Choose “Unknown” where the information is not known.'}
@@ -129,7 +129,7 @@ export const MobJusticeDetailsFields: React.FC<MobJusticeDetailsFieldsProps> = (
             placeholder={language === 'bn' ? 'যেমন: ১' : 'e.g. 1'}
           />
           {errors.targetedCount ? (
-            <p id="mob-justice-targeted-count-error" role="alert" className="mt-1.5 type-helper text-ui-validation-text font-medium">
+            <p id="mob-justice-targeted-count-error" role="alert" className="mt-1.5 type-helper text-ui-validation-text font-[var(--font-weight-medium)]">
               {errors.targetedCount}
             </p>
           ) : (

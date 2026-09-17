@@ -63,7 +63,7 @@ export const IssuesPage: React.FC = () => {
         <button
           type="button"
           onClick={loadCounts}
-          className="flex w-full min-h-[44px] items-center gap-2 ui-radius-control border border-ui-warning-border bg-ui-warning-bg px-3 py-2.5 text-left type-helper font-medium text-ui-warning-text cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="flex w-full min-h-[44px] items-center gap-2 ui-radius-control border border-ui-warning-border bg-ui-warning-bg px-3 py-2.5 text-left type-helper font-[var(--font-weight-medium)] text-ui-warning-text cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>
@@ -102,7 +102,7 @@ export const IssuesPage: React.FC = () => {
                   {language === 'bn' ? config.nameBn : config.nameEn}
                 </h4>
 
-                <p className="shrink-0 text-right type-meta font-medium text-ui-content-secondary">
+                <p className="shrink-0 text-right type-meta font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {isLoading
                     ? language === 'bn'
                       ? 'গণনা হচ্ছে...'

@@ -119,7 +119,7 @@ export const AppShell: React.FC = () => {
     <div className="min-h-screen bg-ui-page text-ui-content-primary flex flex-col">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-ui-action-bg focus:text-ui-action-text focus:ui-radius-control focus:ui-elevation-control focus:font-semibold focus:outline-none focus:ring-2 focus:ring-ui-focus type-action"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-ui-action-bg focus:text-ui-action-text focus:ui-radius-control focus:ui-elevation-control focus:font-[var(--font-weight-semibold)] focus:outline-none focus:ring-2 focus:ring-ui-focus type-action"
       >
         {language === 'bn' ? 'মূল বিষয়বস্তুতে যান' : 'Skip to main content'}
       </a>
@@ -187,7 +187,7 @@ export const AppShell: React.FC = () => {
           <footer className="pt-8 pb-6 border-t border-ui-stroke-subtle mt-10 type-meta text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-ui-content-primary">সবাইকে জানাও</span>
+                <span className="font-[var(--font-weight-bold)] text-ui-content-primary">সবাইকে জানাও</span>
                 <span>•</span>
                 <span>
                   {language === 'bn'

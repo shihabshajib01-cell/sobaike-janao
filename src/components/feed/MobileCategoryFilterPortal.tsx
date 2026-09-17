@@ -20,7 +20,7 @@ const CategoryFilterButton: React.FC<{
     onClick={onOpen}
     aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
     aria-haspopup="dialog"
-    className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+    className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
   >
     <Filter className="h-5 w-5" aria-hidden="true" />
   </button>

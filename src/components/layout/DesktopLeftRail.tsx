@@ -105,9 +105,9 @@ export const DesktopLeftRail: React.FC = () => {
 
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
     if (!sectionKey) {
-      return 'bg-ui-surface-elevated text-ui-content-primary font-semibold border border-ui-stroke-default';
+      return 'bg-ui-surface-elevated text-ui-content-primary font-[var(--font-weight-semibold)] border border-ui-stroke-default';
     }
-    return 'font-semibold border';
+    return 'font-[var(--font-weight-semibold)] border';
   };
 
   return (
@@ -132,7 +132,7 @@ export const DesktopLeftRail: React.FC = () => {
             fullWidth
             leftIcon={<AppIcon name="plus-circle" size="lg" className="text-ui-content-inverse" />}
             onClick={() => openReportComposer()}
-            className="font-semibold py-2.5 min-h-[44px]"
+            className="font-[var(--font-weight-semibold)] py-2.5 min-h-[44px]"
           >
             {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
           </Button>
@@ -200,14 +200,14 @@ export const DesktopLeftRail: React.FC = () => {
           aria-label={language === 'bn' ? 'ইংরেজিতে পরিবর্তন করুন' : 'Switch to Bangla'}
           className="w-full flex items-center justify-between px-3.5 py-2.5 type-compact ui-radius-control border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
-          <span className="font-medium">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
-          <span className="font-semibold text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-badge-md type-helper">
+          <span className="font-[var(--font-weight-medium)]">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
+          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-badge-md type-helper">
             {language === 'bn' ? 'English' : 'বাংলা'}
           </span>
         </button>
 
         <div className="px-2 pt-1 type-meta text-ui-content-muted leading-tight">
-          <p className="font-medium text-ui-content-secondary">
+          <p className="font-[var(--font-weight-medium)] text-ui-content-secondary">
             {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
           </p>
           <small className="opacity-80">

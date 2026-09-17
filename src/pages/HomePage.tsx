@@ -144,7 +144,7 @@ export const HomePage: React.FC = () => {
         {!isLoading && fetchError && (
           <div role="alert" className="ui-card p-6 text-center space-y-3 border-ui-error-border">
             <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
-            <p className="type-h4 font-semibold text-ui-error-text">
+            <p className="type-h4 font-[var(--font-weight-semibold)] text-ui-error-text">
               {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি।' : 'Couldn’t load reports.'}
             </p>
             <Button variant="primary" size="md" onClick={loadReports}>
