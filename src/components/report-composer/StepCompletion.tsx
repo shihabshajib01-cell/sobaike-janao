@@ -32,7 +32,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
         <h3 className="type-h2 font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'প্রতিবেদন জমা হয়েছে' : 'Report submitted'}
         </h3>
-        <p className="type-helper type-label text-ui-content-secondary max-w-lg mx-auto leading-relaxed">
+        <p className="type-label text-ui-content-secondary max-w-lg mx-auto leading-relaxed">
           {language === 'bn'
             ? 'আপনার প্রতিবেদন পর্যালোচনার জন্য জমা হয়েছে।'
             : 'Your report has been submitted for review.'}

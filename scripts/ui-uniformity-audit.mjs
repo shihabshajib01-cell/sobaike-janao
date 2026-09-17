@@ -179,12 +179,13 @@ requireNotContains(reportTitleField, '--type-fixed-', 'report title field must n
 requireNotContains(reportTitleField, 'min-h-[44px]', 'report title field must inherit minimum target size from ui-control');
 
 const closureFiles = [
-  'src/components/ui/Accordion.tsx',
-  'src/components/ui/Modal.tsx',
-  'src/components/ui/SearchableSelect.tsx',
   ...fs.readdirSync(path.resolve(ROOT, 'src/components/report-composer'))
     .filter((name) => name.endsWith('.tsx'))
     .map((name) => `src/components/report-composer/${name}`),
+  'src/components/ui/Accordion.tsx',
+  'src/components/ui/Modal.tsx',
+  'src/components/ui/SearchableSelect.tsx',
+  'src/components/location/AddressSearchInput.tsx',
 ];
 
 for (const file of closureFiles) {
@@ -192,6 +193,16 @@ for (const file of closureFiles) {
   requireNotContains(file, 'min-h-[42px]', 'interactive controls must meet the 44px minimum target');
 }
 
+requireContains(
+  'src/components/report-composer/Step2ComplaintTypeAccordion.tsx',
+  'role="radiogroup"',
+  'complaint type choices must expose radio-group semantics'
+);
+requireContains(
+  'src/components/report-composer/Step2ComplaintTypeAccordion.tsx',
+  "'ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'",
+  'complaint type radio group must support standard keyboard navigation'
+);
 requireContains(
   'src/components/layout/AppShell.tsx',
   'LazyReportComposerModal',
@@ -211,6 +222,11 @@ requireContains(
   'src/components/ui/Modal.tsx',
   'const { language: appLanguage } = useApp();',
   'Modal must call useApp unconditionally in accordance with Hooks rules'
+);
+requireContains(
+  'src/components/category/CategoryHeroBanner.tsx',
+  "loading={active ? 'eager' : 'lazy'}",
+  'inactive hero artwork must remain lazy-loaded'
 );
 
 if (failures.length) {

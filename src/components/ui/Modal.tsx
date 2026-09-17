@@ -232,12 +232,12 @@ export const Modal: React.FC<ModalProps> = ({
           <div className="flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 border-b border-ui-stroke-subtle bg-ui-surface shrink-0 gap-3">
             <div className="min-w-0 flex-1">
               {title && (
-                <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+                <h2 id={`${id}-title`} className="type-h2 font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id={`${id}-desc`} className="type-helper text-ui-content-muted mt-0.5 leading-normal">{description}</p>
+                <p id={`${id}-desc`} className="type-compact text-ui-content-muted mt-0.5 leading-normal">{description}</p>
               )}
             </div>
             <IconButton

@@ -149,7 +149,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         className="absolute top-0 inset-x-0 p-4 flex items-center justify-between z-10 bg-gradient-to-b from-ui-media-gradient to-transparent"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-ui-media-viewer-text text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] tracking-wide">
+        <div className="text-ui-media-viewer-text type-compact font-[var(--font-weight-medium)] tracking-wide">
           <span>
             {language === 'bn'
               ? `ছবি ${toBanglaNum(currentIndex + 1)} / ${toBanglaNum(images.length)}`

@@ -923,7 +923,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   id="composer-submit-error-banner"
                   role="alert"
                   aria-live="assertive"
-                  className="p-4 sm:p-5 rounded-[var(--radius-card)] border flex flex-col sm:flex-row items-start justify-between gap-4 type-helper"
+                  className="p-4 sm:p-5 rounded-[var(--radius-card)] border flex flex-col sm:flex-row items-start justify-between gap-4 type-compact"
                   style={{
                     backgroundColor: 'var(--ui-error-bg)',
                     borderColor: 'var(--ui-error-border)',
@@ -948,7 +948,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       </p>
                       <p className="mt-1 leading-relaxed">{submitError}</p>
                       {isLocationError && (
-                        <p className="mt-2 type-h1 opacity-90">
+                        <p className="mt-2 type-compact opacity-90">
                           {language === 'bn'
                             ? 'ব্রাউজারে লোকেশন অনুমতি বন্ধ থাকলে অ্যাড্রেস বারের তালার আইকন বা সেটিংসে গিয়ে অনুমতি চালু করুন, তারপর পুনরায় চেষ্টা করুন। এই স্ক্রিনে দেওয়া তথ্য সম্পাদনা চালিয়ে যাওয়া পর্যন্ত থাকবে।'
                             : 'If permission is blocked, please click the lock/settings icon in your browser address bar to allow location access, then retry. The information on this screen remains available while you continue editing.'}
@@ -966,7 +966,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                       disabled={isSubmitting}
                       onClick={handleSubmitReport}
                       leftIcon={<RotateCcw className="w-4 h-4" />}
-                      className="shrink-0 min-h-[44px] type-helper px-4 self-stretch sm:self-auto justify-center"
+                      className="shrink-0 min-h-[44px] type-compact px-4 self-stretch sm:self-auto justify-center"
                     >
                       {language === 'bn' ? 'অবস্থান যাচাই ও পুনরায় জমা' : 'Retry Location & Submit'}
                     </Button>
@@ -1106,7 +1106,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             </div>
           </div>
 
-          <div className="space-y-3 type-h1 type-helper leading-relaxed text-ui-content-secondary bg-ui-surface-subtle p-3.5 sm:p-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
+          <div className="space-y-3 type-compact leading-relaxed text-ui-content-secondary bg-ui-surface-subtle p-3.5 sm:p-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
             <p>
               {language === 'bn'
                 ? 'এই প্ল্যাটফর্ম কোনো আইনি বা বিচারিক সেবা নয়। এখানে প্রতিবেদন প্রকাশের উদ্দেশ্য জনস্বার্থে তথ্য তুলে ধরা—কারও অপরাধ প্রমাণ করা নয়।'
@@ -1131,7 +1131,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 onChange={(e) => setRapeConsentCheckbox(e.target.checked)}
                 className="mt-1 w-4 h-4 rounded border-ui-stroke-subtle text-ui-accent focus:ring-2 focus:ring-ui-focus shrink-0 cursor-pointer"
               />
-              <span className="type-h1 type-helper font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
+              <span className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
                 {language === 'bn'
                   ? 'আমি এই প্রকাশনা নীতি পড়েছি এবং সম্মত।'
                   : 'I have read and agree to this publishing policy.'}
@@ -1145,7 +1145,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               type="button"
               variant="outline"
               onClick={handleCancelRapeConsent}
-              className="min-h-[44px] type-body"
+              className="min-h-[44px] type-h4"
             >
               {language === 'bn' ? 'ফিরে যান' : 'Go back'}
             </Button>
@@ -1156,7 +1156,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               variant="primary"
               disabled={!rapeConsentCheckbox}
               onClick={handleAgreeRapeConsent}
-              className="min-h-[44px] type-body px-5"
+              className="min-h-[44px] type-h4 px-5"
             >
               {language === 'bn' ? 'সম্মত হয়ে এগিয়ে যান' : 'Agree and continue'}
             </Button>
@@ -1184,7 +1184,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'প্রতিবেদন বাতিল করবেন?' : 'Cancel this report?'}
               </h3>
-              <p className="type-helper type-h1 leading-relaxed text-ui-content-secondary">
+              <p className="type-compact leading-relaxed text-ui-content-secondary">
                 {language === 'bn'
                   ? 'এখন বাতিল করলে এই প্রতিবেদনে দেওয়া তথ্য সংরক্ষিত থাকবে না।'
                   : 'If you cancel now, the information entered in this report will not be saved.'}

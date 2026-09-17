@@ -75,12 +75,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="type-label type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+                <span className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 type-helper font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
+                  <span className="inline-flex items-center gap-1 type-compact font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{errorLabel}</span>
                   </span>
@@ -88,7 +88,7 @@ export const Accordion: React.FC<AccordionProps> = ({
               </div>
 
               {summary && !isExpanded && (
-                <div className="type-helper leading-snug text-ui-content-muted mt-1 truncate">
+                <div className="type-compact leading-snug text-ui-content-muted mt-1 truncate">
                   {summary}
                 </div>
               )}
@@ -125,12 +125,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="type-label type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+                <span className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 type-helper font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
+                  <span className="inline-flex items-center gap-1 type-compact font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{errorLabel}</span>
                   </span>

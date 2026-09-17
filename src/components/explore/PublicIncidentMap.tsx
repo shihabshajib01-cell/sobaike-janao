@@ -427,7 +427,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       <div
         role="status"
         aria-live="polite"
-        className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] text-ui-content-secondary flex items-start sm:items-center justify-between gap-2 shadow-[var(--elevation-2xs)]"
+        className="px-3 py-2 sm:px-3.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact text-ui-content-secondary flex items-start sm:items-center justify-between gap-2 shadow-[var(--elevation-2xs)]"
       >
         <div className="flex items-start sm:items-center gap-2 min-w-0 w-full">
           <MapIcon name="info" size="xs" className="text-ui-content-muted shrink-0 mt-0.5 sm:mt-0" ariaHidden={true} />
@@ -493,10 +493,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         {totalReportsCount === 0 && (
           <div className="absolute inset-0 z-[550] bg-ui-surface/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-3">
             <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
-            <h4 className="text-[var(--type-fixed-17)] font-[var(--font-weight-bold)] text-ui-content-primary">
+            <h4 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
               {language === 'bn' ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই' : 'No reports match these filters'}
             </h4>
-            <p className="text-[var(--type-fixed-13)] text-ui-content-muted max-w-xs">
+            <p className="type-compact text-ui-content-muted max-w-xs">
               {language === 'bn'
                 ? 'বর্তমান অনুসন্ধান বা ফিল্টারের সাথে কোনো তথ্যের মিল পাওয়া যায়নি।'
                 : 'No reports found matching your current filter selection.'}
@@ -505,7 +505,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
               <button
                 type="button"
                 onClick={onResetFilters}
-                className="btn-primary-action px-4 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="btn-primary-action px-4 py-2 rounded-[var(--radius-control)] type-compact font-[var(--font-weight-semibold)] min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               </button>
