@@ -41,13 +41,13 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
     >
       <div
         id="location-reminder-bar"
-        className="w-full bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-3 sm:p-3.5 sm:px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs transition-colors"
+        className="w-full bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-3 sm:p-3.5 sm:px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[var(--elevation-2xs)] transition-colors"
       >
         <div className="flex items-center gap-2.5 sm:gap-3 text-ui-content-primary">
-          <div className="w-8 h-8 rounded-lg bg-ui-surface-subtle flex items-center justify-center shrink-0 border border-ui-stroke-subtle text-ui-accent">
+          <div className="w-8 h-8 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle flex items-center justify-center shrink-0 border border-ui-stroke-subtle text-ui-accent">
             <MapPin className="w-4 h-4 sm:w-4.5 sm:h-4.5" aria-hidden="true" />
           </div>
-          <p className="text-[13.5px] sm:text-[14px] font-medium leading-snug text-ui-content-secondary">
+          <p className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] leading-snug text-ui-content-secondary">
             {isBn
               ? 'আপনার ব্রাউজিং অভিজ্ঞতা ব্যক্তিগতকরণ করতে লোকেশন চালু করুন।'
               : 'Turn on location to personalize your browsing experience.'}
@@ -60,7 +60,7 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
             variant="secondary"
             size="md"
             onClick={() => openLocationConsent('browse')}
-            className="w-full sm:w-auto min-h-[44px] text-[13.5px] font-semibold"
+            className="w-full sm:w-auto min-h-[44px] text-[var(--type-fixed-135)] font-[var(--font-weight-semibold)]"
           >
             {isBn ? 'লোকেশন চালু করুন' : 'Turn on location'}
           </Button>

@@ -42,12 +42,12 @@ export const Toggle: React.FC<ToggleProps> = ({
         aria-label={typeof label === 'string' ? label : undefined}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ui-focus focus:ring-offset-2 ${
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-[var(--radius-pill)] border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ui-focus focus:ring-offset-2 ${
           checked ? 'bg-ui-action-bg' : 'bg-ui-surface-subtle border border-ui-stroke-subtle'
         }`}
       >
         <span
-          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-ui-action-text shadow-xs ring-0 transition duration-200 ease-in-out ${
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-[var(--radius-pill)] bg-ui-action-text shadow-[var(--elevation-xs)] ring-0 transition duration-200 ease-in-out ${
             checked ? 'translate-x-5' : 'translate-x-0'
           }`}
         />

@@ -59,16 +59,16 @@ export class ErrorBoundary extends Component<Props, State> {
       const isBn = typeof document !== 'undefined' ? document.documentElement.lang !== 'en' : true;
       return (
         <div className="min-h-screen bg-page text-primary flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-surface border border-subtle rounded-2xl p-6 md:p-8 text-center space-y-5 shadow-sm">
-            <div className="w-14 h-14 bg-ui-error-bg text-ui-error-text border border-ui-error-border rounded-full flex items-center justify-center mx-auto">
+          <div className="max-w-md w-full bg-surface border border-subtle rounded-[var(--radius-card)] p-6 md:p-8 text-center space-y-5 shadow-[var(--elevation-sm)]">
+            <div className="w-14 h-14 bg-ui-error-bg text-ui-error-text border border-ui-error-border rounded-[var(--radius-pill)] flex items-center justify-center mx-auto">
               <AlertCircle className="w-7 h-7" />
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-[24px] leading-[34px] font-bold text-primary">
+              <h2 className="text-[var(--type-fixed-24)] leading-[var(--type-line-34)] font-[var(--font-weight-bold)] text-primary">
                 {isBn ? 'কিছু সমস্যা হয়েছে' : 'Something went wrong'}
               </h2>
-              <p className="text-[16px] leading-[26px] text-secondary">
+              <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-secondary">
                 {isBn ? 'পৃষ্ঠাটি লোড করা যায়নি।' : "Couldn't load this page."}
               </p>
             </div>
@@ -76,7 +76,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <button
               type="button"
               onClick={this.handleReset}
-              className="btn-primary-action inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl cursor-pointer min-h-[44px]"
+              className="btn-primary-action inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-[var(--radius-control)] cursor-pointer min-h-[44px]"
             >
               <RotateCcw className="w-4 h-4" />
               <span>{isBn ? 'মূল পাতায় যান' : 'Go to home'}</span>

@@ -200,7 +200,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div
             ref={panelRef}
             style={panelStyle}
-            className="z-[1000] flex flex-col overflow-hidden rounded-xl border border-ui-stroke-default bg-ui-surface shadow-xl"
+            className="z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-control)] border border-ui-stroke-default bg-ui-surface shadow-[var(--elevation-xl)]"
           >
             <div className="shrink-0 p-2 border-b border-ui-stroke-subtle bg-ui-surface">
               <div className="relative">
@@ -220,7 +220,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   aria-activedescendant={
                     activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
                   }
-                  className="w-full min-h-[42px] rounded-lg border border-ui-stroke-default bg-ui-surface pl-9 pr-3 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus"
+                  className="w-full min-h-[42px] rounded-[var(--radius-badge-md)] border border-ui-stroke-default bg-ui-surface pl-9 pr-3 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               className="min-h-0 flex-1 overflow-y-auto p-1.5 overscroll-contain"
             >
               {filteredOptions.length === 0 ? (
-                <p className="px-3 py-4 text-[14px] text-ui-content-muted text-center">
+                <p className="px-3 py-4 text-[var(--type-fixed-14)] text-ui-content-muted text-center">
                   {noResultsText}
                 </p>
               ) : (
@@ -248,7 +248,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                       disabled={option.disabled}
                       onMouseEnter={() => !option.disabled && setActiveIndex(index)}
                       onClick={() => selectValue(option.value)}
-                      className={`w-full min-h-[42px] px-3 py-2 rounded-lg flex items-center justify-between gap-3 text-left text-[14px] text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus disabled:opacity-50 disabled:cursor-not-allowed ${
+                      className={`w-full min-h-[42px] px-3 py-2 rounded-[var(--radius-badge-md)] flex items-center justify-between gap-3 text-left text-[var(--type-fixed-14)] text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus disabled:opacity-50 disabled:cursor-not-allowed ${
                         isActive ? 'bg-ui-surface-subtle' : 'hover:bg-ui-surface-subtle'
                       }`}
                     >
@@ -317,7 +317,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           {clearable && value && !disabled && (
             <button
               type="button"
-              className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-ui-content-muted hover:text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-badge-md)] text-ui-content-muted hover:text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               aria-label="Clear selection"
               onClick={(event) => {
                 event.stopPropagation();
@@ -338,7 +338,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       {dropdown}
 
       {error && (
-        <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-medium">
+        <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-[var(--font-weight-medium)]">
           {error}
         </p>
       )}

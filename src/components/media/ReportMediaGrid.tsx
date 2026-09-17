@@ -58,7 +58,7 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
         {isBroken ? (
           <div className="w-full h-full flex flex-col items-center justify-center p-3 text-ui-content-muted bg-ui-surface-subtle text-center space-y-1">
             <ImageOff className="w-5 h-5 text-ui-content-muted stroke-[1.5]" />
-            <span className="text-[14px]">
+            <span className="text-[var(--type-fixed-14)]">
               {language === 'bn' ? 'ছবিটি দেখানো যাচ্ছে না' : 'Image unavailable'}
             </span>
           </div>
@@ -83,7 +83,7 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
         {/* +N Overlay for 5+ images on the 4th cell */}
         {overlayCount && overlayCount > 0 ? (
           <div className="absolute inset-0 bg-ui-media-overlay-strong backdrop-blur-[2px] flex items-center justify-center text-ui-media-viewer-text">
-            <span className="text-[20px] md:text-[24px] font-bold tracking-tight">
+            <span className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-24)] font-[var(--font-weight-bold)] tracking-tight">
               +{overlayCount}
             </span>
           </div>
@@ -95,8 +95,8 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
   return (
     <div className="space-y-2 select-none" onClick={(e) => e.stopPropagation()}>
       {!isCompact && (
-        <div className="flex items-center justify-between text-[14px] text-ui-content-secondary font-medium">
-          <span className="font-semibold text-ui-content-primary">
+        <div className="flex items-center justify-between text-[var(--type-fixed-14)] text-ui-content-secondary font-[var(--font-weight-medium)]">
+          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
             {language === 'bn' ? 'সহায়ক ছবি' : 'Supporting images'} ({count})
           </span>
           <span className="text-ui-content-muted">
@@ -106,7 +106,7 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
       )}
 
       {/* Media container: Outer radius 12px, Internal gap 4px */}
-      <div className="rounded-[12px] overflow-hidden border border-ui-stroke-subtle bg-ui-surface-subtle">
+      <div className="rounded-[var(--radius-control)] overflow-hidden border border-ui-stroke-subtle bg-ui-surface-subtle">
         {/* 1 Image: Full width frame */}
         {count === 1 && (
           <div className={`w-full ${isCompact ? 'h-[170px] sm:h-[210px] md:h-[340px]' : 'h-[220px] md:h-[340px]'}`}>
