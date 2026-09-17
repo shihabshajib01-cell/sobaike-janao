@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { PublicEngagementService } from '../../services/publicEngagementService';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { BrandLogo } from '../branding/BrandLogo';
 import { IconButton } from '../ui/IconButton';
@@ -14,6 +15,8 @@ const CATEGORY_BY_ROUTE: Record<string, SectionKey> = {
   '/illegal-occupation': 'illegal_occupation',
   '/rickshaw': 'rickshaw',
 };
+
+const REPORT_DETAIL_PREFIX = '/report-detail/';
 
 const goBackWithFallback = (fallback: () => void) => {
   if (window.history.length > 1) {
@@ -37,7 +40,16 @@ export const MobileHeader: React.FC = () => {
   const activeCategoryKey = CATEGORY_BY_ROUTE[currentRoute];
   const activeCategory = activeCategoryKey ? SECTIONS[activeCategoryKey] : null;
   const isHarassmentCategory = activeCategoryKey === 'harassment';
-  const isReportDetailRoute = currentRoute.startsWith('/report-detail/');
+  const isReportDetailRoute = currentRoute.startsWith(REPORT_DETAIL_PREFIX);
+  const reportDetailId = isReportDetailRoute
+    ? decodeURIComponent(currentRoute.slice(REPORT_DETAIL_PREFIX.length))
+    : '';
+
+  const registerSuccessfulShare = () => {
+    if (reportDetailId) {
+      void PublicEngagementService.trackShare(reportDetailId);
+    }
+  };
 
   const handleReportShare = async () => {
     const shareData = {
@@ -48,11 +60,13 @@ export const MobileHeader: React.FC = () => {
     try {
       if (navigator.share) {
         await navigator.share(shareData);
+        registerSuccessfulShare();
         return;
       }
 
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareData.url);
+        registerSuccessfulShare();
         setIsShareConfirmed(true);
         window.setTimeout(() => setIsShareConfirmed(false), 2000);
       }
