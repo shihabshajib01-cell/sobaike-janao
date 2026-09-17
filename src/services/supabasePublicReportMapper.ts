@@ -30,6 +30,8 @@ export interface SupabasePublicReportRPC {
   priority?: string | null;
   hasSupportingInfo?: boolean | null;
   status?: string | null;
+  viewCount?: number | null;
+  shareCount?: number | null;
   recentBillMonth?: string | null;
   recentBillAmount?: number | null;
   previousBillMonth?: string | null;
@@ -75,62 +77,41 @@ const ENGLISH_MONTHS = [
 export const formatBanglaDate = (dateStr?: string | null): string => {
   if (!dateStr) return '';
   const d = new Date(dateStr);
-  if (isNaN(d.getTime())) {
-    return toBanglaDigits(dateStr);
-  }
+  if (isNaN(d.getTime())) return toBanglaDigits(dateStr);
   const day = toBanglaDigits(d.getDate().toString().padStart(2, '0'));
-  const month = BANGLA_MONTHS[d.getMonth()];
-  const year = toBanglaDigits(d.getFullYear());
-  return `${day} ${month} ${year}`;
+  return `${day} ${BANGLA_MONTHS[d.getMonth()]} ${toBanglaDigits(d.getFullYear())}`;
 };
 
 export const formatEnglishDate = (dateStr?: string | null): string => {
   if (!dateStr) return '';
   const d = new Date(dateStr);
-  if (isNaN(d.getTime())) {
-    return dateStr;
-  }
-  const day = d.getDate().toString().padStart(2, '0');
-  const month = ENGLISH_MONTHS[d.getMonth()];
-  const year = d.getFullYear();
-  return `${day} ${month} ${year}`;
+  if (isNaN(d.getTime())) return dateStr;
+  return `${d.getDate().toString().padStart(2, '0')} ${ENGLISH_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 };
 
-export const mapSupabasePublicReportToItem = (
-  rpc: SupabasePublicReportRPC
-): ReportItem => {
+export const mapSupabasePublicReportToItem = (rpc: SupabasePublicReportRPC): ReportItem => {
   const segment = (rpc.segment as SectionKey) || 'harassment';
   const subcategoryId = rpc.subcategoryId || '';
   const subcategoryBn = rpc.subcategoryBn || subcategoryId;
   const subcategoryEn = rpc.subcategoryEn || subcategoryId;
-
   const titleBn = rpc.titleBn || rpc.titleEn || rpc.id;
   const titleEn = rpc.titleEn || rpc.titleBn || rpc.id;
-
   const shortDescBn = rpc.summaryBn || rpc.summaryEn || rpc.descriptionBn || rpc.descriptionEn || '';
   const shortDescEn = rpc.summaryEn || rpc.summaryBn || rpc.descriptionEn || rpc.descriptionBn || '';
   const fullDescBn = rpc.descriptionBn || rpc.descriptionEn || shortDescBn;
   const fullDescEn = rpc.descriptionEn || rpc.descriptionBn || shortDescEn;
-
   const locationBn = rpc.location ? rpc.location : 'অবস্থান গোপন';
   const locationEn = rpc.location ? rpc.location : 'Location withheld';
-
   const districtBn = rpc.district || '';
   const districtEn = rpc.district || '';
-
   const areaBn = rpc.area || '';
   const areaEn = rpc.area || '';
-
   const incidentDateBn = rpc.incidentDate ? formatBanglaDate(rpc.incidentDate) : '';
   const incidentDateEn = rpc.incidentDate ? formatEnglishDate(rpc.incidentDate) : '';
-
   const publishedDateBn = rpc.publishedAt ? formatBanglaDate(rpc.publishedAt) : '';
   const publishedDateEn = rpc.publishedAt ? formatEnglishDate(rpc.publishedAt) : '';
-
   const priority = rpc.priority ? rpc.priority.toLowerCase() : 'medium';
   const isHighUrgency = priority === 'urgent' || priority === 'high';
-
-  // Phase 8: Public per-report RPC payloads never contain or populate latitude/longitude.
   const coordinates = undefined;
 
   return {
@@ -182,6 +163,8 @@ export const mapSupabasePublicReportToItem = (
     publishedDateBn,
     publishedDateEn,
     publishedAt: rpc.publishedAt || undefined,
+    viewCount: Math.max(0, Number(rpc.viewCount ?? 0) || 0),
+    shareCount: Math.max(0, Number(rpc.shareCount ?? 0) || 0),
     evidenceSummaryBn: [],
     evidenceSummaryEn: [],
     status: 'published',
@@ -190,10 +173,7 @@ export const mapSupabasePublicReportToItem = (
     isHighUrgency,
     coordinates,
     images: [],
-    media: {
-      type: 'none',
-      images: [],
-    },
+    media: { type: 'none', images: [] },
     trustIndicators: {
       evidenceSubmitted: Boolean(rpc.hasSupportingInfo),
       multipleReports: false,
