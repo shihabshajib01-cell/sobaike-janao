@@ -1,0 +1,162 @@
+name: Temporary Report Title Phase 1 Patch
+
+on:
+  push:
+    branches:
+      - feature/report-title-input-phase1
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/report-title-input-phase1
+          fetch-depth: 0
+
+      - name: Apply assertion-based source patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          step3_path = Path('src/components/report-composer/Step3ComplaintDetails.tsx')
+          modal_path = Path('src/components/report-composer/ReportComposerModal.tsx')
+
+          step3 = step3_path.read_text()
+          modal = modal_path.read_text()
+
+          # Step 3: one shared title component for every category.
+          import_anchor = "} from '../../services/googlePlacesService';\n"
+          title_import = "import { ReportTitleField, REPORT_TITLE_MAX_LENGTH } from './ReportTitleField';\n"
+          assert import_anchor in step3, 'Step3 import anchor not found'
+          assert title_import not in step3, 'Title import already present unexpectedly'
+          step3 = step3.replace(import_anchor, import_anchor + title_import, 1)
+
+          old_state = "    // Progressive disclosure states\n    const [showTitleField, setShowTitleField] = useState<boolean>(false);\n    const [showIdentifyingDetails, setShowIdentifyingDetails] = useState<boolean>(false);"
+          new_state = "    // Progressive disclosure states\n    const [showIdentifyingDetails, setShowIdentifyingDetails] = useState<boolean>(false);"
+          assert old_state in step3, 'Old title progressive-disclosure state not found'
+          step3 = step3.replace(old_state, new_state, 1)
+
+          validation_anchor = "    const validateAndProceed = (): boolean => {\n      const newErrors: Record<string, string> = {};\n\n"
+          title_validation = """    const validateAndProceed = (): boolean => {\n      const newErrors: Record<string, string> = {};\n\n      const normalizedTitle = formData.title?.trim() || '';\n      if (!normalizedTitle) {\n        newErrors.title =\n          language === 'bn' ? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.';\n      } else if (normalizedTitle.length > REPORT_TITLE_MAX_LENGTH) {\n        newErrors.title =\n          language === 'bn'\n            ? 'শিরোনাম ১০০ অক্ষরের মধ্যে রাখুন।'\n            : 'Keep the report title within 100 characters.';\n      }\n\n"""
+          assert validation_anchor in step3, 'Step3 validation anchor not found'
+          step3 = step3.replace(validation_anchor, title_validation, 1)
+
+          utility_autofill = re.compile(
+              r"\n        // Auto-populate title if empty before validating\n"
+              r"        let effectiveTitle = formData\.title\?\.trim\(\);\n"
+              r"        if \(!effectiveTitle && currentSubcategoryOption\) \{\n"
+              r"          effectiveTitle = language === 'bn' \? currentSubcategoryOption\.nameBn : currentSubcategoryOption\.nameEn;\n"
+              r"          onUpdateFormData\(\{ title: effectiveTitle \}\);\n"
+              r"        \}\n"
+              r"        if \(!effectiveTitle\) \{\n"
+              r"          effectiveTitle = isExcessElectricityBill\n"
+              r"            \? \(language === 'bn' \? 'অতিরিক্ত বিদ্যুৎ বিল' : 'Excess Electricity Bill'\)\n"
+              r"            : isLoadShedding\n"
+              r"            \? \(language === 'bn' \? 'লোডশেডিং' : 'Load Shedding'\)\n"
+              r"            : \(language === 'bn' \? 'গ্যাস সংকট' : 'Gas Shortage'\);\n"
+              r"          onUpdateFormData\(\{ title: effectiveTitle \}\);\n"
+              r"        \}\n"
+          )
+          step3, count = utility_autofill.subn('\n', step3, count=1)
+          assert count == 1, f'Expected one utility title autofill block, found {count}'
+
+          standard_autofill = re.compile(
+              r"\n        // Auto-populate title if empty before validating\n"
+              r"        let effectiveTitle = formData\.title\?\.trim\(\);\n"
+              r"        if \(!effectiveTitle && currentSubcategoryOption\) \{\n"
+              r"          effectiveTitle = language === 'bn' \? currentSubcategoryOption\.nameBn : currentSubcategoryOption\.nameEn;\n"
+              r"          onUpdateFormData\(\{ title: effectiveTitle \}\);\n"
+              r"        \}\n\n"
+              r"        if \(!effectiveTitle\) \{\n"
+              r"          newErrors\.title =\n"
+              r"            language === 'bn' \? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.';\n"
+              r"        \}\n"
+          )
+          step3, count = standard_autofill.subn('\n', step3, count=1)
+          assert count == 1, f'Expected one standard title autofill block, found {count}'
+
+          title_component = """              <ReportTitleField\n                value={formData.title || ''}\n                error={errors.title}\n                language={language}\n                onChange={(value) => {\n                  onUpdateFormData({ title: value });\n                  if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));\n                }}\n              />"""
+
+          utility_title_block = re.compile(
+              r"              \{/\* Title / Headline: Compact with secondary action \*/\}\n"
+              r"              <div className=\"space-y-1\.5\">.*?\n"
+              r"              </div>\n\n"
+              r"              \{isExcessElectricityBill \? \(",
+              re.DOTALL,
+          )
+          step3, count = utility_title_block.subn(title_component + "\n\n              {isExcessElectricityBill ? (", step3, count=1)
+          assert count == 1, f'Expected one utility title UI block, found {count}'
+
+          standard_title_block = re.compile(
+              r"            \{/\* Title / Headline: Compact with secondary action \*/\}\n"
+              r"            <div className=\"space-y-1\.5\">.*?\n"
+              r"            </div>\n\n"
+              r"            \{/\* Incident Narrative \*/\}",
+              re.DOTALL,
+          )
+          standard_component = title_component.replace('              <ReportTitleField', '            <ReportTitleField').replace('\n                ', '\n              ').replace('\n              />', '\n            />')
+          step3, count = standard_title_block.subn(standard_component + "\n\n            {/* Incident Narrative */}", step3, count=1)
+          assert count == 1, f'Expected one standard title UI block, found {count}'
+
+          assert 'showTitleField' not in step3, 'Old showTitleField reference remains'
+          assert 'Auto-populate title if empty before validating' not in step3, 'Old title autofill remains'
+          assert step3.count('<ReportTitleField') == 2, 'Expected shared title field in both Step3 render branches'
+          step3_path.write_text(step3)
+
+          # Composer: changing a subcategory must clear report-specific title, never synthesize it from taxonomy.
+          old_handler = "async (subcategoryId: string, option: SubcategoryOption) => {"
+          new_handler = "async (subcategoryId: string, _option: SubcategoryOption) => {"
+          assert old_handler in modal, 'Subcategory handler signature not found'
+          modal = modal.replace(old_handler, new_handler, 1)
+
+          old_title_logic = """        const updatedTitle =\n          isUtilitySwitch || !prev.title?.trim()\n            ? language === 'bn'\n              ? option.nameBn\n              : option.nameEn\n            : prev.title;\n\n"""
+          assert old_title_logic in modal, 'Subcategory-generated title logic not found'
+          modal = modal.replace(old_title_logic, '', 1)
+          assert 'title: updatedTitle,' in modal, 'Generated title assignment not found'
+          modal = modal.replace('          title: updatedTitle,', "          title: '',", 1)
+
+          import_modal_anchor = "import { MobJusticeReviewSummary } from './MobJusticeReviewSummary';\n"
+          title_limit_import = "import { REPORT_TITLE_MAX_LENGTH } from './ReportTitleField';\n"
+          assert import_modal_anchor in modal, 'Modal title-limit import anchor not found'
+          modal = modal.replace(import_modal_anchor, import_modal_anchor + title_limit_import, 1)
+
+          submit_anchor = "    // Length limit guard\n    if ((formData.description?.length || 0) > 2000) {"
+          submit_title_guard = """    // Defense-in-depth: every report must carry a citizen-entered title.\n    const normalizedTitle = formData.title?.trim() || '';\n    if (!normalizedTitle) {\n      setFormData((prev) => ({ ...prev, currentStep: 3 }));\n      setSubmitError(\n        language === 'bn' ? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.'\n      );\n      return;\n    }\n    if (normalizedTitle.length > REPORT_TITLE_MAX_LENGTH) {\n      setFormData((prev) => ({ ...prev, currentStep: 3 }));\n      setSubmitError(\n        language === 'bn'\n          ? 'শিরোনাম ১০০ অক্ষরের মধ্যে রাখুন।'\n          : 'Keep the report title within 100 characters.'\n      );\n      return;\n    }\n\n    // Length limit guard\n    if ((formData.description?.length || 0) > 2000) {"""
+          assert submit_anchor in modal, 'Final submission length guard anchor not found'
+          modal = modal.replace(submit_anchor, submit_title_guard, 1)
+
+          assert "        title: formData.title || ''," in modal, 'Payload title assignment not found'
+          modal = modal.replace("        title: formData.title || '',", "        title: normalizedTitle,", 1)
+
+          assert 'option.nameBn' not in modal and 'option.nameEn' not in modal, 'Taxonomy title generation remains'
+          modal_path.write_text(modal)
+          PY
+
+      - name: Validate title contract source invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "maxLength={REPORT_TITLE_MAX_LENGTH}" src/components/report-composer/ReportTitleField.tsx
+          grep -q "normalizedTitle.length > REPORT_TITLE_MAX_LENGTH" src/components/report-composer/Step3ComplaintDetails.tsx
+          grep -q "title: normalizedTitle" src/components/report-composer/ReportComposerModal.tsx
+          ! grep -q "Auto-populate title if empty before validating" src/components/report-composer/Step3ComplaintDetails.tsx
+          ! grep -q "title: updatedTitle" src/components/report-composer/ReportComposerModal.tsx
+
+      - name: Remove temporary workflow and commit patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/tmp-report-title-phase1-patch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: require citizen report titles"
+          git push origin HEAD:feature/report-title-input-phase1
