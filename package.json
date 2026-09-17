@@ -13,7 +13,8 @@
     "test:a11y": "node scripts/public-accessibility-smoke.mjs",
     "audit:bundle": "node scripts/bundle-budget.mjs",
     "audit:design-system": "node scripts/design-system-audit.mjs",
-    "audit:ui-uniformity": "node scripts/ui-uniformity-audit.mjs"
+    "audit:ui-uniformity": "node scripts/ui-uniformity-audit.mjs",
+    "audit:technical-quality": "node scripts/technical-quality-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
