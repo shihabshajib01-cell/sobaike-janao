@@ -125,6 +125,14 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       descriptionEn: 'Report snatching incidents in streets or public places',
       isSensitive: true,
     },
+    {
+      id: 'mob-justice',
+      nameBn: 'গণপিটুনি / মব সহিংসতা',
+      nameEn: 'Mob Justice / Mob Violence',
+      descriptionBn: 'সন্দেহ, অভিযোগ, গুজব বা বিরোধের ভিত্তিতে সংঘবদ্ধ মারধর, আটক, হুমকি বা আক্রমণের ঘটনা জানান',
+      descriptionEn: 'Report crowd attacks, restraint, threats, or violence arising from accusations, suspicion, rumors, or disputes',
+      isSensitive: true,
+    },
   ],
   road_transport: [
     {
