@@ -48,11 +48,11 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           <div className="flex items-center gap-2.5 min-w-0 pr-2">
             {icon && <div className="text-ui-content-primary shrink-0">{icon}</div>}
             <div className="min-w-0">
-              <span className="text-[var(--type-fixed-14)] sm:text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight block truncate">
+              <span className="type-helper type-body font-[var(--font-weight-bold)] text-ui-content-primary leading-tight block truncate">
                 {title}
               </span>
               {!isOpen && summary && (
-                <div className="text-[var(--type-fixed-125)] sm:text-[var(--type-fixed-13)] text-ui-content-muted truncate mt-0.5 font-[var(--font-weight-regular)]">
+                <div className="type-h1 type-helper text-ui-content-muted truncate mt-0.5 font-[var(--font-weight-regular)]">
                   {summary}
                 </div>
               )}
@@ -75,7 +75,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
               e.stopPropagation();
               onEdit();
             }}
-            className="inline-flex items-center justify-center gap-1.5 text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline cursor-pointer min-h-[44px] min-w-[44px] px-2.5 py-1.5 shrink-0 rounded-[var(--radius-control)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
+            className="inline-flex items-center justify-center gap-1.5 type-helper font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline cursor-pointer min-h-[44px] min-w-[44px] px-2.5 py-1.5 shrink-0 rounded-[var(--radius-control)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
           >
             <Edit2 className="w-3.5 h-3.5" />
             <span>{editLabel}</span>

@@ -7,7 +7,6 @@ import { Header } from './Header';
 import { MobileHeader } from './MobileHeader';
 import { BottomNav, shouldHideBottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
-import { ReportComposerModal } from '../report-composer/ReportComposerModal';
 import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
 import { LocationConsentModal } from '../location/LocationConsentModal';
 import { LocationReminderBar } from '../location/LocationReminderBar';
@@ -30,6 +29,10 @@ import { MapExploreSkeleton } from '../ui/LoadingSkeleton';
 
 const LazyExplorePage = React.lazy(() =>
   import('../../pages/ExplorePage').then((m) => ({ default: m.ExplorePage }))
+);
+
+const LazyReportComposerModal = React.lazy(() =>
+  import('../report-composer/ReportComposerModal').then((m) => ({ default: m.ReportComposerModal }))
 );
 
 const ReportDetailRouteWrapper: React.FC = () => {
@@ -209,14 +212,18 @@ export const AppShell: React.FC = () => {
         <SearchModal />
       </ErrorBoundary>
 
-      <ErrorBoundary componentName="ReportComposerModal" silent>
-        <ReportComposerModal
-          isOpen={isReportComposerOpen}
-          onClose={closeReportComposer}
-          initialSegment={reportComposerInitialSegment}
-          language={language}
-        />
-      </ErrorBoundary>
+      {isReportComposerOpen && (
+        <ErrorBoundary componentName="ReportComposerModal" silent>
+          <React.Suspense fallback={null}>
+            <LazyReportComposerModal
+              isOpen={isReportComposerOpen}
+              onClose={closeReportComposer}
+              initialSegment={reportComposerInitialSegment}
+              language={language}
+            />
+          </React.Suspense>
+        </ErrorBoundary>
+      )}
 
       <ErrorBoundary componentName="FirstVisitNoticeModal" silent>
         <FirstVisitNoticeModal

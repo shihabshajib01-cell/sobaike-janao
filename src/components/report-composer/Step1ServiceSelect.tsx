@@ -141,7 +141,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   return (
     <div className="space-y-6">
       <div className="text-left">
-        <h3 className="text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-[var(--font-weight-bold)] text-ui-content-primary">
+        <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'কোন বিষয়ে জানাতে চান?' : 'What would you like to report?'}
         </h3>
       </div>
@@ -209,7 +209,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       {comingSoonList.length > 0 && (
         <div className="pt-2 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-[var(--type-fixed-12)] font-[var(--font-weight-bold)] text-ui-content-muted uppercase tracking-wider">
+            <span className="type-helper font-[var(--font-weight-bold)] text-ui-content-muted uppercase tracking-wider">
               {language === 'bn' ? 'আসন্ন সেবাসমূহ' : 'Upcoming services'}
             </span>
             <span className="h-px flex-1" />
@@ -240,7 +240,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
 
                       <span
                         id={`service-select-badge-${cs.key}`}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[var(--radius-pill)] text-[var(--type-fixed-12)] font-[var(--font-weight-semibold)] bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[var(--radius-pill)] type-helper font-[var(--font-weight-semibold)] bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary"
                       >
                         <span className="w-1.5 h-1.5 rounded-[var(--radius-pill)] bg-ui-warning-text animate-pulse" />
                         <span>{language === 'bn' ? cs.badgeBn : cs.badgeEn}</span>
@@ -248,10 +248,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                     </div>
 
                     <div>
-                      <h4 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+                      <h4 className="type-label font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
                         {language === 'bn' ? cs.nameBn : cs.nameEn}
                       </h4>
-                      <p className="text-[var(--type-fixed-135)] leading-relaxed text-ui-content-secondary mt-1">
+                      <p className="type-h1 leading-relaxed text-ui-content-secondary mt-1">
                         {language === 'bn' ? cs.descriptionBn : cs.descriptionEn}
                       </p>
                     </div>
@@ -270,14 +270,14 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <span className="type-helper font-[var(--font-weight-bold)] text-ui-content-primary">
                     {language === 'bn' ? activeComingSoonData.nameBn : activeComingSoonData.nameEn}
                   </span>
-                  <span className="text-[var(--type-fixed-11)] font-[var(--font-weight-semibold)] px-2 py-0.5 rounded-[var(--radius-badge-sm)] bg-ui-surface border border-ui-stroke-subtle text-ui-content-muted">
+                  <span className="type-helper font-[var(--font-weight-semibold)] px-2 py-0.5 rounded-[var(--radius-badge-sm)] bg-ui-surface border border-ui-stroke-subtle text-ui-content-muted">
                     {language === 'bn' ? activeComingSoonData.badgeBn : activeComingSoonData.badgeEn}
                   </span>
                 </div>
-                <p className="text-[var(--type-fixed-135)] text-ui-content-secondary leading-relaxed">
+                <p className="type-h1 text-ui-content-secondary leading-relaxed">
                   {language === 'bn'
                     ? 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি। অনুগ্রহ করে চালুকৃত সেবা নির্বাচন করুন অথবা বিস্তারিত দেখুন।'
                     : 'This reporting service is being prepared and is not available yet. Please select an active service or read more details.'}
@@ -289,7 +289,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   type="button"
                   id={`coming-soon-learn-more-${activeComingSoonData.key}`}
                   onClick={() => onNavigateToComingSoon(activeComingSoonData.slug)}
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[var(--radius-control)] type-helper font-[var(--font-weight-bold)] bg-ui-surface border border-ui-stroke-subtle text-ui-content-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'Learn more'}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-ui-content-muted" />

@@ -35,10 +35,10 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
     <div className="space-y-4 sm:space-y-5">
       {/* 1. Minimal Header: Title + Short Helper Text */}
       <div className="space-y-1 text-left">
-        <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+        <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
           {headerTitle}
         </h3>
-        <p className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] md:text-[var(--type-fixed-15)] leading-normal text-ui-content-secondary">
+        <p className="type-helper leading-normal text-ui-content-secondary">
           {helperText}
         </p>
       </div>
@@ -77,7 +77,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
               }`}
             >
               <div className="flex items-start justify-between gap-2.5">
-                <h4 className="text-[var(--type-fixed-145)] sm:text-[var(--type-fixed-155)] font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
+                <h4 className="type-h4 font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
                   {itemName}
                 </h4>
 
@@ -96,7 +96,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
               </div>
 
               {itemDesc && (
-                <p className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] leading-[var(--type-line-ratio-140)] text-ui-content-secondary font-[var(--font-weight-regular)]">
+                <p className="type-helper leading-[var(--type-line-ratio-140)] text-ui-content-secondary font-[var(--font-weight-regular)]">
                   {itemDesc}
                 </p>
               )}

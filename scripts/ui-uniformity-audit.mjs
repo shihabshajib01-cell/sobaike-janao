@@ -178,6 +178,41 @@ requireContains(reportTitleField, 'role="alert"', 'report title validation must 
 requireNotContains(reportTitleField, '--type-fixed-', 'report title field must not use legacy fixed typography aliases');
 requireNotContains(reportTitleField, 'min-h-[44px]', 'report title field must inherit minimum target size from ui-control');
 
+const closureFiles = [
+  'src/components/ui/Accordion.tsx',
+  'src/components/ui/Modal.tsx',
+  'src/components/ui/SearchableSelect.tsx',
+  ...fs.readdirSync(path.resolve(ROOT, 'src/components/report-composer'))
+    .filter((name) => name.endsWith('.tsx'))
+    .map((name) => `src/components/report-composer/${name}`),
+];
+
+for (const file of closureFiles) {
+  requireNotContains(file, '--type-fixed-', '100% closure forbids legacy fixed typography aliases');
+  requireNotContains(file, 'min-h-[42px]', 'interactive controls must meet the 44px minimum target');
+}
+
+requireContains(
+  'src/components/layout/AppShell.tsx',
+  'LazyReportComposerModal',
+  'report composer must remain lazy-loaded outside the initial browsing bundle'
+);
+requireNotContains(
+  'src/components/layout/AppShell.tsx',
+  "import { ReportComposerModal } from '../report-composer/ReportComposerModal';",
+  'report composer must not return to the eager app-shell bundle'
+);
+requireContains(
+  'src/components/ui/SearchableSelect.tsx',
+  'min-w-[44px] min-h-[44px]',
+  'searchable select clear action must meet the minimum touch target'
+);
+requireContains(
+  'src/components/ui/Modal.tsx',
+  'const { language: appLanguage } = useApp();',
+  'Modal must call useApp unconditionally in accordance with Hooks rules'
+);
+
 if (failures.length) {
   console.error(`Public UI uniformity audit found ${failures.length} violation(s):`);
   for (const failure of failures) console.error(`  - ${failure}`);

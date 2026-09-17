@@ -62,17 +62,7 @@ export const Modal: React.FC<ModalProps> = ({
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
-  let appLanguage: 'bn' | 'en' = 'bn';
-  try {
-    const app = useApp();
-    if (app?.language) {
-      appLanguage = app.language;
-    }
-  } catch {
-    if (typeof document !== 'undefined' && document.documentElement.lang === 'en') {
-      appLanguage = 'en';
-    }
-  }
+  const { language: appLanguage } = useApp();
   const activeLang = customLanguage || appLanguage;
   const closeLabel = activeLang === 'bn' ? 'ডায়ালগ বন্ধ করুন' : 'Close dialog';
 
@@ -193,7 +183,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const cardShapeClasses =
     effectiveMobilePresentation === 'sheet'
-      ? 'rounded-t-2xl rounded-b-none md:rounded-[var(--radius-card)] border-t border-x-0 border-b-0 md:border animate-sheet-slide-up'
+      ? 'rounded-t-[var(--radius-card)] rounded-b-none md:rounded-[var(--radius-card)] border-t border-x-0 border-b-0 md:border animate-sheet-slide-up'
       : maxWidth === 'composer'
       ? 'rounded-none md:rounded-[var(--radius-modal)] border-0 md:border'
       : 'rounded-[var(--radius-card)] border';
@@ -242,12 +232,12 @@ export const Modal: React.FC<ModalProps> = ({
           <div className="flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 border-b border-ui-stroke-subtle bg-ui-surface shrink-0 gap-3">
             <div className="min-w-0 flex-1">
               {title && (
-                <h2 id={`${id}-title`} className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+                <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id={`${id}-desc`} className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] text-ui-content-muted mt-0.5 leading-normal">{description}</p>
+                <p id={`${id}-desc`} className="type-helper text-ui-content-muted mt-0.5 leading-normal">{description}</p>
               )}
             </div>
             <IconButton
