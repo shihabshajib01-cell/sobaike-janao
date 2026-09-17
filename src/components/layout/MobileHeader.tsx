@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, Filter, Menu, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { BrandLogo } from '../branding/BrandLogo';
@@ -14,6 +14,15 @@ const CATEGORY_BY_ROUTE: Record<string, SectionKey> = {
   '/rickshaw': 'rickshaw',
 };
 
+const goBackWithFallback = (fallback: () => void) => {
+  if (window.history.length > 1) {
+    window.history.back();
+    return;
+  }
+
+  fallback();
+};
+
 export const MobileHeader: React.FC = () => {
   const {
     currentRoute,
@@ -22,9 +31,87 @@ export const MobileHeader: React.FC = () => {
     setIsTabletMenuOpen,
     setIsHarassmentFilterOpen,
   } = useApp();
+  const [isShareConfirmed, setIsShareConfirmed] = useState(false);
+
   const activeCategoryKey = CATEGORY_BY_ROUTE[currentRoute];
   const activeCategory = activeCategoryKey ? SECTIONS[activeCategoryKey] : null;
   const isHarassmentCategory = activeCategoryKey === 'harassment';
+  const isReportDetailRoute = currentRoute.startsWith('/report-detail/');
+
+  const handleReportShare = async () => {
+    const shareData = {
+      title: document.title,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareData.url);
+        setIsShareConfirmed(true);
+        window.setTimeout(() => setIsShareConfirmed(false), 2000);
+      }
+    } catch (error) {
+      // Native share cancellation is an expected user action; do not surface it as an error.
+      if ((error as DOMException)?.name !== 'AbortError') {
+        console.warn('[MobileHeader share error]', error);
+      }
+    }
+  };
+
+  if (isReportDetailRoute) {
+    return (
+      <header
+        id="mobile-report-detail-header"
+        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
+      >
+        <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
+          <button
+            id="mobile-report-detail-back-btn"
+            type="button"
+            onClick={() => goBackWithFallback(() => navigateTo('/'))}
+            aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+
+          <p
+            id="mobile-report-detail-title"
+            className="min-w-0 flex-1 truncate type-h3 text-ui-content-primary"
+          >
+            {language === 'bn' ? 'প্রতিবেদন' : 'Report'}
+          </p>
+
+          <button
+            id="mobile-report-detail-share-btn"
+            type="button"
+            onClick={handleReportShare}
+            aria-label={
+              isShareConfirmed
+                ? language === 'bn'
+                  ? 'লিংক কপি হয়েছে'
+                  : 'Link copied'
+                : language === 'bn'
+                ? 'প্রতিবেদন শেয়ার করুন'
+                : 'Share report'
+            }
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            {isShareConfirmed ? (
+              <Check className="h-5 w-5 text-ui-success-text" aria-hidden="true" />
+            ) : (
+              <Share2 className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+      </header>
+    );
+  }
 
   if (activeCategory) {
     return (
