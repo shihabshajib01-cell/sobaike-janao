@@ -6,15 +6,21 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
-import { MobileCategoryLocationPortal } from '../components/feed/MobileCategoryLocationPortal';
+import { MobileCategoryFilterPortal } from '../components/feed/MobileCategoryFilterPortal';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
+import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import {
+  CategoryFeedFilterState,
+  EMPTY_CATEGORY_FEED_FILTERS,
+  matchesCategoryFeedFilters,
+} from '../data/categoryFeedFilters';
 
 export const ExtortionPage: React.FC = () => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
@@ -23,7 +29,10 @@ export const ExtortionPage: React.FC = () => {
   const bannerContent = CANONICAL_BANNER_CONTENT.extortion;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
+    ...EMPTY_CATEGORY_FEED_FILTERS,
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -63,22 +72,26 @@ export const ExtortionPage: React.FC = () => {
   }, [loadData]);
 
   const filteredReports = useMemo(() => {
-    return reports.filter((r) => {
-      if (r.segment !== 'extortion') return false;
-      const matchesSubcat = selectedSubcat === 'all' || r.subcategoryId === selectedSubcat;
-      const matchesDistrict =
-        selectedDistrict === 'all' ||
-        (r.districtBn && r.districtBn.includes(selectedDistrict)) ||
-        (r.districtEn && r.districtEn.toLowerCase().includes(selectedDistrict.toLowerCase()));
-      return matchesSubcat && matchesDistrict;
+    return reports.filter((report) => {
+      if (report.segment !== 'extortion') return false;
+      const matchesSubcat = selectedSubcat === 'all' || report.subcategoryId === selectedSubcat;
+      return matchesSubcat && matchesCategoryFeedFilters(report, 'extortion', feedFilters);
     });
-  }, [reports, selectedSubcat, selectedDistrict]);
+  }, [reports, selectedSubcat, feedFilters]);
+
+  const handleDesktopDistrictChange = (districtId: string) => {
+    setFeedFilters((current) => ({
+      ...current,
+      divisionId: 'all',
+      districtId,
+    }));
+  };
 
   return (
     <PublicPageContainer id="extortion-page-container">
-      <MobileCategoryLocationPortal
-        selectedDistrict={selectedDistrict}
-        onSelectDistrict={setSelectedDistrict}
+      <MobileCategoryFilterPortal
+        language={language}
+        onOpen={() => setIsFilterOpen(true)}
       />
 
       <CategoryHeroSlider
@@ -120,20 +133,18 @@ export const ExtortionPage: React.FC = () => {
 
           <div className="hidden md:block shrink-0">
             <LocationSelector
-              selectedDistrict={selectedDistrict}
-              onSelectDistrict={setSelectedDistrict}
+              selectedDistrict={feedFilters.districtId}
+              onSelectDistrict={handleDesktopDistrictChange}
             />
           </div>
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {subcategories.map((subcat) => {
-            const count = reports.filter((r) => {
-              if (r.segment !== 'extortion') return false;
-              const matchesSub = subcat.id === 'all' || r.subcategoryId === subcat.id;
-              const matchesDist =
-                selectedDistrict === 'all' || (r.districtBn && r.districtBn.includes(selectedDistrict));
-              return matchesSub && matchesDist;
+            const count = reports.filter((report) => {
+              if (report.segment !== 'extortion') return false;
+              const matchesSub = subcat.id === 'all' || report.subcategoryId === subcat.id;
+              return matchesSub && matchesCategoryFeedFilters(report, 'extortion', feedFilters);
             }).length;
 
             return (
@@ -184,18 +195,30 @@ export const ExtortionPage: React.FC = () => {
               title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               description={
                 language === 'bn'
-                  ? 'এই উপ-বিভাগ বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
-                  : 'There are currently no published reports under this subcategory.'
+                  ? 'এই ফিল্টারগুলোর জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
+                  : 'There are currently no published reports for these filters.'
               }
               actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               onAction={() => {
                 setSelectedSubcat('all');
-                setSelectedDistrict('all');
+                setFeedFilters({ ...EMPTY_CATEGORY_FEED_FILTERS });
               }}
             />
           )}
         </div>
       )}
+
+      <CategoryFilterSheet
+        section="extortion"
+        isOpen={isFilterOpen}
+        language={language}
+        value={feedFilters}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={(next) => {
+          setFeedFilters(next);
+          setIsFilterOpen(false);
+        }}
+      />
     </PublicPageContainer>
   );
 };

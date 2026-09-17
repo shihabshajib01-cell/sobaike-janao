@@ -152,7 +152,7 @@ export const MobileHeader: React.FC = () => {
             <div
               id="mobile-category-location-slot"
               className="shrink-0"
-              aria-label={language === 'bn' ? 'এলাকা ফিল্টার' : 'Location filter'}
+              aria-label={language === 'bn' ? 'ফিল্টার' : 'Filters'}
             />
           )}
         </div>
