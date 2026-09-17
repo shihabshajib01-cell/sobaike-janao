@@ -117,13 +117,20 @@ replaceOrThrow(
   'mobile filter action'
 );
 
+// Remove responsive fixed-size overrides first; semantic role classes below own the scale.
+source = source.replace(/(?:sm:|md:|lg:|xl:)?text-\[var\(--type-fixed-(?:10|105|11|115|12|13|14|15|16|18|20|24|32)\)\]/g, (token) => {
+  if (/^(?:sm:|md:|lg:|xl:)/.test(token)) return '';
+  const sizeMatch = token.match(/type-fixed-(\d+)/);
+  const size = Number(sizeMatch?.[1] || 14);
+  if (size <= 14 || size === 105 || size === 115) return 'type-meta';
+  if (size <= 16) return 'type-body';
+  if (size <= 18) return 'type-h4';
+  if (size <= 20) return 'type-h3';
+  if (size <= 24) return 'type-h2';
+  return 'type-h1';
+});
+
 const semanticReplacements = [
-  ['text-[var(--type-fixed-11)]', 'type-meta'],
-  ['text-[var(--type-fixed-12)]', 'type-meta'],
-  ['text-[var(--type-fixed-13)]', 'type-meta'],
-  ['text-[var(--type-fixed-14)]', 'type-meta'],
-  ['text-[var(--type-fixed-15)]', 'type-label'],
-  ['text-[var(--type-fixed-16)]', 'type-body'],
   ['rounded-[var(--radius-card)]', 'ui-radius-card'],
   ['rounded-[var(--radius-control)]', 'ui-radius-control'],
   ['rounded-[var(--radius-badge-md)]', 'ui-radius-badge-md'],
@@ -135,8 +142,9 @@ for (const [from, to] of semanticReplacements) {
   source = source.split(from).join(to);
 }
 
-if (source.includes('--type-fixed-')) {
-  throw new Error('Explore UI closure left legacy fixed typography aliases behind');
+const remainingFixedTypography = source.match(/(?:[a-z]+:)?text-\[var\(--type-fixed-[^)]+\)\]/g) || [];
+if (remainingFixedTypography.length) {
+  throw new Error(`Explore UI closure left legacy fixed typography aliases behind: ${[...new Set(remainingFixedTypography)].join(', ')}`);
 }
 
 fs.writeFileSync(file, source);
