@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ReportItem } from '../../types/report';
 import { useApp } from '../../context/AppContext';
@@ -6,6 +6,7 @@ import { CategoryBadge } from '../ui/CategoryBadge';
 import { ReportMediaGrid } from '../media/ReportMediaGrid';
 import { AppIcon } from '../ui/AppIcon';
 import { formatBillingMonth, toBanglaDigits } from '../../utils/formatters';
+import { PublicEngagementService } from '../../services/publicEngagementService';
 
 export interface ReportCardProps {
   report: ReportItem;
@@ -15,11 +16,19 @@ export interface ReportCardProps {
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
+  const [shareCount, setShareCount] = useState(report.shareCount ?? 0);
+
+  useEffect(() => {
+    setShareCount(report.shareCount ?? 0);
+  }, [report.id, report.shareCount]);
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const publishedDate = language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
+  const viewCount = report.viewCount ?? 0;
+  const formatCount = (value: number) =>
+    language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
 
   const normalizedTitle = (title || '').trim();
   const normalizedDesc = (shortDesc || '').trim();
@@ -33,8 +42,12 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     e.stopPropagation();
     const shareUrl = `${window.location.origin}${window.location.pathname}#/report-detail/${report.id}`;
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
+      navigator.clipboard.writeText(shareUrl).then(async () => {
         setIsCopied(true);
+        const counts = await PublicEngagementService.trackShare(report.id);
+        if (counts) {
+          setShareCount(counts.shareCount);
+        }
         setTimeout(() => setIsCopied(false), 2000);
       });
     }
@@ -106,6 +119,14 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <p className="type-meta whitespace-nowrap">{publishedDate}</p>
           </div>
+          <span className="text-ui-content-muted" aria-hidden="true">•</span>
+          <div
+            className="flex items-center gap-1 text-ui-content-muted shrink-0"
+            aria-label={language === 'bn' ? `${formatCount(viewCount)} বার দেখা হয়েছে` : `${formatCount(viewCount)} views`}
+          >
+            <AppIcon name="eye" size="xs" className="text-ui-content-muted" />
+            <span>{formatCount(viewCount)}</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 type-action">
@@ -126,6 +147,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
                 <AppIcon name="share" size="xs" className="text-ui-content-muted md:hidden" />
                 <AppIcon name="share" size="sm" className="text-ui-content-muted hidden md:inline-block" />
                 <span>{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
+                <span className="text-ui-content-muted">{formatCount(shareCount)}</span>
               </span>
             )}
           </button>
