@@ -5,11 +5,16 @@ import { SECTIONS } from '../../theme/tokens';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
 
 const CATEGORY_ROUTES = Object.values(SECTIONS).map((section) => section.slug);
+const BACK_NAV_ROUTE_PREFIXES = ['/report-detail/', '/location/', '/subject/'];
+
+export const shouldHideBottomNav = (currentRoute: string): boolean =>
+  CATEGORY_ROUTES.includes(currentRoute) ||
+  BACK_NAV_ROUTE_PREFIXES.some((prefix) => currentRoute.startsWith(prefix));
 
 export const BottomNav: React.FC = () => {
   const { currentRoute, navigateTo, language, openReportComposer } = useApp();
 
-  if (CATEGORY_ROUTES.includes(currentRoute)) return null;
+  if (shouldHideBottomNav(currentRoute)) return null;
 
   const navItems: Array<{
     id: string;
