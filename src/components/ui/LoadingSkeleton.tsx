@@ -8,7 +8,7 @@ export interface SkeletonProps {
 export const Skeleton: React.FC<SkeletonProps> = ({ className = '', style }) => {
   return (
     <div
-      className={`animate-pulse bg-ui-surface-hover rounded-md ${className}`}
+      className={`animate-pulse bg-ui-surface-hover rounded-[var(--radius-badge-sm)] ${className}`}
       style={style}
       aria-hidden="true"
     />
@@ -29,29 +29,29 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
   return (
     <div
       id={id}
-      className={`bg-ui-surface border border-ui-stroke-subtle rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-6 space-y-2 sm:space-y-2.5 md:space-y-3.5 shadow-2xs select-none ${className}`}
+      className={`bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] sm:rounded-[var(--radius-card)] p-3.5 sm:p-4 md:p-6 space-y-2 sm:space-y-2.5 md:space-y-3.5 shadow-[var(--elevation-2xs)] select-none ${className}`}
       aria-hidden="true"
     >
       {/* 1. Top Context Line: Category badge placeholder + subcategory dot placeholder */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Skeleton className="w-20 sm:w-24 h-4 sm:h-5 rounded-md" />
-          <span className="text-ui-content-muted text-[11px] sm:text-[12px] opacity-40">•</span>
+          <Skeleton className="w-20 sm:w-24 h-4 sm:h-5 rounded-[var(--radius-badge-sm)]" />
+          <span className="text-ui-content-muted text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] opacity-40">•</span>
           <Skeleton className="w-24 sm:w-32 h-3.5 sm:h-4 rounded" />
         </div>
-        <Skeleton className="w-16 sm:w-20 h-4 sm:h-5 rounded-md" />
+        <Skeleton className="w-16 sm:w-20 h-4 sm:h-5 rounded-[var(--radius-badge-sm)]" />
       </div>
 
       {/* 2. Main Headline */}
       <div className="space-y-1.5 pt-0.5">
-        <Skeleton className="w-4/5 sm:w-3/4 h-5 sm:h-6 md:h-7 rounded-md" />
-        <Skeleton className="w-1/2 h-4 sm:h-5 rounded-md hidden sm:block" />
+        <Skeleton className="w-4/5 sm:w-3/4 h-5 sm:h-6 md:h-7 rounded-[var(--radius-badge-sm)]" />
+        <Skeleton className="w-1/2 h-4 sm:h-5 rounded-[var(--radius-badge-sm)] hidden sm:block" />
       </div>
 
       {/* 3. Reported Subject Context */}
       <div className="flex items-center gap-2 pt-0.5">
         <Skeleton className="w-20 sm:w-24 h-3.5 sm:h-4 rounded" />
-        <Skeleton className="w-28 sm:w-36 h-3.5 sm:h-4 rounded font-medium" />
+        <Skeleton className="w-28 sm:w-36 h-3.5 sm:h-4 rounded font-[var(--font-weight-medium)]" />
       </div>
 
       {/* 4. Description Preview (2-3 lines) */}
@@ -64,9 +64,9 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
       {/* 4.5 Optional Media Grid Preview placeholder */}
       {hasMediaPreview && (
         <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1">
-          <Skeleton className="h-20 sm:h-28 rounded-xl" />
-          <Skeleton className="h-20 sm:h-28 rounded-xl" />
-          <Skeleton className="h-20 sm:h-28 rounded-xl" />
+          <Skeleton className="h-20 sm:h-28 rounded-[var(--radius-control)]" />
+          <Skeleton className="h-20 sm:h-28 rounded-[var(--radius-control)]" />
+          <Skeleton className="h-20 sm:h-28 rounded-[var(--radius-control)]" />
         </div>
       )}
 
@@ -74,13 +74,13 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
       <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3.5 border-t border-ui-stroke-subtle">
         <div className="flex items-center gap-2 sm:gap-3">
           <Skeleton className="w-24 sm:w-32 h-3.5 sm:h-4 rounded" />
-          <span className="text-ui-content-muted text-[10px] sm:text-[12px] opacity-40">•</span>
+          <span className="text-ui-content-muted text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-12)] opacity-40">•</span>
           <Skeleton className="w-16 sm:w-24 h-3.5 sm:h-4 rounded" />
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3">
-          <Skeleton className="w-10 sm:w-14 h-5 sm:h-6 rounded-lg" />
-          <span className="text-subtle opacity-40 text-[10px] sm:text-[12px]">|</span>
-          <Skeleton className="w-12 sm:w-18 h-5 sm:h-6 rounded-lg" />
+          <Skeleton className="w-10 sm:w-14 h-5 sm:h-6 rounded-[var(--radius-badge-md)]" />
+          <span className="text-subtle opacity-40 text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-12)]">|</span>
+          <Skeleton className="w-12 sm:w-18 h-5 sm:h-6 rounded-[var(--radius-badge-md)]" />
         </div>
       </div>
     </div>
@@ -140,40 +140,40 @@ export const MapCardSkeleton: React.FC<MapCardSkeletonProps> = ({
       role="status"
       aria-busy="true"
       aria-label={ariaLabel}
-      className={`relative rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs overflow-hidden flex flex-col select-none ${className}`}
+      className={`relative rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface shadow-[var(--elevation-xs)] overflow-hidden flex flex-col select-none ${className}`}
       style={{ minHeight: '520px' }}
     >
       <span className="sr-only">{ariaLabel}</span>
 
       {/* Top-Right Mock Controls Skeleton */}
-      <div className="absolute top-3.5 right-3.5 z-20 flex flex-col gap-1.5 shadow-sm">
-        <Skeleton className="w-9 h-9 rounded-xl" />
-        <Skeleton className="w-9 h-9 rounded-xl" />
-        <Skeleton className="w-9 h-9 rounded-xl" />
+      <div className="absolute top-3.5 right-3.5 z-20 flex flex-col gap-1.5 shadow-[var(--elevation-sm)]">
+        <Skeleton className="w-9 h-9 rounded-[var(--radius-control)]" />
+        <Skeleton className="w-9 h-9 rounded-[var(--radius-control)]" />
+        <Skeleton className="w-9 h-9 rounded-[var(--radius-control)]" />
       </div>
 
       {/* Top-Left Mock Map Legend Skeleton */}
-      <div className="absolute top-3.5 left-3.5 z-20 bg-surface/90 backdrop-blur-xs border border-ui-stroke-subtle rounded-xl p-3 shadow-2xs flex flex-col gap-2 w-44">
+      <div className="absolute top-3.5 left-3.5 z-20 bg-surface/90 backdrop-blur-xs border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3 shadow-[var(--elevation-2xs)] flex flex-col gap-2 w-44">
         <Skeleton className="w-24 h-3.5 rounded" />
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="w-3 h-3 rounded-[var(--radius-pill)]" />
             <Skeleton className="w-20 h-3 rounded" />
           </div>
           <div className="flex items-center gap-2">
-            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="w-3 h-3 rounded-[var(--radius-pill)]" />
             <Skeleton className="w-24 h-3 rounded" />
           </div>
           <div className="flex items-center gap-2">
-            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="w-3 h-3 rounded-[var(--radius-pill)]" />
             <Skeleton className="w-16 h-3 rounded" />
           </div>
         </div>
       </div>
 
       {/* Bottom-Left Mock Marker Count Skeleton */}
-      <div className="absolute bottom-3.5 left-3.5 z-20 bg-surface/95 backdrop-blur-xs border border-ui-stroke-subtle rounded-xl px-3 py-2 shadow-2xs flex items-center gap-2">
-        <Skeleton className="w-4 h-4 rounded-full" />
+      <div className="absolute bottom-3.5 left-3.5 z-20 bg-surface/95 backdrop-blur-xs border border-ui-stroke-subtle rounded-[var(--radius-control)] px-3 py-2 shadow-[var(--elevation-2xs)] flex items-center gap-2">
+        <Skeleton className="w-4 h-4 rounded-[var(--radius-pill)]" />
         <Skeleton className="w-28 h-4 rounded" />
       </div>
 
@@ -186,28 +186,28 @@ export const MapCardSkeleton: React.FC<MapCardSkeletonProps> = ({
         <div className="relative w-full max-w-sm h-72 flex items-center justify-center">
           {/* Dhaka Center Cluster */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-ui-surface-hover border-2 border-ui-surface animate-ping opacity-35" />
-            <div className="w-8 h-8 rounded-full bg-ui-surface-hover border-2 border-ui-surface absolute top-1" />
+            <div className="w-10 h-10 rounded-[var(--radius-pill)] bg-ui-surface-hover border-2 border-ui-surface animate-ping opacity-35" />
+            <div className="w-8 h-8 rounded-[var(--radius-pill)] bg-ui-surface-hover border-2 border-ui-surface absolute top-1" />
           </div>
 
           {/* Chittagong / South-East Cluster */}
           <div className="absolute bottom-6 right-10 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
+            <div className="w-7 h-7 rounded-[var(--radius-pill)] bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
 
           {/* Sylhet / North-East Cluster */}
           <div className="absolute top-10 right-14 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
+            <div className="w-7 h-7 rounded-[var(--radius-pill)] bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
 
           {/* Rajshahi / North-West Cluster */}
           <div className="absolute top-14 left-10 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
+            <div className="w-7 h-7 rounded-[var(--radius-pill)] bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
 
           {/* Khulna / South-West Cluster */}
           <div className="absolute bottom-12 left-14 flex flex-col items-center">
-            <div className="w-7 h-7 rounded-full bg-ui-surface-hover border-2 border-ui-surface" />
+            <div className="w-7 h-7 rounded-[var(--radius-pill)] bg-ui-surface-hover border-2 border-ui-surface" />
           </div>
         </div>
       </div>
@@ -230,23 +230,23 @@ export const DistrictRankingSkeleton: React.FC<DistrictRankingSkeletonProps> = (
   return (
     <div
       id={id}
-      className={`rounded-2xl border border-ui-stroke-subtle bg-ui-surface shadow-xs p-4 sm:p-5 space-y-4 select-none ${className}`}
+      className={`rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface shadow-[var(--elevation-xs)] p-4 sm:p-5 space-y-4 select-none ${className}`}
       aria-hidden="true"
     >
       {/* Panel Header */}
       <div className="flex items-center justify-between pb-3 border-b border-ui-stroke-subtle">
         <div className="space-y-1">
-          <Skeleton className="w-32 h-5 rounded-md" />
+          <Skeleton className="w-32 h-5 rounded-[var(--radius-badge-sm)]" />
           <Skeleton className="w-48 h-3.5 rounded" />
         </div>
-        <Skeleton className="w-14 h-6 rounded-full" />
+        <Skeleton className="w-14 h-6 rounded-[var(--radius-pill)]" />
       </div>
 
       {/* Category Breakdown Metric Pills */}
       <div className="grid grid-cols-3 gap-2">
-        <Skeleton className="h-14 rounded-xl" />
-        <Skeleton className="h-14 rounded-xl" />
-        <Skeleton className="h-14 rounded-xl" />
+        <Skeleton className="h-14 rounded-[var(--radius-control)]" />
+        <Skeleton className="h-14 rounded-[var(--radius-control)]" />
+        <Skeleton className="h-14 rounded-[var(--radius-control)]" />
       </div>
 
       {/* District List Skeletons */}
@@ -254,16 +254,16 @@ export const DistrictRankingSkeleton: React.FC<DistrictRankingSkeletonProps> = (
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="p-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface flex items-center justify-between gap-3"
+            className="p-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface flex items-center justify-between gap-3"
           >
             <div className="flex items-center gap-2.5">
-              <Skeleton className="w-6 h-6 rounded-lg" />
+              <Skeleton className="w-6 h-6 rounded-[var(--radius-badge-md)]" />
               <div className="space-y-1">
                 <Skeleton className="w-24 h-4 rounded" />
                 <Skeleton className="w-16 h-3 rounded" />
               </div>
             </div>
-            <Skeleton className="w-12 h-6 rounded-lg" />
+            <Skeleton className="w-12 h-6 rounded-[var(--radius-badge-md)]" />
           </div>
         ))}
       </div>
@@ -290,7 +290,7 @@ export const RecentAreaReportsSkeleton: React.FC<{ count?: number; id?: string }
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="p-4 rounded-2xl bg-ui-surface border border-ui-stroke-subtle space-y-3">
+          <div key={i} className="p-4 rounded-[var(--radius-card)] bg-ui-surface border border-ui-stroke-subtle space-y-3">
             <div className="flex items-center justify-between">
               <Skeleton className="w-20 h-4 rounded" />
               <Skeleton className="w-12 h-3 rounded" />
@@ -339,9 +339,9 @@ export const MapExploreSkeleton: React.FC<{ id?: string; ariaLabel?: string }> =
 
 export const StatCardSkeleton: React.FC<{ id?: string }> = ({ id }) => {
   return (
-    <div id={id} className="p-4 sm:p-5 bg-ui-surface border border-ui-stroke-subtle rounded-2xl space-y-2.5 shadow-2xs select-none" aria-hidden="true">
+    <div id={id} className="p-4 sm:p-5 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] space-y-2.5 shadow-[var(--elevation-2xs)] select-none" aria-hidden="true">
       <Skeleton className="w-24 h-4 rounded" />
-      <Skeleton className="w-16 h-8 rounded-lg" />
+      <Skeleton className="w-16 h-8 rounded-[var(--radius-badge-md)]" />
       <Skeleton className="w-32 h-4 rounded" />
     </div>
   );
@@ -352,30 +352,30 @@ export const ReportDetailSkeleton: React.FC<{ id?: string }> = ({ id = 'report-d
     <div id={id} className="space-y-6 select-none" role="status" aria-busy="true" aria-label="Loading report...">
       <span className="sr-only">Loading report...</span>
       {/* Back button */}
-      <Skeleton className="w-24 h-8 rounded-lg" />
+      <Skeleton className="w-24 h-8 rounded-[var(--radius-badge-md)]" />
 
       {/* Main card */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-3xl p-6 md:p-8 space-y-6 shadow-2xs">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-modal)] p-6 md:p-8 space-y-6 shadow-[var(--elevation-2xs)]">
         {/* Context bar */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Skeleton className="w-28 h-6 rounded-md" />
+            <Skeleton className="w-28 h-6 rounded-[var(--radius-badge-sm)]" />
             <Skeleton className="w-36 h-5 rounded" />
           </div>
-          <Skeleton className="w-24 h-6 rounded-full" />
+          <Skeleton className="w-24 h-6 rounded-[var(--radius-pill)]" />
         </div>
 
         {/* Title */}
         <div className="space-y-2">
-          <Skeleton className="w-4/5 h-8 md:h-9 rounded-lg" />
-          <Skeleton className="w-2/3 h-7 md:h-8 rounded-lg" />
+          <Skeleton className="w-4/5 h-8 md:h-9 rounded-[var(--radius-badge-md)]" />
+          <Skeleton className="w-2/3 h-7 md:h-8 rounded-[var(--radius-badge-md)]" />
         </div>
 
         {/* Metadata pills */}
         <div className="flex flex-wrap gap-2 pt-1">
-          <Skeleton className="w-32 h-7 rounded-lg" />
-          <Skeleton className="w-28 h-7 rounded-lg" />
-          <Skeleton className="w-36 h-7 rounded-lg" />
+          <Skeleton className="w-32 h-7 rounded-[var(--radius-badge-md)]" />
+          <Skeleton className="w-28 h-7 rounded-[var(--radius-badge-md)]" />
+          <Skeleton className="w-36 h-7 rounded-[var(--radius-badge-md)]" />
         </div>
 
         {/* Long content description */}
@@ -389,9 +389,9 @@ export const ReportDetailSkeleton: React.FC<{ id?: string }> = ({ id = 'report-d
 
         {/* Image Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-          <Skeleton className="h-36 sm:h-44 rounded-2xl" />
-          <Skeleton className="h-36 sm:h-44 rounded-2xl" />
-          <Skeleton className="h-36 sm:h-44 rounded-2xl hidden sm:block" />
+          <Skeleton className="h-36 sm:h-44 rounded-[var(--radius-card)]" />
+          <Skeleton className="h-36 sm:h-44 rounded-[var(--radius-card)]" />
+          <Skeleton className="h-36 sm:h-44 rounded-[var(--radius-card)] hidden sm:block" />
         </div>
       </div>
     </div>

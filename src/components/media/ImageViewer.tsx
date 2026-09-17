@@ -149,7 +149,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         className="absolute top-0 inset-x-0 p-4 flex items-center justify-between z-10 bg-gradient-to-b from-ui-media-gradient to-transparent"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-ui-media-viewer-text text-[14px] font-medium tracking-wide">
+        <div className="text-ui-media-viewer-text text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] tracking-wide">
           <span>
             {language === 'bn'
               ? `ছবি ${toBanglaNum(currentIndex + 1)} / ${toBanglaNum(images.length)}`
@@ -162,7 +162,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           type="button"
           onClick={onClose}
           aria-label={language === 'bn' ? 'ছবি দেখা বন্ধ করুন' : 'Close image viewer'}
-          className="min-w-[44px] min-h-[44px] rounded-full bg-ui-media-viewer-chip hover:bg-ui-media-viewer-chip-hover text-ui-media-viewer-text flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
+          className="min-w-[44px] min-h-[44px] rounded-[var(--radius-pill)] bg-ui-media-viewer-chip hover:bg-ui-media-viewer-chip-hover text-ui-media-viewer-text flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
         >
           <X className="w-6 h-6" />
         </button>
@@ -186,7 +186,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
               ? `প্রতিবেদনের সহায়ক ছবি ${toBanglaNum(currentIndex + 1)}`
               : `Supporting image ${currentIndex + 1} for this report`
           }
-          className="max-w-full max-h-[80vh] object-contain rounded-2xl md:rounded-[var(--radius-modal)] ui-radius-modal shadow-2xl pointer-events-none"
+          className="max-w-full max-h-[80vh] object-contain rounded-[var(--radius-card)] md:rounded-[var(--radius-modal)] ui-radius-modal shadow-[var(--elevation-2xl)] pointer-events-none"
           referrerPolicy="no-referrer"
         />
       </div>
@@ -201,7 +201,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
               handlePrev();
             }}
             aria-label={language === 'bn' ? 'পূর্ববর্তী ছবি' : 'Previous image'}
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-media-overlay-strong hover:bg-ui-media-overlay-max text-ui-media-viewer-text border border-ui-media-viewer-border-strong flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-[var(--radius-pill)] bg-ui-media-overlay-strong hover:bg-ui-media-overlay-max text-ui-media-viewer-text border border-ui-media-viewer-border-strong flex items-center justify-center cursor-pointer transition-all shadow-[var(--elevation-md)] z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -213,7 +213,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
               handleNext();
             }}
             aria-label={language === 'bn' ? 'পরবর্তী ছবি' : 'Next image'}
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-full bg-ui-media-overlay-strong hover:bg-ui-media-overlay-max text-ui-media-viewer-text border border-ui-media-viewer-border-strong flex items-center justify-center cursor-pointer transition-all shadow-md z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] rounded-[var(--radius-pill)] bg-ui-media-overlay-strong hover:bg-ui-media-overlay-max text-ui-media-viewer-text border border-ui-media-viewer-border-strong flex items-center justify-center cursor-pointer transition-all shadow-[var(--elevation-md)] z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus focus-visible:ring-offset-2 focus-visible:ring-offset-ui-media-viewer-bg"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -226,7 +226,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           className="absolute bottom-4 inset-x-0 flex justify-center items-center gap-2 p-2 overflow-x-auto z-10"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex gap-2 p-1.5 rounded-xl bg-ui-media-overlay-strong border border-ui-media-viewer-border backdrop-blur-md">
+          <div className="flex gap-2 p-1.5 rounded-[var(--radius-control)] bg-ui-media-overlay-strong border border-ui-media-viewer-border backdrop-blur-md">
             {images.map((img, idx) => (
               <button
                 key={img.id}
@@ -237,7 +237,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     ? `ছবি ${toBanglaNum(idx + 1)} দেখুন`
                     : `Go to image ${idx + 1}`
                 }
-                className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus ${
+                className={`w-12 h-12 rounded-[var(--radius-badge-md)] overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus ${
                   idx === currentIndex
                     ? 'border-ui-accent scale-105 opacity-100'
                     : 'border-transparent opacity-50 hover:opacity-80'

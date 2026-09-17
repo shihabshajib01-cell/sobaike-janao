@@ -43,7 +43,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           size="lg"
           onClick={onClose}
           leftIcon={<X className="w-4 h-4" />}
-          className="min-h-[44px] text-[16px] text-ui-content-muted"
+          className="min-h-[44px] text-[var(--type-fixed-16)] text-ui-content-muted"
         >
           {language === 'bn' ? 'বাতিল' : 'Cancel'}
         </Button>
@@ -56,7 +56,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           onClick={onBack}
           disabled={isSubmitting}
           leftIcon={<ArrowLeft className="w-4 h-4" />}
-          className="min-h-[44px] text-[16px]"
+          className="min-h-[44px] text-[var(--type-fixed-16)]"
         >
           {language === 'bn' ? 'পূর্ববর্তী' : 'Back'}
         </Button>
@@ -72,7 +72,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           disabled={!canContinue}
           onClick={onNext}
           rightIcon={<ArrowRight className="w-4 h-4" />}
-          className="min-h-[44px] text-[16px] px-6"
+          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
         >
           {language === 'bn' ? 'এগিয়ে যান' : 'Continue'}
         </Button>
@@ -87,7 +87,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           disabled={!canContinue}
           onClick={onNext}
           rightIcon={<ArrowRight className="w-4 h-4" />}
-          className="min-h-[44px] text-[16px] px-6"
+          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
         >
           {language === 'bn' ? 'এগিয়ে যান' : 'Continue'}
         </Button>
@@ -101,7 +101,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           size="lg"
           onClick={onNext}
           rightIcon={<ArrowRight className="w-4 h-4" />}
-          className="min-h-[44px] text-[16px] px-6"
+          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
         >
           {language === 'bn' ? 'পর্যালোচনা' : 'Review'}
         </Button>
@@ -122,7 +122,7 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
               <Send className="w-4 h-4" />
             )
           }
-          className="min-h-[44px] text-[16px] px-6"
+          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
         >
           {isSubmitting
             ? language === 'bn'

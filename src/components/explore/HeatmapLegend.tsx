@@ -1,4 +1,5 @@
 import React from 'react';
+import { HEATMAP_TOKENS } from '../../theme/data-viz-tokens';
 
 interface HeatmapLegendProps {
   language: 'bn' | 'en';
@@ -14,10 +15,10 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
       id="heatmap-legend"
       role="region"
       aria-label={language === 'bn' ? 'হিটম্যাপ নির্দেশিকা' : 'Heatmap legend'}
-      className={`bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-xl p-2 sm:p-2.5 shadow-2xs flex flex-col gap-1 text-[11px] max-w-[170px] sm:max-w-[190px] select-none ${className}`}
+      className={`bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle rounded-[var(--radius-control)] p-2 sm:p-2.5 shadow-[var(--elevation-2xs)] flex flex-col gap-1 text-[var(--type-fixed-11)] max-w-[170px] sm:max-w-[190px] select-none ${className}`}
     >
       <div className="flex items-center justify-between">
-        <span className="font-bold text-ui-content-primary text-[10px] sm:text-[11px] uppercase tracking-wider">
+        <span className="font-[var(--font-weight-bold)] text-ui-content-primary text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-11)] uppercase tracking-wider">
           {language === 'bn' ? 'প্রতিবেদনের ঘনত্ব' : 'Report density'}
         </span>
       </div>
@@ -25,22 +26,22 @@ export const HeatmapLegend: React.FC<HeatmapLegendProps> = ({
       {/* Continuous Gradient Bar */}
       <div
         aria-hidden="true"
-        className="h-2 w-full rounded-full border border-ui-stroke-subtle/50"
+        className="h-2 w-full rounded-[var(--radius-pill)] border border-ui-stroke-subtle/50"
         style={{
           background:
-            'linear-gradient(to right, #2563EB 0%, #06B6D4 30%, #10B981 55%, #F59E0B 80%, #EF4444 100%)',
+            HEATMAP_TOKENS.cssGradient,
         }}
       />
 
       {/* Range Labels */}
-      <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-ui-content-secondary px-0.5">
+      <div className="flex items-center justify-between text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-11)] font-[var(--font-weight-semibold)] text-ui-content-secondary px-0.5">
         <span>{language === 'bn' ? 'কম' : 'Low'}</span>
         <span>{language === 'bn' ? 'মাঝারি' : 'Medium'}</span>
         <span>{language === 'bn' ? 'বেশি' : 'High'}</span>
       </div>
 
       {/* Responsible Interpretation Note */}
-      <p className="text-[9.5px] sm:text-[10px] leading-tight text-ui-content-muted pt-1 border-t border-ui-stroke-subtle/50">
+      <p className="text-[var(--type-fixed-095)] sm:text-[var(--type-fixed-10)] leading-tight text-ui-content-muted pt-1 border-t border-ui-stroke-subtle/50">
         {language === 'bn'
           ? 'এটি প্রতিবেদনের ঘনত্ব দেখায়, তীব্রতা বা যাচাই নয়।'
           : 'Shows report concentration, not severity or verification.'}

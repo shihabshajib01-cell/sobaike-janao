@@ -104,9 +104,9 @@ export const MorePage: React.FC = () => {
 
   return (
     <PublicPageContainer id="more-page-container">
-      <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+      <section className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4">
         <div className="space-y-2">
-          <p className="inline-flex items-center gap-2 w-fit px-3 py-1 rounded-full bg-ui-surface-subtle border border-ui-stroke-subtle type-meta text-ui-content-secondary">
+          <p className="inline-flex items-center gap-2 w-fit px-3 py-1 rounded-[var(--radius-pill)] bg-ui-surface-subtle border border-ui-stroke-subtle type-meta text-ui-content-secondary">
             <Info className="w-4 h-4 text-ui-accent" aria-hidden="true" />
             {language === 'bn' ? 'ব্যবহারকারী নির্দেশিকা ও জ্ঞান কেন্দ্র' : 'User guide & knowledge hub'}
           </p>
@@ -130,7 +130,7 @@ export const MorePage: React.FC = () => {
                 type="button"
                 aria-pressed={active}
                 onClick={() => setActiveTab(tab.key)}
-                className={`min-h-11 shrink-0 inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 type-meta font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${active ? 'bg-ui-action-bg text-ui-action-text' : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'}`}
+                className={`min-h-11 shrink-0 inline-flex items-center gap-2 rounded-[var(--radius-control)] px-3.5 py-2.5 type-meta font-[var(--font-weight-semibold)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${active ? 'bg-ui-action-bg text-ui-action-text' : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'}`}
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
                 <p>{language === 'bn' ? tab.labelBn : tab.labelEn}</p>
@@ -142,7 +142,7 @@ export const MorePage: React.FC = () => {
 
       {activeTab === 'about' && (
         <section className="space-y-4">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-5">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-5">
             <div className="space-y-2">
               <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'সবাইকে জানাও কী?' : 'What is Sobaike Janao?'}</h2>
               <p className="type-body text-ui-content-secondary">
@@ -153,17 +153,17 @@ export const MorePage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="rounded-xl border border-ui-warning-border bg-ui-warning-bg p-4 space-y-2">
+              <div className="rounded-[var(--radius-control)] border border-ui-warning-border bg-ui-warning-bg p-4 space-y-2">
                 <ShieldAlert className="w-5 h-5 text-ui-warning-text" aria-hidden="true" />
                 <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'সরকারি ওয়েবসাইট নয়' : 'Not a government website'}</h3>
                 <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'এটি কোনো সরকারি প্রতিষ্ঠান, মন্ত্রণালয় বা দাপ্তরিক অভিযোগ পোর্টাল নয়।' : 'This is not a government agency, ministry, or official complaint portal.'}</p>
               </div>
-              <div className="rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4 space-y-2">
+              <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-4 space-y-2">
                 <Scale className="w-5 h-5 text-ui-accent" aria-hidden="true" />
                 <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'থানা বা আদালত নয়' : 'Not police or a court'}</h3>
                 <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'এখানে প্রতিবেদন করা জিডি, মামলা বা আনুষ্ঠানিক তদন্তের বিকল্প নয়।' : 'Reporting here does not create a GD, case, or formal investigation.'}</p>
               </div>
-              <div className="rounded-xl border border-ui-info-border bg-ui-info-bg p-4 space-y-2">
+              <div className="rounded-[var(--radius-control)] border border-ui-info-border bg-ui-info-bg p-4 space-y-2">
                 <AlertTriangle className="w-5 h-5 text-ui-info-text" aria-hidden="true" />
                 <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'জরুরি সেবা নয়' : 'Not an emergency service'}</h3>
                 <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'তাৎক্ষণিক ঝুঁকি বা জরুরি অবস্থায় জাতীয় জরুরি সেবা বা সংশ্লিষ্ট কর্তৃপক্ষের সঙ্গে যোগাযোগ করুন।' : 'For immediate danger or emergencies, contact national emergency services or the appropriate authority.'}</p>
@@ -171,7 +171,7 @@ export const MorePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4">
             <div className="space-y-1">
               <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'বর্তমান প্রতিবেদন বিষয়সমূহ' : 'Current reporting areas'}</h2>
               <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্ল্যাটফর্মে বর্তমানে সক্রিয় সাতটি বিষয়।' : 'The seven issue areas currently available on the platform.'}</p>
@@ -181,8 +181,8 @@ export const MorePage: React.FC = () => {
                 const segment = segments[item.key];
                 if (!segment) return null;
                 return (
-                  <div key={item.key} className="flex items-center gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-3.5">
-                    <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border" style={{ backgroundColor: `var(--sec-${item.key}-bg)`, color: `var(--sec-${item.key}-text)`, borderColor: `var(--sec-${item.key}-border)` }}>
+                  <div key={item.key} className="flex items-center gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3.5">
+                    <div className="w-10 h-10 shrink-0 rounded-[var(--radius-control)] flex items-center justify-center border" style={{ backgroundColor: `var(--sec-${item.key}-bg)`, color: `var(--sec-${item.key}-text)`, borderColor: `var(--sec-${item.key}-border)` }}>
                       <CategoryIcon section={item.key} size="sm" />
                     </div>
                     <div className="min-w-0">
@@ -199,7 +199,7 @@ export const MorePage: React.FC = () => {
 
       {activeTab === 'guide' && (
         <section className="space-y-4">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4">
             <div className="space-y-1">
               <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'চার ধাপে প্রতিবেদন করুন' : 'Report in four steps'}</h2>
               <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'বর্তমান রিপোর্ট কম্পোজারের ধাপগুলোর সঙ্গে মিল রেখে নির্দেশিকা।' : 'Guidance aligned with the current report composer.'}</p>
@@ -208,8 +208,8 @@ export const MorePage: React.FC = () => {
               {REPORT_STEPS.map((step) => {
                 const Icon = step.icon;
                 return (
-                  <div key={step.n} className="flex gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4">
-                    <div className="w-10 h-10 shrink-0 rounded-full bg-ui-action-bg text-ui-action-text flex items-center justify-center font-bold">{step.n}</div>
+                  <div key={step.n} className="flex gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-4">
+                    <div className="w-10 h-10 shrink-0 rounded-[var(--radius-pill)] bg-ui-action-bg text-ui-action-text flex items-center justify-center font-[var(--font-weight-bold)]">{step.n}</div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Icon className="w-4 h-4 text-ui-accent" aria-hidden="true" />
@@ -223,7 +223,7 @@ export const MorePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4">
             <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'কোন তথ্য প্রস্তুত রাখবেন' : 'Information to prepare'}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
@@ -234,14 +234,14 @@ export const MorePage: React.FC = () => {
               ].map(([Icon, bn, en], index) => {
                 const ItemIcon = Icon as React.ComponentType<{ className?: string }>;
                 return (
-                  <div key={index} className="flex items-start gap-3 rounded-xl border border-ui-stroke-subtle p-4">
+                  <div key={index} className="flex items-start gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle p-4">
                     <ItemIcon className="w-5 h-5 shrink-0 text-ui-accent mt-0.5" aria-hidden="true" />
                     <p className="type-body text-ui-content-secondary">{language === 'bn' ? bn as string : en as string}</p>
                   </div>
                 );
               })}
             </div>
-            <div className="rounded-xl border border-ui-info-border bg-ui-info-bg p-4 space-y-1">
+            <div className="rounded-[var(--radius-control)] border border-ui-info-border bg-ui-info-bg p-4 space-y-1">
               <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'ঘুষ প্রতিবেদনে অতিরিক্ত তথ্য' : 'Extra details for bribery reports'}</h3>
               <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রযোজ্য হলে দপ্তর, সেবা বা প্রক্রিয়া এবং টাকার পরিমাণ যোগ করুন। এগুলো মূল ঘটনার বিবরণ ও অবস্থানের বিকল্প নয়।' : 'When relevant, add the office, service/process and amount of money. These supplement the core incident description and location.'}</p>
             </div>
@@ -250,14 +250,14 @@ export const MorePage: React.FC = () => {
       )}
 
       {activeTab === 'helplines' && (
-        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4">
           <div className="space-y-1">
             <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'জরুরি ও জাতীয় সহায়তা' : 'Emergency & national support'}</h2>
             <p className="type-body text-ui-content-secondary">{language === 'bn' ? 'সবাইকে জানাও জরুরি সেবা নয়। তাৎক্ষণিক সহায়তার প্রয়োজন হলে প্রাসঙ্গিক জাতীয় হেল্পলাইনে যোগাযোগ করুন।' : 'Sobaike Janao is not an emergency service. Use the relevant national helpline when immediate support is needed.'}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {BANGLADESH_HELPLINES.map((hl) => (
-              <a key={hl.number} href={`tel:${hl.number}`} className="flex items-center justify-between gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+              <a key={hl.number} href={`tel:${hl.number}`} className="flex items-center justify-between gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
                 <div className="min-w-0">
                   <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? hl.labelBn : hl.labelEn}</h3>
                   <p className="type-meta text-ui-content-secondary">{language === 'bn' ? hl.descBn : hl.descEn}</p>
@@ -271,7 +271,7 @@ export const MorePage: React.FC = () => {
 
       {activeTab === 'principles' && (
         <section className="space-y-4">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4">
             <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'সুরক্ষা ও গোপনীয়তার মূল নীতি' : 'Privacy & safety principles'}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
@@ -282,7 +282,7 @@ export const MorePage: React.FC = () => {
               ].map(([Icon, bn, en], index) => {
                 const ItemIcon = Icon as React.ComponentType<{ className?: string }>;
                 return (
-                  <div key={index} className="flex items-start gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4">
+                  <div key={index} className="flex items-start gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-4">
                     <ItemIcon className="w-5 h-5 shrink-0 text-ui-accent mt-0.5" aria-hidden="true" />
                     <p className="type-body text-ui-content-secondary">{language === 'bn' ? bn as string : en as string}</p>
                   </div>
@@ -294,24 +294,24 @@ export const MorePage: React.FC = () => {
       )}
 
       {activeTab === 'response' && (
-        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-5">
+        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-5">
           <div className="space-y-1">
             <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'জমা দেওয়ার পর কী হয়?' : 'What happens after submission?'}</h2>
             <p className="type-body text-ui-content-secondary">{language === 'bn' ? 'প্রতিবেদন প্রকাশের আগে প্রশাসনিক পর্যালোচনার মধ্য দিয়ে যায়।' : 'Reports go through administrative review before publication.'}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="rounded-xl border border-ui-stroke-subtle p-4 space-y-2"><FileCheck2 className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '১. পর্যালোচনা' : '1. Review'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'বিষয়, উপধরন, বিবরণ, অবস্থান, সংযুক্তি ও প্রাসঙ্গিক তথ্য দেখা হয়।' : 'Category, subtype, description, location, attachments and relevant details are reviewed.'}</p></div>
-            <div className="rounded-xl border border-ui-stroke-subtle p-4 space-y-2"><Shield className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '২. প্রয়োজনীয় ব্যবস্থা' : '2. Moderation'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রয়োজনে সম্পাদনা, তথ্য আড়াল, প্রত্যাখ্যান বা অতিরিক্ত যাচাই করা হতে পারে।' : 'A report may be edited, redacted, rejected or checked further when needed.'}</p></div>
-            <div className="rounded-xl border border-ui-stroke-subtle p-4 space-y-2"><CheckCircle2 className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '৩. প্রকাশ' : '3. Publication'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'অনুমোদিত প্রতিবেদন সংশ্লিষ্ট বিষয়, অনুসন্ধান, ফিল্টার ও মানচিত্রে দেখা যেতে পারে।' : 'Approved reports may appear in category feeds, search, filters and map views.'}</p></div>
+            <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle p-4 space-y-2"><FileCheck2 className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '১. পর্যালোচনা' : '1. Review'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'বিষয়, উপধরন, বিবরণ, অবস্থান, সংযুক্তি ও প্রাসঙ্গিক তথ্য দেখা হয়।' : 'Category, subtype, description, location, attachments and relevant details are reviewed.'}</p></div>
+            <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle p-4 space-y-2"><Shield className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '২. প্রয়োজনীয় ব্যবস্থা' : '2. Moderation'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রয়োজনে সম্পাদনা, তথ্য আড়াল, প্রত্যাখ্যান বা অতিরিক্ত যাচাই করা হতে পারে।' : 'A report may be edited, redacted, rejected or checked further when needed.'}</p></div>
+            <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle p-4 space-y-2"><CheckCircle2 className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '৩. প্রকাশ' : '3. Publication'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'অনুমোদিত প্রতিবেদন সংশ্লিষ্ট বিষয়, অনুসন্ধান, ফিল্টার ও মানচিত্রে দেখা যেতে পারে।' : 'Approved reports may appear in category feeds, search, filters and map views.'}</p></div>
           </div>
-          <div className="rounded-xl bg-ui-warning-bg border border-ui-warning-border p-4">
+          <div className="rounded-[var(--radius-control)] bg-ui-warning-bg border border-ui-warning-border p-4">
             <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রকাশিত হওয়া মানে অভিযোগটি আদালত, পুলিশ বা সরকারি কর্তৃপক্ষ কর্তৃক সত্য প্রমাণিত হয়েছে—এমন নয়।' : 'Publication does not mean an allegation has been proven by a court, police, or government authority.'}</p>
           </div>
         </section>
       )}
 
       {activeTab === 'faq' && (
-        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-3">
+        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-3">
           <div className="space-y-1 pb-2">
             <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'সাধারণ প্রশ্ন' : 'Frequently asked questions'}</h2>
             <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'বর্তমান রিপোর্টিং ব্যবস্থা সম্পর্কে গুরুত্বপূর্ণ প্রশ্নের উত্তর।' : 'Key answers about the current reporting system.'}</p>
@@ -319,7 +319,7 @@ export const MorePage: React.FC = () => {
           {faqs.map((faq) => {
             const open = openFaq === faq.id;
             return (
-              <div key={faq.id} className="rounded-xl border border-ui-stroke-subtle overflow-hidden">
+              <div key={faq.id} className="rounded-[var(--radius-control)] border border-ui-stroke-subtle overflow-hidden">
                 <button type="button" aria-expanded={open} onClick={() => setOpenFaq(open ? null : faq.id)} className="w-full min-h-12 flex items-center justify-between gap-3 px-4 py-3 text-left bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
                   <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? faq.qBn : faq.qEn}</h3>
                   <ChevronDown className={`w-5 h-5 shrink-0 text-ui-content-muted transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />

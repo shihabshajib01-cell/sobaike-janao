@@ -45,7 +45,7 @@ export const SearchModal: React.FC = () => {
 
         {/* Quick Category Filters */}
         <div className="space-y-2.5">
-          <p className="text-[14px] font-bold text-ui-content-muted uppercase tracking-wider">
+          <p className="text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-muted uppercase tracking-wider">
             {language === 'bn' ? 'বিভাগ' : 'Categories'}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -55,7 +55,7 @@ export const SearchModal: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => handleSelectSection(sec.slug as RoutePath)}
-                  className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-xl min-h-[44px] flex items-center"
+                  className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-control)] min-h-[44px] flex items-center"
                 >
                   <CategoryBadge section={key} language={language} size="md" />
                 </button>
