@@ -40,7 +40,7 @@ const browser = await chromium.launch({ headless: true });
 const origin = new URL(SITE_URL).origin;
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
-  geolocation: { latitude: 23.7806, longitude: 90.4070 },
+  geolocation: { latitude: 23.7806, longitude: 90.4070, accuracy: 20 },
 });
 await context.grantPermissions(['geolocation'], { origin });
 await seedReturningVisitor(context);
