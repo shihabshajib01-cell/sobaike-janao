@@ -18,6 +18,7 @@ export interface ReportCardProps {
 }
 
 const INITIAL_ENGAGEMENT: PublicEngagementCounts = { viewCount: 0, shareCount: 0 };
+const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"], [role="link"], [role="textbox"]';
 
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
@@ -49,9 +50,22 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     });
   };
 
-  const handleCardClick = () => {
+  const openReportDetail = () => {
     registerView();
     navigateTo(`/report-detail/${report.id}`);
+  };
+
+  const handleCardClick = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement | null;
+    if (target && target !== event.currentTarget && target.closest(INTERACTIVE_SELECTOR)) return;
+    openReportDetail();
+  };
+
+  const handleCardKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    openReportDetail();
   };
 
   const registerShare = () => {
@@ -90,9 +104,12 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
   return (
     <article
       id={`report-card-${report.id}`}
+      role="link"
+      tabIndex={0}
       aria-label={title}
       onClick={handleCardClick}
-      className={`group relative ui-card p-3.5 sm:p-4 md:p-6 transition-all duration-150 cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none hover:border-ui-stroke-default ${className}`}
+      onKeyDown={handleCardKeyDown}
+      className={`group relative ui-card p-3.5 sm:p-4 md:p-6 transition-all duration-150 cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 ${className}`}
     >
       <div className="flex items-center justify-between gap-2 type-meta">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
