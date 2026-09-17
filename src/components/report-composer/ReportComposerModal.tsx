@@ -19,7 +19,16 @@ import { Step2ComplaintTypeAccordion } from './Step2ComplaintTypeAccordion';
 import { Step3ComplaintDetails, Step3Handle } from './Step3ComplaintDetails';
 import { Step4Review } from './Step4Review';
 import { StepCompletion } from './StepCompletion';
+import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
+import { MobJusticeReviewSummary } from './MobJusticeReviewSummary';
 import { SubcategoryOption } from '../../data/reportOptions';
+import {
+  EMPTY_MOB_JUSTICE_DETAILS,
+  MobJusticeDetails,
+  MobJusticeValidationErrors,
+  hasMobJusticeValidationErrors,
+  validateMobJusticeDetails,
+} from '../../data/mobJusticeOptions';
 import { AlertCircle, MapPin, Shield, RotateCcw } from 'lucide-react';
 
 import { Modal } from '../ui/Modal';
@@ -41,13 +50,19 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 }) => {
   const { navigateTo } = useApp();
 
-
   // Main form state - always start on Step 1 with no pre-selected segment unless specified
   const [formData, setFormData] = useState<ReportFormData>(() => ({
     ...INITIAL_REPORT_FORM,
     segment: initialSegment,
     currentStep: initialSegment ? 2 : 1,
   }));
+
+  // Mob Justice has five category-specific fields. Keep them isolated from the shared form model
+  // so existing report categories remain untouched while still using the same composer journey.
+  const [mobJusticeDetails, setMobJusticeDetails] = useState<MobJusticeDetails>(() => ({
+    ...EMPTY_MOB_JUSTICE_DETAILS,
+  }));
+  const [mobJusticeErrors, setMobJusticeErrors] = useState<MobJusticeValidationErrors>({});
 
   // Attached media state (in-memory files)
   const [pendingImages, setPendingImages] = useState<AttachedImagePreview[]>([]);
@@ -100,6 +115,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Derived state for rape publishing consent requirements
   const requiresRapeConsent = formData.subcategoryId === 'rape-sexual-violence';
   const rapeConsentMissing = requiresRapeConsent && !rapePublishingConsentAccepted;
+  const isMobJusticeReport =
+    formData.segment === 'public_safety' && formData.subcategoryId === 'mob-justice';
 
   // Defensive guard: if formData ever targets Step 3/4 with rape subcategory without consent, open disclaimer and hold step
   useEffect(() => {
@@ -118,6 +135,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setRapePublishingConsentAccepted(false);
       setRapeConsentCheckbox(false);
       setIsRapeConsentModalOpen(false);
+      setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
+      setMobJusticeErrors({});
       pendingTargetStepRef.current = null;
       retryCredentialsRef.current = null;
       setSubmitError(null);
@@ -137,6 +156,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setRapePublishingConsentAccepted(false);
       setRapeConsentCheckbox(false);
       setIsRapeConsentModalOpen(false);
+      setMobJusticeErrors({});
       pendingTargetStepRef.current = null;
     }
   }, [isOpen, initialSegment]);
@@ -145,6 +165,29 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const handleUpdateFormData = useCallback((updates: Partial<ReportFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
+
+  const handleMobJusticeDetailsChange = useCallback((details: MobJusticeDetails) => {
+    setMobJusticeDetails(details);
+    setMobJusticeErrors({});
+  }, []);
+
+  const validateMobJusticeSection = useCallback((): boolean => {
+    if (!isMobJusticeReport) return true;
+
+    const errors = validateMobJusticeDetails(mobJusticeDetails, language);
+    setMobJusticeErrors(errors);
+
+    if (hasMobJusticeValidationErrors(errors)) {
+      setTimeout(() => {
+        document
+          .getElementById('composer-section-mob-justice')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+      return false;
+    }
+
+    return true;
+  }, [isMobJusticeReport, mobJusticeDetails, language]);
 
   // Attached images remain in memory for the current composer session only.
   const handlePendingImagesChange = useCallback(
@@ -230,6 +273,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       }
 
       setRapePublishingConsentAccepted(false);
+      setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
+      setMobJusticeErrors({});
 
       // State A: pre-submit category switch
       // Cleanly discard old local evidence attachments and old clientSubmissionId
@@ -300,6 +345,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       }
 
       setRapePublishingConsentAccepted(false);
+      setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
+      setMobJusticeErrors({});
 
       // State A: pre-submit subcategory switch
       // Cleanly discard old local evidence attachments and reset idempotency key
@@ -325,7 +372,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           subcategoryId,
           clientSubmissionId: undefined,
           serverSubmissionState: 'not_attempted',
-            hasSupportingInfo: false,
+          hasSupportingInfo: false,
           evidenceTypes: [],
           evidenceDescription: '',
           title: updatedTitle,
@@ -372,11 +419,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, [formData.subcategoryId, rapePublishingConsentAccepted]);
 
   const handleNextFromStep3 = useCallback(() => {
+    if (!validateMobJusticeSection()) return;
     if (!step3Ref.current) return;
     const isValid = step3Ref.current.validateAndProceed();
     if (!isValid) return;
     handleGoToStep(4);
-  }, [handleGoToStep]);
+  }, [handleGoToStep, validateMobJusticeSection]);
 
   // Rape Consent Modal Handlers
   const handleAgreeRapeConsent = useCallback(() => {
@@ -436,7 +484,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     }
   }, [formData.currentStep, handleGoToStep, handleRequestClose]);
 
-
   // Submission handler
   const handleSubmitReport = useCallback(async () => {
     if (!formData.segment || !formData.subcategoryId) return;
@@ -481,6 +528,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setTimeout(() => {
         document.getElementById('composer-section-narrative')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
+      return;
+    }
+
+    // Defense-in-depth: Mob Justice classifications must be complete before any server call.
+    if (!validateMobJusticeSection()) {
+      setFormData((prev) => ({ ...prev, currentStep: 3 }));
+      setSubmitError(
+        language === 'bn'
+          ? 'মব সহিংসতার প্রয়োজনীয় তথ্য পূরণ করুন।'
+          : 'Complete the required Mob Justice details before submitting.'
+      );
       return;
     }
 
@@ -573,7 +631,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const isHarassment = formData.segment === 'harassment';
       const isBribery = formData.segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
       const isIllegalOccupation = formData.segment === 'illegal_occupation';
-      const isPartySegment = formData.segment === 'rickshaw' || formData.segment === 'extortion';
+      const isPartySegment =
+        formData.segment === 'rickshaw' ||
+        formData.segment === 'extortion' ||
+        formData.segment === 'public_safety';
       const isChargingStation = isPartySegment && formData.segment === 'rickshaw' && (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
       const resolvedReportedSubject = isChargingStation
@@ -617,6 +678,16 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           isBribery && formData.briberyAmount !== undefined && formData.briberyAmount !== null && String(formData.briberyAmount).trim() !== ''
             ? Number(formData.briberyAmount)
             : undefined,
+        mobJusticeDetails: isMobJusticeReport
+          ? {
+              trigger: mobJusticeDetails.trigger,
+              spread: mobJusticeDetails.spread || undefined,
+              outcome: mobJusticeDetails.outcome,
+              targetedCount:
+                mobJusticeDetails.targetedCount === '' ? undefined : Number(mobJusticeDetails.targetedCount),
+              ongoingStatus: mobJusticeDetails.ongoingStatus,
+            }
+          : undefined,
         frequency: isIllegalOccupation ? 'one-time' : formData.frequency || 'one-time',
         affectedPersonAgeGroup: isHarassment ? formData.affectedPersonAgeGroup || undefined : undefined,
         allegedAbuserRelationship: isHarassment ? formData.allegedAbuserRelationship || undefined : undefined,
@@ -699,6 +770,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         retryCredentialsRef.current = null;
         setPendingImages([]);
         setRapePublishingConsentAccepted(false);
+        setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
+        setMobJusticeErrors({});
         setFormData({
           ...INITIAL_REPORT_FORM,
           segment: initialSegment,
@@ -737,14 +810,24 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-
-  }, [formData, pendingImages, language, rapePublishingConsentAccepted]);
+  }, [
+    formData,
+    pendingImages,
+    language,
+    rapePublishingConsentAccepted,
+    isMobJusticeReport,
+    mobJusticeDetails,
+    validateMobJusticeSection,
+    initialSegment,
+  ]);
 
   const handleStartAnother = useCallback(() => {
     revokePreviewUrls(pendingImages);
     retryCredentialsRef.current = null;
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
+    setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
+    setMobJusticeErrors({});
     setFormData({
       ...INITIAL_REPORT_FORM,
       segment: initialSegment,
@@ -763,6 +846,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setRapePublishingConsentAccepted(false);
     setRapeConsentCheckbox(false);
     setIsRapeConsentModalOpen(false);
+    setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
+    setMobJusticeErrors({});
     pendingTargetStepRef.current = null;
     setSubmitError(null);
     setIsLocationError(false);
@@ -876,7 +961,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 </div>
               )}
 
-
               {submissionResult ? (
                 <StepCompletion
                   reportId={submissionResult.reportId}
@@ -913,29 +997,48 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   )}
 
                   {effectiveCurrentStep === 3 && formData.segment && (
-                    <Step3ComplaintDetails
-                      ref={step3Ref}
-                      segment={formData.segment}
-                      formData={formData}
-                      pendingImages={pendingImages}
-                      onPendingImagesChange={handlePendingImagesChange}
-                      onUpdateFormData={handleUpdateFormData}
-                      onNext={handleNextFromStep3}
-                      initialOpenSection={step3JumpSection}
-                      language={language}
-                    />
+                    <>
+                      {isMobJusticeReport && (
+                        <MobJusticeDetailsFields
+                          value={mobJusticeDetails}
+                          errors={mobJusticeErrors}
+                          onChange={handleMobJusticeDetailsChange}
+                          language={language}
+                        />
+                      )}
+                      <Step3ComplaintDetails
+                        ref={step3Ref}
+                        segment={formData.segment}
+                        formData={formData}
+                        pendingImages={pendingImages}
+                        onPendingImagesChange={handlePendingImagesChange}
+                        onUpdateFormData={handleUpdateFormData}
+                        onNext={handleNextFromStep3}
+                        initialOpenSection={step3JumpSection}
+                        language={language}
+                      />
+                    </>
                   )}
 
                   {effectiveCurrentStep === 4 && formData.segment && (
-                    <Step4Review
-                      segment={formData.segment}
-                      formData={formData}
-                      pendingImages={pendingImages}
-                      onEditStep={(step, secKey) => handleGoToStep(step, secKey)}
-                      onSubmit={handleSubmitReport}
-                      isSubmitting={isSubmitting}
-                      language={language}
-                    />
+                    <>
+                      {isMobJusticeReport && (
+                        <MobJusticeReviewSummary
+                          details={mobJusticeDetails}
+                          language={language}
+                          onEdit={() => handleGoToStep(3)}
+                        />
+                      )}
+                      <Step4Review
+                        segment={formData.segment}
+                        formData={formData}
+                        pendingImages={pendingImages}
+                        onEditStep={(step, secKey) => handleGoToStep(step, secKey)}
+                        onSubmit={handleSubmitReport}
+                        isSubmitting={isSubmitting}
+                        language={language}
+                      />
+                    </>
                   )}
                 </>
               )}
@@ -963,7 +1066,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 canSubmit={!isSubmitting}
                 isSubmitting={isSubmitting}
               />
-
             )}
         </>
       </Modal>
