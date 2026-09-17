@@ -6,7 +6,6 @@ export interface SearchInputProps {
   value?: string;
   defaultValue?: string;
   placeholder?: string;
-  placeholderBn?: string;
   onChange?: (value: string) => void;
   onSearch?: (query: string) => void;
   onClear?: () => void;
