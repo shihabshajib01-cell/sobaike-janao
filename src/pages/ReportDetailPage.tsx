@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { formatBillingMonth, toBanglaDigits } from '../utils/formatters';
 import { CategoryBadge } from '../components/ui/CategoryBadge';
+import { Button } from '../components/ui/Button';
 import { useApp } from '../context/AppContext';
 import { CitizenActionModal } from '../components/report-detail/CitizenActionModal';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
@@ -181,7 +182,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         className="w-full max-w-[900px] mx-auto"
       >
         <div role="alert" className="w-full py-12 text-center space-y-6">
-          <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-[var(--radius-pill)] flex items-center justify-center mx-auto text-ui-error-text">
+          <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border ui-radius-pill flex items-center justify-center mx-auto text-ui-error-text">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
 
@@ -190,21 +191,25 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </h1>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="md"
               onClick={fetchReport}
-              className="btn-primary-action w-full md:w-auto px-5 py-2.5 ui-radius-control type-action min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="w-full md:w-auto"
             >
               {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
+              size="md"
               onClick={() => goBackWithFallback(() => navigateTo('/'))}
-              className="hidden md:flex w-auto px-5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle text-ui-content-secondary type-action transition-colors cursor-pointer min-h-[44px] items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              leftIcon={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              className="hidden md:inline-flex"
             >
-              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-              <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
-            </button>
+              {language === 'bn' ? 'ফিরে যান' : 'Go back'}
+            </Button>
           </div>
         </div>
       </PublicPageContainer>
@@ -218,7 +223,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         className="w-full max-w-[900px] mx-auto"
       >
         <div role="alert" className="w-full py-12 text-center space-y-6">
-          <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-pill)] flex items-center justify-center mx-auto text-ui-content-muted">
+          <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-pill flex items-center justify-center mx-auto text-ui-content-muted">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
 
@@ -234,23 +239,27 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="md"
               onClick={() => goBackWithFallback(() => navigateTo('/'))}
-              className="hidden md:flex w-auto px-5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle text-ui-content-secondary type-action transition-colors cursor-pointer min-h-[44px] items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              leftIcon={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              className="hidden md:inline-flex"
             >
-              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-              <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
-            </button>
+              {language === 'bn' ? 'ফিরে যান' : 'Go back'}
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="md"
               onClick={() => navigateTo('/')}
-              className="btn-primary-action w-full md:w-auto px-5 py-2.5 ui-radius-control type-action min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              leftIcon={<Home className="w-4 h-4" aria-hidden="true" />}
+              className="w-full md:w-auto"
             >
-              <Home className="w-4 h-4" aria-hidden="true" />
-              <span>{language === 'bn' ? 'মূল পাতায় ফিরুন' : 'Back to home'}</span>
-            </button>
+              {language === 'bn' ? 'মূল পাতায় ফিরুন' : 'Back to home'}
+            </Button>
           </div>
         </div>
       </PublicPageContainer>
@@ -343,34 +352,38 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     >
       <div className="w-full space-y-5 md:space-y-6">
         <div className="hidden md:flex items-center justify-between gap-4">
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="md"
             onClick={() => goBackWithFallback(() => navigateTo('/'))}
-            className="inline-flex items-center gap-2 type-action text-ui-content-secondary bg-ui-surface ui-border-default border-ui-stroke-subtle px-4 py-2.5 ui-radius-control transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            leftIcon={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
           >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>{language === 'bn' ? 'তালিকায় ফিরুন' : 'Back to reports'}</span>
-          </button>
+            {language === 'bn' ? 'তালিকায় ফিরুন' : 'Back to reports'}
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="md"
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 type-action text-ui-content-secondary bg-ui-surface ui-border-default border-ui-stroke-subtle px-4 py-2.5 ui-radius-control transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            {isCopied ? (
-              <>
+            leftIcon={
+              isCopied ? (
                 <Check className="w-4 h-4 text-ui-success-text" aria-hidden="true" />
-                <span className="text-ui-success-text">
-                  {language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link copied'}
-                </span>
-              </>
-            ) : (
-              <>
+              ) : (
                 <Share2 className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-                <span>{language === 'bn' ? 'শেয়ার করুন' : 'Share'}</span>
-              </>
-            )}
-          </button>
+              )
+            }
+            className={isCopied ? 'text-ui-success-text' : ''}
+          >
+            {isCopied
+              ? language === 'bn'
+                ? 'লিংক কপি হয়েছে'
+                : 'Link copied'
+              : language === 'bn'
+              ? 'শেয়ার করুন'
+              : 'Share'}
+          </Button>
         </div>
 
         <article className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-7 space-y-5 ui-elevation-card">
@@ -597,7 +610,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     key={`${item}-${index}`}
                     className="flex items-center gap-2.5 bg-ui-surface-subtle p-3 ui-radius-badge-md ui-border-default border-ui-stroke-subtle"
                   >
-                    <span className="w-1.5 h-1.5 rounded-[var(--radius-pill)] bg-ui-stroke-strong shrink-0" />
+                    <span className="w-1.5 h-1.5 ui-radius-pill bg-ui-stroke-strong shrink-0" />
                     <span className="font-[var(--font-weight-medium)]">{item}</span>
                   </li>
                 ))}
@@ -655,13 +668,15 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     ? 'প্রকাশিত প্রতিক্রিয়াগুলো লোড করা যায়নি।'
                     : 'Published responses could not be loaded.'}
                 </span>
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={fetchReport}
-                  className="min-h-[44px] px-3.5 py-2 type-action text-ui-content-primary bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-badge-md transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                  className="shrink-0"
                 >
                   {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
-                </button>
+                </Button>
               </div>
             )}
 
@@ -752,26 +767,32 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <button
+            <Button
               id="btn-respond-citizen-info"
               type="button"
+              variant="secondary"
+              size="md"
+              fullWidth
               onClick={() => setIsCitizenModalOpen(true)}
-              className="px-3.5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary type-action text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="whitespace-normal"
             >
               {language === 'bn'
                 ? 'আমার কাছে তথ্য আছে বা আমিও ভুক্তভোগী'
                 : 'I have information / I experienced this too'}
-            </button>
-            <button
+            </Button>
+            <Button
               id="btn-respond-subject-party"
               type="button"
+              variant="secondary"
+              size="md"
+              fullWidth
               onClick={() => setIsSubjectModalOpen(true)}
-              className="px-3.5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary type-action text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="whitespace-normal"
             >
               {language === 'bn'
                 ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ'
                 : 'I’m the person or party mentioned'}
-            </button>
+            </Button>
           </div>
         </section>
 
