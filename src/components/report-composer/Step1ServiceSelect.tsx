@@ -45,8 +45,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       key: 'harassment',
       titleBn: segments.harassment?.nameBn || SECTIONS.harassment.nameBn,
       titleEn: segments.harassment?.nameEn || SECTIONS.harassment.nameEn,
-      descBn: 'যৌন হয়রানি, নির্যাতন, প্রতারণা বা অনলাইন হয়রানি সম্পর্কিত অভিযোগ।',
-      descEn: 'Report sexual harassment, abuse, relationship deception, or online harassment.',
+      descBn: 'হয়রানি, নির্যাতন বা অনলাইন হয়রানি জানান।',
+      descEn: 'Report harassment, abuse, or online harassment.',
       bgVar: 'var(--sec-harassment-bg)',
       textVar: 'var(--sec-harassment-text)',
       borderVar: 'var(--sec-harassment-border)',
@@ -56,8 +56,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       key: 'extortion',
       titleBn: segments.extortion?.nameBn || SECTIONS.extortion.nameBn,
       titleEn: segments.extortion?.nameEn || SECTIONS.extortion.nameEn,
-      descBn: 'ঘুষ দাবি, ঘুষ প্রদান, চাঁদা দাবি বা জোরপূর্বক অর্থ আদায়ের ঘটনা জানান।',
-      descEn: 'Report bribery, extortion, coercive collections, or illegal payment demands.',
+      descBn: 'ঘুষ, চাঁদাবাজি বা জোরপূর্বক অর্থ আদায় জানান।',
+      descEn: 'Report bribery, extortion, or forced payments.',
       bgVar: 'var(--sec-extortion-bg)',
       textVar: 'var(--sec-extortion-text)',
       borderVar: 'var(--sec-extortion-border)',
@@ -67,8 +67,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       key: 'public_safety',
       titleBn: segments.public_safety?.nameBn || SECTIONS.public_safety.nameBn,
       titleEn: segments.public_safety?.nameEn || SECTIONS.public_safety.nameEn,
-      descBn: 'চুরি, ডাকাতি, ছিনতাই বা মব সহিংসতার ঘটনা ও অবস্থান জানান।',
-      descEn: 'Report theft, robbery, snatching, mob violence, and related public-safety incidents.',
+      descBn: 'চুরি, ডাকাতি, ছিনতাই বা মব সহিংসতা জানান।',
+      descEn: 'Report theft, robbery, snatching, or mob violence.',
       bgVar: 'var(--sec-public_safety-bg)',
       textVar: 'var(--sec-public_safety-text)',
       borderVar: 'var(--sec-public_safety-border)',
@@ -78,8 +78,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       key: 'road_transport',
       titleBn: segments.road_transport?.nameBn || SECTIONS.road_transport.nameBn,
       titleEn: segments.road_transport?.nameEn || SECTIONS.road_transport.nameEn,
-      descBn: 'রাস্তা মেরামতে বিলম্ব, দুর্ঘটনা বা সড়ক অবরোধের তথ্য জানান।',
-      descEn: 'Report road repair delays, accidents, road blocks, or other transport issues.',
+      descBn: 'সড়ক মেরামত, দুর্ঘটনা বা অবরোধ জানান।',
+      descEn: 'Report road repairs, accidents, or road blocks.',
       bgVar: 'var(--sec-road_transport-bg)',
       textVar: 'var(--sec-road_transport-text)',
       borderVar: 'var(--sec-road_transport-border)',
@@ -89,8 +89,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       key: 'load_shedding',
       titleBn: segments.load_shedding?.nameBn || SECTIONS.load_shedding.nameBn,
       titleEn: segments.load_shedding?.nameEn || SECTIONS.load_shedding.nameEn,
-      descBn: 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত অভিযোগ।',
-      descEn: 'Report load shedding, gas shortages, or excess electricity bill issues.',
+      descBn: 'বিদ্যুৎ, গ্যাস বা ইউটিলিটি সমস্যা জানান।',
+      descEn: 'Report electricity, gas, or utility issues.',
       bgVar: 'var(--sec-load_shedding-bg)',
       textVar: 'var(--sec-load_shedding-text)',
       borderVar: 'var(--sec-load_shedding-border)',
@@ -100,8 +100,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       key: 'illegal_occupation',
       titleBn: segments.illegal_occupation?.nameBn || SECTIONS.illegal_occupation.nameBn,
       titleEn: segments.illegal_occupation?.nameEn || SECTIONS.illegal_occupation.nameEn,
-      descBn: 'রাস্তা, ফুটপাত, ব্যক্তিগত বা সরকারি জমি ও সম্পত্তির অবৈধ দখল জানান।',
-      descEn: 'Report illegal occupation of public space, private land, or government property.',
+      descBn: 'রাস্তা, ফুটপাত বা জমির অবৈধ দখল জানান।',
+      descEn: 'Report illegal occupation of roads, paths, or land.',
       bgVar: 'var(--sec-illegal_occupation-bg)',
       textVar: 'var(--sec-illegal_occupation-text)',
       borderVar: 'var(--sec-illegal_occupation-border)',
@@ -111,8 +111,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       key: 'rickshaw',
       titleBn: segments.rickshaw?.nameBn || SECTIONS.rickshaw.nameBn,
       titleEn: segments.rickshaw?.nameEn || SECTIONS.rickshaw.nameEn,
-      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।',
-      descEn: 'Share the location and details of illegal or unsafe charging stations.',
+      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশন জানান।',
+      descEn: 'Report illegal or unsafe charging stations.',
       bgVar: 'var(--sec-rickshaw-bg)',
       textVar: 'var(--sec-rickshaw-text)',
       borderVar: 'var(--sec-rickshaw-border)',
@@ -179,10 +179,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               </div>
 
               <div className="min-w-0 flex-1">
-                <h4 className="type-h4 text-ui-content-primary">
+                <h4 className="type-h3 text-ui-content-primary">
                   {language === 'bn' ? srv.titleBn : srv.titleEn}
                 </h4>
-                <p className="type-meta text-ui-content-secondary mt-1">
+                <p className="type-meta text-ui-content-secondary mt-0.5 truncate">
                   {language === 'bn' ? srv.descBn : srv.descEn}
                 </p>
               </div>
