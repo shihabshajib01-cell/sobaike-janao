@@ -95,11 +95,11 @@ export const IssuesPage: React.FC = () => {
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
 
-                <h2 className="min-w-0 flex-1 text-[15px] font-bold leading-snug text-ui-content-primary">
+                <h4 className="min-w-0 flex-1 text-ui-content-primary">
                   {language === 'bn' ? config.nameBn : config.nameEn}
-                </h2>
+                </h4>
 
-                <p className="shrink-0 text-right text-[12.5px] font-medium text-ui-content-secondary">
+                <p className="shrink-0 text-right font-medium text-ui-content-secondary">
                   {isLoading
                     ? language === 'bn'
                       ? 'গণনা হচ্ছে...'
