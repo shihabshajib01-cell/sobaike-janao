@@ -634,7 +634,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const isPartySegment =
         formData.segment === 'rickshaw' ||
         formData.segment === 'extortion' ||
-        formData.segment === 'public_safety';
+        formData.segment === 'public_safety' ||
+        formData.segment === 'road_transport' ||
+        formData.segment === 'illegal_occupation';
       const isChargingStation = isPartySegment && formData.segment === 'rickshaw' && (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
       const resolvedReportedSubject = isChargingStation
