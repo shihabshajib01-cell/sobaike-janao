@@ -20,6 +20,7 @@ import { useApp } from '../context/AppContext';
 import { CitizenActionModal } from '../components/report-detail/CitizenActionModal';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
 import { PublicReportService } from '../services/publicReportService';
+import { PublicEngagementService } from '../services/publicEngagementService';
 import { PUBLIC_RESPONSE_DISPLAY_CONNECTED } from '../services/publicResponseService';
 import { ReportMediaGrid } from '../components/media/ReportMediaGrid';
 import { ReportItem, PublicPublishedResponse } from '../types/report';
@@ -262,17 +263,28 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     storedResponses.length > 0 ||
     (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError);
 
+  const registerShare = () => {
+    void PublicEngagementService.trackShare(report.id);
+  };
+
+  const openRelatedReport = (relatedReportId: string) => {
+    void PublicEngagementService.trackView(relatedReportId);
+    navigateTo(`/report-detail/${relatedReportId}`);
+  };
+
   const handleShare = async () => {
     const shareUrl = window.location.href;
 
     try {
       if (navigator.share) {
         await navigator.share({ title, url: shareUrl });
+        registerShare();
         return;
       }
 
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl);
+        registerShare();
         setIsCopied(true);
         window.setTimeout(() => setIsCopied(false), 2000);
       }
@@ -738,11 +750,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   key={relatedReport.id}
                   role="button"
                   tabIndex={0}
-                  onClick={() => navigateTo(`/report-detail/${relatedReport.id}`)}
+                  onClick={() => openRelatedReport(relatedReport.id)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      navigateTo(`/report-detail/${relatedReport.id}`);
+                      openRelatedReport(relatedReport.id);
                     }
                   }}
                   className="p-4 bg-ui-surface ui-border-default border-ui-stroke-subtle hover:border-ui-stroke-strong ui-radius-control space-y-2 cursor-pointer transition-colors ui-elevation-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
