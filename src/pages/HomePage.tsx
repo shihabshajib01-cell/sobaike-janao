@@ -8,9 +8,11 @@ import {
 import { SectionKey } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { PublicEngagementService } from '../services/publicEngagementService';
+import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
+import { NewReportsNotice } from '../components/feed/NewReportsNotice';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Button } from '../components/ui/Button';
@@ -22,8 +24,13 @@ import { VisitorSessionService } from '../services/visitorSessionService';
 
 type FeedFilterType = 'all' | 'latest' | 'popular';
 
+interface LoadReportsOptions {
+  background?: boolean;
+}
+
 const INITIAL_VISIBLE_REPORT_COUNT = 10;
 const LOAD_MORE_REPORT_COUNT = 10;
+const FEED_UPDATE_POLL_INTERVAL_MS = 30_000;
 
 export const HomePage: React.FC = () => {
   const { language, browseLocation, browseLocationStatus } = useApp();
@@ -35,6 +42,10 @@ export const HomePage: React.FC = () => {
   const [feedFilter, setFeedFilter] = useState<FeedFilterType>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [visibleCount, setVisibleCount] = useState<number>(INITIAL_VISIBLE_REPORT_COUNT);
+  const [feedWatermark, setFeedWatermark] = useState<string | null>(null);
+  const [newReportCount, setNewReportCount] = useState<number>(0);
+  const [pendingNewestPublishedAt, setPendingNewestPublishedAt] = useState<string | null>(null);
+  const [isRefreshingNewReports, setIsRefreshingNewReports] = useState<boolean>(false);
 
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
@@ -46,9 +57,14 @@ export const HomePage: React.FC = () => {
   const visitorLat = hasValidBrowseLocation ? browseLocation.latitude : null;
   const visitorLng = hasValidBrowseLocation ? browseLocation.longitude : null;
 
-  const loadReports = useCallback(async () => {
-    setIsLoading(true);
-    setFetchError(null);
+  const loadReports = useCallback(async (options?: LoadReportsOptions): Promise<boolean> => {
+    const background = options?.background === true;
+
+    if (!background) {
+      setIsLoading(true);
+      setFetchError(null);
+    }
+
     try {
       const reports = await PublicReportService.getHomeFeed({
         visitorLat,
@@ -73,21 +89,142 @@ export const HomePage: React.FC = () => {
       }
 
       setAllReports(reports);
+      return true;
     } catch (err) {
       console.warn('[HomePage data load error]', err);
-      setFetchError('LOAD_ERROR');
+      if (!background) {
+        setFetchError('LOAD_ERROR');
+      }
+      return false;
     } finally {
-      setIsLoading(false);
+      if (!background) {
+        setIsLoading(false);
+      }
     }
   }, [visitorLat, visitorLng, feedFilter, selectedDistrict]);
 
   useEffect(() => {
-    loadReports();
+    void loadReports();
   }, [loadReports]);
 
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE_REPORT_COUNT);
+    setFeedWatermark(null);
+    setNewReportCount(0);
+    setPendingNewestPublishedAt(null);
   }, [feedFilter, selectedDistrict, visitorLat, visitorLng]);
+
+  useEffect(() => {
+    if (isLoading || fetchError || feedWatermark) return;
+
+    let cancelled = false;
+
+    const establishFeedWatermark = async () => {
+      try {
+        const state = await PublicFeedUpdateService.getState({
+          district: selectedDistrict,
+        });
+
+        if (!cancelled) {
+          setFeedWatermark(state.newestPublishedAt || state.checkedAt);
+          setNewReportCount(0);
+          setPendingNewestPublishedAt(null);
+        }
+      } catch (err) {
+        console.warn('[HomePage feed watermark error]', err);
+        if (!cancelled) {
+          setFeedWatermark(new Date().toISOString());
+        }
+      }
+    };
+
+    void establishFeedWatermark();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, fetchError, feedWatermark, selectedDistrict]);
+
+  useEffect(() => {
+    if (!feedWatermark || isLoading || fetchError) return;
+
+    let cancelled = false;
+    let checkInFlight = false;
+
+    const checkForNewReports = async () => {
+      if (
+        cancelled ||
+        checkInFlight ||
+        document.visibilityState === 'hidden' ||
+        !navigator.onLine
+      ) {
+        return;
+      }
+
+      checkInFlight = true;
+      try {
+        const state = await PublicFeedUpdateService.getState({
+          since: feedWatermark,
+          district: selectedDistrict,
+        });
+
+        if (!cancelled) {
+          setNewReportCount(state.newCount);
+          setPendingNewestPublishedAt(state.newCount > 0 ? state.newestPublishedAt : null);
+        }
+      } catch (err) {
+        console.warn('[HomePage feed update check error]', err);
+      } finally {
+        checkInFlight = false;
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void checkForNewReports();
+    }, FEED_UPDATE_POLL_INTERVAL_MS);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void checkForNewReports();
+      }
+    };
+
+    const handleOnline = () => {
+      void checkForNewReports();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [feedWatermark, selectedDistrict, isLoading, fetchError]);
+
+  const handleRefreshNewReports = useCallback(async () => {
+    if (isRefreshingNewReports) return;
+
+    setIsRefreshingNewReports(true);
+    try {
+      const refreshed = await loadReports({ background: true });
+      if (!refreshed) return;
+
+      setFeedWatermark(pendingNewestPublishedAt || new Date().toISOString());
+      setNewReportCount(0);
+      setPendingNewestPublishedAt(null);
+      setVisibleCount(INITIAL_VISIBLE_REPORT_COUNT);
+
+      document.getElementById('home-feed-section')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    } finally {
+      setIsRefreshingNewReports(false);
+    }
+  }, [isRefreshingNewReports, loadReports, pendingNewestPublishedAt]);
 
   const reportCounts: Partial<Record<SectionKey, number>> = useMemo(() => {
     return {
@@ -158,6 +295,13 @@ export const HomePage: React.FC = () => {
           />
         </div>
 
+        <NewReportsNotice
+          count={newReportCount}
+          language={language}
+          isRefreshing={isRefreshingNewReports}
+          onRefresh={() => void handleRefreshNewReports()}
+        />
+
         {isLoading && (
           <ReportFeedSkeleton
             count={4}
@@ -172,7 +316,7 @@ export const HomePage: React.FC = () => {
             <p className="type-h4 font-[var(--font-weight-semibold)] text-ui-error-text">
               {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি।' : 'Couldn’t load reports.'}
             </p>
-            <Button variant="primary" size="md" onClick={loadReports}>
+            <Button variant="primary" size="md" onClick={() => void loadReports()}>
               {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
             </Button>
           </div>
