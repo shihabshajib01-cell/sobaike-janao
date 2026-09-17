@@ -20,6 +20,7 @@ import { useApp } from '../context/AppContext';
 import { CitizenActionModal } from '../components/report-detail/CitizenActionModal';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
 import { PublicReportService } from '../services/publicReportService';
+import { PublicEngagementService } from '../services/publicEngagementService';
 import { PUBLIC_RESPONSE_DISPLAY_CONNECTED } from '../services/publicResponseService';
 import { ReportMediaGrid } from '../components/media/ReportMediaGrid';
 import { ReportItem, PublicPublishedResponse } from '../types/report';
@@ -165,7 +166,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         className="w-full max-w-[900px] mx-auto"
       >
         <div role="alert" className="w-full py-12 text-center space-y-6">
-          <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-[var(--radius-pill)] flex items-center justify-center mx-auto text-ui-error-text">
+          <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
 
@@ -202,7 +203,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         className="w-full max-w-[900px] mx-auto"
       >
         <div role="alert" className="w-full py-12 text-center space-y-6">
-          <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-pill)] flex items-center justify-center mx-auto text-ui-content-muted">
+          <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
 
@@ -262,17 +263,28 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     storedResponses.length > 0 ||
     (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError);
 
+  const registerShare = () => {
+    void PublicEngagementService.trackShare(report.id);
+  };
+
+  const openRelatedReport = (relatedReportId: string) => {
+    void PublicEngagementService.trackView(relatedReportId);
+    navigateTo(`/report-detail/${relatedReportId}`);
+  };
+
   const handleShare = async () => {
     const shareUrl = window.location.href;
 
     try {
       if (navigator.share) {
         await navigator.share({ title, url: shareUrl });
+        registerShare();
         return;
       }
 
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl);
+        registerShare();
         setIsCopied(true);
         window.setTimeout(() => setIsCopied(false), 2000);
       }
@@ -343,7 +355,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <div className="flex flex-wrap items-center gap-2 type-meta">
             <CategoryBadge section={report.segment} language={language} size="md" />
             <span className="text-ui-content-muted">·</span>
-            <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subcategory}</span>
+            <span className="font-semibold text-ui-content-primary">{subcategory}</span>
           </div>
 
           <h1 className="type-h1 text-ui-content-primary tracking-tight">{title}</h1>
@@ -354,7 +366,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <button
                   type="button"
                   onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
-                  className="flex items-center gap-1.5 font-[var(--font-weight-medium)] text-ui-content-primary min-h-[44px] px-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+                  className="flex items-center gap-1.5 font-medium text-ui-content-primary min-h-[44px] px-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
                 >
                   <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
                   <span className="underline decoration-ui-stroke-subtle">{location}</span>
@@ -390,7 +402,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           {report.reportedSubject && (
             <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-1.5">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-1.5 font-[var(--font-weight-medium)] text-ui-content-secondary type-meta">
+                <div className="flex items-center gap-1.5 font-medium text-ui-content-secondary type-meta">
                   <UserX className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                   <span>{language === 'bn' ? 'প্রতিবেদনে উল্লেখিত পক্ষ:' : 'Mentioned party:'}</span>
                 </div>
@@ -398,7 +410,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   <button
                     type="button"
                     onClick={() => navigateTo(`/subject/${encodeURIComponent(subjectTargetName)}`)}
-                    className="type-meta font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline cursor-pointer min-h-[44px] flex items-center px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+                    className="type-meta font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[44px] flex items-center px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
                   >
                     {language === 'bn'
                       ? 'এই নামে প্রকাশিত প্রতিবেদন দেখুন →'
@@ -406,7 +418,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   </button>
                 )}
               </div>
-              <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary">
+              <p className="type-label font-semibold text-ui-content-primary">
                 {report.reportedSubject}
               </p>
               {report.organization && (
@@ -417,7 +429,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
           {(report.recentBillMonth || report.recentBillAmount !== undefined) && (
             <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-3">
-              <h2 className="type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary flex items-center gap-2">
+              <h2 className="type-meta font-semibold text-ui-content-secondary flex items-center gap-2">
                 <Zap className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                 <span>
                   {language === 'bn'
@@ -433,12 +445,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       ? 'সাম্প্রতিক বিলের মাস ও পরিমাণ'
                       : 'Recent bill month & amount'}
                   </span>
-                  <p className="type-label font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <p className="type-label font-bold text-ui-content-primary">
                     {report.recentBillMonth
                       ? formatBillingMonth(report.recentBillMonth, language)
                       : '-'}
                   </p>
-                  <p className="type-label font-[var(--font-weight-semibold)] text-ui-error-text">
+                  <p className="type-label font-semibold text-ui-error-text">
                     {report.recentBillAmount !== undefined
                       ? `৳ ${
                           language === 'bn'
@@ -455,12 +467,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       ? 'পূর্ববর্তী বিলের মাস ও পরিমাণ'
                       : 'Previous bill month & amount'}
                   </span>
-                  <p className="type-label font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <p className="type-label font-bold text-ui-content-primary">
                     {report.previousBillMonth
                       ? formatBillingMonth(report.previousBillMonth, language)
                       : '-'}
                   </p>
-                  <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-secondary">
+                  <p className="type-label font-semibold text-ui-content-secondary">
                     {report.previousBillAmount !== undefined
                       ? `৳ ${
                           language === 'bn'
@@ -478,7 +490,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     <span className="text-ui-content-muted">
                       {language === 'bn' ? 'পার্থক্য বা বৃদ্ধি:' : 'Difference / increase:'}
                     </span>
-                    <span className="font-[var(--font-weight-semibold)] text-ui-error-text">
+                    <span className="font-semibold text-ui-error-text">
                       +৳{' '}
                       {language === 'bn'
                         ? toBanglaDigits(
@@ -489,7 +501,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                             report.recentBillAmount - report.previousBillAmount
                           ).toLocaleString()}
                       {report.previousBillAmount > 0 && (
-                        <span className="ml-1 font-[var(--font-weight-regular)] text-ui-content-muted">
+                        <span className="ml-1 font-normal text-ui-content-muted">
                           (
                           {Math.round(
                             ((report.recentBillAmount - report.previousBillAmount) /
@@ -547,8 +559,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     key={`${item}-${index}`}
                     className="flex items-center gap-2.5 bg-ui-surface-subtle p-3 ui-radius-badge-md ui-border-default border-ui-stroke-subtle"
                   >
-                    <span className="w-1.5 h-1.5 rounded-[var(--radius-pill)] bg-ui-stroke-strong shrink-0" />
-                    <span className="font-[var(--font-weight-medium)]">{item}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-ui-stroke-strong shrink-0" />
+                    <span className="font-medium">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -572,7 +584,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     key={`${update.dateEn}-${index}`}
                     className="p-3.5 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle space-y-1"
                   >
-                    <div className="flex items-center justify-between gap-3 type-meta font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    <div className="flex items-center justify-between gap-3 type-meta font-semibold text-ui-content-primary">
                       <span>{language === 'bn' ? update.titleBn : update.titleEn}</span>
                       <span className="text-ui-content-muted shrink-0">
                         {language === 'bn' ? update.dateBn : update.dateEn}
@@ -617,7 +629,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
             {report.response && (
               <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2">
-                <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-[var(--font-weight-semibold)]">
+                <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-semibold">
                   <span>
                     {language === 'bn'
                       ? report.response.respondentBn
@@ -644,7 +656,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2 type-meta">
                     <div className="space-y-0.5">
-                      <p className="font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      <p className="font-semibold text-ui-content-primary">
                         {isCitizenInformation
                           ? language === 'bn'
                             ? 'তথ্য বা অভিজ্ঞতা'
@@ -655,10 +667,10 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       </p>
 
                       {!isCitizenInformation && response.responderName && (
-                        <p className="type-meta font-[var(--font-weight-medium)] text-ui-content-secondary break-words">
+                        <p className="type-meta font-medium text-ui-content-secondary break-words">
                           {response.responderName}
                           {subtitleParts.length > 0 && (
-                            <span className="text-ui-content-muted font-[var(--font-weight-regular)]">
+                            <span className="text-ui-content-muted font-normal">
                               {' '}({subtitleParts.join(', ')})
                             </span>
                           )}
@@ -738,11 +750,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   key={relatedReport.id}
                   role="button"
                   tabIndex={0}
-                  onClick={() => navigateTo(`/report-detail/${relatedReport.id}`)}
+                  onClick={() => openRelatedReport(relatedReport.id)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      navigateTo(`/report-detail/${relatedReport.id}`);
+                      openRelatedReport(relatedReport.id);
                     }
                   }}
                   className="p-4 bg-ui-surface ui-border-default border-ui-stroke-subtle hover:border-ui-stroke-strong ui-radius-control space-y-2 cursor-pointer transition-colors ui-elevation-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
