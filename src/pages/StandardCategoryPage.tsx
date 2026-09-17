@@ -6,15 +6,21 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
-import { MobileCategoryLocationPortal } from '../components/feed/MobileCategoryLocationPortal';
+import { MobileCategoryFilterPortal } from '../components/feed/MobileCategoryFilterPortal';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
+import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import {
+  CategoryFeedFilterState,
+  EMPTY_CATEGORY_FEED_FILTERS,
+  matchesCategoryFeedFilters,
+} from '../data/categoryFeedFilters';
 
 export interface StandardCategoryPageProps {
   section: SectionKey;
@@ -26,7 +32,10 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   const bannerContent = CANONICAL_BANNER_CONTENT[section];
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
+    ...EMPTY_CATEGORY_FEED_FILTERS,
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -62,7 +71,8 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
 
   useEffect(() => {
     setSelectedSubcat('all');
-    setSelectedDistrict('all');
+    setFeedFilters({ ...EMPTY_CATEGORY_FEED_FILTERS });
+    setIsFilterOpen(false);
   }, [section]);
 
   useEffect(() => {
@@ -73,19 +83,23 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
     return reports.filter((report) => {
       if (report.segment !== section) return false;
       const matchesSubcat = selectedSubcat === 'all' || report.subcategoryId === selectedSubcat;
-      const matchesDistrict =
-        selectedDistrict === 'all' ||
-        (report.districtBn && report.districtBn.includes(selectedDistrict)) ||
-        (report.districtEn && report.districtEn.toLowerCase().includes(selectedDistrict.toLowerCase()));
-      return matchesSubcat && matchesDistrict;
+      return matchesSubcat && matchesCategoryFeedFilters(report, section, feedFilters);
     });
-  }, [reports, section, selectedSubcat, selectedDistrict]);
+  }, [reports, section, selectedSubcat, feedFilters]);
+
+  const handleDesktopDistrictChange = (districtId: string) => {
+    setFeedFilters((current) => ({
+      ...current,
+      divisionId: 'all',
+      districtId,
+    }));
+  };
 
   return (
     <PublicPageContainer id={`${section}-page-container`}>
-      <MobileCategoryLocationPortal
-        selectedDistrict={selectedDistrict}
-        onSelectDistrict={setSelectedDistrict}
+      <MobileCategoryFilterPortal
+        language={language}
+        onOpen={() => setIsFilterOpen(true)}
       />
 
       <CategoryHeroSlider
@@ -127,8 +141,8 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
 
           <div className="hidden md:block shrink-0">
             <LocationSelector
-              selectedDistrict={selectedDistrict}
-              onSelectDistrict={setSelectedDistrict}
+              selectedDistrict={feedFilters.districtId}
+              onSelectDistrict={handleDesktopDistrictChange}
             />
           </div>
         </div>
@@ -138,11 +152,7 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
             const count = reports.filter((report) => {
               if (report.segment !== section) return false;
               const matchesSub = subcat.id === 'all' || report.subcategoryId === subcat.id;
-              const matchesDist =
-                selectedDistrict === 'all' ||
-                (report.districtBn && report.districtBn.includes(selectedDistrict)) ||
-                (report.districtEn && report.districtEn.toLowerCase().includes(selectedDistrict.toLowerCase()));
-              return matchesSub && matchesDist;
+              return matchesSub && matchesCategoryFeedFilters(report, section, feedFilters);
             }).length;
 
             return (
@@ -193,18 +203,30 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
               title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               description={
                 language === 'bn'
-                  ? 'এই উপ-বিভাগ বা এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
-                  : 'There are currently no published reports under this subcategory.'
+                  ? 'এই ফিল্টারগুলোর জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
+                  : 'There are currently no published reports for these filters.'
               }
               actionLabel={language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
               onAction={() => {
                 setSelectedSubcat('all');
-                setSelectedDistrict('all');
+                setFeedFilters({ ...EMPTY_CATEGORY_FEED_FILTERS });
               }}
             />
           )}
         </div>
       )}
+
+      <CategoryFilterSheet
+        section={section}
+        isOpen={isFilterOpen}
+        language={language}
+        value={feedFilters}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={(next) => {
+          setFeedFilters(next);
+          setIsFilterOpen(false);
+        }}
+      />
     </PublicPageContainer>
   );
 };
