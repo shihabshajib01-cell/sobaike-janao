@@ -27,9 +27,9 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
   const label = language === 'bn' ? config.shortNameBn : config.shortNameEn;
 
   const sizeClasses = {
-    sm: 'text-[13px] px-2.5 py-1 rounded-md gap-1.5 font-semibold min-h-[26px]',
-    md: 'text-[14px] px-3 py-1.5 rounded-lg gap-2 font-semibold min-h-[30px]',
-    lg: 'text-[15px] px-3.5 py-2 rounded-xl gap-2 font-semibold min-h-[36px]',
+    sm: 'type-helper ui-space-badge-sm ui-radius-badge-sm font-semibold min-h-[26px]',
+    md: 'type-meta ui-space-badge-md ui-radius-badge-md font-semibold min-h-[30px]',
+    lg: 'type-action px-3.5 py-2 ui-radius-control gap-2 font-semibold min-h-[36px]',
   };
 
   const iconSizeMap: Record<'sm' | 'md' | 'lg', 'xs' | 'sm' | 'md'> = {
@@ -53,4 +53,3 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
     </span>
   );
 };
-

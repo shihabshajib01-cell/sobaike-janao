@@ -1,0 +1,245 @@
+/*
+ * Sobaike Janao public design-system authority layer.
+ *
+ * Imported after legacy/base styles so every public surface resolves through one
+ * semantic visual contract. Keep page/component code on semantic `ui-*` and
+ * `sec-*` variables; do not introduce page-specific colors here.
+ */
+
+:root,
+html[data-theme="light"] {
+  --ui-page: #F0F2F5;
+  --ui-surface: #FFFFFF;
+  --ui-surface-subtle: #F7F8FA;
+  --ui-surface-elevated: #FFFFFF;
+  --ui-surface-hover: #ECEEF1;
+
+  --ui-text-primary: #050505;
+  --ui-text-secondary: #65676B;
+  --ui-text-muted: #8A8D91;
+  --ui-text-inverse: #FFFFFF;
+
+  --ui-border-subtle: #E4E6EB;
+  --ui-border: #CED0D4;
+  --ui-border-strong: #B0B3B8;
+
+  --ui-input: #FFFFFF;
+  --ui-input-placeholder: #8A8D91;
+  --ui-disabled-bg: #E4E6EB;
+  --ui-disabled-text: #8A8D91;
+  --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.14);
+
+  --sec-harassment-primary: #B84A62;
+  --sec-harassment-hover: #9E384E;
+  --sec-harassment-bg: #FDF2F4;
+  --sec-harassment-border: #F7CCD5;
+  --sec-harassment-text: #8B293E;
+  --sec-harassment-on-primary: #FFFFFF;
+
+  --sec-extortion-primary: #4F5D95;
+  --sec-extortion-hover: #3E4A7A;
+  --sec-extortion-bg: #F0F3F9;
+  --sec-extortion-border: #CCD5E8;
+  --sec-extortion-text: #333E67;
+  --sec-extortion-on-primary: #FFFFFF;
+
+  --sec-public_safety-primary: #2563EB;
+  --sec-public_safety-hover: #1D4ED8;
+  --sec-public_safety-bg: #EFF6FF;
+  --sec-public_safety-border: #BFDBFE;
+  --sec-public_safety-text: #1E40AF;
+  --sec-public_safety-on-primary: #FFFFFF;
+
+  --sec-road_transport-primary: #A16207;
+  --sec-road_transport-hover: #854D0E;
+  --sec-road_transport-bg: #FFFBEB;
+  --sec-road_transport-border: #FDE68A;
+  --sec-road_transport-text: #854D0E;
+  --sec-road_transport-on-primary: #FFFFFF;
+
+  --sec-load_shedding-primary: #0D9488;
+  --sec-load_shedding-hover: #0F766E;
+  --sec-load_shedding-bg: #F0FDFA;
+  --sec-load_shedding-border: #CCFBF1;
+  --sec-load_shedding-text: #115E59;
+  --sec-load_shedding-on-primary: #050505;
+
+  --sec-load-shedding-primary: var(--sec-load_shedding-primary);
+  --sec-load-shedding-hover: var(--sec-load_shedding-hover);
+  --sec-load-shedding-bg: var(--sec-load_shedding-bg);
+  --sec-load-shedding-border: var(--sec-load_shedding-border);
+  --sec-load-shedding-text: var(--sec-load_shedding-text);
+  --sec-load-shedding-on-primary: var(--sec-load_shedding-on-primary);
+
+  --sec-illegal_occupation-primary: #64748B;
+  --sec-illegal_occupation-hover: #475569;
+  --sec-illegal_occupation-bg: #F8FAFC;
+  --sec-illegal_occupation-border: #CBD5E1;
+  --sec-illegal_occupation-text: #334155;
+  --sec-illegal_occupation-on-primary: #FFFFFF;
+
+  --sec-rickshaw-primary: #D9822B;
+  --sec-rickshaw-hover: #B8681A;
+  --sec-rickshaw-bg: #FEF7EE;
+  --sec-rickshaw-border: #FBDDB9;
+  --sec-rickshaw-text: #9A530C;
+  --sec-rickshaw-on-primary: #050505;
+}
+
+html[data-theme="dark"],
+.dark {
+  --ui-page: #18191A;
+  --ui-surface: #242526;
+  --ui-surface-subtle: #202122;
+  --ui-surface-elevated: #2B2D2F;
+  --ui-surface-hover: #303234;
+
+  --ui-text-primary: #E4E6EB;
+  --ui-text-secondary: #B0B3B8;
+  --ui-text-muted: #8A8D91;
+  --ui-text-inverse: #FFFFFF;
+
+  --ui-border-subtle: #303234;
+  --ui-border: #3A3B3C;
+  --ui-border-strong: #4E4F50;
+
+  --ui-input: #242526;
+  --ui-input-placeholder: #8A8D91;
+  --ui-disabled-bg: #303234;
+  --ui-disabled-text: #8A8D91;
+  --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.32);
+
+  --sec-harassment-primary: #B84A62;
+  --sec-harassment-hover: #D05B75;
+  --sec-harassment-bg: #211619;
+  --sec-harassment-border: #4A2931;
+  --sec-harassment-text: #E7AAB8;
+  --sec-harassment-on-primary: #FFFFFF;
+
+  --sec-extortion-primary: #4F5D95;
+  --sec-extortion-hover: #6777B8;
+  --sec-extortion-bg: #171A25;
+  --sec-extortion-border: #333B5D;
+  --sec-extortion-text: #AFB9E1;
+  --sec-extortion-on-primary: #FFFFFF;
+
+  --sec-public_safety-primary: #60A5FA;
+  --sec-public_safety-hover: #93C5FD;
+  --sec-public_safety-bg: #101E32;
+  --sec-public_safety-border: #254B78;
+  --sec-public_safety-text: #BFDBFE;
+  --sec-public_safety-on-primary: #050505;
+
+  --sec-road_transport-primary: #FBBF24;
+  --sec-road_transport-hover: #FCD34D;
+  --sec-road_transport-bg: #2A2110;
+  --sec-road_transport-border: #6B4E12;
+  --sec-road_transport-text: #FDE68A;
+  --sec-road_transport-on-primary: #050505;
+
+  --sec-load_shedding-primary: #14B8A6;
+  --sec-load_shedding-hover: #2DD4BF;
+  --sec-load_shedding-bg: #112220;
+  --sec-load_shedding-border: #1D433F;
+  --sec-load_shedding-text: #99F6E4;
+  --sec-load_shedding-on-primary: #050505;
+
+  --sec-load-shedding-primary: var(--sec-load_shedding-primary);
+  --sec-load-shedding-hover: var(--sec-load_shedding-hover);
+  --sec-load-shedding-bg: var(--sec-load_shedding-bg);
+  --sec-load-shedding-border: var(--sec-load_shedding-border);
+  --sec-load-shedding-text: var(--sec-load_shedding-text);
+  --sec-load-shedding-on-primary: var(--sec-load_shedding-on-primary);
+
+  --sec-illegal_occupation-primary: #94A3B8;
+  --sec-illegal_occupation-hover: #CBD5E1;
+  --sec-illegal_occupation-bg: #1E293B;
+  --sec-illegal_occupation-border: #475569;
+  --sec-illegal_occupation-text: #E2E8F0;
+  --sec-illegal_occupation-on-primary: #050505;
+
+  --sec-rickshaw-primary: #D9822B;
+  --sec-rickshaw-hover: #E89540;
+  --sec-rickshaw-bg: #21190F;
+  --sec-rickshaw-border: #54371C;
+  --sec-rickshaw-text: #E9B579;
+  --sec-rickshaw-on-primary: #050505;
+}
+
+:root {
+  --layout-rail-desktop: 240px;
+  --layout-rail-large: 250px;
+  --layout-rail-xl: 260px;
+  --layout-content-max: 900px;
+  --touch-target-min: 44px;
+}
+
+.ui-card {
+  background-color: var(--ui-surface);
+  border: var(--border-width-default) var(--border-style-default) var(--ui-border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-card);
+}
+
+.ui-control {
+  min-height: var(--touch-target-min);
+  border-radius: var(--radius-control);
+}
+
+.ui-icon-control {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  border-radius: var(--radius-control);
+}
+
+.ui-page-shell {
+  width: 100%;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .ui-page-shell {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ui-page-shell {
+    padding: 1.5rem 2rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .ui-page-shell {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+:where(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+  select
+) {
+  min-height: var(--touch-target-min);
+}
+
+/* Enforce the centralized form type scale even in older local field recipes. */
+:where(input, select, textarea) {
+  font-size: var(--type-body-size) !important;
+  line-height: var(--type-label-line) !important;
+}
+
+.rounded-lg { border-radius: var(--radius-badge-md); }
+.rounded-xl { border-radius: var(--radius-control); }
+.rounded-2xl { border-radius: var(--radius-card); }
+.rounded-3xl { border-radius: var(--radius-modal); }
+.rounded-full { border-radius: var(--radius-pill); }
+
+.shadow-2xs { box-shadow: var(--elevation-card); }
+.shadow-xs { box-shadow: var(--elevation-selected-control); }
+.shadow-sm { box-shadow: var(--elevation-control); }
+.shadow-lg { box-shadow: var(--elevation-floating); }
+
+:where(input, select, textarea, button, a) {
+  -webkit-tap-highlight-color: transparent;
+}

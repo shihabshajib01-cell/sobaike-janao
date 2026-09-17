@@ -119,7 +119,7 @@ export const AppShell: React.FC = () => {
     <div className="min-h-screen bg-ui-page text-ui-content-primary flex flex-col">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-ui-action-bg focus:text-ui-action-text focus:rounded-xl focus:shadow-lg focus:font-semibold focus:outline-none focus:ring-2 focus:ring-ui-focus text-[15px]"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-ui-action-bg focus:text-ui-action-text focus:ui-radius-control focus:ui-elevation-control focus:font-semibold focus:outline-none focus:ring-2 focus:ring-ui-focus type-action"
       >
         {language === 'bn' ? 'মূল বিষয়বস্তুতে যান' : 'Skip to main content'}
       </a>
@@ -138,7 +138,7 @@ export const AppShell: React.FC = () => {
 
       <div
         id="public-desktop-workspace"
-        className="w-full flex-1 flex flex-col min-[1440px]:pl-[240px] min-[1536px]:pl-[250px] min-[1920px]:pl-[260px]"
+        className="w-full flex-1 flex flex-col min-[1440px]:pl-[var(--layout-rail-desktop)] min-[1536px]:pl-[var(--layout-rail-large)] min-[1920px]:pl-[var(--layout-rail-xl)]"
       >
         <ErrorBoundary componentName="LocationReminderBar" silent>
           <LocationReminderBar isFirstVisitNoticeOpen={isFirstVisitNoticeOpen} />
@@ -147,7 +147,7 @@ export const AppShell: React.FC = () => {
         <main
           id="main-content"
           tabIndex={-1}
-          className={`w-full mx-auto max-w-[900px] flex-1 flex flex-col justify-between focus:outline-none ${
+          className={`w-full mx-auto max-w-[var(--layout-content-max)] flex-1 flex flex-col justify-between focus:outline-none ${
             hideMobileMainNavigation ? 'pb-6 md:pb-0' : 'pb-28 pb-safe md:pb-0'
           }`}
         >
@@ -184,7 +184,7 @@ export const AppShell: React.FC = () => {
             </SeoManager>
           </div>
 
-          <footer className="pt-8 pb-6 border-t border-ui-stroke-subtle mt-10 text-[14px] text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
+          <footer className="pt-8 pb-6 border-t border-ui-stroke-subtle mt-10 type-meta text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-ui-content-primary">সবাইকে জানাও</span>
@@ -195,9 +195,7 @@ export const AppShell: React.FC = () => {
                     : 'Citizen reporting platform'}
                 </span>
               </div>
-              <div className="text-[14px] text-ui-content-muted">
-                <span>{language === 'bn' ? 'জনস্বার্থ রেকর্ড' : 'Public interest record'}</span>
-              </div>
+              <span>{language === 'bn' ? 'জনস্বার্থ রেকর্ড' : 'Public interest record'}</span>
             </div>
           </footer>
         </main>

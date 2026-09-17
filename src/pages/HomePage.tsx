@@ -34,7 +34,6 @@ export const HomePage: React.FC = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [visibleCount, setVisibleCount] = useState<number>(INITIAL_VISIBLE_REPORT_COUNT);
 
-  // Determine valid browse location (transient request scope only)
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
     browseLocation !== null &&
@@ -68,12 +67,10 @@ export const HomePage: React.FC = () => {
     loadReports();
   }, [loadReports]);
 
-  // Phase 7: Reset visible count whenever ranking context changes
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE_REPORT_COUNT);
   }, [feedFilter, selectedDistrict, visitorLat, visitorLng]);
 
-  // Compute report counts per segment for the carousel
   const reportCounts: Partial<Record<SectionKey, number>> = useMemo(() => {
     return {
       harassment: allReports.filter((r) => r.segment === 'harassment').length,
@@ -83,12 +80,8 @@ export const HomePage: React.FC = () => {
     };
   }, [allReports]);
 
-  // Filtered and ranked reports returned directly from the shadow-ranked backend
-  const filteredReports = useMemo(() => {
-    return allReports;
-  }, [allReports]);
+  const filteredReports = useMemo(() => allReports, [allReports]);
 
-  // Phase 7: Slice visible reports for progressive reveal
   const visibleReports = useMemo(() => {
     return filteredReports.slice(0, visibleCount);
   }, [filteredReports, visibleCount]);
@@ -101,40 +94,27 @@ export const HomePage: React.FC = () => {
 
   return (
     <PublicPageContainer id="home-page-container">
-      {/* Semantic Page Level H1 for Screen Readers and Landmark Hierarchy */}
       <h1 className="sr-only">
         {language === 'bn'
           ? 'সবাইকে জানাও — নাগরিক প্রতিবেদন প্ল্যাটফর্ম'
           : 'Sobaike Janao — Citizen Reporting Platform'}
       </h1>
 
-      {/* 1. Service Hero Carousel */}
-      <ServiceHeroCarousel
-        id="home-service-carousel"
-        reportCounts={reportCounts}
-        className="mb-2"
-      />
+      <ServiceHeroCarousel id="home-service-carousel" reportCounts={reportCounts} className="mb-2" />
 
-      {/* 2. Combined Public Feed */}
       <section id="home-feed-section" className="space-y-4 pt-1">
-        {/* Feed Header & District Filter */}
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
+            <h2 className="type-h2 text-ui-content-primary">
               {language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports'}
             </h2>
           </div>
 
-          {/* Location Selector */}
           <div className="shrink-0">
-            <LocationSelector
-              selectedDistrict={selectedDistrict}
-              onSelectDistrict={setSelectedDistrict}
-            />
+            <LocationSelector selectedDistrict={selectedDistrict} onSelectDistrict={setSelectedDistrict} />
           </div>
         </div>
 
-        {/* Feed Control Chips: সব | সর্বশেষ */}
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
           <FilterChip
             id="filter-chip-all"
@@ -153,7 +133,6 @@ export const HomePage: React.FC = () => {
           />
         </div>
 
-        {/* Loading State Skeleton Screen */}
         {isLoading && (
           <ReportFeedSkeleton
             count={4}
@@ -162,33 +141,24 @@ export const HomePage: React.FC = () => {
           />
         )}
 
-        {/* Error State */}
         {!isLoading && fetchError && (
-          <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
+          <div role="alert" className="ui-card p-6 text-center space-y-3 border-ui-error-border">
             <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
-            <p className="text-[16px] font-semibold text-ui-error-text">
-              {language === 'bn'
-                ? 'প্রতিবেদন লোড করা যায়নি।'
-                : 'Couldn’t load reports.'}
+            <p className="type-h4 font-semibold text-ui-error-text">
+              {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি।' : 'Couldn’t load reports.'}
             </p>
-            <button
-              type="button"
-              onClick={loadReports}
-              className="btn-primary-action px-4 py-2 text-[14px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
-            >
+            <Button variant="primary" size="md" onClick={loadReports}>
               {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
-            </button>
+            </Button>
           </div>
         )}
 
-        {/* Feed List of Report Cards (Phase 7 Progressive Rendering) */}
         {!isLoading && !fetchError && visibleReports.length > 0 && (
           <div className="space-y-3">
             {visibleReports.map((report) => (
               <ReportCard key={report.id} report={report} />
             ))}
 
-            {/* Phase 7 Load More Button */}
             {hasMoreReports && (
               <div className="pt-2 flex justify-center">
                 <Button
@@ -208,11 +178,7 @@ export const HomePage: React.FC = () => {
         {!isLoading && !fetchError && filteredReports.length === 0 && (
           <EmptyState
             title={language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No reports found'}
-            description={
-              language === 'bn'
-                ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই।'
-                : 'No reports match these filters.'
-            }
+            description={language === 'bn' ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই।' : 'No reports match these filters.'}
             actionLabel={language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
             onAction={() => {
               setFeedFilter('all');
