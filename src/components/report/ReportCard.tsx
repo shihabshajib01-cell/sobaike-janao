@@ -16,24 +16,34 @@ export interface ReportCardProps {
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
+  const [viewCount, setViewCount] = useState(report.viewCount);
   const [shareCount, setShareCount] = useState(report.shareCount);
 
   useEffect(() => {
+    setViewCount(report.viewCount);
     setShareCount(report.shareCount);
-  }, [report.id, report.shareCount]);
+  }, [report.id, report.viewCount, report.shareCount]);
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const publishedDate = language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
-  const viewCountLabel = language === 'bn' ? toBanglaDigits(report.viewCount) : report.viewCount.toLocaleString();
+  const viewCountLabel = language === 'bn' ? toBanglaDigits(viewCount) : viewCount.toLocaleString();
   const shareCountLabel = language === 'bn' ? toBanglaDigits(shareCount) : shareCount.toLocaleString();
 
   const normalizedTitle = (title || '').trim();
   const normalizedDesc = (shortDesc || '').trim();
   const shouldShowDescription = normalizedDesc.length > 0 && normalizedDesc !== normalizedTitle;
 
+  const recordOpen = () => {
+    setViewCount((current) => current + 1);
+    void PublicReportService.recordView(report.id).then((counts) => {
+      if (counts) setViewCount(counts.viewCount);
+    });
+  };
+
   const handleCardClick = () => {
+    recordOpen();
     navigateTo(`/report-detail/${report.id}`);
   };
 
@@ -51,6 +61,11 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     } catch (error) {
       console.warn('[ReportCard] Copy/share failed:', error);
     }
+  };
+
+  const handleDetailsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.stopPropagation();
+    recordOpen();
   };
 
   return (
@@ -159,7 +174,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
           <Link
             to={`/report-detail/${report.id}`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleDetailsClick}
             aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
             className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
           >
