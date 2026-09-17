@@ -80,7 +80,7 @@ export const Header: React.FC = () => {
               id="tablet-brand-logo"
               size="sm"
               onClick={() => navigateTo('/')}
-              englishClassName="hidden min-[900px]:block text-[var(--type-fixed-14)] leading-tight text-ui-content-secondary font-[var(--font-weight-medium)]"
+              englishClassName="hidden min-[900px]:block type-meta leading-tight text-ui-content-secondary font-[var(--font-weight-medium)]"
             />
 
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -88,20 +88,20 @@ export const Header: React.FC = () => {
                 id="tablet-report-cta"
                 variant="primary"
                 size="md"
-                leftIcon={<PlusCircle className="w-4 h-4 text-ui-content-inverse" />}
+                leftIcon={<PlusCircle className="w-4 h-4 text-ui-content-inverse" aria-hidden="true" />}
                 onClick={() => openReportComposer()}
-                className="shadow-[var(--elevation-2xs)] font-[var(--font-weight-semibold)] text-[var(--type-fixed-16)] min-h-[44px]"
+                className="font-[var(--font-weight-semibold)]"
               >
                 {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
               </Button>
 
               <IconButton
                 id="tablet-menu-button"
-                icon={<Menu className="w-5 h-5 text-ui-content-primary" />}
+                icon={<Menu className="w-5 h-5 text-ui-content-primary" aria-hidden="true" />}
                 aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
                 size="md"
                 onClick={() => setIsTabletMenuOpen(true)}
-                className="border border-ui-stroke-subtle rounded-[var(--radius-control)] bg-ui-surface-subtle min-h-[44px] min-w-[44px]"
+                className="border border-ui-stroke-subtle ui-radius-control bg-ui-surface-subtle"
               />
             </div>
           </div>
@@ -119,7 +119,7 @@ export const Header: React.FC = () => {
       >
         <div className="space-y-4">
           <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu navigation'}>
-            <p className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-muted uppercase tracking-wide px-3 mb-2">
+            <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-muted uppercase tracking-wide px-3 mb-2">
               {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & pages'}
             </p>
             {navItems.map((item) => {
@@ -129,12 +129,13 @@ export const Header: React.FC = () => {
               return (
                 <button
                   key={item.path}
+                  type="button"
                   onClick={() => {
                     setIsTabletMenuOpen(false);
                     navigateTo(item.path);
                   }}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] transition-colors text-left cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  className={`w-full flex items-center justify-between px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] transition-colors text-left cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     isActive ? getSectionActiveStyles(item.sectionKey) : 'text-ui-content-secondary'
                   }`}
                   style={
@@ -147,16 +148,17 @@ export const Header: React.FC = () => {
                       : undefined
                   }
                 >
-                  <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-3 min-w-0">
                     <span className={isActive && !secConfig ? 'text-ui-content-primary' : 'text-ui-content-muted'}>
                       {item.icon}
                     </span>
-                    <span>{language === 'bn' ? item.nameBn : item.nameEn}</span>
-                  </div>
+                    <span className="truncate">{language === 'bn' ? item.nameBn : item.nameEn}</span>
+                  </span>
                   {item.sectionKey && (
                     <span
-                      className="w-2.5 h-2.5 rounded-[var(--radius-pill)]"
+                      className="w-2.5 h-2.5 ui-radius-pill shrink-0"
                       style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
+                      aria-hidden="true"
                     />
                   )}
                 </button>
@@ -166,12 +168,13 @@ export const Header: React.FC = () => {
 
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-1">
             <button
+              type="button"
               onClick={() => {
                 setIsTabletMenuOpen(false);
                 navigateTo('/search');
               }}
               aria-current={currentRoute === '/search' ? 'page' : undefined}
-              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`w-full flex items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/search'
                   ? 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)] border border-ui-stroke-subtle'
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
@@ -182,12 +185,13 @@ export const Header: React.FC = () => {
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setIsTabletMenuOpen(false);
                 navigateTo('/more');
               }}
               aria-current={currentRoute === '/more' ? 'page' : undefined}
-              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`w-full flex items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/more'
                   ? 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)] border border-ui-stroke-subtle'
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
@@ -199,42 +203,43 @@ export const Header: React.FC = () => {
           </div>
 
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-3">
-            <p className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-muted uppercase tracking-wide px-1">
+            <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-muted uppercase tracking-wide px-1">
               {language === 'bn' ? 'সেটিংস' : 'Settings'}
             </p>
 
             <div className="space-y-1.5">
-              <span className="text-[var(--type-fixed-14)] text-ui-content-secondary font-[var(--font-weight-medium)] px-1">
+              <p className="type-meta text-ui-content-secondary font-[var(--font-weight-medium)] px-1">
                 {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
-              </span>
+              </p>
               <ThemeSelector variant="segmented" />
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[var(--type-fixed-14)] text-ui-content-secondary font-[var(--font-weight-medium)] px-1">
+              <p className="type-meta text-ui-content-secondary font-[var(--font-weight-medium)] px-1">
                 {language === 'bn' ? 'ভাষা' : 'Language'}
-              </span>
+              </p>
               <button
                 id="drawer-lang-toggle"
+                type="button"
                 onClick={toggleLanguage}
                 aria-label={language === 'bn' ? 'ইংরেজিতে পরিবর্তন করুন' : 'Switch to Bangla'}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 text-[var(--type-fixed-14)] rounded-[var(--radius-control)] border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 type-meta ui-radius-control border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
-                <div className="flex items-center gap-2">
+                <span className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                   <span className="font-[var(--font-weight-medium)]">
                     {language === 'bn' ? 'বাংলা / English' : 'English / বাংলা'}
                   </span>
-                </div>
-                <div className="flex items-center font-[var(--font-weight-semibold)] text-[var(--type-fixed-14)]">
+                </span>
+                <span className="flex items-center font-[var(--font-weight-semibold)] type-meta">
                   <span className={language === 'bn' ? 'text-ui-content-primary font-[var(--font-weight-bold)]' : 'text-ui-content-muted'}>
                     বাং
                   </span>
-                  <span className="mx-1 text-ui-content-muted">/</span>
+                  <span className="mx-1 text-ui-content-muted" aria-hidden="true">/</span>
                   <span className={language === 'en' ? 'text-ui-content-primary font-[var(--font-weight-bold)]' : 'text-ui-content-muted'}>
                     EN
                   </span>
-                </div>
+                </span>
               </button>
             </div>
           </div>

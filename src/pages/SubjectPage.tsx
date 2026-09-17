@@ -5,6 +5,8 @@ import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
@@ -24,7 +26,6 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Decode subject query / identifier
   const decodedSubject = decodeURIComponent(subjectId).trim();
 
   const loadData = useCallback(async () => {
@@ -42,10 +43,9 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
   }, [decodedSubject]);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, [loadData]);
 
-  // Primary subject metadata from first report
   const primaryReport = reports[0];
   const displayName = primaryReport
     ? language === 'bn'
@@ -53,7 +53,6 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
       : primaryReport.reportedSubjectEn || primaryReport.reportedSubject || decodedSubject
     : decodedSubject;
 
-  // Retrieve any responses from reports
   const storedResponses = useMemo(() => {
     return reports.filter((r) => r.response).map((r) => r.response!);
   }, [reports]);
@@ -117,41 +116,44 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
     }
   }, [primaryReport, reports.length, isLoading, fetchError, language, setDynamicSeo]);
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      navigateTo('/explore');
+    }
+  };
+
   return (
     <PublicPageContainer id="subject-page-container">
-      {/* Back button & Breadcrumb */}
-      <div className="flex items-center gap-2 text-[var(--type-fixed-14)] text-ui-content-muted">
-        <button
+      <div className="type-meta text-ui-content-muted">
+        <Button
           type="button"
-          onClick={() => {
-            if (window.history.length > 1) {
-              window.history.back();
-            } else {
-              navigateTo('/explore');
-            }
-          }}
-          className="flex items-center gap-2 font-[var(--font-weight-medium)] transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          variant="secondary"
+          size="sm"
+          onClick={handleBack}
+          leftIcon={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
         >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}</span>
-        </button>
+          {language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}
+        </Button>
       </div>
 
-      {/* Subject Header */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 space-y-4 shadow-[var(--elevation-2xs)]">
+      <section className="ui-card p-5 md:p-7 space-y-4" aria-labelledby="subject-page-title">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
+          <div className="flex items-start gap-4 min-w-0">
+            <div className="w-12 h-12 ui-radius-control bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary shrink-0">
               <UserX className="w-6 h-6" aria-hidden="true" />
             </div>
-            <div className="space-y-1.5">
-              <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
+            <div className="space-y-1.5 min-w-0">
+              <h1 id="subject-page-title" className="type-h1 text-ui-content-primary break-words">
                 {displayName}
               </h1>
               {primaryReport?.organization && (
-                <p className="text-[var(--type-fixed-16)] text-ui-content-secondary font-[var(--font-weight-medium)]">{primaryReport.organization}</p>
+                <p className="type-body text-ui-content-secondary font-[var(--font-weight-medium)]">
+                  {primaryReport.organization}
+                </p>
               )}
-              <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary">
+              <p className="type-body text-ui-content-secondary">
                 {language === 'bn'
                   ? `${toBanglaDigits(reports.length)}টি প্রকাশিত প্রতিবেদনে উল্লেখ রয়েছে।`
                   : `Mentioned in ${reports.length} published reports.`}
@@ -159,19 +161,19 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
             </div>
           </div>
 
-          {/* Right of Response Trigger */}
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="md"
             onClick={() => setIsResponseModalOpen(true)}
-            className="px-4 py-2.5 bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-primary text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] transition-colors cursor-pointer flex items-center gap-2 shrink-0 self-start min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            leftIcon={<Scale className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />}
+            className="shrink-0 self-start"
           >
-            <Scale className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
-            <span>{language === 'bn' ? 'জবাব দিন' : 'Submit response'}</span>
-          </button>
+            {language === 'bn' ? 'জবাব দিন' : 'Submit response'}
+          </Button>
         </div>
-      </div>
+      </section>
 
-      {/* Loading State Skeleton Screen */}
       {isLoading && (
         <ReportFeedSkeleton
           count={3}
@@ -180,69 +182,51 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         />
       )}
 
-      {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-control)] p-8 text-center space-y-4">
+        <div role="alert" className="ui-card border-ui-error-border p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
-          <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-ui-error-text">
-            {language === 'bn'
-              ? 'প্রতিবেদন লোড করা যায়নি।'
-              : "Couldn't load reports."}
+          <p className="type-body font-[var(--font-weight-semibold)] text-ui-error-text">
+            {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি।' : "Couldn't load reports."}
           </p>
-          <button
-            type="button"
-            onClick={loadData}
-            className="btn-primary-action px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
-          >
+          <Button type="button" variant="primary" size="md" onClick={loadData}>
             {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
-          </button>
+          </Button>
         </div>
       )}
 
-      {/* Formal Responses Section if any */}
       {!isLoading && !fetchError && storedResponses.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
+        <section className="space-y-3" aria-labelledby="subject-responses-title">
+          <h2 id="subject-responses-title" className="type-h2 text-ui-content-primary flex items-center gap-2">
             <Scale className="w-5 h-5 text-ui-accent" aria-hidden="true" />
             <span>{language === 'bn' ? 'জবাব' : 'Responses'}</span>
           </h2>
           <div className="space-y-3">
             {storedResponses.map((res, rIdx) => (
-              <div
-                key={rIdx}
-                className="p-4 sm:p-5 border rounded-[var(--radius-control)] space-y-2"
-                style={{
-                  backgroundColor: 'var(--ui-info-bg)',
-                  borderColor: 'var(--ui-info-border)',
-                }}
+              <article
+                key={`${res.respondentEn || res.respondentBn}-${rIdx}`}
+                className="p-4 sm:p-5 border border-ui-info-border ui-radius-control bg-ui-info-bg space-y-2"
               >
-                <div
-                  className="flex items-center justify-between text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)]"
-                  style={{ color: 'var(--ui-info-text)' }}
-                >
-                  <span>{language === 'bn' ? res.respondentBn : res.respondentEn}</span>
-                  <span className="text-ui-content-muted tabular-nums text-[var(--type-fixed-14)]">{language === 'bn' ? res.dateBn : res.dateEn}</span>
+                <div className="flex items-center justify-between gap-3 type-meta font-[var(--font-weight-semibold)] text-ui-info-text">
+                  <p>{language === 'bn' ? res.respondentBn : res.respondentEn}</p>
+                  <p className="text-ui-content-muted tabular-nums shrink-0">
+                    {language === 'bn' ? res.dateBn : res.dateEn}
+                  </p>
                 </div>
-                <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary">
+                <p className="type-body text-ui-content-secondary">
                   {language === 'bn' ? res.statementBn : res.statementEn}
                 </p>
-              </div>
+              </article>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Reports Feed */}
       {!isLoading && !fetchError && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
-              <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
-              <span>
-                {language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published reports'}
-              </span>
-            </h2>
-          </div>
+        <section className="space-y-4" aria-labelledby="subject-published-reports-title">
+          <h2 id="subject-published-reports-title" className="type-h2 text-ui-content-primary flex items-center gap-2">
+            <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
+            <span>{language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published reports'}</span>
+          </h2>
 
           {reports.length > 0 ? (
             <div className="space-y-3">
@@ -251,22 +235,18 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
               ))}
             </div>
           ) : (
-            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-8 text-center space-y-3">
-              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
-              <h3 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
-                {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
-              </h3>
-              <p className="text-[var(--type-fixed-14)] text-ui-content-muted max-w-sm mx-auto leading-relaxed">
-                {language === 'bn'
+            <EmptyState
+              title={language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
+              description={
+                language === 'bn'
                   ? 'এই নামে কোনো প্রকাশিত প্রতিবেদন নেই বা নাম গোপনীয়তার জন্য লুকানো থাকতে পারে।'
-                  : 'No published reports are available for this name, or the name may be hidden for privacy.'}
-              </p>
-            </div>
+                  : 'No published reports are available for this name, or the name may be hidden for privacy.'
+              }
+            />
           )}
-        </div>
+        </section>
       )}
 
-      {/* Response Modal */}
       {isResponseModalOpen && (
         <SubjectResponseModal
           reportId={primaryReport?.id || ''}
@@ -275,7 +255,7 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           isOpen={isResponseModalOpen}
           onClose={() => {
             setIsResponseModalOpen(false);
-            loadData();
+            void loadData();
           }}
         />
       )}

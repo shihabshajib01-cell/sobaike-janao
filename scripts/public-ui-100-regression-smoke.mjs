@@ -109,6 +109,49 @@ await check('Issues remains one-card-per-row regardless of popularity order', as
   await context.close();
 });
 
+await check('Issues direct route remains visible on tablet and desktop', async () => {
+  const viewports = [
+    { width: 1024, height: 768, label: 'tablet' },
+    { width: 1365, height: 900, label: 'desktop' },
+  ];
+
+  for (const viewport of viewports) {
+    const context = await browser.newContext({ viewport });
+    await seedReturningVisitor(context);
+    const page = await context.newPage();
+    await page.goto(routeUrl('/issues'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await expectVisible(page.locator('#issues-page-container'), `Issues page hidden on ${viewport.label}`);
+    await expectVisible(page.locator('#issues-category-grid'), `Issues category list hidden on ${viewport.label}`);
+    const cardCount = await page.locator('#issues-category-grid [id^="issues-card-"]').count();
+    if (cardCount !== 7) throw new Error(`${viewport.label} Issues route expected 7 cards, found ${cardCount}`);
+    await context.close();
+  }
+});
+
+await check('Home uses the shared filter rail and report cards are keyboard reachable', async () => {
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#home-feed-filter-rail'), 'Home shared filter rail missing');
+
+  const firstCard = page.locator('[id^="report-card-"][role="link"]').first();
+  await expectVisible(firstCard, 'No keyboard-addressable report card found on Home');
+  if ((await firstCard.getAttribute('tabindex')) !== '0') {
+    throw new Error('Report card is not in the keyboard tab order');
+  }
+
+  const cardId = await firstCard.getAttribute('id');
+  await firstCard.focus();
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(350);
+  if (!page.url().includes('#/report-detail/')) {
+    throw new Error(`Enter did not open report detail from ${cardId}; got ${page.url()}`);
+  }
+
+  await context.close();
+});
+
 await check('All seven category pages preserve the shared mobile navigation contract', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
@@ -155,8 +198,6 @@ await check('Dark semantic surfaces retain distinct visual hierarchy', async () 
   await page.locator('#tablet-menu-button').click();
   await expectVisible(page.locator('#tablet-drawer'), 'tablet drawer missing');
 
-  // Theme labels are localized (Dark / ডার্ক), so target the stable segmented
-  // option order inside the tablet drawer: Light, Dark, System.
   const themeOptions = page.locator('#tablet-drawer [role="radiogroup"] [role="radio"]');
   const themeOptionCount = await themeOptions.count();
   if (themeOptionCount !== 3) {
