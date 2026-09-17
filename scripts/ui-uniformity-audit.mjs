@@ -92,10 +92,21 @@ requireNotContains(
   'SearchInput must not expose unused language-specific placeholder props'
 );
 
+const reportTitleField = 'src/components/report-composer/ReportTitleField.tsx';
+requireContains(reportTitleField, 'type-label', 'report title label must use semantic label typography');
+requireContains(reportTitleField, 'type-body', 'report title input must use semantic body typography');
+requireContains(reportTitleField, 'type-helper', 'report title helper/error text must use semantic helper typography');
+requireContains(reportTitleField, 'type-meta', 'report title counter must use semantic meta typography');
+requireContains(reportTitleField, 'ui-control', 'report title input must use the shared control recipe');
+requireContains(reportTitleField, 'aria-required="true"', 'required report title input must expose required semantics');
+requireContains(reportTitleField, 'role="alert"', 'report title validation must announce errors');
+requireNotContains(reportTitleField, '--type-fixed-', 'report title field must not use legacy fixed typography aliases');
+requireNotContains(reportTitleField, 'min-h-[44px]', 'report title field must inherit minimum target size from ui-control');
+
 if (failures.length) {
   console.error(`Public UI uniformity audit found ${failures.length} violation(s):`);
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exit(1);
 }
 
-console.log('Public UI uniformity audit passed: shared feed, rail, search, hero and action patterns are enforced.');
+console.log('Public UI uniformity audit passed: shared feed, rail, search, hero, form and action patterns are enforced.');
