@@ -3,6 +3,7 @@ import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { BrandLogo } from '../branding/BrandLogo';
+import { IconButton } from '../ui/IconButton';
 
 const CATEGORY_BY_ROUTE: Record<string, SectionKey> = {
   '/harassment': 'harassment',
@@ -56,7 +57,6 @@ export const MobileHeader: React.FC = () => {
         window.setTimeout(() => setIsShareConfirmed(false), 2000);
       }
     } catch (error) {
-      // Native share cancellation is an expected user action; do not surface it as an error.
       if ((error as DOMException)?.name !== 'AbortError') {
         console.warn('[MobileHeader share error]', error);
       }
@@ -70,15 +70,14 @@ export const MobileHeader: React.FC = () => {
         className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
       >
         <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-          <button
+          <IconButton
             id="mobile-report-detail-back-btn"
-            type="button"
+            variant="ghost"
+            size="md"
             onClick={() => goBackWithFallback(() => navigateTo('/'))}
             aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
-            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-          </button>
+            icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
+          />
 
           <p
             id="mobile-report-detail-title"
@@ -87,9 +86,10 @@ export const MobileHeader: React.FC = () => {
             {language === 'bn' ? 'প্রতিবেদন' : 'Report'}
           </p>
 
-          <button
+          <IconButton
             id="mobile-report-detail-share-btn"
-            type="button"
+            variant="outline"
+            size="md"
             onClick={handleReportShare}
             aria-label={
               isShareConfirmed
@@ -100,14 +100,14 @@ export const MobileHeader: React.FC = () => {
                 ? 'প্রতিবেদন শেয়ার করুন'
                 : 'Share report'
             }
-            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            {isShareConfirmed ? (
-              <Check className="h-5 w-5 text-ui-success-text" aria-hidden="true" />
-            ) : (
-              <Share2 className="h-5 w-5" aria-hidden="true" />
-            )}
-          </button>
+            icon={
+              isShareConfirmed ? (
+                <Check className="h-5 w-5 text-ui-success-text" aria-hidden="true" />
+              ) : (
+                <Share2 className="h-5 w-5" aria-hidden="true" />
+              )
+            }
+          />
         </div>
       </header>
     );
@@ -120,15 +120,14 @@ export const MobileHeader: React.FC = () => {
         className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
       >
         <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-          <button
+          <IconButton
             id="mobile-category-back-btn"
-            type="button"
+            variant="ghost"
+            size="md"
             onClick={() => navigateTo('/issues')}
             aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
-            className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-          </button>
+            icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
+          />
 
           <p
             id="mobile-category-title"
@@ -138,16 +137,15 @@ export const MobileHeader: React.FC = () => {
           </p>
 
           {isHarassmentCategory ? (
-            <button
+            <IconButton
               id="mobile-category-filter-btn"
-              type="button"
+              variant="outline"
+              size="md"
               onClick={() => setIsHarassmentFilterOpen(true)}
               aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
               aria-haspopup="dialog"
-              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            >
-              <Filter className="h-5 w-5" aria-hidden="true" />
-            </button>
+              icon={<Filter className="h-5 w-5" aria-hidden="true" />}
+            />
           ) : (
             <div
               id="mobile-category-location-slot"
@@ -167,15 +165,14 @@ export const MobileHeader: React.FC = () => {
     >
       <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <button
+          <IconButton
             id="mobile-header-menu-btn"
-            type="button"
+            variant="outline"
+            size="md"
             onClick={() => setIsTabletMenuOpen(true)}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-            className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
-          >
-            <Menu className="w-5 h-5 text-ui-content-primary" aria-hidden="true" />
-          </button>
+            icon={<Menu className="w-5 h-5" aria-hidden="true" />}
+          />
 
           <BrandLogo
             id="mobile-header-brand-logo"
@@ -185,15 +182,14 @@ export const MobileHeader: React.FC = () => {
           />
         </div>
 
-        <button
+        <IconButton
           id="mobile-header-search-btn"
-          type="button"
+          variant="outline"
+          size="md"
           onClick={() => navigateTo('/search')}
           aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-          className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-xl border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary flex items-center justify-center cursor-pointer transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shrink-0"
-        >
-          <Search className="w-5 h-5 text-ui-content-primary" aria-hidden="true" />
-        </button>
+          icon={<Search className="w-5 h-5" aria-hidden="true" />}
+        />
       </div>
     </header>
   );
