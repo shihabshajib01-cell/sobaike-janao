@@ -8,20 +8,17 @@
 
 :root,
 html[data-theme="light"] {
-  /* Surface hierarchy */
   --ui-page: #F0F2F5;
   --ui-surface: #FFFFFF;
   --ui-surface-subtle: #F7F8FA;
   --ui-surface-elevated: #FFFFFF;
   --ui-surface-hover: #ECEEF1;
 
-  /* Content hierarchy */
   --ui-text-primary: #050505;
   --ui-text-secondary: #65676B;
   --ui-text-muted: #8A8D91;
   --ui-text-inverse: #FFFFFF;
 
-  /* Stroke hierarchy */
   --ui-border-subtle: #E4E6EB;
   --ui-border: #CED0D4;
   --ui-border-strong: #B0B3B8;
@@ -32,7 +29,6 @@ html[data-theme="light"] {
   --ui-disabled-text: #8A8D91;
   --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.14);
 
-  /* Category system — authoritative light values */
   --sec-harassment-primary: #B84A62;
   --sec-harassment-hover: #9E384E;
   --sec-harassment-bg: #FDF2F4;
@@ -92,20 +88,17 @@ html[data-theme="light"] {
 
 html[data-theme="dark"],
 .dark {
-  /* Surface hierarchy — deliberately distinct at every semantic level. */
   --ui-page: #18191A;
   --ui-surface: #242526;
   --ui-surface-subtle: #202122;
   --ui-surface-elevated: #2B2D2F;
   --ui-surface-hover: #303234;
 
-  /* Content hierarchy */
   --ui-text-primary: #E4E6EB;
   --ui-text-secondary: #B0B3B8;
   --ui-text-muted: #8A8D91;
   --ui-text-inverse: #FFFFFF;
 
-  /* Stroke hierarchy */
   --ui-border-subtle: #303234;
   --ui-border: #3A3B3C;
   --ui-border-strong: #4E4F50;
@@ -116,7 +109,6 @@ html[data-theme="dark"],
   --ui-disabled-text: #8A8D91;
   --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.32);
 
-  /* Category system — authoritative dark values */
   --sec-harassment-primary: #B84A62;
   --sec-harassment-hover: #D05B75;
   --sec-harassment-bg: #211619;
@@ -174,7 +166,6 @@ html[data-theme="dark"],
   --sec-rickshaw-on-primary: #050505;
 }
 
-/* Layout and interaction authority */
 :root {
   --layout-rail-desktop: 240px;
   --layout-rail-large: 250px;
@@ -183,7 +174,6 @@ html[data-theme="dark"],
   --touch-target-min: 44px;
 }
 
-/* Shared semantic recipes used by public components. */
 .ui-card {
   background-color: var(--ui-surface);
   border: var(--border-width-default) var(--border-style-default) var(--ui-border-subtle);
@@ -226,7 +216,6 @@ html[data-theme="dark"],
   }
 }
 
-/* All form controls share the same minimum interactive height. */
 :where(
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
   select
@@ -234,11 +223,12 @@ html[data-theme="dark"],
   min-height: var(--touch-target-min);
 }
 
-/*
- * Compatibility bridge for existing Tailwind geometry utilities.
- * Values are intentionally equivalent to the established UI so older working
- * components resolve through central tokens without a visual rewrite.
- */
+/* Enforce the centralized form type scale even in older local field recipes. */
+:where(input, select, textarea) {
+  font-size: var(--type-body-size) !important;
+  line-height: var(--type-label-line) !important;
+}
+
 .rounded-lg { border-radius: var(--radius-badge-md); }
 .rounded-xl { border-radius: var(--radius-control); }
 .rounded-2xl { border-radius: var(--radius-card); }
@@ -250,7 +240,6 @@ html[data-theme="dark"],
 .shadow-sm { box-shadow: var(--elevation-control); }
 .shadow-lg { box-shadow: var(--elevation-floating); }
 
-/* Preserve native content sizing while keeping interaction styling semantic. */
 :where(input, select, textarea, button, a) {
   -webkit-tap-highlight-color: transparent;
 }
