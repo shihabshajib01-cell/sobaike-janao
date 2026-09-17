@@ -27,9 +27,15 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@types/node": "^22.14.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "typescript": "~5.8.2"
+    "eslint": "^9.35.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "playwright": "^1.55.0",
+    "tsx": "^4.20.5",
+    "typescript": "~5.8.2",
+    "typescript-eslint": "^8.44.0"
   }
 }
