@@ -46,12 +46,12 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
   const availableSlides: ServiceSlide[] = [
     { key: 'harassment', path: '/harassment' },
-    { key: 'rickshaw', path: '/rickshaw' },
-    { key: 'extortion', path: '/extortion' },
     { key: 'load_shedding', path: '/load-shedding' },
+    { key: 'extortion', path: '/extortion' },
     { key: 'public_safety', path: '/public-safety' },
     { key: 'road_transport', path: '/road-transport' },
     { key: 'illegal_occupation', path: '/illegal-occupation' },
+    { key: 'rickshaw', path: '/rickshaw' },
   ];
   const slides = availableSlides.filter((slide) => Boolean(segments[slide.key]));
 
@@ -363,4 +363,3 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     </div>
   );
 };
-

@@ -33,6 +33,14 @@ export const DesktopLeftRail: React.FC = () => {
       sectionKey: 'harassment',
     },
     {
+      id: 'rail-load-shedding',
+      path: SECTIONS.load_shedding.slug,
+      nameBn: SECTIONS.load_shedding.shortNameBn,
+      nameEn: SECTIONS.load_shedding.shortNameEn,
+      iconName: 'zap-off',
+      sectionKey: 'load_shedding',
+    },
+    {
       id: 'rail-extortion',
       path: SECTIONS.extortion.slug,
       nameBn: SECTIONS.extortion.shortNameBn,
@@ -57,14 +65,6 @@ export const DesktopLeftRail: React.FC = () => {
       sectionKey: 'road_transport',
     },
     {
-      id: 'rail-load-shedding',
-      path: SECTIONS.load_shedding.slug,
-      nameBn: SECTIONS.load_shedding.shortNameBn,
-      nameEn: SECTIONS.load_shedding.shortNameEn,
-      iconName: 'zap-off',
-      sectionKey: 'load_shedding',
-    },
-    {
       id: 'rail-illegal-occupation',
       path: SECTIONS.illegal_occupation.slug,
       nameBn: SECTIONS.illegal_occupation.shortNameBn,
@@ -75,8 +75,8 @@ export const DesktopLeftRail: React.FC = () => {
     {
       id: 'rail-rickshaw',
       path: SECTIONS.rickshaw.slug,
-      nameBn: SECTIONS.rickshaw.shortNameBn,
-      nameEn: SECTIONS.rickshaw.shortNameEn,
+      nameBn: 'অবৈধ অটো-রিকশা চার্জিং স্টেশন',
+      nameEn: 'Illegal Auto-rickshaw Charging Station',
       iconName: 'rickshaw',
       sectionKey: 'rickshaw',
     },
