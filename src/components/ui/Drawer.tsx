@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { useApp } from '../../context/AppContext';
@@ -52,18 +53,9 @@ export const Drawer: React.FC<DrawerProps> = ({
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    const timeoutId = setTimeout(() => {
-      if (drawerRef.current) {
-        const focusableElements = drawerRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length > 0) {
-          focusableElements[0].focus();
-        } else {
-          drawerRef.current.focus();
-        }
-      }
-    }, 30);
+    const timeoutId = window.setTimeout(() => {
+      drawerRef.current?.focus({ preventScroll: true });
+    }, 0);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -83,15 +75,13 @@ export const Drawer: React.FC<DrawerProps> = ({
         const lastElement = focusableElements[focusableElements.length - 1];
 
         if (e.shiftKey) {
-          if (document.activeElement === firstElement) {
+          if (document.activeElement === firstElement || document.activeElement === drawerRef.current) {
             e.preventDefault();
-            lastElement.focus();
+            lastElement.focus({ preventScroll: true });
           }
-        } else {
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
+        } else if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus({ preventScroll: true });
         }
       }
     };
@@ -103,7 +93,7 @@ export const Drawer: React.FC<DrawerProps> = ({
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
       if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
-        previouslyFocusedElementRef.current.focus();
+        previouslyFocusedElementRef.current.focus({ preventScroll: true });
       }
     };
   }, [isOpen]);
@@ -112,24 +102,24 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const positionClasses = {
     bottom:
-      'fixed inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl border-t border-ui-stroke-default pb-safe',
+      'absolute inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl border-t border-ui-stroke-default pb-safe',
     right:
-      'fixed inset-y-0 right-0 w-full max-w-md border-l border-ui-stroke-default',
+      'absolute inset-y-0 right-0 w-full max-w-md border-l border-ui-stroke-default',
     left:
-      'fixed inset-y-0 left-0 w-full max-w-md border-r border-ui-stroke-default',
+      'absolute inset-y-0 left-0 w-full max-w-md border-r border-ui-stroke-default',
   };
 
-  return (
+  const drawerNode = (
     <div
       id={id}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? `${id}-title` : undefined}
-      className="fixed inset-0 z-50 overflow-hidden"
+      className="fixed inset-0 h-[100dvh] z-50 overflow-hidden"
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 backdrop-blur-xs transition-opacity"
+        className="absolute inset-0 backdrop-blur-xs transition-opacity"
         style={{ backgroundColor: 'var(--ui-overlay)' }}
         onClick={onClose}
         aria-hidden="true"
@@ -182,4 +172,6 @@ export const Drawer: React.FC<DrawerProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(drawerNode, document.body) : drawerNode;
 };
