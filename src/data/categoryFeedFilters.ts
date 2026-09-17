@@ -81,6 +81,20 @@ const resolveReportDistrict = (report: ReportItem) => {
   });
 };
 
+const districtMatchesSelection = (
+  district: (typeof BANGLADESH_DISTRICTS)[number],
+  districtSelection: string
+) => {
+  if (districtSelection === 'all') return true;
+
+  const normalizedSelection = normalizeDistrictName(districtSelection);
+  return (
+    district.id === districtSelection ||
+    district.nameBn === districtSelection ||
+    normalizeDistrictName(district.nameEn) === normalizedSelection
+  );
+};
+
 export const matchesCategoryLocationFilters = (
   report: ReportItem,
   divisionId: string,
@@ -91,7 +105,7 @@ export const matchesCategoryLocationFilters = (
   const district = resolveReportDistrict(report);
   if (!district) return false;
   if (divisionId !== 'all' && district.divisionId !== divisionId) return false;
-  if (districtId !== 'all' && district.id !== districtId) return false;
+  if (!districtMatchesSelection(district, districtId)) return false;
   return true;
 };
 
@@ -132,7 +146,11 @@ const matchesEvidenceAvailability = (
   evidence: EvidenceAvailabilityFilter
 ) => {
   if (evidence === 'all') return true;
-  const hasEvidence = Boolean(report.trustIndicators?.evidenceSubmitted);
+  const hasEvidence = Boolean(
+    report.trustIndicators?.evidenceSubmitted ||
+      report.images?.length ||
+      report.media?.images?.length
+  );
   return evidence === 'with-evidence' ? hasEvidence : !hasEvidence;
 };
 
