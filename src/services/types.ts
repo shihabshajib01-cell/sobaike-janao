@@ -1,5 +1,5 @@
 import { SectionKey } from '../theme/tokens';
-import { ReportItem, ReportUpdate, ReportResponse, ReportTrustIndicators, PublicReportImage } from '../types/report';
+import { PublicReportImage } from '../types/report';
 import {
   HarassmentAgeGroup,
   HarassmentAbuserRelationship,

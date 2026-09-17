@@ -4,7 +4,6 @@ import {
   FileText,
   MapPin,
   Paperclip,
-  ChevronDown,
   Lock,
   Info,
   Calendar,
@@ -29,7 +28,6 @@ import {
 } from '../../data/reportOptions';
 import {
   getReportSubjectConfig,
-  SubjectTypeValue,
 } from '../../data/reportSubjectOptions';
 import {
   DIVISIONS,
@@ -93,29 +91,6 @@ const getLocalToday = (): string => {
   return `${year}-${month}-${day}`;
 };
 
-const RICKSHAW_OPERATOR_OPTIONS: { value: SubjectTypeValue; labelBn: string; labelEn: string }[] = [
-  {
-    value: 'business',
-    labelBn: 'চার্জিং স্টেশন / গ্যারেজ',
-    labelEn: 'Charging station / garage',
-  },
-  {
-    value: 'individual',
-    labelBn: 'পরিচালনাকারী ব্যক্তি',
-    labelEn: 'Individual operator',
-  },
-  {
-    value: 'organization',
-    labelBn: 'প্রতিষ্ঠান / ভবন কর্তৃপক্ষ',
-    labelEn: 'Organization / building authority',
-  },
-  {
-    value: 'unknown',
-    labelBn: 'অজ্ঞাত / নিশ্চিত নই',
-    labelEn: 'Unknown / not sure',
-  },
-];
-
 export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetailsProps>(
   (
     {
@@ -141,7 +116,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const showsIdentitySection = segment === 'harassment';
     const isUtilityReport = (segment as string) === 'utility' || segment === 'load_shedding';
     const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
-    const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
     const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
     const isBriberyReport = segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
     const isIllegalOccupation = segment === 'illegal_occupation';
@@ -321,28 +295,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
     const { openLocationConsent } = useApp();
 
-    const handleRequestDeviceLocation = async () => {
-      setReporterGateState('requesting');
-      try {
-        const res = await VisitorSessionService.captureReporterDeviceLocation();
-        if (res.success && res.coords) {
-          setReporterGateState('verified');
-          setErrors((prev) => {
-            if (!prev.reporterLocation) return prev;
-            const updated = { ...prev };
-            delete updated.reporterLocation;
-            return updated;
-          });
-        } else if (res.errorType === 'denied') {
-          setReporterGateState('denied');
-        } else {
-          setReporterGateState('unavailable');
-        }
-      } catch {
-        setReporterGateState('unavailable');
-      }
-    };
-
     const handleRetryLocationClick = () => {
       openLocationConsent(async () => {
         if (VisitorSessionService.hasValidCurrentReporterLocation()) {
@@ -375,8 +327,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const isLocationLocked = reporterGateState !== 'verified';
 
     // Progressive disclosure states
-    const [showIdentifyingDetails, setShowIdentifyingDetails] = useState<boolean>(false);
-
     // Toggle specific accordion
     const toggleSection = (secKey: string) => {
       if (secKey === 'narrative' || secKey === 'location') return;
@@ -468,7 +418,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           });
         }
       }
-    }, [isUtilityReport]);
+    }, [isUtilityReport, formData.location, onUpdateFormData]);
 
     // Clear stale address-specific location data for utility complaints
     useEffect(() => {
@@ -990,14 +940,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     useImperativeHandle(ref, () => ({
       validateAndProceed,
     }));
-
-    // Check if extortion has primary party data
-    const hasPrimaryPartyData = Boolean(
-      formData.reportedSubject?.trim() ||
-      formData.organization?.trim() ||
-      formData.identifyingDescription?.trim() ||
-      (formData.mentionedParties && formData.mentionedParties.length > 0)
-    );
 
     return (
       <div className="space-y-4 md:space-y-5">

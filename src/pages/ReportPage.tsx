@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PlusCircle, ArrowLeft } from 'lucide-react';
 import { SectionKey } from '../theme/tokens';
 import { useApp } from '../context/AppContext';

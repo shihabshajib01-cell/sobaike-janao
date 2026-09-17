@@ -7,7 +7,6 @@ import { Header } from './Header';
 import { MobileHeader } from './MobileHeader';
 import { BottomNav, shouldHideBottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
-import { ReportComposerModal } from '../report-composer/ReportComposerModal';
 import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
 import { LocationConsentModal } from '../location/LocationConsentModal';
 import { LocationReminderBar } from '../location/LocationReminderBar';
@@ -19,32 +18,67 @@ import { RickshawPage } from '../../pages/RickshawPage';
 import { ExtortionPage } from '../../pages/ExtortionPage';
 import { UtilityPage } from '../../pages/UtilityPage';
 import { StandardCategoryPage } from '../../pages/StandardCategoryPage';
-import { ReportDetailPage } from '../../pages/ReportDetailPage';
 import { ReportPage } from '../../pages/ReportPage';
-import { SearchPage } from '../../pages/SearchPage';
-import { MorePage } from '../../pages/MorePage';
-import { LocationPage } from '../../pages/LocationPage';
-import { SubjectPage } from '../../pages/SubjectPage';
 import { SeoManager } from '../seo/SeoManager';
 import { MapExploreSkeleton } from '../ui/LoadingSkeleton';
 
 const LazyExplorePage = React.lazy(() =>
   import('../../pages/ExplorePage').then((m) => ({ default: m.ExplorePage }))
 );
+const LazySearchPage = React.lazy(() =>
+  import('../../pages/SearchPage').then((m) => ({ default: m.SearchPage }))
+);
+const LazyMorePage = React.lazy(() =>
+  import('../../pages/MorePage').then((m) => ({ default: m.MorePage }))
+);
+const LazyReportDetailPage = React.lazy(() =>
+  import('../../pages/ReportDetailPage').then((m) => ({ default: m.ReportDetailPage }))
+);
+const LazyLocationPage = React.lazy(() =>
+  import('../../pages/LocationPage').then((m) => ({ default: m.LocationPage }))
+);
+const LazySubjectPage = React.lazy(() =>
+  import('../../pages/SubjectPage').then((m) => ({ default: m.SubjectPage }))
+);
+const LazyReportComposerModal = React.lazy(() =>
+  import('../report-composer/ReportComposerModal').then((m) => ({ default: m.ReportComposerModal }))
+);
+
+const RouteLoadingFallback: React.FC<{ label: string }> = ({ label }) => (
+  <div
+    role="status"
+    aria-live="polite"
+    className="ui-page-shell min-h-40 flex items-center justify-center type-body text-ui-content-muted"
+  >
+    <span>{label}</span>
+  </div>
+);
 
 const ReportDetailRouteWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  return <ReportDetailPage reportId={id ? decodeURIComponent(id) : ''} />;
+  return (
+    <React.Suspense fallback={<RouteLoadingFallback label="Loading report…" />}>
+      <LazyReportDetailPage reportId={id ? decodeURIComponent(id) : ''} />
+    </React.Suspense>
+  );
 };
 
 const LocationRouteWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  return <LocationPage locationId={id ? decodeURIComponent(id) : ''} />;
+  return (
+    <React.Suspense fallback={<RouteLoadingFallback label="Loading location…" />}>
+      <LazyLocationPage locationId={id ? decodeURIComponent(id) : ''} />
+    </React.Suspense>
+  );
 };
 
 const SubjectRouteWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  return <SubjectPage subjectId={id ? decodeURIComponent(id) : ''} />;
+  return (
+    <React.Suspense fallback={<RouteLoadingFallback label="Loading subject…" />}>
+      <LazySubjectPage subjectId={id ? decodeURIComponent(id) : ''} />
+    </React.Suspense>
+  );
 };
 
 const RESPONSIBILITY_NOTICE_KEY = 'sobaike_responsibility_notice_v1';
@@ -173,8 +207,22 @@ export const AppShell: React.FC = () => {
                       </React.Suspense>
                     }
                   />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/more" element={<MorePage />} />
+                  <Route
+                    path="/search"
+                    element={
+                      <React.Suspense fallback={<RouteLoadingFallback label={language === 'bn' ? 'খোঁজ লোড হচ্ছে…' : 'Loading search…'} />}>
+                        <LazySearchPage />
+                      </React.Suspense>
+                    }
+                  />
+                  <Route
+                    path="/more"
+                    element={
+                      <React.Suspense fallback={<RouteLoadingFallback label={language === 'bn' ? 'তথ্য লোড হচ্ছে…' : 'Loading information…'} />}>
+                        <LazyMorePage />
+                      </React.Suspense>
+                    }
+                  />
                   <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
                   <Route path="/location/:id" element={<LocationRouteWrapper />} />
                   <Route path="/subject/:id" element={<SubjectRouteWrapper />} />
@@ -209,14 +257,18 @@ export const AppShell: React.FC = () => {
         <SearchModal />
       </ErrorBoundary>
 
-      <ErrorBoundary componentName="ReportComposerModal" silent>
-        <ReportComposerModal
-          isOpen={isReportComposerOpen}
-          onClose={closeReportComposer}
-          initialSegment={reportComposerInitialSegment}
-          language={language}
-        />
-      </ErrorBoundary>
+      {isReportComposerOpen && (
+        <ErrorBoundary componentName="ReportComposerModal" silent>
+          <React.Suspense fallback={null}>
+            <LazyReportComposerModal
+              isOpen={isReportComposerOpen}
+              onClose={closeReportComposer}
+              initialSegment={reportComposerInitialSegment}
+              language={language}
+            />
+          </React.Suspense>
+        </ErrorBoundary>
+      )}
 
       <ErrorBoundary componentName="FirstVisitNoticeModal" silent>
         <FirstVisitNoticeModal

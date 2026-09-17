@@ -9,7 +9,6 @@ import {
   Users,
   Info,
   Layers,
-  Coins,
 } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { ReportFormData, isMeaningfulMentionedParty } from '../../services/types';
@@ -57,7 +56,6 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const isUtilityReport = (segment as string) === 'utility' || segment === 'load_shedding';
   const isLoadShedding = isUtilityReport && formData.subcategoryId === 'load-shedding-outage';
-  const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';
   const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
   const isBriberyReport = segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
   const isIllegalOccupation = segment === 'illegal_occupation';

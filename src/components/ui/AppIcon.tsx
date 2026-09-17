@@ -26,7 +26,6 @@ import {
   Eye,
   FileText,
   HeartHandshake,
-  Zap,
   ZapOff,
   Building,
   Building2,

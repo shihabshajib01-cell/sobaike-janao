@@ -7,9 +7,14 @@
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "tsc --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:a11y": "node scripts/public-accessibility-smoke.mjs",
+    "audit:bundle": "node scripts/bundle-budget.mjs",
     "audit:design-system": "node scripts/design-system-audit.mjs",
-    "audit:ui-uniformity": "node scripts/ui-uniformity-audit.mjs"
+    "audit:ui-uniformity": "node scripts/ui-uniformity-audit.mjs",
+    "audit:technical-quality": "node scripts/technical-quality-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
@@ -27,9 +32,15 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@types/node": "^22.14.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "typescript": "~5.8.2"
+    "eslint": "^9.35.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "playwright": "^1.55.1",
+    "tsx": "^4.20.5",
+    "typescript": "~5.8.2",
+    "typescript-eslint": "^8.44.0"
   }
 }

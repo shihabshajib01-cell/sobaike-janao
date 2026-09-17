@@ -13,7 +13,7 @@ jobs:
   browser-smoke:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       SITE_URL: https://shihabshajib01-cell.github.io/sobaike-janao/
       SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
@@ -32,13 +32,14 @@ jobs:
       - name: Install project dependencies
         run: npm ci
 
-      - name: Install Playwright runtime
-        run: |
-          npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Run comprehensive non-destructive Public browser smoke
         run: node scripts/public-functional-smoke.mjs
 
       - name: Run Public UI 100% regression closure smoke
         run: node scripts/public-ui-100-regression-smoke.mjs
+
+      - name: Run production accessibility closure smoke
+        run: npm run test:a11y

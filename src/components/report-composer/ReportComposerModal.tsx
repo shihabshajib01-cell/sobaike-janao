@@ -34,7 +34,6 @@ import { AlertCircle, MapPin, Shield, RotateCcw } from 'lucide-react';
 
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { CategoryBadge } from '../ui/CategoryBadge';
 
 export interface ReportComposerModalProps {
   isOpen: boolean;
@@ -329,7 +328,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         briberyAmount: undefined,
       }));
     },
-    [formData.segment, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
+    [formData.segment, formData.serverSubmissionState, language, pendingImages]
   );
 
   const handleSelectSubcategory = useCallback(
@@ -389,7 +388,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         };
       });
     },
-    [formData.subcategoryId, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
+    [formData.subcategoryId, formData.serverSubmissionState, language, pendingImages]
   );
 
   const handleNextFromStep2 = useCallback(() => {

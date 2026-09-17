@@ -12,6 +12,12 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
     steps:
       - name: Checkout
@@ -55,8 +61,48 @@ jobs:
       - name: UI uniformity source audit
         run: npm run audit:ui-uniformity
 
-      - name: Lint
+      - name: Technical-quality source audit
+        run: npm run audit:technical-quality
+
+      - name: Source lint
         run: npm run lint
 
-      - name: Build
+      - name: TypeScript check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build
         run: npm run build
+
+      - name: Bundle budget
+        run: npm run audit:bundle
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser quality and regression gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/public-preview.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill "$PREVIEW_PID" 2>/dev/null || true' EXIT
+          READY=0
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$READY" -ne 1 ]; then
+            cat /tmp/public-preview.log
+            echo "ERROR: preview server did not become ready"
+            exit 1
+          fi
+          export SITE_URL=http://127.0.0.1:4173/
+          npm run test:a11y
+          node scripts/public-functional-smoke.mjs
+          node scripts/public-ui-100-regression-smoke.mjs
