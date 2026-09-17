@@ -30,22 +30,7 @@ jobs:
       - name: Apply deterministic UI closure transform
         run: node scripts/apply-public-ui-100-closure.mjs
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Verify design-system contract
-        run: npm run audit:design-system
-
-      - name: Verify UI uniformity contract
-        run: npm run audit:ui-uniformity
-
-      - name: Verify TypeScript
-        run: npm run lint
-
-      - name: Verify production build
-        run: npm run build
-
-      - name: Commit verified closure changes
+      - name: Retain generated closure changes on isolated branch
         run: |
           if git diff --quiet; then
             echo "No generated changes to commit."
@@ -56,3 +41,18 @@ jobs:
           git add src scripts/design-system-audit.mjs scripts/ui-uniformity-audit.mjs
           git commit -m "fix: close public UI uniformity gaps"
           git push origin HEAD:fix/public-ui-100-closure
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify design-system contract
+        run: AUDIT_VERBOSE=1 npm run audit:design-system
+
+      - name: Verify UI uniformity contract
+        run: npm run audit:ui-uniformity
+
+      - name: Verify TypeScript
+        run: npm run lint
+
+      - name: Verify production build
+        run: npm run build
