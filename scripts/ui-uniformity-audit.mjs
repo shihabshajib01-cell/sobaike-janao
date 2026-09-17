@@ -76,10 +76,26 @@ requireNotContains(
   'Search page must not recreate the primary retry button recipe'
 );
 
+requireNotContains(
+  'src/pages/HomePage.tsx',
+  'reportCounts',
+  'Home must not carry stale category-count presentation plumbing'
+);
+requireNotContains(
+  'src/components/home/ServiceHeroCarousel.tsx',
+  'reportCounts',
+  'Hero must not expose an unused report-count presentation API'
+);
+requireNotContains(
+  'src/components/ui/SearchInput.tsx',
+  'placeholderBn',
+  'SearchInput must not expose unused language-specific placeholder props'
+);
+
 if (failures.length) {
   console.error(`Public UI uniformity audit found ${failures.length} violation(s):`);
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exit(1);
 }
 
-console.log('Public UI uniformity audit passed: shared feed, rail, search and action patterns are enforced.');
+console.log('Public UI uniformity audit passed: shared feed, rail, search, hero and action patterns are enforced.');
