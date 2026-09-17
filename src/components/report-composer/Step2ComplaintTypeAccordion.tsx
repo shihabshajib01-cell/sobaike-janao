@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { Info } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { SubcategoryOption } from '../../data/reportOptions';
 import { useTaxonomy } from '../../services/taxonomyService';

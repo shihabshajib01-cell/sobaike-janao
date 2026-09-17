@@ -20,8 +20,6 @@ export interface ReportComposerFooterProps {
 
 export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   currentStep,
-  segment,
-  selectedSubcategoryId,
   language,
   onClose,
   onBack,

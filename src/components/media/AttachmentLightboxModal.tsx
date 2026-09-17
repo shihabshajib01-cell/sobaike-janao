@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
-import { AttachedImagePreview } from './ImageAttachmentPicker';
 import { toBanglaDigits } from '../../utils/formatters';
 
 export interface AttachmentItem {

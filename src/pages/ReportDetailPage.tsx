@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   AlertCircle,
   ArrowLeft,
@@ -59,7 +59,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const [viewCount, setViewCount] = useState(0);
   const [shareCount, setShareCount] = useState(0);
 
-  const fetchReport = () => {
+  const fetchReport = useCallback(() => {
     setIsLoading(true);
     setFetchError(false);
     setStoredResponses([]);
@@ -101,11 +101,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [reportId]);
 
   useEffect(() => {
     fetchReport();
-  }, [reportId]);
+  }, [fetchReport]);
 
   useEffect(() => {
     let active = true;
