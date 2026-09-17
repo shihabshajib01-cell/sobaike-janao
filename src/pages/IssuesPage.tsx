@@ -3,11 +3,12 @@ import { AlertCircle } from 'lucide-react';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useApp } from '../context/AppContext';
+import { CATEGORY_ORDER } from '../data/categoryOrder';
 import { PublicReportService } from '../services/publicReportService';
 import { SectionKey, SECTIONS } from '../theme/tokens';
 import { toBanglaDigits } from '../utils/formatters';
 
-const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
+const CATEGORY_KEYS = CATEGORY_ORDER;
 
 export const IssuesPage: React.FC = () => {
   const { language, navigateTo } = useApp();
