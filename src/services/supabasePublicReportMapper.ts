@@ -40,6 +40,8 @@ export interface SupabasePublicReportRPC {
   previous_bill_amount?: number | null;
   utilityEndTime?: string | null;
   utility_end_time?: string | null;
+  viewCount?: number | null;
+  shareCount?: number | null;
 }
 
 const BANGLA_MONTHS = [
@@ -130,7 +132,6 @@ export const mapSupabasePublicReportToItem = (
   const priority = rpc.priority ? rpc.priority.toLowerCase() : 'medium';
   const isHighUrgency = priority === 'urgent' || priority === 'high';
 
-  // Phase 8: Public per-report RPC payloads never contain or populate latitude/longitude.
   const coordinates = undefined;
 
   return {
@@ -182,6 +183,8 @@ export const mapSupabasePublicReportToItem = (
     publishedDateBn,
     publishedDateEn,
     publishedAt: rpc.publishedAt || undefined,
+    viewCount: Number(rpc.viewCount || 0),
+    shareCount: Number(rpc.shareCount || 0),
     evidenceSummaryBn: [],
     evidenceSummaryEn: [],
     status: 'published',

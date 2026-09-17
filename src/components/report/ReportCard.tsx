@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ReportItem } from '../../types/report';
 import { useApp } from '../../context/AppContext';
@@ -6,6 +6,7 @@ import { CategoryBadge } from '../ui/CategoryBadge';
 import { ReportMediaGrid } from '../media/ReportMediaGrid';
 import { AppIcon } from '../ui/AppIcon';
 import { formatBillingMonth, toBanglaDigits } from '../../utils/formatters';
+import { PublicReportService } from '../../services/publicReportService';
 
 export interface ReportCardProps {
   report: ReportItem;
@@ -15,31 +16,56 @@ export interface ReportCardProps {
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
+  const [viewCount, setViewCount] = useState(report.viewCount);
+  const [shareCount, setShareCount] = useState(report.shareCount);
+
+  useEffect(() => {
+    setViewCount(report.viewCount);
+    setShareCount(report.shareCount);
+  }, [report.id, report.viewCount, report.shareCount]);
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const publishedDate = language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
+  const viewCountLabel = language === 'bn' ? toBanglaDigits(viewCount) : viewCount.toLocaleString();
+  const shareCountLabel = language === 'bn' ? toBanglaDigits(shareCount) : shareCount.toLocaleString();
 
   const normalizedTitle = (title || '').trim();
   const normalizedDesc = (shortDesc || '').trim();
-  const shouldShowDescription =
-    normalizedDesc.length > 0 &&
-    normalizedDesc !== normalizedTitle;
+  const shouldShowDescription = normalizedDesc.length > 0 && normalizedDesc !== normalizedTitle;
+
+  const recordOpen = () => {
+    setViewCount((current) => current + 1);
+    void PublicReportService.recordView(report.id).then((counts) => {
+      if (counts) setViewCount(counts.viewCount);
+    });
+  };
 
   const handleCardClick = () => {
+    recordOpen();
     navigateTo(`/report-detail/${report.id}`);
   };
 
-  const handleShare = (e: React.MouseEvent) => {
+  const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const shareUrl = `${window.location.origin}${window.location.pathname}#/report-detail/${report.id}`;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      });
+    if (!navigator.clipboard) return;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+      const counts = await PublicReportService.recordShare(report.id);
+      if (counts) setShareCount(counts.shareCount);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.warn('[ReportCard] Copy/share failed:', error);
     }
+  };
+
+  const handleDetailsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.stopPropagation();
+    recordOpen();
   };
 
   return (
@@ -69,9 +95,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
           <p className="text-ui-content-muted font-normal text-[11.5px] sm:text-[12px] md:text-[13px]">
             {language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}
           </p>
-          <p className="font-semibold text-ui-content-primary truncate max-w-full">
-            {report.reportedSubject}
-          </p>
+          <p className="font-semibold text-ui-content-primary truncate max-w-full">{report.reportedSubject}</p>
         </div>
       )}
 
@@ -96,11 +120,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
       {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
         <div className="pt-0.5 md:pt-1">
-          <ReportMediaGrid
-            images={report.media?.images || report.images || []}
-            language={language}
-            isCompact={true}
-          />
+          <ReportMediaGrid images={report.media?.images || report.images || []} language={language} isCompact={true} />
         </div>
       )}
 
@@ -117,6 +137,15 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <p className="whitespace-nowrap">{publishedDate}</p>
           </div>
+          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[13px]" aria-hidden="true">•</span>
+          <div className="flex items-center gap-1 text-ui-content-muted shrink-0" aria-label={language === 'bn' ? `${viewCountLabel} বার দেখা হয়েছে` : `${viewCountLabel} views`}>
+            <AppIcon name="eye" size="xs" className="text-ui-content-muted" />
+            <p className="whitespace-nowrap">{viewCountLabel}</p>
+          </div>
+          <div className="flex items-center gap-1 text-ui-content-muted shrink-0" aria-label={language === 'bn' ? `${shareCountLabel} বার শেয়ার` : `${shareCountLabel} shares`}>
+            <AppIcon name="share" size="xs" className="text-ui-content-muted" />
+            <p className="whitespace-nowrap">{shareCountLabel}</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 text-[12.5px] sm:text-[13.5px] md:text-[16px]">
@@ -130,9 +159,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
               <span className="inline-flex items-center gap-1" aria-live="polite">
                 <AppIcon name="check" size="xs" className="text-ui-success-text md:hidden" />
                 <AppIcon name="check" size="sm" className="text-ui-success-text hidden md:inline-block" />
-                <span className="text-ui-success-text font-semibold text-[11.5px] sm:text-[13px] md:text-[14px]">
-                  {language === 'bn' ? 'কপি হয়েছে' : 'Copied'}
-                </span>
+                <span className="text-ui-success-text font-semibold text-[11.5px] sm:text-[13px] md:text-[14px]">{language === 'bn' ? 'কপি হয়েছে' : 'Copied'}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1">
@@ -147,7 +174,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
           <Link
             to={`/report-detail/${report.id}`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleDetailsClick}
             aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
             className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
           >
