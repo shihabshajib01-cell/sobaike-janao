@@ -1,775 +1,334 @@
 import React, { useState } from 'react';
-import { 
-  Phone, 
-  Shield, 
-  Scale, 
-  Info, 
-  HelpCircle, 
-  Palette, 
-  BookOpen, 
-  FileText, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Search, 
-  MapPin, 
-  UserCheck, 
-  Users, 
-  Lock, 
-  Clock, 
-  ArrowRight,
+import {
+  AlertTriangle,
+  BookOpen,
+  CheckCircle2,
+  ChevronDown,
+  FileCheck2,
+  FileText,
+  HelpCircle,
+  Info,
+  Lock,
+  MapPin,
+  Paperclip,
+  Phone,
+  Scale,
+  Shield,
   ShieldAlert,
-  Building2,
-  FileSearch,
-  MessageSquare,
-  Sparkles
+  UserRound,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { BANGLADESH_HELPLINES } from '../data/reportOptions';
-import { ThemeSelector } from '../components/ui/ThemeSelector';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
-import { Accordion } from '../components/ui/Accordion';
+import { CategoryIcon } from '../components/branding/CategoryIcon';
+import { useTaxonomy } from '../services/taxonomyService';
+import { SECTIONS, SectionKey } from '../theme/tokens';
+
+type InfoTab = 'about' | 'guide' | 'helplines' | 'principles' | 'response' | 'faq';
+
+type CategoryGuide = {
+  key: SectionKey;
+  bn: string;
+  en: string;
+};
+
+const CATEGORY_GUIDES: CategoryGuide[] = [
+  { key: 'harassment', bn: 'হয়রানি, নির্যাতন, প্রতারণা ও অনলাইন হয়রানি', en: 'Harassment, abuse, deception and online harassment' },
+  { key: 'extortion', bn: 'ঘুষ ও চাঁদাবাজি', en: 'Bribery and extortion' },
+  { key: 'public_safety', bn: 'চুরি, ডাকাতি, ছিনতাই ও মব সহিংসতা', en: 'Theft, robbery, snatching and mob violence' },
+  { key: 'road_transport', bn: 'সড়ক মেরামত, দুর্ঘটনা ও সড়ক অবরোধ', en: 'Road repair, accidents and road blocks' },
+  { key: 'load_shedding', bn: 'লোডশেডিং, গ্যাস সংকট ও অতিরিক্ত বিদ্যুৎ বিল', en: 'Load shedding, gas shortage and excess electricity bills' },
+  { key: 'illegal_occupation', bn: 'রাস্তা, ফুটপাত, ব্যক্তিগত বা সরকারি সম্পত্তির অবৈধ দখল', en: 'Illegal occupation of roads, public space, private or government property' },
+  { key: 'rickshaw', bn: 'অবৈধ বা ঝুঁকিপূর্ণ অটো-রিকশা চার্জিং', en: 'Illegal or unsafe auto-rickshaw charging' },
+];
+
+const REPORT_STEPS = [
+  { n: '1', icon: FileText, bn: 'বিষয় নির্বাচন করুন', en: 'Choose an issue', bnText: 'সাতটি সক্রিয় বিষয়ের মধ্যে সঠিক বিভাগ বেছে নিন।', enText: 'Choose the correct category from the seven active issue areas.' },
+  { n: '2', icon: CheckCircle2, bn: 'অভিযোগের ধরন বেছে নিন', en: 'Choose the complaint type', bnText: 'নির্বাচিত বিষয়ের উপধরন বা পরিস্থিতি নির্বাচন করুন।', enText: 'Select the relevant subtype or situation for that category.' },
+  { n: '3', icon: MapPin, bn: 'ঘটনার তথ্য দিন', en: 'Add incident details', bnText: 'বিবরণ, তারিখ, অবস্থান এবং প্রাসঙ্গিক অতিরিক্ত তথ্য দিন।', enText: 'Add the description, date, location and relevant supporting details.' },
+  { n: '4', icon: FileCheck2, bn: 'পর্যালোচনা করে জমা দিন', en: 'Review and submit', bnText: 'সব তথ্য যাচাই করে তারপর প্রতিবেদন জমা দিন।', enText: 'Check the information before sending the report for review.' },
+];
 
 export const MorePage: React.FC = () => {
   const { language } = useApp();
-  const [activeTab, setActiveTab] = useState<'about' | 'guide' | 'helplines' | 'principles' | 'response' | 'faq'>('about');
-  const [openFaqId, setOpenFaqId] = useState<string | null>('faq-1');
+  const { segments } = useTaxonomy();
+  const [activeTab, setActiveTab] = useState<InfoTab>('about');
+  const [openFaq, setOpenFaq] = useState<string | null>('faq-1');
 
-  const toggleFaq = (id: string) => {
-    setOpenFaqId(openFaqId === id ? null : id);
-  };
+  const tabs: Array<{ key: InfoTab; labelBn: string; labelEn: string; icon: React.ComponentType<{ className?: string }> }> = [
+    { key: 'about', labelBn: 'সম্পর্কে', labelEn: 'About', icon: Info },
+    { key: 'guide', labelBn: 'রিপোর্ট নির্দেশিকা', labelEn: 'Reporting Guide', icon: BookOpen },
+    { key: 'helplines', labelBn: 'জরুরি সহায়তা', labelEn: 'Emergency Help', icon: Phone },
+    { key: 'principles', labelBn: 'সুরক্ষা ও গোপনীয়তা', labelEn: 'Privacy & Safety', icon: Shield },
+    { key: 'response', labelBn: 'পর্যালোচনা ও প্রকাশ', labelEn: 'Review & Publication', icon: Scale },
+    { key: 'faq', labelBn: 'সাধারণ প্রশ্ন', labelEn: 'FAQ', icon: HelpCircle },
+  ];
+
+  const faqs = [
+    {
+      id: 'faq-1',
+      qBn: 'কোন কোন বিষয়ে প্রতিবেদন করা যায়?',
+      qEn: 'What can I report?',
+      aBn: 'বর্তমানে হয়রানি ও নির্যাতন, ঘুষ ও চাঁদাবাজি, জননিরাপত্তা, সড়ক ও যাতায়াত সমস্যা, ইউটিলিটি সমস্যা, অবৈধ দখল এবং অবৈধ অটো চার্জিং বিষয়ে প্রতিবেদন করা যায়।',
+      aEn: 'Current reporting areas are harassment and abuse, bribery and extortion, public safety, road and transport issues, utility issues, illegal occupation, and illegal auto-rickshaw charging.',
+    },
+    {
+      id: 'faq-2',
+      qBn: 'প্রতিবেদন কি সঙ্গে সঙ্গে প্রকাশিত হয়?',
+      qEn: 'Is a report published immediately?',
+      aBn: 'না। জমা দেওয়া প্রতিবেদন আগে পর্যালোচনা করা হয়। প্রয়োজন হলে তথ্য যাচাই, সম্পাদনা বা গোপনীয় তথ্য আড়াল করার পর উপযুক্ত প্রতিবেদন প্রকাশ করা হয়।',
+      aEn: 'No. Submitted reports are reviewed first. Suitable reports may be verified, edited, or have sensitive information redacted before publication.',
+    },
+    {
+      id: 'faq-3',
+      qBn: 'ব্যক্তির নাম দেওয়া কি বাধ্যতামূলক?',
+      qEn: 'Is a person name required?',
+      aBn: 'না। কোনো ব্যক্তি, দপ্তর, প্রতিষ্ঠান, যানবাহন বা সংশ্লিষ্ট পক্ষের পরিচয় জানা থাকলে প্রাসঙ্গিক তথ্য দেওয়া যায়; না জানলে অনুমান করে তথ্য দেওয়ার প্রয়োজন নেই।',
+      aEn: 'No. Add a person, office, organisation, vehicle or other involved party only when the information is known and relevant. Do not guess.',
+    },
+    {
+      id: 'faq-4',
+      qBn: 'ছবি বা প্রমাণ দেওয়া কি বাধ্যতামূলক?',
+      qEn: 'Are photos or evidence required?',
+      aBn: 'না। সংযুক্তি ঐচ্ছিক। তবে নিরাপদ ও প্রাসঙ্গিক হলে ছবি বা নথি প্রতিবেদন বুঝতে সহায়তা করতে পারে।',
+      aEn: 'No. Attachments are optional, but relevant and safe photos or documents can help reviewers understand the incident.',
+    },
+    {
+      id: 'faq-5',
+      qBn: 'এখানে প্রতিবেদন করলে কি জিডি বা মামলা হয়ে যায়?',
+      qEn: 'Does reporting here create a GD or legal case?',
+      aBn: 'না। সবাইকে জানাও কোনো থানা, আদালত বা সরকারি অভিযোগ ব্যবস্থা নয়। জরুরি অবস্থা বা আনুষ্ঠানিক আইনি সহায়তার জন্য সংশ্লিষ্ট কর্তৃপক্ষের সঙ্গে যোগাযোগ করুন।',
+      aEn: 'No. Sobaike Janao is not a police station, court, or government complaint system. Contact the appropriate authority for emergencies or formal legal action.',
+    },
+  ];
 
   return (
     <PublicPageContainer id="more-page-container">
-      {/* Page Header */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 space-y-4 shadow-2xs">
-        <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ui-surface-subtle border border-ui-stroke-subtle text-[13px] font-medium text-ui-content-secondary">
-            <Info className="w-3.5 h-3.5 text-ui-accent" />
-            <span>{language === 'bn' ? 'ব্যবহারকারী নির্দেশিকা ও জ্ঞান কেন্দ্র' : 'User Guide & Knowledge Hub'}</span>
-          </div>
-          <h1 className="text-[28px] md:text-[32px] leading-[38px] md:leading-[42px] font-bold text-ui-content-primary tracking-tight">
+      <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+        <div className="space-y-2">
+          <p className="inline-flex items-center gap-2 w-fit px-3 py-1 rounded-full bg-ui-surface-subtle border border-ui-stroke-subtle type-meta text-ui-content-secondary">
+            <Info className="w-4 h-4 text-ui-accent" aria-hidden="true" />
+            {language === 'bn' ? 'ব্যবহারকারী নির্দেশিকা ও জ্ঞান কেন্দ্র' : 'User guide & knowledge hub'}
+          </p>
+          <h1 className="type-h1 text-ui-content-primary">
             {language === 'bn' ? 'তথ্য ও সহায়তা' : 'Information & Support'}
           </h1>
-          <p className="text-[15px] md:text-[16px] leading-[24px] text-ui-content-secondary max-w-3xl">
+          <p className="type-body text-ui-content-secondary max-w-3xl">
             {language === 'bn'
-              ? 'সবাইকে জানাও প্ল্যাটফর্মের উদ্দেশ্য, পরিচালনা পদ্ধতি, প্রতিবেদন করার নিয়মকানুন, গোপনীয়তা নীতি এবং জরুরি সহায়তার সম্পূর্ণ নির্দেশিকা।'
-              : 'Complete guide to Sobaike Janao\'s purpose, reporting workflows, privacy policies, moderation standards, and emergency resources.'}
+              ? 'কীভাবে প্রতিবেদন করবেন, কোন বিষয়গুলো এখন চালু আছে, কী তথ্য দেওয়া প্রয়োজন, কীভাবে প্রতিবেদন পর্যালোচনা ও প্রকাশ করা হয় এবং কোথায় জরুরি সহায়তা পাবেন—সবকিছু এক জায়গায়।'
+              : 'Learn what you can report, what information to provide, how review and publication work, and where to find emergency help.'}
           </p>
         </div>
 
-        {/* Mobile-Only Appearance / Theme Setting Card (md:hidden) */}
-        <div className="pt-3 border-t border-ui-stroke-subtle md:hidden space-y-2">
-          <div className="flex items-center gap-2">
-            <Palette className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-            <p className="text-[14px] font-semibold text-ui-content-secondary">
-              {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
-            </p>
-          </div>
-          <ThemeSelector variant="segmented" />
-        </div>
+        <nav aria-label={language === 'bn' ? 'তথ্য ও সহায়তা বিভাগ' : 'Information and support sections'} className="flex gap-2 overflow-x-auto no-scrollbar pt-3 border-t border-ui-stroke-subtle">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setActiveTab(tab.key)}
+                className={`min-h-11 shrink-0 inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 type-meta font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${active ? 'bg-ui-action-bg text-ui-action-text' : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'}`}
+              >
+                <Icon className="w-4 h-4" aria-hidden="true" />
+                <p>{language === 'bn' ? tab.labelBn : tab.labelEn}</p>
+              </button>
+            );
+          })}
+        </nav>
+      </section>
 
-        {/* Tab Navigation */}
-        <div
-          aria-label={language === 'bn' ? 'তথ্য ও সহায়তা বিভাগ' : 'Information and support sections'}
-          className="flex items-center gap-2 pt-2 border-t border-ui-stroke-subtle overflow-x-auto pb-1 no-scrollbar"
-        >
-          <button
-            aria-pressed={activeTab === 'about'}
-            type="button"
-            onClick={() => setActiveTab('about')}
-            className={`px-4 py-2.5 rounded-xl text-[15px] leading-[22px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              activeTab === 'about'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-2xs'
-                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
-            }`}
-          >
-            <Info className="w-4 h-4" />
-            <span>{language === 'bn' ? 'সম্পর্কে' : 'About'}</span>
-          </button>
-
-          <button
-            aria-pressed={activeTab === 'guide'}
-            type="button"
-            onClick={() => setActiveTab('guide')}
-            className={`px-4 py-2.5 rounded-xl text-[15px] leading-[22px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              activeTab === 'guide'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-2xs'
-                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span>{language === 'bn' ? 'ব্যবহার নির্দেশিকা' : 'User Guide'}</span>
-          </button>
-
-          <button
-            aria-pressed={activeTab === 'helplines'}
-            type="button"
-            onClick={() => setActiveTab('helplines')}
-            className={`px-4 py-2.5 rounded-xl text-[15px] leading-[22px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              activeTab === 'helplines'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-2xs'
-                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
-            }`}
-          >
-            <Phone className="w-4 h-4" />
-            <span>{language === 'bn' ? 'সহায়তা' : 'Support'}</span>
-          </button>
-
-          <button
-            aria-pressed={activeTab === 'principles'}
-            type="button"
-            onClick={() => setActiveTab('principles')}
-            className={`px-4 py-2.5 rounded-xl text-[15px] leading-[22px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              activeTab === 'principles'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-2xs'
-                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
-            }`}
-          >
-            <Shield className="w-4 h-4" />
-            <span>{language === 'bn' ? 'সুরক্ষা ও গোপনীয়তা' : 'Privacy & Safety'}</span>
-          </button>
-
-          <button
-            aria-pressed={activeTab === 'response'}
-            type="button"
-            onClick={() => setActiveTab('response')}
-            className={`px-4 py-2.5 rounded-xl text-[15px] leading-[22px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              activeTab === 'response'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-2xs'
-                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
-            }`}
-          >
-            <Scale className="w-4 h-4" />
-            <span>{language === 'bn' ? 'প্রতিউত্তর ও অংশগ্রহণ' : 'Response & Participation'}</span>
-          </button>
-
-          <button
-            aria-pressed={activeTab === 'faq'}
-            type="button"
-            onClick={() => setActiveTab('faq')}
-            className={`px-4 py-2.5 rounded-xl text-[15px] leading-[22px] font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              activeTab === 'faq'
-                ? 'bg-ui-action-bg text-ui-action-text font-bold shadow-2xs'
-                : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle hover:bg-ui-surface'
-            }`}
-          >
-            <HelpCircle className="w-4 h-4" />
-            <span>{language === 'bn' ? 'সাধারণ প্রশ্ন (FAQ)' : 'FAQ'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ========================================================= */}
-      {/* TAB 1: সম্পর্কে (ABOUT) */}
-      {/* ========================================================= */}
       {activeTab === 'about' && (
-        <div className="space-y-6">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
-            <div className="space-y-3">
-              <h2 className="text-[22px] md:text-[24px] leading-[32px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'সবাইকে জানাও কী?' : 'What is Sobaike Janao?'}
-              </h2>
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                {language === 'bn'
-                  ? 'সবাইকে জানাও একটি স্বাধীন নাগরিক তথ্য ও জনস্বার্থ প্ল্যাটফর্ম। এখানে নাগরিকরা জনস্বার্থসংশ্লিষ্ট ঘটনা, সমস্যা ও অভিজ্ঞতা কাঠামোবদ্ধভাবে জানাতে পারেন। জমা দেওয়া প্রতিবেদন সরাসরি প্রকাশিত হয় না; প্রকাশের আগে তা পর্যালোচনা করা হয়।'
-                  : 'Sobaike Janao is an independent citizen information and public-interest reporting platform. It gives citizens a structured place to report public-interest incidents, document what happened, provide relevant context, and make suitable information visible after review.'}
-              </p>
-            </div>
-
-            {/* Crucial Positionings Callout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div className="p-5 bg-ui-warning-bg border border-ui-warning-border rounded-xl space-y-2">
-                <div className="flex items-center gap-2 text-ui-warning-text font-bold text-[16px]">
-                  <ShieldAlert className="w-5 h-5 shrink-0" />
-                  <span>{language === 'bn' ? 'এটি কোনো সরকারি ওয়েবসাইট নয়' : 'Not a Government Website'}</span>
-                </div>
-                <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'সবাইকে জানাও কোনো সরকারি বা রাষ্ট্রীয় প্রতিষ্ঠান নয়। আমাদের কোনো সরকারি অনুমোদন, সিলমোহর বা দাপ্তরিক কর্তৃত্ব নেই।'
-                    : 'Sobaike Janao is not a government portal, agency, or ministry. We have no official endorsement, seals, or administrative authority.'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-info-bg border border-ui-info-border rounded-xl space-y-2">
-                <div className="flex items-center gap-2 text-ui-info-text font-bold text-[16px]">
-                  <Scale className="w-5 h-5 shrink-0" />
-                  <span>{language === 'bn' ? 'আইন প্রয়োগকারী সংস্থা নয়' : 'Not Law Enforcement or Court'}</span>
-                </div>
-                <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'এটি পুলিশ স্টেশন, আদালত বা নিয়ন্ত্রণকারী সংস্থা নয়। এখানে প্রতিবেদন করা মানে জিডি বা মামলা করা বা বিচার চাওয়া নয়।'
-                    : 'Filing a report here is not a police complaint, GD, case, or regulatory investigation. We do not arrest, prosecute, or adjudicate.'}
-                </p>
-              </div>
-            </div>
-
-            {/* Publication notice */}
-            <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
-              <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-ui-warning-text shrink-0" />
-                <span>{language === 'bn' ? 'প্রকাশিত প্রতিবেদন ও আইনি অবস্থান' : 'Published Reports & Legal Position'}</span>
-              </h3>
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary font-medium">
-                {language === 'bn'
-                  ? '“প্রকাশিত প্রতিবেদন কোনো ব্যক্তি বা প্রতিষ্ঠানকে আইনগতভাবে দোষী প্রমাণ করে না।”'
-                  : '"A published report does not legally prove guilt of any person or organization."'}
-              </p>
-              <p className="text-[14px] leading-[22px] text-ui-content-muted">
-                {language === 'bn'
-                  ? 'প্রকাশিত তথ্যগুলো নাগরিক জমা দেওয়া এবং পর্যালোচিত তথ্য। প্ল্যাটফর্মের কাজ জনস্বার্থে তথ্য দৃশ্যমান করা এবং নাগরিক অংশগ্রহণ উৎসাহিত করা—কোনো বিচারিক রায় দেওয়া বা অপরাধী সাব্যস্ত করা নয়।'
-                  : 'Published items represent citizen-submitted and reviewed information. Our role is public-interest visibility and citizen participation—not judicial findings or criminal convictions.'}
-              </p>
-            </div>
-
-            {/* Active Categories */}
-            <div className="space-y-4 pt-4 border-t border-ui-stroke-subtle">
-              <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'বর্তমান সক্রিয় ক্যাটাগরি ও সেবা' : 'Currently Active Categories & Services'}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[13px] font-bold bg-[var(--sec-harassment-bg)] text-[var(--sec-harassment-text)] border border-[var(--sec-harassment-border)]">
-                    {language === 'bn' ? 'হয়রানি' : 'Harassment'}
-                  </span>
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'হয়রানি ও নির্যাতন' : 'Harassment & Abuse'}
-                  </h4>
-                  <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                    {language === 'bn' ? 'শারীরিক বা মানসিক নির্যাতন, নিপীড়ন ও হয়রানির ঘটনা।' : 'Report safety violations, abuse, or harassment incidents.'}
-                  </p>
-                </div>
-
-                <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[13px] font-bold bg-[var(--sec-rickshaw-bg)] text-[var(--sec-rickshaw-text)] border border-[var(--sec-rickshaw-border)]">
-                    {language === 'bn' ? 'অটো চার্জিং' : 'Auto-Charging'}
-                  </span>
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'অবৈধ অটো চার্জিং' : 'Illegal Auto Charging'}
-                  </h4>
-                  <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                    {language === 'bn' ? 'ঝুঁকিপূর্ণ ও অবৈধ অটো-রিকশা চার্জিং স্টেশনের তথ্য।' : 'Report unsafe and illegal charging station locations.'}
-                  </p>
-                </div>
-
-                <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[13px] font-bold bg-[var(--sec-extortion-bg)] text-[var(--sec-extortion-text)] border border-[var(--sec-extortion-border)]">
-                    {language === 'bn' ? 'চাঁদাবাজি' : 'Extortion'}
-                  </span>
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'চাঁদাবাজি ও জোরপূর্বক আদায়' : 'Extortion & Coercion'}
-                  </h4>
-                  <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                    {language === 'bn' ? 'অবৈধ চাঁদা দাবি, হুমকি ও বলপ্রয়োগের তথ্য।' : 'Report illegal tolls, extortion demands, and coercion.'}
-                  </p>
-                </div>
-
-                <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[13px] font-bold bg-ui-warning-bg text-ui-warning-text border border-ui-warning-border">
-                    {language === 'bn' ? 'ইউটিলিটি' : 'Utility'}
-                  </span>
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'ইউটিলিটি ও বিদ্যুৎ সমস্যা' : 'Utility & Load Shedding'}
-                  </h4>
-                  <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                    {language === 'bn' ? 'দীর্ঘ লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল।' : 'Report load shedding, gas shortages, or billing issues.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* TAB 2: ব্যবহার নির্দেশিকা (USER GUIDE) */}
-      {/* ========================================================= */}
-      {activeTab === 'guide' && (
-        <div className="space-y-6">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
+        <section className="space-y-4">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-5">
             <div className="space-y-2">
-              <h2 className="text-[22px] md:text-[24px] leading-[32px] font-bold text-ui-content-primary flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-ui-accent" />
-                <span>{language === 'bn' ? 'প্রতিবেদন করার ধাপসমূহ' : 'Step-by-Step Reporting Guide'}</span>
-              </h2>
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary">
+              <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'সবাইকে জানাও কী?' : 'What is Sobaike Janao?'}</h2>
+              <p className="type-body text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'সহজ ও কাঠামোবদ্ধ প্রক্রিয়ায় আপনার তথ্য জমা দেওয়ার সম্পূর্ণ নির্দেশিকা।'
-                  : 'Follow these straightforward steps to submit structured and useful information.'}
+                  ? 'সবাইকে জানাও একটি স্বাধীন নাগরিক তথ্য ও জনস্বার্থ প্ল্যাটফর্ম। নাগরিকরা জনস্বার্থসংশ্লিষ্ট ঘটনা, সমস্যা ও অভিজ্ঞতা কাঠামোবদ্ধভাবে জমা দিতে পারেন। জমা দেওয়া প্রতিবেদন সরাসরি প্রকাশিত হয় না; প্রকাশের আগে তা পর্যালোচনা করা হয়।'
+                  : 'Sobaike Janao is an independent citizen-information and public-interest platform where people can submit structured reports about incidents, problems and experiences. Reports are reviewed before publication.'}
               </p>
             </div>
 
-            <div className="space-y-4">
-              <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
-                <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">১</p>
-                  <h3 className="text-[18px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'সেবা বা ক্যাটাগরি নির্বাচন' : 'Choose Category'}
-                  </h3>
-                </div>
-                <p className="text-[15px] leading-[24px] text-ui-content-secondary pl-11">
-                  {language === 'bn'
-                    ? 'হোমপেজ বা মেনু থেকে উপযুক্ত সমস্যা বা সেবাটি বেছে নিন (যেমন: হয়রানি, অবৈধ অটো চার্জিং, চাঁদাবাজি বা ইউটিলিটি সমস্যা)।'
-                    : 'Select the relevant category from the homepage or navigation menu that matches the incident.'}
-                </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="rounded-xl border border-ui-warning-border bg-ui-warning-bg p-4 space-y-2">
+                <ShieldAlert className="w-5 h-5 text-ui-warning-text" aria-hidden="true" />
+                <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'সরকারি ওয়েবসাইট নয়' : 'Not a government website'}</h3>
+                <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'এটি কোনো সরকারি প্রতিষ্ঠান, মন্ত্রণালয় বা দাপ্তরিক অভিযোগ পোর্টাল নয়।' : 'This is not a government agency, ministry, or official complaint portal.'}</p>
               </div>
-
-              <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
-                <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">২</p>
-                  <h3 className="text-[18px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'ঘটনার ধরন ও বিবরণ দিন' : 'Provide Details & Context'}
-                  </h3>
-                </div>
-                <p className="text-[15px] leading-[24px] text-ui-content-secondary pl-11">
-                  {language === 'bn'
-                    ? 'ঘটনার সুনির্দিষ্ট শিরোনাম, বিস্তারিত বিবরণ, তারিখ ও সময় প্রদান করুন। ক্যাটাগরি অনুযায়ী নির্দিষ্ট প্রশ্ন বা বিলের তথ্য থাকলে তা পূরণ করুন।'
-                    : 'Provide a clear title, detailed description, date, and time. Fill in category-specific fields (such as electricity billing info where required).'}
-                </p>
+              <div className="rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4 space-y-2">
+                <Scale className="w-5 h-5 text-ui-accent" aria-hidden="true" />
+                <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'থানা বা আদালত নয়' : 'Not police or a court'}</h3>
+                <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'এখানে প্রতিবেদন করা জিডি, মামলা বা আনুষ্ঠানিক তদন্তের বিকল্প নয়।' : 'Reporting here does not create a GD, case, or formal investigation.'}</p>
               </div>
-
-              <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
-                <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">৩</p>
-                  <h3 className="text-[18px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'অবস্থান নির্ধারণ করুন' : 'Specify Incident Location'}
-                  </h3>
-                </div>
-                <p className="text-[15px] leading-[24px] text-ui-content-secondary pl-11">
-                  {language === 'bn'
-                    ? 'ঘটনাটি কোথায় ঘটেছে তার বিভাগ, জেলা, উপজেলা/থানা এবং সুনির্দিষ্ট ঠিকানা উল্লেখ করুন। মানচিত্র থেকেও অবস্থান চিহ্নিত করা যায়।'
-                    : 'Select the division, district, upazila/thana, and exact address where the incident took place. You can also pin it on the map.'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
-                <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">৪</p>
-                  <h3 className="text-[18px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'প্রমাণ বা ছবি যুক্ত করুন (ঐচ্ছিক)' : 'Attach Evidence (Optional)'}
-                  </h3>
-                </div>
-                <p className="text-[15px] leading-[24px] text-ui-content-secondary pl-11">
-                  {language === 'bn'
-                    ? 'যদি আপনার কাছে প্রাসঙ্গিক ছবি বা প্রমাণ থাকে তবে তা আপলোড করুন। গোপনীয়তা রক্ষার্থে অপ্রয়োজনীয় ব্যক্তিগত ছবি দেওয়া থেকে বিরত থাকুন।'
-                    : 'Upload relevant supporting images or evidence if available. Avoid uploading unnecessary private personal photos.'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-2">
-                <div className="flex items-center gap-3">
-                  <p className="w-8 h-8 rounded-lg bg-ui-accent text-ui-content-inverse flex items-center justify-center font-bold text-[15px]">৫</p>
-                  <h3 className="text-[18px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'যাচাই ও জমা দিন' : 'Review & Submit'}
-                  </h3>
-                </div>
-                <p className="text-[15px] leading-[24px] text-ui-content-secondary pl-11">
-                  {language === 'bn'
-                    ? 'রিভিউ ধাপে সমস্ত তথ্য একবার দেখে নিন। প্রয়োজনে এডিট করে সংশোধন করুন এবং চূড়ান্ত জমা দিন। সফল জমার পর একটি রেফারেন্স আইডি দেওয়া হবে।'
-                    : 'Review all entered information on the summary screen. Edit if needed, then submit. A reference ID will be provided upon success.'}
-                </p>
-              </div>
-            </div>
-
-            {/* Draft & Good Report tips */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-ui-stroke-subtle">
-              <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <h4 className="text-[16px] font-bold text-ui-content-primary flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-ui-accent" />
-                  <span>{language === 'bn' ? 'ড্রাফট ও অসমাপ্ত প্রতিবেদন' : 'Drafts & Resuming'}</span>
-                </h4>
-                <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'আপনার ব্রাউজারে অসমাপ্ত প্রতিবেদন স্বয়ংক্রিয়ভাবে সংরক্ষিত হতে পারে, যা পরবর্তীতে পুনরায় চালু করা সম্ভব। তবে এটি ডিভাইস বা ব্রাউজার পরিবর্তনের সাথে সিঙ্ক হয় না।'
-                    : 'Unfinished reports may be saved locally in your browser so you can resume later. Drafts are not permanently synced across different devices.'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <h4 className="text-[16px] font-bold text-ui-content-primary flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-ui-accent" />
-                  <span>{language === 'bn' ? 'কার্যকর প্রতিবেদন লেখার টিপস' : 'Tips for a Good Report'}</span>
-                </h4>
-                <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'সুনির্দিষ্ট তথ্য দিন, অনুমানের ওপর ভিত্তি করে কথা বলবেন না, শালীন ভাষা ব্যবহার করুন এবং ঘটনাস্থলের সঠিক সময় ও স্থান উল্লেখ করুন।'
-                    : 'Be factual and specific, avoid unverified assumptions, maintain respectful language, and provide accurate time and location.'}
-                </p>
+              <div className="rounded-xl border border-ui-info-border bg-ui-info-bg p-4 space-y-2">
+                <AlertTriangle className="w-5 h-5 text-ui-info-text" aria-hidden="true" />
+                <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'জরুরি সেবা নয়' : 'Not an emergency service'}</h3>
+                <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'তাৎক্ষণিক ঝুঁকি বা জরুরি অবস্থায় জাতীয় জরুরি সেবা বা সংশ্লিষ্ট কর্তৃপক্ষের সঙ্গে যোগাযোগ করুন।' : 'For immediate danger or emergencies, contact national emergency services or the appropriate authority.'}</p>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* ========================================================= */}
-      {/* TAB 3: সহায়তা (SUPPORT & HELPLINES) */}
-      {/* ========================================================= */}
-      {activeTab === 'helplines' && (
-        <div className="space-y-6">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
-            <div className="p-5 bg-ui-error-bg border border-ui-error-border rounded-xl space-y-2">
-              <div className="flex items-center gap-2 text-ui-error-text font-bold text-[18px]">
-                <ShieldAlert className="w-6 h-6 shrink-0" />
-                <span>{language === 'bn' ? 'জরুরি পরিস্থিতিতে কী করবেন?' : 'What to Do in an Emergency'}</span>
-              </div>
-              <p className="text-[15px] leading-[24px] text-ui-content-secondary">
-                {language === 'bn'
-                  ? '“সবাইকে জানাও জরুরি প্রতিক্রিয়া সেবা নয়।” তাৎক্ষণিক বিপদে বা জরুরি আইনগত সহায়তার জন্য এখানে প্রতিবেদন দিয়ে অপেক্ষা না করে সরাসরি উপযুক্ত সরকারি জরুরি সেবায় যোগাযোগ করুন।'
-                  : '"Sobaike Janao is not an emergency response service." In immediate danger or urgent distress, contact official emergency services directly rather than waiting for publication.'}
-              </p>
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+            <div className="space-y-1">
+              <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'বর্তমান প্রতিবেদন বিষয়সমূহ' : 'Current reporting areas'}</h2>
+              <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্ল্যাটফর্মে বর্তমানে সক্রিয় সাতটি বিষয়।' : 'The seven issue areas currently available on the platform.'}</p>
             </div>
-
-            <div className="space-y-3">
-              <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
-                <Phone className="w-5 h-5 text-ui-accent" />
-                <span>{language === 'bn' ? 'জরুরি ও সরকারি সহায়তা নম্বরসমূহ' : 'Official Emergency & Support Hotlines'}</span>
-              </h2>
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                {language === 'bn'
-                  ? 'বাংলাদেশের জরুরি ও হেল্পলাইন নম্বরগুলোতে সরাসরি কল করতে নিচের বাটনগুলো ব্যবহার করুন।'
-                  : 'Tap below to quickly call verified national helplines in Bangladesh.'}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {BANGLADESH_HELPLINES.map((hl) => (
-                <div
-                  key={hl.number}
-                  className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl p-5 flex items-center justify-between gap-4 shadow-2xs"
-                >
-                  <div className="space-y-1 min-w-0">
-                    <span className="text-[14px] text-ui-content-secondary font-medium">
-                      {language === 'bn' ? hl.labelBn : hl.labelEn}
-                    </span>
-                    <div className="text-[24px] leading-tight font-mono font-bold text-ui-content-primary">{hl.number}</div>
-                    <span className="text-[14px] text-ui-content-muted block truncate">
-                      {language === 'bn' ? hl.descBn : hl.descEn}
-                    </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {CATEGORY_GUIDES.map((item) => {
+                const segment = segments[item.key];
+                if (!segment) return null;
+                return (
+                  <div key={item.key} className="flex items-center gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-3.5">
+                    <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border" style={{ backgroundColor: `var(--sec-${item.key}-bg)`, color: `var(--sec-${item.key}-text)`, borderColor: `var(--sec-${item.key}-border)` }}>
+                      <CategoryIcon section={item.key} size="sm" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? segment.nameBn || SECTIONS[item.key].nameBn : segment.nameEn || SECTIONS[item.key].nameEn}</h3>
+                      <p className="type-meta text-ui-content-secondary">{language === 'bn' ? item.bn : item.en}</p>
+                    </div>
                   </div>
-                  <a
-                    href={`tel:${hl.number}`}
-                    className="btn-primary-action px-5 py-2.5 rounded-xl text-[16px] font-semibold flex items-center gap-2 shrink-0 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                  >
-                    <Phone className="w-4 h-4" aria-hidden="true" />
-                    <span>{language === 'bn' ? 'কল করুন' : 'Call'}</span>
-                  </a>
-                </div>
-              ))}
-            </div>
-
-            {/* Platform vs Official comparison */}
-            <div className="space-y-4 pt-6 border-t border-ui-stroke-subtle">
-              <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary">
-                {language === 'bn' ? 'সবাইকে জানাও বনাম সরকারি/আইনি প্রক্রিয়া' : 'Sobaike Janao vs. Official Legal Process'}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'সবাইকে জানাও প্ল্যাটফর্ম' : 'Sobaike Janao Platform'}
-                  </h4>
-                  <ul className="space-y-1.5 text-[14px] leading-[22px] text-ui-content-secondary list-disc pl-4">
-                    <li>{language === 'bn' ? 'স্বাধীন নাগরিক তথ্য প্ল্যাটফর্ম' : 'Independent citizen info platform'}</li>
-                    <li>{language === 'bn' ? 'জনস্বার্থে প্রতিবেদন প্রকাশ ও পর্যালোচনা' : 'Public interest reporting & review'}</li>
-                    <li>{language === 'bn' ? 'নাগরিক অংশগ্রহণ ও সচেতনতা বৃদ্ধি' : 'Citizen participation & awareness'}</li>
-                  </ul>
-                </div>
-
-                <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'সরকারি / আইনি প্রক্রিয়া' : 'Official / Legal Process'}
-                  </h4>
-                  <ul className="space-y-1.5 text-[14px] leading-[22px] text-ui-content-secondary list-disc pl-4">
-                    <li>{language === 'bn' ? 'থানা, পুলিশ বা আদালতে জিডি/মামলা' : 'Police GD, formal case, or court filing'}</li>
-                    <li>{language === 'bn' ? 'আইনশৃঙ্খলা রক্ষাকারী বাহিনীর তদন্ত' : 'Official law enforcement investigation'}</li>
-                    <li>{language === 'bn' ? 'আইনি প্রতিকার ও বিচারিক ব্যবস্থা' : 'Legal enforcement & adjudication'}</li>
-                  </ul>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* ========================================================= */}
-      {/* TAB 4: সুরক্ষা ও গোপনীয়তা (PRIVACY & SAFETY) */}
-      {/* ========================================================= */}
+      {activeTab === 'guide' && (
+        <section className="space-y-4">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+            <div className="space-y-1">
+              <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'চার ধাপে প্রতিবেদন করুন' : 'Report in four steps'}</h2>
+              <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'বর্তমান রিপোর্ট কম্পোজারের ধাপগুলোর সঙ্গে মিল রেখে নির্দেশিকা।' : 'Guidance aligned with the current report composer.'}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {REPORT_STEPS.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <div key={step.n} className="flex gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-ui-action-bg text-ui-action-text flex items-center justify-center font-bold">{step.n}</div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-4 h-4 text-ui-accent" aria-hidden="true" />
+                        <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? step.bn : step.en}</h3>
+                      </div>
+                      <p className="type-meta text-ui-content-secondary">{language === 'bn' ? step.bnText : step.enText}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+            <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'কোন তথ্য প্রস্তুত রাখবেন' : 'Information to prepare'}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                [MapPin, 'ঘটনার সঠিক এলাকা ও প্রয়োজনীয় বিস্তারিত ঠিকানা', 'Accurate area and any useful address details'],
+                [FileText, 'সংক্ষিপ্ত কিন্তু স্পষ্ট ঘটনার বিবরণ, তারিখ ও সময়', 'A concise description, date and time'],
+                [UserRound, 'জানা থাকলে সংশ্লিষ্ট ব্যক্তি, প্রতিষ্ঠান, যানবাহন বা দপ্তরের তথ্য', 'Known person, organisation, vehicle or office details when relevant'],
+                [Paperclip, 'নিরাপদ ও প্রাসঙ্গিক হলে ছবি বা নথি—সংযুক্তি ঐচ্ছিক', 'Photos or documents when safe and relevant—attachments are optional'],
+              ].map(([Icon, bn, en], index) => {
+                const ItemIcon = Icon as React.ComponentType<{ className?: string }>;
+                return (
+                  <div key={index} className="flex items-start gap-3 rounded-xl border border-ui-stroke-subtle p-4">
+                    <ItemIcon className="w-5 h-5 shrink-0 text-ui-accent mt-0.5" aria-hidden="true" />
+                    <p className="type-body text-ui-content-secondary">{language === 'bn' ? bn as string : en as string}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="rounded-xl border border-ui-info-border bg-ui-info-bg p-4 space-y-1">
+              <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'ঘুষ প্রতিবেদনে অতিরিক্ত তথ্য' : 'Extra details for bribery reports'}</h3>
+              <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রযোজ্য হলে দপ্তর, সেবা বা প্রক্রিয়া এবং টাকার পরিমাণ যোগ করুন। এগুলো মূল ঘটনার বিবরণ ও অবস্থানের বিকল্প নয়।' : 'When relevant, add the office, service/process and amount of money. These supplement the core incident description and location.'}</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'helplines' && (
+        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+          <div className="space-y-1">
+            <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'জরুরি ও জাতীয় সহায়তা' : 'Emergency & national support'}</h2>
+            <p className="type-body text-ui-content-secondary">{language === 'bn' ? 'সবাইকে জানাও জরুরি সেবা নয়। তাৎক্ষণিক সহায়তার প্রয়োজন হলে প্রাসঙ্গিক জাতীয় হেল্পলাইনে যোগাযোগ করুন।' : 'Sobaike Janao is not an emergency service. Use the relevant national helpline when immediate support is needed.'}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {BANGLADESH_HELPLINES.map((hl) => (
+              <a key={hl.number} href={`tel:${hl.number}`} className="flex items-center justify-between gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+                <div className="min-w-0">
+                  <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? hl.labelBn : hl.labelEn}</h3>
+                  <p className="type-meta text-ui-content-secondary">{language === 'bn' ? hl.descBn : hl.descEn}</p>
+                </div>
+                <p className="type-h3 text-ui-accent shrink-0">{hl.number}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
       {activeTab === 'principles' && (
-        <div className="space-y-6">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
-            <div className="space-y-2">
-              <h2 className="text-[22px] md:text-[24px] leading-[32px] font-bold text-ui-content-primary flex items-center gap-2">
-                <Shield className="w-6 h-6 text-ui-accent" />
-                <span>{language === 'bn' ? 'সুরক্ষা, গোপনীয়তা ও মডারেশন নীতি' : 'Privacy, Safety & Moderation Policy'}</span>
-              </h2>
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                {language === 'bn'
-                  ? 'নাগরিকদের ব্যক্তিগত গোপনীয়তা রক্ষা এবং মানসম্মত তথ্য প্রকাশে আমাদের সুনির্দিষ্ট নীতিমালা।'
-                  : 'Our standards for protecting complainant privacy, managing evidence, and reviewing reports.'}
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-ui-accent" />
-                  <span>{language === 'bn' ? '১. প্রতিবেদকের পরিচয় ও গোপনীয়তা' : '1. Complainant Privacy'}</span>
-                </h3>
-                <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? '“প্রতিবেদকের পরিচয় জনসমক্ষে দেখানোর জন্য নয়।” অভিযোগকারীর নাম, ফোন নম্বর বা ব্যক্তিগত যোগাযোগের তথ্য জনসমক্ষে প্রকাশ করা হয় না। এই তথ্যগুলো শুধুমাত্র সম্পাদকীয় যোগাযোগ বা ফলোআপের জন্য সংরক্ষিত থাকে (যেখানে প্রযোজ্য)।'
-                    : '"Complainant identity is not for public display." Personal contact details and names are kept private and are never published publicly.'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-ui-accent" />
-                  <span>{language === 'bn' ? '২. প্রমাণ ও ছবি সংক্রান্ত নীতি' : '2. Evidence & Image Policy'}</span>
-                </h3>
-                <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'জমা দেওয়া ছবি বা প্রমাণ প্রতিবেদন বুঝতে সাহায্য করে। তবে সব জমাকৃত প্রমাণ স্বয়ংক্রিয়ভাবে প্রকাশ পায় না; মডারেশনের পর শুধুমাত্র উপযুক্ত ও জনস্বার্থমূলক প্রমাণ দৃশ্যমান করা হয়। অপ্রয়োজনীয় ব্যক্তিগত ছবি আপলোড করা থেকে বিরত থাকুন।'
-                    : 'Submitted evidence helps reviewers understand context. Not all uploaded evidence is published publicly; only appropriate materials pass review.'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-ui-accent" />
-                  <span>{language === 'bn' ? '৩. লোকেশন বা অবস্থান নীতি' : '3. Location Privacy'}</span>
-                </h3>
-                <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'বর্তমান ডিভাইস লোকেশন (ব্রাউজার/জিপিএস অনুমতি সাপেক্ষে) শুধুমাত্র নিকটস্থ তথ্য বা মানচিত্র কেন্দ্রিক অভিজ্ঞতার জন্য ব্যবহৃত হতে পারে। অন্যদিকে, \'ঘটনার লোকেশন\' হলো সেই স্থান যেখানে রিপোর্টেড সমস্যাটি ঘটেছে—এই দুটি সম্পূর্ণ আলাদা।'
-                    : 'Device location (when permitted) is used only for nearby context. This is strictly separate from the "incident location" where the reported event occurred.'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-ui-accent" />
-                  <span>{language === 'bn' ? '৪. পর্যালোচনার মানদণ্ড ও সীমানা' : '4. Moderation Standards'}</span>
-                </h3>
-                <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'প্রতিটি প্রতিবেদন প্রকাশ পূর্বে প্রাসঙ্গিকতা, শালীনতা, গোপনীয়তা এবং সঠিকতা যাচাইয়ের জন্য পর্যালোচনা করা হয়। তবে মনে রাখবেন: “পর্যালোচনা মানেই অভিযোগের সত্যতা সম্পর্কে কোনো আইনি সিদ্ধান্ত বা তদন্ত নয়।”'
-                    : 'Reports undergo review for relevance, civility, and safety before publication. Remember: "Review does not constitute legal verification or official investigation."'}
-                </p>
-              </div>
-
-              <div className="p-5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                  <Users className="w-5 h-5 text-ui-accent" />
-                  <span>{language === 'bn' ? '৫. নাগরিক দায়িত্ব' : '5. Citizen Responsibility'}</span>
-                </h3>
-                <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'সদুপায়ে এবং বাস্তব তথ্যের ভিত্তিতে প্রতিবেদন করুন। জেনেশুনে মিথ্যা তথ্য ছড়ানো, ব্যক্তিগত আক্রোশ মেটানো বা মানহানিকর অপব্যবহার থেকে বিরত থাকুন।'
-                    : 'Submit reports in good faith with truthful information. Avoid knowingly false statements, personal vendettas, or defamatory misuse.'}
-                </p>
-              </div>
+        <section className="space-y-4">
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-4">
+            <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'সুরক্ষা ও গোপনীয়তার মূল নীতি' : 'Privacy & safety principles'}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                [Lock, 'অপ্রয়োজনীয় ব্যক্তিগত তথ্য দেবেন না', 'Avoid unnecessary personal information'],
+                [UserRound, 'নাম বা পরিচয় জানা না থাকলে অনুমান করে লিখবেন না', 'Do not guess names or identities you do not know'],
+                [Paperclip, 'সংযুক্তিতে ব্যক্তিগত বা সংবেদনশীল তথ্য থাকলে সতর্ক থাকুন', 'Use care when attachments contain personal or sensitive information'],
+                [Shield, 'প্রকাশের আগে প্রতিবেদন পর্যালোচনা ও প্রয়োজনীয় রেডাকশন করা হতে পারে', 'Reports may be reviewed and sensitive details redacted before publication'],
+              ].map(([Icon, bn, en], index) => {
+                const ItemIcon = Icon as React.ComponentType<{ className?: string }>;
+                return (
+                  <div key={index} className="flex items-start gap-3 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle p-4">
+                    <ItemIcon className="w-5 h-5 shrink-0 text-ui-accent mt-0.5" aria-hidden="true" />
+                    <p className="type-body text-ui-content-secondary">{language === 'bn' ? bn as string : en as string}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* ========================================================= */}
-      {/* TAB 5: প্রতিউত্তর ও অংশগ্রহণ (RESPONSE & PARTICIPATION) */}
-      {/* ========================================================= */}
       {activeTab === 'response' && (
-        <div className="space-y-6">
-          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
-            <div className="space-y-2">
-              <h2 className="text-[22px] md:text-[24px] leading-[32px] font-bold text-ui-content-primary flex items-center gap-2">
-                <Scale className="w-6 h-6 text-ui-accent" />
-                <span>{language === 'bn' ? 'প্রতিউত্তর ও নাগরিক অংশগ্রহণের নিয়মাবলী' : 'Response & Participation Guidelines'}</span>
-              </h2>
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-                {language === 'bn'
-                  ? 'প্রকাশিত প্রতিবেদনের বিষয়ে অতিরিক্ত তথ্য দেওয়া অথবা উল্লেখিত পক্ষ হিসেবে বক্তব্য পেশ করার সুযোগ।'
-                  : 'How citizens can contribute additional details and how mentioned parties can submit responses.'}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="p-6 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-ui-accent-soft text-ui-accent flex items-center justify-center font-bold">
-                  <UserCheck className="w-5 h-5" />
-                </div>
-                <h3 className="text-[18px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'আমার কাছে তথ্য আছে বা আমিও ভুক্তভোগী' : 'I Have Info or Am a Victim'}
-                </h3>
-                <p className="text-[15px] leading-[24px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'কোনো প্রকাশিত প্রতিবেদনের সাথে মিল রয়েছে এমন ঘটনা বা অতিরিক্ত তথ্য আপনার কাছে থাকলে আপনি "আমার কাছে তথ্য আছে" অপশনের মাধ্যমে তা যুক্ত করতে পারেন। পর্যালোচনার পর তা প্রাসঙ্গিক প্রতিবেদনে যুক্ত হয়।'
-                    : 'If you have additional context or experienced a similar incident related to an existing report, use the contribution option to submit details for review.'}
-                </p>
-              </div>
-
-              <div className="p-6 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-xl space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-ui-accent-soft text-ui-accent flex items-center justify-center font-bold">
-                  <MessageSquare className="w-5 h-5" />
-                </div>
-                <h3 className="text-[18px] font-bold text-ui-content-primary">
-                  {language === 'bn' ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ' : 'I Am the Mentioned Person or Party'}
-                </h3>
-                <p className="text-[15px] leading-[24px] text-ui-content-secondary">
-                  {language === 'bn'
-                    ? 'কোনো প্রতিবেদনে আপনার বা আপনার প্রতিষ্ঠানের নাম উল্লেখ থাকলে আপনি প্রতিউত্তর বা স্পষ্টীকরণ জমা দিতে পারেন। পর্যালোচনার পর তা সংশ্লিষ্ট প্রতিবেদনের নিচে প্রকাশিত হতে পারে।'
-                    : 'If you or your organization are mentioned in a report, you may submit a clarification or response. Approved statements are displayed alongside the report.'}
-                </p>
-              </div>
-            </div>
-
-            {/* Information discovery guide */}
-            <div className="space-y-4 pt-6 border-t border-ui-stroke-subtle">
-              <h3 className="text-[18px] leading-[26px] font-bold text-ui-content-primary flex items-center gap-2">
-                <FileSearch className="w-5 h-5 text-ui-accent" />
-                <span>{language === 'bn' ? 'তথ্য ও প্রতিবেদন অনুসন্ধানের উপায়' : 'How to Discover Information'}</span>
-              </h3>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'মূলপাতা ও ক্যাটাগরি' : 'Home & Categories'}
-                  </h4>
-                  <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                    {language === 'bn' ? 'সর্বশেষ প্রকাশিত প্রতিবেদন ও নির্দিষ্ট সেবা পেজ থেকে তথ্য ব্রাউজ করুন।' : 'Browse recent published reports and dedicated service feeds.'}
-                  </p>
-                </div>
-
-                <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'অনুসন্ধান (Search)' : 'Search'}
-                  </h4>
-                  <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                    {language === 'bn' ? 'কীওয়ার্ড, জেলা বা শিরোনাম দিয়ে নির্দিষ্ট প্রতিবেদন খুঁজুন।' : 'Search reports instantly by keywords, districts, or titles.'}
-                  </p>
-                </div>
-
-                <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
-                  <h4 className="text-[16px] font-bold text-ui-content-primary">
-                    {language === 'bn' ? 'এক্সপ্লোর ও ম্যাপ' : 'Explore & Map'}
-                  </h4>
-                  <p className="text-[14px] leading-[22px] text-ui-content-secondary">
-                    {language === 'bn' ? 'ম্যাপ হিটম্যাপ ও জেলাভিত্তিক পরিসংখ্যা এবং টাইমলাইন দেখুন।' : 'Explore geographic heatmaps, district rankings, and UTC timeline analytics.'}
-                  </p>
-                </div>
-              </div>
-            </div>
+        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-5">
+          <div className="space-y-1">
+            <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'জমা দেওয়ার পর কী হয়?' : 'What happens after submission?'}</h2>
+            <p className="type-body text-ui-content-secondary">{language === 'bn' ? 'প্রতিবেদন প্রকাশের আগে প্রশাসনিক পর্যালোচনার মধ্য দিয়ে যায়।' : 'Reports go through administrative review before publication.'}</p>
           </div>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="rounded-xl border border-ui-stroke-subtle p-4 space-y-2"><FileCheck2 className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '১. পর্যালোচনা' : '1. Review'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'বিষয়, উপধরন, বিবরণ, অবস্থান, সংযুক্তি ও প্রাসঙ্গিক তথ্য দেখা হয়।' : 'Category, subtype, description, location, attachments and relevant details are reviewed.'}</p></div>
+            <div className="rounded-xl border border-ui-stroke-subtle p-4 space-y-2"><Shield className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '২. প্রয়োজনীয় ব্যবস্থা' : '2. Moderation'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রয়োজনে সম্পাদনা, তথ্য আড়াল, প্রত্যাখ্যান বা অতিরিক্ত যাচাই করা হতে পারে।' : 'A report may be edited, redacted, rejected or checked further when needed.'}</p></div>
+            <div className="rounded-xl border border-ui-stroke-subtle p-4 space-y-2"><CheckCircle2 className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '৩. প্রকাশ' : '3. Publication'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'অনুমোদিত প্রতিবেদন সংশ্লিষ্ট বিষয়, অনুসন্ধান, ফিল্টার ও মানচিত্রে দেখা যেতে পারে।' : 'Approved reports may appear in category feeds, search, filters and map views.'}</p></div>
+          </div>
+          <div className="rounded-xl bg-ui-warning-bg border border-ui-warning-border p-4">
+            <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রকাশিত হওয়া মানে অভিযোগটি আদালত, পুলিশ বা সরকারি কর্তৃপক্ষ কর্তৃক সত্য প্রমাণিত হয়েছে—এমন নয়।' : 'Publication does not mean an allegation has been proven by a court, police, or government authority.'}</p>
+          </div>
+        </section>
       )}
 
-      {/* ========================================================= */}
-      {/* TAB 6: সাধারণ প্রশ্ন (FAQ) */}
-      {/* ========================================================= */}
       {activeTab === 'faq' && (
-        <div className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-6 md:p-8 space-y-6 shadow-2xs">
-          <div className="space-y-2">
-            <h2 className="text-[22px] md:text-[24px] leading-[32px] font-bold text-ui-content-primary flex items-center gap-2">
-              <HelpCircle className="w-6 h-6 text-ui-accent" />
-              <span>{language === 'bn' ? 'সাধারণ জিজ্ঞাসা ও প্রশ্নাবলী (FAQ)' : 'Frequently Asked Questions'}</span>
-            </h2>
-            <p className="text-[16px] leading-[26px] text-ui-content-secondary">
-              {language === 'bn'
-                ? 'প্ল্যাটফর্মের কার্যপদ্ধতি ও নিয়মকানুন নিয়ে সাধারণ জিজ্ঞাসাগুলোর উত্তর।'
-                : 'Clear answers to common questions about Sobaike Janao platform operations.'}
-            </p>
+        <section className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 shadow-2xs space-y-3">
+          <div className="space-y-1 pb-2">
+            <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'সাধারণ প্রশ্ন' : 'Frequently asked questions'}</h2>
+            <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'বর্তমান রিপোর্টিং ব্যবস্থা সম্পর্কে গুরুত্বপূর্ণ প্রশ্নের উত্তর।' : 'Key answers about the current reporting system.'}</p>
           </div>
-
-          <div className="space-y-3">
-            <Accordion
-              id="faq-1"
-              isOpen={openFaqId === 'faq-1'}
-              onToggle={() => toggleFaq('faq-1')}
-              title={language === 'bn' ? '১. সবাইকে জানাও কি সরকারি ওয়েবসাইট?' : '1. Is Sobaike Janao a government website?'}
-            >
-              <p className="text-ui-content-secondary text-[15px] leading-[24px]">
-                {language === 'bn'
-                  ? 'না। এটি সম্পূর্ণ স্বাধীন একটি নাগরিক তথ্য ও জনস্বার্থ প্ল্যাটফর্ম। এর সাথে সরকারি কোনো দপ্তরের প্রাতিষ্ঠানিক সংযোগ বা অনুমোদন নেই।'
-                  : 'No. It is a completely independent citizen information and public-interest platform with no official government affiliation or endorsement.'}
-              </p>
-            </Accordion>
-
-            <Accordion
-              id="faq-2"
-              isOpen={openFaqId === 'faq-2'}
-              onToggle={() => toggleFaq('faq-2')}
-              title={language === 'bn' ? '২. এটি কি পুলিশ বা আইনশৃঙ্খলা রক্ষাকারী সংস্থা?' : '2. Is this a police or law enforcement agency?'}
-            >
-              <p className="text-ui-content-secondary text-[15px] leading-[24px]">
-                {language === 'bn'
-                  ? 'না। এটি পুলিশ, আদালত বা কোনো নিয়ন্ত্রণকারী সংস্থা নয়। এখানে প্রতিবেদন করা মানে পুলিশে অভিযোগ করা বা জিডি/মামলা দায়ের করা নয়।'
-                  : 'No. It is not police, a court, or a regulatory agency. Submitting a report here does not file a police complaint, GD, or formal legal case.'}
-              </p>
-            </Accordion>
-
-            <Accordion
-              id="faq-3"
-              isOpen={openFaqId === 'faq-3'}
-              onToggle={() => toggleFaq('faq-3')}
-              title={language === 'bn' ? '৩. প্রকাশিত প্রতিবেদন কি প্রমাণ করে যে অভিযোগটি সত্য?' : '3. Does a published report prove the allegation is true?'}
-            >
-              <p className="text-ui-content-secondary text-[15px] leading-[24px]">
-                {language === 'bn'
-                  ? 'না। প্রকাশিত প্রতিবেদনগুলো নাগরিক জমা দেওয়া এবং পর্যালোচিত তথ্য। এটি কোনো আইনি রায়, বিচারিক সিদ্ধান্ত বা অপরাধের প্রমাণপত্র নয়।'
-                  : 'No. Published reports represent citizen-submitted and reviewed information. They are never judicial findings, legal proofs, or formal determinations of guilt.'}
-              </p>
-            </Accordion>
-
-            <Accordion
-              id="faq-4"
-              isOpen={openFaqId === 'faq-4'}
-              onToggle={() => toggleFaq('faq-4')}
-              title={language === 'bn' ? '৪. কী ধরনের ঘটনা বা সমস্যা এখানে জানানো যাবে?' : '4. What kind of issues can I report?'}
-            >
-              <p className="text-ui-content-secondary text-[15px] leading-[24px]">
-                {language === 'bn'
-                  ? 'বর্তমানে নির্দিষ্ট ৪টি ক্যাটাগরিতে তথ্য জানানো যায়: হয়রানি ও নির্যাতন, অবৈধ অটো-রিকশা চার্জিং, চাঁদাবাজি এবং ইউটিলিটি/বিদ্যুৎ সমস্যা।'
-                  : 'Currently, you can report across 4 active categories: Harassment & Abuse, Illegal Auto-Charging, Extortion, and Utility/Load Shedding.'}
-              </p>
-            </Accordion>
-
-            <Accordion
-              id="faq-5"
-              isOpen={openFaqId === 'faq-5'}
-              onToggle={() => toggleFaq('faq-5')}
-              title={language === 'bn' ? '৫. জমা দেওয়ার সাথে সাথেই কি প্রতিবেদন প্রকাশিত হয়?' : '5. Are reports published immediately upon submission?'}
-            >
-              <p className="text-ui-content-secondary text-[15px] leading-[24px]">
-                {language === 'bn'
-                  ? 'না। প্রতিটি প্রতিবেদন প্রকাশের পূর্বে আমাদের সম্পাদকীয় দল ও মডারেশন নীতিমালার আলোকে পর্যালোচনা করে।'
-                  : 'No. Every report goes through moderation and review before public publication.'}
-              </p>
-            </Accordion>
-
-            <Accordion
-              id="faq-6"
-              isOpen={openFaqId === 'faq-6'}
-              onToggle={() => toggleFaq('faq-6')}
-              title={language === 'bn' ? '৬. আমার ব্যক্তিগত তথ্য কি প্রকাশ পাবে?' : '6. Will my personal information be published?'}
-            >
-              <p className="text-ui-content-secondary text-[15px] leading-[24px]">
-                {language === 'bn'
-                  ? 'না। অভিযোগকারীর নাম, ফোন নম্বর ও ব্যক্তিগত গোপনীয় তথ্য জনসমক্ষে প্রকাশ করা হয় না।'
-                  : 'No. Complainant names, phone numbers, and private contact details are kept strictly confidential and never displayed publicly.'}
-              </p>
-            </Accordion>
-
-            <Accordion
-              id="faq-7"
-              isOpen={openFaqId === 'faq-7'}
-              onToggle={() => toggleFaq('faq-7')}
-              title={language === 'bn' ? '৭. জরুরি পরিস্থিতিতে আমার কী করা উচিত?' : '7. What should I do in an emergency?'}
-            >
-              <p className="text-ui-content-secondary text-[15px] leading-[24px]">
-                {language === 'bn'
-                  ? 'তাৎক্ষণিক বিপদে পড়লে সবাইকে জানাও-তে প্রতিবেদন দিয়ে অপেক্ষা না করে অবিলম্বে জাতীয় জরুরি সেবা ৯৯৯ বা সংশ্লিষ্ট আইন প্রয়োগকারী সংস্থায় যোগাযোগ করুন।'
-                  : 'In immediate danger, do not wait for Sobaike Janao publication—immediately contact National Emergency Service 999 or official authorities.'}
-              </p>
-            </Accordion>
-          </div>
-        </div>
+          {faqs.map((faq) => {
+            const open = openFaq === faq.id;
+            return (
+              <div key={faq.id} className="rounded-xl border border-ui-stroke-subtle overflow-hidden">
+                <button type="button" aria-expanded={open} onClick={() => setOpenFaq(open ? null : faq.id)} className="w-full min-h-12 flex items-center justify-between gap-3 px-4 py-3 text-left bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+                  <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? faq.qBn : faq.qEn}</h3>
+                  <ChevronDown className={`w-5 h-5 shrink-0 text-ui-content-muted transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
+                </button>
+                {open && <p className="type-body text-ui-content-secondary px-4 py-4 border-t border-ui-stroke-subtle">{language === 'bn' ? faq.aBn : faq.aEn}</p>}
+              </div>
+            );
+          })}
+        </section>
       )}
     </PublicPageContainer>
   );
