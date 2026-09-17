@@ -14,7 +14,7 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
   harassment: [
     {
       id: 'rape-sexual-violence',
-      nameBn: 'ধর্ষণ',
+      nameBn: 'ধর্ষণ / যৌন সহিংসতা',
       nameEn: 'Rape / Sexual Violence',
       descriptionBn: 'যৌন সহিংসতা বা ধর্ষণ সংক্রান্ত অভিযোগ',
       descriptionEn: 'Sexual violence, assault or rape allegation',
@@ -39,8 +39,8 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
     },
     {
       id: 'blackmail-coercion',
-      nameBn: 'ব্ল্যাকমেইলিং',
-      nameEn: 'Blackmailing',
+      nameBn: 'ব্ল্যাকমেইল / জবরদস্তি',
+      nameEn: 'Blackmailing / Coercion',
       descriptionBn: 'ব্যক্তিগত ছবি, ভিডিও বা তথ্য ব্যবহার করে ভয় দেখানো',
       descriptionEn: 'Blackmail or threats using photos, videos, or personal information',
       categoryGroup: 'digital_intimate',
