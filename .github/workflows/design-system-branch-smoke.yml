@@ -11,6 +11,9 @@ permissions:
 jobs:
   browser-smoke:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - name: Checkout exact branch head
         uses: actions/checkout@v4
