@@ -13,6 +13,8 @@ interface PublicBannerRow {
   content?: unknown;
 }
 
+const BANNER_BOOTSTRAP_TIMEOUT_MS = 2500;
+
 const SECTION_KEYS: SectionKey[] = [
   'harassment',
   'extortion',
@@ -81,23 +83,46 @@ const parseContent = (
   };
 };
 
+const loadPublishedRows = async (): Promise<PublicBannerRow[]> => {
+  if (!supabase) return [];
+
+  let timeoutId: number | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = window.setTimeout(
+      () => reject(new Error('Banner CMS bootstrap timed out')),
+      BANNER_BOOTSTRAP_TIMEOUT_MS
+    );
+  });
+
+  try {
+    const result = await Promise.race([
+      supabase.rpc('get_public_site_banners'),
+      timeout,
+    ]);
+
+    if (result.error || !Array.isArray(result.data)) {
+      throw result.error || new Error('Invalid banner response');
+    }
+
+    return result.data as PublicBannerRow[];
+  } finally {
+    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+  }
+};
+
 /**
  * Hydrates the existing canonical in-memory banner content before React mounts.
- * If the public RPC is unavailable or returns an invalid/incomplete contract,
+ * If the public RPC is unavailable, slow, or returns an invalid/incomplete contract,
  * the application keeps the exact code-backed banners as a fail-safe fallback.
  */
 export const hydratePublishedBannerContent = async (): Promise<void> => {
   if (!supabase) return;
 
   try {
-    const { data, error } = await supabase.rpc('get_public_site_banners');
-    if (error || !Array.isArray(data)) {
-      throw error || new Error('Invalid banner response');
-    }
-
+    const rows = await loadPublishedRows();
     const parsed = new Map<SectionKey, ManagedBannerContent>();
 
-    for (const row of data as PublicBannerRow[]) {
+    for (const row of rows) {
       if (!isSectionKey(row.category_key)) continue;
       const content = parseContent(row.category_key, row.content);
       if (content) parsed.set(row.category_key, content);
