@@ -50,7 +50,7 @@ export const SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
   ],
   rickshaw: [
     { id: 'all', nameBn: 'সকল রিপোর্ট', nameEn: 'All Reports' },
-    { id: 'charging-station-location', nameBn: 'অবৈধ অটো চার্জিং', nameEn: 'Illegal auto-rickshaw charging' },
+    { id: 'charging-station-location', nameBn: 'অবৈধ অটো-রিকশা চার্জিং স্টেশন', nameEn: 'Illegal Auto-rickshaw Charging Station' },
   ],
 };
 
