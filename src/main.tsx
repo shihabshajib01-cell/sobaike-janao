@@ -5,6 +5,7 @@ import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 import './theme/category-tokens.css';
+import './theme/desktop-horizontal-scroll.css';
 
 const rootElement = document.getElementById('root');
 

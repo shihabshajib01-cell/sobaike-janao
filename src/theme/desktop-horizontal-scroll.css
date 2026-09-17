@@ -1,0 +1,138 @@
+/*
+ * Desktop horizontal overflow affordances.
+ *
+ * Mobile/tablet touch scrolling remains unchanged. On desktop-sized viewports,
+ * horizontal chip/tab rails hide the native scrollbar. Chromium-based browsers
+ * that support CSS scroll buttons also receive state-aware previous/next
+ * controls, similar to YouTube's horizontal topic rails. Browsers without
+ * ::scroll-button support retain normal wheel/trackpad/keyboard scrolling.
+ */
+
+@media (min-width: 1024px) {
+  :where(
+    .overflow-x-auto.no-scrollbar,
+    .overflow-x-auto.scrollbar-none,
+    .overflow-x-scroll.no-scrollbar,
+    .overflow-x-scroll.scrollbar-none
+  ) {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  :where(
+    .overflow-x-auto.no-scrollbar,
+    .overflow-x-auto.scrollbar-none,
+    .overflow-x-scroll.no-scrollbar,
+    .overflow-x-scroll.scrollbar-none
+  )::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  @supports selector(::scroll-button(right)) and (anchor-name: --sj-horizontal-rail) {
+    :where(*):has(
+      > :is(
+        .overflow-x-auto.no-scrollbar,
+        .overflow-x-auto.scrollbar-none,
+        .overflow-x-scroll.no-scrollbar,
+        .overflow-x-scroll.scrollbar-none
+      ):not([class*="scrollbar-width:none"])
+    ) {
+      position: relative;
+      anchor-scope: --sj-horizontal-rail;
+    }
+
+    :is(
+      .overflow-x-auto.no-scrollbar,
+      .overflow-x-auto.scrollbar-none,
+      .overflow-x-scroll.no-scrollbar,
+      .overflow-x-scroll.scrollbar-none
+    ):not([class*="scrollbar-width:none"]) {
+      anchor-name: --sj-horizontal-rail;
+      scroll-behavior: smooth;
+      scroll-padding-inline: 52px;
+    }
+
+    :is(
+      .overflow-x-auto.no-scrollbar,
+      .overflow-x-auto.scrollbar-none,
+      .overflow-x-scroll.no-scrollbar,
+      .overflow-x-scroll.scrollbar-none
+    ):not([class*="scrollbar-width:none"])::scroll-button(*) {
+      position: absolute;
+      position-anchor: --sj-horizontal-rail;
+      top: anchor(50%);
+      z-index: 30;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid var(--ui-border);
+      border-radius: var(--radius-pill);
+      background: var(--ui-surface-elevated);
+      color: var(--ui-text-primary);
+      box-shadow: var(--elevation-control);
+      translate: 0 -50%;
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: 26px;
+      font-weight: var(--font-weight-medium);
+      line-height: 1;
+      transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        opacity 150ms ease,
+        visibility 150ms ease;
+    }
+
+    :is(
+      .overflow-x-auto.no-scrollbar,
+      .overflow-x-auto.scrollbar-none,
+      .overflow-x-scroll.no-scrollbar,
+      .overflow-x-scroll.scrollbar-none
+    ):not([class*="scrollbar-width:none"])::scroll-button(left) {
+      content: "‹" / "Scroll previous";
+      left: calc(anchor(left) + 4px);
+    }
+
+    :is(
+      .overflow-x-auto.no-scrollbar,
+      .overflow-x-auto.scrollbar-none,
+      .overflow-x-scroll.no-scrollbar,
+      .overflow-x-scroll.scrollbar-none
+    ):not([class*="scrollbar-width:none"])::scroll-button(right) {
+      content: "›" / "Scroll next";
+      left: calc(anchor(right) - 44px);
+    }
+
+    :is(
+      .overflow-x-auto.no-scrollbar,
+      .overflow-x-auto.scrollbar-none,
+      .overflow-x-scroll.no-scrollbar,
+      .overflow-x-scroll.scrollbar-none
+    ):not([class*="scrollbar-width:none"])::scroll-button(*):hover {
+      background: var(--ui-surface-hover);
+    }
+
+    :is(
+      .overflow-x-auto.no-scrollbar,
+      .overflow-x-auto.scrollbar-none,
+      .overflow-x-scroll.no-scrollbar,
+      .overflow-x-scroll.scrollbar-none
+    ):not([class*="scrollbar-width:none"])::scroll-button(*):focus-visible {
+      outline: 2px solid var(--ui-focus);
+      outline-offset: 2px;
+    }
+
+    :is(
+      .overflow-x-auto.no-scrollbar,
+      .overflow-x-auto.scrollbar-none,
+      .overflow-x-scroll.no-scrollbar,
+      .overflow-x-scroll.scrollbar-none
+    ):not([class*="scrollbar-width:none"])::scroll-button(*):disabled {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
