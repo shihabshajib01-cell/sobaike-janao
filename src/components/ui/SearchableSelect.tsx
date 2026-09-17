@@ -55,6 +55,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
 
   const selected = options.find((option) => option.value === value);
+  const accessibleName = selected?.label || placeholder;
 
   const filteredOptions = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase();
@@ -288,6 +289,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={listboxId}
+          aria-label={label ? undefined : accessibleName}
           aria-labelledby={label ? `${controlId}-label ${controlId}` : undefined}
           aria-required={required || undefined}
           aria-invalid={Boolean(error)}
