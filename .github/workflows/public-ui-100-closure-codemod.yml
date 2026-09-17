@@ -1,0 +1,58 @@
+name: Public UI 100 Closure Codemod
+
+on:
+  push:
+    branches:
+      - fix/public-ui-100-closure
+    paths:
+      - scripts/apply-public-ui-100-closure.mjs
+      - .github/workflows/public-ui-100-closure-codemod.yml
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout closure branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/public-ui-100-closure
+          fetch-depth: 0
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Apply deterministic UI closure transform
+        run: node scripts/apply-public-ui-100-closure.mjs
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify design-system contract
+        run: npm run audit:design-system
+
+      - name: Verify UI uniformity contract
+        run: npm run audit:ui-uniformity
+
+      - name: Verify TypeScript
+        run: npm run lint
+
+      - name: Verify production build
+        run: npm run build
+
+      - name: Commit verified closure changes
+        run: |
+          if git diff --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src scripts/design-system-audit.mjs scripts/ui-uniformity-audit.mjs
+          git commit -m "fix: close public UI uniformity gaps"
+          git push origin HEAD:fix/public-ui-100-closure
