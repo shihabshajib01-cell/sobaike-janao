@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { useApp } from '../../context/AppContext';
@@ -87,19 +88,12 @@ export const Modal: React.FC<ModalProps> = ({
     openModalsCount++;
     modalStack.push(instanceIdRef.current);
 
-    // Focus modal or first focusable element asynchronously without triggering synchronous loop
-    const timeoutId = setTimeout(() => {
-      if (modalRef.current) {
-        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length > 0) {
-          focusableElements[0].focus();
-        } else {
-          modalRef.current.focus();
-        }
-      }
-    }, 30);
+    // Keep initial focus inside the dialog without asking mobile Safari to scroll
+    // a button/input into view. Auto-focusing actionable controls was causing the
+    // visual viewport to jump on first open, leaving bottom sheets at a stale Y offset.
+    const timeoutId = window.setTimeout(() => {
+      modalRef.current?.focus({ preventScroll: true });
+    }, 0);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // ONLY the topmost currently open Modal handles Escape and traps Tab
@@ -124,15 +118,13 @@ export const Modal: React.FC<ModalProps> = ({
         const lastElement = focusableElements[focusableElements.length - 1];
 
         if (e.shiftKey) {
-          if (document.activeElement === firstElement) {
+          if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
             e.preventDefault();
-            lastElement.focus();
+            lastElement.focus({ preventScroll: true });
           }
-        } else {
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
+        } else if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus({ preventScroll: true });
         }
       }
     };
@@ -152,7 +144,7 @@ export const Modal: React.FC<ModalProps> = ({
       }
       window.removeEventListener('keydown', handleKeyDown);
       if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
-        previouslyFocusedElementRef.current.focus();
+        previouslyFocusedElementRef.current.focus({ preventScroll: true });
       }
     };
   }, [isOpen]);
@@ -212,7 +204,7 @@ export const Modal: React.FC<ModalProps> = ({
   const effectiveDescribedBy = ariaDescribedBy || (description ? `${id}-desc` : undefined);
   const effectiveAriaLabel = !effectiveLabelledBy && ariaLabel ? ariaLabel : undefined;
 
-  return (
+  const modalNode = (
     <div
       id={id}
       role="dialog"
@@ -220,13 +212,13 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={effectiveLabelledBy}
       aria-describedby={effectiveDescribedBy}
       aria-label={effectiveAriaLabel}
-      className={`fixed inset-0 ${zIndexClass} ${rootPositionClasses} transition-opacity duration-200 ${
+      className={`fixed inset-0 h-[100dvh] ${zIndexClass} ${rootPositionClasses} transition-opacity duration-200 ${
         isHidden ? 'opacity-0 pointer-events-none invisible' : 'opacity-100 visible'
       }`}
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 backdrop-blur-xs transition-opacity"
+        className="absolute inset-0 backdrop-blur-xs transition-opacity"
         style={{ backgroundColor: 'var(--ui-overlay)' }}
         onClick={closeOnBackdrop ? onClose : undefined}
         aria-hidden="true"
@@ -305,4 +297,6 @@ export const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalNode, document.body) : modalNode;
 };
