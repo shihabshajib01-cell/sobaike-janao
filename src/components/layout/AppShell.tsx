@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -12,6 +12,7 @@ import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
 import { LocationConsentModal } from '../location/LocationConsentModal';
 import { LocationReminderBar } from '../location/LocationReminderBar';
 import { VisitorSessionService } from '../../services/visitorSessionService';
+import { PublicEngagementService } from '../../services/publicEngagementService';
 import { HomePage } from '../../pages/HomePage';
 import { IssuesPage } from '../../pages/IssuesPage';
 import { HarassmentPage } from '../../pages/HarassmentPage';
@@ -34,7 +35,16 @@ const LazyExplorePage = React.lazy(() =>
 
 const ReportDetailRouteWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  return <ReportDetailPage reportId={id ? decodeURIComponent(id) : ''} />;
+  const reportId = id ? decodeURIComponent(id) : '';
+  const trackedReportIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!reportId || trackedReportIdRef.current === reportId) return;
+    trackedReportIdRef.current = reportId;
+    void PublicEngagementService.trackView(reportId);
+  }, [reportId]);
+
+  return <ReportDetailPage reportId={reportId} />;
 };
 
 const LocationRouteWrapper: React.FC = () => {
