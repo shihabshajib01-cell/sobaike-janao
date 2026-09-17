@@ -39,3 +39,6 @@ jobs:
 
       - name: Run comprehensive non-destructive Public browser smoke
         run: node scripts/public-functional-smoke.mjs
+
+      - name: Run Public UI 100% regression closure smoke
+        run: node scripts/public-ui-100-regression-smoke.mjs
