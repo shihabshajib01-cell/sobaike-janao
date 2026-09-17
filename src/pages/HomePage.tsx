@@ -15,6 +15,7 @@ import { NewReportsNotice } from '../components/feed/NewReportsNotice';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Button } from '../components/ui/Button';
+import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
@@ -260,7 +261,13 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <HorizontalScrollRail
+          id="home-feed-filter-rail"
+          ariaLabel={language === 'bn' ? 'প্রতিবেদন ফিল্টার' : 'Report filters'}
+          previousLabel={language === 'bn' ? 'আগের ফিল্টারগুলো দেখুন' : 'Show previous filters'}
+          nextLabel={language === 'bn' ? 'পরের ফিল্টারগুলো দেখুন' : 'Show more filters'}
+          className="gap-1.5 sm:gap-2"
+        >
           <FilterChip
             id="filter-chip-all"
             label={language === 'bn' ? 'সব' : 'All'}
@@ -283,7 +290,7 @@ export const HomePage: React.FC = () => {
             selected={feedFilter === 'popular'}
             onClick={() => setFeedFilter('popular')}
           />
-        </div>
+        </HorizontalScrollRail>
 
         <NewReportsNotice
           count={newReportCount}
