@@ -80,6 +80,7 @@ export interface ReportItem {
   districtEn: string;
   areaBn: string;
   areaEn: string;
+  incidentDate?: string;
   incidentDateBn: string;
   incidentDateEn: string;
   incidentTime?: string;
