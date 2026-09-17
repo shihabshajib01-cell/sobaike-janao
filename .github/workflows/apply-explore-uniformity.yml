@@ -1,0 +1,49 @@
+name: Apply Explore UI Uniformity
+
+on:
+  push:
+    branches: [ux/public-ui-uniformity-100]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ux/public-ui-uniformity-100
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply guarded Explore consolidation
+        run: node scripts/apply-explore-uniformity.mjs
+
+      - name: Validate source audits and TypeScript
+        run: |
+          npm ci
+          npm run audit:design-system
+          npm run audit:ui-uniformity
+          npm run lint
+          npm run build
+
+      - name: Commit Explore consolidation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/pages/ExplorePage.tsx
+          if git diff --cached --quiet; then
+            echo "No Explore changes to commit"
+            exit 0
+          fi
+          git commit -m "Unify Explore shared controls"
+          git push origin HEAD:ux/public-ui-uniformity-100
