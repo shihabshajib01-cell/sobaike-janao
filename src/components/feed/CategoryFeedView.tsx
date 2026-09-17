@@ -20,6 +20,7 @@ type SubcategoryOption = {
 export interface CategoryFeedViewProps {
   section: SectionKey;
   language: Language;
+  reports?: ReportItem[];
   filteredReports: ReportItem[];
   isLoading: boolean;
   fetchError: string | null;
