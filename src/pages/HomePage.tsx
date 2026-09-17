@@ -3,6 +3,7 @@ import {
   AlertCircle,
   Sparkles,
   LayoutGrid,
+  Flame,
 } from 'lucide-react';
 import { SectionKey } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
@@ -18,7 +19,7 @@ import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 
-type FeedFilterType = 'all' | 'latest';
+type FeedFilterType = 'all' | 'latest' | 'popular';
 
 const INITIAL_VISIBLE_REPORT_COUNT = 10;
 const LOAD_MORE_REPORT_COUNT = 10;
@@ -34,7 +35,6 @@ export const HomePage: React.FC = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [visibleCount, setVisibleCount] = useState<number>(INITIAL_VISIBLE_REPORT_COUNT);
 
-  // Determine valid browse location (transient request scope only)
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
     browseLocation !== null &&
@@ -68,12 +68,10 @@ export const HomePage: React.FC = () => {
     loadReports();
   }, [loadReports]);
 
-  // Phase 7: Reset visible count whenever ranking context changes
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE_REPORT_COUNT);
   }, [feedFilter, selectedDistrict, visitorLat, visitorLng]);
 
-  // Compute report counts per segment for the carousel
   const reportCounts: Partial<Record<SectionKey, number>> = useMemo(() => {
     return {
       harassment: allReports.filter((r) => r.segment === 'harassment').length,
@@ -83,16 +81,11 @@ export const HomePage: React.FC = () => {
     };
   }, [allReports]);
 
-  // Filtered and ranked reports returned directly from the shadow-ranked backend
-  const filteredReports = useMemo(() => {
-    return allReports;
-  }, [allReports]);
-
-  // Phase 7: Slice visible reports for progressive reveal
-  const visibleReports = useMemo(() => {
-    return filteredReports.slice(0, visibleCount);
-  }, [filteredReports, visibleCount]);
-
+  const filteredReports = useMemo(() => allReports, [allReports]);
+  const visibleReports = useMemo(
+    () => filteredReports.slice(0, visibleCount),
+    [filteredReports, visibleCount]
+  );
   const hasMoreReports = visibleReports.length < filteredReports.length;
 
   const handleLoadMore = useCallback(() => {
@@ -101,23 +94,19 @@ export const HomePage: React.FC = () => {
 
   return (
     <PublicPageContainer id="home-page-container">
-      {/* Semantic Page Level H1 for Screen Readers and Landmark Hierarchy */}
       <h1 className="sr-only">
         {language === 'bn'
           ? 'সবাইকে জানাও — নাগরিক প্রতিবেদন প্ল্যাটফর্ম'
           : 'Sobaike Janao — Citizen Reporting Platform'}
       </h1>
 
-      {/* 1. Service Hero Carousel */}
       <ServiceHeroCarousel
         id="home-service-carousel"
         reportCounts={reportCounts}
         className="mb-2"
       />
 
-      {/* 2. Combined Public Feed */}
       <section id="home-feed-section" className="space-y-4 pt-1">
-        {/* Feed Header & District Filter */}
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
             <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
@@ -125,7 +114,6 @@ export const HomePage: React.FC = () => {
             </h2>
           </div>
 
-          {/* Location Selector */}
           <div className="shrink-0">
             <LocationSelector
               selectedDistrict={selectedDistrict}
@@ -134,7 +122,6 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Feed Control Chips: সব | সর্বশেষ */}
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
           <FilterChip
             id="filter-chip-all"
@@ -151,9 +138,15 @@ export const HomePage: React.FC = () => {
             selected={feedFilter === 'latest'}
             onClick={() => setFeedFilter('latest')}
           />
+          <FilterChip
+            id="filter-chip-popular"
+            label={language === 'bn' ? 'জনপ্রিয়' : 'Popular'}
+            icon={<Flame className="w-3.5 h-3.5" aria-hidden="true" />}
+            selected={feedFilter === 'popular'}
+            onClick={() => setFeedFilter('popular')}
+          />
         </div>
 
-        {/* Loading State Skeleton Screen */}
         {isLoading && (
           <ReportFeedSkeleton
             count={4}
@@ -162,7 +155,6 @@ export const HomePage: React.FC = () => {
           />
         )}
 
-        {/* Error State */}
         {!isLoading && fetchError && (
           <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
             <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
@@ -181,14 +173,12 @@ export const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* Feed List of Report Cards (Phase 7 Progressive Rendering) */}
         {!isLoading && !fetchError && visibleReports.length > 0 && (
           <div className="space-y-3">
             {visibleReports.map((report) => (
               <ReportCard key={report.id} report={report} />
             ))}
 
-            {/* Phase 7 Load More Button */}
             {hasMoreReports && (
               <div className="pt-2 flex justify-center">
                 <Button
