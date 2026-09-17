@@ -5,7 +5,6 @@ import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
-import { LocationSelector } from '../components/feed/LocationSelector';
 import { MobileCategoryFilterPortal } from '../components/feed/MobileCategoryFilterPortal';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -87,14 +86,6 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
     });
   }, [reports, section, selectedSubcat, feedFilters]);
 
-  const handleDesktopDistrictChange = (districtId: string) => {
-    setFeedFilters((current) => ({
-      ...current,
-      divisionId: 'all',
-      districtId,
-    }));
-  };
-
   return (
     <PublicPageContainer id={`${section}-page-container`}>
       <MobileCategoryFilterPortal
@@ -139,12 +130,10 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
             </p>
           </div>
 
-          <div className="hidden md:block shrink-0">
-            <LocationSelector
-              selectedDistrict={feedFilters.districtId}
-              onSelectDistrict={handleDesktopDistrictChange}
-            />
-          </div>
+          <div
+            id="desktop-category-filter-slot"
+            className="hidden md:flex shrink-0 items-center"
+          />
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">

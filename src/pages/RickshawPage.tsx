@@ -5,7 +5,6 @@ import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
-import { LocationSelector } from '../components/feed/LocationSelector';
 import { MobileCategoryFilterPortal } from '../components/feed/MobileCategoryFilterPortal';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
@@ -74,14 +73,6 @@ export const RickshawPage: React.FC = () => {
     });
   }, [reports, feedFilters]);
 
-  const handleDesktopDistrictChange = (districtId: string) => {
-    setFeedFilters((current) => ({
-      ...current,
-      divisionId: 'all',
-      districtId,
-    }));
-  };
-
   return (
     <PublicPageContainer id="rickshaw-page-container">
       <MobileCategoryFilterPortal
@@ -135,12 +126,10 @@ export const RickshawPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="hidden md:block shrink-0">
-            <LocationSelector
-              selectedDistrict={feedFilters.districtId}
-              onSelectDistrict={handleDesktopDistrictChange}
-            />
-          </div>
+          <div
+            id="desktop-category-filter-slot"
+            className="hidden md:flex shrink-0 items-center"
+          />
         </div>
       </section>
 
