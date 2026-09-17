@@ -1,0 +1,185 @@
+/*
+ * Canonical semantic UI color tokens.
+ *
+ * Imported after index.css so every public component receives one consistent
+ * light/dark surface, content, border, action and feedback hierarchy.
+ * Keep component CSS free of literal theme colors; use semantic utilities.
+ */
+
+:root,
+html[data-theme="light"] {
+  /* Surfaces */
+  --ui-page: #F0F2F5;
+  --ui-surface: #FFFFFF;
+  --ui-surface-subtle: #F0F2F5;
+  --ui-surface-elevated: #FFFFFF;
+  --ui-surface-hover: #E4E6EB;
+
+  /* Content */
+  --ui-text-primary: #050505;
+  --ui-text-secondary: #65676B;
+  --ui-text-muted: #73767A;
+  --ui-text-inverse: #FFFFFF;
+
+  /* Borders */
+  --ui-border-subtle: #E4E6EB;
+  --ui-border: #DADDE1;
+  --ui-border-strong: #C8CCD1;
+
+  /* Inputs / disabled */
+  --ui-input: #FFFFFF;
+  --ui-input-placeholder: #73767A;
+  --ui-disabled-bg: #E4E6EB;
+  --ui-disabled-text: #73767A;
+
+  /* Accent / overlay */
+  --ui-accent: #3A7CA5;
+  --ui-focus: #3A7CA5;
+  --ui-overlay: rgba(5, 5, 5, 0.55);
+  --ui-accent-soft: color-mix(in srgb, var(--ui-accent) 12%, var(--ui-surface));
+  --ui-accent-border: color-mix(in srgb, var(--ui-accent) 35%, var(--ui-surface));
+  --ui-accent-hover: #163B52;
+
+  /* Primary action */
+  --ui-primary-action-bg: #1B4D6B;
+  --ui-primary-action-hover: #163B52;
+  --ui-primary-action-active: #245F82;
+  --ui-primary-action-text: #FFFFFF;
+
+  /* Feedback */
+  --ui-success-text: #15803D;
+  --ui-success-bg: #F0FDF4;
+  --ui-success-border: #BBF7D0;
+
+  --ui-warning-text: #B45309;
+  --ui-warning-bg: #FFFBEB;
+  --ui-warning-border: #FDE68A;
+
+  --ui-error-text: #B91C1C;
+  --ui-error-bg: #FEF2F2;
+  --ui-error-border: #FECACA;
+
+  --ui-info-text: #1D4ED8;
+  --ui-info-bg: #EFF6FF;
+  --ui-info-border: #BFDBFE;
+
+  /* Validation */
+  --ui-validation-text: oklch(57.7% .245 27.325);
+  --ui-validation-border: oklch(63.7% .237 25.331);
+  --ui-validation-focus: oklch(63.7% .237 25.331);
+
+  /* Sensitive information */
+  --ui-sensitive-bg: #FFF5F7;
+  --ui-sensitive-border: #F3C7D1;
+  --ui-sensitive-text: #7A2338;
+  --ui-sensitive-muted: #9B5364;
+
+  /* Media viewer */
+  --ui-media-viewer-bg: #171717;
+  --ui-media-viewer-bg-elevated: rgba(23, 23, 23, 0.94);
+  --ui-media-viewer-text: #FFFFFF;
+  --ui-media-viewer-muted: rgba(255, 255, 255, 0.55);
+  --ui-media-viewer-border: rgba(255, 255, 255, 0.16);
+  --ui-media-viewer-control: rgba(23, 23, 23, 0.82);
+  --ui-media-viewer-control-hover: #171717;
+  --ui-media-viewer-focus: #FFFFFF;
+  --ui-media-viewer-backdrop: rgba(0, 0, 0, 0.85);
+  --ui-media-viewer-stage: rgba(0, 0, 0, 0.95);
+  --ui-media-viewer-chip: rgba(255, 255, 255, 0.10);
+  --ui-media-viewer-chip-hover: rgba(255, 255, 255, 0.20);
+  --ui-media-viewer-strip: rgba(0, 0, 0, 0.40);
+  --ui-media-viewer-border-soft: rgba(255, 255, 255, 0.05);
+  --ui-media-viewer-border-strong: rgba(255, 255, 255, 0.20);
+  --ui-media-overlay-soft: rgba(0, 0, 0, 0.25);
+  --ui-media-overlay-strong: rgba(0, 0, 0, 0.60);
+  --ui-media-overlay-label: rgba(0, 0, 0, 0.75);
+  --ui-media-overlay-max: rgba(0, 0, 0, 0.90);
+  --ui-media-gradient: rgba(0, 0, 0, 0.80);
+  --ui-debug-overlay: rgba(0, 0, 0, 0.80);
+  --ui-debug-text: #FFFFFF;
+  --ui-debug-muted: rgba(255, 255, 255, 0.55);
+  --ui-debug-border: rgba(255, 255, 255, 0.20);
+
+  /* Compatibility aliases */
+  --text-primary: var(--ui-text-primary);
+  --text-secondary: var(--ui-text-secondary);
+  --text-muted: var(--ui-text-muted);
+  --text-inverse: var(--ui-text-inverse);
+  --border-subtle: var(--ui-border-subtle);
+}
+
+html[data-theme="dark"],
+.dark {
+  /* Surfaces: deliberately separated so semantic roles remain visible. */
+  --ui-page: #18191A;
+  --ui-surface: #242526;
+  --ui-surface-subtle: #2B2C2E;
+  --ui-surface-elevated: #2F3032;
+  --ui-surface-hover: #3A3B3C;
+
+  /* Content */
+  --ui-text-primary: #E4E6EB;
+  --ui-text-secondary: #B0B3B8;
+  --ui-text-muted: #8A8D91;
+  --ui-text-inverse: #FFFFFF;
+
+  /* Borders */
+  --ui-border-subtle: #323436;
+  --ui-border: #3A3B3C;
+  --ui-border-strong: #505255;
+
+  /* Inputs / disabled */
+  --ui-input: #242526;
+  --ui-input-placeholder: #8A8D91;
+  --ui-disabled-bg: #3A3B3C;
+  --ui-disabled-text: #8A8D91;
+
+  /* Accent / overlay */
+  --ui-accent: #3A7CA5;
+  --ui-focus: #3A7CA5;
+  --ui-overlay: rgba(0, 0, 0, 0.72);
+  --ui-accent-soft: color-mix(in srgb, var(--ui-accent) 18%, var(--ui-surface));
+  --ui-accent-border: color-mix(in srgb, var(--ui-accent) 40%, var(--ui-surface));
+  --ui-accent-hover: #245F82;
+
+  /* Primary action */
+  --ui-primary-action-bg: #1B4D6B;
+  --ui-primary-action-hover: #163B52;
+  --ui-primary-action-active: #245F82;
+  --ui-primary-action-text: #FFFFFF;
+
+  /* Feedback */
+  --ui-success-text: #86EFAC;
+  --ui-success-bg: #10261A;
+  --ui-success-border: #1F5A35;
+
+  --ui-warning-text: #FCD34D;
+  --ui-warning-bg: #2A2110;
+  --ui-warning-border: #6B4E12;
+
+  --ui-error-text: #FCA5A5;
+  --ui-error-bg: #2B1416;
+  --ui-error-border: #6B252A;
+
+  --ui-info-text: #93C5FD;
+  --ui-info-bg: #101E32;
+  --ui-info-border: #254B78;
+
+  /* Validation */
+  --ui-validation-text: oklch(70.4% .191 22.216);
+  --ui-validation-border: oklch(70.4% .191 22.216);
+  --ui-validation-focus: oklch(63.7% .237 25.331);
+
+  /* Sensitive information */
+  --ui-sensitive-bg: #24151A;
+  --ui-sensitive-border: #56303A;
+  --ui-sensitive-text: #F0B5C2;
+  --ui-sensitive-muted: #C38A97;
+
+  /* Compatibility aliases */
+  --text-primary: var(--ui-text-primary);
+  --text-secondary: var(--ui-text-secondary);
+  --text-muted: var(--ui-text-muted);
+  --text-inverse: var(--ui-text-inverse);
+  --border-subtle: var(--ui-border-subtle);
+}
