@@ -154,7 +154,15 @@ await check('Dark semantic surfaces retain distinct visual hierarchy', async () 
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#tablet-menu-button').click();
   await expectVisible(page.locator('#tablet-drawer'), 'tablet drawer missing');
-  const darkOption = page.locator('[role="radio"]').filter({ hasText: 'Dark' }).first();
+
+  // Theme labels are localized (Dark / ডার্ক), so target the stable segmented
+  // option order inside the tablet drawer: Light, Dark, System.
+  const themeOptions = page.locator('#tablet-drawer [role="radiogroup"] [role="radio"]');
+  const themeOptionCount = await themeOptions.count();
+  if (themeOptionCount !== 3) {
+    throw new Error(`expected 3 theme options, found ${themeOptionCount}`);
+  }
+  const darkOption = themeOptions.nth(1);
   await expectVisible(darkOption, 'dark theme control missing');
   await darkOption.click();
   await page.waitForTimeout(150);
