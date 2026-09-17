@@ -852,8 +852,10 @@ export const ExplorePage: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      variant="primary"
+                      size="md"
                       onClick={() => {
                         setIsFilterSheetOpen(false);
                         setIsAreaSheetOpen(true);
@@ -865,11 +867,11 @@ export const ExplorePage: React.FC = () => {
                           ? `${activeDistrictName || selectedDistrict} এলাকার বিস্তারিত দেখুন`
                           : `View details for ${activeDistrictName || selectedDistrict}`
                       }
-                      className="btn-primary-action px-3.5 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] min-h-[44px] w-full sm:w-auto flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-2xs)]"
+                      rightIcon={<MapIcon name="arrow-right" size="xs" ariaHidden={true} />}
+                      className="w-full sm:w-auto shrink-0"
                     >
-                      <span>{language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}</span>
-                      <MapIcon name="arrow-right" size="xs" ariaHidden={true} />
-                    </button>
+                      {language === 'bn' ? 'এলাকার বিস্তারিত' : 'Area details'}
+                    </Button>
                   </div>
                 </div>
               )}
@@ -976,13 +978,9 @@ export const ExplorePage: React.FC = () => {
         language={language}
         footer={
           <div className="flex items-center justify-between w-full gap-3">
-            <button
-              type="button"
-              onClick={handleClearFilterSheet}
-              className="px-3 sm:px-4 py-2.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle transition-colors min-h-[44px] cursor-pointer shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            >
+            <Button type="button" variant="secondary" size="md" onClick={handleClearFilterSheet} className="shrink-0">
               {language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
-            </button>
+            </Button>
             <Button type="button" variant="primary" size="md" onClick={handleApplyFilterSheet} className="flex-1">
               {language === 'bn' ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters'}
             </Button>
