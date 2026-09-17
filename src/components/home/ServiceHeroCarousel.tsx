@@ -19,7 +19,6 @@ export interface ServiceSlide {
 
 export interface ServiceHeroCarouselProps {
   id?: string;
-  reportCounts?: Partial<Record<SectionKey, number>>;
   className?: string;
 }
 
@@ -27,7 +26,6 @@ const AUTOPLAY_INTERVAL = HERO_SLIDER_BEHAVIOR.autoplayIntervalMs;
 
 export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   id = 'home-service-carousel',
-  reportCounts: _reportCounts = {},
   className = '',
 }) => {
   const { language, openReportComposer } = useApp();
