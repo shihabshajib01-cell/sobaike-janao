@@ -45,7 +45,9 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       navigator.clipboard.writeText(shareUrl).then(async () => {
         setIsCopied(true);
         const counts = await PublicEngagementService.trackShare(report.id);
-        if (counts) setShareCount(counts.shareCount);
+        if (counts) {
+          setShareCount(counts.shareCount);
+        }
         setTimeout(() => setIsCopied(false), 2000);
       });
     }
@@ -64,12 +66,18 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         </div>
       </div>
 
-      <h3 className="type-h3 text-ui-content-primary transition-colors line-clamp-2 break-words">{title}</h3>
+      <h3 className="type-h3 text-ui-content-primary transition-colors line-clamp-2 break-words">
+        {title}
+      </h3>
 
       {report.reportedSubject && (
         <div className="type-meta text-ui-content-secondary flex items-center gap-1.5 flex-wrap min-w-0">
-          <p className="type-helper text-ui-content-muted">{language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}</p>
-          <p className="type-helper font-semibold text-ui-content-primary truncate max-w-full">{report.reportedSubject}</p>
+          <p className="type-helper text-ui-content-muted">
+            {language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}
+          </p>
+          <p className="type-helper font-semibold text-ui-content-primary truncate max-w-full">
+            {report.reportedSubject}
+          </p>
         </div>
       )}
 
@@ -79,12 +87,18 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : (language === 'bn' ? 'সাম্প্রতিক বিল' : 'Recent bill')}: ৳{report.recentBillAmount !== undefined ? (language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()) : '-'}
           </p>
           {report.previousBillAmount !== undefined && (
-            <p className="type-helper text-ui-content-muted">({language === 'bn' ? 'পূর্বে: ' : 'prev: '}৳{language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()})</p>
+            <p className="type-helper text-ui-content-muted">
+              ({language === 'bn' ? 'পূর্বে: ' : 'prev: '}৳{language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()})
+            </p>
           )}
         </div>
       )}
 
-      {shouldShowDescription && <p className="type-body text-ui-content-secondary line-clamp-2 md:line-clamp-3 break-words">{shortDesc}</p>}
+      {shouldShowDescription && (
+        <p className="type-body text-ui-content-secondary line-clamp-2 md:line-clamp-3 break-words">
+          {shortDesc}
+        </p>
+      )}
 
       {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
         <div className="pt-0.5 md:pt-1">
@@ -106,7 +120,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             <p className="type-meta whitespace-nowrap">{publishedDate}</p>
           </div>
           <span className="text-ui-content-muted" aria-hidden="true">•</span>
-          <div className="flex items-center gap-1 text-ui-content-muted shrink-0" aria-label={language === 'bn' ? `${formatCount(viewCount)} বার দেখা হয়েছে` : `${formatCount(viewCount)} views`}>
+          <div
+            className="flex items-center gap-1 text-ui-content-muted shrink-0"
+            aria-label={language === 'bn' ? `${formatCount(viewCount)} বার দেখা হয়েছে` : `${formatCount(viewCount)} views`}
+          >
             <AppIcon name="eye" size="xs" className="text-ui-content-muted" />
             <span>{formatCount(viewCount)}</span>
           </div>
