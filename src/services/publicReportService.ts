@@ -34,7 +34,11 @@ export interface HomeFeedParams {
   district?: string;
 }
 
-// In-flight request deduplication map to prevent redundant concurrent network bursts
+export interface PublicEngagementCounts {
+  viewCount: number;
+  shareCount: number;
+}
+
 const inFlightRequests = new Map<string, Promise<any>>();
 
 function fetchWithDeduplication<T>(key: string, fetcher: () => PromiseLike<T>): Promise<T> {
@@ -90,28 +94,58 @@ async function enrichHarassmentClassifications(list: ReportItem[]): Promise<Repo
   }
 }
 
+async function enrichEvidence(list: ReportItem[], logScope: string): Promise<void> {
+  if (!isSupabaseConfigured() || !supabase) return;
+  const reportIds = list.map((r) => r.id);
+  if (reportIds.length === 0) return;
+
+  try {
+    const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(reportIds);
+    for (const report of list) {
+      const reportImages = evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
+      report.images = reportImages;
+      report.media = {
+        type: reportImages.length === 0 ? 'none' : reportImages.length === 1 ? 'single' : 'gallery',
+        images: reportImages,
+      };
+      if (reportImages.length > 0) {
+        report.trustIndicators.evidenceCount = reportImages.length;
+      }
+    }
+  } catch (error) {
+    console.warn(`[PublicReportService.${logScope}] Evidence enrichment error:`, error);
+  }
+}
+
+function normalizeEngagementCounts(data: unknown): PublicEngagementCounts | null {
+  if (!data || typeof data !== 'object') return null;
+  const raw = data as { viewCount?: unknown; shareCount?: unknown };
+  const viewCount = Number(raw.viewCount);
+  const shareCount = Number(raw.shareCount);
+  if (!Number.isFinite(viewCount) || !Number.isFinite(shareCount)) return null;
+  return {
+    viewCount: Math.max(0, viewCount),
+    shareCount: Math.max(0, shareCount),
+  };
+}
+
 export const PublicReportService = {
-  /**
-   * Fetch all published reports matching optional criteria.
-   * Queries the sanitized RPC `get_public_published_reports`.
-   * Returns an empty array if no reports are published in the database.
-   * Exposes a recoverable error state if the service is unavailable.
-   */
   async getAll(filters?: PublicReportFilters): Promise<ReportItem[]> {
     let list: ReportItem[] = [];
 
     if (!isSupabaseConfigured() || !supabase) {
       throw new Error('Public reports service is currently unavailable.');
-    } else {
-      const { data, error } = await fetchWithDeduplication('rpc:get_public_published_reports', () =>
-        supabase!.rpc('get_public_published_reports')
-      );
-      if (error) {
-        console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
-        throw new Error(error.message || 'Failed to load public reports from server.');
-      } else if (data && Array.isArray(data)) {
-        list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
-      }
+    }
+
+    const { data, error } = await fetchWithDeduplication('rpc:get_public_published_reports_with_engagement', () =>
+      supabase!.rpc('get_public_published_reports_with_engagement')
+    );
+    if (error) {
+      console.warn('[PublicReportService.getAll] Supabase RPC error:', error);
+      throw new Error(error.message || 'Failed to load public reports from server.');
+    }
+    if (data && Array.isArray(data)) {
+      list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
     }
 
     list = await enrichHarassmentClassifications(list);
@@ -169,53 +203,19 @@ export const PublicReportService = {
       list = list.slice(0, filters.limit);
     }
 
-    // Batch enrich published reports with evidence images (single RPC call for all visible items)
-    if (isSupabaseConfigured() && supabase) {
-      const reportIds = list.map((r) => r.id);
-      if (reportIds.length > 0) {
-        try {
-          const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(reportIds);
-          for (const report of list) {
-            const reportImages =
-              evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-            report.images = reportImages;
-            report.media = {
-              type:
-                reportImages.length === 0
-                  ? 'none'
-                  : reportImages.length === 1
-                  ? 'single'
-                  : 'gallery',
-              images: reportImages,
-            };
-            if (reportImages.length > 0) {
-              report.trustIndicators.evidenceCount = reportImages.length;
-            }
-          }
-        } catch (evErr) {
-          console.warn('[PublicReportService.getAll] Evidence enrichment error:', evErr);
-        }
-      }
-    }
-
+    await enrichEvidence(list, 'getAll');
     return list;
   },
 
-  /**
-   * Fetch ranked Home feed reports from the shadow-ranking RPC `get_public_home_feed`.
-   * The backend returns the complete eligible report set already sorted in the shadow.
-   * Responses contain NO incident coordinates, NO visitor coordinates, and NO derived distance.
-   */
   async getHomeFeed(params?: HomeFeedParams): Promise<ReportItem[]> {
     let list: ReportItem[] = [];
 
     if (!isSupabaseConfigured() || !supabase) {
-      // Reuse the fail-closed published-report path when Supabase is unavailable.
       list = await this.getAll();
     } else {
-      const dedupKey = `rpc:get_public_home_feed:${params?.visitorLat ?? 'null'}:${params?.visitorLng ?? 'null'}:${params?.filter || 'all'}:${params?.district || 'all'}`;
+      const dedupKey = `rpc:get_public_home_feed_with_engagement:${params?.visitorLat ?? 'null'}:${params?.visitorLng ?? 'null'}:${params?.filter || 'all'}:${params?.district || 'all'}`;
       const { data, error } = await fetchWithDeduplication(dedupKey, () =>
-        supabase!.rpc('get_public_home_feed', {
+        supabase!.rpc('get_public_home_feed_with_engagement', {
           p_visitor_lat: params?.visitorLat ?? null,
           p_visitor_lng: params?.visitorLng ?? null,
           p_filter: params?.filter || 'all',
@@ -226,49 +226,17 @@ export const PublicReportService = {
       if (error) {
         console.warn('[PublicReportService.getHomeFeed] RPC error:', error);
         throw error;
-      } else if (data && Array.isArray(data)) {
+      }
+      if (data && Array.isArray(data)) {
         list = data.map((raw: SupabasePublicReportRPC) => mapSupabasePublicReportToItem(raw));
       }
     }
 
     list = await enrichHarassmentClassifications(list);
-
-    // Batch enrich published reports with evidence images (single RPC call for all visible items)
-    if (isSupabaseConfigured() && supabase) {
-      const reportIds = list.map((r) => r.id);
-      if (reportIds.length > 0) {
-        try {
-          const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(reportIds);
-          for (const report of list) {
-            const reportImages =
-              evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-            report.images = reportImages;
-            report.media = {
-              type:
-                reportImages.length === 0
-                  ? 'none'
-                  : reportImages.length === 1
-                  ? 'single'
-                  : 'gallery',
-              images: reportImages,
-            };
-            if (reportImages.length > 0) {
-              report.trustIndicators.evidenceCount = reportImages.length;
-            }
-          }
-        } catch (evErr) {
-          console.warn('[PublicReportService.getHomeFeed] Evidence enrichment error:', evErr);
-        }
-      }
-    }
-
+    await enrichEvidence(list, 'getHomeFeed');
     return list;
   },
 
-  /**
-   * Fetch a single published report and any published subject responses by ID.
-   * Queries the sanitized RPC `get_public_published_report`.
-   */
   async getById(
     id: string
   ): Promise<{
@@ -282,8 +250,8 @@ export const PublicReportService = {
       throw new Error('Public reports service is currently unavailable.');
     }
 
-    const { data, error } = await fetchWithDeduplication(`rpc:get_public_published_report:${cleanId}`, () =>
-      supabase!.rpc('get_public_published_report', {
+    const { data, error } = await fetchWithDeduplication(`rpc:get_public_published_report_with_engagement:${cleanId}`, () =>
+      supabase!.rpc('get_public_published_report_with_engagement', {
         p_report_id: cleanId,
       })
     );
@@ -293,57 +261,65 @@ export const PublicReportService = {
       throw new Error(error.message || 'Failed to fetch report from server.');
     }
 
-    if (data) {
-      let report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
-      report = (await enrichHarassmentClassifications([report]))[0] || report;
+    if (!data) return null;
 
-      try {
-        const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
-        const reportImages =
-          evidenceMap[cleanId] || evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-        report.images = reportImages;
-        report.media = {
-          type:
-            reportImages.length === 0
-              ? 'none'
-              : reportImages.length === 1
-              ? 'single'
-              : 'gallery',
-          images: reportImages,
-        };
-        if (reportImages.length > 0) {
-          report.trustIndicators.evidenceCount = reportImages.length;
-        }
-      } catch (evErr) {
-        console.warn('[PublicReportService.getById] Evidence enrichment error:', evErr);
+    let report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
+    report = (await enrichHarassmentClassifications([report]))[0] || report;
+    await enrichEvidence([report], 'getById');
+
+    // Phase 1 definition: each successful published detail open is a view.
+    // Engagement failure must never block the report detail journey.
+    try {
+      const counts = await this.trackView(cleanId);
+      if (counts) {
+        report.viewCount = counts.viewCount;
+        report.shareCount = counts.shareCount;
       }
-
-      let responses: PublicPublishedResponse[] = [];
-      let responseLoadError = false;
-
-      try {
-        responses = await PublicResponseService.getPublishedForReport(cleanId);
-      } catch (respErr) {
-        console.warn('[PublicReportService.getById] Published responses load error:', respErr);
-        responseLoadError = true;
-        responses = [];
-      }
-
-      return {
-        report,
-        responses,
-        responseLoadError,
-      };
+    } catch (engagementError) {
+      console.warn('[PublicReportService.getById] View tracking failed:', engagementError);
     }
 
-    return null;
+    let responses: PublicPublishedResponse[] = [];
+    let responseLoadError = false;
+    try {
+      responses = await PublicResponseService.getPublishedForReport(cleanId);
+    } catch (respErr) {
+      console.warn('[PublicReportService.getById] Published responses load error:', respErr);
+      responseLoadError = true;
+      responses = [];
+    }
+
+    return {
+      report,
+      responses,
+      responseLoadError,
+    };
   },
 
-  /**
-   * Fetch published reports filtered by section/segment.
-   * If visitor coordinates are provided, uses the shadow-ranked backend path.
-   * Otherwise preserves default chronological ordering.
-   */
+  async trackView(id: string): Promise<PublicEngagementCounts | null> {
+    if (!isSupabaseConfigured() || !supabase) return null;
+    const cleanId = id.trim().toUpperCase();
+    if (!cleanId) return null;
+
+    const { data, error } = await supabase.rpc('track_public_report_view', {
+      p_report_id: cleanId,
+    });
+    if (error) throw error;
+    return normalizeEngagementCounts(data);
+  },
+
+  async trackShare(id: string): Promise<PublicEngagementCounts | null> {
+    if (!isSupabaseConfigured() || !supabase) return null;
+    const cleanId = id.trim().toUpperCase();
+    if (!cleanId) return null;
+
+    const { data, error } = await supabase.rpc('track_public_report_share', {
+      p_report_id: cleanId,
+    });
+    if (error) throw error;
+    return normalizeEngagementCounts(data);
+  },
+
   async getBySegment(
     segment: SectionKey,
     filters?: Omit<PublicReportFilters, 'segment'>
@@ -375,9 +351,6 @@ export const PublicReportService = {
     return this.getAll({ ...filters, segment });
   },
 
-  /**
-   * Search published reports by keyword and optional segment/district filters.
-   */
   async search(
     query: string,
     filters?: { segment?: SectionKey | 'all'; district?: string }
@@ -390,9 +363,6 @@ export const PublicReportService = {
     });
   },
 
-  /**
-   * Fetch published reports associated with a specific location / district name.
-   */
   async getByLocation(locationQuery: string): Promise<ReportItem[]> {
     const all = await this.getAll();
     const clean = locationQuery.toLowerCase().trim();
@@ -402,7 +372,6 @@ export const PublicReportService = {
       const locEn = (r.locationEn || '').toLowerCase();
       const locBn = (r.locationBn || '').toLowerCase();
 
-      // Guard: withheld location reports must never appear in named location feeds
       if (
         !r.districtEn ||
         distEn.includes('withheld') ||
@@ -422,14 +391,10 @@ export const PublicReportService = {
     });
   },
 
-  /**
-   * Fetch published reports where a specific subject is publicly identified.
-   */
   async getBySubject(subjectName: string): Promise<ReportItem[]> {
     const all = await this.getAll();
     const clean = subjectName.toLowerCase().trim();
     return all.filter((r) => {
-      // Guard: withheld subjects must never appear in named subject feeds
       if (
         !r.reportedSubject ||
         r.reportedSubjectBn === 'পরিচয় গোপন' ||
@@ -446,9 +411,6 @@ export const PublicReportService = {
     });
   },
 
-  /**
-   * Fetch related published reports for a given report ID.
-   */
   async getRelatedReports(reportId: string, relatedIds: string[] = []): Promise<ReportItem[]> {
     if (!relatedIds || relatedIds.length === 0) {
       return [];
