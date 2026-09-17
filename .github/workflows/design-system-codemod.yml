@@ -1,0 +1,49 @@
+name: Design System Closure Codemod
+
+on:
+  push:
+    branches:
+      - fix/public-design-system-100-closure
+
+permissions:
+  contents: write
+
+concurrency:
+  group: design-system-closure-codemod
+  cancel-in-progress: true
+
+jobs:
+  codemod:
+    if: ${{ !contains(github.event.head_commit.message, '[design-system-codemod]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/public-design-system-100-closure
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply mechanical token migration
+        run: node scripts/apply-design-system-codemod.mjs
+
+      - name: Verify design-system source audit
+        run: npm run audit:design-system
+
+      - name: Commit transformed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No source changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          git commit -m "refactor(ui): close remaining design-system source violations [design-system-codemod]"
+          git push origin HEAD:fix/public-design-system-100-closure
