@@ -20,8 +20,6 @@ export interface ReportComposerFooterProps {
 
 export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   currentStep,
-  segment,
-  selectedSubcategoryId,
   language,
   onClose,
   onBack,
@@ -31,10 +29,25 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
   canSubmit = true,
   isSubmitting = false,
 }) => {
+  const isPreSubmitStep = currentStep >= 1 && currentStep <= 3;
+  const nextActionLabel =
+    currentStep === 3
+      ? language === 'bn'
+        ? 'পর্যালোচনা'
+        : 'Review'
+      : language === 'bn'
+      ? 'এগিয়ে যান'
+      : 'Continue';
+
+  const nextActionId =
+    currentStep === 1
+      ? 'composer-footer-step1-next-btn'
+      : currentStep === 2
+      ? 'composer-footer-step2-next-btn'
+      : 'composer-footer-step3-review-btn';
 
   return (
     <div className="sticky bottom-0 z-20 bg-ui-surface border-t border-ui-stroke-subtle px-4 md:px-8 py-3.5 flex items-center justify-between gap-3 shrink-0 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
-      {/* Left-side action (Cancel or Back) */}
       {currentStep === 1 ? (
         <Button
           id="composer-footer-cancel-btn"
@@ -42,8 +55,8 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           variant="ghost"
           size="lg"
           onClick={onClose}
-          leftIcon={<X className="w-4 h-4" />}
-          className="min-h-[44px] text-[var(--type-fixed-16)] text-ui-content-muted"
+          leftIcon={<X className="w-4 h-4" aria-hidden="true" />}
+          className="text-ui-content-muted"
         >
           {language === 'bn' ? 'বাতিল' : 'Cancel'}
         </Button>
@@ -55,55 +68,24 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           size="lg"
           onClick={onBack}
           disabled={isSubmitting}
-          leftIcon={<ArrowLeft className="w-4 h-4" />}
-          className="min-h-[44px] text-[var(--type-fixed-16)]"
+          leftIcon={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
         >
           {language === 'bn' ? 'পূর্ববর্তী' : 'Back'}
         </Button>
       )}
 
-      {/* Right-side primary action (Continue / Review / Submit) */}
-      {currentStep === 1 && (
+      {isPreSubmitStep && (
         <Button
-          id="composer-footer-step1-next-btn"
+          id={nextActionId}
           type="button"
           variant="primary"
           size="lg"
-          disabled={!canContinue}
+          disabled={currentStep < 3 ? !canContinue : false}
           onClick={onNext}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
-          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
+          rightIcon={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
+          className="px-6"
         >
-          {language === 'bn' ? 'এগিয়ে যান' : 'Continue'}
-        </Button>
-      )}
-
-      {currentStep === 2 && (
-        <Button
-          id="composer-footer-step2-next-btn"
-          type="button"
-          variant="primary"
-          size="lg"
-          disabled={!canContinue}
-          onClick={onNext}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
-          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
-        >
-          {language === 'bn' ? 'এগিয়ে যান' : 'Continue'}
-        </Button>
-      )}
-
-      {currentStep === 3 && (
-        <Button
-          id="composer-footer-step3-review-btn"
-          type="button"
-          variant="primary"
-          size="lg"
-          onClick={onNext}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
-          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
-        >
-          {language === 'bn' ? 'পর্যালোচনা' : 'Review'}
+          {nextActionLabel}
         </Button>
       )}
 
@@ -117,12 +99,12 @@ export const ReportComposerFooter: React.FC<ReportComposerFooterProps> = ({
           onClick={onSubmit}
           leftIcon={
             isSubmitting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
             ) : (
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4" aria-hidden="true" />
             )
           }
-          className="min-h-[44px] text-[var(--type-fixed-16)] px-6"
+          className="px-6"
         >
           {isSubmitting
             ? language === 'bn'
