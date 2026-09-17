@@ -1,13 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp, RoutePath } from '../../context/AppContext';
+import { CATEGORY_ORDER } from '../../data/categoryOrder';
+import { CategoryPopularityService } from '../../services/categoryPopularityService';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { BrandLogo } from '../branding/BrandLogo';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
 
+const SECTION_ICON_NAMES: Record<SectionKey, AppIconName> = {
+  harassment: 'harassment',
+  extortion: 'extortion',
+  public_safety: 'public-safety',
+  road_transport: 'road-transport',
+  load_shedding: 'zap-off',
+  illegal_occupation: 'illegal-occupation',
+  rickshaw: 'rickshaw',
+};
+
 export const DesktopLeftRail: React.FC = () => {
   const { currentRoute, navigateTo, language, toggleLanguage, openReportComposer } = useApp();
+  const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
+
+  useEffect(() => {
+    let active = true;
+    CategoryPopularityService.getOrderedCategoryKeys().then((keys) => {
+      if (active) setCategoryOrder(keys);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const navItems: Array<{
     id: string;
@@ -24,62 +47,14 @@ export const DesktopLeftRail: React.FC = () => {
       nameEn: 'Home',
       iconName: 'home',
     },
-    {
-      id: 'rail-harassment',
-      path: SECTIONS.harassment.slug,
-      nameBn: SECTIONS.harassment.shortNameBn,
-      nameEn: SECTIONS.harassment.shortNameEn,
-      iconName: 'harassment',
-      sectionKey: 'harassment',
-    },
-    {
-      id: 'rail-load-shedding',
-      path: SECTIONS.load_shedding.slug,
-      nameBn: SECTIONS.load_shedding.shortNameBn,
-      nameEn: SECTIONS.load_shedding.shortNameEn,
-      iconName: 'zap-off',
-      sectionKey: 'load_shedding',
-    },
-    {
-      id: 'rail-extortion',
-      path: SECTIONS.extortion.slug,
-      nameBn: SECTIONS.extortion.shortNameBn,
-      nameEn: SECTIONS.extortion.shortNameEn,
-      iconName: 'extortion',
-      sectionKey: 'extortion',
-    },
-    {
-      id: 'rail-public-safety',
-      path: SECTIONS.public_safety.slug,
-      nameBn: SECTIONS.public_safety.shortNameBn,
-      nameEn: SECTIONS.public_safety.shortNameEn,
-      iconName: 'public-safety',
-      sectionKey: 'public_safety',
-    },
-    {
-      id: 'rail-road-transport',
-      path: SECTIONS.road_transport.slug,
-      nameBn: SECTIONS.road_transport.shortNameBn,
-      nameEn: SECTIONS.road_transport.shortNameEn,
-      iconName: 'road-transport',
-      sectionKey: 'road_transport',
-    },
-    {
-      id: 'rail-illegal-occupation',
-      path: SECTIONS.illegal_occupation.slug,
-      nameBn: SECTIONS.illegal_occupation.shortNameBn,
-      nameEn: SECTIONS.illegal_occupation.shortNameEn,
-      iconName: 'illegal-occupation',
-      sectionKey: 'illegal_occupation',
-    },
-    {
-      id: 'rail-rickshaw',
-      path: SECTIONS.rickshaw.slug,
-      nameBn: 'অবৈধ অটো-রিকশা চার্জিং স্টেশন',
-      nameEn: 'Illegal Auto-rickshaw Charging Station',
-      iconName: 'rickshaw',
-      sectionKey: 'rickshaw',
-    },
+    ...categoryOrder.map((sectionKey) => ({
+      id: `rail-${sectionKey.replaceAll('_', '-')}`,
+      path: SECTIONS[sectionKey].slug,
+      nameBn: SECTIONS[sectionKey].shortNameBn,
+      nameEn: SECTIONS[sectionKey].shortNameEn,
+      iconName: SECTION_ICON_NAMES[sectionKey],
+      sectionKey,
+    })),
     {
       id: 'rail-explore',
       path: '/explore',

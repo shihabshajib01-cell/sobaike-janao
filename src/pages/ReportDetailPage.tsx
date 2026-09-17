@@ -5,6 +5,7 @@ import {
   Calendar,
   Check,
   Clock,
+  Eye,
   FileCheck,
   Home,
   Layers,
@@ -55,6 +56,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const [relatedReports, setRelatedReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<boolean>(false);
+  const [viewCount, setViewCount] = useState(0);
+  const [shareCount, setShareCount] = useState(0);
 
   const fetchReport = () => {
     setIsLoading(true);
@@ -102,6 +105,18 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
   useEffect(() => {
     fetchReport();
+  }, [reportId]);
+
+  useEffect(() => {
+    let active = true;
+    PublicEngagementService.getCounts(reportId).then((counts) => {
+      if (!active) return;
+      setViewCount(counts.viewCount);
+      setShareCount(counts.shareCount);
+    });
+    return () => {
+      active = false;
+    };
   }, [reportId]);
 
   useEffect(() => {
@@ -263,8 +278,15 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     storedResponses.length > 0 ||
     (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError);
 
+  const displayEngagementCount = (value: number) =>
+    language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
+
   const registerShare = () => {
-    void PublicEngagementService.trackShare(report.id);
+    void PublicEngagementService.trackShare(report.id).then((counts) => {
+      if (!counts) return;
+      setViewCount(counts.viewCount);
+      setShareCount(counts.shareCount);
+    });
   };
 
   const openRelatedReport = (relatedReportId: string) => {
@@ -386,6 +408,22 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing period: '}${formatBillingMonth(report.recentBillMonth, language)}`
                   : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}${incidentDate}`}
               </span>
+            </div>
+
+            <div
+              className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]"
+              aria-label={`${displayEngagementCount(viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}
+            >
+              <Eye className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>{displayEngagementCount(viewCount)} {language === 'bn' ? 'ভিউ' : 'views'}</span>
+            </div>
+
+            <div
+              className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]"
+              aria-label={`${displayEngagementCount(shareCount)} ${language === 'bn' ? 'শেয়ার' : 'shares'}`}
+            >
+              <Share2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>{displayEngagementCount(shareCount)} {language === 'bn' ? 'শেয়ার' : 'shares'}</span>
             </div>
           </div>
 
