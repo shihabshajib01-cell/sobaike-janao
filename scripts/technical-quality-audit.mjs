@@ -64,6 +64,8 @@ for (const file of [
   'eslint.config.mjs',
   'scripts/public-accessibility-smoke.mjs',
   'scripts/bundle-budget.mjs',
+  'scripts/public-functional-smoke.mjs',
+  'scripts/public-ui-100-regression-smoke.mjs',
   'tests/formatters.test.ts',
   'tests/report-domain.test.ts',
   'tests/geo-distance.test.ts',
@@ -92,6 +94,9 @@ for (const token of [
   'npm test',
   'npm run audit:bundle',
   'npm run audit:technical-quality',
+  'npm run test:a11y',
+  'node scripts/public-functional-smoke.mjs',
+  'node scripts/public-ui-100-regression-smoke.mjs',
 ]) {
   if (!ci.includes(token)) failures.push(`.github/workflows/ci.yml: missing ${token}`);
 }
@@ -102,4 +107,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('Public technical-quality audit passed: code splitting, real linting, tests, accessibility tooling, bundle budgets and complexity guards are enforced.');
+console.log('Public technical-quality audit passed: code splitting, real linting, tests, accessibility tooling, bundle budgets, full browser regression and complexity guards are enforced.');
