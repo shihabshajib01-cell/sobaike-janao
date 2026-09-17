@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
+import './theme/semantic-tokens.css';
 import './theme/category-tokens.css';
 import './theme/desktop-horizontal-scroll.css';
 
@@ -20,5 +21,3 @@ createRoot(rootElement).render(
     </ErrorBoundary>
   </StrictMode>
 );
-
-

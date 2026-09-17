@@ -26,10 +26,10 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
 
   const label = language === 'bn' ? config.shortNameBn : config.shortNameEn;
 
-  const sizeClasses = {
-    sm: 'text-[13px] px-2.5 py-1 rounded-md gap-1.5 font-semibold min-h-[26px]',
-    md: 'text-[14px] px-3 py-1.5 rounded-lg gap-2 font-semibold min-h-[30px]',
-    lg: 'text-[15px] px-3.5 py-2 rounded-xl gap-2 font-semibold min-h-[36px]',
+  const sizeClasses: Record<'sm' | 'md' | 'lg', string> = {
+    sm: 'ui-space-badge-sm ui-radius-badge-sm type-meta font-semibold min-h-[26px]',
+    md: 'ui-space-badge-md ui-radius-badge-md type-meta font-semibold min-h-[30px]',
+    lg: 'ui-space-badge-md ui-radius-control type-label font-semibold min-h-[36px]',
   };
 
   const iconSizeMap: Record<'sm' | 'md' | 'lg', 'xs' | 'sm' | 'md'> = {
@@ -46,11 +46,10 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
         color: `var(--sec-${section}-text)`,
         borderColor: `var(--sec-${section}-border)`,
       }}
-      className={`inline-flex items-center justify-center border whitespace-nowrap leading-none select-none ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center ui-border-default whitespace-nowrap leading-none select-none ${sizeClasses[size]} ${className}`}
     >
       {showIcon && <CategoryIcon section={section} size={iconSizeMap[size]} />}
       <span>{label}</span>
     </span>
   );
 };
-

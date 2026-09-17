@@ -80,6 +80,9 @@ export const HomePage: React.FC = () => {
       rickshaw: allReports.filter((r) => r.segment === 'rickshaw').length,
       extortion: allReports.filter((r) => r.segment === 'extortion').length,
       load_shedding: allReports.filter((r) => r.segment === 'load_shedding').length,
+      public_safety: allReports.filter((r) => r.segment === 'public_safety').length,
+      road_transport: allReports.filter((r) => r.segment === 'road_transport').length,
+      illegal_occupation: allReports.filter((r) => r.segment === 'illegal_occupation').length,
     };
   }, [allReports]);
 
@@ -120,7 +123,7 @@ export const HomePage: React.FC = () => {
         {/* Feed Header & District Filter */}
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
+            <h2 className="text-ui-content-primary">
               {language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports'}
             </h2>
           </div>
@@ -164,20 +167,19 @@ export const HomePage: React.FC = () => {
 
         {/* Error State */}
         {!isLoading && fetchError && (
-          <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
+          <div
+            role="alert"
+            className="bg-ui-surface ui-border-default border-ui-error-border ui-radius-card p-6 text-center space-y-3 ui-elevation-card"
+          >
             <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
-            <p className="text-[16px] font-semibold text-ui-error-text">
+            <p className="type-label font-semibold text-ui-error-text">
               {language === 'bn'
                 ? 'প্রতিবেদন লোড করা যায়নি।'
                 : 'Couldn’t load reports.'}
             </p>
-            <button
-              type="button"
-              onClick={loadReports}
-              className="btn-primary-action px-4 py-2 text-[14px] font-semibold rounded-xl min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
-            >
+            <Button type="button" variant="primary" size="md" onClick={loadReports}>
               {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
-            </button>
+            </Button>
           </div>
         )}
 

@@ -56,7 +56,7 @@ export const BottomNav: React.FC = () => {
       aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
       className="md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)]"
     >
-      <div className="pointer-events-auto mx-auto grid max-w-[420px] grid-cols-[1fr_1fr_1fr_auto] items-center gap-1 rounded-2xl border border-ui-stroke-subtle bg-ui-surface/95 p-1.5 shadow-lg backdrop-blur-md">
+      <div className="pointer-events-auto mx-auto grid max-w-[420px] grid-cols-[1fr_1fr_1fr_auto] items-center gap-1 ui-radius-card ui-border-default border-ui-stroke-subtle bg-ui-surface/95 p-1.5 ui-elevation-card backdrop-blur-md">
         {navItems.map((item) => (
           <button
             key={item.id}
@@ -64,9 +64,9 @@ export const BottomNav: React.FC = () => {
             type="button"
             onClick={() => navigateTo(item.path)}
             aria-current={item.isActive ? 'page' : undefined}
-            className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-xl px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center ui-radius-control px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               item.isActive
-                ? 'bg-ui-surface-subtle text-ui-content-primary dark:bg-ui-accent-soft dark:ring-1 dark:ring-ui-accent-border'
+                ? 'bg-ui-accent-soft text-ui-content-primary ring-1 ring-ui-accent-border'
                 : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
             }`}
           >
@@ -86,7 +86,7 @@ export const BottomNav: React.FC = () => {
           type="button"
           onClick={() => openReportComposer()}
           aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
-          className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-ui-action-bg text-ui-action-text shadow-sm transition-all hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
+          className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-all hover:bg-ui-action-hover active:bg-ui-action-active active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
         >
           <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
         </button>
