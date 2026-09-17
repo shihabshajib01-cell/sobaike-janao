@@ -21,6 +21,7 @@ import { Step4Review } from './Step4Review';
 import { StepCompletion } from './StepCompletion';
 import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
 import { MobJusticeReviewSummary } from './MobJusticeReviewSummary';
+import { REPORT_TITLE_MAX_LENGTH } from './ReportTitleField';
 import { SubcategoryOption } from '../../data/reportOptions';
 import {
   EMPTY_MOB_JUSTICE_DETAILS,
@@ -332,7 +333,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   );
 
   const handleSelectSubcategory = useCallback(
-    async (subcategoryId: string, option: SubcategoryOption) => {
+    async (subcategoryId: string, _option: SubcategoryOption) => {
       if (formData.subcategoryId === subcategoryId) return;
 
       if (formData.serverSubmissionState === 'attempted') {
@@ -360,13 +361,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           Boolean(prev.subcategoryId) &&
           prev.subcategoryId !== subcategoryId;
 
-        const updatedTitle =
-          isUtilitySwitch || !prev.title?.trim()
-            ? language === 'bn'
-              ? option.nameBn
-              : option.nameEn
-            : prev.title;
-
         return {
           ...prev,
           subcategoryId,
@@ -375,7 +369,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           hasSupportingInfo: false,
           evidenceTypes: [],
           evidenceDescription: '',
-          title: updatedTitle,
+          title: '',
           subjectType: 'unknown',
           ...(isUtilitySwitch
             ? {
@@ -500,6 +494,25 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         language === 'bn'
           ? 'রিপোর্ট শুরুর আগের নীতিমালায় সম্মতি নিশ্চিত করুন।'
           : 'Please confirm the pre-report policy acknowledgement.'
+      );
+      return;
+    }
+
+    // Defense-in-depth: every report must carry a citizen-entered title.
+    const normalizedTitle = formData.title?.trim() || '';
+    if (!normalizedTitle) {
+      setFormData((prev) => ({ ...prev, currentStep: 3 }));
+      setSubmitError(
+        language === 'bn' ? 'প্রতিবেদনের শিরোনাম লিখুন।' : 'Enter a report title.'
+      );
+      return;
+    }
+    if (normalizedTitle.length > REPORT_TITLE_MAX_LENGTH) {
+      setFormData((prev) => ({ ...prev, currentStep: 3 }));
+      setSubmitError(
+        language === 'bn'
+          ? 'শিরোনাম ১০০ অক্ষরের মধ্যে রাখুন।'
+          : 'Keep the report title within 100 characters.'
       );
       return;
     }
@@ -648,7 +661,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const payload = {
         segment: formData.segment,
         subcategoryId: formData.subcategoryId,
-        title: formData.title || '',
+        title: normalizedTitle,
         description: formData.description || '',
         incidentDate:
           formData.subcategoryId === 'excess-electricity-bill'
