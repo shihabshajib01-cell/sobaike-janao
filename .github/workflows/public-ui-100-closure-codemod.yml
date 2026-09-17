@@ -6,6 +6,7 @@ on:
       - fix/public-ui-100-closure
     paths:
       - scripts/apply-public-ui-100-closure.mjs
+      - scripts/public-composer-100-regression-smoke.mjs
       - .github/workflows/public-ui-100-closure-codemod.yml
 
 permissions:
@@ -14,6 +15,10 @@ permissions:
 jobs:
   normalize-and-verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - name: Checkout closure branch
         uses: actions/checkout@v4
@@ -34,13 +39,13 @@ jobs:
         run: |
           if git diff --quiet; then
             echo "No generated changes to commit."
-            exit 0
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src scripts/design-system-audit.mjs scripts/ui-uniformity-audit.mjs
+            git commit -m "fix: close public UI uniformity gaps"
+            git push origin HEAD:fix/public-ui-100-closure
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src scripts/design-system-audit.mjs scripts/ui-uniformity-audit.mjs
-          git commit -m "fix: close public UI uniformity gaps"
-          git push origin HEAD:fix/public-ui-100-closure
 
       - name: Install dependencies
         run: npm ci
@@ -56,3 +61,31 @@ jobs:
 
       - name: Verify production build
         run: npm run build
+
+      - name: Install Playwright runtime
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Serve verified production build
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4173 > /tmp/public-ui-preview.log 2>&1 &
+          echo $! > /tmp/public-ui-preview.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/sobaike-janao/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/public-ui-preview.log
+          exit 1
+
+      - name: Run Public UI browser regression
+        env:
+          SITE_URL: http://127.0.0.1:4173/sobaike-janao/
+        run: node scripts/public-ui-100-regression-smoke.mjs
+
+      - name: Run complete non-destructive composer journey
+        env:
+          SITE_URL: http://127.0.0.1:4173/sobaike-janao/
+        run: node scripts/public-composer-100-regression-smoke.mjs
