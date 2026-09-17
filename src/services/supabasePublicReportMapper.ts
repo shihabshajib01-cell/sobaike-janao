@@ -10,6 +10,8 @@ export interface SupabasePublicReportRPC {
   subcategoryEn?: string;
   titleBn?: string;
   titleEn?: string;
+  summaryBn?: string;
+  summaryEn?: string;
   descriptionBn?: string;
   descriptionEn?: string;
   reportedSubject?: string | null;
@@ -105,8 +107,10 @@ export const mapSupabasePublicReportToItem = (
   const titleBn = rpc.titleBn || rpc.titleEn || rpc.id;
   const titleEn = rpc.titleEn || rpc.titleBn || rpc.id;
 
-  const fullDescBn = rpc.descriptionBn || rpc.descriptionEn || '';
-  const fullDescEn = rpc.descriptionEn || rpc.descriptionBn || '';
+  const shortDescBn = rpc.summaryBn || rpc.summaryEn || rpc.descriptionBn || rpc.descriptionEn || '';
+  const shortDescEn = rpc.summaryEn || rpc.summaryBn || rpc.descriptionEn || rpc.descriptionBn || '';
+  const fullDescBn = rpc.descriptionBn || rpc.descriptionEn || shortDescBn;
+  const fullDescEn = rpc.descriptionEn || rpc.descriptionBn || shortDescEn;
 
   const locationBn = rpc.location ? rpc.location : 'অবস্থান গোপন';
   const locationEn = rpc.location ? rpc.location : 'Location withheld';
@@ -137,8 +141,8 @@ export const mapSupabasePublicReportToItem = (
     subcategoryEn,
     titleBn,
     titleEn,
-    shortDescriptionBn: fullDescBn,
-    shortDescriptionEn: fullDescEn,
+    shortDescriptionBn: shortDescBn,
+    shortDescriptionEn: shortDescEn,
     fullDescriptionBn: fullDescBn,
     fullDescriptionEn: fullDescEn,
     reportedSubject: rpc.reportedSubject || undefined,
