@@ -158,9 +158,13 @@ await check('Mobile navigation, issue rows and category controls follow the appr
   await page.locator('#issues-card-extortion').click();
   await page.waitForTimeout(350);
   if (!page.url().includes('#/extortion')) throw new Error(`Issue card did not navigate to extortion; got ${page.url()}`);
-  await expectVisible(page.locator('#mobile-category-location-filter-select'), 'mobile category location filter missing');
-  const locationText = (await page.locator('#mobile-category-location-filter-select').innerText()).trim();
-  if (!locationText.includes('সারা বাংলাদেশ')) throw new Error(`default mobile location filter is incorrect: ${locationText}`);
+  await expectVisible(page.locator('#mobile-category-filter-btn'), 'mobile category filter action missing');
+  await page.locator('#mobile-category-filter-btn').click();
+  await expectVisible(page.locator('#extortion-filter-sheet'), 'mobile category filter sheet did not open');
+  await expectVisible(page.locator('#extortion-filter-division'), 'mobile division filter missing');
+  await expectVisible(page.locator('#extortion-filter-district'), 'mobile district filter missing');
+  await page.locator('#extortion-filter-apply-btn').click();
+  await page.locator('#extortion-filter-sheet').waitFor({ state: 'hidden', timeout: 10000 });
   if ((await page.locator('#bottom-nav').count()) !== 0) throw new Error('Bottom navigation should be hidden on extortion category page');
   if ((await page.getByText('জরুরি সহায়তার জন্য ৯৯৯', { exact: false }).count()) !== 0) throw new Error('Removed emergency assistance strip is still visible');
 
