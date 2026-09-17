@@ -76,6 +76,21 @@ requireNotContains(
   'Search page must not recreate the primary retry button recipe'
 );
 
+requireContains(
+  'src/pages/HomePage.tsx',
+  'HorizontalScrollRail',
+  'Home feed filters must use the shared horizontal rail'
+);
+requireContains(
+  'src/pages/HomePage.tsx',
+  'home-feed-filter-rail',
+  'Home feed must expose a stable shared filter rail target'
+);
+requireNotContains(
+  'src/pages/HomePage.tsx',
+  'overflow-x-auto',
+  'Home must not recreate its own horizontal filter rail'
+);
 requireNotContains(
   'src/pages/HomePage.tsx',
   'reportCounts',
@@ -90,6 +105,66 @@ requireNotContains(
   'src/components/ui/SearchInput.tsx',
   'placeholderBn',
   'SearchInput must not expose unused language-specific placeholder props'
+);
+
+requireNotContains(
+  'src/pages/IssuesPage.tsx',
+  'className="md:hidden"',
+  'Issues route content must remain available at tablet and desktop widths'
+);
+
+const reportCard = 'src/components/report/ReportCard.tsx';
+requireContains(reportCard, 'role="link"', 'clickable report card must expose link semantics');
+requireContains(reportCard, 'tabIndex={0}', 'clickable report card must be keyboard focusable');
+requireContains(reportCard, 'onKeyDown={handleCardKeyDown}', 'clickable report card must support Enter/Space activation');
+requireContains(reportCard, 'INTERACTIVE_SELECTOR', 'card activation must protect nested interactive actions');
+
+const consolidatedPublicUiFiles = [
+  'src/pages/ReportPage.tsx',
+  'src/components/layout/Header.tsx',
+  'src/components/layout/BottomNav.tsx',
+  'src/pages/LocationPage.tsx',
+  'src/pages/SubjectPage.tsx',
+  'src/pages/ReportDetailPage.tsx',
+  'src/pages/ExplorePage.tsx',
+];
+
+for (const file of consolidatedPublicUiFiles) {
+  requireNotContains(file, '--type-fixed-', 'must use semantic typography roles instead of legacy fixed aliases');
+}
+
+for (const file of ['src/pages/LocationPage.tsx', 'src/pages/SubjectPage.tsx']) {
+  requireContains(file, '<Button', 'entity feed page actions must use the shared Button primitive');
+  requireContains(file, '<EmptyState', 'entity feed page empty state must use shared EmptyState');
+  requireNotContains(file, 'btn-primary-action', 'entity feed page must not recreate primary action styling');
+}
+
+requireContains(
+  'src/pages/LocationPage.tsx',
+  'CATEGORY_ORDER',
+  'Location summaries must derive from the current active category set'
+);
+
+requireContains(
+  'src/pages/ReportDetailPage.tsx',
+  "import { Button } from '../components/ui/Button';",
+  'Report detail actions must use the shared Button primitive'
+);
+requireNotContains(
+  'src/pages/ReportDetailPage.tsx',
+  'btn-primary-action',
+  'Report detail must not recreate primary action styling'
+);
+
+requireContains(
+  'src/pages/ExplorePage.tsx',
+  "import { FilterChip } from '../components/ui/FilterChip';",
+  'Explore category controls must reuse shared FilterChip'
+);
+requireContains(
+  'src/pages/ExplorePage.tsx',
+  'explore-mobile-filter-button',
+  'Explore mobile filter action must use the shared action path'
 );
 
 const reportTitleField = 'src/components/report-composer/ReportTitleField.tsx';
@@ -109,4 +184,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('Public UI uniformity audit passed: shared feed, rail, search, hero, form and action patterns are enforced.');
+console.log('Public UI uniformity audit passed: shared feed, rail, navigation, entity pages, report detail, explore, form and action patterns are enforced.');
