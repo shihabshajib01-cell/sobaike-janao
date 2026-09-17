@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
-    "audit:design-system": "node scripts/design-system-audit.mjs"
+    "audit:design-system": "node scripts/design-system-audit.mjs",
+    "audit:ui-uniformity": "node scripts/ui-uniformity-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
