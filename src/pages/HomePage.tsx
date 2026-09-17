@@ -3,9 +3,11 @@ import {
   AlertCircle,
   Sparkles,
   LayoutGrid,
+  TrendingUp,
 } from 'lucide-react';
 import { SectionKey } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
+import { PublicEngagementService } from '../services/publicEngagementService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { LocationSelector } from '../components/feed/LocationSelector';
@@ -18,7 +20,7 @@ import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 
-type FeedFilterType = 'all' | 'latest';
+type FeedFilterType = 'all' | 'latest' | 'popular';
 
 const INITIAL_VISIBLE_REPORT_COUNT = 10;
 const LOAD_MORE_REPORT_COUNT = 10;
@@ -51,9 +53,25 @@ export const HomePage: React.FC = () => {
       const reports = await PublicReportService.getHomeFeed({
         visitorLat,
         visitorLng,
-        filter: feedFilter,
+        filter: feedFilter === 'popular' ? 'all' : feedFilter,
         district: selectedDistrict,
       });
+
+      if (feedFilter === 'popular') {
+        const counts = await PublicEngagementService.getAllCounts();
+        reports.sort((a, b) => {
+          const aCounts = counts.get(a.id.trim().toUpperCase()) || { viewCount: 0, shareCount: 0 };
+          const bCounts = counts.get(b.id.trim().toUpperCase()) || { viewCount: 0, shareCount: 0 };
+          if (bCounts.viewCount !== aCounts.viewCount) {
+            return bCounts.viewCount - aCounts.viewCount;
+          }
+          if (bCounts.shareCount !== aCounts.shareCount) {
+            return bCounts.shareCount - aCounts.shareCount;
+          }
+          return (b.publishedAt || '').localeCompare(a.publishedAt || '');
+        });
+      }
+
       setAllReports(reports);
     } catch (err) {
       console.warn('[HomePage data load error]', err);
@@ -130,6 +148,13 @@ export const HomePage: React.FC = () => {
             icon={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'latest'}
             onClick={() => setFeedFilter('latest')}
+          />
+          <FilterChip
+            id="filter-chip-popular"
+            label={language === 'bn' ? 'জনপ্রিয়' : 'Popular'}
+            icon={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
+            selected={feedFilter === 'popular'}
+            onClick={() => setFeedFilter('popular')}
           />
         </div>
 

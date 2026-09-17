@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Eye } from 'lucide-react';
 import { ReportItem } from '../../types/report';
 import { useApp } from '../../context/AppContext';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { ReportMediaGrid } from '../media/ReportMediaGrid';
 import { AppIcon } from '../ui/AppIcon';
 import { formatBillingMonth, toBanglaDigits } from '../../utils/formatters';
+import {
+  PublicEngagementCounts,
+  PublicEngagementService,
+} from '../../services/publicEngagementService';
 
 export interface ReportCardProps {
   report: ReportItem;
   className?: string;
 }
 
+const INITIAL_ENGAGEMENT: PublicEngagementCounts = { viewCount: 0, shareCount: 0 };
+
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
+  const [engagement, setEngagement] = useState<PublicEngagementCounts>(INITIAL_ENGAGEMENT);
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
@@ -25,20 +33,59 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
   const normalizedDesc = (shortDesc || '').trim();
   const shouldShowDescription = normalizedDesc.length > 0 && normalizedDesc !== normalizedTitle;
 
+  useEffect(() => {
+    let active = true;
+    PublicEngagementService.getCounts(report.id).then((counts) => {
+      if (active) setEngagement(counts);
+    });
+    return () => {
+      active = false;
+    };
+  }, [report.id]);
+
+  const registerView = () => {
+    void PublicEngagementService.trackView(report.id).then((counts) => {
+      if (counts) setEngagement(counts);
+    });
+  };
+
   const handleCardClick = () => {
+    registerView();
     navigateTo(`/report-detail/${report.id}`);
   };
 
-  const handleShare = (e: React.MouseEvent) => {
+  const registerShare = () => {
+    void PublicEngagementService.trackShare(report.id).then((counts) => {
+      if (counts) setEngagement(counts);
+    });
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const shareUrl = `${window.location.origin}${window.location.pathname}#/report-detail/${report.id}`;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url: shareUrl });
+        registerShare();
+        return;
+      }
+
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        registerShare();
         setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      });
+        window.setTimeout(() => setIsCopied(false), 2000);
+      }
+    } catch (error) {
+      if ((error as DOMException)?.name !== 'AbortError') {
+        console.warn('[ReportCard share error]', error);
+      }
     }
   };
+
+  const displayCount = (value: number) =>
+    language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
 
   return (
     <article
@@ -106,13 +153,21 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <p className="type-meta whitespace-nowrap">{publishedDate}</p>
           </div>
+          <span className="text-ui-content-muted" aria-hidden="true">•</span>
+          <div
+            className="flex items-center gap-1 text-ui-content-muted shrink-0"
+            aria-label={`${displayCount(engagement.viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}
+          >
+            <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="type-meta whitespace-nowrap">{displayCount(engagement.viewCount)}</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 type-action">
           <button
             type="button"
             onClick={handleShare}
-            aria-label={language === 'bn' ? 'লিংক কপি করুন' : 'Copy link'}
+            aria-label={language === 'bn' ? 'প্রতিবেদন শেয়ার করুন' : 'Share report'}
             className="inline-flex items-center justify-center gap-1 sm:gap-1.5 text-ui-content-secondary transition-colors cursor-pointer py-1.5 px-2 min-h-[44px] min-w-[44px] ui-radius-badge-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
           >
             {isCopied ? (
@@ -126,6 +181,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
                 <AppIcon name="share" size="xs" className="text-ui-content-muted md:hidden" />
                 <AppIcon name="share" size="sm" className="text-ui-content-muted hidden md:inline-block" />
                 <span>{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
+                <span className="type-meta text-ui-content-muted">{displayCount(engagement.shareCount)}</span>
               </span>
             )}
           </button>
@@ -134,7 +190,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
           <Link
             to={`/report-detail/${report.id}`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              registerView();
+            }}
             aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
             className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
           >
