@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ReportItem } from '../../types/report';
 import { useApp } from '../../context/AppContext';
@@ -6,6 +6,7 @@ import { CategoryBadge } from '../ui/CategoryBadge';
 import { ReportMediaGrid } from '../media/ReportMediaGrid';
 import { AppIcon } from '../ui/AppIcon';
 import { formatBillingMonth, toBanglaDigits } from '../../utils/formatters';
+import { PublicEngagementService } from '../../services/publicEngagementService';
 
 export interface ReportCardProps {
   report: ReportItem;
@@ -15,11 +16,19 @@ export interface ReportCardProps {
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
+  const [shareCount, setShareCount] = useState(report.shareCount ?? 0);
+
+  useEffect(() => {
+    setShareCount(report.shareCount ?? 0);
+  }, [report.id, report.shareCount]);
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const publishedDate = language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
+  const viewCount = report.viewCount ?? 0;
+  const formatCount = (value: number) =>
+    language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
 
   const normalizedTitle = (title || '').trim();
   const normalizedDesc = (shortDesc || '').trim();
@@ -33,8 +42,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     e.stopPropagation();
     const shareUrl = `${window.location.origin}${window.location.pathname}#/report-detail/${report.id}`;
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
+      navigator.clipboard.writeText(shareUrl).then(async () => {
         setIsCopied(true);
+        const counts = await PublicEngagementService.trackShare(report.id);
+        if (counts) setShareCount(counts.shareCount);
         setTimeout(() => setIsCopied(false), 2000);
       });
     }
@@ -53,18 +64,12 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         </div>
       </div>
 
-      <h3 className="type-h3 text-ui-content-primary transition-colors line-clamp-2 break-words">
-        {title}
-      </h3>
+      <h3 className="type-h3 text-ui-content-primary transition-colors line-clamp-2 break-words">{title}</h3>
 
       {report.reportedSubject && (
         <div className="type-meta text-ui-content-secondary flex items-center gap-1.5 flex-wrap min-w-0">
-          <p className="type-helper text-ui-content-muted">
-            {language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}
-          </p>
-          <p className="type-helper font-semibold text-ui-content-primary truncate max-w-full">
-            {report.reportedSubject}
-          </p>
+          <p className="type-helper text-ui-content-muted">{language === 'bn' ? 'প্রতিবেদনে উল্লিখিত পক্ষ:' : 'Reported subject:'}</p>
+          <p className="type-helper font-semibold text-ui-content-primary truncate max-w-full">{report.reportedSubject}</p>
         </div>
       )}
 
@@ -74,18 +79,12 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : (language === 'bn' ? 'সাম্প্রতিক বিল' : 'Recent bill')}: ৳{report.recentBillAmount !== undefined ? (language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()) : '-'}
           </p>
           {report.previousBillAmount !== undefined && (
-            <p className="type-helper text-ui-content-muted">
-              ({language === 'bn' ? 'পূর্বে: ' : 'prev: '}৳{language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()})
-            </p>
+            <p className="type-helper text-ui-content-muted">({language === 'bn' ? 'পূর্বে: ' : 'prev: '}৳{language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()})</p>
           )}
         </div>
       )}
 
-      {shouldShowDescription && (
-        <p className="type-body text-ui-content-secondary line-clamp-2 md:line-clamp-3 break-words">
-          {shortDesc}
-        </p>
-      )}
+      {shouldShowDescription && <p className="type-body text-ui-content-secondary line-clamp-2 md:line-clamp-3 break-words">{shortDesc}</p>}
 
       {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
         <div className="pt-0.5 md:pt-1">
@@ -105,6 +104,11 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             <AppIcon name="calendar" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
             <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <p className="type-meta whitespace-nowrap">{publishedDate}</p>
+          </div>
+          <span className="text-ui-content-muted" aria-hidden="true">•</span>
+          <div className="flex items-center gap-1 text-ui-content-muted shrink-0" aria-label={language === 'bn' ? `${formatCount(viewCount)} বার দেখা হয়েছে` : `${formatCount(viewCount)} views`}>
+            <AppIcon name="eye" size="xs" className="text-ui-content-muted" />
+            <span>{formatCount(viewCount)}</span>
           </div>
         </div>
 
@@ -126,6 +130,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
                 <AppIcon name="share" size="xs" className="text-ui-content-muted md:hidden" />
                 <AppIcon name="share" size="sm" className="text-ui-content-muted hidden md:inline-block" />
                 <span>{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
+                <span className="text-ui-content-muted">{formatCount(shareCount)}</span>
               </span>
             )}
           </button>
