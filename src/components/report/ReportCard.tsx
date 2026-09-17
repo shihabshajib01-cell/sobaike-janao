@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ReportItem } from '../../types/report';
 import { useApp } from '../../context/AppContext';
@@ -6,6 +6,10 @@ import { CategoryBadge } from '../ui/CategoryBadge';
 import { ReportMediaGrid } from '../media/ReportMediaGrid';
 import { AppIcon } from '../ui/AppIcon';
 import { formatBillingMonth, toBanglaDigits } from '../../utils/formatters';
+import {
+  PublicEngagementCounts,
+  PublicEngagementService,
+} from '../../services/publicEngagementService';
 
 export interface ReportCardProps {
   report: ReportItem;
@@ -15,6 +19,10 @@ export interface ReportCardProps {
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
+  const [engagement, setEngagement] = useState<PublicEngagementCounts>({
+    viewCount: 0,
+    shareCount: 0,
+  });
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
@@ -27,7 +35,25 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     normalizedDesc.length > 0 &&
     normalizedDesc !== normalizedTitle;
 
+  useEffect(() => {
+    let active = true;
+    void PublicEngagementService.getCounts(report.id).then((counts) => {
+      if (active) setEngagement(counts);
+    });
+    return () => {
+      active = false;
+    };
+  }, [report.id]);
+
+  const trackView = () => {
+    setEngagement((current) => ({ ...current, viewCount: current.viewCount + 1 }));
+    void PublicEngagementService.trackView(report.id).then((counts) => {
+      if (counts) setEngagement(counts);
+    });
+  };
+
   const handleCardClick = () => {
+    trackView();
     navigateTo(`/report-detail/${report.id}`);
   };
 
@@ -38,6 +64,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       navigator.clipboard.writeText(shareUrl).then(() => {
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
+        setEngagement((current) => ({ ...current, shareCount: current.shareCount + 1 }));
+        void PublicEngagementService.trackShare(report.id).then((counts) => {
+          if (counts) setEngagement(counts);
+        });
       });
     }
   };
@@ -117,6 +147,15 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
             <p className="whitespace-nowrap">{publishedDate}</p>
           </div>
+          <span className="text-ui-content-muted text-[10px] sm:text-[12px] md:text-[13px]" aria-hidden="true">•</span>
+          <div className="flex items-center gap-1 text-ui-content-muted shrink-0" aria-label={language === 'bn' ? `${engagement.viewCount} ভিউ` : `${engagement.viewCount} views`}>
+            <AppIcon name="eye" size="xs" className="text-ui-content-muted" />
+            <p>{language === 'bn' ? toBanglaDigits(engagement.viewCount) : engagement.viewCount.toLocaleString()}</p>
+          </div>
+          <div className="hidden sm:flex items-center gap-1 text-ui-content-muted shrink-0" aria-label={language === 'bn' ? `${engagement.shareCount} শেয়ার` : `${engagement.shareCount} shares`}>
+            <AppIcon name="share" size="xs" className="text-ui-content-muted" />
+            <p>{language === 'bn' ? toBanglaDigits(engagement.shareCount) : engagement.shareCount.toLocaleString()}</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 text-[12.5px] sm:text-[13.5px] md:text-[16px]">
@@ -147,7 +186,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
           <Link
             to={`/report-detail/${report.id}`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              trackView();
+            }}
             aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
             className="inline-flex items-center gap-1 sm:gap-1.5 font-semibold text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
           >
