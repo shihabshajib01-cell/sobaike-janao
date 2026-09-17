@@ -68,15 +68,15 @@ html[data-theme="light"] {
 
 html[data-theme="dark"],
 .dark {
-  --sec-harassment-primary: #D05B75;
-  --sec-harassment-hover: #E6758D;
+  --sec-harassment-primary: #B84A62;
+  --sec-harassment-hover: #D05B75;
   --sec-harassment-bg: #211619;
   --sec-harassment-border: #4A2931;
   --sec-harassment-text: #E7AAB8;
   --sec-harassment-on-primary: #FFFFFF;
 
-  --sec-extortion-primary: #6777B8;
-  --sec-extortion-hover: #8492D0;
+  --sec-extortion-primary: #4F5D95;
+  --sec-extortion-hover: #6777B8;
   --sec-extortion-bg: #171A25;
   --sec-extortion-border: #333B5D;
   --sec-extortion-text: #AFB9E1;
@@ -118,8 +118,8 @@ html[data-theme="dark"],
   --sec-illegal_occupation-text: #E2E8F0;
   --sec-illegal_occupation-on-primary: #050505;
 
-  --sec-rickshaw-primary: #E89540;
-  --sec-rickshaw-hover: #F0AB63;
+  --sec-rickshaw-primary: #D9822B;
+  --sec-rickshaw-hover: #E89540;
   --sec-rickshaw-bg: #21190F;
   --sec-rickshaw-border: #54371C;
   --sec-rickshaw-text: #E9B579;
