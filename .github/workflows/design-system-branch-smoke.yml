@@ -25,7 +25,9 @@ jobs:
         run: npm ci
 
       - name: Install Playwright runtime
-        run: npx playwright install --with-deps chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
 
       - name: Build exact branch source
         env:
