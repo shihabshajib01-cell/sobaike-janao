@@ -5,6 +5,7 @@ import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
+import { MobileCategoryFilterPortal } from '../components/feed/MobileCategoryFilterPortal';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
@@ -89,7 +90,6 @@ export const HarassmentPage: React.FC = () => {
 
   const subcategories = getFeedSubcategories('harassment');
 
-  // Determine valid browse location (transient request scope only)
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
     browseLocation !== null &&
@@ -198,7 +198,12 @@ export const HarassmentPage: React.FC = () => {
 
   return (
     <PublicPageContainer id="harassment-page-container">
-      {/* 1. Category Hero Slider */}
+      <MobileCategoryFilterPortal
+        language={language}
+        onOpen={() => setIsHarassmentFilterOpen(true)}
+        renderMobile={false}
+      />
+
       <CategoryHeroSlider
         id="harassment-header-banner"
         section="harassment"
@@ -223,10 +228,9 @@ export const HarassmentPage: React.FC = () => {
         ]}
       />
 
-      {/* 2. Subcategory filter controls */}
       <section id="harassment-filter-section" className="space-y-3">
-        <div className="border-b border-ui-stroke-subtle pb-3">
-          <div className="min-w-0">
+        <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
+          <div className="min-w-0 flex-1">
             <h2 className="text-[18px] sm:text-[20px] font-bold leading-[1.3] text-ui-content-primary">
               {language === 'bn'
                 ? 'সকল প্রতিবেদন'
@@ -238,9 +242,13 @@ export const HarassmentPage: React.FC = () => {
                 : `${filteredReports.length} published reports`}
             </p>
           </div>
+
+          <div
+            id="desktop-category-filter-slot"
+            className="hidden md:flex shrink-0 items-center"
+          />
         </div>
 
-        {/* Horizontally scrollable subcategory chips. Desktop adds YouTube-style edge controls. */}
         <div className="relative">
           {canScrollSubcategoriesLeft && (
             <div className="absolute inset-y-0 left-0 z-10 hidden lg:flex items-center pr-5 bg-gradient-to-r from-ui-page via-ui-page to-transparent pointer-events-none">
@@ -300,7 +308,6 @@ export const HarassmentPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Loading State Skeleton Screen */}
       {isLoading && (
         <ReportFeedSkeleton
           count={3}
@@ -309,7 +316,6 @@ export const HarassmentPage: React.FC = () => {
         />
       )}
 
-      {/* 4. Error State */}
       {!isLoading && fetchError && (
         <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-2xl p-6 text-center space-y-3">
           <AlertCircle className="w-6 h-6 text-ui-error-text mx-auto" aria-hidden="true" />
@@ -328,7 +334,6 @@ export const HarassmentPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Reports Feed */}
       {!isLoading && !fetchError && (
         <div className="space-y-3">
           {filteredReports.length > 0 ? (
