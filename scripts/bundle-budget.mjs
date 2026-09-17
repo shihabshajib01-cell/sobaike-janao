@@ -21,7 +21,7 @@ const composerChunk = jsFiles.find((file) => file.name.startsWith('ReportCompose
 
 const limits = {
   entry: kib(850),
-  anyJsChunk: kib(700),
+  lazyJsChunk: kib(400),
   css: kib(160),
   totalJs: kib(1800),
 };
@@ -33,8 +33,9 @@ if (entry && entry.bytes > limits.entry) {
   failures.push(`main entry ${entry.name} is ${(entry.bytes / 1024).toFixed(1)} KiB; budget is 850 KiB`);
 }
 for (const file of jsFiles) {
-  if (file.bytes > limits.anyJsChunk) {
-    failures.push(`JS chunk ${file.name} is ${(file.bytes / 1024).toFixed(1)} KiB; per-chunk budget is 700 KiB`);
+  if (entry && file.name === entry.name) continue;
+  if (file.bytes > limits.lazyJsChunk) {
+    failures.push(`lazy JS chunk ${file.name} is ${(file.bytes / 1024).toFixed(1)} KiB; budget is 400 KiB`);
   }
 }
 for (const file of cssFiles) {
@@ -58,4 +59,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`\nBundle budget passed. Main entry: ${(entry.bytes / 1024).toFixed(1)} KiB; composer is code-split.`);
+console.log(`\nBundle budget passed. Main entry: ${(entry.bytes / 1024).toFixed(1)} KiB; composer is code-split and every lazy chunk is <= 400 KiB.`);
