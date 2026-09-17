@@ -30,6 +30,7 @@ html[data-theme="light"] {
   --ui-input-placeholder: #8A8D91;
   --ui-disabled-bg: #E4E6EB;
   --ui-disabled-text: #8A8D91;
+  --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.14);
 
   /* Category system — authoritative light values */
   --sec-harassment-primary: #B84A62;
@@ -67,7 +68,6 @@ html[data-theme="light"] {
   --sec-load_shedding-text: #115E59;
   --sec-load_shedding-on-primary: #050505;
 
-  /* Compatibility alias for older hyphenated references. */
   --sec-load-shedding-primary: var(--sec-load_shedding-primary);
   --sec-load-shedding-hover: var(--sec-load_shedding-hover);
   --sec-load-shedding-bg: var(--sec-load_shedding-bg);
@@ -114,6 +114,7 @@ html[data-theme="dark"],
   --ui-input-placeholder: #8A8D91;
   --ui-disabled-bg: #303234;
   --ui-disabled-text: #8A8D91;
+  --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.32);
 
   /* Category system — authoritative dark values */
   --sec-harassment-primary: #B84A62;
@@ -233,7 +234,23 @@ html[data-theme="dark"],
   min-height: var(--touch-target-min);
 }
 
-/* Preserve native content sizing while keeping focus/error styling semantic. */
+/*
+ * Compatibility bridge for existing Tailwind geometry utilities.
+ * Values are intentionally equivalent to the established UI so older working
+ * components resolve through central tokens without a visual rewrite.
+ */
+.rounded-lg { border-radius: var(--radius-badge-md); }
+.rounded-xl { border-radius: var(--radius-control); }
+.rounded-2xl { border-radius: var(--radius-card); }
+.rounded-3xl { border-radius: var(--radius-modal); }
+.rounded-full { border-radius: var(--radius-pill); }
+
+.shadow-2xs { box-shadow: var(--elevation-card); }
+.shadow-xs { box-shadow: var(--elevation-selected-control); }
+.shadow-sm { box-shadow: var(--elevation-control); }
+.shadow-lg { box-shadow: var(--elevation-floating); }
+
+/* Preserve native content sizing while keeping interaction styling semantic. */
 :where(input, select, textarea, button, a) {
   -webkit-tap-highlight-color: transparent;
 }
