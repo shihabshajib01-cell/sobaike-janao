@@ -21,6 +21,7 @@ import { Modal } from '../components/ui/Modal';
 import { SearchableSelect } from '../components/ui/SearchableSelect';
 import { SearchInput } from '../components/ui/SearchInput';
 import { Button } from '../components/ui/Button';
+import { FilterChip } from '../components/ui/FilterChip';
 import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { HarassmentClassificationFilters } from '../components/report/HarassmentClassificationFilters';
 import { HarassmentClassificationBreakdown } from '../components/explore/HarassmentClassificationBreakdown';
@@ -386,7 +387,7 @@ export const ExplorePage: React.FC = () => {
         </div>
 
       {/* 2. Control Layer (Find reports - Compact Workbench) */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-3.5 sm:p-4 md:p-4.5 space-y-3 shadow-[var(--elevation-2xs)]">
+      <div className="bg-ui-surface border border-ui-stroke-subtle ui-radius-card p-3.5 sm:p-4 md:p-4.5 space-y-3 shadow-[var(--elevation-2xs)]">
         <div className="space-y-0.5">
           <h2 className="type-h4 text-ui-content-primary">
             {language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Find reports'}
@@ -471,29 +472,15 @@ export const ExplorePage: React.FC = () => {
 
             {CATEGORY_KEYS.map((sectionKey) => {
               const section = SECTIONS[sectionKey];
-              const selected = selectedSection === sectionKey;
               return (
-                <button
-                  type="button"
+                <FilterChip
                   key={sectionKey}
-                  aria-pressed={selected}
+                  label={language === 'bn' ? section.shortNameBn : section.shortNameEn}
+                  section={sectionKey}
+                  selected={selectedSection === sectionKey}
+                  icon={<CategoryIcon section={sectionKey} size="xs" />}
                   onClick={() => setSelectedSection(sectionKey)}
-                  className={
-                    'px-3.5 py-2 rounded-[var(--radius-control)] type-label shrink-0 cursor-pointer border transition-all flex items-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ' +
-                    (selected
-                      ? 'shadow-[var(--elevation-xs)] ring-1'
-                      : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary')
-                  }
-                  style={selected ? {
-                    backgroundColor: `var(--sec-${sectionKey}-bg)`,
-                    color: `var(--sec-${sectionKey}-text)`,
-                    borderColor: `var(--sec-${sectionKey}-border)`,
-                    ['--tw-ring-color' as any]: `var(--sec-${sectionKey}-border)`,
-                  } : undefined}
-                >
-                  <CategoryIcon section={sectionKey} size="xs" />
-                  <span>{language === 'bn' ? section.shortNameBn : section.shortNameEn}</span>
-                </button>
+                />
               );
             })}
           </HorizontalScrollRail>
@@ -524,8 +511,11 @@ export const ExplorePage: React.FC = () => {
           </div>
 
           {/* Mobile Filter Button */}
-          <button
+          <Button
+            id="explore-mobile-filter-button"
             type="button"
+            variant={mobileFilterCount > 0 ? 'secondary' : 'outline'}
+            size="md"
             onClick={handleOpenFilterSheet}
             aria-expanded={isFilterSheetOpen}
             aria-controls="mobile-filter-sheet"
@@ -534,20 +524,20 @@ export const ExplorePage: React.FC = () => {
                 ? `ফিল্টার খুলুন${mobileFilterCount > 0 ? ` (${toBanglaDigits(mobileFilterCount)}টি সক্রিয়)` : ''}`
                 : `Open filters${mobileFilterCount > 0 ? ` (${mobileFilterCount} active)` : ''}`
             }
-            className={`flex items-center justify-center gap-1.5 px-3 py-2.5 sm:px-3.5 rounded-[var(--radius-control)] border text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] min-h-[44px] cursor-pointer transition-colors shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              mobileFilterCount > 0
-                ? 'bg-ui-surface-subtle border-ui-accent text-ui-content-primary shadow-[var(--elevation-2xs)] font-[var(--font-weight-bold)]'
-                : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
+            leftIcon={<MapIcon name="filter" size="sm" ariaHidden={true} />}
+            rightIcon={
+              mobileFilterCount > 0 ? (
+                <span className="w-5 h-5 ui-radius-pill bg-ui-accent text-ui-action-text type-meta font-[var(--font-weight-bold)] flex items-center justify-center">
+                  {language === 'bn' ? toBanglaDigits(mobileFilterCount) : mobileFilterCount}
+                </span>
+              ) : undefined
+            }
+            className={`shrink-0 whitespace-nowrap ${
+              mobileFilterCount > 0 ? 'border-ui-accent font-[var(--font-weight-bold)]' : ''
             }`}
           >
-            <MapIcon name="filter" size="sm" ariaHidden={true} />
-            <span>{language === 'bn' ? 'ফিল্টার' : 'Filters'}</span>
-            {mobileFilterCount > 0 && (
-              <span className="w-5 h-5 rounded-[var(--radius-pill)] bg-ui-accent text-ui-action-text text-[var(--type-fixed-11)] font-[var(--font-weight-bold)] flex items-center justify-center">
-                {language === 'bn' ? toBanglaDigits(mobileFilterCount) : mobileFilterCount}
-              </span>
-            )}
-          </button>
+            {language === 'bn' ? 'ফিল্টার' : 'Filters'}
+          </Button>
         </div>
       </div>
 
@@ -558,13 +548,13 @@ export const ExplorePage: React.FC = () => {
           aria-label={language === 'bn' ? 'সক্রিয় ফিল্টার' : 'Active filters'}
           className="flex flex-wrap items-center gap-2 pt-0"
         >
-          <span className="text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] text-ui-content-secondary mr-1 shrink-0">
+          <span className="type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary mr-1 shrink-0">
             {language === 'bn' ? 'সক্রিয় ফিল্টার:' : 'Active filters:'}
           </span>
 
           {/* Division Chip */}
           {selectedDivision !== 'all' && activeDivisionName && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate">{activeDivisionName}</span>
               <button
                 type="button"
@@ -586,7 +576,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* District Chip */}
           {selectedDistrict !== 'all' && activeDistrictName && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate">{activeDistrictName}</span>
               <button
                 type="button"
@@ -605,7 +595,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Category Chip */}
           {selectedSection !== 'all' && activeCategoryName && (
-            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <CategoryIcon section={selectedSection as SectionKey} size="xs" className="shrink-0" />
               <span className="truncate">{activeCategoryName}</span>
               <button
@@ -625,7 +615,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Search Query Chip */}
           {searchQuery.trim() && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate max-w-[180px] sm:max-w-[240px]">
                 {language === 'bn'
                   ? `অনুসন্ধান: “${searchQuery.trim()}”`
@@ -647,19 +637,19 @@ export const ExplorePage: React.FC = () => {
           )}
 
           {selectedSection === 'harassment' && harassmentFilters.ageGroup !== 'all' && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
               <span>{getBilingualOptionLabel(HARASSMENT_AGE_GROUP_OPTIONS, harassmentFilters.ageGroup, language)}</span>
               <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, ageGroup: 'all' }))} aria-label={language === 'bn' ? 'বয়সের ফিল্টার সরান' : 'Remove age filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
             </span>
           )}
           {selectedSection === 'harassment' && harassmentFilters.abuserRelationship !== 'all' && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
               <span>{getBilingualOptionLabel(HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS, harassmentFilters.abuserRelationship, language)}</span>
               <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, abuserRelationship: 'all' }))} aria-label={language === 'bn' ? 'সম্পর্কের ফিল্টার সরান' : 'Remove relationship filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
             </span>
           )}
           {selectedSection === 'harassment' && harassmentFilters.reportingFor !== 'all' && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
               <span>{getBilingualOptionLabel(HARASSMENT_REPORTING_FOR_OPTIONS, harassmentFilters.reportingFor, language)}</span>
               <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, reportingFor: 'all' }))} aria-label={language === 'bn' ? 'প্রতিবেদনকারীর ফিল্টার সরান' : 'Remove reporting-for filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
             </span>
@@ -669,7 +659,7 @@ export const ExplorePage: React.FC = () => {
           <button
             type="button"
             onClick={handleResetFilters}
-            className="min-h-[44px] px-3 py-2 inline-flex items-center text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] text-ui-accent hover:underline cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)] ml-auto sm:ml-1"
+            className="min-h-[44px] px-3 py-2 inline-flex items-center type-meta font-[var(--font-weight-semibold)] text-ui-accent hover:underline cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md ml-auto sm:ml-1"
           >
             {language === 'bn' ? 'সব মুছুন' : 'Clear all'}
           </button>
@@ -680,24 +670,24 @@ export const ExplorePage: React.FC = () => {
       {!isLoading && !fetchError && (
         <div className="space-y-2">
           {/* Dynamic Result Context */}
-          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] px-4 py-3 shadow-[var(--elevation-2xs)] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4">
-            <h3 className="text-[var(--type-fixed-14)] sm:text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+          <div className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control px-4 py-3 shadow-[var(--elevation-2xs)] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4">
+            <h3 className="type-meta  font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
               {dynamicAnswerHeading}
             </h3>
-            <p className="text-[var(--type-fixed-13)] font-[var(--font-weight-medium)] text-ui-content-secondary shrink-0">
+            <p className="type-meta font-[var(--font-weight-medium)] text-ui-content-secondary shrink-0">
               {countMessage}
             </p>
           </div>
 
           {/* Secondary About This Data Disclosure */}
-          <details className="group bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] px-3.5 sm:px-4 py-1 text-[var(--type-fixed-13)] text-ui-content-secondary shadow-[var(--elevation-2xs)]">
-            <summary className="font-[var(--font-weight-medium)] text-[var(--type-fixed-13)] text-ui-content-secondary hover:text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] flex items-center justify-between gap-2 list-none">
+          <details className="group bg-ui-surface border border-ui-stroke-subtle ui-radius-control px-3.5 sm:px-4 py-1 type-meta text-ui-content-secondary shadow-[var(--elevation-2xs)]">
+            <summary className="font-[var(--font-weight-medium)] type-meta text-ui-content-secondary hover:text-ui-content-primary cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus min-h-[44px] flex items-center justify-between gap-2 list-none">
               <span>{language === 'bn' ? 'এই তথ্য সম্পর্কে' : 'About this data'}</span>
-              <span className="w-7 h-7 rounded-[var(--radius-badge-sm)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
+              <span className="w-7 h-7 ui-radius-badge-sm bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center text-ui-content-secondary group-hover:text-ui-content-primary shrink-0 transition-transform duration-200 group-open:rotate-180">
                 <MapIcon name="chevron-down" size="xs" ariaHidden={true} />
               </span>
             </summary>
-            <div className="pt-2 pb-3 border-t border-ui-stroke-subtle mt-1 text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] text-ui-content-secondary leading-relaxed">
+            <div className="pt-2 pb-3 border-t border-ui-stroke-subtle mt-1 type-meta  text-ui-content-secondary leading-relaxed">
               {language === 'bn'
                 ? 'এখানে সবাইকে জানাও-এ প্রকাশিত নাগরিক প্রতিবেদন বিশ্লেষণ করা হয়েছে। এটি সরকারি অপরাধ পরিসংখ্যান নয় এবং কোনো এলাকার সামগ্রিক নিরাপত্তা বা কোনো অভিযোগের আইনগত সত্যতা নির্ধারণ করে না।'
                 : 'This analysis is based on citizen reports published on Sobaike Janao. It is not official crime statistics and does not determine the overall safety of an area or the legal truth of an allegation.'}
@@ -711,13 +701,13 @@ export const ExplorePage: React.FC = () => {
         <div
           role="group"
           aria-label={language === 'bn' ? 'ভিউ পরিবর্তন' : 'View mode switcher'}
-          className="flex items-center bg-ui-surface-subtle p-1 rounded-[var(--radius-control)] border border-ui-stroke-subtle w-fit shadow-[var(--elevation-2xs)]"
+          className="flex items-center bg-ui-surface-subtle p-1 ui-radius-control border border-ui-stroke-subtle w-fit shadow-[var(--elevation-2xs)]"
         >
           <button
             type="button"
             aria-pressed={viewMode === 'reports'}
             onClick={() => setViewMode('reports')}
-            className={`px-3.5 sm:px-4 py-2 rounded-[var(--radius-badge-md)] text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
+            className={`px-3.5 sm:px-4 py-2 ui-radius-badge-md type-meta  font-[var(--font-weight-semibold)] flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
               viewMode === 'reports'
                 ? 'bg-ui-surface text-ui-content-primary shadow-[var(--elevation-2xs)] font-[var(--font-weight-bold)] border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
                 : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
@@ -731,7 +721,7 @@ export const ExplorePage: React.FC = () => {
             type="button"
             aria-pressed={viewMode === 'heatmap'}
             onClick={() => setViewMode('heatmap')}
-            className={`px-3.5 sm:px-4 py-2 rounded-[var(--radius-badge-md)] text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
+            className={`px-3.5 sm:px-4 py-2 ui-radius-badge-md type-meta  font-[var(--font-weight-semibold)] flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
               viewMode === 'heatmap'
                 ? 'bg-ui-surface text-ui-content-primary shadow-[var(--elevation-2xs)] font-[var(--font-weight-bold)] border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
                 : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
@@ -764,7 +754,7 @@ export const ExplorePage: React.FC = () => {
       {!isLoading && fetchError && (
         <div
           role="alert"
-          className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-control)] p-8 text-center space-y-4 shadow-[var(--elevation-xs)]"
+          className="bg-ui-surface border border-ui-error-border ui-radius-control p-8 text-center space-y-4 shadow-[var(--elevation-xs)]"
         >
           <MapIcon
             name="alert-circle"
@@ -772,7 +762,7 @@ export const ExplorePage: React.FC = () => {
             className="text-ui-error-text mx-auto"
             ariaHidden={true}
           />
-          <p className="text-[var(--type-fixed-15)] font-[var(--font-weight-semibold)] text-ui-error-text">
+          <p className="type-body font-[var(--font-weight-semibold)] text-ui-error-text">
             {language === 'bn'
               ? 'প্রতিবেদন লোড করা যায়নি।'
               : 'Couldn’t load reports.'}
@@ -790,7 +780,7 @@ export const ExplorePage: React.FC = () => {
             /* Authoritative Zero-Result Recovery State */
             <div
               role="status"
-              className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-8 sm:p-10 text-center space-y-4 shadow-[var(--elevation-2xs)]"
+              className="bg-ui-surface border border-ui-stroke-subtle ui-radius-card p-8 sm:p-10 text-center space-y-4 shadow-[var(--elevation-2xs)]"
             >
               <MapIcon
                 name="alert-circle"
@@ -799,12 +789,12 @@ export const ExplorePage: React.FC = () => {
                 ariaHidden={true}
               />
               <div className="space-y-1.5 max-w-md mx-auto">
-                <h3 className="text-[var(--type-fixed-16)] sm:text-[var(--type-fixed-17)] font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h3 className="type-body  font-[var(--font-weight-bold)] text-ui-content-primary">
                   {language === 'bn'
                     ? 'এই ফিল্টারে কোনো প্রতিবেদন পাওয়া যায়নি'
                     : 'No reports found for these filters'}
                 </h3>
-                <p className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] text-ui-content-secondary leading-relaxed">
+                <p className="type-meta  text-ui-content-secondary leading-relaxed">
                   {language === 'bn'
                     ? 'অন্য এলাকা বা বিষয় নির্বাচন করুন, অনুসন্ধান পরিবর্তন করুন, অথবা কিছু ফিল্টার সরিয়ে আবার দেখুন।'
                     : 'Try another area or topic, change your search, or remove some filters and try again.'}
@@ -836,16 +826,16 @@ export const ExplorePage: React.FC = () => {
               {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
               {selectedDistrict !== 'all' && (
                 <div className="block md:hidden w-full">
-                  <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-3.5 sm:p-4 shadow-[var(--elevation-2xs)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="bg-ui-surface border border-ui-stroke-subtle ui-radius-card p-3.5 sm:p-4 shadow-[var(--elevation-2xs)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
+                      <div className="w-10 h-10 ui-radius-control bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
                         <MapIcon name="map-pin" size="md" ariaHidden={true} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-[var(--type-fixed-15)] font-[var(--font-weight-bold)] text-ui-content-primary whitespace-normal break-words line-clamp-2 leading-snug">
+                        <h3 className="type-body font-[var(--font-weight-bold)] text-ui-content-primary whitespace-normal break-words line-clamp-2 leading-snug">
                           {activeDistrictName || selectedDistrict}
                         </h3>
-                        <p className="text-[var(--type-fixed-13)] text-ui-content-secondary whitespace-normal break-words leading-tight mt-0.5">
+                        <p className="type-meta text-ui-content-secondary whitespace-normal break-words leading-tight mt-0.5">
                           {language === 'bn'
                             ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
                             : `${filteredReports.length} published reports`}
@@ -942,13 +932,13 @@ export const ExplorePage: React.FC = () => {
 
                   {/* 3. Activity Timeline or Small Dataset Trend Safety Message */}
                   {filteredReports.length <= 2 ? (
-                    <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 text-left space-y-1">
-                      <div className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary">
+                    <div className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control p-3.5 sm:p-4 text-left space-y-1">
+                      <div className="type-meta  font-[var(--font-weight-bold)] text-ui-content-primary">
                         {language === 'bn'
                           ? 'এই নির্বাচনে প্রবণতা দেখানোর মতো পর্যাপ্ত প্রতিবেদন নেই।'
                           : 'There are not enough reports in this selection to show a meaningful trend.'}
                       </div>
-                      <div className="text-[var(--type-fixed-12)] text-ui-content-secondary">
+                      <div className="type-meta text-ui-content-secondary">
                         {language === 'bn'
                           ? 'সময়ের সাথে পরিবর্তন অর্থপূর্ণভাবে দেখাতে আরও প্রকাশিত প্রতিবেদন প্রয়োজন।'
                           : 'More published reports are needed before changes over time can be interpreted meaningfully.'}
@@ -1016,7 +1006,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Topic / Category */}
           <fieldset className="space-y-2 border-0 p-0 m-0">
-            <legend className="text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] text-ui-content-primary block p-0 mb-1">
+            <legend className="type-meta font-[var(--font-weight-bold)] text-ui-content-primary block p-0 mb-1">
               {language === 'bn' ? 'বিষয়' : 'Topic'}
             </legend>
             <div className="grid grid-cols-2 gap-2">
@@ -1024,7 +1014,7 @@ export const ExplorePage: React.FC = () => {
                 type="button"
                 aria-pressed={draftSection === 'all'}
                 onClick={() => setDraftSection('all')}
-                className={`px-3 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] cursor-pointer border transition-all min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                className={`px-3 py-2.5 ui-radius-control type-meta font-[var(--font-weight-semibold)] cursor-pointer border transition-all min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   draftSection === 'all'
                     ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg shadow-[var(--elevation-xs)] font-[var(--font-weight-bold)]'
                     : 'bg-ui-surface border border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
@@ -1042,7 +1032,7 @@ export const ExplorePage: React.FC = () => {
                     key={sectionKey}
                     aria-pressed={selected}
                     onClick={() => setDraftSection(sectionKey)}
-                    className={`px-3 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                    className={`px-3 py-2.5 ui-radius-control type-meta font-[var(--font-weight-semibold)] cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                       selected
                         ? 'shadow-[var(--elevation-xs)] font-[var(--font-weight-bold)] ring-1'
                         : 'bg-ui-surface border-ui-stroke-subtle text-ui-content-secondary hover:text-ui-content-primary'
