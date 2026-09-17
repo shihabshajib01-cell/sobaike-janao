@@ -19,7 +19,6 @@ export interface ServiceSlide {
 
 export interface ServiceHeroCarouselProps {
   id?: string;
-  reportCounts?: Partial<Record<SectionKey, number>>;
   className?: string;
 }
 
@@ -27,7 +26,6 @@ const AUTOPLAY_INTERVAL = HERO_SLIDER_BEHAVIOR.autoplayIntervalMs;
 
 export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   id = 'home-service-carousel',
-  reportCounts: _reportCounts = {},
   className = '',
 }) => {
   const { language, openReportComposer } = useApp();
@@ -65,7 +63,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     }
   }, [currentIndex, safeIndex]);
 
-  // Check prefers-reduced-motion
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -76,7 +73,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
-  // Track document visibility
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const handleVisibilityChange = () => {
@@ -96,7 +92,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     setCurrentIndex((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
   }, [isMultiSlide, totalSlides]);
 
-  // Autoplay management
   useEffect(() => {
     if (timerRef.current) {
       window.clearTimeout(timerRef.current);
@@ -135,11 +130,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     handleNext,
   ]);
 
-  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isMultiSlide) return;
 
-    // Do not trigger carousel navigation when event originates from an interactive child
     const target = e.target as HTMLElement | null;
     if (target && target !== sliderRef.current) {
       const isInteractive =
@@ -160,7 +153,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     }
   };
 
-  // Pointer-safe hover handling (ignores touch / coarse pointers)
   const handlePointerEnter = (e: React.PointerEvent) => {
     if (e.pointerType !== 'mouse') return;
     if (
@@ -177,7 +169,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     }
   };
 
-  // Focus handling with inner containment check
   const handleFocus = () => {
     setIsFocused(true);
   };
@@ -192,7 +183,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     setIsFocused(false);
   };
 
-  // Touch / Pointer gestures for swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!isMultiSlide) return;
     setIsHovered(false);
@@ -211,7 +201,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     const diffX = touch.clientX - touchStartRef.current.x;
     const diffY = touch.clientY - touchStartRef.current.y;
 
-    // Minimum swipe threshold and predominantly horizontal
     if (
       Math.abs(diffX) > HERO_SLIDER_BEHAVIOR.swipeThresholdPx &&
       Math.abs(diffX) > Math.abs(diffY) * HERO_SLIDER_BEHAVIOR.swipeDominanceRatio
@@ -277,7 +266,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         className="w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         style={containerStyle}
       >
-        {/* Slides Track */}
         <div
           className={`hero-slider-track ${
             prefersReducedMotion ? '!transition-none' : ''
@@ -334,7 +322,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         </div>
       </section>
 
-      {/* Large-Desktop (>=1440px) / Fine-Pointer Hover Arrows */}
       {isMultiSlide && (
         <>
           <IconButton
