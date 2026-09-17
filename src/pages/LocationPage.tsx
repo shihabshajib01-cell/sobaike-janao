@@ -2,11 +2,14 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { ArrowLeft, AlertCircle, FileText } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { BANGLADESH_DISTRICTS } from '../data/districts';
+import { CATEGORY_ORDER } from '../data/categoryOrder';
 import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
-import { SECTIONS } from '../theme/tokens';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { SECTIONS, SectionKey } from '../theme/tokens';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
 import { BRAND_NAME } from '../lib/seo';
@@ -24,7 +27,6 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Find district metadata from districts dataset
   const district = useMemo(() => {
     const cleanId = locationId.toLowerCase().trim();
     return BANGLADESH_DISTRICTS.find(
@@ -50,13 +52,21 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
   }, [locationId]);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, [loadData]);
 
-  // Breakdowns by segment
-  const harassmentCount = reports.filter((r) => r.segment === 'harassment').length;
-  const rickshawCount = reports.filter((r) => r.segment === 'rickshaw').length;
-  const extortionCount = reports.filter((r) => r.segment === 'extortion').length;
+  const segmentCounts = useMemo(() => {
+    const counts = Object.fromEntries(CATEGORY_ORDER.map((key) => [key, 0])) as Record<SectionKey, number>;
+    reports.forEach((report) => {
+      if (report.segment in counts) counts[report.segment as SectionKey] += 1;
+    });
+    return counts;
+  }, [reports]);
+
+  const visibleSegmentKeys = useMemo(
+    () => CATEGORY_ORDER.filter((key) => segmentCounts[key] > 0),
+    [segmentCounts]
+  );
 
   const districtDisplayName = district
     ? language === 'bn'
@@ -129,73 +139,66 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
     }
   }, [district, isLoading, fetchError, language, setDynamicSeo]);
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      navigateTo('/explore');
+    }
+  };
+
   return (
     <PublicPageContainer id="location-page-container">
-      {/* Back button & Breadcrumb */}
-      <div className="flex items-center gap-2 text-[var(--type-fixed-14)] text-ui-content-muted">
-        <button
+      <div className="flex items-center gap-2 type-meta text-ui-content-muted">
+        <Button
           type="button"
-          onClick={() => {
-            if (window.history.length > 1) {
-              window.history.back();
-            } else {
-              navigateTo('/explore');
-            }
-          }}
-          className="flex items-center gap-2 font-[var(--font-weight-medium)] transition-colors cursor-pointer min-h-[44px] px-3 py-1.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          variant="secondary"
+          size="sm"
+          onClick={handleBack}
+          leftIcon={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
         >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>{language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}</span>
-        </button>
+          {language === 'bn' ? 'এক্সপ্লোরে ফিরুন' : 'Back to explore'}
+        </Button>
         <span aria-hidden="true">/</span>
-        <span className="text-ui-content-primary font-[var(--font-weight-semibold)]">{districtDisplayName}</span>
+        <span className="text-ui-content-primary font-[var(--font-weight-semibold)] truncate">
+          {districtDisplayName}
+        </span>
       </div>
 
-      {/* District Header Card */}
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 space-y-4 shadow-[var(--elevation-2xs)]">
+      <section className="ui-card p-5 md:p-7 space-y-4" aria-labelledby="location-page-title">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-[var(--type-fixed-32)] leading-[var(--type-line-42)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight">
+            <h1 id="location-page-title" className="type-h1 text-ui-content-primary">
               {districtDisplayName}
             </h1>
             {divisionDisplayName && (
-              <span className="text-[var(--type-fixed-14)] px-2.5 py-0.5 rounded-[var(--radius-badge-md)] bg-ui-surface-subtle text-ui-content-secondary font-[var(--font-weight-medium)] border border-ui-stroke-subtle">
+              <span className="type-meta px-2.5 py-0.5 ui-radius-badge-md bg-ui-surface-subtle text-ui-content-secondary font-[var(--font-weight-medium)] border border-ui-stroke-subtle">
                 {language === 'bn' ? `${divisionDisplayName} বিভাগ` : `${divisionDisplayName} division`}
               </span>
             )}
           </div>
-          <p className="text-[var(--type-fixed-16)] leading-[var(--type-line-26)] text-ui-content-secondary">
-            {language === 'bn'
-              ? 'এই এলাকার প্রতিবেদন'
-              : 'Reports from this area'}
+          <p className="type-body text-ui-content-secondary">
+            {language === 'bn' ? 'এই এলাকার প্রতিবেদন' : 'Reports from this area'}
           </p>
         </div>
 
-        {/* Quiet Inline Summary */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 border-t border-ui-stroke-subtle text-[var(--type-fixed-14)] text-ui-content-secondary font-[var(--font-weight-medium)]">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-secondary font-[var(--font-weight-medium)]">
           <span>
             {language === 'bn' ? `${toBanglaDigits(reports.length)}টি প্রতিবেদন` : `${reports.length} reports`}
           </span>
-          {reports.length > 0 && (
-            <>
-              <span>·</span>
+          {visibleSegmentKeys.map((key) => (
+            <React.Fragment key={key}>
+              <span aria-hidden="true">·</span>
               <span>
-                {language === 'bn' ? `${SECTIONS.harassment.shortNameBn} ${toBanglaDigits(harassmentCount)}` : `${SECTIONS.harassment.shortNameEn} ${harassmentCount}`}
+                {language === 'bn'
+                  ? `${SECTIONS[key].shortNameBn} ${toBanglaDigits(segmentCounts[key])}`
+                  : `${SECTIONS[key].shortNameEn} ${segmentCounts[key]}`}
               </span>
-              <span>·</span>
-              <span>
-                {language === 'bn' ? `${SECTIONS.rickshaw.shortNameBn} ${toBanglaDigits(rickshawCount)}` : `${SECTIONS.rickshaw.shortNameEn} ${rickshawCount}`}
-              </span>
-              <span>·</span>
-              <span>
-                {language === 'bn' ? `${SECTIONS.extortion.shortNameBn} ${toBanglaDigits(extortionCount)}` : `${SECTIONS.extortion.shortNameEn} ${extortionCount}`}
-              </span>
-            </>
-          )}
+            </React.Fragment>
+          ))}
         </div>
-      </div>
+      </section>
 
-      {/* Loading State Skeleton Screen */}
       {isLoading && (
         <ReportFeedSkeleton
           count={3}
@@ -204,38 +207,26 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         />
       )}
 
-      {/* Error State */}
       {!isLoading && fetchError && (
-        <div role="alert" className="bg-ui-surface border border-ui-error-border rounded-[var(--radius-control)] p-8 text-center space-y-4">
+        <div role="alert" className="ui-card border-ui-error-border p-8 text-center space-y-4">
           <AlertCircle className="w-8 h-8 text-ui-error-text mx-auto" aria-hidden="true" />
-          <p className="text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] text-ui-error-text">
+          <p className="type-body font-[var(--font-weight-semibold)] text-ui-error-text">
             {language === 'bn'
               ? 'এই এলাকার প্রতিবেদন লোড করা যায়নি।'
               : "Couldn't load reports for this area."}
           </p>
-          <button
-            type="button"
-            onClick={loadData}
-            className="btn-primary-action px-4 py-2.5 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-semibold)] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus cursor-pointer"
-          >
+          <Button type="button" variant="primary" size="md" onClick={loadData}>
             {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
-          </button>
+          </Button>
         </div>
       )}
 
-      {/* Reports Feed */}
       {!isLoading && !fetchError && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[var(--type-fixed-18)] leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary flex items-center gap-2">
-              <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
-              <span>
-                {language === 'bn'
-                  ? 'প্রকাশিত প্রতিবেদন'
-                  : 'Published reports'}
-              </span>
-            </h2>
-          </div>
+        <section className="space-y-4" aria-labelledby="location-published-reports-title">
+          <h2 id="location-published-reports-title" className="type-h2 text-ui-content-primary flex items-center gap-2">
+            <FileText className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
+            <span>{language === 'bn' ? 'প্রকাশিত প্রতিবেদন' : 'Published reports'}</span>
+          </h2>
 
           {reports.length > 0 ? (
             <div className="space-y-3">
@@ -244,14 +235,16 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
               ))}
             </div>
           ) : (
-            <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-8 text-center space-y-2">
-              <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
-              <h3 className="text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary">
-                {language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই।' : 'No reports in this area.'}
-              </h3>
-            </div>
+            <EmptyState
+              title={language === 'bn' ? 'এই এলাকায় কোনো প্রতিবেদন নেই।' : 'No reports in this area.'}
+              description={
+                language === 'bn'
+                  ? 'এই এলাকার জন্য বর্তমানে কোনো প্রকাশিত প্রতিবেদন নেই।'
+                  : 'There are currently no published reports for this area.'
+              }
+            />
           )}
-        </div>
+        </section>
       )}
     </PublicPageContainer>
   );
