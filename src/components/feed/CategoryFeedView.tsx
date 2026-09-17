@@ -20,7 +20,6 @@ type SubcategoryOption = {
 export interface CategoryFeedViewProps {
   section: SectionKey;
   language: Language;
-  reports: ReportItem[];
   filteredReports: ReportItem[];
   isLoading: boolean;
   fetchError: string | null;
@@ -39,7 +38,6 @@ export interface CategoryFeedViewProps {
 export const CategoryFeedView: React.FC<CategoryFeedViewProps> = ({
   section,
   language,
-  reports,
   filteredReports,
   isLoading,
   fetchError,
@@ -145,10 +143,6 @@ export const CategoryFeedView: React.FC<CategoryFeedViewProps> = ({
           )}
         </div>
       )}
-
-      <span className="sr-only" aria-hidden="true">
-        {reports.length}
-      </span>
     </>
   );
 };
