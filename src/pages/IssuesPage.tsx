@@ -62,7 +62,7 @@ export const IssuesPage: React.FC = () => {
   );
 
   return (
-    <PublicPageContainer id="issues-page-container" className="md:hidden">
+    <PublicPageContainer id="issues-page-container">
       <section aria-labelledby="issues-page-title" className="space-y-1">
         <h1 id="issues-page-title" className="type-h1 text-ui-content-primary">
           {language === 'bn' ? 'বিষয়সমূহ' : 'Issues'}
