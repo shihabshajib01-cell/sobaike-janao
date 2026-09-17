@@ -49,6 +49,9 @@ jobs:
           test -f supabase/migrations/20260915164500_public_security_surface_limits.sql
           test -f supabase/migrations/20260915165000_public_security_policy_cleanup.sql
 
+      - name: Public design-system authority audit
+        run: npm run design:audit
+
       - name: Lint
         run: npm run lint
 

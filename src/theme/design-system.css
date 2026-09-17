@@ -2,8 +2,8 @@
  * Sobaike Janao public design-system authority layer.
  *
  * Imported after legacy/base styles so every public surface resolves through one
- * semantic visual contract. Keep page/component code on semantic `ui-*` and
- * `sec-*` variables; do not introduce page-specific colors here.
+ * semantic visual contract. Legacy utility recipes are normalized here while
+ * working page/component behavior remains unchanged.
  */
 
 :root,
@@ -174,6 +174,7 @@ html[data-theme="dark"],
   --touch-target-min: 44px;
 }
 
+/* Shared structural recipes */
 .ui-card {
   background-color: var(--ui-surface);
   border: var(--border-width-default) var(--border-style-default) var(--ui-border-subtle);
@@ -198,15 +199,11 @@ html[data-theme="dark"],
 }
 
 @media (min-width: 768px) {
-  .ui-page-shell {
-    padding: 1.25rem 1.5rem;
-  }
+  .ui-page-shell { padding: 1.25rem 1.5rem; }
 }
 
 @media (min-width: 1024px) {
-  .ui-page-shell {
-    padding: 1.5rem 2rem;
-  }
+  .ui-page-shell { padding: 1.5rem 2rem; }
 }
 
 @media (min-width: 1440px) {
@@ -216,29 +213,130 @@ html[data-theme="dark"],
   }
 }
 
-:where(
-  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
-  select
-) {
-  min-height: var(--touch-target-min);
+/* Typography authority. Semantic elements win over old page-level text utilities. */
+:where(h1) {
+  font-size: var(--type-h1-size-mobile) !important;
+  line-height: var(--type-h1-line-mobile) !important;
+  font-weight: var(--type-h1-weight) !important;
 }
 
-/* Enforce the centralized form type scale even in older local field recipes. */
-:where(input, select, textarea) {
+:where(h2) {
+  font-size: var(--type-h2-size-mobile) !important;
+  line-height: var(--type-h2-line-mobile) !important;
+  font-weight: var(--type-h2-weight) !important;
+}
+
+:where(h3) {
+  font-size: var(--type-h3-size-mobile) !important;
+  line-height: var(--type-h3-line-mobile) !important;
+  font-weight: var(--type-h3-weight) !important;
+}
+
+:where(h4, h5) {
+  font-size: var(--type-h4-size-mobile) !important;
+  line-height: var(--type-h4-line-mobile) !important;
+  font-weight: var(--type-h4-weight) !important;
+}
+
+:where(p) {
+  font-size: var(--type-body-size) !important;
+  line-height: var(--type-body-line) !important;
+}
+
+:where(label) {
+  font-size: var(--type-meta-size) !important;
+  line-height: var(--type-meta-line) !important;
+  font-weight: var(--font-weight-medium);
+}
+
+:where(button) {
+  min-height: var(--touch-target-min) !important;
+  font-size: var(--type-action-size) !important;
+  line-height: var(--type-action-line) !important;
+  font-weight: var(--type-action-weight);
+}
+
+:where(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+  select,
+  textarea
+) {
+  min-height: var(--touch-target-min) !important;
+  font-family: var(--font-ui) !important;
   font-size: var(--type-body-size) !important;
   line-height: var(--type-label-line) !important;
 }
 
-.rounded-lg { border-radius: var(--radius-badge-md); }
-.rounded-xl { border-radius: var(--radius-control); }
-.rounded-2xl { border-radius: var(--radius-card); }
-.rounded-3xl { border-radius: var(--radius-modal); }
-.rounded-full { border-radius: var(--radius-pill); }
+/* Generic wrappers should inherit semantic type rather than create a local type scale. */
+:where(span, div)[class*="text-["] {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
 
-.shadow-2xs { box-shadow: var(--elevation-card); }
-.shadow-xs { box-shadow: var(--elevation-selected-control); }
-.shadow-sm { box-shadow: var(--elevation-control); }
-.shadow-lg { box-shadow: var(--elevation-floating); }
+/* Language-aware font is authoritative, including legacy utility classes. */
+.font-sans,
+.font-serif,
+.font-mono {
+  font-family: var(--font-ui) !important;
+}
+
+/* Central weight compatibility for legacy Tailwind classes. */
+.font-normal { font-weight: var(--font-weight-regular) !important; }
+.font-medium { font-weight: var(--font-weight-medium) !important; }
+.font-semibold { font-weight: var(--font-weight-semibold) !important; }
+.font-bold { font-weight: var(--font-weight-bold) !important; }
+
+@media (min-width: 768px) {
+  :where(h1) {
+    font-size: var(--type-h1-size-tablet) !important;
+    line-height: var(--type-h1-line-tablet) !important;
+  }
+  :where(h2) {
+    font-size: var(--type-h2-size-tablet) !important;
+    line-height: var(--type-h2-line-tablet) !important;
+  }
+  :where(h3) {
+    font-size: var(--type-h3-size-tablet) !important;
+    line-height: var(--type-h3-line-tablet) !important;
+  }
+  :where(h4, h5) {
+    font-size: var(--type-h4-size-tablet) !important;
+    line-height: var(--type-h4-line-tablet) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  :where(h1) {
+    font-size: var(--type-h1-size-desktop) !important;
+    line-height: var(--type-h1-line-desktop) !important;
+  }
+}
+
+/* Radius compatibility: old utilities now resolve from the central radius scale. */
+.rounded-sm { border-radius: var(--radius-badge-sm) !important; }
+.rounded-md,
+.rounded-lg { border-radius: var(--radius-badge-md) !important; }
+.rounded-xl { border-radius: var(--radius-control) !important; }
+.rounded-2xl { border-radius: var(--radius-card) !important; }
+.rounded-3xl { border-radius: var(--radius-modal) !important; }
+.rounded-full { border-radius: var(--radius-pill) !important; }
+
+:where(button, input, select, textarea)[class*="rounded-["] {
+  border-radius: var(--radius-control) !important;
+}
+
+:where(section, article)[class*="rounded-["] {
+  border-radius: var(--radius-card) !important;
+}
+
+/* Elevation compatibility: old utilities resolve from central elevation roles. */
+.shadow-2xs { box-shadow: var(--elevation-card) !important; }
+.shadow-xs { box-shadow: var(--elevation-selected-control) !important; }
+.shadow-sm,
+.shadow-md { box-shadow: var(--elevation-control) !important; }
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl { box-shadow: var(--elevation-floating) !important; }
 
 :where(input, select, textarea, button, a) {
   -webkit-tap-highlight-color: transparent;
