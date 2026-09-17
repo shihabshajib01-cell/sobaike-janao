@@ -5,7 +5,6 @@ import {
   LayoutGrid,
   TrendingUp,
 } from 'lucide-react';
-import { SectionKey } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { PublicEngagementService } from '../services/publicEngagementService';
 import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
@@ -16,6 +15,7 @@ import { NewReportsNotice } from '../components/feed/NewReportsNotice';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Button } from '../components/ui/Button';
+import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
@@ -226,15 +226,6 @@ export const HomePage: React.FC = () => {
     }
   }, [isRefreshingNewReports, loadReports, pendingNewestPublishedAt]);
 
-  const reportCounts: Partial<Record<SectionKey, number>> = useMemo(() => {
-    return {
-      harassment: allReports.filter((r) => r.segment === 'harassment').length,
-      rickshaw: allReports.filter((r) => r.segment === 'rickshaw').length,
-      extortion: allReports.filter((r) => r.segment === 'extortion').length,
-      load_shedding: allReports.filter((r) => r.segment === 'load_shedding').length,
-    };
-  }, [allReports]);
-
   const filteredReports = useMemo(() => allReports, [allReports]);
 
   const visibleReports = useMemo(() => {
@@ -255,7 +246,7 @@ export const HomePage: React.FC = () => {
           : 'Sobaike Janao — Citizen Reporting Platform'}
       </h1>
 
-      <ServiceHeroCarousel id="home-service-carousel" reportCounts={reportCounts} className="mb-2" />
+      <ServiceHeroCarousel id="home-service-carousel" className="mb-2" />
 
       <section id="home-feed-section" className="space-y-4 pt-1">
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
@@ -270,7 +261,13 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <HorizontalScrollRail
+          id="home-feed-filter-rail"
+          ariaLabel={language === 'bn' ? 'প্রতিবেদন ফিল্টার' : 'Report filters'}
+          previousLabel={language === 'bn' ? 'আগের ফিল্টার দেখুন' : 'Show previous filters'}
+          nextLabel={language === 'bn' ? 'পরের ফিল্টার দেখুন' : 'Show more filters'}
+          className="gap-1.5 sm:gap-2"
+        >
           <FilterChip
             id="filter-chip-all"
             label={language === 'bn' ? 'সব' : 'All'}
@@ -293,7 +290,7 @@ export const HomePage: React.FC = () => {
             selected={feedFilter === 'popular'}
             onClick={() => setFeedFilter('popular')}
           />
-        </div>
+        </HorizontalScrollRail>
 
         <NewReportsNotice
           count={newReportCount}
