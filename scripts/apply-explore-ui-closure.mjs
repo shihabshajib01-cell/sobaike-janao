@@ -117,12 +117,13 @@ replaceOrThrow(
   'mobile filter action'
 );
 
-// Remove responsive fixed-size overrides first; semantic role classes below own the scale.
-source = source.replace(/(?:sm:|md:|lg:|xl:)?text-\[var\(--type-fixed-(?:10|105|11|115|12|13|14|15|16|18|20|24|32)\)\]/g, (token) => {
+// Fixed typography token names include whole and half-step aliases (e.g. 14, 135 = 13.5).
+// Responsive size overrides are removed; the semantic role owns responsive scaling centrally.
+source = source.replace(/(?:sm:|md:|lg:|xl:)?text-\[var\(--type-fixed-(\d+)\)\]/g, (token, rawSize) => {
   if (/^(?:sm:|md:|lg:|xl:)/.test(token)) return '';
-  const sizeMatch = token.match(/type-fixed-(\d+)/);
-  const size = Number(sizeMatch?.[1] || 14);
-  if (size <= 14 || size === 105 || size === 115) return 'type-meta';
+  let size = Number(rawSize);
+  if (size >= 100) size /= 10;
+  if (size <= 14) return 'type-meta';
   if (size <= 16) return 'type-body';
   if (size <= 18) return 'type-h4';
   if (size <= 20) return 'type-h3';
