@@ -26,26 +26,19 @@ The public application is built as a high-performance modern web application uti
 
 ---
 
-## 📋 Reporting Segments
+## 📋 Reporting Categories
 
-The public platform supports three incident reporting segments:
+The public platform currently supports seven top-level reporting categories. The live taxonomy and subcategory definitions in the application remain the source of truth for the detailed reporting options shown to users.
 
-### 1. Harassment & Violence (হয়রানি ও সহিংসতা)
-* Rape / Sexual Violence (ধর্ষণ)
-* Sexual Harassment (যৌন হয়রানি)
-* Domestic Violence (পারিবারিক সহিংসতা)
-* Blackmailing (ব্ল্যাকমেইলিং)
-* Honeytrap (হানিট্র্যাপ)
+1. **Harassment & Abuse (হয়রানি ও নির্যাতন)** — harassment, abuse, exploitation, deception, and related digital or interpersonal incidents.
+2. **Extortion & Bribery (চাঁদাবাজি ও ঘুষ)** — extortion, coercive demands, bribery, and related incidents.
+3. **Public Safety (জননিরাপত্তা)** — public-safety incidents such as theft, robbery, snatching, mob violence, and other supported safety reports.
+4. **Road & Transport Issues (সড়ক ও যাতায়াত সমস্যা)** — road, traffic, transport, accident, obstruction, and supported mobility issues.
+5. **Utility Issues (ইউটিলিটি সমস্যা)** — load shedding, gas shortages, electricity-billing issues, and other supported utility reports.
+6. **Illegal Occupation (অবৈধ দখল)** — illegal occupation of roads, footpaths, public spaces, private property, or government property where supported by the reporting taxonomy.
+7. **Illegal Auto-Rickshaw Charging (অবৈধ অটো চার্জিং)** — illegal or unsafe auto-rickshaw charging locations and related supported incidents.
 
-### 2. Battery Rickshaw & Charging Hazards (ব্যাটারি রিকশা ও চার্জিং ঝুঁকি)
-* Illegal / Hazardous Charging Station (অবৈধ বা অনিরাপদ চার্জিং স্টেশন)
-
-### 3. Extortion & Coercion (চাঁদাবাজি ও জবরদস্তি)
-* Extortion from Shops & Businesses (দোকান ও ব্যবসা প্রতিষ্ঠানে চাঁদা দাবি)
-* Extortion in Transport & Transit (পরিবহন বা চলাচলে চাঁদা দাবি)
-* Construction & Property Extortion (নির্মাণ/সম্পত্তি সংক্রান্ত চাঁদা দাবি)
-* Threats & Coercive Demands (হুমকি দিয়ে টাকা দাবি)
-* Other Extortion (অন্যান্য চাঁদাবাজি)
+`SECTIONS`, the taxonomy service, and the reporting option data in `src/` should be consulted before changing category names, IDs, routes, or subcategory behavior.
 
 ---
 
