@@ -47,3 +47,5 @@ jobs:
           fi
           git commit -m "Quality: resolve Public source lint findings"
           git push origin HEAD:hardening/public-100-closure
+
+      # This workflow is temporary and is removed after the verified cleanup lands.
