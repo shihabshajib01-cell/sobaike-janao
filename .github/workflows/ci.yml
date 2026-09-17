@@ -52,6 +52,9 @@ jobs:
       - name: Design-system source audit
         run: npm run audit:design-system
 
+      - name: UI uniformity source audit
+        run: npm run audit:ui-uniformity
+
       - name: Lint
         run: npm run lint
 

@@ -23,6 +23,8 @@ import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { useTaxonomy } from '../services/taxonomyService';
 import { SECTIONS, SectionKey } from '../theme/tokens';
+import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
+import { Button } from '../components/ui/Button';
 
 type InfoTab = 'about' | 'guide' | 'helplines' | 'principles' | 'response' | 'faq';
 
@@ -120,24 +122,32 @@ export const MorePage: React.FC = () => {
           </p>
         </div>
 
-        <nav aria-label={language === 'bn' ? 'তথ্য ও সহায়তা বিভাগ' : 'Information and support sections'} className="flex gap-2 overflow-x-auto no-scrollbar pt-3 border-t border-ui-stroke-subtle">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setActiveTab(tab.key)}
-                className={`min-h-11 shrink-0 inline-flex items-center gap-2 rounded-[var(--radius-control)] px-3.5 py-2.5 type-meta font-[var(--font-weight-semibold)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${active ? 'bg-ui-action-bg text-ui-action-text' : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle'}`}
-              >
-                <Icon className="w-4 h-4" aria-hidden="true" />
-                <p>{language === 'bn' ? tab.labelBn : tab.labelEn}</p>
-              </button>
-            );
-          })}
-        </nav>
+        <div className="pt-3 border-t border-ui-stroke-subtle">
+          <HorizontalScrollRail
+            ariaLabel={language === 'bn' ? 'তথ্য ও সহায়তা বিভাগ' : 'Information and support sections'}
+            previousLabel={language === 'bn' ? 'আগের বিভাগগুলো দেখুন' : 'Show previous sections'}
+            nextLabel={language === 'bn' ? 'পরের বিভাগগুলো দেখুন' : 'Show more sections'}
+          >
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const active = activeTab === tab.key;
+              return (
+                <Button
+                  key={tab.key}
+                  type="button"
+                  variant={active ? 'primary' : 'secondary'}
+                  size="sm"
+                  aria-pressed={active}
+                  onClick={() => setActiveTab(tab.key)}
+                  leftIcon={<Icon className="w-4 h-4" aria-hidden="true" />}
+                  className="shrink-0"
+                >
+                  {language === 'bn' ? tab.labelBn : tab.labelEn}
+                </Button>
+              );
+            })}
+          </HorizontalScrollRail>
+        </div>
       </section>
 
       {activeTab === 'about' && (
