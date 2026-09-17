@@ -72,7 +72,7 @@ jobs:
           npx vite preview --host 127.0.0.1 --port 4173 > /tmp/public-ui-preview.log 2>&1 &
           echo $! > /tmp/public-ui-preview.pid
           for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:4173/sobaike-janao/ >/dev/null; then
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
               exit 0
             fi
             sleep 1
@@ -82,10 +82,10 @@ jobs:
 
       - name: Run Public UI browser regression
         env:
-          SITE_URL: http://127.0.0.1:4173/sobaike-janao/
+          SITE_URL: http://127.0.0.1:4173/
         run: node scripts/public-ui-100-regression-smoke.mjs
 
       - name: Run complete non-destructive composer journey
         env:
-          SITE_URL: http://127.0.0.1:4173/sobaike-janao/
+          SITE_URL: http://127.0.0.1:4173/
         run: node scripts/public-composer-100-regression-smoke.mjs
