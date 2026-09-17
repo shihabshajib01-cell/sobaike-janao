@@ -153,6 +153,7 @@ export const mapSupabasePublicReportToItem = (
     districtEn,
     areaBn,
     areaEn,
+    incidentDate: rpc.incidentDate || undefined,
     incidentDateBn,
     incidentDateEn,
     incidentTime: rpc.incidentTime || rpc.incident_time || undefined,
