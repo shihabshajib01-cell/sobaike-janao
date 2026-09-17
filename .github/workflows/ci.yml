@@ -12,10 +12,12 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
       VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
     steps:
       - name: Checkout
@@ -80,7 +82,7 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Accessibility regression
+      - name: Browser quality and regression gates
         shell: bash
         run: |
           set -euo pipefail
@@ -100,4 +102,7 @@ jobs:
             echo "ERROR: preview server did not become ready"
             exit 1
           fi
-          SITE_URL=http://127.0.0.1:4173/ npm run test:a11y
+          export SITE_URL=http://127.0.0.1:4173/
+          npm run test:a11y
+          node scripts/public-functional-smoke.mjs
+          node scripts/public-ui-100-regression-smoke.mjs
