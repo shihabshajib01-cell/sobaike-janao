@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Menu, PlusCircle, Home, Compass, PhoneCall, Globe } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
+import { CATEGORY_ORDER } from '../../data/categoryOrder';
+import { CategoryPopularityService } from '../../services/categoryPopularityService';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { IconButton } from '../ui/IconButton';
@@ -19,6 +21,17 @@ export const Header: React.FC = () => {
     setIsTabletMenuOpen,
     openReportComposer,
   } = useApp();
+  const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
+
+  useEffect(() => {
+    let active = true;
+    CategoryPopularityService.getOrderedCategoryKeys().then((keys) => {
+      if (active) setCategoryOrder(keys);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const navItems: Array<{
     path: RoutePath;
@@ -33,17 +46,7 @@ export const Header: React.FC = () => {
       nameEn: 'Home',
       icon: <Home className="w-4 h-4" aria-hidden="true" />,
     },
-    ...(
-      [
-        'harassment',
-        'extortion',
-        'public_safety',
-        'road_transport',
-        'load_shedding',
-        'illegal_occupation',
-        'rickshaw',
-      ] as SectionKey[]
-    ).map((sectionKey) => ({
+    ...categoryOrder.map((sectionKey) => ({
       path: SECTIONS[sectionKey].slug,
       nameBn: SECTIONS[sectionKey].shortNameBn,
       nameEn: SECTIONS[sectionKey].shortNameEn,
@@ -112,11 +115,7 @@ export const Header: React.FC = () => {
         position="right"
         language={language}
         title={language === 'bn' ? 'সবাইকে জানাও' : 'Sobaike Janao'}
-        description={
-          language === 'bn'
-            ? 'নাগরিক তথ্য ও অভিযোগ প্ল্যাটফর্ম'
-            : 'Citizen reporting platform'
-        }
+        description={language === 'bn' ? 'নাগরিক তথ্য ও অভিযোগ প্ল্যাটফর্ম' : 'Citizen reporting platform'}
       >
         <div className="space-y-4">
           <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu navigation'}>
@@ -136,9 +135,7 @@ export const Header: React.FC = () => {
                   }}
                   aria-current={isActive ? 'page' : undefined}
                   className={`w-full flex items-center justify-between px-3.5 py-3 rounded-[var(--radius-control)] text-[var(--type-fixed-16)] font-[var(--font-weight-medium)] transition-colors text-left cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                    isActive
-                      ? getSectionActiveStyles(item.sectionKey)
-                      : 'text-ui-content-secondary'
+                    isActive ? getSectionActiveStyles(item.sectionKey) : 'text-ui-content-secondary'
                   }`}
                   style={
                     isActive && item.sectionKey
@@ -220,16 +217,14 @@ export const Header: React.FC = () => {
               <button
                 id="drawer-lang-toggle"
                 onClick={toggleLanguage}
-                aria-label={
-                  language === 'bn'
-                    ? 'ইংরেজিতে পরিবর্তন করুন'
-                    : 'Switch to Bangla'
-                }
+                aria-label={language === 'bn' ? 'ইংরেজিতে পরিবর্তন করুন' : 'Switch to Bangla'}
                 className="w-full flex items-center justify-between px-3.5 py-2.5 text-[var(--type-fixed-14)] rounded-[var(--radius-control)] border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-                  <span className="font-[var(--font-weight-medium)]">{language === 'bn' ? 'বাংলা / English' : 'English / বাংলা'}</span>
+                  <span className="font-[var(--font-weight-medium)]">
+                    {language === 'bn' ? 'বাংলা / English' : 'English / বাংলা'}
+                  </span>
                 </div>
                 <div className="flex items-center font-[var(--font-weight-semibold)] text-[var(--type-fixed-14)]">
                   <span className={language === 'bn' ? 'text-ui-content-primary font-[var(--font-weight-bold)]' : 'text-ui-content-muted'}>
