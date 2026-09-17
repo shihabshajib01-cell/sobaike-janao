@@ -4,8 +4,8 @@ import 'leaflet/dist/leaflet.css';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
-import './theme/category-tokens.css';
 import './theme/desktop-horizontal-scroll.css';
+import './theme/design-system.css';
 
 const rootElement = document.getElementById('root');
 
@@ -20,5 +20,4 @@ createRoot(rootElement).render(
     </ErrorBoundary>
   </StrictMode>
 );
-
 
