@@ -5,7 +5,7 @@ import { ErrorBoundary } from '../ErrorBoundary';
 import { DesktopLeftRail } from './DesktopLeftRail';
 import { Header } from './Header';
 import { MobileHeader } from './MobileHeader';
-import { BottomNav } from './BottomNav';
+import { BottomNav, shouldHideBottomNav } from './BottomNav';
 import { SearchModal } from './SearchModal';
 import { ReportComposerModal } from '../report-composer/ReportComposerModal';
 import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
@@ -69,6 +69,7 @@ function setAcceptedResponsibilityNotice(): void {
 
 export const AppShell: React.FC = () => {
   const {
+    currentRoute,
     language,
     isReportComposerOpen,
     reportComposerInitialSegment,
@@ -81,6 +82,7 @@ export const AppShell: React.FC = () => {
   } = useApp();
 
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
+  const hideMobileMainNavigation = shouldHideBottomNav(currentRoute);
 
   useEffect(() => {
     const hasNoticeAccepted = hasAcceptedResponsibilityNotice();
@@ -145,7 +147,9 @@ export const AppShell: React.FC = () => {
         <main
           id="main-content"
           tabIndex={-1}
-          className="w-full mx-auto max-w-[900px] flex-1 flex flex-col justify-between pb-28 pb-safe md:pb-0 focus:outline-none"
+          className={`w-full mx-auto max-w-[900px] flex-1 flex flex-col justify-between focus:outline-none ${
+            hideMobileMainNavigation ? 'pb-6 md:pb-0' : 'pb-28 pb-safe md:pb-0'
+          }`}
         >
           <div className="w-full">
             <SeoManager>

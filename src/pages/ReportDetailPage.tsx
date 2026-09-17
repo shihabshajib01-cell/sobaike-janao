@@ -1,24 +1,21 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  AlertCircle,
   ArrowLeft,
   Calendar,
-  Clock,
-  MapPin,
-  FileCheck,
-  Share2,
   Check,
-  UserX,
-  FileText,
-  Layers,
-  AlertCircle,
+  Clock,
+  FileCheck,
   Home,
+  Layers,
+  MapPin,
   Scale,
+  Share2,
+  UserX,
   Zap,
 } from 'lucide-react';
 import { formatBillingMonth, toBanglaDigits } from '../utils/formatters';
-import { SECTIONS } from '../theme/tokens';
 import { CategoryBadge } from '../components/ui/CategoryBadge';
-import { Button } from '../components/ui/Button';
 import { useApp } from '../context/AppContext';
 import { CitizenActionModal } from '../components/report-detail/CitizenActionModal';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
@@ -35,6 +32,15 @@ import { HarassmentContextSummary } from '../components/report/HarassmentContext
 export interface ReportDetailPageProps {
   reportId: string;
 }
+
+const goBackWithFallback = (fallback: () => void) => {
+  if (window.history.length > 1) {
+    window.history.back();
+    return;
+  }
+
+  fallback();
+};
 
 export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) => {
   const { language, navigateTo } = useApp();
@@ -62,16 +68,20 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           setStoredResponses(res.responses || []);
           setResponseLoadError(Boolean(res.responseLoadError));
 
-          // Fetch related reports from backend service ONLY if explicit relatedReportIds exist
-          if (res.report.relatedReportIds && Array.isArray(res.report.relatedReportIds) && res.report.relatedReportIds.length > 0) {
+          if (
+            res.report.relatedReportIds &&
+            Array.isArray(res.report.relatedReportIds) &&
+            res.report.relatedReportIds.length > 0
+          ) {
             try {
-              const rel = await PublicReportService.getRelatedReports(
+              const related = await PublicReportService.getRelatedReports(
                 res.report.id,
                 res.report.relatedReportIds
               );
-              setRelatedReports(rel.slice(0, 3));
-            } catch (e) {
-              console.warn('[ReportDetailPage related reports error]', e);
+              setRelatedReports(related.slice(0, 3));
+            } catch (error) {
+              console.warn('[ReportDetailPage related reports error]', error);
+              setRelatedReports([]);
             }
           } else {
             setRelatedReports([]);
@@ -80,8 +90,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           setReport(null);
         }
       })
-      .catch((err) => {
-        console.warn('[ReportDetailPage API fetch error]', err);
+      .catch((error) => {
+        console.warn('[ReportDetailPage API fetch error]', error);
         setFetchError(true);
       })
       .finally(() => {
@@ -108,66 +118,73 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         ogType: 'article',
         ogSiteName: BRAND_NAME[language],
       });
-    } else if (!isLoading) {
+      return;
+    }
+
+    if (!isLoading) {
       setDynamicSeo({
         title: `${language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি' : 'Report Unavailable / Not Found'} | ${BRAND_NAME[language]}`,
-        description: language === 'bn' ? 'অনুরোধকৃত প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ।' : 'The requested report could not be found or is unavailable.',
+        description:
+          language === 'bn'
+            ? 'অনুরোধকৃত প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ।'
+            : 'The requested report could not be found or is unavailable.',
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
       });
-    } else {
-      setDynamicSeo({
-        title: `${language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading Report...'} | ${BRAND_NAME[language]}`,
-        description: language === 'bn' ? 'সবাইকে জানাও প্ল্যাটফর্মের প্রতিবেদন লোড হচ্ছে।' : 'Loading report on Sobaike Janao platform.',
-        robots: 'noindex, follow',
-        ogType: 'article',
-        ogSiteName: BRAND_NAME[language],
-      });
+      return;
     }
-  }, [report, isLoading, fetchError, language, setDynamicSeo]);
+
+    setDynamicSeo({
+      title: `${language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading Report...'} | ${BRAND_NAME[language]}`,
+      description:
+        language === 'bn'
+          ? 'সবাইকে জানাও প্ল্যাটফর্মের প্রতিবেদন লোড হচ্ছে।'
+          : 'Loading report on Sobaike Janao platform.',
+      robots: 'noindex, follow',
+      ogType: 'article',
+      ogSiteName: BRAND_NAME[language],
+    });
+  }, [report, isLoading, language, setDynamicSeo]);
 
   if (isLoading) {
     return (
-      <PublicPageContainer id="report-detail-loading-container" className="w-full max-w-[900px] mx-auto">
+      <PublicPageContainer
+        id="report-detail-loading-container"
+        className="w-full max-w-[900px] mx-auto"
+      >
         <ReportDetailSkeleton id="report-detail-loading-skeleton" />
       </PublicPageContainer>
     );
   }
 
-  // Network / API fetch error state
   if (fetchError) {
     return (
-      <PublicPageContainer id="report-detail-error-container" className="w-full max-w-[900px] mx-auto">
+      <PublicPageContainer
+        id="report-detail-error-container"
+        className="w-full max-w-[900px] mx-auto"
+      >
         <div role="alert" className="w-full py-12 text-center space-y-6">
           <div className="w-14 h-14 bg-ui-error-bg border border-ui-error-border rounded-full flex items-center justify-center mx-auto text-ui-error-text">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
 
-          <div className="space-y-2">
-            <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
-              {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি' : "Couldn't load report"}
-            </h1>
-          </div>
+          <h1 className="type-h2 text-ui-content-primary">
+            {language === 'bn' ? 'প্রতিবেদন লোড করা যায়নি' : "Couldn't load report"}
+          </h1>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 pt-2">
             <button
               type="button"
               onClick={fetchReport}
-              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="btn-primary-action w-full md:w-auto px-5 py-2.5 ui-radius-control type-action min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
-              <span>{language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}</span>
+              {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
             </button>
             <button
               type="button"
-              onClick={() => {
-                if (window.history.length > 1) {
-                  window.history.back();
-                } else {
-                  navigateTo('/');
-                }
-              }}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              onClick={() => goBackWithFallback(() => navigateTo('/'))}
+              className="hidden md:flex w-auto px-5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle text-ui-content-secondary type-action transition-colors cursor-pointer min-h-[44px] items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
@@ -178,39 +195,33 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     );
   }
 
-  // If report does not exist, show dedicated "Report not found" state
   if (!report) {
     return (
-      <PublicPageContainer id="report-detail-not-found-container" className="w-full max-w-[900px] mx-auto">
+      <PublicPageContainer
+        id="report-detail-not-found-container"
+        className="w-full max-w-[900px] mx-auto"
+      >
         <div role="alert" className="w-full py-12 text-center space-y-6">
           <div className="w-14 h-14 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-full flex items-center justify-center mx-auto text-ui-content-muted">
             <AlertCircle className="w-7 h-7" aria-hidden="true" />
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-[24px] leading-[32px] font-bold text-ui-content-primary">
+            <h1 className="type-h2 text-ui-content-primary">
               {language === 'bn' ? 'প্রতিবেদন পাওয়া যায়নি' : 'Report not found'}
             </h1>
-            <div className="max-w-[720px] mx-auto">
-              <p className="text-[16px] leading-[26px] text-ui-content-secondary max-w-[480px] mx-auto">
-                {language === 'bn'
-                  ? 'প্রতিবেদনটি অনুপলব্ধ হতে পারে বা লিংকটি সঠিক নয়।'
-                  : 'This report may be unavailable or the link may be incorrect.'}
-              </p>
-            </div>
+            <p className="type-body text-ui-content-secondary max-w-[480px] mx-auto">
+              {language === 'bn'
+                ? 'প্রতিবেদনটি অনুপলব্ধ হতে পারে বা লিংকটি সঠিক নয়।'
+                : 'This report may be unavailable or the link may be incorrect.'}
+            </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 pt-2">
             <button
               type="button"
-              onClick={() => {
-                if (window.history.length > 1) {
-                  window.history.back();
-                } else {
-                  navigateTo('/');
-                }
-              }}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-ui-stroke-subtle text-ui-content-secondary text-[16px] font-semibold transition-colors cursor-pointer min-h-[44px] flex items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              onClick={() => goBackWithFallback(() => navigateTo('/'))}
+              className="hidden md:flex w-auto px-5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle text-ui-content-secondary type-action transition-colors cursor-pointer min-h-[44px] items-center justify-center gap-2 bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               <span>{language === 'bn' ? 'ফিরে যান' : 'Go back'}</span>
@@ -219,7 +230,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <button
               type="button"
               onClick={() => navigateTo('/')}
-              className="btn-primary-action w-full sm:w-auto px-5 py-2.5 rounded-xl text-[16px] font-semibold min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="btn-primary-action w-full md:w-auto px-5 py-2.5 ui-radius-control type-action min-h-[44px] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <Home className="w-4 h-4" aria-hidden="true" />
               <span>{language === 'bn' ? 'মূল পাতায় ফিরুন' : 'Back to home'}</span>
@@ -230,38 +241,58 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     );
   }
 
-  const sectionConfig = SECTIONS[report.segment];
-
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const fullDesc = language === 'bn' ? report.fullDescriptionBn : report.fullDescriptionEn;
+  const detailText = fullDesc || shortDesc;
   const subcategory = language === 'bn' ? report.subcategoryBn : report.subcategoryEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const incidentDateRaw = language === 'bn' ? report.incidentDateBn : report.incidentDateEn;
-  const incidentDate = incidentDateRaw && incidentDateRaw !== 'undefined' && incidentDateRaw !== 'null'
-    ? incidentDateRaw
-    : (language === 'bn' ? 'ঘটনার তারিখ দেওয়া হয়নি' : 'Incident date not provided');
-  const publishedDate = language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
+  const incidentDate =
+    incidentDateRaw && incidentDateRaw !== 'undefined' && incidentDateRaw !== 'null'
+      ? incidentDateRaw
+      : language === 'bn'
+      ? 'ঘটনার তারিখ দেওয়া হয়নি'
+      : 'Incident date not provided';
   const evidenceList = language === 'bn' ? report.evidenceSummaryBn : report.evidenceSummaryEn;
+  const subjectTargetName =
+    report.reportedSubjectEn || report.reportedSubjectBn || report.reportedSubject || '';
+  const hasPublishedResponses =
+    Boolean(report.response) ||
+    storedResponses.length > 0 ||
+    (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError);
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const shareUrl = window.location.href;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url: shareUrl });
+        return;
+      }
+
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
         setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      });
+        window.setTimeout(() => setIsCopied(false), 2000);
+      }
+    } catch (error) {
+      if ((error as DOMException)?.name !== 'AbortError') {
+        console.warn('[ReportDetailPage share error]', error);
+      }
     }
   };
 
-  const subjectTargetName = report.reportedSubjectEn || report.reportedSubjectBn || report.reportedSubject || '';
-
-  const formatResponseDate = (dateStr: string | null | undefined, lang: 'bn' | 'en'): string => {
+  const formatResponseDate = (
+    dateStr: string | null | undefined,
+    lang: 'bn' | 'en'
+  ): string => {
     if (!dateStr) return '';
+
     try {
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return dateStr;
-      return d.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-GB', {
+      const date = new Date(dateStr);
+      if (Number.isNaN(date.getTime())) return dateStr;
+      return date.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-GB', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -272,286 +303,303 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   };
 
   return (
-    <PublicPageContainer id="report-detail-page-container" className="w-full max-w-[900px] mx-auto">
-      <div className="w-full space-y-6">
-        {/* 1. Single Primary Back Navigation */}
-      <div className="flex items-center justify-between gap-4">
-        <button
-          type="button"
-          onClick={() => {
-            if (window.history.length > 1) {
-              window.history.back();
-            } else {
-              navigateTo('/');
-            }
-          }}
-          className="inline-flex items-center gap-2 text-[16px] leading-[24px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-        >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>{language === 'bn' ? 'তালিকায় ফিরুন' : 'Back to reports'}</span>
-        </button>
-
-        {/* Quiet Share CTA */}
-        <button
-          type="button"
-          onClick={handleShare}
-          className="inline-flex items-center gap-1.5 text-[16px] font-medium text-ui-content-secondary bg-ui-surface border border-ui-stroke-subtle px-4 py-2.5 rounded-xl transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-        >
-          {isCopied ? (
-            <>
-              <Check className="w-4 h-4 text-ui-success-text" aria-hidden="true" />
-              <span className="text-ui-success-text font-semibold">{language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link copied'}</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-              <span>{language === 'bn' ? 'শেয়ার করুন' : 'Share'}</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* 2. Main Article Content */}
-      <article className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-7 space-y-5 shadow-2xs">
-        {/* Category & Subcategory Header */}
-        <div className="flex flex-wrap items-center gap-2 text-[14px]">
-          <CategoryBadge section={report.segment} language={language} size="md" />
-          <span className="text-ui-content-muted">·</span>
-          <span className="font-semibold text-ui-content-primary">
-            {subcategory}
-          </span>
-        </div>
-
-        {/* Main Headline */}
-        <h1 className="text-[32px] leading-[42px] font-bold text-ui-content-primary tracking-tight">
-          {title}
-        </h1>
-
-        {/* Canonical Unified Metadata Bar */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-3 border-t border-ui-stroke-subtle text-[14px] text-ui-content-secondary">
+    <PublicPageContainer
+      id="report-detail-page-container"
+      className="w-full max-w-[900px] mx-auto"
+    >
+      <div className="w-full space-y-5 md:space-y-6">
+        <div className="hidden md:flex items-center justify-between gap-4">
           <button
             type="button"
-            onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
-            className="flex items-center gap-1.5 font-medium text-ui-content-primary hover:text-ui-content-primary transition-colors cursor-pointer min-h-[44px] px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
+            onClick={() => goBackWithFallback(() => navigateTo('/'))}
+            className="inline-flex items-center gap-2 type-action text-ui-content-secondary bg-ui-surface ui-border-default border-ui-stroke-subtle px-4 py-2.5 ui-radius-control transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
-            <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-            <span className="underline decoration-ui-stroke-subtle">{location}</span>
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            <span>{language === 'bn' ? 'তালিকায় ফিরুন' : 'Back to reports'}</span>
           </button>
-          <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
-            <Calendar className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-            <span>
-              {report.subcategoryId === 'excess-electricity-bill' && report.recentBillMonth
-                ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing period: '}${formatBillingMonth(report.recentBillMonth, language)}`
-                : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}${incidentDate}`}
-            </span>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="inline-flex items-center gap-1.5 type-action text-ui-content-secondary bg-ui-surface ui-border-default border-ui-stroke-subtle px-4 py-2.5 ui-radius-control transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            {isCopied ? (
+              <>
+                <Check className="w-4 h-4 text-ui-success-text" aria-hidden="true" />
+                <span className="text-ui-success-text">
+                  {language === 'bn' ? 'লিংক কপি হয়েছে' : 'Link copied'}
+                </span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
+                <span>{language === 'bn' ? 'শেয়ার করুন' : 'Share'}</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <article className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-7 space-y-5 ui-elevation-card">
+          <div className="flex flex-wrap items-center gap-2 type-meta">
+            <CategoryBadge section={report.segment} language={language} size="md" />
+            <span className="text-ui-content-muted">·</span>
+            <span className="font-semibold text-ui-content-primary">{subcategory}</span>
           </div>
+
+          <h1 className="type-h1 text-ui-content-primary tracking-tight">{title}</h1>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 type-meta text-ui-content-secondary">
+            {location && (
+              report.districtEn ? (
+                <button
+                  type="button"
+                  onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
+                  className="flex items-center gap-1.5 font-medium text-ui-content-primary min-h-[44px] px-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+                >
+                  <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+                  <span className="underline decoration-ui-stroke-subtle">{location}</span>
+                </button>
+              ) : (
+                <span className="flex items-center gap-1.5 min-h-[44px]">
+                  <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+                  <span>{location}</span>
+                </span>
+              )
+            )}
+
+            <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
+              <Calendar className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>
+                {report.subcategoryId === 'excess-electricity-bill' && report.recentBillMonth
+                  ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing period: '}${formatBillingMonth(report.recentBillMonth, language)}`
+                  : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}${incidentDate}`}
+              </span>
+            </div>
+          </div>
+
+          <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
+
+          {detailText && (
+            <div className="max-w-[720px] type-body text-ui-content-primary">
+              <p className="whitespace-pre-line">{detailText}</p>
+            </div>
+          )}
+
+          <HarassmentContextSummary report={report} language={language} />
+
+          {report.reportedSubject && (
+            <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-1.5">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-1.5 font-medium text-ui-content-secondary type-meta">
+                  <UserX className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
+                  <span>{language === 'bn' ? 'প্রতিবেদনে উল্লেখিত পক্ষ:' : 'Mentioned party:'}</span>
+                </div>
+                {subjectTargetName && (
+                  <button
+                    type="button"
+                    onClick={() => navigateTo(`/subject/${encodeURIComponent(subjectTargetName)}`)}
+                    className="type-meta font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[44px] flex items-center px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+                  >
+                    {language === 'bn'
+                      ? 'এই নামে প্রকাশিত প্রতিবেদন দেখুন →'
+                      : 'View reports mentioning this party →'}
+                  </button>
+                )}
+              </div>
+              <p className="type-label font-semibold text-ui-content-primary">
+                {report.reportedSubject}
+              </p>
+              {report.organization && (
+                <p className="type-meta text-ui-content-muted">{report.organization}</p>
+              )}
+            </div>
+          )}
+
+          {(report.recentBillMonth || report.recentBillAmount !== undefined) && (
+            <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-3">
+              <h2 className="type-meta font-semibold text-ui-content-secondary flex items-center gap-2">
+                <Zap className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
+                <span>
+                  {language === 'bn'
+                    ? 'বিদ্যুৎ বিল সংক্রান্ত বিবরণ'
+                    : 'Electricity billing details'}
+                </span>
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-ui-surface ui-radius-badge-md ui-border-default border-ui-stroke-subtle space-y-1">
+                  <span className="type-meta text-ui-content-muted block">
+                    {language === 'bn'
+                      ? 'সাম্প্রতিক বিলের মাস ও পরিমাণ'
+                      : 'Recent bill month & amount'}
+                  </span>
+                  <p className="type-label font-bold text-ui-content-primary">
+                    {report.recentBillMonth
+                      ? formatBillingMonth(report.recentBillMonth, language)
+                      : '-'}
+                  </p>
+                  <p className="type-label font-semibold text-ui-error-text">
+                    {report.recentBillAmount !== undefined
+                      ? `৳ ${
+                          language === 'bn'
+                            ? toBanglaDigits(report.recentBillAmount)
+                            : report.recentBillAmount.toLocaleString()
+                        }`
+                      : '-'}
+                  </p>
+                </div>
+
+                <div className="p-3 bg-ui-surface ui-radius-badge-md ui-border-default border-ui-stroke-subtle space-y-1">
+                  <span className="type-meta text-ui-content-muted block">
+                    {language === 'bn'
+                      ? 'পূর্ববর্তী বিলের মাস ও পরিমাণ'
+                      : 'Previous bill month & amount'}
+                  </span>
+                  <p className="type-label font-bold text-ui-content-primary">
+                    {report.previousBillMonth
+                      ? formatBillingMonth(report.previousBillMonth, language)
+                      : '-'}
+                  </p>
+                  <p className="type-label font-semibold text-ui-content-secondary">
+                    {report.previousBillAmount !== undefined
+                      ? `৳ ${
+                          language === 'bn'
+                            ? toBanglaDigits(report.previousBillAmount)
+                            : report.previousBillAmount.toLocaleString()
+                        }`
+                      : '-'}
+                  </p>
+                </div>
+              </div>
+
+              {report.recentBillAmount !== undefined &&
+                report.previousBillAmount !== undefined && (
+                  <div className="flex items-center gap-2 type-meta text-ui-content-secondary pt-2 border-t border-ui-stroke-subtle">
+                    <span className="text-ui-content-muted">
+                      {language === 'bn' ? 'পার্থক্য বা বৃদ্ধি:' : 'Difference / increase:'}
+                    </span>
+                    <span className="font-semibold text-ui-error-text">
+                      +৳{' '}
+                      {language === 'bn'
+                        ? toBanglaDigits(
+                            Math.max(0, report.recentBillAmount - report.previousBillAmount)
+                          )
+                        : Math.max(
+                            0,
+                            report.recentBillAmount - report.previousBillAmount
+                          ).toLocaleString()}
+                      {report.previousBillAmount > 0 && (
+                        <span className="ml-1 font-normal text-ui-content-muted">
+                          (
+                          {Math.round(
+                            ((report.recentBillAmount - report.previousBillAmount) /
+                              report.previousBillAmount) *
+                              100
+                          )}
+                          % {language === 'bn' ? 'বৃদ্ধি' : 'increase'})
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                )}
+            </div>
+          )}
+
           {report.incidentTime &&
             report.segment === 'load_shedding' &&
-            (report.subcategoryId === 'load-shedding-outage' || report.subcategoryId === 'gas-shortage') && (
-              <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
-                <Clock className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-                <span>
+            (report.subcategoryId === 'load-shedding-outage' ||
+              report.subcategoryId === 'gas-shortage') && (
+              <div className="flex flex-wrap gap-3 type-meta text-ui-content-secondary">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                   {language === 'bn'
                     ? `বিভ্রাটের শুরু: ${report.incidentTime}`
                     : `Outage started: ${report.incidentTime}`}
                 </span>
+                {report.utilityEndTime && (
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
+                    {language === 'bn'
+                      ? `বিভ্রাটের সমাপ্তি: ${report.utilityEndTime}`
+                      : `Outage ended: ${report.utilityEndTime}`}
+                  </span>
+                )}
               </div>
             )}
-          {report.utilityEndTime && (
-            <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
-              <Clock className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-              <span>
-                {language === 'bn'
-                  ? `বিভ্রাটের সমাপ্তি: ${report.utilityEndTime}`
-                  : `Outage ended: ${report.utilityEndTime}`}
-              </span>
-            </div>
+
+          {((report.media?.images && report.media.images.length > 0) ||
+            (report.images && report.images.length > 0)) && (
+            <ReportMediaGrid
+              images={report.media?.images || report.images || []}
+              language={language}
+            />
           )}
-          <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
-            <Clock className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-            <span>
-              {language === 'bn' ? `প্রকাশ: ${publishedDate}` : `Published: ${publishedDate}`}
-            </span>
-          </div>
-        </div>
 
-        {/* Reported Subject Context Block */}
-        {report.reportedSubject && (
-          <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-1.5">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-1.5 font-medium text-ui-content-secondary text-[14px]">
-                <UserX className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-                <span>{language === 'bn' ? 'প্রতিবেদনে উল্লেখিত পক্ষ:' : 'Mentioned party:'}</span>
-              </div>
-              {subjectTargetName && (
-                <button
-                  type="button"
-                  onClick={() => navigateTo(`/subject/${encodeURIComponent(subjectTargetName)}`)}
-                  className="text-[14px] font-semibold text-ui-content-primary hover:underline cursor-pointer min-h-[44px] flex items-center px-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-lg"
-                >
-                  {language === 'bn' ? 'এই নামে প্রকাশিত প্রতিবেদন দেখুন →' : 'View reports mentioning this party →'}
-                </button>
-              )}
-            </div>
-            <div className="text-ui-content-primary font-semibold text-[16px]">
-              {report.reportedSubject}
-            </div>
-            {report.organization && (
-              <p className="text-[14px] text-ui-content-muted">{report.organization}</p>
-            )}
-          </div>
-        )}
-
-        {/* Summary */}
-        {shortDesc && (
-          <div className="p-4 rounded-xl bg-ui-surface-subtle border border-ui-stroke-subtle space-y-1.5">
-            <h2 className="text-[14px] font-semibold text-ui-content-secondary">
-              {language === 'bn' ? 'সারসংক্ষেপ' : 'Summary'}
-            </h2>
-            <div className="max-w-[720px]">
-              <p className="text-[16px] leading-[26px] text-ui-content-primary">
-                {shortDesc}
+          {evidenceList && evidenceList.length > 0 && (
+            <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
+              <h3 className="type-h4 text-ui-content-primary flex items-center gap-2">
+                <FileCheck className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
+                <span>{language === 'bn' ? 'সহায়ক তথ্য' : 'Supporting information'}</span>
+              </h3>
+              <ul className="space-y-2 type-meta text-ui-content-secondary">
+                {evidenceList.map((item, index) => (
+                  <li
+                    key={`${item}-${index}`}
+                    className="flex items-center gap-2.5 bg-ui-surface-subtle p-3 ui-radius-badge-md ui-border-default border-ui-stroke-subtle"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-ui-stroke-strong shrink-0" />
+                    <span className="font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="type-meta text-ui-content-muted">
+                {language === 'bn'
+                  ? '* ব্যক্তিগত গোপনীয়তার জন্য সংবেদনশীল তথ্য সার্বজনীনভাবে প্রদর্শিত হয় না।'
+                  : '* Sensitive contact materials are withheld for privacy.'}
               </p>
             </div>
-          </div>
-        )}
+          )}
 
-        <HarassmentContextSummary report={report} language={language} />
-
-        {/* Excess Electricity Bill Context Block */}
-        {(report.recentBillMonth || report.recentBillAmount !== undefined) && (
-          <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-3">
-            <h2 className="text-[14px] font-semibold text-ui-content-secondary flex items-center gap-2">
-              <Zap className="w-4 h-4 text-ui-content-muted" />
-              <span>{language === 'bn' ? 'বিদ্যুৎ বিল সংক্রান্ত বিবরণ' : 'Electricity billing details'}</span>
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 bg-ui-surface rounded-lg border border-ui-stroke-subtle space-y-1">
-                <span className="text-[12px] text-ui-content-muted block">
-                  {language === 'bn' ? 'সাম্প্রতিক বিলের মাস ও পরিমাণ' : 'Recent bill month & amount'}
-                </span>
-                <p className="text-[16px] font-bold text-ui-content-primary">
-                  {report.recentBillMonth ? formatBillingMonth(report.recentBillMonth, language) : '-'}
-                </p>
-                <p className="text-[16px] font-semibold text-ui-error-text">
-                  {report.recentBillAmount !== undefined
-                    ? `৳ ${language === 'bn' ? toBanglaDigits(report.recentBillAmount) : report.recentBillAmount.toLocaleString()}`
-                    : '-'}
-                </p>
-              </div>
-
-              <div className="p-3 bg-ui-surface rounded-lg border border-ui-stroke-subtle space-y-1">
-                <span className="text-[12px] text-ui-content-muted block">
-                  {language === 'bn' ? 'পূর্ববর্তী বিলের মাস ও পরিমাণ' : 'Previous bill month & amount'}
-                </span>
-                <p className="text-[16px] font-bold text-ui-content-primary">
-                  {report.previousBillMonth ? formatBillingMonth(report.previousBillMonth, language) : '-'}
-                </p>
-                <p className="text-[16px] font-semibold text-ui-content-secondary">
-                  {report.previousBillAmount !== undefined
-                    ? `৳ ${language === 'bn' ? toBanglaDigits(report.previousBillAmount) : report.previousBillAmount.toLocaleString()}`
-                    : '-'}
-                </p>
-              </div>
-            </div>
-
-            {/* Difference / Increase indicator if both amounts exist */}
-            {report.recentBillAmount !== undefined && report.previousBillAmount !== undefined && (
-              <div className="flex items-center gap-2 text-[13px] text-ui-content-secondary pt-2 border-t border-ui-stroke-subtle">
-                <span className="text-ui-content-muted">
-                  {language === 'bn' ? 'পার্থক্য বা বৃদ্ধি:' : 'Difference / increase:'}
-                </span>
-                <span className="font-semibold text-ui-error-text">
-                  +৳ {language === 'bn'
-                    ? toBanglaDigits(Math.max(0, report.recentBillAmount - report.previousBillAmount))
-                    : Math.max(0, report.recentBillAmount - report.previousBillAmount).toLocaleString()}
-                  {report.previousBillAmount > 0 && (
-                    <span className="ml-1 text-[12px] font-normal text-ui-content-muted">
-                      ({Math.round(((report.recentBillAmount - report.previousBillAmount) / report.previousBillAmount) * 100)}% {language === 'bn' ? 'বৃদ্ধি' : 'increase'})
-                    </span>
-                  )}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Full Report Body */}
-        <div className="pt-2 space-y-3">
-          <h2 className="text-[20px] leading-[30px] font-bold text-ui-content-primary flex items-center gap-2">
-            <FileText className="w-4 h-4 text-ui-content-muted" />
-            <span>{language === 'bn' ? 'প্রতিবেদনের বিবরণ' : 'Report details'}</span>
-          </h2>
-          <div className="max-w-[720px] text-[16px] leading-[26px] text-ui-content-primary space-y-3">
-            <p className="whitespace-pre-line">{fullDesc}</p>
-          </div>
-        </div>
-
-        {/* Public Images Gallery (if approved and published) */}
-        {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
-          <ReportMediaGrid images={report.media?.images || report.images || []} language={language} />
-        )}
-
-        {/* Supporting Information Section */}
-        {evidenceList && evidenceList.length > 0 && (
-          <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
-            <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-ui-content-secondary" />
-              <span>{language === 'bn' ? 'সহায়ক তথ্য' : 'Supporting information'}</span>
-            </h3>
-            <ul className="space-y-2 text-[14px] text-ui-content-secondary">
-              {evidenceList.map((item, idx) => (
-                <li key={idx} className="flex items-center gap-2.5 bg-ui-surface-subtle p-3 rounded-lg border border-ui-stroke-subtle">
-                  <span className="w-1.5 h-1.5 rounded-full bg-ui-stroke-strong shrink-0" />
-                  <span className="font-medium">{item}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-[14px] text-ui-content-muted">
-              {language === 'bn'
-                ? '* ব্যক্তিগত গোপনীয়তার জন্য সংবেদনশীল তথ্য সার্বজনীনভাবে প্রদর্শিত হয় না।'
-                : '* Sensitive contact materials are withheld for privacy.'}
-            </p>
-          </div>
-        )}
-
-        {/* Updates Timeline Section */}
-        {report.updates && report.updates.length > 0 && (
-          <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
-            <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
-              <Clock className="w-4 h-4 text-ui-content-muted" />
-              <span>{language === 'bn' ? 'আপডেট' : 'Updates'}</span>
-            </h3>
-            <div className="space-y-3">
-              {report.updates.map((update, idx) => (
-                <div key={idx} className="p-3.5 bg-ui-surface-subtle rounded-lg border border-ui-stroke-subtle space-y-1">
-                  <div className="flex items-center justify-between text-[14px] font-semibold text-ui-content-primary">
-                    <span>{language === 'bn' ? update.titleBn : update.titleEn}</span>
-                    <span className="text-ui-content-muted">{language === 'bn' ? update.dateBn : update.dateEn}</span>
-                  </div>
-                  <div className="max-w-[720px]">
-                    <p className="text-[16px] leading-[26px] text-ui-content-secondary">
+          {report.updates && report.updates.length > 0 && (
+            <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
+              <h3 className="type-h4 text-ui-content-primary flex items-center gap-2">
+                <Clock className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
+                <span>{language === 'bn' ? 'আপডেট' : 'Updates'}</span>
+              </h3>
+              <div className="space-y-3">
+                {report.updates.map((update, index) => (
+                  <div
+                    key={`${update.dateEn}-${index}`}
+                    className="p-3.5 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle space-y-1"
+                  >
+                    <div className="flex items-center justify-between gap-3 type-meta font-semibold text-ui-content-primary">
+                      <span>{language === 'bn' ? update.titleBn : update.titleEn}</span>
+                      <span className="text-ui-content-muted shrink-0">
+                        {language === 'bn' ? update.dateBn : update.dateEn}
+                      </span>
+                    </div>
+                    <p className="type-body text-ui-content-secondary">
                       {language === 'bn' ? update.contentBn : update.contentEn}
                     </p>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </article>
 
-        {/* Published Responses Section */}
-        {((report.response || storedResponses.length > 0) || (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError)) && (
-          <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
-            <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-2">
-              <Scale className="w-4 h-4 text-ui-content-secondary" />
+        {hasPublishedResponses && (
+          <section
+            id="published-responses-section"
+            className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-6 space-y-4 ui-elevation-card"
+          >
+            <h2 className="type-h3 text-ui-content-primary flex items-center gap-2">
+              <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>{language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}</span>
-            </h3>
+            </h2>
 
-            {/* Error UI when responses failed to load and connection gate is active */}
             {PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError && (
-              <div className="p-3.5 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[14px]">
+              <div className="p-3.5 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 type-meta">
                 <span className="text-ui-content-secondary">
                   {language === 'bn'
                     ? 'প্রকাশিত প্রতিক্রিয়াগুলো লোড করা যায়নি।'
@@ -560,201 +608,186 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 <button
                   type="button"
                   onClick={fetchReport}
-                  className="min-h-[44px] px-3.5 py-2 text-[14px] font-semibold text-ui-content-primary bg-ui-surface border border-ui-stroke-subtle rounded-lg hover:bg-ui-surface-subtle transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                  className="min-h-[44px] px-3.5 py-2 type-action text-ui-content-primary bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-badge-md transition-colors cursor-pointer inline-flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
                 </button>
               </div>
             )}
 
-            {/* Legacy report.response Card */}
             {report.response && (
-              <div className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2">
-                <div className="flex items-center justify-between text-[14px] text-ui-content-primary font-semibold">
+              <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2">
+                <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-semibold">
                   <span>
-                    {language === 'bn' ? report.response.respondentBn : report.response.respondentEn}
+                    {language === 'bn'
+                      ? report.response.respondentBn
+                      : report.response.respondentEn}
                   </span>
-                  <span className="text-ui-content-muted">
+                  <span className="text-ui-content-muted shrink-0">
                     {language === 'bn' ? report.response.dateBn : report.response.dateEn}
                   </span>
                 </div>
-                <div className="max-w-[720px]">
-                  <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words">
-                    "{language === 'bn' ? report.response.statementBn : report.response.statementEn}"
-                  </blockquote>
-                </div>
+                <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words">
+                  “{language === 'bn' ? report.response.statementBn : report.response.statementEn}”
+                </blockquote>
               </div>
             )}
 
-            {/* Canonical Published Responses Cards */}
-            {storedResponses.map((resp) => {
-              if (resp.responseType === 'citizen_information') {
-                return (
-                  <div key={resp.id} className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2.5">
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-[14px]">
-                      <span className="font-semibold text-ui-content-primary">
-                        {language === 'bn' ? 'তথ্য বা অভিজ্ঞতা' : 'Information / experience'}
-                      </span>
-                      <div className="flex flex-wrap items-center gap-3 text-ui-content-muted text-[13px]">
-                        {resp.incidentDate && (
-                          <span>
-                            {language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}
-                            {formatResponseDate(resp.incidentDate, language)}
-                          </span>
-                        )}
-                        {resp.publishedAt && (
-                          <span>
-                            {language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}
-                            {formatResponseDate(resp.publishedAt, language)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="max-w-[720px]">
-                      <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
-                        "{resp.content}"
-                      </blockquote>
-                    </div>
-                  </div>
-                );
-              }
-
-              // Canonical Subject Response Card
-              const subtitleParts: string[] = [];
-              if (resp.designation) subtitleParts.push(resp.designation);
-              if (resp.organizationName) subtitleParts.push(resp.organizationName);
+            {storedResponses.map((response) => {
+              const subtitleParts = [response.designation, response.organizationName].filter(Boolean);
+              const isCitizenInformation = response.responseType === 'citizen_information';
 
               return (
-                <div key={resp.id} className="p-4 bg-ui-surface-subtle rounded-xl border border-ui-stroke-subtle space-y-2.5">
-                  <div className="flex flex-wrap items-start justify-between gap-2 text-[14px]">
+                <div
+                  key={response.id}
+                  className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2.5"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2 type-meta">
                     <div className="space-y-0.5">
-                      <div className="font-semibold text-ui-content-primary">
-                        {language === 'bn' ? 'উল্লেখিত ব্যক্তি বা পক্ষ' : 'Mentioned person / party'}
-                      </div>
-                      {resp.responderName && (
-                        <div className="text-[14px] font-medium text-ui-content-secondary break-words">
-                          {resp.responderName}
+                      <p className="font-semibold text-ui-content-primary">
+                        {isCitizenInformation
+                          ? language === 'bn'
+                            ? 'তথ্য বা অভিজ্ঞতা'
+                            : 'Information / experience'
+                          : language === 'bn'
+                          ? 'উল্লেখিত ব্যক্তি বা পক্ষ'
+                          : 'Mentioned person / party'}
+                      </p>
+
+                      {!isCitizenInformation && response.responderName && (
+                        <p className="type-meta font-medium text-ui-content-secondary break-words">
+                          {response.responderName}
                           {subtitleParts.length > 0 && (
-                            <span className="text-ui-content-muted font-normal"> ({subtitleParts.join(', ')})</span>
+                            <span className="text-ui-content-muted font-normal">
+                              {' '}({subtitleParts.join(', ')})
+                            </span>
                           )}
-                        </div>
+                        </p>
                       )}
                     </div>
-                    <div className="flex flex-wrap items-center gap-3 text-ui-content-muted text-[13px]">
-                      {resp.incidentDate && (
+
+                    <div className="flex flex-wrap items-center gap-3 text-ui-content-muted type-meta">
+                      {response.incidentDate && (
                         <span>
                           {language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}
-                          {formatResponseDate(resp.incidentDate, language)}
+                          {formatResponseDate(response.incidentDate, language)}
                         </span>
                       )}
-                      {resp.publishedAt && (
+                      {response.publishedAt && (
                         <span>
                           {language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}
-                          {formatResponseDate(resp.publishedAt, language)}
+                          {formatResponseDate(response.publishedAt, language)}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="max-w-[720px]">
-                    <blockquote className="text-[16px] leading-[26px] text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
-                      "{resp.content}"
-                    </blockquote>
-                  </div>
+
+                  <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
+                    “{response.content}”
+                  </blockquote>
                 </div>
               );
             })}
-          </div>
+          </section>
         )}
-      </article>
 
-      {/* 3. Citizen Participation Action Box */}
-      <div id="report-response-action-box" className="bg-ui-surface border border-ui-stroke-subtle rounded-2xl p-5 md:p-6 space-y-3 shadow-2xs">
-        <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary">
-          {language === 'bn' ? 'এই প্রতিবেদন সম্পর্কে কিছু জানেন?' : 'Do you know something about this report?'}
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-          <button
-            id="btn-respond-citizen-info"
-            type="button"
-            onClick={() => setIsCitizenModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
+        <section
+          id="report-response-action-box"
+          className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-6 space-y-3 ui-elevation-card"
+        >
+          <h2 className="type-h3 text-ui-content-primary">
             {language === 'bn'
-              ? 'আমার কাছে তথ্য আছে বা আমিও ভুক্তভোগী'
-              : 'I have information / I experienced this too'}
-          </button>
-          <button
-            id="btn-respond-subject-party"
-            type="button"
-            onClick={() => setIsSubjectModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl border border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary text-[16px] font-semibold text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            {language === 'bn' ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ' : 'I’m the person or party mentioned'}
-          </button>
-        </div>
-      </div>
+              ? 'এই প্রতিবেদন সম্পর্কে কিছু জানেন?'
+              : 'Do you know something about this report?'}
+          </h2>
 
-      {/* 4. Related Reports Section (Below article) */}
-      {relatedReports.length > 0 && (
-        <div className="space-y-3 pt-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-[18px] leading-[28px] font-bold text-ui-content-primary flex items-center gap-1.5">
-              <Layers className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <button
+              id="btn-respond-citizen-info"
+              type="button"
+              onClick={() => setIsCitizenModalOpen(true)}
+              className="px-3.5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary type-action text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              {language === 'bn'
+                ? 'আমার কাছে তথ্য আছে বা আমিও ভুক্তভোগী'
+                : 'I have information / I experienced this too'}
+            </button>
+            <button
+              id="btn-respond-subject-party"
+              type="button"
+              onClick={() => setIsSubjectModalOpen(true)}
+              className="px-3.5 py-2.5 ui-radius-control ui-border-default border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary type-action text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              {language === 'bn'
+                ? 'আমি উল্লেখিত ব্যক্তি বা পক্ষ'
+                : 'I’m the person or party mentioned'}
+            </button>
+          </div>
+        </section>
+
+        {relatedReports.length > 0 && (
+          <section className="space-y-3 pt-2">
+            <h2 className="type-h3 text-ui-content-primary flex items-center gap-1.5">
+              <Layers className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'সম্পর্কিত প্রতিবেদন' : 'Related reports'}</span>
-            </h3>
-          </div>
+            </h2>
 
-          <div className="space-y-3">
-            {relatedReports.map((relReport) => (
-              <div
-                key={relReport.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => navigateTo(`/report-detail/${relReport.id}`)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigateTo(`/report-detail/${relReport.id}`);
-                  }
-                }}
-                className="p-4 bg-ui-surface border border-ui-stroke-subtle hover:border-ui-stroke-strong rounded-xl space-y-2 cursor-pointer transition-colors shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
-                <div className="flex items-center gap-2">
-                  <CategoryBadge section={relReport.segment} language={language} size="sm" />
-                  <span className="text-[14px] text-ui-content-muted">
-                    {language === 'bn' ? relReport.publishedDateBn : relReport.publishedDateEn}
-                  </span>
+            <div className="space-y-3">
+              {relatedReports.map((relatedReport) => (
+                <div
+                  key={relatedReport.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigateTo(`/report-detail/${relatedReport.id}`)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      navigateTo(`/report-detail/${relatedReport.id}`);
+                    }
+                  }}
+                  className="p-4 bg-ui-surface ui-border-default border-ui-stroke-subtle hover:border-ui-stroke-strong ui-radius-control space-y-2 cursor-pointer transition-colors ui-elevation-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                >
+                  <div className="flex items-center gap-2">
+                    <CategoryBadge
+                      section={relatedReport.segment}
+                      language={language}
+                      size="sm"
+                    />
+                    <span className="type-meta text-ui-content-muted">
+                      {language === 'bn'
+                        ? relatedReport.publishedDateBn
+                        : relatedReport.publishedDateEn}
+                    </span>
+                  </div>
+                  <h3 className="type-h4 text-ui-content-primary line-clamp-2">
+                    {language === 'bn' ? relatedReport.titleBn : relatedReport.titleEn}
+                  </h3>
+                  <p className="type-meta text-ui-content-secondary line-clamp-2">
+                    {language === 'bn'
+                      ? relatedReport.shortDescriptionBn
+                      : relatedReport.shortDescriptionEn}
+                  </p>
                 </div>
-                <h4 className="text-[16px] font-bold text-ui-content-primary line-clamp-2 leading-snug">
-                  {language === 'bn' ? relReport.titleBn : relReport.titleEn}
-                </h4>
-                <p className="text-[14px] text-ui-content-secondary line-clamp-2">
-                  {language === 'bn' ? relReport.shortDescriptionBn : relReport.shortDescriptionEn}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Citizen Action Modal */}
-      <CitizenActionModal
-        isOpen={isCitizenModalOpen}
-        onClose={() => setIsCitizenModalOpen(false)}
-        reportId={report.id}
-        reportTitle={title}
-        language={language}
-      />
+        <CitizenActionModal
+          isOpen={isCitizenModalOpen}
+          onClose={() => setIsCitizenModalOpen(false)}
+          reportId={report.id}
+          reportTitle={title}
+          language={language}
+        />
 
-      {/* Subject Response Modal */}
-      <SubjectResponseModal
-        isOpen={isSubjectModalOpen}
-        onClose={() => setIsSubjectModalOpen(false)}
-        reportId={report.id}
-        subjectName={report.reportedSubject || title}
-        language={language}
-      />
+        <SubjectResponseModal
+          isOpen={isSubjectModalOpen}
+          onClose={() => setIsSubjectModalOpen(false)}
+          reportId={report.id}
+          subjectName={report.reportedSubject || title}
+          language={language}
+        />
       </div>
     </PublicPageContainer>
   );
