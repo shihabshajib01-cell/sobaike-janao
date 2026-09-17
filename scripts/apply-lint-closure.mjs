@@ -48,6 +48,7 @@ const primaryPartyData = `    // Check if extortion has primary party data\n    
 
 edit('src/components/report-composer/Step3ComplaintDetails.tsx', [
   ['  ChevronDown,\n', '', 'unused ChevronDown import'],
+  ['  SubjectTypeValue,\n', '', 'unused SubjectTypeValue import'],
   [rickshawOptions, '', 'unused rickshaw operator option block'],
   ["    const isGasShortage = isUtilityReport && formData.subcategoryId === 'gas-shortage';\n", '', 'unused gas shortage flag'],
   [requestLocationHandler, '', 'unused request-location handler'],
