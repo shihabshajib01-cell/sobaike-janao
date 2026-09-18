@@ -131,3 +131,13 @@ export interface PublicPublishedResponse {
   designation: string | null;
   organizationName: string | null;
 }
+
+
+export interface PublicConfiguredReportField {
+  fieldKey: string;
+  labelEn: string;
+  labelBn: string;
+  fieldType: string;
+  sortOrder: number;
+  value: unknown;
+}
