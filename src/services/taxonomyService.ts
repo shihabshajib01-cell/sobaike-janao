@@ -36,6 +36,8 @@ export interface SupabaseSubcategoryRow {
 export interface SegmentTaxonomyItem {
   key: SectionKey;
   id: string;
+  iconKey?: string;
+  themeKey?: string;
   slug: string;
   nameBn: string;
   nameEn: string;
@@ -49,12 +51,20 @@ export interface SegmentTaxonomyItem {
   borderColor: string;
   textColor: string;
   colors: typeof SECTIONS.harassment.colors;
-  iconKey?: string;
-  themeKey?: string;
   sortOrder?: number;
 }
 
 const sectionKeys = Object.keys(SECTIONS) as SectionKey[];
+
+const THEME_SECTION_FALLBACKS: Record<string, SectionKey> = {
+  sky: 'road_transport',
+  indigo: 'public_safety',
+  emerald: 'rickshaw',
+  amber: 'illegal_occupation',
+  rose: 'harassment',
+  violet: 'extortion',
+  slate: 'load_shedding',
+};
 
 // In-memory cache initialized from the unified local section registry. This keeps
 // local fallbacks and backend taxonomy aligned without duplicating a hard-coded list.
@@ -106,47 +116,23 @@ export const TaxonomyService = {
 
         data.forEach((row: SupabaseSegmentRow) => {
           const key = row.id as SectionKey;
-          const fallback = SECTIONS[key] || {
-            key: row.id as SectionKey,
-            slug: `/${row.id}`,
-            nameBn: row.name_bn || row.id,
-            nameEn: row.name_en || row.id,
-            shortNameBn: row.name_bn || row.id,
-            shortNameEn: row.name_en || row.id,
-            descriptionBn: '',
-            descriptionEn: '',
-            primaryColor: 'var(--ui-action-bg)',
-            hoverColor: 'var(--ui-action-hover)',
-            bgColor: 'var(--ui-surface-subtle)',
-            borderColor: 'var(--ui-stroke-default)',
-            textColor: 'var(--ui-content-primary)',
-            colors: {
-              primary: 'var(--ui-action-bg)',
-              hover: 'var(--ui-action-hover)',
-              lightBg: 'var(--ui-surface-subtle)',
-              bgLight: 'var(--ui-surface-subtle)',
-              border: 'var(--ui-stroke-default)',
-              text: 'var(--ui-content-primary)',
-              textSafe: 'var(--ui-content-primary)',
-              filledText: 'var(--ui-action-text)',
-            },
-          };
+          const themeFallbackKey =
+            THEME_SECTION_FALLBACKS[row.theme_key || ''] || 'road_transport';
+          const fallback = SECTIONS[key] || SECTIONS[themeFallbackKey];
 
           nextSegments[row.id] = {
             ...fallback,
             key,
             id: row.id,
-            slug:
-              SECTIONS[key]?.slug ||
-              (row.slug ? `/category/${row.slug}` : fallback.slug),
+            iconKey: row.icon_key || 'shield',
+            themeKey: row.theme_key || 'sky',
+            slug: row.slug ? `/category/${row.slug}` : fallback.slug,
             nameBn: row.name_bn || fallback.nameBn,
             nameEn: row.name_en || fallback.nameEn,
             shortNameBn: row.short_name_bn || row.name_bn || fallback.shortNameBn,
             shortNameEn: row.short_name_en || row.name_en || fallback.shortNameEn,
             descriptionBn: row.description_bn || fallback.descriptionBn,
             descriptionEn: row.description_en || fallback.descriptionEn,
-            iconKey: row.icon_key || (fallback as SegmentTaxonomyItem).iconKey || 'shield',
-            themeKey: row.theme_key || (fallback as SegmentTaxonomyItem).themeKey || 'sky',
             sortOrder: typeof row.sort_order === 'number' ? row.sort_order : undefined,
           };
         });
@@ -243,7 +229,10 @@ export const TaxonomyService = {
   },
 
   getSegment(key: SectionKey): SegmentTaxonomyItem {
-    return cachedSegments[key] || { ...SECTIONS[key], id: key };
+    return (
+      cachedSegments[key] ||
+      ({ ...SECTIONS[key], id: key } as SegmentTaxonomyItem)
+    );
   },
 
   getSubcategories(segment: SectionKey): SubcategoryOption[] {
