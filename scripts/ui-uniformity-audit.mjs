@@ -14,6 +14,53 @@ const walkTsx = (dir) => {
   return files;
 };
 
+const extractJsxPropExpressions = (source, propName) => {
+  const token = `${propName}={`;
+  const expressions = [];
+  let cursor = 0;
+
+  while (cursor < source.length) {
+    const start = source.indexOf(token, cursor);
+    if (start === -1) break;
+
+    let index = start + token.length;
+    let depth = 1;
+    let quote = null;
+    let escaped = false;
+
+    while (index < source.length && depth > 0) {
+      const char = source[index];
+
+      if (quote) {
+        if (escaped) {
+          escaped = false;
+        } else if (char === '\\') {
+          escaped = true;
+        } else if (char === quote) {
+          quote = null;
+        }
+        index += 1;
+        continue;
+      }
+
+      if (char === "'" || char === '"' || char === '`') {
+        quote = char;
+      } else if (char === '{') {
+        depth += 1;
+      } else if (char === '}') {
+        depth -= 1;
+      }
+
+      index += 1;
+    }
+
+    expressions.push(source.slice(start + token.length, Math.max(start + token.length, index - 1)));
+    cursor = index;
+  }
+
+  return expressions;
+};
+
 const failures = [];
 const requireContains = (file, token, message) => {
   const source = read(file);
@@ -249,24 +296,23 @@ for (const file of standardModalSurfaces) {
   requireNotContains(file, 'showHeader={false}', 'standard dialogs must use the unified Modal header anatomy');
 }
 
-const modalActionSurfaces = [
-  'src/components/location/FirstVisitNoticeModal.tsx',
-  'src/components/location/LocationConsentModal.tsx',
-  'src/components/report-detail/CitizenActionModal.tsx',
-  'src/components/report-detail/SubjectResponseModal.tsx',
-  'src/components/report/CategoryFilterSheet.tsx',
-  'src/components/report/HarassmentFilterSheet.tsx',
-];
+for (const root of [path.resolve(ROOT, 'src/components'), path.resolve(ROOT, 'src/pages')]) {
+  for (const filePath of walkTsx(root)) {
+    const relative = path.relative(ROOT, filePath).replaceAll('\\', '/');
+    const source = fs.readFileSync(filePath, 'utf8');
+    if (!source.includes('<Modal')) continue;
 
-for (const file of modalActionSurfaces) {
-  requireContains(file, '<ModalActions', 'modal footers must use the shared ModalActions layout');
+    const footerExpressions = extractJsxPropExpressions(source, 'footer');
+    footerExpressions.forEach((footerExpression, index) => {
+      if (!footerExpression.includes('<ModalActions')) {
+        failures.push(
+          `${relative}: Modal footer #${index + 1} must use the shared ModalActions layout`
+        );
+      }
+    });
+  }
 }
 
-requireContains(
-  'src/components/report-composer/ReportComposerModal.tsx',
-  '<ModalActions',
-  'nested report-composer dialogs must use shared ModalActions'
-);
 requireContains(
   'src/components/layout/SearchModal.tsx',
   '<Button',
@@ -322,15 +368,25 @@ requireContains(
   'Modal must expose an explicit Escape-dismiss policy'
 );
 
-for (const file of [
+requireContains(
   'src/components/location/FirstVisitNoticeModal.tsx',
+  'closeOnEscape={false}',
+  'mandatory first-visit acknowledgement must not dismiss with Escape'
+);
+
+for (const file of [
   'src/components/report-detail/CitizenActionModal.tsx',
   'src/components/report-detail/SubjectResponseModal.tsx',
 ]) {
   requireContains(
     file,
-    'closeOnEscape={false}',
-    'mandatory or data-entry modals must explicitly protect against accidental Escape dismissal'
+    '<UnsavedChangesDialog',
+    'data-entry modals must protect dirty content with the shared discard confirmation'
+  );
+  requireContains(
+    file,
+    'closeOnEscape={true}',
+    'data-entry modal Escape must route through the guarded close path'
   );
 }
 
@@ -358,6 +414,37 @@ requireContains(
   'src/components/ui/useDialogLifecycle.ts',
   'getClientRects().length > 0',
   'dialog focus trapping must exclude hidden controls'
+);
+
+requireContains(
+  'src/components/ui/useDialogLifecycle.ts',
+  'container.contains(activeElement)',
+  'dialog lifecycle must preserve an element that already received autofocus inside the dialog'
+);
+requireContains(
+  'src/components/ui/useDialogLifecycle.ts',
+  'syncDialogInertState',
+  'nested dialogs must isolate underlying dialog surfaces with inert state'
+);
+requireContains(
+  'src/components/ui/Modal.tsx',
+  'dialogRef: modalRootRef',
+  'shared Modal must register its dialog root for nested inert isolation'
+);
+requireNotContains(
+  'src/components/ui/Modal.tsx',
+  'draft-confirm-close-modal',
+  'Modal must not retain deleted draft-confirmation sizing exceptions'
+);
+requireContains(
+  'src/components/ui/UnsavedChangesDialog.tsx',
+  "variant: 'destructive'",
+  'shared unsaved-changes confirmation must expose a destructive discard action'
+);
+requireContains(
+  'src/components/ui/UnsavedChangesDialog.tsx',
+  '<ModalActions',
+  'shared unsaved-changes confirmation must use ModalActions'
 );
 requireContains(
   'src/components/media/ImageViewer.tsx',
@@ -390,6 +477,27 @@ for (const file of [
     'specialized media dialogs must provide a safe lifecycle focus target'
   );
 }
+
+requireContains(
+  'src/components/ui/Drawer.tsx',
+  'useDialogLifecycle',
+  'shared Drawer must reuse the central dialog lifecycle'
+);
+requireNotContains(
+  'src/components/ui/Drawer.tsx',
+  "window.addEventListener('keydown'",
+  'Drawer must not recreate keyboard lifecycle handling'
+);
+requireNotContains(
+  'src/components/ui/Drawer.tsx',
+  "document.body.style.overflow",
+  'Drawer must not recreate scroll-lock handling'
+);
+requireContains(
+  'src/components/ui/SearchInput.tsx',
+  'e.stopPropagation();',
+  'search input must clear its value without also dismissing a parent modal'
+);
 requireContains(
   'src/components/ui/ModalActions.tsx',
   "{secondary ? renderAction(secondary, 'outline') : null}",
