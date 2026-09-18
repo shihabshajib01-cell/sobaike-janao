@@ -29,6 +29,14 @@ import {
   HARASSMENT_REPORTING_FOR_OPTIONS,
   getBilingualOptionLabel,
 } from '../../data/harassmentClassification';
+import {
+  SEXUAL_HARASSMENT_AGE_GROUP_OPTIONS,
+  SEXUAL_HARASSMENT_CONTEXT_OPTIONS,
+  SEXUAL_HARASSMENT_FREQUENCY_OPTIONS,
+  SEXUAL_HARASSMENT_RELATIONSHIP_OPTIONS,
+  SEXUAL_HARASSMENT_TYPE_OPTIONS,
+  getSexualHarassmentOptionLabel,
+} from '../../data/sexualHarassmentOptions';
 
 export interface Step4ReviewProps {
   segment: SectionKey;
@@ -61,6 +69,8 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const isExcessElectricityBill = isUtilityReport && formData.subcategoryId === 'excess-electricity-bill';
   const isBriberyReport = segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
   const isIllegalOccupation = segment === 'illegal_occupation';
+  const isSexualHarassment =
+    segment === 'harassment' && formData.subcategoryId === 'sexual-harassment';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -150,7 +160,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     : hideFrequency
     ? `${formData.incidentDate || '-'}`
     : `${formData.incidentDate || '-'} · ${
-        formData.frequency === 'repeated'
+        isSexualHarassment
+          ? getSexualHarassmentOptionLabel(
+              SEXUAL_HARASSMENT_FREQUENCY_OPTIONS,
+              formData.frequency,
+              language
+            )
+          : formData.frequency === 'repeated'
           ? language === 'bn'
             ? 'নিয়মিত'
             : 'Repeated'
@@ -416,7 +432,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     <span>
                       {language === 'bn' ? 'পুনরাবৃত্তি: ' : 'Frequency: '}
                       <strong>
-                        {formData.frequency === 'repeated'
+{isSexualHarassment
+                          ? getSexualHarassmentOptionLabel(
+                              SEXUAL_HARASSMENT_FREQUENCY_OPTIONS,
+                              formData.frequency,
+                              language
+                            )
+                          : formData.frequency === 'repeated'
                           ? language === 'bn'
                             ? 'নিয়মিত / একাধিকবার'
                             : 'Repeated'
@@ -430,6 +452,45 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
               </div>
             )}
 
+            {isSexualHarassment && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
+                  <span className="type-compact text-ui-content-muted block mb-0.5">
+                    {language === 'bn' ? 'হয়রানির ধরন' : 'Type of harassment'}
+                  </span>
+                  <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                    {getSexualHarassmentOptionLabel(
+                      SEXUAL_HARASSMENT_TYPE_OPTIONS,
+                      formData.sexualHarassmentType,
+                      language
+                    ) || '-'}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
+                  <span className="type-compact text-ui-content-muted block mb-0.5">
+                    {language === 'bn' ? 'ঘটনার প্রেক্ষাপট' : 'Incident context'}
+                  </span>
+                  <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                    {getSexualHarassmentOptionLabel(
+                      SEXUAL_HARASSMENT_CONTEXT_OPTIONS,
+                      formData.sexualHarassmentContext,
+                      language
+                    ) || '-'}
+                  </p>
+                </div>
+                {formData.sexualHarassmentInstitution?.trim() && (
+                  <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
+                    <span className="type-compact text-ui-content-muted block mb-0.5">
+                      {language === 'bn' ? 'প্রতিষ্ঠান / সংস্থা' : 'Institution / organization'}
+                    </span>
+                    <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                      {formData.sexualHarassmentInstitution.trim()}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {segment === 'harassment' && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
                 <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
@@ -437,7 +498,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়স' : "Affected person's age group"}
                   </span>
                   <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
-                    {getBilingualOptionLabel(HARASSMENT_AGE_GROUP_OPTIONS, formData.affectedPersonAgeGroup, language) || '-'}
+                    {getBilingualOptionLabel(
+                      isSexualHarassment
+                        ? SEXUAL_HARASSMENT_AGE_GROUP_OPTIONS
+                        : HARASSMENT_AGE_GROUP_OPTIONS,
+                      formData.affectedPersonAgeGroup,
+                      language
+                    ) || '-'}
                   </p>
                 </div>
                 <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
@@ -445,7 +512,13 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     {language === 'bn' ? 'অভিযুক্ত ব্যক্তির সঙ্গে সম্পর্ক' : 'Relationship with alleged abuser'}
                   </span>
                   <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
-                    {getBilingualOptionLabel(HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS, formData.allegedAbuserRelationship, language) || '-'}
+                    {getBilingualOptionLabel(
+                      isSexualHarassment
+                        ? SEXUAL_HARASSMENT_RELATIONSHIP_OPTIONS
+                        : HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
+                      formData.allegedAbuserRelationship,
+                      language
+                    ) || '-'}
                   </p>
                 </div>
                 <div className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
