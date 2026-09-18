@@ -114,6 +114,76 @@ const STATIC_PAGES = [
   },
 ];
 
+const STATIC_ENGLISH = {
+  '/': {
+    title: 'Sobaike Janao | Citizen Reporting Platform',
+    description:
+      'Sobaike Janao is a moderated citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
+    socialDescription:
+      'Sobaike Janao helps people in Bangladesh responsibly publish, discover, and follow moderated public-interest reports, community issues, and citizen concerns.',
+  },
+  '/issues': {
+    title: 'Citizen Reporting Topics | Sobaike Janao',
+    description:
+      'Browse moderated public-interest reports by topic, including public safety, harassment, extortion, roads, utilities, illegal occupation, and more.',
+  },
+  '/harassment': {
+    title: 'Harassment & Abuse Reports | Sobaike Janao',
+    description:
+      'Browse moderated citizen reports related to harassment, abuse, deception, and other public-interest safety concerns in Bangladesh.',
+  },
+  '/extortion': {
+    title: 'Extortion & Bribery Reports | Sobaike Janao',
+    description:
+      'Browse moderated reports about extortion, coercive collections, bribery, and related public-interest concerns across Bangladesh.',
+  },
+  '/public-safety': {
+    title: 'Public Safety Reports | Sobaike Janao',
+    description:
+      'Browse moderated citizen reports about theft, robbery, snatching, mob violence, and other public-safety concerns across Bangladesh.',
+  },
+  '/road-transport': {
+    title: 'Road & Transport Reports | Sobaike Janao',
+    description:
+      'Browse moderated reports about roads, traffic, transport, accidents, obstructions, and mobility issues across Bangladesh.',
+  },
+  '/load-shedding': {
+    title: 'Utility Issue Reports | Sobaike Janao',
+    description:
+      'Browse moderated reports about load shedding, gas shortages, electricity billing, and other utility issues across Bangladesh.',
+  },
+  '/illegal-occupation': {
+    title: 'Illegal Occupation Reports | Sobaike Janao',
+    description:
+      'Browse moderated citizen reports about illegal occupation of roads, footpaths, public spaces, and property across Bangladesh.',
+  },
+  '/rickshaw': {
+    title: 'Auto-rickshaw Charging Reports | Sobaike Janao',
+    description:
+      'Browse moderated reports about illegal or unsafe auto-rickshaw charging locations and related public-interest incidents.',
+  },
+  '/explore': {
+    title: 'Explore Reports & Map | Sobaike Janao',
+    description:
+      'Explore moderated citizen reports and incident maps across Bangladesh by division, district, area, and reporting topic.',
+  },
+  '/more': {
+    title: 'Information, Policies & Help | Sobaike Janao',
+    description:
+      'Read platform guidelines, privacy information, right-of-response standards, responsible publishing guidance, and emergency help.',
+  },
+  '/report': {
+    title: 'Report an Incident | Sobaike Janao',
+    description:
+      'Submit a public-interest incident or complaint responsibly with relevant details, context, and supporting information.',
+  },
+  '/search': {
+    title: 'Search Reports | Sobaike Janao',
+    description:
+      'Search published citizen reports by topic, location, or reported party on the Sobaike Janao public-interest platform.',
+  },
+};
+
 const htmlEscape = (value = '') =>
   String(value)
     .replaceAll('&', '&amp;')
