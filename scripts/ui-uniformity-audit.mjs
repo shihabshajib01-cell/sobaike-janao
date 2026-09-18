@@ -223,6 +223,37 @@ requireContains(
   'const { language: appLanguage } = useApp();',
   'Modal must call useApp unconditionally in accordance with Hooks rules'
 );
+
+const standardModalSurfaces = [
+  'src/components/layout/SearchModal.tsx',
+  'src/components/location/FirstVisitNoticeModal.tsx',
+  'src/components/location/LocationConsentModal.tsx',
+  'src/components/report-detail/CitizenActionModal.tsx',
+  'src/components/report-detail/SubjectResponseModal.tsx',
+  'src/components/report/CategoryFilterSheet.tsx',
+  'src/components/report/HarassmentFilterSheet.tsx',
+];
+
+for (const file of standardModalSurfaces) {
+  requireContains(file, '<Modal', 'standard dialogs must use the shared Modal shell');
+  requireNotContains(file, 'showHeader={false}', 'standard dialogs must use the unified Modal header anatomy');
+}
+
+requireContains(
+  'src/components/ui/Modal.tsx',
+  'headerIcon?: React.ReactNode;',
+  'Modal must own the shared icon-header recipe'
+);
+requireContains(
+  'src/components/ui/Modal.tsx',
+  'showCloseButton?: boolean;',
+  'Modal must centrally control close-button presence'
+);
+requireContains(
+  'src/components/ui/Modal.tsx',
+  'bg-ui-surface border-t border-ui-stroke-subtle',
+  'Modal footer must use the unified surface and divider recipe'
+);
 requireContains(
   'src/components/ui/Modal.tsx',
   'bg-ui-overlay',
