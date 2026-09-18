@@ -202,7 +202,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         ) : (
           <div
             aria-hidden="true"
-            className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-ui-surface-subtle/60 ui-border-default border-ui-stroke-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
+            className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 ui-radius-card bg-role-surface-subtle/60 ui-border-default border-role-outline-subtle/40 opacity-40 shrink-0 m-4 lg:m-0"
           />
         )}
       </div>
