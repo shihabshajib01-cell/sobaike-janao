@@ -1743,7 +1743,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Conditional Digital Threat Questions ONLY for Digital Harassment */}
             {isDigitalHarassment && (
-              <div className="p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle space-y-3 mt-2">
+              <div className="pt-4 border-t border-ui-stroke-subtle space-y-3 mt-2">
                 <h4 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
                   {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital threat & evidence details'}
                 </h4>
