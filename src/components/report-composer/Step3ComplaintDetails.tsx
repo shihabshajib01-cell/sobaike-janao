@@ -1836,36 +1836,22 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
               {/* Row 3: Detailed Address (Optional for non-utility, completely omitted for utility) */}
               {!isUtilityReport && (
-                <div>
-                  <label
-                    htmlFor="complaint-address-input"
-                    className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                  >
-                    {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed address (optional)'}
-                  </label>
-                  <textarea
-                    id="complaint-address-input"
-                  aria-invalid={Boolean(errors.formattedAddress)}
-                  aria-describedby={errors.formattedAddress ? 'complaint-address-input-error' : undefined}
-                    rows={3}
-                    disabled={isLocationLocked}
-                    value={formData.location?.formattedAddress || ''}
-                    onChange={(e) => handleManualLocationChange({ formattedAddress: e.target.value })}
-                    placeholder={
-                      language === 'bn'
-                        ? 'বাড়ি/হোল্ডিং, রাস্তা, বাজার, প্রতিষ্ঠান, পরিচিত স্থান বা প্রয়োজনীয় অন্যান্য ঠিকানা লিখুন'
-                        : 'Enter house/holding, road, market, institution, landmark, or other useful address details'
-                    }
-                    className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent resize-none leading-relaxed ${
-                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : ''
-                    } ${
-                      errors.formattedAddress ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                    }`}
-                  />
-                  {errors.formattedAddress && (
-                    <p id="complaint-address-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.formattedAddress}</p>
-                  )}
-                </div>
+                <TextAreaField
+                  id="complaint-address-input"
+                  rows={3}
+                  disabled={isLocationLocked}
+                  label={language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed address (optional)'}
+                  value={formData.location?.formattedAddress || ''}
+                  error={errors.formattedAddress}
+                  onChange={(e) => handleManualLocationChange({ formattedAddress: e.target.value })}
+                  placeholder={
+                    language === 'bn'
+                      ? 'বাড়ি/হোল্ডিং, রাস্তা, বাজার, প্রতিষ্ঠান, পরিচিত স্থান বা প্রয়োজনীয় অন্যান্য ঠিকানা লিখুন'
+                      : 'Enter house/holding, road, market, institution, landmark, or other useful address details'
+                  }
+                  maxLength={500}
+                  className="resize-none"
+                />
               )}
 
               {/* Optional address/place search; no report-input map */}
@@ -1951,57 +1937,33 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label
-                          htmlFor="reporter-admin-name"
-                          className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary mb-1"
-                        >
-                          {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)'}
-                        </label>
-                        <input
-                          id="reporter-admin-name"
-                  aria-invalid={Boolean(errors.adminName)}
-                  aria-describedby={errors.adminName ? 'reporter-admin-name-error' : undefined}
-                          type="text"
-                          value={formData.adminName || ''}
-                          onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
-                          placeholder={language === 'bn' ? 'নাম' : 'Name'}
-                          className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                        />
-                        {errors.adminName && (
-                          <p id="reporter-admin-name-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminName}</p>
-                        )}
-                      </div>
+                      <TextField
+                        id="reporter-admin-name"
+                        type="text"
+                        label={language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)'}
+                        value={formData.adminName || ''}
+                        error={errors.adminName}
+                        onChange={(e) => {
+                          onUpdateFormData({ adminName: e.target.value });
+                          if (errors.adminName) setErrors((prev) => ({ ...prev, adminName: '' }));
+                        }}
+                        placeholder={language === 'bn' ? 'নাম' : 'Name'}
+                        autoComplete="name"
+                      />
 
-                      <div>
-                        <label
-                          htmlFor="reporter-admin-contact"
-                          className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary mb-1"
-                        >
-                          <span>{language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল' : 'Phone number or email'}</span>
-                          <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
-                        </label>
-                        <input
-                          id="reporter-admin-contact"
-                  aria-invalid={Boolean(errors.adminContact)}
-                  aria-describedby={errors.adminContact ? 'reporter-admin-contact-error' : undefined}
-                  aria-required="true"
-                          type="text"
-                          value={formData.adminContact || ''}
-                          onChange={(e) => {
-                            onUpdateFormData({ adminContact: e.target.value });
-                            if (errors.adminContact)
-                              setErrors((prev) => ({ ...prev, adminContact: '' }));
-                          }}
-                          placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
-                          className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                            errors.adminContact ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                          }`}
-                        />
-                        {errors.adminContact && (
-                          <p id="reporter-admin-contact-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminContact}</p>
-                        )}
-                      </div>
+                      <TextField
+                        id="reporter-admin-contact"
+                        type="text"
+                        required
+                        label={language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল' : 'Phone number or email'}
+                        value={formData.adminContact || ''}
+                        error={errors.adminContact}
+                        onChange={(e) => {
+                          onUpdateFormData({ adminContact: e.target.value });
+                          if (errors.adminContact) setErrors((prev) => ({ ...prev, adminContact: '' }));
+                        }}
+                        placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
+                      />
                     </div>
 
                     {/* Secondary Optional Toggle: Request Public Identity */}
