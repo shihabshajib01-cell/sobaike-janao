@@ -30,6 +30,9 @@ export const INITIAL_REPORT_FORM: ReportFormData = {
   affectedPersonAgeGroup: '',
   allegedAbuserRelationship: '',
   reportingFor: '',
+  sexualHarassmentType: '',
+  sexualHarassmentContext: '',
+  sexualHarassmentInstitution: '',
   relationshipContext: '',
   intimateWhatHappened: '',
   intimatePlatform: '',
@@ -104,6 +107,9 @@ export function hasMeaningfulReportInput(
   if (Boolean(form.affectedPersonAgeGroup)) return true;
   if (Boolean(form.allegedAbuserRelationship)) return true;
   if (Boolean(form.reportingFor)) return true;
+  if (Boolean(form.sexualHarassmentType)) return true;
+  if (Boolean(form.sexualHarassmentContext)) return true;
+  if (Boolean(form.sexualHarassmentInstitution?.trim())) return true;
   if (Boolean(form.intimateWhatHappened?.trim())) return true;
   if (Boolean(form.intimatePlatform?.trim())) return true;
   if (Boolean(form.relationshipContext?.trim())) return true;
