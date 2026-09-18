@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { IconButton } from '../ui/IconButton';
 
 /**
  * Rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -138,58 +137,74 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     <Modal
       id="subject-response-modal"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleResetAndClose}
       closeOnBackdrop={false}
-      showHeader={false}
       maxWidth="lg"
-      contentClassName="flex flex-col min-h-0 overflow-hidden md:block md:overflow-y-auto md:overscroll-contain"
       language={language}
-      ariaLabelledBy="subject-modal-title"
-    >
-      <div className="flex flex-col h-full min-h-0 text-left md:block md:h-auto md:p-6 sm:md:p-7 md:space-y-5">
-        {/* Header */}
-        <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-0 pb-3.5 sm:pb-4 md:pb-3.5 border-b border-ui-stroke-subtle">
-          <div className="space-y-1">
-            {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
-              <div
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-badge-md)] type-compact font-[var(--font-weight-semibold)] border"
-                style={{
-                  backgroundColor: 'var(--ui-info-bg)',
-                  borderColor: 'var(--ui-info-border)',
-                  color: 'var(--ui-info-text)',
-                }}
-              >
-                <Scale className="w-3.5 h-3.5" style={{ color: 'var(--ui-info-text)' }} />
-                <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার (Right of Response)' : 'Formal Right of Response'}</span>
-              </div>
-            )}
-            <h3 id="subject-modal-title" className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary">
-              {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                ? (language === 'bn' ? 'প্রতিবেদনের জবাব দিন' : 'Respond to this report')
-                : (language === 'bn'
-                    ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আনুষ্ঠানিক বক্তব্য জমা দিন'
-                    : 'Submit Official Response or Clarification')}
-            </h3>
-            <p className="type-helper text-ui-content-secondary">
-              {language === 'bn' ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠান:' : 'Mentioned person or organization:'}{' '}
-              <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subjectName}</span>
-            </p>
+      title={
+        SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+          ? (language === 'bn' ? 'প্রতিবেদনের জবাব দিন' : 'Respond to this report')
+          : (language === 'bn'
+              ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আনুষ্ঠানিক বক্তব্য জমা দিন'
+              : 'Submit Official Response or Clarification')
+      }
+      description={
+        language === 'bn'
+          ? `উল্লেখিত ব্যক্তি বা প্রতিষ্ঠান: ${subjectName}`
+          : `Mentioned person or organization: ${subjectName}`
+      }
+      footer={
+        isSubmitted ? (
+          <Button type="button" variant="primary" size="md" onClick={handleResetAndClose}>
+            {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
+          </Button>
+        ) : (
+          <div className="flex items-center justify-end gap-2.5 w-full">
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={handleResetAndClose}
+              disabled={isSubmitting}
+            >
+              {language === 'bn' ? 'বাতিল' : 'Cancel'}
+            </Button>
+            <Button
+              form="subject-response-form"
+              type="submit"
+              variant="primary"
+              size="md"
+              isLoading={isSubmitting}
+              leftIcon={<Send className="w-4 h-4" aria-hidden="true" />}
+            >
+              {isSubmitting
+                ? language === 'bn'
+                  ? 'জমা দেওয়া হচ্ছে...'
+                  : 'Submitting...'
+                : language === 'bn'
+                  ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? 'জবাব জমা দিন' : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
+                  : 'Submit response'}
+            </Button>
           </div>
+        )
+      }
+    >
+      {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
+        <div
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 ui-radius-badge-md type-helper font-[var(--font-weight-semibold)] ui-border-default mb-4"
+          style={{
+            backgroundColor: 'var(--ui-info-bg)',
+            borderColor: 'var(--ui-info-border)',
+            color: 'var(--ui-info-text)',
+          }}
+        >
+          <Scale className="w-3.5 h-3.5" aria-hidden="true" />
+          <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার' : 'Formal Right of Response'}</span>
+        </div>
+      )}
 
-          <IconButton
-            type="button"
-            onClick={handleResetAndClose}
-            aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-            icon={<X className="w-5 h-5" aria-hidden="true" />}
-            variant="ghost"
-            size="md"
-            className="-mt-1"
-          />
-        </header>
-
-        {isSubmitted ? (
-          <div className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
-            <div role="status" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible py-6 text-center space-y-4">
+      {isSubmitted ? (
+        <div role="status" aria-live="polite" className="py-3 text-center space-y-4">
               <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text border border-ui-success-border rounded-[var(--radius-pill)] flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
@@ -219,16 +234,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   </span>
                 </div>
               )}
-            </div>
-            <footer className="shrink-0 p-4 sm:p-5 md:p-0 border-t md:border-0 border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-              <Button type="button" variant="primary" size="md" onClick={handleResetAndClose}>
-                {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-              </Button>
-            </footer>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible space-y-4">
+        </div>
+      ) : (
+        <form id="subject-response-form" onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] type-compact font-[var(--font-weight-medium)]">
                 {error}
@@ -434,39 +442,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               </div>
             )}
 
-            </div>
-
-            {/* Footer Buttons */}
-            <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-0 md:py-0 md:pt-2 border-t border-ui-stroke-subtle bg-ui-surface md:bg-transparent flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                onClick={handleResetAndClose}
-                disabled={isSubmitting}
-              >
-                {language === 'bn' ? 'বাতিল' : 'Cancel'}
-              </Button>
-
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-                isLoading={isSubmitting}
-                leftIcon={<Send className="w-4 h-4" aria-hidden="true" />}
-              >
-                {isSubmitting
-                  ? language === 'bn'
-                    ? 'জমা দেওয়া হচ্ছে...'
-                    : 'Submitting...'
-                  : language === 'bn'
-                    ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? 'জবাব জমা দিন' : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
-                    : 'Submit response'}
-              </Button>
-            </footer>
-          </form>
-        )}
-      </div>
+        </form>
+      )}
     </Modal>
   );
 };
