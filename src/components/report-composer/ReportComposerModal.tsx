@@ -37,6 +37,7 @@ import { AlertCircle, MapPin, Shield, RotateCcw } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
+import { ModalActions } from '../ui/ModalActions';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { PublicReportingConfigService, PublicReportingForm } from '../../services/reportingFormConfig';
 
@@ -1224,31 +1225,26 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         title={language === 'bn' ? 'নিরাপদভাবে প্রতিবেদন করুন' : 'Report safely'}
         headerIcon={<Shield className="w-5 h-5" aria-hidden="true" />}
         showCloseButton={false}
+        closeOnEscape={true}
         ariaDescribedBy="rape-consent-description"
         footer={
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
-            <Button
-              id="rape-consent-back-btn"
-              type="button"
-              variant="outline"
-              size="lg"
-              onClick={handleCancelRapeConsent}
-              fullWidth
-            >
-              {language === 'bn' ? 'ফিরে যান' : 'Go back'}
-            </Button>
-            <Button
-              id="rape-consent-agree-btn"
-              type="button"
-              variant="primary"
-              size="lg"
-              disabled={!rapeConsentCheckbox}
-              onClick={handleAgreeRapeConsent}
-              fullWidth
-            >
-              {language === 'bn' ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
-            </Button>
-          </div>
+          <ModalActions
+            primary={{
+              id: 'rape-consent-agree-btn',
+              type: 'button',
+              size: 'lg',
+              disabled: !rapeConsentCheckbox,
+              onClick: handleAgreeRapeConsent,
+              label: language === 'bn' ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue',
+            }}
+            secondary={{
+              id: 'rape-consent-back-btn',
+              type: 'button',
+              size: 'lg',
+              onClick: handleCancelRapeConsent,
+              label: language === 'bn' ? 'ফিরে যান' : 'Go back',
+            }}
+          />
         }
       >
         <div className="flex flex-col gap-4 text-ui-content-primary">
@@ -1344,29 +1340,25 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         }
         headerIcon={<AlertCircle className="w-5 h-5" aria-hidden="true" />}
         showCloseButton={false}
+        closeOnEscape={true}
         footer={
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
-            <Button
-              id="report-continue-editing-btn"
-              type="button"
-              variant="outline"
-              size="md"
-              onClick={handleContinueEditing}
-              fullWidth
-            >
-              {language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Continue editing'}
-            </Button>
-            <Button
-              id="report-cancel-btn"
-              type="button"
-              variant="destructive"
-              size="md"
-              onClick={handleCancelReport}
-              fullWidth
-            >
-              {language === 'bn' ? 'প্রতিবেদন বাতিল করুন' : 'Cancel reporting'}
-            </Button>
-          </div>
+          <ModalActions
+            primary={{
+              id: 'report-cancel-btn',
+              type: 'button',
+              variant: 'destructive',
+              size: 'md',
+              onClick: handleCancelReport,
+              label: language === 'bn' ? 'প্রতিবেদন বাতিল করুন' : 'Cancel reporting',
+            }}
+            secondary={{
+              id: 'report-continue-editing-btn',
+              type: 'button',
+              size: 'md',
+              onClick: handleContinueEditing,
+              label: language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Continue editing',
+            }}
+          />
         }
       >
         <p className="type-body text-ui-content-secondary">
