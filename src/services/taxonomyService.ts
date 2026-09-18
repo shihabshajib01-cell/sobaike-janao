@@ -126,7 +126,11 @@ export const TaxonomyService = {
             id: row.id,
             iconKey: row.icon_key || 'shield',
             themeKey: row.theme_key || 'sky',
-            slug: row.slug ? `/category/${row.slug}` : fallback.slug,
+            slug: SECTIONS[key]
+              ? SECTIONS[key].slug
+              : row.slug
+                ? `/category/${row.slug}`
+                : `/category/${row.id.replace(/_/g, '-')}`,
             nameBn: row.name_bn || fallback.nameBn,
             nameEn: row.name_en || fallback.nameEn,
             shortNameBn: row.short_name_bn || row.name_bn || fallback.shortNameBn,
