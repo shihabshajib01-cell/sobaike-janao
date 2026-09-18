@@ -475,11 +475,11 @@ export const getHeroCtaStyle = (section: SectionKey): React.CSSProperties => {
   if (!t) {
     const key = String(section).replace(/[^a-z0-9_-]/gi, '');
     return {
-      '--hero-cta-text': `var(--sec-${key}-text, var(--ui-content-primary))`,
-      '--hero-cta-border': `var(--sec-${key}-primary, var(--ui-action-bg))`,
-      '--hero-cta-hover-bg': `var(--sec-${key}-primary, var(--ui-action-bg))`,
-      '--hero-cta-hover-border': `var(--sec-${key}-primary, var(--ui-action-bg))`,
-      '--hero-cta-hover-text': 'var(--ui-action-text)',
+      '--hero-cta-text': `var(--category-${key}-on-container, var(--md-on-surface))`,
+      '--hero-cta-border': `var(--category-${key}-primary, var(--md-primary))`,
+      '--hero-cta-hover-bg': `var(--category-${key}-primary, var(--md-primary))`,
+      '--hero-cta-hover-border': `var(--category-${key}-primary, var(--md-primary))`,
+      '--hero-cta-hover-text': `var(--category-${key}-on-primary, var(--md-on-primary))`,
     } as React.CSSProperties;
   }
 
