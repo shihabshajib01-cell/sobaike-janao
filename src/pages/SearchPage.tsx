@@ -8,7 +8,7 @@ import { ReportCard } from '../components/report/ReportCard';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
-import { SectionKey, SECTIONS } from '../theme/tokens';
+import { useTaxonomy } from '../services/taxonomyService';
 import { Select } from '../components/ui/Select';
 import { SearchInput } from '../components/ui/SearchInput';
 import { Button } from '../components/ui/Button';
@@ -24,10 +24,11 @@ type SearchTab = 'all' | 'reports' | 'locations' | 'subjects';
 
 export const SearchPage: React.FC = () => {
   const { language, navigateTo, queryParams } = useApp();
+  const { segments } = useTaxonomy();
   const initialQuery = queryParams.q || '';
   const [query, setQuery] = useState(initialQuery);
   const [activeTab, setActiveTab] = useState<SearchTab>('all');
-  const [selectedReportSegment, setSelectedReportSegment] = useState<SectionKey | 'all'>('all');
+  const [selectedReportSegment, setSelectedReportSegment] = useState<string>('all');
   const [harassmentFilters, setHarassmentFilters] = useState(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
 
   const [allReports, setAllReports] = useState<ReportItem[]>([]);
@@ -152,12 +153,14 @@ export const SearchPage: React.FC = () => {
   const categoryOptions = useMemo(
     () => [
       { value: 'all', label: language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports' },
-      ...(Object.values(SECTIONS) as Array<(typeof SECTIONS)[SectionKey]>).map((section) => ({
-        value: section.key,
-        label: language === 'bn' ? section.nameBn : section.nameEn,
-      })),
+      ...Object.values(segments)
+        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+        .map((section) => ({
+          value: section.id,
+          label: language === 'bn' ? section.nameBn : section.nameEn,
+        })),
     ],
-    [language]
+    [language, segments]
   );
 
   const tabs: Array<{ key: SearchTab; label: string; count: number }> = [
@@ -194,7 +197,7 @@ export const SearchPage: React.FC = () => {
             id="search-report-category"
             label={language === 'bn' ? 'প্রতিবেদনের ধরন' : 'Report category'}
             value={selectedReportSegment}
-            onChange={(event) => setSelectedReportSegment(event.target.value as SectionKey | 'all')}
+            onChange={(event) => setSelectedReportSegment(event.target.value)}
             options={categoryOptions}
           />
         </div>
