@@ -1612,49 +1612,28 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label
-                      htmlFor="intimate-action-select"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat status / action'}
-                    </label>
-                    <select
-                      id="intimate-action-select"
-                      value={formData.intimateWhatHappened || ''}
-                      onChange={(e) => onUpdateFormData({ intimateWhatHappened: e.target.value })}
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[44px]"
-                    >
-                      <option value="">{language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}</option>
-                      {INTIMATE_WHAT_HAPPENED_OPTIONS.map((opt) => (
-                        <option key={opt.id} value={opt.id}>
-                          {language === 'bn' ? opt.nameBn : opt.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="intimate-platform-select"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / channel'}
-                    </label>
-                    <select
-                      id="intimate-platform-select"
-                      value={formData.intimatePlatform || ''}
-                      onChange={(e) => onUpdateFormData({ intimatePlatform: e.target.value })}
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[44px]"
-                    >
-                      <option value="">{language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}</option>
-                      {INTIMATE_PLATFORMS.map((plat) => (
-                        <option key={plat.id} value={plat.id}>
-                          {language === 'bn' ? plat.nameBn : plat.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="intimate-action-select"
+                    label={language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat status / action'}
+                    value={formData.intimateWhatHappened || ''}
+                    onChange={(event) => onUpdateFormData({ intimateWhatHappened: event.target.value })}
+                    placeholder={language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}
+                    options={INTIMATE_WHAT_HAPPENED_OPTIONS.map((option) => ({
+                      value: option.id,
+                      label: language === 'bn' ? option.nameBn : option.nameEn,
+                    }))}
+                  />
+                  <Select
+                    id="intimate-platform-select"
+                    label={language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / channel'}
+                    value={formData.intimatePlatform || ''}
+                    onChange={(event) => onUpdateFormData({ intimatePlatform: event.target.value })}
+                    placeholder={language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}
+                    options={INTIMATE_PLATFORMS.map((platform) => ({
+                      value: platform.id,
+                      label: language === 'bn' ? platform.nameBn : platform.nameEn,
+                    }))}
+                  />
                 </div>
               </div>
             )}
