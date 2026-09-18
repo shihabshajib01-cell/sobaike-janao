@@ -12,7 +12,12 @@ import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { getRuntimeBannerContent, usePublishedBannerRuntime } from '../services/bannerRuntime';
 import { useSeo } from '../components/seo/SeoManager';
-import { BRAND_NAME } from '../lib/seo';
+import {
+  BRAND_NAME,
+  STATIC_ROUTE_SEO,
+  buildBrandedSeoTitle,
+  normalizeSeoDescription,
+} from '../lib/seo';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
@@ -45,21 +50,30 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   useEffect(() => {
     if (!segmentSeo) return;
 
+    const canonicalPath = segmentSeo.slug.startsWith('/')
+      ? segmentSeo.slug
+      : `/${segmentSeo.slug}`;
+    const curated = STATIC_ROUTE_SEO[canonicalPath]?.[language];
+
+    if (curated) {
+      setDynamicSeo(curated);
+      return;
+    }
+
     const name = language === 'bn' ? segmentSeo.nameBn : segmentSeo.nameEn;
-    const description =
-      language === 'bn' ? segmentSeo.descriptionBn : segmentSeo.descriptionEn;
+    const rawDescription =
+      (language === 'bn' ? segmentSeo.descriptionBn : segmentSeo.descriptionEn) ||
+      (language === 'bn'
+        ? `${name} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন, সংশ্লিষ্ট এলাকা, উৎস ও সর্বশেষ আপডেট দেখুন।`
+        : `Browse moderated citizen reports, locations, sources, and the latest updates about ${name}.`);
 
     setDynamicSeo({
-      title: `${name} | ${BRAND_NAME[language]}`,
-      description:
-        description ||
-        (language === 'bn'
-          ? `${name} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন দেখুন।`
-          : `Browse moderated citizen reports about ${name}.`),
+      title: buildBrandedSeoTitle(name, BRAND_NAME[language]),
+      description: normalizeSeoDescription(rawDescription, language),
       robots: 'index, follow, max-image-preview:large',
       ogType: 'website',
       ogSiteName: BRAND_NAME[language],
-      canonicalPath: segmentSeo.slug,
+      canonicalPath,
       pageType: 'collection',
     });
   }, [

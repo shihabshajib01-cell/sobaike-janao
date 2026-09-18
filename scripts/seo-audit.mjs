@@ -70,6 +70,16 @@ const rootOgImage = attr(rootHtml, /<meta\s+[^>]*property=["']og:image["'][^>]*>
 const rootOgWidth = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:width["'][^>]*>/i, 'content');
 const rootOgHeight = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:height["'][^>]*>/i, 'content');
 const rootTwitterCard = attr(rootHtml, /<meta\s+[^>]*name=["']twitter:card["'][^>]*>/i, 'content');
+const rootBnAlternate = attr(
+  rootHtml,
+  /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']bn-BD["'][^>]*>/i,
+  'href'
+);
+const rootEnAlternate = attr(
+  rootHtml,
+  /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']en["'][^>]*>/i,
+  'href'
+);
 
 record('Homepage title exists', rootTitle.length > 0, rootTitle);
 record(
@@ -113,6 +123,16 @@ record(
 );
 record('Twitter card', rootTwitterCard === 'summary_large_image', rootTwitterCard);
 record(
+  'Language alternate links',
+  rootBnAlternate === `${SITE_ORIGIN}/` && rootEnAlternate === `${SITE_ORIGIN}/?lang=en`,
+  `bn=${rootBnAlternate}; en=${rootEnAlternate}`
+);
+record(
+  'Head assets use root-absolute URLs',
+  !/href=["']\.\/brand\//i.test(rootHtml) &&
+    !/href=["']\.\/site\.webmanifest/i.test(rootHtml)
+);
+record(
   'Prepaint fallback guard',
   rootHtml.includes("document.documentElement.classList.add('js')") &&
     rootHtml.includes('.js #seo-static-fallback{display:none!important}')
@@ -147,6 +167,14 @@ record(
   robotsTxt.includes(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`)
 );
 
+const homeSeoContentSource = await readFile('src/components/home/HomeSeoContent.tsx', 'utf8');
+record(
+  'Crawler fallback has a user-visible counterpart',
+  homeSeoContentSource.includes('home-platform-information') &&
+    homeSeoContentSource.includes('Responsible reporting and verification') &&
+    homeSeoContentSource.includes('দায়িত্বশীল প্রতিবেদন ও যাচাই')
+);
+
 const llmsTxt = await readFile(join(DIST, 'llms.txt'), 'utf8');
 record(
   'llms.txt available',
@@ -166,6 +194,12 @@ record(
   sitemapUrls.every((url) => url.startsWith(`${SITE_ORIGIN}/`))
 );
 record('Sitemap has no duplicates', new Set(sitemapUrls).size === sitemapUrls.length);
+record(
+  'Sitemap includes language alternates',
+  sitemap.includes('xmlns:xhtml="http://www.w3.org/1999/xhtml"') &&
+    sitemap.includes('hreflang="bn-BD"') &&
+    sitemap.includes('hreflang="en"')
+);
 
 const htmlFiles = (await walk(DIST)).filter((file) => file.endsWith(`${sep}index.html`));
 const seenCanonicals = new Set();
@@ -180,6 +214,16 @@ for (const file of htmlFiles) {
   const description = getDescription(html);
   const robots = getRobots(html);
   const h1Count = count(html, /<h1\b/gi);
+  const bnAlternate = attr(
+    html,
+    /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']bn-BD["'][^>]*>/i,
+    'href'
+  );
+  const enAlternate = attr(
+    html,
+    /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']en["'][^>]*>/i,
+    'href'
+  );
 
   if (!canonical.startsWith(SITE_ORIGIN)) {
     failures.push(`Route canonical invalid: ${rel} -> ${canonical}`);
@@ -189,10 +233,42 @@ for (const file of htmlFiles) {
     failures.push(`Route metadata missing: ${rel}`);
     routeFailures += 1;
   }
+  if (/index/i.test(robots) && !/noindex/i.test(robots)) {
+    if ([...title].length > 60) {
+      failures.push(`Indexable route title too long: ${rel} -> ${[...title].length}`);
+      routeFailures += 1;
+    }
+    if ([...description].length < 90 || [...description].length > 160) {
+      failures.push(`Indexable route description length invalid: ${rel} -> ${[...description].length}`);
+      routeFailures += 1;
+    }
+  }
+  if (!bnAlternate || !enAlternate) {
+    failures.push(`Route language alternates missing: ${rel}`);
+    routeFailures += 1;
+  }
   if (h1Count !== 1) {
     failures.push(`Route H1 count invalid: ${rel} -> ${h1Count}`);
     routeFailures += 1;
   }
+  const schemaRaw = html.match(
+    /<script\s+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i
+  )?.[1];
+  try {
+    const parsed = JSON.parse(schemaRaw || '');
+    const graph = Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [parsed];
+    const pageNode = graph.find((item) =>
+      ['WebPage', 'CollectionPage', 'Article'].includes(item?.['@type'])
+    );
+    if (!pageNode || pageNode.url !== canonical) {
+      failures.push(`Route structured data URL mismatch: ${rel}`);
+      routeFailures += 1;
+    }
+  } catch {
+    failures.push(`Route structured data invalid: ${rel}`);
+    routeFailures += 1;
+  }
+
   if (/index/i.test(robots) && seenCanonicals.has(canonical)) {
     failures.push(`Duplicate indexable canonical: ${canonical}`);
     routeFailures += 1;

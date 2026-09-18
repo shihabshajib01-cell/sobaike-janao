@@ -29,6 +29,58 @@ export const BRAND_NAME = {
 
 const DEFAULT_SOCIAL_IMAGE = '/brand/og-social-1200x630.png';
 
+const SEO_TEST_MARKER_PATTERN =
+  /(test only|system verification|test post|পরীক্ষামূলক পোস্ট)/i;
+
+function truncateSeoText(value: string, maxLength: number): string {
+  const clean = String(value || '').replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  if (maxLength <= 1) return clean.slice(0, maxLength);
+  return `${clean.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+export function buildBrandedSeoTitle(
+  title: string,
+  brand: string,
+  maxLength = 60
+): string {
+  const cleanTitle = String(title || '').replace(/\s+/g, ' ').trim();
+  const cleanBrand = String(brand || '').replace(/\s+/g, ' ').trim();
+  const suffix = cleanBrand ? ` | ${cleanBrand}` : '';
+  const available = Math.max(1, maxLength - suffix.length);
+  return `${truncateSeoText(cleanTitle, available)}${suffix}`;
+}
+
+export function normalizeSeoDescription(
+  value: string,
+  language: 'bn' | 'en',
+  minLength = 90,
+  maxLength = 155
+): string {
+  const clean = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!clean) {
+    return language === 'bn'
+      ? 'সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত নাগরিক প্রতিবেদন, প্রাসঙ্গিক তথ্য, এলাকা, উৎস ও আপডেট দেখুন।'
+      : 'Read this published citizen report on Sobaike Janao with its relevant details, location, sources, and updates.';
+  }
+
+  let result = clean;
+  if (result.length < minLength) {
+    const suffix =
+      language === 'bn'
+        ? ' বিস্তারিত, এলাকা, উৎস ও পরবর্তী আপডেট সবাইকে জানাও প্ল্যাটফর্মে দেখুন।'
+        : ' Review the relevant details, location, sources, and updates on Sobaike Janao.';
+    result = `${result.replace(/[।.!?]+$/, '')}.${suffix}`;
+  }
+
+  return truncateSeoText(result, maxLength);
+}
+
+export function isSeoIndexableReportContent(...values: Array<string | null | undefined>): boolean {
+  const haystack = values.filter(Boolean).join(' ');
+  return !SEO_TEST_MARKER_PATTERN.test(haystack);
+}
+
 export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
   bn: {
     title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
@@ -294,6 +346,31 @@ function setLinkTag(rel: string, href: string): void {
   element.href = href;
 }
 
+function setAlternateLinkTag(hreflang: string, href: string): void {
+  if (typeof document === 'undefined') return;
+  let element = document.head.querySelector<HTMLLinkElement>(
+    `link[rel="alternate"][hreflang="${hreflang}"]`
+  );
+  if (!element) {
+    element = document.createElement('link');
+    element.rel = 'alternate';
+    element.hreflang = hreflang;
+    element.setAttribute('data-seo-managed', 'true');
+    document.head.appendChild(element);
+  }
+  element.href = href;
+}
+
+function localizedCanonicalUrl(pathname: string, language: 'bn' | 'en'): string {
+  const url = new URL(pathname, SITE_ORIGIN);
+  if (language === 'en') {
+    url.searchParams.set('lang', 'en');
+  } else {
+    url.searchParams.delete('lang');
+  }
+  return url.toString();
+}
+
 function normalizeCanonicalPath(pathname?: string): string {
   const raw = pathname || '/';
   const clean = raw.split('?')[0].split('#')[0] || '/';
@@ -391,12 +468,18 @@ export function applySeoMetadata(metadata: SeoMetadata, language: 'bn' | 'en'): 
 
   document.documentElement.lang = language === 'bn' ? 'bn' : 'en';
 
+  const normalizedDescription = normalizeSeoDescription(metadata.description, language);
+  const normalizedMetadata: SeoMetadata = {
+    ...metadata,
+    description: normalizedDescription,
+  };
+
   if (metadata.title && document.title !== metadata.title) {
     document.title = metadata.title;
   }
 
-  if (metadata.description) {
-    setMetaTag('name', 'description', metadata.description);
+  if (normalizedDescription) {
+    setMetaTag('name', 'description', normalizedDescription);
   }
 
   const robots = metadata.robots || 'index, follow, max-image-preview:large';
@@ -407,11 +490,18 @@ export function applySeoMetadata(metadata: SeoMetadata, language: 'bn' | 'en'): 
     metadata.canonicalPath ||
       (typeof window !== 'undefined' ? window.location.pathname : '/')
   );
-  const canonicalUrl = absoluteUrl(canonicalPath);
+  const baseCanonicalUrl = absoluteUrl(canonicalPath);
+  const canonicalUrl = localizedCanonicalUrl(baseCanonicalUrl, language);
   setLinkTag('canonical', canonicalUrl);
+  setAlternateLinkTag('bn-BD', localizedCanonicalUrl(baseCanonicalUrl, 'bn'));
+  setAlternateLinkTag('en', localizedCanonicalUrl(baseCanonicalUrl, 'en'));
+  setAlternateLinkTag('x-default', localizedCanonicalUrl(baseCanonicalUrl, 'bn'));
 
   const image = absoluteUrl(metadata.image || DEFAULT_SOCIAL_IMAGE);
-  const socialDescription = metadata.socialDescription || metadata.description;
+  const socialDescription = normalizeSeoDescription(
+    metadata.socialDescription || normalizedDescription,
+    language
+  );
   const isDefaultSocialImage = !metadata.image;
   const imageAlt =
     metadata.imageAlt ||
@@ -458,7 +548,7 @@ export function applySeoMetadata(metadata: SeoMetadata, language: 'bn' | 'en'): 
     removeMetaTag('property', 'article:modified_time');
   }
 
-  updateJsonLd(metadata, language, canonicalUrl);
+  updateJsonLd(normalizedMetadata, language, canonicalUrl);
 }
 
 export function getStaticSeo(pathname: string, language: 'bn' | 'en'): SeoMetadata {
