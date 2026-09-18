@@ -247,7 +247,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
     <div className="space-y-4">
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-3.5 bg-ui-error-bg border border-ui-error-border rounded-[var(--radius-control)] flex items-start gap-2.5 type-compact text-ui-error-text">
+        <div role="alert" aria-live="assertive" className="p-3.5 bg-ui-error-bg border border-ui-error-border rounded-[var(--radius-control)] flex items-start gap-2.5 type-compact text-ui-error-text">
           <AlertCircle className="w-5 h-5 text-ui-error-text shrink-0 mt-0.5" />
           <p className="leading-[var(--type-line-22)]">{language === 'bn' ? errorMessage.bn : errorMessage.en}</p>
         </div>
@@ -315,7 +315,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                   : `Attached Evidence (${images.length}/${maxImages})`}
               </span>
               {hasAnyCompressing && (
-                <span className="flex items-center gap-1 type-compact font-[var(--font-weight-medium)] text-ui-success-text bg-ui-success-bg px-2 py-0.5 rounded-[var(--radius-pill)]">
+                <span role="status" aria-live="polite" className="flex items-center gap-1 type-compact font-[var(--font-weight-medium)] text-ui-success-text bg-ui-success-bg px-2 py-0.5 rounded-[var(--radius-pill)]">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing…'}
                 </span>
@@ -362,7 +362,11 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     {img.previewUrl ? (
                       <img
                         src={img.previewUrl}
-                        alt={`Selected ${index + 1}`}
+                        alt={
+                          language === 'bn'
+                            ? `নির্বাচিত ছবি ${index + 1}`
+                            : `Selected image ${index + 1}`
+                        }
                         loading="lazy"
                         decoding="async"
                         className={`w-full h-full object-cover transition-all duration-300 ${
@@ -404,7 +408,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
 
                     {/* Error Overlay if any */}
                     {img.compressionError && !img.isCompressing && (
-                      <div className="absolute inset-0 bg-ui-error-text/90 p-3 flex flex-col items-center justify-center text-center text-ui-content-inverse gap-1 pointer-events-none">
+                      <div role="alert" className="absolute inset-0 bg-ui-error-text/90 p-3 flex flex-col items-center justify-center text-center text-ui-content-inverse gap-1 pointer-events-none">
                         <AlertCircle className="w-5 h-5 text-ui-content-inverse" />
                         <p className="type-compact leading-tight">
                           {language === 'bn' ? img.compressionError.bn : img.compressionError.en}
