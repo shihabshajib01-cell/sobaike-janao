@@ -181,8 +181,6 @@ export const getRuntimeBannerEntries = (): Array<[
  * category banner is added to the runtime registry.
  */
 export const hydratePublishedBannerContent = async (): Promise<void> => {
-  if (!supabase) return;
-
   try {
     const rows = await loadPublishedRows();
     const parsed = new Map<string, ManagedBannerContent>();
