@@ -1,11 +1,12 @@
 {
   "application": "sobaike-janao-public",
-  "version": "0.3.1",
-  "release": "public-detail-source-link-scope-fix",
+  "version": "0.3.2",
+  "release": "plain-source-text-format",
   "releasedAt": "2026-09-18",
   "features": [
-    "remove public verified-source card",
-    "show canonical source URL as plain selectable text only",
-    "preserve existing report form and post structure"
+    "source name shown as plain text",
+    "canonical URL shown as plain selectable text",
+    "source text uses normal post content color",
+    "no source card badge button or special background"
   ]
 }
