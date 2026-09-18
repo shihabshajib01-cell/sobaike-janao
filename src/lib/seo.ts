@@ -55,8 +55,8 @@ export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
 };
 
 const routeSeo = (
-  bn: Pick<SeoMetadata, 'title' | 'description'>,
-  en: Pick<SeoMetadata, 'title' | 'description'>,
+  bn: Pick<SeoMetadata, 'title' | 'description' | 'socialDescription'>,
+  en: Pick<SeoMetadata, 'title' | 'description' | 'socialDescription'>,
   canonicalPath: string,
   pageType: SeoPageType = 'website',
   robots = 'index, follow, max-image-preview:large'
