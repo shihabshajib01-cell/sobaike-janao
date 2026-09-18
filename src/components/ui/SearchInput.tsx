@@ -60,7 +60,8 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       onSearch?.(currentValue);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === 'Escape' && currentValue.length > 0) {
+      e.stopPropagation();
       handleClear();
     }
   };
