@@ -57,24 +57,25 @@ export interface SegmentTaxonomyItem {
 
 const sectionKeys = Object.keys(SECTIONS) as SectionKey[];
 
-const THEME_PRIMARY: Record<string, string> = {
-  sky: '#0284C7',
-  indigo: '#4F46E5',
-  emerald: '#059669',
-  amber: '#D97706',
-  rose: '#E11D48',
-  violet: '#7C3AED',
-  slate: '#64748B',
+const THEME_PRESETS: Record<string, { primary: string; onPrimary: string }> = {
+  sky: { primary: '#0284C7', onPrimary: '#050505' },
+  indigo: { primary: '#4F46E5', onPrimary: '#FFFFFF' },
+  emerald: { primary: '#059669', onPrimary: '#050505' },
+  amber: { primary: '#D97706', onPrimary: '#050505' },
+  rose: { primary: '#E11D48', onPrimary: '#FFFFFF' },
+  violet: { primary: '#7C3AED', onPrimary: '#FFFFFF' },
+  slate: { primary: '#64748B', onPrimary: '#FFFFFF' },
 };
 
 export const isManagedThemePreset = (themeKey?: string): boolean =>
-  Boolean(themeKey && THEME_PRIMARY[themeKey]);
+  Boolean(themeKey && THEME_PRESETS[themeKey]);
 
 const buildDynamicTheme = (themeKey?: string) => {
-  const primary = THEME_PRIMARY[themeKey || ''] || THEME_PRIMARY.sky;
+  const preset = THEME_PRESETS[themeKey || ''] || THEME_PRESETS.sky;
+  const primary = preset.primary;
   const background = `color-mix(in srgb, ${primary} 10%, var(--ui-surface))`;
   const border = `color-mix(in srgb, ${primary} 35%, var(--ui-surface))`;
-  const text = `color-mix(in srgb, ${primary} 72%, var(--ui-content-primary))`;
+  const text = `color-mix(in srgb, ${primary} 72%, var(--ui-text-primary))`;
 
   return {
     primaryColor: primary,
@@ -90,15 +91,35 @@ const buildDynamicTheme = (themeKey?: string) => {
       border,
       text,
       textSafe: text,
-      filledText: '#FFFFFF',
+      filledText: preset.onPrimary,
     },
   };
+};
+
+const getSafeSectionCssId = (segmentId: string) =>
+  segmentId.replace(/[^a-z0-9_-]/gi, '');
+
+const clearRuntimeSectionCssVariables = (segmentId: string) => {
+  if (typeof document === 'undefined') return;
+
+  const safeId = getSafeSectionCssId(segmentId);
+  if (!safeId) return;
+
+  const style = document.documentElement.style;
+  [
+    'primary',
+    'hover',
+    'bg',
+    'border',
+    'text',
+    'on-primary',
+  ].forEach((token) => style.removeProperty(`--sec-${safeId}-${token}`));
 };
 
 const applyRuntimeSectionCssVariables = (segment: SegmentTaxonomyItem) => {
   if (typeof document === 'undefined') return;
 
-  const safeId = segment.id.replace(/[^a-z0-9_-]/gi, '');
+  const safeId = getSafeSectionCssId(segment.id);
   if (!safeId) return;
 
   const style = document.documentElement.style;
@@ -107,6 +128,7 @@ const applyRuntimeSectionCssVariables = (segment: SegmentTaxonomyItem) => {
   style.setProperty(`--sec-${safeId}-bg`, segment.bgColor);
   style.setProperty(`--sec-${safeId}-border`, segment.borderColor);
   style.setProperty(`--sec-${safeId}-text`, segment.textColor);
+  style.setProperty(`--sec-${safeId}-on-primary`, segment.colors.filledText);
 };
 
 // In-memory cache initialized from the unified local section registry. This keeps
@@ -200,7 +222,14 @@ export const TaxonomyService = {
           };
 
           nextSegments[row.id] = segment;
-          applyRuntimeSectionCssVariables(segment);
+
+          // Existing built-in categories must keep their CSS light/dark tokens.
+          // Only truly dynamic or explicitly managed themes should write runtime overrides.
+          if (legacy && !hasManagedTheme) {
+            clearRuntimeSectionCssVariables(segment.id);
+          } else {
+            applyRuntimeSectionCssVariables(segment);
+          }
         });
 
         cachedSegments = nextSegments;

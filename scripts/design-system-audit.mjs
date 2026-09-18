@@ -100,6 +100,172 @@ const files = [
 ];
 
 const findings = [];
+
+const APPROVED_CORE_COLORS = {
+  light: {
+    '--ui-page': '#F0F2F5',
+    '--ui-surface': '#FFFFFF',
+    '--ui-surface-subtle': '#F0F2F5',
+    '--ui-surface-elevated': '#FFFFFF',
+    '--ui-surface-hover': '#E4E6EB',
+    '--ui-text-primary': '#050505',
+    '--ui-text-secondary': '#65676B',
+    '--ui-text-muted': '#65676B',
+    '--ui-text-inverse': '#FFFFFF',
+    '--ui-border-subtle': '#E4E6EB',
+    '--ui-border': '#E4E6EB',
+    '--ui-border-strong': '#E4E6EB',
+    '--ui-input': '#FFFFFF',
+    '--ui-input-placeholder': '#65676B',
+    '--ui-disabled-bg': '#E4E6EB',
+    '--ui-disabled-text': '#65676B',
+  },
+  dark: {
+    '--ui-page': '#18191A',
+    '--ui-surface': '#242526',
+    '--ui-surface-subtle': '#242526',
+    '--ui-surface-elevated': '#242526',
+    '--ui-surface-hover': '#3A3B3C',
+    '--ui-text-primary': '#E4E6EB',
+    '--ui-text-secondary': '#B0B3B8',
+    '--ui-text-muted': '#B0B3B8',
+    '--ui-text-inverse': '#FFFFFF',
+    '--ui-border-subtle': '#3A3B3C',
+    '--ui-border': '#3A3B3C',
+    '--ui-border-strong': '#3A3B3C',
+    '--ui-input': '#242526',
+    '--ui-input-placeholder': '#B0B3B8',
+    '--ui-disabled-bg': '#3A3B3C',
+    '--ui-disabled-text': '#B0B3B8',
+  },
+};
+
+const parseVariables = (source) =>
+  Object.fromEntries(
+    [...source.matchAll(/(--[a-z0-9-_]+)\s*:\s*([^;]+);/gi)].map((match) => [
+      match[1],
+      match[2].trim(),
+    ])
+  );
+
+const getThemeBlock = (source, theme) => {
+  const pattern =
+    theme === 'light'
+      ? /(?:^|\n)\s*:root,\s*\n\s*html\[data-theme="light"\]\s*\{([\s\S]*?)\n\s*\}\s*\n\s*html\[data-theme="dark"\]/
+      : /html\[data-theme="dark"\],\s*\n\s*\.dark\s*\{([\s\S]*?)\n\s*\}\s*(?:\n\s*:root\s*\{|\n\s*html,)/;
+
+  return source.match(pattern)?.[1] || '';
+};
+
+const colorSystemFile = 'src/theme/design-system.css';
+if (fs.existsSync(colorSystemFile)) {
+  const source = fs.readFileSync(colorSystemFile, 'utf8');
+
+  for (const theme of ['light', 'dark']) {
+    const values = parseVariables(getThemeBlock(source, theme));
+    for (const [token, expected] of Object.entries(APPROVED_CORE_COLORS[theme])) {
+      const actual = values[token];
+      if (actual !== expected) {
+        findings.push({
+          file: colorSystemFile,
+          line: 1,
+          rule: 'semantic-color-drift',
+          token,
+          message: `Approved ${theme} semantic color changed from ${expected} to ${actual || 'missing'}`,
+          source: `${token}: ${actual || 'missing'}`,
+        });
+      }
+    }
+  }
+}
+
+const relativeLuminance = (hex) => {
+  const channels = hex
+    .slice(1)
+    .match(/.{2}/g)
+    .map((value) => Number.parseInt(value, 16) / 255)
+    .map((value) =>
+      value <= 0.04045
+        ? value / 12.92
+        : ((value + 0.055) / 1.055) ** 2.4
+    );
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+};
+
+const contrastRatio = (a, b) => {
+  const first = relativeLuminance(a);
+  const second = relativeLuminance(b);
+  const lighter = Math.max(first, second);
+  const darker = Math.min(first, second);
+  return (lighter + 0.05) / (darker + 0.05);
+};
+
+const taxonomyFile = 'src/services/taxonomyService.ts';
+if (fs.existsSync(taxonomyFile)) {
+  const source = fs.readFileSync(taxonomyFile, 'utf8');
+
+  if (source.includes('var(--ui-content-primary)')) {
+    findings.push({
+      file: taxonomyFile,
+      line: 1,
+      rule: 'undefined-semantic-color-token',
+      token: '--ui-content-primary',
+      message: 'Dynamic themes must reference the real --ui-text-primary CSS token',
+      source: 'var(--ui-content-primary)',
+    });
+  }
+
+  if (!source.includes('if (legacy && !hasManagedTheme)')) {
+    findings.push({
+      file: taxonomyFile,
+      line: 1,
+      rule: 'legacy-theme-inline-override',
+      token: 'legacy-category-runtime-theme',
+      message: 'Built-in categories must not receive inline runtime colors that override dark-mode CSS tokens',
+      source: 'Expected legacy theme guard is missing',
+    });
+  }
+
+  if (!source.includes('clearRuntimeSectionCssVariables(segment.id)')) {
+    findings.push({
+      file: taxonomyFile,
+      line: 1,
+      rule: 'stale-runtime-theme',
+      token: 'clearRuntimeSectionCssVariables',
+      message: 'Switching back to a built-in theme must clear stale inline category color variables',
+      source: 'Expected runtime color cleanup is missing',
+    });
+  }
+
+  if (!source.includes('segment.colors.filledText')) {
+    findings.push({
+      file: taxonomyFile,
+      line: 1,
+      rule: 'managed-theme-on-primary',
+      token: 'filledText',
+      message: 'Managed category themes must publish an accessible on-primary text color',
+      source: 'Expected on-primary runtime token is missing',
+    });
+  }
+
+  const presetPattern =
+    /(\w+):\s*\{\s*primary:\s*'(#[0-9a-fA-F]{6})',\s*onPrimary:\s*'(#[0-9a-fA-F]{6})'\s*\}/g;
+
+  for (const match of source.matchAll(presetPattern)) {
+    const [, preset, primary, onPrimary] = match;
+    const ratio = contrastRatio(primary, onPrimary);
+    if (ratio < 4.5) {
+      findings.push({
+        file: taxonomyFile,
+        line: 1,
+        rule: 'managed-theme-contrast',
+        token: preset,
+        message: `Managed theme CTA contrast is ${ratio.toFixed(2)}:1; minimum is 4.5:1`,
+        source: `${primary} on ${onPrimary}`,
+      });
+    }
+  }
+}
 for (const file of files) {
   const relative = path.relative(process.cwd(), file).replaceAll('\\', '/');
   const source = fs.readFileSync(file, 'utf8');
