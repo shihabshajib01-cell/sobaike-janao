@@ -40,14 +40,14 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         <div className="space-y-3">
           <h1
             id={`coming-soon-title-${serviceKey}`}
-            className="type-h1 font-extrabold text-ui-content-primary tracking-tight leading-snug"
+            className="type-h1 font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight"
           >
             {language === 'bn' ? service.nameBn : service.nameEn}
           </h1>
 
           <p
             id={`coming-soon-description-${serviceKey}`}
-            className="type-label leading-[var(--type-line-ratio-160)] text-ui-content-secondary max-w-[480px] mx-auto"
+            className="type-label text-ui-content-secondary max-w-[480px] mx-auto"
           >
             {language === 'bn'
               ? 'এই সেবাটি এখনো চালু হয়নি।'
