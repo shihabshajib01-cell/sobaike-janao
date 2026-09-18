@@ -18,7 +18,7 @@ async function seedReturningVisitor(context) {
 
 async function scan(page, name) {
   const result = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
     .exclude('.leaflet-container')
     .analyze();
 
@@ -78,6 +78,16 @@ await scan(mobilePage, 'mobile home');
 await mobilePage.locator('#mobile-nav-report').click();
 await mobilePage.locator('#report-composer-modal').waitFor({ state: 'visible', timeout: 15000 });
 await scan(mobilePage, 'mobile report composer step 1');
+
+await mobilePage.locator('#service-select-card-extortion').click();
+await mobilePage.locator('#composer-footer-step1-next-btn').click();
+await mobilePage.locator('[id^="subcategory-option-"]').first().click();
+await mobilePage.locator('#composer-footer-step2-next-btn').click();
+await mobilePage.locator('#composer-footer-step3-review-btn').waitFor({ state: 'visible', timeout: 15000 });
+await scan(mobilePage, 'mobile report composer step 3');
+await mobilePage.locator('#composer-footer-step3-review-btn').click();
+await mobilePage.waitForTimeout(250);
+await scan(mobilePage, 'mobile report composer validation errors');
 await mobile.close();
 
 const firstVisit = await browser.newContext({ viewport: { width: 390, height: 844 } });
