@@ -1,9 +1,16 @@
-import React, { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import {
   PublicReportingField,
   PublicReportingForm,
 } from '../../services/reportingFormConfig';
 import { ReportFormData } from '../../services/types';
+import { VisitorSessionService } from '../../services/visitorSessionService';
+import { Button } from '../ui/Button';
+import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
+import {
+  MobJusticeDetails,
+  MobJusticeValidationErrors,
+} from '../../data/mobJusticeOptions';
 import {
   AttachedImagePreview,
   ImageAttachmentPicker,
@@ -31,6 +38,9 @@ interface ConfiguredFieldsSectionProps {
   pendingImages: AttachedImagePreview[];
   onPendingImagesChange: (images: AttachedImagePreview[]) => void;
   onUpdateFormData: (updates: Partial<ReportFormData>) => void;
+  mobJusticeDetails: MobJusticeDetails;
+  mobJusticeErrors: MobJusticeValidationErrors;
+  onMobJusticeDetailsChange: (details: MobJusticeDetails) => void;
 }
 
 const isEmpty = (value: unknown): boolean => {
@@ -55,10 +65,35 @@ export const ConfiguredFieldsSection = forwardRef<
       pendingImages,
       onPendingImagesChange,
       onUpdateFormData,
+      mobJusticeDetails,
+      mobJusticeErrors,
+      onMobJusticeDetailsChange,
     },
     ref
   ) => {
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [reporterLocationState, setReporterLocationState] = useState<
+      'verified' | 'checking' | 'required' | 'denied'
+    >(() =>
+      VisitorSessionService.hasValidCurrentReporterLocation()
+        ? 'verified'
+        : 'required'
+    );
+
+    useEffect(() => {
+      const unsubscribe = VisitorSessionService.subscribeLocationChange((location) => {
+        setReporterLocationState(location ? 'verified' : 'required');
+      });
+      return unsubscribe;
+    }, []);
+
+    const verifyReporterLocation = async () => {
+      setReporterLocationState('checking');
+      const result = await VisitorSessionService.captureReporterDeviceLocation();
+      setReporterLocationState(
+        result.success ? 'verified' : result.errorType === 'denied' ? 'denied' : 'required'
+      );
+    };
 
     const fields = useMemo(
       () =>
@@ -140,6 +175,14 @@ export const ConfiguredFieldsSection = forwardRef<
         }
 
         const value = readValue(field);
+
+        if (field.required && field.fieldType === 'checkbox' && value !== true) {
+          next[field.fieldKey] =
+            language === 'bn'
+              ? 'এগিয়ে যেতে এই সম্মতি নির্বাচন করুন।'
+              : 'Select this required checkbox to continue.';
+          continue;
+        }
 
         if (field.required && isEmpty(value)) {
           next[field.fieldKey] =
@@ -236,7 +279,18 @@ export const ConfiguredFieldsSection = forwardRef<
             language === 'bn' ? field.placeholderBn : field.placeholderEn;
           const error = errors[field.fieldKey];
 
-          if (field.fieldType === 'mob_justice_details') return null;
+          if (field.fieldType === 'mob_justice_details') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`}>
+                <MobJusticeDetailsFields
+                  value={mobJusticeDetails}
+                  errors={mobJusticeErrors}
+                  onChange={onMobJusticeDetailsChange}
+                  language={language}
+                />
+              </div>
+            );
+          }
 
           if (field.fieldType === 'location') {
             return (
@@ -255,6 +309,46 @@ export const ConfiguredFieldsSection = forwardRef<
                       {helper}
                     </p>
                   )}
+                </div>
+
+                <div
+                  className={
+                    reporterLocationState === 'verified'
+                      ? 'rounded-[var(--radius-control)] border border-ui-success-border bg-ui-success-bg p-3'
+                      : reporterLocationState === 'denied'
+                        ? 'rounded-[var(--radius-control)] border border-ui-error-border bg-ui-error-bg p-3'
+                        : 'rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3'
+                  }
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <p className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                        {reporterLocationState === 'verified'
+                          ? language === 'bn'
+                            ? 'ডিভাইস লোকেশন যাচাই হয়েছে'
+                            : 'Device location verified'
+                          : language === 'bn'
+                            ? 'রিপোর্ট জমা দিতে ডিভাইস লোকেশন প্রয়োজন'
+                            : 'Device location is required to submit'}
+                      </p>
+                      <p className="type-helper text-ui-content-secondary">
+                        {language === 'bn'
+                          ? 'এটি স্প্যাম প্রতিরোধের জন্য ব্যক্তিগতভাবে সংরক্ষিত হয়; প্রকাশিত রিপোর্টে দেখানো হয় না।'
+                          : 'It is stored privately for anti-abuse checks and is never shown on the published report.'}
+                      </p>
+                    </div>
+                    {reporterLocationState !== 'verified' && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        isLoading={reporterLocationState === 'checking'}
+                        onClick={() => void verifyReporterLocation()}
+                      >
+                        {language === 'bn' ? 'লোকেশন যাচাই করুন' : 'Verify location'}
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
