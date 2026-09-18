@@ -58,8 +58,32 @@ jobs:
       - name: UI uniformity source audit
         run: npm run audit:ui-uniformity
 
+      - name: Accessibility source audit
+        run: npm run audit:accessibility
+
       - name: Lint
         run: npm run lint
 
       - name: Build
         run: npm run build
+
+      - name: Install accessibility browser runtime
+        run: |
+          npm install --no-save playwright@1.55.0 @axe-core/playwright@4.10.2
+          npx playwright install --with-deps chromium
+
+      - name: Run local WCAG accessibility smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/sobaike-preview.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill $PREVIEW_PID || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+          SITE_URL=http://127.0.0.1:4173/ node scripts/public-accessibility-smoke.mjs
