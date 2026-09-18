@@ -38,10 +38,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       titleEn: service.nameEn,
       descBn: service.descriptionBn || service.shortNameBn,
       descEn: service.descriptionEn || service.shortNameEn,
-      bgColor: service.bgColor || '#F0F3F9',
-      textColor: service.textColor || '#1B4D6B',
-      borderColor: service.borderColor || '#CCD5E8',
-      primaryColor: service.primaryColor || '#3A7CA5',
+      bgColor: service.bgColor,
+      textColor: service.textColor,
+      borderColor: service.borderColor,
+      primaryColor: service.primaryColor,
     }));
 
   const comingSoonList = Object.values(COMING_SOON_SERVICES).filter(
