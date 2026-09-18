@@ -215,18 +215,24 @@
     --type-h2-line-mobile: 32px;
     --type-h2-size-tablet: 24px;
     --type-h2-line-tablet: 34px;
+    --type-h2-size-desktop: 24px;
+    --type-h2-line-desktop: 34px;
     --type-h2-weight: var(--font-weight-bold);
 
     --type-h3-size-mobile: 18px;
     --type-h3-line-mobile: 28px;
     --type-h3-size-tablet: 20px;
     --type-h3-line-tablet: 30px;
+    --type-h3-size-desktop: 20px;
+    --type-h3-line-desktop: 30px;
     --type-h3-weight: var(--font-weight-semibold);
 
     --type-h4-size-mobile: 16px;
     --type-h4-line-mobile: 26px;
     --type-h4-size-tablet: 18px;
     --type-h4-line-tablet: 28px;
+    --type-h4-size-desktop: 18px;
+    --type-h4-line-desktop: 28px;
     --type-h4-weight: var(--font-weight-semibold);
 
     --type-h5-size: 16px;
@@ -306,25 +312,31 @@
     --type-h1-line-mobile: 38px;
     --type-h1-size-tablet: 28px;
     --type-h1-line-tablet: 38px;
-    --type-h1-size-desktop: 30px;
-    --type-h1-line-desktop: 40px;
+    --type-h1-size-desktop: 32px;
+    --type-h1-line-desktop: 42px;
     --type-h1-weight: var(--font-weight-semibold);
 
     --type-h2-size-mobile: 22px;
     --type-h2-line-mobile: 32px;
     --type-h2-size-tablet: 22px;
     --type-h2-line-tablet: 32px;
+    --type-h2-size-desktop: 24px;
+    --type-h2-line-desktop: 34px;
     --type-h2-weight: var(--font-weight-semibold);
 
     --type-h3-size-mobile: 18px;
     --type-h3-line-mobile: 28px;
     --type-h3-size-tablet: 19px;
     --type-h3-line-tablet: 28px;
+    --type-h3-size-desktop: 20px;
+    --type-h3-line-desktop: 30px;
 
     --type-h4-size-mobile: 16px;
     --type-h4-line-mobile: 26px;
     --type-h4-size-tablet: 17px;
     --type-h4-line-tablet: 26px;
+    --type-h4-size-desktop: 18px;
+    --type-h4-line-desktop: 28px;
   }
 
   @media (min-width: 768px) {
@@ -407,6 +419,13 @@
     }
   }
 
+  @media (min-width: 1440px) {
+    h2, .type-h2 {
+      font-size: var(--type-h2-size-desktop) !important;
+      line-height: var(--type-h2-line-desktop) !important;
+    }
+  }
+
   h3, .type-h3 {
     font-size: var(--type-h3-size-mobile) !important;
     line-height: var(--type-h3-line-mobile) !important;
@@ -421,6 +440,13 @@
     }
   }
 
+  @media (min-width: 1440px) {
+    h3, .type-h3 {
+      font-size: var(--type-h3-size-desktop) !important;
+      line-height: var(--type-h3-line-desktop) !important;
+    }
+  }
+
   h4, .type-h4 {
     font-size: var(--type-h4-size-mobile) !important;
     line-height: var(--type-h4-line-mobile) !important;
@@ -432,6 +458,13 @@
     h4, .type-h4 {
       font-size: var(--type-h4-size-tablet) !important;
       line-height: var(--type-h4-line-tablet) !important;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    h4, .type-h4 {
+      font-size: var(--type-h4-size-desktop) !important;
+      line-height: var(--type-h4-line-desktop) !important;
     }
   }
 
@@ -487,15 +520,15 @@
       line-height: var(--type-compact-line-mobile) !important;
       font-weight: var(--type-compact-weight) !important;
     }
+  }
 
-    /* Bengali glyph rhythm should not inherit Latin-oriented letter-spacing utilities on mobile. */
-    html[lang="bn"] .tracking-tighter,
-    html[lang="bn"] .tracking-tight,
-    html[lang="bn"] .tracking-wide,
-    html[lang="bn"] .tracking-wider,
-    html[lang="bn"] .tracking-widest {
-      letter-spacing: normal !important;
-    }
+  /* Bengali glyph rhythm should not inherit Latin-oriented letter-spacing utilities. */
+  html[lang="bn"] .tracking-tighter,
+  html[lang="bn"] .tracking-tight,
+  html[lang="bn"] .tracking-wide,
+  html[lang="bn"] .tracking-wider,
+  html[lang="bn"] .tracking-widest {
+    letter-spacing: normal !important;
   }
 
   /* Central Shape / Radius Utilities */
