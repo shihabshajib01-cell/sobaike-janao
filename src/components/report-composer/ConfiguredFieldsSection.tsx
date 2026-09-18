@@ -493,18 +493,18 @@ export const ConfiguredFieldsSection = forwardRef<
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <div className="space-y-1">
-                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
                     {label}
+                    {field.required ? ' *' : ''}
                   </h3>
-                  {helper && (
-                    <p className="type-compact text-ui-content-secondary">
-                      {helper}
-                    </p>
-                  )}
+                  {helper ? (
+                    <p className="type-helper text-role-on-surface-muted">{helper}</p>
+                  ) : null}
                 </div>
+
                 <ImageAttachmentPicker
                   images={pendingImages}
                   onChange={(images) => {
@@ -514,33 +514,40 @@ export const ConfiguredFieldsSection = forwardRef<
                         images.length > 0 ||
                         Boolean(formData.evidenceDescription?.trim()),
                     });
+                    if (error && (images.length > 0 || formData.evidenceDescription?.trim())) {
+                      setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                    }
                   }}
                   language={language}
                 />
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="configured-evidence-description"
-                    className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                  >
-                    {language === 'bn'
+
+                <TextAreaField
+                  id="configured-evidence-description"
+                  rows={3}
+                  label={
+                    language === 'bn'
                       ? 'সহায়ক তথ্যের বিবরণ'
-                      : 'Supporting information notes'}
-                  </label>
-                  <textarea
-                    id="configured-evidence-description"
-                    rows={3}
-                    value={formData.evidenceDescription || ''}
-                    onChange={(event) =>
-                      onUpdateFormData({
-                        evidenceDescription: event.target.value,
-                        hasSupportingInfo:
-                          pendingImages.length > 0 ||
-                          Boolean(event.target.value.trim()),
-                      })
+                      : 'Supporting information notes'
+                  }
+                  value={formData.evidenceDescription || ''}
+                  onChange={(event) => {
+                    onUpdateFormData({
+                      evidenceDescription: event.target.value,
+                      hasSupportingInfo:
+                        pendingImages.length > 0 ||
+                        Boolean(event.target.value.trim()),
+                    });
+                    if (error && (pendingImages.length > 0 || event.target.value.trim())) {
+                      setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
                     }
-                    className={`${commonInputClass} resize-y`}
-                  />
-                </div>
+                  }}
+                />
+
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                    {error}
+                  </p>
+                ) : null}
               </div>
             );
           }
