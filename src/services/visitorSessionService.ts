@@ -1,4 +1,3 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import {
   ReporterSubmissionContext,
   ReporterLocationCaptureResult,
@@ -286,6 +285,7 @@ export const VisitorSessionService = {
   async recordSession(
     status: PermissionStatus
   ): Promise<void> {
+    const { supabase, isSupabaseConfigured } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) {
       // Local or demo mode, do not fail
       return;
