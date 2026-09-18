@@ -247,6 +247,23 @@ if (!fs.existsSync(colorSystemFile)) {
     addContrastFinding(colorSystemFile, theme, 'on-surface-secondary', values['--md-on-surface-secondary'], values['--md-surface']);
     addContrastFinding(colorSystemFile, theme, 'on-surface-muted', values['--md-on-surface-muted'], values['--md-surface']);
 
+    for (const semantic of ['success', 'warning', 'error', 'info']) {
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        `on-${semantic}`,
+        values[`--md-on-${semantic}`],
+        values[`--md-${semantic}`]
+      );
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        `on-${semantic}-container`,
+        values[`--md-on-${semantic}-container`],
+        values[`--md-${semantic}-container`]
+      );
+    }
+
     for (const category of [
       'harassment',
       'extortion',
