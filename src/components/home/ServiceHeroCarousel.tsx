@@ -10,6 +10,7 @@ import { useApp, RoutePath } from '../../context/AppContext';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 import { CANONICAL_BANNER_CONTENT } from '../../data/bannerContent';
+import { getPublishedBannerSettings } from '../../services/bannerRuntime';
 import { IconButton } from '../ui/IconButton';
 
 export interface ServiceSlide {
@@ -51,7 +52,19 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     { key: 'illegal_occupation', path: '/illegal-occupation' },
     { key: 'rickshaw', path: '/rickshaw' },
   ];
-  const slides = availableSlides.filter((slide) => Boolean(segments[slide.key]));
+  const slides = availableSlides
+    .filter((slide) => Boolean(segments[slide.key]))
+    .filter((slide) => {
+      const settings = getPublishedBannerSettings(slide.key);
+      return settings ? settings.isActive && settings.showOnHome : true;
+    })
+    .sort((a, b) => {
+      const aSettings = getPublishedBannerSettings(a.key);
+      const bSettings = getPublishedBannerSettings(b.key);
+      const aFallback = availableSlides.findIndex((slide) => slide.key === a.key) + 1;
+      const bFallback = availableSlides.findIndex((slide) => slide.key === b.key) + 1;
+      return (aSettings?.sortOrder ?? aFallback) - (bSettings?.sortOrder ?? bFallback);
+    });
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
