@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
@@ -16,8 +17,10 @@ const emptyCounts = (keys: SectionKey[] = CATEGORY_ORDER) =>
   Object.fromEntries(keys.map((key) => [key, 0])) as Record<string, number>;
 
 export const IssuesPage: React.FC = () => {
-  const { language, navigateTo } = useApp();
+  const { language } = useApp();
   const { segments } = useTaxonomy();
+  const localizePath = (path: string) =>
+    language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
   const activeKeys = useMemo(
     () =>
       Object.values(segments)
@@ -109,11 +112,10 @@ export const IssuesPage: React.FC = () => {
           const displayCount = language === 'bn' ? toBanglaDigits(counts[key]) : counts[key];
           const rank = metric?.popularityRank || categoryOrder.indexOf(key) + 1;
           return (
-            <button
+            <Link
               key={key}
               id={`issues-card-${key}`}
-              type="button"
-              onClick={() => navigateTo(config.slug)}
+              to={localizePath(config.slug)}
               aria-label={`${language === 'bn' ? config.nameBn : config.nameEn}, ${
                 language === 'bn' ? `জনপ্রিয়তার অবস্থান ${toBanglaDigits(rank)}` : `popularity rank ${rank}`
               }`}
@@ -142,7 +144,7 @@ export const IssuesPage: React.FC = () => {
                     : `${displayCount} reports`}
                 </p>
               </div>
-            </button>
+            </Link>
           );
         })}
       </section>
