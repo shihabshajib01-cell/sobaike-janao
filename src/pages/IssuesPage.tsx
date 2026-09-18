@@ -12,15 +12,22 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { SectionKey } from '../theme/tokens';
 import { toBanglaDigits } from '../utils/formatters';
 
-const emptyCounts = () =>
-  Object.fromEntries(CATEGORY_ORDER.map((key) => [key, 0])) as Record<SectionKey, number>;
+const emptyCounts = (keys: SectionKey[] = CATEGORY_ORDER) =>
+  Object.fromEntries(keys.map((key) => [key, 0])) as Record<string, number>;
 
 export const IssuesPage: React.FC = () => {
   const { language, navigateTo } = useApp();
-  const { getSegment } = useTaxonomy();
+  const { segments } = useTaxonomy();
+  const activeKeys = useMemo(
+    () =>
+      Object.values(segments)
+        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+        .map((segment) => segment.id as SectionKey),
+    [segments]
+  );
   const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
   const [metrics, setMetrics] = useState<CategoryPopularityMetric[]>([]);
-  const [counts, setCounts] = useState<Record<SectionKey, number>>(emptyCounts);
+  const [counts, setCounts] = useState<Record<string, number>>(emptyCounts());
   const [isLoading, setIsLoading] = useState(true);
   const [hasCountError, setHasCountError] = useState(false);
 
@@ -31,7 +38,7 @@ export const IssuesPage: React.FC = () => {
       CategoryPopularityService.clearCache();
       const ranking = await CategoryPopularityService.getRanking();
       const ordered = await CategoryPopularityService.getOrderedCategoryKeys();
-      const nextCounts = emptyCounts();
+      const nextCounts = emptyCounts(activeKeys);
       ranking.forEach((item) => {
         nextCounts[item.segmentId] = item.publishedPostCount;
       });
@@ -41,11 +48,11 @@ export const IssuesPage: React.FC = () => {
     } catch (error) {
       console.warn('[IssuesPage popularity load error]', error);
       setHasCountError(true);
-      setCategoryOrder(CATEGORY_ORDER);
+      setCategoryOrder(activeKeys.length > 0 ? activeKeys : CATEGORY_ORDER);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [activeKeys]);
 
   useEffect(() => {
     void loadPopularity();
@@ -57,8 +64,11 @@ export const IssuesPage: React.FC = () => {
   );
 
   const cards = useMemo(
-    () => categoryOrder.map((key) => ({ key, config: getSegment(key) })),
-    [categoryOrder, getSegment]
+    () =>
+      categoryOrder
+        .map((key) => ({ key, config: segments[key] }))
+        .filter((item) => Boolean(item.config)),
+    [categoryOrder, segments]
   );
 
   return (
@@ -108,7 +118,7 @@ export const IssuesPage: React.FC = () => {
                 language === 'bn' ? `জনপ্রিয়তার অবস্থান ${toBanglaDigits(rank)}` : `popularity rank ${rank}`
               }`}
               className="min-h-[84px] ui-card px-3.5 py-3 text-left transition-all hover:bg-ui-surface-hover active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              style={{ borderColor: `var(--sec-${key}-border)` }}
+              style={{ borderColor: config.borderColor }}
             >
               <div className="flex items-center gap-3">
                 <CategoryIcon
