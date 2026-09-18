@@ -1,4 +1,4 @@
-import { ReportItem, PublicPublishedResponse } from '../types/report';
+import { ReportItem, PublicPublishedResponse, PublicConfiguredReportField } from '../types/report';
 import { SectionKey } from '../theme/tokens';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import {
@@ -337,6 +337,39 @@ export const PublicReportService = {
     }
 
     return null;
+  },
+
+  async getConfiguredFields(reportId: string): Promise<PublicConfiguredReportField[]> {
+    if (!isSupabaseConfigured() || !supabase) return [];
+
+    const cleanId = reportId.trim().toUpperCase();
+    const { data, error } = await fetchWithDeduplication(
+      `rpc:get_public_report_configured_fields:${cleanId}`,
+      () =>
+        supabase!.rpc('get_public_report_configured_fields', {
+          p_report_id: cleanId,
+        })
+    );
+
+    if (error) {
+      console.warn('[PublicReportService.getConfiguredFields] RPC error:', error);
+      return [];
+    }
+
+    const fields = (data as any)?.fields;
+    if (!Array.isArray(fields)) return [];
+
+    return fields
+      .filter((field: any) => field && field.value !== null && field.value !== undefined)
+      .map((field: any) => ({
+        fieldKey: String(field.fieldKey || ''),
+        labelEn: String(field.labelEn || field.fieldKey || ''),
+        labelBn: String(field.labelBn || field.labelEn || field.fieldKey || ''),
+        fieldType: String(field.fieldType || 'text'),
+        sortOrder: Number(field.sortOrder || 0),
+        value: field.value,
+      }))
+      .sort((a: PublicConfiguredReportField, b: PublicConfiguredReportField) => a.sortOrder - b.sortOrder);
   },
 
   /**
