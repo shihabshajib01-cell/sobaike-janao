@@ -49,8 +49,6 @@ export interface SegmentTaxonomyItem {
   borderColor: string;
   textColor: string;
   colors: typeof SECTIONS.harassment.colors;
-  iconKey?: string;
-  themeKey?: string;
   sortOrder?: number;
 }
 
@@ -115,20 +113,20 @@ export const TaxonomyService = {
             shortNameEn: row.name_en || row.id,
             descriptionBn: '',
             descriptionEn: '',
-            primaryColor: 'var(--ui-action-bg)',
-            hoverColor: 'var(--ui-action-hover)',
-            bgColor: 'var(--ui-surface-subtle)',
-            borderColor: 'var(--ui-stroke-default)',
-            textColor: 'var(--ui-content-primary)',
+            primaryColor: '#3A7CA5',
+            hoverColor: '#1B4D6B',
+            bgColor: '#F0F3F9',
+            borderColor: '#CCD5E8',
+            textColor: '#1B4D6B',
             colors: {
-              primary: 'var(--ui-action-bg)',
-              hover: 'var(--ui-action-hover)',
-              lightBg: 'var(--ui-surface-subtle)',
-              bgLight: 'var(--ui-surface-subtle)',
-              border: 'var(--ui-stroke-default)',
-              text: 'var(--ui-content-primary)',
-              textSafe: 'var(--ui-content-primary)',
-              filledText: 'var(--ui-action-text)',
+              primary: '#3A7CA5',
+              hover: '#1B4D6B',
+              lightBg: '#F0F3F9',
+              bgLight: '#F0F3F9',
+              border: '#CCD5E8',
+              text: '#1B4D6B',
+              textSafe: '#1B4D6B',
+              filledText: '#FFFFFF',
             },
           };
 
@@ -136,17 +134,13 @@ export const TaxonomyService = {
             ...fallback,
             key,
             id: row.id,
-            slug:
-              SECTIONS[key]?.slug ||
-              (row.slug ? `/category/${row.slug}` : fallback.slug),
+            slug: row.slug ? `/category/${row.slug}` : fallback.slug,
             nameBn: row.name_bn || fallback.nameBn,
             nameEn: row.name_en || fallback.nameEn,
             shortNameBn: row.short_name_bn || row.name_bn || fallback.shortNameBn,
             shortNameEn: row.short_name_en || row.name_en || fallback.shortNameEn,
             descriptionBn: row.description_bn || fallback.descriptionBn,
             descriptionEn: row.description_en || fallback.descriptionEn,
-            iconKey: row.icon_key || (fallback as SegmentTaxonomyItem).iconKey || 'shield',
-            themeKey: row.theme_key || (fallback as SegmentTaxonomyItem).themeKey || 'sky',
             sortOrder: typeof row.sort_order === 'number' ? row.sort_order : undefined,
           };
         });
