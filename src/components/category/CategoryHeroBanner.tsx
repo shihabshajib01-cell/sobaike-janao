@@ -94,7 +94,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         '--hero-cta-border': segmentMeta.primaryColor,
         '--hero-cta-hover-bg': segmentMeta.primaryColor,
         '--hero-cta-hover-border': segmentMeta.primaryColor,
-        '--hero-cta-hover-text': 'var(--ui-action-text)',
+        '--hero-cta-hover-text': segmentMeta.colors.filledText,
       } as React.CSSProperties)
     : getHeroCtaStyle(sectionKey);
 
