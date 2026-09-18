@@ -10,7 +10,6 @@ import {
   Home,
   Layers,
   MapPin,
-  Scale,
   Share2,
   UserX,
   Zap,
@@ -595,6 +594,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <ReportMediaGrid
               images={report.media?.images || report.images || []}
               language={language}
+              isCompact
             />
           )}
 
@@ -654,14 +654,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {hasPublishedResponses && (
           <section
             id="published-responses-section"
-            className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-6 space-y-4 ui-elevation-card"
+            className="border-y border-ui-stroke-subtle py-5 md:py-6 px-1 sm:px-2 space-y-4"
           >
-            <h2 className="type-h3 text-ui-content-primary flex items-center gap-2">
-              <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
-              <span>
-                {language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}
-                {' '}({(report.response ? 1 : 0) + storedResponses.length})
-              </span>
+            <h2 className="type-h3 text-ui-content-primary">
+              {language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}
+              {' '}({language === 'bn'
+                ? toBanglaDigits((report.response ? 1 : 0) + storedResponses.length)
+                : (report.response ? 1 : 0) + storedResponses.length})
             </h2>
 
             {PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError && (
@@ -684,7 +683,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             )}
 
             {report.response && (
-              <div className="bg-ui-surface-subtle ui-radius-control p-4 space-y-2">
+              <div className="py-1 space-y-2">
                 <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-[var(--font-weight-semibold)]">
                   <span>
                     {language === 'bn'
@@ -708,7 +707,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               return (
                 <div
                   key={response.id}
-                  className="bg-ui-surface-subtle ui-radius-control p-4 space-y-2.5"
+                  className="py-1 space-y-2.5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2 type-meta">
                     <div className="space-y-0.5">
@@ -761,7 +760,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
         <section
           id="report-response-action-box"
-          className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-6 space-y-3 ui-elevation-card"
+          className="border-b border-ui-stroke-subtle pb-5 md:pb-6 px-1 sm:px-2 space-y-3"
         >
           <h2 className="type-h3 text-ui-content-primary">
             {language === 'bn'
@@ -769,17 +768,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               : 'Do you know something about this report?'}
           </h2>
 
-          <p className="type-meta text-ui-content-secondary">
-            {language === 'bn'
-              ? 'আপনার তথ্য এই ঘটনার সত্যতা যাচাইয়ে সহায়তা করতে পারে।'
-              : 'Your information may help verify this report.'}
-          </p>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
             <Button
               id="btn-respond-citizen-info"
               type="button"
-              variant="primary"
+              variant="outline"
               size="md"
               fullWidth
               onClick={() => setIsCitizenModalOpen(true)}
