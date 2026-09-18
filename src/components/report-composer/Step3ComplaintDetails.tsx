@@ -1584,7 +1584,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             </div>
 
             {isSexualHarassment && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t border-ui-stroke-subtle">
                 <Select
                   id="sexual-harassment-type-select"
                   label={language === 'bn' ? 'হয়রানির ধরন' : 'Type of harassment'}
@@ -1678,7 +1678,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             )}
 
             {segment === 'harassment' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t border-ui-stroke-subtle">
                 <Select
                   id="harassment-age-group-select"
                   label={language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়সের গ্রুপ' : "Affected person's age group"}
