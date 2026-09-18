@@ -350,7 +350,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       id="report-detail-page-container"
       className="w-full max-w-[900px] mx-auto"
     >
-      <div className="w-full space-y-5 md:space-y-6">
+      <div className="w-full space-y-4 md:space-y-5">
         <div className="hidden md:flex items-center justify-between gap-4">
           <Button
             type="button"
@@ -393,9 +393,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subcategory}</span>
           </div>
 
-          <h1 className="type-h1 text-ui-content-primary tracking-tight">{title}</h1>
+          <h1 className="type-h1 text-ui-content-primary tracking-tight leading-[1.35]">{title}</h1>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 type-meta text-ui-content-secondary">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-secondary">
             {location && (
               report.districtEn ? (
                 <button
@@ -403,19 +403,19 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                   onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
                   className="flex items-center gap-1.5 font-[var(--font-weight-medium)] text-ui-content-primary min-h-[44px] px-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
                 >
-                  <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
                   <span className="underline decoration-ui-stroke-subtle">{location}</span>
                 </button>
               ) : (
                 <span className="flex items-center gap-1.5 min-h-[44px]">
-                  <MapPin className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
+                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
                   <span>{location}</span>
                 </span>
               )
             )}
 
             <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
-              <Calendar className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <Calendar className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
               <span>
                 {report.subcategoryId === 'excess-electricity-bill' && report.recentBillMonth
                   ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing period: '}${formatBillingMonth(report.recentBillMonth, language)}`
@@ -427,7 +427,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]"
               aria-label={`${displayEngagementCount(viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}
             >
-              <Eye className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <Eye className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
               <span>{displayEngagementCount(viewCount)} {language === 'bn' ? 'ভিউ' : 'views'}</span>
             </div>
 
@@ -435,7 +435,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]"
               aria-label={`${displayEngagementCount(shareCount)} ${language === 'bn' ? 'শেয়ার' : 'shares'}`}
             >
-              <Share2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <Share2 className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
               <span>{displayEngagementCount(shareCount)} {language === 'bn' ? 'শেয়ার' : 'shares'}</span>
             </div>
           </div>
@@ -443,7 +443,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
 
           {detailText && (
-            <div className="max-w-[720px] type-body text-ui-content-primary">
+            <div className="max-w-[760px] type-body text-ui-content-primary leading-7">
               <p className="whitespace-pre-line">{detailText}</p>
             </div>
           )}
@@ -681,7 +681,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             )}
 
             {report.response && (
-              <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2">
+              <div className="py-1 pl-4 border-l-2 border-ui-stroke-default space-y-2">
                 <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-[var(--font-weight-semibold)]">
                   <span>
                     {language === 'bn'
@@ -705,7 +705,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               return (
                 <div
                   key={response.id}
-                  className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2.5"
+                  className="py-1 pl-4 border-l-2 border-ui-stroke-default space-y-2.5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2 type-meta">
                     <div className="space-y-0.5">
@@ -766,11 +766,17 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               : 'Do you know something about this report?'}
           </h2>
 
+          <p className="type-meta text-ui-content-secondary">
+            {language === 'bn'
+              ? 'আপনার তথ্য এই ঘটনার সত্যতা যাচাইয়ে সহায়তা করতে পারে।'
+              : 'Your information may help verify this report.'}
+          </p>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
             <Button
               id="btn-respond-citizen-info"
               type="button"
-              variant="secondary"
+              variant="primary"
               size="md"
               fullWidth
               onClick={() => setIsCitizenModalOpen(true)}
