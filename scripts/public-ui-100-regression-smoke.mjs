@@ -188,7 +188,7 @@ await check('All seven category pages preserve the shared mobile navigation cont
     const sectionId = route.replace(/^\//, '').replace(/-/g, '_');
     const sharedFeedSection = page.locator(
       sectionId === 'load_shedding'
-        ? '#load_shedding-filter-section'
+        ? '#utility-filter-section'
         : `#${sectionId}-filter-section`
     );
     await expectVisible(
