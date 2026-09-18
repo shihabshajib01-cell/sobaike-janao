@@ -3,6 +3,11 @@ import {
   PublicReportingField,
   PublicReportingForm,
 } from '../../services/reportingFormConfig';
+import {
+  MobJusticeDetails,
+  MobJusticeValidationErrors,
+} from '../../data/mobJusticeOptions';
+import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
 import { ReportFormData } from '../../services/types';
 import {
   AttachedImagePreview,
@@ -31,6 +36,9 @@ interface ConfiguredFieldsSectionProps {
   pendingImages: AttachedImagePreview[];
   onPendingImagesChange: (images: AttachedImagePreview[]) => void;
   onUpdateFormData: (updates: Partial<ReportFormData>) => void;
+  mobJusticeDetails?: MobJusticeDetails;
+  mobJusticeErrors?: MobJusticeValidationErrors;
+  onMobJusticeDetailsChange?: (details: MobJusticeDetails) => void;
 }
 
 const isEmpty = (value: unknown): boolean => {
@@ -55,6 +63,9 @@ export const ConfiguredFieldsSection = forwardRef<
       pendingImages,
       onPendingImagesChange,
       onUpdateFormData,
+      mobJusticeDetails,
+      mobJusticeErrors,
+      onMobJusticeDetailsChange,
     },
     ref
   ) => {
@@ -105,7 +116,17 @@ export const ConfiguredFieldsSection = forwardRef<
       const next: Record<string, string> = {};
 
       for (const field of fields) {
-        if (field.fieldType === 'mob_justice_details') continue;
+        if (field.fieldType === 'mob_justice_details') {
+          if (field.required && mobJusticeDetails) {
+            if (!mobJusticeDetails.trigger || !mobJusticeDetails.outcome || !mobJusticeDetails.ongoingStatus) {
+              next[field.fieldKey] =
+                language === 'bn'
+                  ? 'মব সহিংসতার প্রয়োজনীয় তথ্য পূরণ করুন।'
+                  : 'Complete the required Mob Justice details.';
+            }
+          }
+          continue;
+        }
 
         if (field.fieldType === 'location') {
           if (
@@ -236,7 +257,19 @@ export const ConfiguredFieldsSection = forwardRef<
             language === 'bn' ? field.placeholderBn : field.placeholderEn;
           const error = errors[field.fieldKey];
 
-          if (field.fieldType === 'mob_justice_details') return null;
+          if (field.fieldType === 'mob_justice_details') {
+            if (!mobJusticeDetails || !onMobJusticeDetailsChange) return null;
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`}>
+                <MobJusticeDetailsFields
+                  value={mobJusticeDetails}
+                  errors={mobJusticeErrors}
+                  onChange={onMobJusticeDetailsChange}
+                  language={language}
+                />
+              </div>
+            );
+          }
 
           if (field.fieldType === 'location') {
             return (
