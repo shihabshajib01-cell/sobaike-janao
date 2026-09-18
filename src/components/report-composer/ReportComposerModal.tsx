@@ -1166,37 +1166,44 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         onClose={handleCancelRapeConsent}
         maxWidth="md"
         zIndexClass="z-[60]"
-        showHeader={false}
         language={language}
-        ariaLabelledBy="rape-consent-title"
+        title={language === 'bn' ? 'নিরাপদভাবে প্রতিবেদন করুন' : 'Report safely'}
+        headerIcon={<Shield className="w-5 h-5" aria-hidden="true" />}
+        showCloseButton={false}
         ariaDescribedBy="rape-consent-description"
-      >
-        <div className="p-5 sm:p-6 flex flex-col gap-4 text-ui-content-primary">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 ui-radius-control bg-ui-accent-soft text-ui-accent flex items-center justify-center shrink-0 ui-border-default border-ui-accent-border">
-              <Shield className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
-              <h1
-                id="rape-consent-title"
-                className="type-h2 tracking-tight text-ui-content-primary"
-              >
-                {language === 'bn' ? 'নিরাপদভাবে প্রতিবেদন করুন' : 'Report safely'}
-              </h1>
-            </div>
-          </div>
-
-          <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
-
-          <div className="flex flex-col gap-2.5">
-            <h2 className="type-h3 text-ui-content-primary">
-              {language === 'bn' ? 'গল্পটি বলুন, পরিচয় নয়' : 'Share the story, not the identity'}
-            </h2>
-
-            <div
-              id="rape-consent-description"
-              className="flex flex-col gap-2.5"
+        footer={
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+            <Button
+              id="rape-consent-back-btn"
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={handleCancelRapeConsent}
+              fullWidth
             >
+              {language === 'bn' ? 'ফিরে যান' : 'Go back'}
+            </Button>
+            <Button
+              id="rape-consent-agree-btn"
+              type="button"
+              variant="primary"
+              size="lg"
+              disabled={!rapeConsentCheckbox}
+              onClick={handleAgreeRapeConsent}
+              fullWidth
+            >
+              {language === 'bn' ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-4 text-ui-content-primary">
+          <div className="flex flex-col gap-2.5">
+            <h3 className="type-h3 text-ui-content-primary">
+              {language === 'bn' ? 'গল্পটি বলুন, পরিচয় নয়' : 'Share the story, not the identity'}
+            </h3>
+
+            <div id="rape-consent-description" className="flex flex-col gap-2.5">
               <p className="type-body text-ui-content-primary">
                 {language === 'bn'
                   ? 'সবাইকে জানাও কোনো সরকারি, আইনশৃঙ্খলা রক্ষাকারী বা বিচারিক সেবা নয়। এখানে প্রকাশিত প্রতিবেদন কারও অপরাধ প্রমাণ করে না।'
@@ -1210,7 +1217,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             </div>
           </div>
 
-          <div className="ui-radius-control ui-border-default border-ui-stroke-default p-4 bg-ui-surface">
+          <div className="ui-radius-control ui-border-default border-ui-stroke-default p-4 bg-ui-surface-subtle">
             <ol className="space-y-3 list-none">
               <li className="flex items-start gap-3">
                 <p className="type-body text-ui-content-primary shrink-0" aria-hidden="true">
@@ -1264,31 +1271,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               labelClassName="type-body text-ui-content-primary"
             />
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <Button
-              id="rape-consent-back-btn"
-              type="button"
-              variant="outline"
-              size="lg"
-              onClick={handleCancelRapeConsent}
-              fullWidth
-            >
-              {language === 'bn' ? 'ফিরে যান' : 'Go back'}
-            </Button>
-
-            <Button
-              id="rape-consent-agree-btn"
-              type="button"
-              variant="primary"
-              size="lg"
-              disabled={!rapeConsentCheckbox}
-              onClick={handleAgreeRapeConsent}
-              fullWidth
-            >
-              {language === 'bn' ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
-            </Button>
-          </div>
         </div>
       </Modal>
 
@@ -1299,51 +1281,45 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         onClose={handleContinueEditing}
         maxWidth="md"
         zIndexClass="z-[60]"
-        showHeader={false}
         language={language}
-        ariaLabel={language === 'bn' ? 'প্রতিবেদন বাতিল করার নিশ্চিতকরণ' : 'Cancel report confirmation'}
-      >
-        <div className="p-6 md:p-8 space-y-5 text-left">
-          <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-[var(--radius-card)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary mt-0.5">
-              <AlertCircle className="w-5 h-5" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
-                {language === 'bn' ? 'প্রতিবেদন বাতিল করবেন?' : 'Cancel this report?'}
-              </h3>
-              <p className="type-compact leading-relaxed text-ui-content-secondary">
-                {language === 'bn'
-                  ? 'এখন বাতিল করলে এই প্রতিবেদনে দেওয়া তথ্য সংরক্ষিত থাকবে না।'
-                  : 'If you cancel now, the information entered in this report will not be saved.'}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-3 border-t border-ui-stroke-subtle">
+        title={language === 'bn' ? 'প্রতিবেদন বাতিল করবেন?' : 'Cancel this report?'}
+        description={
+          language === 'bn'
+            ? 'এখন বাতিল করলে এই প্রতিবেদনে দেওয়া তথ্য সংরক্ষিত থাকবে না।'
+            : 'If you cancel now, the information entered in this report will not be saved.'
+        }
+        headerIcon={<AlertCircle className="w-5 h-5" aria-hidden="true" />}
+        showCloseButton={false}
+        footer={
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
             <Button
               id="report-continue-editing-btn"
               type="button"
               variant="outline"
               size="md"
               onClick={handleContinueEditing}
-              className="whitespace-nowrap"
+              fullWidth
             >
               {language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Continue editing'}
             </Button>
-
             <Button
               id="report-cancel-btn"
               type="button"
-              variant="ghost"
+              variant="destructive"
               size="md"
               onClick={handleCancelReport}
-              className="text-ui-error-text hover:bg-ui-error-bg whitespace-nowrap"
+              fullWidth
             >
               {language === 'bn' ? 'প্রতিবেদন বাতিল করুন' : 'Cancel reporting'}
             </Button>
           </div>
-        </div>
+        }
+      >
+        <p className="type-body text-ui-content-secondary">
+          {language === 'bn'
+            ? 'আপনি ফিরে গিয়ে সম্পাদনা চালিয়ে যেতে পারেন, অথবা প্রতিবেদনটি সম্পূর্ণভাবে বাতিল করতে পারেন।'
+            : 'You can go back and keep editing, or discard this report completely.'}
+        </p>
       </Modal>
     </>
   );
