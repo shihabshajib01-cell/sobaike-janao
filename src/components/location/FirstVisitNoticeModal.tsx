@@ -70,7 +70,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           />
           <h1
             id="first-visit-notice-title"
-            className="type-h1 tracking-tight text-ui-content-primary"
+            className="type-h2 tracking-tight text-ui-content-primary"
           >
             {isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
           </h1>
@@ -79,7 +79,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
         <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
 
         <div className="flex flex-col gap-2.5">
-          <h2 className="type-h2 text-ui-content-primary">
+          <h2 className="type-h3 text-ui-content-primary">
             {isBn
               ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
               : 'Independence & Responsible Use Notice'}
@@ -87,7 +87,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
 
           <p
             id="first-visit-notice-desc"
-            className="type-body text-ui-content-secondary"
+            className="type-body text-ui-content-primary"
           >
             {isBn
               ? 'এই প্ল্যাটফর্মটি নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ শেয়ার করার একটি স্বাধীন মাধ্যম। সবার জন্য নির্ভরযোগ্য ও নিরাপদ পরিবেশ বজায় রাখতে নিচের নির্দেশনাগুলো অনুসরণ করুন।'
@@ -100,12 +100,12 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             {instructions.map((instruction, index) => (
               <li key={instruction} className="flex items-start gap-3">
                 <p
-                  className="type-action text-ui-content-primary shrink-0"
+                  className="type-body text-ui-content-primary shrink-0"
                   aria-hidden="true"
                 >
                   {isBn ? `${['১', '২', '৩'][index]}.` : `${index + 1}.`}
                 </p>
-                <p className="type-action text-ui-content-primary">
+                <p className="type-body text-ui-content-primary">
                   {instruction}
                 </p>
               </li>
@@ -119,7 +119,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             checked={isChecked}
             onChange={(e) => setIsChecked(e.target.checked)}
             label={
-              <span className="type-label text-ui-content-primary">
+              <span className="type-body text-ui-content-primary">
                 {isBn
                   ? 'আমি নিয়মগুলো পড়েছি এবং দায়িত্বশীলভাবে ব্যবহার করতে সম্মত।'
                   : 'I have read and agree to use this platform responsibly.'}
