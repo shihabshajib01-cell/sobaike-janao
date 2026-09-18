@@ -101,6 +101,26 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
   const displayCount = (value: number) =>
     language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
 
+  const relativePublishedTime = (() => {
+    if (!report.publishedAt) return publishedDate;
+    const published = new Date(report.publishedAt).getTime();
+    if (!Number.isFinite(published)) return publishedDate;
+    const diffMinutes = Math.max(0, Math.floor((Date.now() - published) / 60000));
+    if (diffMinutes < 60) {
+      const value = Math.max(1, diffMinutes);
+      return language === 'bn' ? `${toBanglaDigits(value)} মিনিট আগে` : `${value} min ago`;
+    }
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) {
+      return language === 'bn' ? `${toBanglaDigits(diffHours)} ঘণ্টা আগে` : `${diffHours}h ago`;
+    }
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) {
+      return language === 'bn' ? `${toBanglaDigits(diffDays)} দিন আগে` : `${diffDays}d ago`;
+    }
+    return publishedDate;
+  })();
+
   return (
     <article
       id={`report-card-${report.id}`}
@@ -111,10 +131,13 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       onKeyDown={handleCardKeyDown}
       className={`group relative ui-card p-3.5 sm:p-4 md:p-6 transition-all duration-150 cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 ${className}`}
     >
-      <div className="flex items-center justify-between gap-2 type-meta">
+      <div className="flex items-center justify-between gap-3 type-meta">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
           <CategoryBadge section={report.segment} language={language} size="sm" className="shrink-0" />
         </div>
+        <p className="md:hidden type-meta text-ui-content-secondary whitespace-nowrap shrink-0">
+          {relativePublishedTime}
+        </p>
       </div>
 
       <h3 className="type-h3 text-ui-content-primary transition-colors line-clamp-2 break-words">
@@ -152,25 +175,24 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       )}
 
       {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
-        <div className="pt-0.5 md:pt-1">
+        <div className="hidden md:block pt-1">
           <ReportMediaGrid images={report.media?.images || report.images || []} language={language} isCompact={true} />
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-muted">
+      <div className="flex items-center justify-between gap-2 pt-2.5 md:pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-muted">
         <div className="flex items-center flex-wrap gap-x-2.5 sm:gap-x-3 gap-y-0.5 min-w-0 flex-1">
           <div className="flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary font-[var(--font-weight-medium)] min-w-0">
             <AppIcon name="map-pin" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
             <AppIcon name="map-pin" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
-            <p className="type-meta truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[200px] md:max-w-xs">{location}</p>
+            <p className="type-meta truncate max-w-[210px] sm:max-w-[280px] md:max-w-xs">{location}</p>
           </div>
-          <span className="text-ui-content-muted" aria-hidden="true">•</span>
-          <div className="flex items-center gap-1 text-ui-content-muted shrink-0">
-            <AppIcon name="calendar" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
-            <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
+          <span className="hidden md:inline text-ui-content-muted" aria-hidden="true">•</span>
+          <div className="hidden md:flex items-center gap-1 text-ui-content-muted shrink-0">
+            <AppIcon name="calendar" size="sm" className="text-ui-content-muted shrink-0" />
             <p className="type-meta whitespace-nowrap">{publishedDate}</p>
           </div>
-          <span className="text-ui-content-muted" aria-hidden="true">•</span>
+          <span className="hidden md:inline text-ui-content-muted" aria-hidden="true">•</span>
           <div
             className="flex items-center gap-1 text-ui-content-muted shrink-0"
             aria-label={`${displayCount(engagement.viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}
@@ -197,13 +219,13 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
               <span className="inline-flex items-center gap-1">
                 <AppIcon name="share" size="xs" className="text-ui-content-muted md:hidden" />
                 <AppIcon name="share" size="sm" className="text-ui-content-muted hidden md:inline-block" />
-                <span>{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
-                <span className="type-meta text-ui-content-muted">{displayCount(engagement.shareCount)}</span>
+                <span className="hidden md:inline">{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
+                <span className="hidden md:inline type-meta text-ui-content-muted">{displayCount(engagement.shareCount)}</span>
               </span>
             )}
           </button>
 
-          <span className="text-ui-content-muted" aria-hidden="true">|</span>
+          <span className="hidden md:inline text-ui-content-muted" aria-hidden="true">|</span>
 
           <Link
             to={`/report-detail/${report.id}`}
@@ -212,7 +234,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
               registerView();
             }}
             aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
-            className="inline-flex items-center gap-1 sm:gap-1.5 font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+            className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline transition-colors py-1.5 px-1 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
           >
             <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
             <AppIcon name="arrow-right" size="xs" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform md:hidden" />
