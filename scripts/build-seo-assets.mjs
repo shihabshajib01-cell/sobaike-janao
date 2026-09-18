@@ -466,9 +466,10 @@ function injectStaticFallback(html, page) {
 
 function injectMeta(template, page) {
   const language = page.language || 'bn';
-  const canonical = localizedUrl(page.path, language);
-  const bnCanonical = localizedUrl(page.path, 'bn');
-  const enCanonical = localizedUrl(page.path, 'en');
+  const logicalPath = page.logicalPath || page.path;
+  const canonical = localizedUrl(logicalPath, language);
+  const bnCanonical = localizedUrl(logicalPath, 'bn');
+  const enCanonical = localizedUrl(logicalPath, 'en');
   const titleText = truncateSeoText(page.title, 60);
   const descriptionText = normalizeSeoDescription(page.description, language);
   const socialDescriptionText = page.socialDescription
@@ -481,6 +482,10 @@ function injectMeta(template, page) {
   const type = page.type === 'article' ? 'article' : 'website';
 
   let html = template
+    .replace(
+      /<html lang="[^"]+">/,
+      `<html lang="${language === 'en' ? 'en' : 'bn'}">`
+    )
     .replace(/<title>.*?<\/title>/s, `<title>${title}</title>`)
     .replace(
       /<meta name="description" content="[^"]*" \/>/,
@@ -527,6 +532,10 @@ function injectMeta(template, page) {
       `<meta property="og:url" content="${htmlEscape(canonical)}" />`
     )
     .replace(
+      /<meta property="og:locale" content="[^"]*" \/>/,
+      `<meta property="og:locale" content="${language === 'en' ? 'en_US' : 'bn_BD'}" />`
+    )
+    .replace(
       /<meta name="twitter:title" content="[^"]*" \/>/,
       `<meta name="twitter:title" content="${title}" />`
     )
@@ -536,10 +545,15 @@ function injectMeta(template, page) {
     );
 
   if (page.type === 'article' && page.publishedAt) {
-    html = html.replace(
-      '</head>',
-      `    <meta property="article:published_time" content="${htmlEscape(page.publishedAt)}" />\n  </head>`
-    );
+    const articleMeta = [
+      `    <meta property="article:published_time" content="${htmlEscape(page.publishedAt)}" />`,
+      page.modifiedAt
+        ? `    <meta property="article:modified_time" content="${htmlEscape(page.modifiedAt)}" />`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+    html = html.replace('</head>', `${articleMeta}\n  </head>`);
   }
 
   const pageSchema =
@@ -550,10 +564,11 @@ function injectMeta(template, page) {
           url: canonical,
           headline: titleText,
           description: descriptionText,
-          inLanguage: 'bn-BD',
+          inLanguage: language === 'en' ? 'en' : 'bn-BD',
           mainEntityOfPage: { '@id': `${canonical}#webpage` },
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
           ...(page.publishedAt ? { datePublished: page.publishedAt } : {}),
+          ...(page.modifiedAt ? { dateModified: page.modifiedAt } : {}),
           image: DEFAULT_IMAGE,
         }
       : {
@@ -562,7 +577,7 @@ function injectMeta(template, page) {
           url: canonical,
           name: titleText,
           description: descriptionText,
-          inLanguage: 'bn-BD',
+          inLanguage: language === 'en' ? 'en' : 'bn-BD',
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         };
 
