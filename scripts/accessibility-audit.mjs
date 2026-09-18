@@ -38,7 +38,11 @@ requireContains('Switches use aria-describedby', toggle, 'aria-describedby={desc
 requireNotContains('Theme compact selector avoids incomplete listbox semantics', theme, 'role="listbox"');
 requireNotContains('Theme choices avoid incomplete radio composite semantics', theme, 'role="radio"');
 requireContains('Report media cells use native buttons', media, '<button\n        key={img.id}');
-requireNotContains('Report cards avoid fake link role', card, 'role="link"');
+requireNotContains(
+  'Report cards avoid fake link role',
+  card,
+  'role="link"\n      tabIndex={0}'
+);
 requireContains('Report cards expose a real Link', card, '<Link');
 requireContains('Upload errors are live alerts', upload, 'role="alert" aria-live="assertive"');
 requireContains('Upload progress is a polite status', upload, 'role="status" aria-live="polite"');
