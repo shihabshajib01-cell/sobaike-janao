@@ -294,8 +294,17 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const displayEngagementCount = (value: number) =>
     language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
 
-  const formatConfiguredValue = (value: unknown): string => {
-    if (Array.isArray(value)) return value.map((item) => String(item)).join(', ');
+  const formatConfiguredValue = (
+    value: unknown,
+    options: Array<{ value: string; labelEn: string; labelBn: string }> = []
+  ): string => {
+    const formatOption = (item: unknown) => {
+      const raw = String(item ?? '');
+      const option = options.find((entry) => entry.value === raw);
+      return option ? (language === 'bn' ? option.labelBn : option.labelEn) : raw;
+    };
+
+    if (Array.isArray(value)) return value.map(formatOption).join(', ');
     if (typeof value === 'boolean') {
       return value
         ? language === 'bn'
@@ -311,7 +320,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         .map((item) => String(item))
         .join(', ');
     }
-    return String(value ?? '');
+    return formatOption(value);
   };
 
   const relativePublishedTime = (() => {
@@ -643,7 +652,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       {language === 'bn' ? field.labelBn : field.labelEn}
                     </dt>
                     <dd className="mt-1 type-body font-[var(--font-weight-semibold)] text-ui-content-primary break-words whitespace-pre-wrap">
-                      {formatConfiguredValue(field.value)}
+                      {formatConfiguredValue(field.value, field.options)}
                     </dd>
                   </div>
                 ))}
