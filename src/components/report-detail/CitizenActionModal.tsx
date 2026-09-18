@@ -4,6 +4,7 @@ import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
 import { ModalActions } from '../ui/ModalActions';
 import { Checkbox } from '../ui/Checkbox';
+import { UnsavedChangesDialog } from '../ui/UnsavedChangesDialog';
 
 interface CitizenActionModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false);
   const maxIncidentDate = getLocalDateInputValue();
 
   useEffect(() => {
@@ -43,6 +45,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       setIsSubmitting(false);
       setResponseId(null);
       setError(null);
+      setIsDiscardConfirmOpen(false);
     }
   }, [isOpen]);
 
@@ -103,6 +106,13 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     }
   };
 
+  const isDirty = Boolean(
+    description.trim() ||
+    witnessDate.trim() ||
+    contactConsent ||
+    contactInfo.trim()
+  );
+
   const handleResetAndClose = () => {
     setDescription('');
     setWitnessDate('');
@@ -112,16 +122,29 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     setIsSubmitting(false);
     setResponseId(null);
     setError(null);
+    setIsDiscardConfirmOpen(false);
     onClose();
   };
 
+  const handleRequestClose = () => {
+    if (isSubmitting) return;
+
+    if (!isSubmitted && isDirty) {
+      setIsDiscardConfirmOpen(true);
+      return;
+    }
+
+    handleResetAndClose();
+  };
+
   return (
-    <Modal
+    <>
+      <Modal
       id="citizen-action-modal"
       isOpen={isOpen}
-      onClose={handleResetAndClose}
+      onClose={handleRequestClose}
       closeOnBackdrop={false}
-      closeOnEscape={false}
+      closeOnEscape={true}
       maxWidth="md"
       language={language}
       title={language === 'bn' ? 'প্রতিবেদনে তথ্য দিন' : 'Share information about this report'}
@@ -152,7 +175,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             secondary={{
               type: 'button',
               size: 'md',
-              onClick: handleResetAndClose,
+              onClick: handleRequestClose,
               disabled: isSubmitting,
               label: language === 'bn' ? 'বাতিল' : 'Cancel',
             }}
@@ -281,5 +304,15 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
           </div>
         </form>
       )}
-    </Modal>
-  );};
+      </Modal>
+
+      <UnsavedChangesDialog
+        id="citizen-action-discard-confirm-modal"
+        isOpen={isDiscardConfirmOpen}
+        language={language}
+        onKeepEditing={() => setIsDiscardConfirmOpen(false)}
+        onDiscard={handleResetAndClose}
+      />
+    </>
+  );
+};
