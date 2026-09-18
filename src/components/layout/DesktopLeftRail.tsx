@@ -1,44 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { CATEGORY_ORDER } from '../../data/categoryOrder';
 import { CategoryPopularityService } from '../../services/categoryPopularityService';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { BrandLogo } from '../branding/BrandLogo';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
-
-const SECTION_ICON_NAMES: Record<SectionKey, AppIconName> = {
-  harassment: 'harassment',
-  extortion: 'extortion',
-  public_safety: 'public-safety',
-  road_transport: 'road-transport',
-  load_shedding: 'zap-off',
-  illegal_occupation: 'illegal-occupation',
-  rickshaw: 'rickshaw',
-};
+import { CategoryIcon } from '../branding/CategoryIcon';
 
 export const DesktopLeftRail: React.FC = () => {
   const { currentRoute, navigateTo, language, toggleLanguage, openReportComposer } = useApp();
-  const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
+  const { segments, getSegment } = useTaxonomy();
+  const [categoryOrder, setCategoryOrder] = useState<string[]>(() =>
+    Object.values(segments)
+      .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+      .map((segment) => segment.id)
+  );
 
   useEffect(() => {
     let active = true;
+    CategoryPopularityService.clearCache();
     CategoryPopularityService.getOrderedCategoryKeys().then((keys) => {
       if (active) setCategoryOrder(keys);
     });
     return () => {
       active = false;
     };
-  }, []);
+  }, [segments]);
 
   const navItems: Array<{
     id: string;
     path: RoutePath;
     nameBn: string;
     nameEn: string;
-    iconName: AppIconName;
-    sectionKey?: SectionKey;
+    iconName?: AppIconName;
+    sectionKey?: string;
   }> = [
     {
       id: 'rail-home',
@@ -47,14 +44,16 @@ export const DesktopLeftRail: React.FC = () => {
       nameEn: 'Home',
       iconName: 'home',
     },
-    ...categoryOrder.map((sectionKey) => ({
-      id: `rail-${sectionKey.replaceAll('_', '-')}`,
-      path: SECTIONS[sectionKey].slug,
-      nameBn: SECTIONS[sectionKey].shortNameBn,
-      nameEn: SECTIONS[sectionKey].shortNameEn,
-      iconName: SECTION_ICON_NAMES[sectionKey],
-      sectionKey,
-    })),
+    ...categoryOrder.map((sectionKey) => {
+      const config = getSegment(sectionKey);
+      return {
+        id: `rail-${sectionKey.replaceAll('_', '-')}`,
+        path: config.slug as RoutePath,
+        nameBn: config.shortNameBn,
+        nameEn: config.shortNameEn,
+        sectionKey,
+      };
+    }),
     {
       id: 'rail-explore',
       path: '/explore',
@@ -78,7 +77,7 @@ export const DesktopLeftRail: React.FC = () => {
     },
   ];
 
-  const getSectionActiveStyles = (sectionKey?: SectionKey) => {
+  const getSectionActiveStyles = (sectionKey?: string) => {
     if (!sectionKey) {
       return 'bg-ui-surface-elevated text-ui-content-primary font-[var(--font-weight-semibold)] border border-ui-stroke-default';
     }
@@ -116,7 +115,7 @@ export const DesktopLeftRail: React.FC = () => {
         <nav className="space-y-1" aria-label={language === 'bn' ? 'প্রধান বিভাগ' : 'Main sections'}>
           {navItems.map((item) => {
             const isActive = currentRoute === item.path;
-            const secConfig = item.sectionKey ? SECTIONS[item.sectionKey] : null;
+            const secConfig = item.sectionKey ? getSegment(item.sectionKey) : null;
 
             return (
               <button
@@ -130,25 +129,33 @@ export const DesktopLeftRail: React.FC = () => {
                 style={
                   isActive && item.sectionKey
                     ? {
-                        backgroundColor: `var(--sec-${item.sectionKey}-bg)`,
-                        color: `var(--sec-${item.sectionKey}-text)`,
-                        borderColor: `var(--sec-${item.sectionKey}-border)`,
+                        backgroundColor: secConfig?.bgColor,
+                        color: secConfig?.textColor,
+                        borderColor: secConfig?.borderColor,
                       }
                     : undefined
                 }
               >
                 <div className="flex items-center gap-3 truncate">
-                  <AppIcon
-                    name={item.iconName}
-                    size="lg"
-                    className={`transition-colors ${
-                      isActive && !secConfig
-                        ? 'text-ui-content-primary'
-                        : !isActive
-                        ? 'text-ui-content-muted'
-                        : ''
-                    }`}
-                  />
+                  {item.sectionKey ? (
+                    <CategoryIcon
+                      section={item.sectionKey as SectionKey}
+                      size="lg"
+                      ariaLabel={language === 'bn' ? item.nameBn : item.nameEn}
+                    />
+                  ) : (
+                    <AppIcon
+                      name={item.iconName as AppIconName}
+                      size="lg"
+                      className={`transition-colors ${
+                        isActive && !secConfig
+                          ? 'text-ui-content-primary'
+                          : !isActive
+                            ? 'text-ui-content-muted'
+                            : ''
+                      }`}
+                    />
+                  )}
                   <span className="truncate">{language === 'bn' ? item.nameBn : item.nameEn}</span>
                 </div>
 
@@ -157,7 +164,7 @@ export const DesktopLeftRail: React.FC = () => {
                     className={`w-2.5 h-2.5 ui-radius-pill shrink-0 transition-opacity ${
                       isActive ? 'opacity-100' : 'opacity-30 group-hover:opacity-60'
                     }`}
-                    style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
+                    style={{ backgroundColor: secConfig?.primaryColor || 'var(--ui-accent)' }}
                   />
                 )}
               </button>
