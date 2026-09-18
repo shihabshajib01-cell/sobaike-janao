@@ -12,7 +12,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { SECTIONS, SectionKey } from '../theme/tokens';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
-import { BRAND_NAME } from '../lib/seo';
+import { BRAND_NAME, buildBrandedSeoTitle, normalizeSeoDescription } from '../lib/seo';
 import { toBanglaDigits } from '../utils/formatters';
 
 export interface LocationPageProps {
@@ -81,73 +81,46 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
     : '';
 
   useEffect(() => {
-    if (!district) {
-      if (!isLoading) {
-        setDynamicSeo({
-          title: language === 'bn' ? `এলাকা পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Location Not Found | ${BRAND_NAME.en}`,
-          description:
-            language === 'bn'
-              ? 'এই এলাকার জন্য কোনো বৈধ প্রকাশিত প্রতিবেদন পৃষ্ঠা পাওয়া যায়নি।'
-              : 'No valid published report page was found for this location.',
-          robots: 'noindex, follow',
-          ogType: 'website',
-          ogSiteName: BRAND_NAME[language],
-          canonicalPath: `/location/${encodeURIComponent(locationId)}`,
-          pageType: 'collection',
-        });
-      } else {
-        setDynamicSeo({
-          title: language === 'bn' ? `এলাকার প্রতিবেদন লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Location Reports... | ${BRAND_NAME.en}`,
-          description: language === 'bn' ? 'এলাকাভিত্তিক নাগরিক প্রতিবেদন লোড হচ্ছে।' : 'Loading location-based community reports.',
-          robots: 'noindex, follow',
-          ogType: 'website',
-          ogSiteName: BRAND_NAME[language],
-          canonicalPath: `/location/${encodeURIComponent(locationId)}`,
-          pageType: 'collection',
-        });
-      }
-    } else if (!isLoading && !fetchError) {
-      const locName = language === 'bn' ? district.nameBn : district.nameEn;
-      const title =
-        language === 'bn'
-          ? `${locName} এলাকার প্রতিবেদন | ${BRAND_NAME.bn}`
-          : `Reports from ${locName} | ${BRAND_NAME.en}`;
-      const description =
-        language === 'bn'
-          ? `${locName} এলাকার প্রকাশিত নাগরিক প্রতিবেদন ও জনস্বার্থ রেকর্ড।`
-          : `Published community reports and public records from ${locName}, Bangladesh.`;
+    if (isLoading) return;
 
+    if (!district) {
       setDynamicSeo({
-        title,
-        description,
-        robots: 'index, follow, max-image-preview:large',
-        ogType: 'website',
-        ogSiteName: BRAND_NAME[language],
-        canonicalPath: `/location/${encodeURIComponent(district.id)}`,
-        pageType: 'collection',
-      });
-    } else if (fetchError) {
-      setDynamicSeo({
-        title: language === 'bn' ? `এলাকার তথ্য পাওয়া যায়নি | ${BRAND_NAME.bn}` : `Location Unavailable | ${BRAND_NAME.en}`,
-        description: language === 'bn' ? 'এই এলাকার তথ্য লোড করতে সমস্যা হয়েছে।' : 'Failed to load reports for this location.',
+        title: buildBrandedSeoTitle(
+          language === 'bn' ? 'এলাকা পাওয়া যায়নি' : 'Location not found',
+          BRAND_NAME[language]
+        ),
+        description:
+          language === 'bn'
+            ? 'এই এলাকার জন্য কোনো বৈধ প্রকাশিত প্রতিবেদন পৃষ্ঠা পাওয়া যায়নি।'
+            : 'No valid published report page was found for this location.',
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
         canonicalPath: `/location/${encodeURIComponent(locationId)}`,
         pageType: 'collection',
       });
-    } else {
-      setDynamicSeo({
-        title: language === 'bn' ? `এলাকার প্রতিবেদন লোড হচ্ছে... | ${BRAND_NAME.bn}` : `Loading Location Reports... | ${BRAND_NAME.en}`,
-        description: language === 'bn' ? 'এলাকাভিত্তিক নাগরিক প্রতিবেদন লোড হচ্ছে।' : 'Loading location-based community reports.',
-        robots: 'noindex, follow',
-        ogType: 'website',
-        ogSiteName: BRAND_NAME[language],
-        canonicalPath: `/location/${encodeURIComponent(locationId)}`,
-        pageType: 'collection',
-      });
+      return;
     }
-  }, [district, isLoading, fetchError, language, setDynamicSeo]);
+
+    const locName = language === 'bn' ? district.nameBn : district.nameEn;
+    const rawDescription =
+      language === 'bn'
+        ? `${locName} এলাকার প্রকাশিত নাগরিক প্রতিবেদন, জনস্বার্থের ঘটনা, সংশ্লিষ্ট বিষয় ও সর্বশেষ আপডেট এক জায়গায় দেখুন।`
+        : `Browse published citizen reports, public-interest incidents, related topics, and the latest updates from ${locName}, Bangladesh.`;
+
+    setDynamicSeo({
+      title: buildBrandedSeoTitle(
+        language === 'bn' ? `${locName} এলাকার প্রতিবেদন` : `Reports from ${locName}`,
+        BRAND_NAME[language]
+      ),
+      description: normalizeSeoDescription(rawDescription, language),
+      robots: 'index, follow, max-image-preview:large',
+      ogType: 'website',
+      ogSiteName: BRAND_NAME[language],
+      canonicalPath: `/location/${encodeURIComponent(district.id)}`,
+      pageType: 'collection',
+    });
+  }, [district, locationId, isLoading, language, setDynamicSeo]);
 
   const handleBack = () => {
     if (window.history.length > 1) {
