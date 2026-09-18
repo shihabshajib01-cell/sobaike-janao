@@ -33,7 +33,7 @@ const RULES = [
   },
   {
     id: 'tailwind-font-weight',
-    pattern: /\bfont-(?:normal|medium|semibold|bold)\b/g,
+    pattern: /\bfont-(?:thin|extralight|light|normal|medium|semibold|bold|extrabold|black)\b/g,
     message: 'Framework font-weight utility bypasses central typography weight tokens',
   },
   {
@@ -531,6 +531,8 @@ if (fs.existsSync(typographyFile)) {
     '--type-h3-size-mobile: 18px;',
     '--type-h4-size-mobile: 16px;',
     '--type-label-size: 16px;',
+    '--type-input-size: 16px;',
+    '--type-input-line: 24px;',
     '--type-meta-size: 14px;',
     '--type-helper-size: 14px;',
     '--type-compact-size: 14px;',
@@ -590,6 +592,46 @@ if (fs.existsSync(typographyFile)) {
     }
   }
 
+  const requiredTabletRoot = [
+    '--type-h1-size-tablet: 30px;',
+    '--type-h2-size-tablet: 24px;',
+    '--type-h3-size-tablet: 20px;',
+    '--type-h4-size-tablet: 18px;',
+  ];
+
+  for (const token of requiredTabletRoot) {
+    if (!mobileRoot.includes(token)) {
+      findings.push({
+        file: typographyFile,
+        line: 1,
+        rule: 'tablet-typography-contract',
+        token,
+        message: 'Tablet typography tokens must preserve the approved Bengali optical scale',
+        source: 'Expected approved tablet typography token is missing',
+      });
+    }
+  }
+
+  const requiredEnglishTablet = [
+    '--type-h1-size-tablet: 28px;',
+    '--type-h2-size-tablet: 22px;',
+    '--type-h3-size-tablet: 19px;',
+    '--type-h4-size-tablet: 17px;',
+  ];
+
+  for (const token of requiredEnglishTablet) {
+    if (!mobileEnglish.includes(token)) {
+      findings.push({
+        file: typographyFile,
+        line: 1,
+        rule: 'tablet-english-optical-contract',
+        token,
+        message: 'English tablet headings must preserve the approved optical normalization',
+        source: 'Expected approved English tablet heading token is missing',
+      });
+    }
+  }
+
   const requiredEnglishMobile = [
     '--type-h1-size-mobile: 28px;',
     '--type-h2-size-mobile: 22px;',
@@ -618,6 +660,44 @@ if (fs.existsSync(typographyFile)) {
       token: 'tracking-*',
       message: 'Bengali typography must neutralize Latin-oriented tracking utilities at every breakpoint',
       source: 'Expected Bengali mobile tracking normalization is missing',
+    });
+  }
+}
+
+const pageFiles = files.filter((file) =>
+  file.replaceAll('\\', '/').includes('/src/pages/')
+);
+
+for (const file of pageFiles) {
+  const source = fs.readFileSync(file, 'utf8');
+  const relative = path.relative(process.cwd(), file).replaceAll('\\', '/');
+  const microHeadingPattern =
+    /<h[1-6]\b[^>]*className=["'`][^"'`]*\btype-(body|label|meta|helper|compact)\b[^"'`]*["'`][^>]*>/g;
+
+  for (const match of source.matchAll(microHeadingPattern)) {
+    const line = source.slice(0, match.index).split(/\r?\n/).length;
+    findings.push({
+      file: relative,
+      line,
+      rule: 'page-heading-micro-role',
+      token: match[1],
+      message: 'Page headings must use heading typography roles; micro/body roles belong to supporting content',
+      source: match[0].replace(/\s+/g, ' ').trim(),
+    });
+  }
+}
+
+const searchableSelectFile = 'src/components/ui/SearchableSelect.tsx';
+if (fs.existsSync(searchableSelectFile)) {
+  const source = fs.readFileSync(searchableSelectFile, 'utf8');
+  if (!source.includes('text-left type-input ui-border-default')) {
+    findings.push({
+      file: searchableSelectFile,
+      line: 1,
+      rule: 'combobox-input-role',
+      token: 'type-input',
+      message: 'Button-backed comboboxes must use the shared input typography role',
+      source: 'SearchableSelect trigger is missing type-input',
     });
   }
 }
