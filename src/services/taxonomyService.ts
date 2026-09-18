@@ -49,10 +49,120 @@ export interface SegmentTaxonomyItem {
   borderColor: string;
   textColor: string;
   colors: typeof SECTIONS.harassment.colors;
+  iconKey?: string;
+  themeKey?: string;
   sortOrder?: number;
 }
 
 const sectionKeys = Object.keys(SECTIONS) as SectionKey[];
+
+const DYNAMIC_THEME_PALETTES: Record<
+  string,
+  {
+    primary: string;
+    hover: string;
+    bg: string;
+    border: string;
+    text: string;
+    filledText: string;
+  }
+> = {
+  sky: {
+    primary: 'var(--ui-accent)',
+    hover: 'var(--ui-action-hover)',
+    bg: 'var(--ui-accent-soft)',
+    border: 'var(--ui-accent-border)',
+    text: 'var(--ui-content-primary)',
+    filledText: 'var(--ui-content-inverse)',
+  },
+  indigo: {
+    primary: 'var(--ui-action-bg)',
+    hover: 'var(--ui-action-hover)',
+    bg: 'var(--ui-accent-soft)',
+    border: 'var(--ui-accent-border)',
+    text: 'var(--ui-content-primary)',
+    filledText: 'var(--ui-action-text)',
+  },
+  emerald: {
+    primary: 'var(--ui-success-text)',
+    hover: 'var(--ui-success-text)',
+    bg: 'var(--ui-success-bg)',
+    border: 'var(--ui-success-border)',
+    text: 'var(--ui-success-text)',
+    filledText: 'var(--ui-content-inverse)',
+  },
+  amber: {
+    primary: 'var(--ui-warning-text)',
+    hover: 'var(--ui-warning-text)',
+    bg: 'var(--ui-warning-bg)',
+    border: 'var(--ui-warning-border)',
+    text: 'var(--ui-warning-text)',
+    filledText: 'var(--ui-content-primary)',
+  },
+  rose: {
+    primary: 'var(--ui-error-text)',
+    hover: 'var(--ui-error-text)',
+    bg: 'var(--ui-error-bg)',
+    border: 'var(--ui-error-border)',
+    text: 'var(--ui-error-text)',
+    filledText: 'var(--ui-content-inverse)',
+  },
+  violet: {
+    primary: 'var(--ui-accent)',
+    hover: 'var(--ui-action-hover)',
+    bg: 'var(--ui-accent-soft)',
+    border: 'var(--ui-accent-border)',
+    text: 'var(--ui-content-primary)',
+    filledText: 'var(--ui-content-inverse)',
+  },
+  slate: {
+    primary: 'var(--ui-content-secondary)',
+    hover: 'var(--ui-content-primary)',
+    bg: 'var(--ui-surface-subtle)',
+    border: 'var(--ui-stroke-subtle)',
+    text: 'var(--ui-content-primary)',
+    filledText: 'var(--ui-content-inverse)',
+  },
+};
+
+const getDynamicPalette = (themeKey?: string) =>
+  DYNAMIC_THEME_PALETTES[themeKey || 'sky'] || DYNAMIC_THEME_PALETTES.sky;
+
+const buildDynamicFallback = (
+  id: string,
+  row?: Partial<SupabaseSegmentRow>
+): SegmentTaxonomyItem => {
+  const palette = getDynamicPalette(row?.theme_key);
+  return {
+    key: id as SectionKey,
+    id,
+    slug: row?.slug ? `/category/${row.slug}` : `/category/${id.replace(/_/g, '-')}`,
+    nameBn: row?.name_bn || id,
+    nameEn: row?.name_en || id,
+    shortNameBn: row?.short_name_bn || row?.name_bn || id,
+    shortNameEn: row?.short_name_en || row?.name_en || id,
+    descriptionBn: row?.description_bn || '',
+    descriptionEn: row?.description_en || '',
+    primaryColor: palette.primary,
+    hoverColor: palette.hover,
+    bgColor: palette.bg,
+    borderColor: palette.border,
+    textColor: palette.text,
+    colors: {
+      primary: palette.primary,
+      hover: palette.hover,
+      lightBg: palette.bg,
+      bgLight: palette.bg,
+      border: palette.border,
+      text: palette.text,
+      textSafe: palette.text,
+      filledText: palette.filledText,
+    },
+    iconKey: row?.icon_key || 'shield',
+    themeKey: row?.theme_key || 'sky',
+    sortOrder: typeof row?.sort_order === 'number' ? row.sort_order : undefined,
+  };
+};
 
 // In-memory cache initialized from the unified local section registry. This keeps
 // local fallbacks and backend taxonomy aligned without duplicating a hard-coded list.
@@ -104,31 +214,9 @@ export const TaxonomyService = {
 
         data.forEach((row: SupabaseSegmentRow) => {
           const key = row.id as SectionKey;
-          const fallback = SECTIONS[key] || {
-            key: row.id as SectionKey,
-            slug: `/${row.id}`,
-            nameBn: row.name_bn || row.id,
-            nameEn: row.name_en || row.id,
-            shortNameBn: row.name_bn || row.id,
-            shortNameEn: row.name_en || row.id,
-            descriptionBn: '',
-            descriptionEn: '',
-            primaryColor: '#3A7CA5',
-            hoverColor: '#1B4D6B',
-            bgColor: '#F0F3F9',
-            borderColor: '#CCD5E8',
-            textColor: '#1B4D6B',
-            colors: {
-              primary: '#3A7CA5',
-              hover: '#1B4D6B',
-              lightBg: '#F0F3F9',
-              bgLight: '#F0F3F9',
-              border: '#CCD5E8',
-              text: '#1B4D6B',
-              textSafe: '#1B4D6B',
-              filledText: '#FFFFFF',
-            },
-          };
+          const fallback =
+            SECTIONS[key] ||
+            buildDynamicFallback(row.id, row);
 
           nextSegments[row.id] = {
             ...fallback,
@@ -141,6 +229,27 @@ export const TaxonomyService = {
             shortNameEn: row.short_name_en || row.name_en || fallback.shortNameEn,
             descriptionBn: row.description_bn || fallback.descriptionBn,
             descriptionEn: row.description_en || fallback.descriptionEn,
+            iconKey: row.icon_key || fallback.iconKey,
+            themeKey: row.theme_key || fallback.themeKey,
+            ...(SECTIONS[key]
+              ? {}
+              : {
+                  primaryColor: getDynamicPalette(row.theme_key).primary,
+                  hoverColor: getDynamicPalette(row.theme_key).hover,
+                  bgColor: getDynamicPalette(row.theme_key).bg,
+                  borderColor: getDynamicPalette(row.theme_key).border,
+                  textColor: getDynamicPalette(row.theme_key).text,
+                  colors: {
+                    primary: getDynamicPalette(row.theme_key).primary,
+                    hover: getDynamicPalette(row.theme_key).hover,
+                    lightBg: getDynamicPalette(row.theme_key).bg,
+                    bgLight: getDynamicPalette(row.theme_key).bg,
+                    border: getDynamicPalette(row.theme_key).border,
+                    text: getDynamicPalette(row.theme_key).text,
+                    textSafe: getDynamicPalette(row.theme_key).text,
+                    filledText: getDynamicPalette(row.theme_key).filledText,
+                  },
+                }),
             sortOrder: typeof row.sort_order === 'number' ? row.sort_order : undefined,
           };
         });
@@ -178,7 +287,7 @@ export const TaxonomyService = {
         const nextSubcategories: Record<string, SubcategoryOption[]> = {};
 
         // Successful backend reads stay authoritative for every known active section.
-        sectionKeys.forEach((sec) => {
+        Object.keys(cachedSegments).forEach((sec) => {
           nextSubcategories[sec] = [];
         });
 
@@ -236,15 +345,24 @@ export const TaxonomyService = {
     return cachedSegments;
   },
 
-  getSegment(key: SectionKey): SegmentTaxonomyItem {
-    return cachedSegments[key] || { ...SECTIONS[key], id: key };
+  getSegment(key: string): SegmentTaxonomyItem {
+    return (
+      cachedSegments[key] ||
+      (SECTIONS[key as SectionKey]
+        ? { ...SECTIONS[key as SectionKey], id: key }
+        : buildDynamicFallback(key))
+    );
   },
 
-  getSubcategories(segment: SectionKey): SubcategoryOption[] {
-    return cachedSubcategories[segment] || SEGMENT_SUBCATEGORIES[segment] || [];
+  getSubcategories(segment: string): SubcategoryOption[] {
+    return (
+      cachedSubcategories[segment] ||
+      SEGMENT_SUBCATEGORIES[segment as SectionKey] ||
+      []
+    );
   },
 
-  getFeedSubcategories(segment: SectionKey): SubcategoryOption[] {
+  getFeedSubcategories(segment: string): SubcategoryOption[] {
     const list = this.getSubcategories(segment);
     const allOption: SubcategoryOption = {
       id: 'all',
@@ -290,9 +408,9 @@ export function useTaxonomy() {
   return {
     segments: TaxonomyService.getSegments(),
     subcategories: TaxonomyService.getAllSubcategories(),
-    getSubcategories: (segment: SectionKey) => TaxonomyService.getSubcategories(segment),
-    getFeedSubcategories: (segment: SectionKey) => TaxonomyService.getFeedSubcategories(segment),
-    getSegment: (key: SectionKey) => TaxonomyService.getSegment(key),
+    getSubcategories: (segment: string) => TaxonomyService.getSubcategories(segment),
+    getFeedSubcategories: (segment: string) => TaxonomyService.getFeedSubcategories(segment),
+    getSegment: (key: string) => TaxonomyService.getSegment(key),
     refreshTaxonomy: () => TaxonomyService.fetchTaxonomy(),
   };
 }
