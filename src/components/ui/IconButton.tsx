@@ -21,7 +21,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center ui-radius-control transition-colors focus:outline-none focus:ring-2 focus:ring-ui-focus focus:ring-offset-1 select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0';
+    'inline-flex items-center justify-center ui-radius-control transition-colors focus:outline-none focus:ring-2 focus:ring-role-focus focus:ring-offset-1 select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0';
 
   const sizeClasses: Record<IconButtonSize, string> = {
     sm: 'min-w-[44px] min-h-[44px] p-2.5',
@@ -31,15 +31,15 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   const variantClasses: Record<IconButtonVariant, string> = {
     primary:
-      'bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover active:bg-ui-action-active ui-border-default border-transparent ui-elevation-control',
+      'bg-role-primary text-role-on-primary hover:bg-role-primary-variant active:bg-role-primary-active ui-border-default border-transparent ui-elevation-control',
     secondary:
-      'bg-ui-surface-subtle text-ui-content-primary hover:bg-ui-surface-elevated active:bg-ui-surface-hover ui-border-default border-ui-stroke-subtle',
+      'bg-role-surface-subtle text-role-on-surface hover:bg-role-surface-elevated active:bg-role-surface-hover ui-border-default border-role-outline-subtle',
     outline:
-      'bg-ui-surface text-ui-content-primary hover:bg-ui-surface-subtle active:bg-ui-surface-hover ui-border-default border-ui-stroke-default ui-elevation-control',
+      'bg-role-surface text-role-on-surface hover:bg-role-surface-subtle active:bg-role-surface-hover ui-border-default border-role-outline ui-elevation-control',
     ghost:
-      'bg-transparent text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle active:bg-ui-surface-hover ui-border-default border-transparent',
+      'bg-transparent text-role-on-surface-secondary hover:text-role-on-surface hover:bg-role-surface-subtle active:bg-role-surface-hover ui-border-default border-transparent',
     destructive:
-      'bg-ui-destructive-bg text-ui-destructive-text hover:bg-ui-destructive-hover active:bg-ui-destructive-active ui-border-default border-ui-destructive-border ui-elevation-control',
+      'bg-role-destructive text-role-on-destructive hover:bg-role-destructive-hover active:bg-role-destructive-active ui-border-default border-role-destructive-outline ui-elevation-control',
   };
 
   return (
