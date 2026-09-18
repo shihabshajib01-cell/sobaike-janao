@@ -4,6 +4,10 @@ import {
   HarassmentAbuserRelationship,
   HarassmentReportingFor,
 } from '../data/harassmentClassification';
+import {
+  SexualHarassmentContext,
+  SexualHarassmentType,
+} from '../data/sexualHarassmentOptions';
 
 export interface ReportUpdate {
   dateBn: string;
@@ -97,6 +101,10 @@ export interface ReportItem {
   affectedPersonAgeGroup?: HarassmentAgeGroup;
   allegedAbuserRelationship?: HarassmentAbuserRelationship;
   reportingFor?: HarassmentReportingFor;
+  sexualHarassmentType?: SexualHarassmentType;
+  sexualHarassmentContext?: SexualHarassmentContext;
+  sexualHarassmentInstitution?: string;
+  frequency?: 'one-time' | 'repeated' | 'ongoing' | 'unknown_not_stated';
   recentBillMonth?: string;
   recentBillAmount?: number;
   previousBillMonth?: string;
