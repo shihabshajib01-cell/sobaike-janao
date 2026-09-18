@@ -264,7 +264,7 @@ export const SearchPage: React.FC = () => {
         <div className="space-y-6">
           {(activeTab === 'all' || activeTab === 'locations') && matchingLocations.length > 0 && (
             <div className="space-y-3">
-              <h2 className="type-label text-ui-content-secondary uppercase tracking-wider">
+              <h2 className="type-h4 text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'এলাকা' : 'Locations'}
               </h2>
               <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] divide-y divide-ui-stroke-subtle overflow-hidden shadow-[var(--elevation-2xs)]">
@@ -300,7 +300,7 @@ export const SearchPage: React.FC = () => {
 
           {(activeTab === 'all' || activeTab === 'subjects') && matchingSubjects.length > 0 && (
             <div className="space-y-3">
-              <h2 className="type-label text-ui-content-secondary uppercase tracking-wider">
+              <h2 className="type-h4 text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'ব্যক্তি ও প্রতিষ্ঠান' : 'People & organizations'}
               </h2>
               <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] divide-y divide-ui-stroke-subtle overflow-hidden shadow-[var(--elevation-2xs)]">
@@ -338,7 +338,7 @@ export const SearchPage: React.FC = () => {
 
           {(activeTab === 'all' || activeTab === 'reports') && matchingReports.length > 0 && (
             <div className="space-y-3">
-              <h2 className="type-label text-ui-content-secondary uppercase tracking-wider">
+              <h2 className="type-h4 text-ui-content-secondary uppercase tracking-wider">
                 {language === 'bn' ? 'প্রতিবেদন' : 'Reports'}
               </h2>
               <div className="space-y-3">
