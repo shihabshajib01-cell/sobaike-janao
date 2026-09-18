@@ -13,7 +13,7 @@ create or replace function public.get_public_home_feed_page(
 returns jsonb
 language plpgsql
 stable
-security definer
+security invoker
 set search_path to 'pg_catalog', 'public'
 as $function$
 declare
@@ -139,7 +139,7 @@ create or replace function public.get_public_segment_feed(
 returns jsonb
 language plpgsql
 stable
-security definer
+security invoker
 set search_path to 'pg_catalog', 'public'
 as $function$
 declare
