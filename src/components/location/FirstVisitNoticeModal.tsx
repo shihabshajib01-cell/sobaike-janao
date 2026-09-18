@@ -102,7 +102,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           </div>
         </div>
 
-        <div className="rounded-[var(--radius-control)] border border-ui-stroke-default p-4 bg-ui-surface">
+        <div className="ui-radius-control ui-border-default border-ui-stroke-default p-4 bg-ui-surface">
           <ol className="space-y-3 list-none">
             {instructions.map((instruction, index) => (
               <li key={instruction} className="flex items-start gap-3">
@@ -126,12 +126,11 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             checked={isChecked}
             onChange={(e) => setIsChecked(e.target.checked)}
             label={
-              <span className="type-body text-ui-content-primary">
-                {isBn
-                  ? 'আমি নিয়মগুলো পড়েছি এবং দায়িত্বশীলভাবে ব্যবহার করতে সম্মত।'
-                  : 'I have read and agree to use this platform responsibly.'}
-              </span>
+              isBn
+                ? 'আমি নিয়মগুলো পড়েছি এবং দায়িত্বশীলভাবে ব্যবহার করতে সম্মত।'
+                : 'I have read and agree to use this platform responsibly.'
             }
+            labelClassName="type-body text-ui-content-primary"
           />
         </div>
 
@@ -143,7 +142,6 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           fullWidth
           onClick={handleContinue}
           disabled={!isChecked}
-          className="disabled:opacity-100 disabled:bg-ui-disabled-bg disabled:text-ui-disabled-text disabled:hover:bg-ui-disabled-bg"
         >
           {isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
         </Button>
