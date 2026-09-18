@@ -48,6 +48,7 @@ export interface HomeFeedPageResult {
   reports: ReportItem[];
   hasMore: boolean;
   nextOffset: number | null;
+  totalCount: number;
 }
 
 // In-flight request deduplication map to prevent redundant concurrent network bursts
@@ -240,6 +241,7 @@ export const PublicReportService = {
         reports,
         hasMore,
         nextOffset: hasMore ? offset + limit : null,
+        totalCount: full.length,
       };
     };
 
@@ -317,6 +319,8 @@ export const PublicReportService = {
         ? null
         : Number(payload.nextOffset);
 
+    const parsedTotalCount = Number(payload.totalCount);
+
     return {
       reports,
       hasMore,
@@ -326,6 +330,9 @@ export const PublicReportService = {
           : hasMore
           ? offset + limit
           : null,
+      totalCount: Number.isFinite(parsedTotalCount)
+        ? Math.max(0, Math.floor(parsedTotalCount))
+        : offset + reports.length + (hasMore ? 1 : 0),
     };
   },
 
