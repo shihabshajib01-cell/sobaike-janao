@@ -34,6 +34,7 @@ import { useSeo } from '../components/seo/SeoManager';
 import {
   BRAND_NAME,
   buildBrandedSeoTitle,
+  buildReportSeoTitle,
   isSeoIndexableReportContent,
   normalizeSeoDescription,
 } from '../lib/seo';
@@ -158,7 +159,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       );
 
       setDynamicSeo({
-        title: buildBrandedSeoTitle(publicTitle, BRAND_NAME[language]),
+        title: buildReportSeoTitle(publicTitle, BRAND_NAME[language], report.id),
         description,
         robots: indexable
           ? 'index, follow, max-image-preview:large'
