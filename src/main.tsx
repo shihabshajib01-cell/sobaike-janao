@@ -5,6 +5,7 @@ import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { hydratePublishedBannerContent } from './services/bannerRuntime';
 import './index.css';
+import './theme/color-system.css';
 import './theme/desktop-horizontal-scroll.css';
 import './theme/design-system-extensions.css';
 import './theme/design-system.css';
