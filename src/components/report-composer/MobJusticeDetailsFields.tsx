@@ -2,6 +2,7 @@ import React from 'react';
 import { Users } from 'lucide-react';
 import { Accordion } from '../ui/Accordion';
 import { Select } from '../ui/Select';
+import { TextField } from '../ui/TextField';
 import {
   MobJusticeDetails,
   MobJusticeValidationErrors,
@@ -100,44 +101,28 @@ export const MobJusticeDetailsFields: React.FC<MobJusticeDetailsFieldsProps> = (
           />
         </div>
 
-        <div className="max-w-sm">
-          <label htmlFor="mob-justice-targeted-count" className="block type-label text-ui-content-primary mb-1.5">
-            {language === 'bn' ? 'কতজন ব্যক্তি মবের লক্ষ্য হয়েছেন?' : 'How many people were targeted?'}
-          </label>
-          <input
-            id="mob-justice-targeted-count"
-            type="number"
-            min={1}
-            max={9999}
-            step={1}
-            inputMode="numeric"
-            value={value.targetedCount}
-            onChange={(event) => {
-              const rawValue = event.target.value;
-              onChange({
-                ...value,
-                targetedCount: rawValue === '' ? '' : Number(rawValue),
-              });
-            }}
-            aria-invalid={Boolean(errors.targetedCount)}
-            aria-describedby={errors.targetedCount ? 'mob-justice-targeted-count-error' : 'mob-justice-targeted-count-helper'}
-            className={`w-full min-h-[44px] bg-ui-surface text-ui-content-primary ui-border-default ui-radius-control px-3 py-2 transition-colors focus:outline-none focus:ring-2 ${
-              errors.targetedCount
-                ? 'border-ui-validation-border focus:ring-ui-validation-focus focus:border-ui-validation-focus'
-                : 'border-ui-stroke-default hover:border-ui-stroke-strong focus:ring-ui-focus'
-            }`}
-            placeholder={language === 'bn' ? 'যেমন: ১' : 'e.g. 1'}
-          />
-          {errors.targetedCount ? (
-            <p id="mob-justice-targeted-count-error" role="alert" className="mt-1.5 type-helper text-ui-validation-text font-[var(--font-weight-medium)]">
-              {errors.targetedCount}
-            </p>
-          ) : (
-            <p id="mob-justice-targeted-count-helper" className="mt-1.5 type-helper text-ui-content-muted">
-              {language === 'bn' ? 'ঐচ্ছিক' : 'Optional'}
-            </p>
-          )}
-        </div>
+        <TextField
+          id="mob-justice-targeted-count"
+          type="number"
+          min={1}
+          max={9999}
+          step={1}
+          inputMode="numeric"
+          fieldClassName="max-w-sm"
+          label={language === 'bn' ? 'কতজন ব্যক্তি মবের লক্ষ্য হয়েছেন?' : 'How many people were targeted?'}
+          helperText={language === 'bn' ? 'ঐচ্ছিক' : 'Optional'}
+          error={errors.targetedCount}
+          value={value.targetedCount}
+          onChange={(event) => {
+            const rawValue = event.target.value;
+            onChange({
+              ...value,
+              targetedCount: rawValue === '' ? '' : Number(rawValue),
+            });
+          }}
+          placeholder={language === 'bn' ? 'যেমন: ১' : 'e.g. 1'}
+        />
+
       </div>
     </Accordion>
   );
