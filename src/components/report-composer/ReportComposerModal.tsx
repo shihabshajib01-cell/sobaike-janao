@@ -324,6 +324,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         affectedPersonAgeGroup: '',
         allegedAbuserRelationship: '',
         reportingFor: '',
+        sexualHarassmentType: '',
+        sexualHarassmentContext: '',
+        sexualHarassmentInstitution: '',
         intimateWhatHappened: '',
         intimatePlatform: '',
         incidentTime: '',
@@ -391,6 +394,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           formEngineMode: cachedForm?.engineMode,
           customFieldAnswers: {},
           subjectType: 'unknown',
+          sexualHarassmentType: '',
+          sexualHarassmentContext: '',
+          sexualHarassmentInstitution: '',
+          frequency:
+            prev.subcategoryId === 'sexual-harassment' || subcategoryId === 'sexual-harassment'
+              ? 'one-time'
+              : prev.frequency,
           ...(isUtilitySwitch
             ? {
                 description: '',
@@ -588,6 +598,37 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       return;
     }
 
+    if (
+      formData.segment === 'harassment' &&
+      formData.subcategoryId === 'sexual-harassment' &&
+      (!formData.sexualHarassmentType || !formData.sexualHarassmentContext)
+    ) {
+      setFormData((prev) => ({ ...prev, currentStep: 3 }));
+      setSubmitError(
+        language === 'bn'
+          ? 'যৌন হয়রানির ধরন এবং ঘটনার প্রেক্ষাপট—দুটি তথ্যই নির্বাচন করুন।'
+          : 'Select both the harassment type and incident context before submitting.'
+      );
+      setTimeout(() => {
+        document.getElementById('composer-section-narrative')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+      return;
+    }
+
+    if (
+      formData.segment === 'harassment' &&
+      formData.subcategoryId === 'sexual-harassment' &&
+      (formData.sexualHarassmentInstitution?.trim().length || 0) > 200
+    ) {
+      setFormData((prev) => ({ ...prev, currentStep: 3 }));
+      setSubmitError(
+        language === 'bn'
+          ? 'প্রতিষ্ঠান বা সংস্থার নাম ২০০ অক্ষরের মধ্যে রাখুন।'
+          : 'Keep the institution or organization within 200 characters.'
+      );
+      return;
+    }
+
     // Defense-in-depth: Mob Justice classifications must be complete before any server call.
     if (!validateMobJusticeSection()) {
       setFormData((prev) => ({ ...prev, currentStep: 3 }));
@@ -756,6 +797,18 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         affectedPersonAgeGroup: isHarassment ? formData.affectedPersonAgeGroup || undefined : undefined,
         allegedAbuserRelationship: isHarassment ? formData.allegedAbuserRelationship || undefined : undefined,
         reportingFor: isHarassment ? formData.reportingFor || undefined : undefined,
+        sexualHarassmentType:
+          isHarassment && formData.subcategoryId === 'sexual-harassment'
+            ? formData.sexualHarassmentType || undefined
+            : undefined,
+        sexualHarassmentContext:
+          isHarassment && formData.subcategoryId === 'sexual-harassment'
+            ? formData.sexualHarassmentContext || undefined
+            : undefined,
+        sexualHarassmentInstitution:
+          isHarassment && formData.subcategoryId === 'sexual-harassment'
+            ? formData.sexualHarassmentInstitution?.trim() || undefined
+            : undefined,
         subjectType: isPartySegment ? (formData.subjectType || 'unknown') : undefined,
         reportedSubject: isPartySegment ? resolvedReportedSubject : undefined,
         roleOrDesignation: isPartySegment ? (formData.roleOrDesignation?.trim() || undefined) : undefined,
