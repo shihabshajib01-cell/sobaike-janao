@@ -553,95 +553,73 @@ export const ConfiguredFieldsSection = forwardRef<
           }
 
           if (field.fieldType === 'privacy') {
+            const privacyValue = formData.privacyChoice || 'anonymous';
             return (
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
-                <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
-                  {label}
-                </h3>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {[
+                <RadioGroup
+                  id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={privacyValue}
+                  onChange={(next) => {
+                    onUpdateFormData({
+                      privacyChoice: next as
+                        | 'anonymous'
+                        | 'admin_only'
+                        | 'public_identity',
+                    });
+                    if (error) setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                  }}
+                  options={[
                     {
                       value: 'anonymous',
-                      en: 'Anonymous',
-                      bn: 'নাম প্রকাশ নয়',
+                      label: language === 'bn' ? 'নাম প্রকাশ নয়' : 'Anonymous',
                     },
                     {
                       value: 'admin_only',
-                      en: 'Admin only',
-                      bn: 'শুধু অ্যাডমিন',
+                      label: language === 'bn' ? 'শুধু অ্যাডমিন' : 'Admin only',
                     },
                     {
                       value: 'public_identity',
-                      en: 'Public identity',
-                      bn: 'পাবলিক পরিচয়',
+                      label: language === 'bn' ? 'পাবলিক পরিচয়' : 'Public identity',
                     },
-                  ].map((option) => (
-                    <label
-                      key={option.value}
-                      className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
-                    >
-                      <input
-                        type="radio"
-                        name="configured-privacy-choice"
-                        value={option.value}
-                        checked={
-                          (formData.privacyChoice || 'anonymous') === option.value
-                        }
-                        onChange={() =>
-                          onUpdateFormData({
-                            privacyChoice: option.value as
-                              | 'anonymous'
-                              | 'admin_only'
-                              | 'public_identity',
-                          })
-                        }
-                      />
-                      {language === 'bn' ? option.bn : option.en}
-                    </label>
-                  ))}
-                </div>
+                  ]}
+                />
 
-                {(formData.privacyChoice === 'admin_only' ||
-                  formData.privacyChoice === 'public_identity') && (
+                {(privacyValue === 'admin_only' || privacyValue === 'public_identity') ? (
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="configured-admin-name"
-                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                      >
-                        {language === 'bn' ? 'নাম' : 'Name'}
-                      </label>
-                      <input
-                        id="configured-admin-name"
-                        value={formData.adminName || ''}
-                        onChange={(event) =>
-                          onUpdateFormData({ adminName: event.target.value })
-                        }
-                        className={commonInputClass}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="configured-admin-contact"
-                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                      >
-                        {language === 'bn' ? 'যোগাযোগ' : 'Contact'}
-                      </label>
-                      <input
-                        id="configured-admin-contact"
-                        value={formData.adminContact || ''}
-                        onChange={(event) =>
-                          onUpdateFormData({ adminContact: event.target.value })
-                        }
-                        className={commonInputClass}
-                      />
-                    </div>
+                    <TextField
+                      id="configured-admin-name"
+                      type="text"
+                      label={language === 'bn' ? 'নাম' : 'Name'}
+                      value={formData.adminName || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ adminName: event.target.value })
+                      }
+                      autoComplete="name"
+                    />
+                    <TextField
+                      id="configured-admin-contact"
+                      type="text"
+                      label={language === 'bn' ? 'যোগাযোগ' : 'Contact'}
+                      value={formData.adminContact || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ adminContact: event.target.value })
+                      }
+                      placeholder={
+                        language === 'bn'
+                          ? 'ইমেইল বা ফোন নম্বর'
+                          : 'Email address or phone number'
+                      }
+                    />
                   </div>
-                )}
+                ) : null}
               </div>
             );
           }
