@@ -3,6 +3,8 @@ import { CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
+import { Checkbox } from '../ui/Checkbox';
+import { ModalActions } from '../ui/ModalActions';
 
 /**
  * Rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -139,6 +141,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       isOpen={isOpen}
       onClose={handleResetAndClose}
       closeOnBackdrop={false}
+      closeOnEscape={false}
       maxWidth="lg"
       language={language}
       title={
@@ -155,37 +158,39 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       }
       footer={
         isSubmitted ? (
-          <Button type="button" variant="primary" size="md" onClick={handleResetAndClose}>
-            {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-          </Button>
+          <ModalActions
+            align="center"
+            primary={{
+              type: 'button',
+              size: 'md',
+              onClick: handleResetAndClose,
+              label: language === 'bn' ? 'বন্ধ করুন' : 'Close',
+            }}
+          />
         ) : (
-          <div className="flex items-center justify-end gap-2.5 w-full">
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              onClick={handleResetAndClose}
-              disabled={isSubmitting}
-            >
-              {language === 'bn' ? 'বাতিল' : 'Cancel'}
-            </Button>
-            <Button
-              form="subject-response-form"
-              type="submit"
-              variant="primary"
-              size="md"
-              isLoading={isSubmitting}
-              leftIcon={<Send className="w-4 h-4" aria-hidden="true" />}
-            >
-              {isSubmitting
-                ? language === 'bn'
-                  ? 'জমা দেওয়া হচ্ছে...'
-                  : 'Submitting...'
+          <ModalActions
+            primary={{
+              form: 'subject-response-form',
+              type: 'submit',
+              size: 'md',
+              isLoading: isSubmitting,
+              leftIcon: <Send className="w-4 h-4" aria-hidden="true" />,
+              label: isSubmitting
+                ? (language === 'bn' ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...')
                 : language === 'bn'
-                  ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? 'জবাব জমা দিন' : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
-                  : 'Submit response'}
-            </Button>
-          </div>
+                  ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                      ? 'জবাব জমা দিন'
+                      : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
+                  : 'Submit response',
+            }}
+            secondary={{
+              type: 'button',
+              size: 'md',
+              onClick: handleResetAndClose,
+              disabled: isSubmitting,
+              label: language === 'bn' ? 'বাতিল' : 'Cancel',
+            }}
+          />
         )
       }
     >
@@ -250,39 +255,33 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   {language === 'bn' ? 'আপনার পরিচয় বা ভূমিকা *' : 'Your Relationship to This Report *'}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <button
+                  <Button
                     type="button"
+                    size="md"
+                    fullWidth
+                    variant={responderType === 'mentioned_person' ? 'primary' : 'outline'}
                     onClick={() => setResponderType('mentioned_person')}
-                    className={`px-3 py-2.5 type-compact font-[var(--font-weight-medium)] rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                      responderType === 'mentioned_person'
-                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-[var(--font-weight-bold)]'
-                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
-                    }`}
                   >
                     {language === 'bn' ? 'আমি সরাসরি উল্লেখিত ব্যক্তি' : 'Mentioned Individual'}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    size="md"
+                    fullWidth
+                    variant={responderType === 'organization_rep' ? 'primary' : 'outline'}
                     onClick={() => setResponderType('organization_rep')}
-                    className={`px-3 py-2.5 type-compact font-[var(--font-weight-medium)] rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                      responderType === 'organization_rep'
-                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-[var(--font-weight-bold)]'
-                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
-                    }`}
                   >
                     {language === 'bn' ? 'প্রতিষ্ঠানের মুখপাত্র/প্রতিনিধি' : 'Authorized Representative'}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    size="md"
+                    fullWidth
+                    variant={responderType === 'legal_rep' ? 'primary' : 'outline'}
                     onClick={() => setResponderType('legal_rep')}
-                    className={`px-3 py-2.5 type-compact font-[var(--font-weight-medium)] rounded-[var(--radius-control)] border text-center transition-colors min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                      responderType === 'legal_rep'
-                        ? 'bg-[var(--ui-accent)] text-inverse border-[var(--ui-accent)] font-[var(--font-weight-bold)]'
-                        : 'bg-ui-surface-subtle text-ui-content-secondary border-ui-stroke-subtle'
-                    }`}
                   >
                     {language === 'bn' ? 'আইনি প্রতিনিধি / আইনজীবী' : 'Legal Counsel'}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -391,21 +390,18 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
             {/* Request Correction / Removal checkbox */}
             {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
-              <div className="p-3.5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2">
-                <label htmlFor="subject-correction-checkbox" className="flex items-start gap-2 cursor-pointer type-compact text-ui-content-primary">
-                  <input
-                    id="subject-correction-checkbox"
-                    type="checkbox"
-                    checked={requestCorrectionOrRemoval}
-                    onChange={(e) => setRequestCorrectionOrRemoval(e.target.checked)}
-                    className="mt-1 rounded border-ui-stroke-subtle text-[var(--ui-accent)] focus:ring-ui-focus accent-[var(--ui-accent)] min-h-[16px] min-w-[16px]"
-                  />
-                  <span className="font-[var(--font-weight-semibold)]">
-                    {language === 'bn'
+              <div className="p-3.5 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2">
+                <Checkbox
+                  id="subject-correction-checkbox"
+                  checked={requestCorrectionOrRemoval}
+                  onChange={(e) => setRequestCorrectionOrRemoval(e.target.checked)}
+                  label={
+                    language === 'bn'
                       ? 'আমি প্রতিবেদনে অনিচ্ছাকৃত ভুল তথ্যের সংশোধন বা পুনঃনিরীক্ষণের আবেদন করছি'
-                      : 'I request formal factual correction or editorial review of this report.'}
-                  </span>
-                </label>
+                      : 'I request formal factual correction or editorial review of this report.'
+                  }
+                  labelClassName="type-helper font-[var(--font-weight-semibold)] text-ui-content-primary"
+                />
 
                 {requestCorrectionOrRemoval && (
                   <div>
