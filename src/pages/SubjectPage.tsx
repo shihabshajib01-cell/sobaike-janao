@@ -78,9 +78,13 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         setDynamicSeo({
           title,
           description,
-          robots: 'index, follow',
+          robots: 'noindex, follow',
           ogType: 'website',
           ogSiteName: BRAND_NAME[language],
+          canonicalPath: `/subject/${encodeURIComponent(decodedSubject)}`,
+          pageType: 'collection',
+          canonicalPath: `/subject/${encodeURIComponent(decodedSubject)}`,
+          pageType: 'collection',
         });
       } else {
         setDynamicSeo({
@@ -95,6 +99,8 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           robots: 'noindex, follow',
           ogType: 'website',
           ogSiteName: BRAND_NAME[language],
+          canonicalPath: `/subject/${encodeURIComponent(decodedSubject)}`,
+          pageType: 'collection',
         });
       }
     } else if (fetchError) {
@@ -104,6 +110,8 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/subject/${encodeURIComponent(decodedSubject)}`,
+        pageType: 'collection',
       });
     } else {
       setDynamicSeo({
