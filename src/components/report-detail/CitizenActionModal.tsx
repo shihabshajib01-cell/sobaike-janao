@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
 import { ModalActions } from '../ui/ModalActions';
 import { Checkbox } from '../ui/Checkbox';
 
