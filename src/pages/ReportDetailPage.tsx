@@ -290,6 +290,26 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const displayEngagementCount = (value: number) =>
     language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
 
+  const relativePublishedTime = (() => {
+    if (!report.publishedAt) return language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
+    const published = new Date(report.publishedAt).getTime();
+    const diff = Date.now() - published;
+    if (!Number.isFinite(published) || diff < 0) return language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
+    const minutes = Math.max(1, Math.floor(diff / 60000));
+    if (minutes < 60) {
+      const n = language === 'bn' ? toBanglaDigits(minutes) : minutes;
+      return language === 'bn' ? `${n} মিনিট আগে` : `${n} min ago`;
+    }
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+      const n = language === 'bn' ? toBanglaDigits(hours) : hours;
+      return language === 'bn' ? `${n} ঘণ্টা আগে` : `${n} hr ago`;
+    }
+    const days = Math.floor(hours / 24);
+    const n = language === 'bn' ? toBanglaDigits(days) : days;
+    return language === 'bn' ? `${n} দিন আগে` : `${n} days ago`;
+  })();
+
   const registerShare = () => {
     void PublicEngagementService.trackShare(report.id).then((counts) => {
       if (!counts) return;
@@ -387,66 +407,53 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         </div>
 
         <article className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-7 space-y-5 ui-elevation-card">
-          <div className="flex flex-wrap items-center gap-2 type-meta">
-            <CategoryBadge section={report.segment} language={language} size="md" />
-            <span className="text-ui-content-muted">·</span>
-            <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subcategory}</span>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2 type-meta min-w-0">
+              <CategoryBadge section={report.segment} language={language} size="md" />
+              <span className="text-ui-content-muted">·</span>
+              <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subcategory}</span>
+            </div>
+            <span className="type-meta text-ui-content-secondary shrink-0 pt-1">{relativePublishedTime}</span>
           </div>
 
           <h1 className="type-h1 text-ui-content-primary tracking-tight">{title}</h1>
-
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-secondary">
-            {location && (
-              report.districtEn ? (
-                <button
-                  type="button"
-                  onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
-                  className="flex items-center gap-1.5 font-[var(--font-weight-medium)] text-ui-content-primary min-h-[44px] px-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
-                >
-                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
-                  <span className="underline decoration-ui-stroke-subtle">{location}</span>
-                </button>
-              ) : (
-                <span className="flex items-center gap-1.5 min-h-[44px]">
-                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
-                  <span>{location}</span>
-                </span>
-              )
-            )}
-
-            <div className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]">
-              <Calendar className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
-              <span>
-                {report.subcategoryId === 'excess-electricity-bill' && report.recentBillMonth
-                  ? `${language === 'bn' ? 'বিলের সময়কাল: ' : 'Billing period: '}${formatBillingMonth(report.recentBillMonth, language)}`
-                  : `${language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}${incidentDate}`}
-              </span>
-            </div>
-
-            <div
-              className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]"
-              aria-label={`${displayEngagementCount(viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}
-            >
-              <Eye className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
-              <span>{displayEngagementCount(viewCount)} {language === 'bn' ? 'ভিউ' : 'views'}</span>
-            </div>
-
-            <div
-              className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]"
-              aria-label={`${displayEngagementCount(shareCount)} ${language === 'bn' ? 'শেয়ার' : 'shares'}`}
-            >
-              <Share2 className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
-              <span>{displayEngagementCount(shareCount)} {language === 'bn' ? 'শেয়ার' : 'shares'}</span>
-            </div>
-          </div>
-
-          <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
 
           {detailText && (
             <div className="max-w-[760px] type-body text-ui-content-primary leading-7">
               <p className="whitespace-pre-line">{detailText}</p>
             </div>
           )}
+
+          <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
+
+          <div className="flex items-center justify-between gap-4 type-meta text-ui-content-secondary min-w-0">
+            {location && (
+              report.districtEn ? (
+                <button type="button" onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
+                  className="flex items-center gap-1.5 min-w-0 font-[var(--font-weight-medium)] text-ui-content-secondary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md">
+                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
+                  <span className="truncate">{location}</span>
+                </button>
+              ) : (
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
+                  <span className="truncate">{location}</span>
+                </span>
+              )
+            )}
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="h-5 w-px bg-ui-stroke-subtle" aria-hidden="true" />
+              <span className="flex items-center gap-1.5" aria-label={`${displayEngagementCount(viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}>
+                <Eye className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
+                <span>{displayEngagementCount(viewCount)}</span>
+              </span>
+              <span className="h-5 w-px bg-ui-stroke-subtle" aria-hidden="true" />
+              <span className="flex items-center gap-1.5" aria-label={`${displayEngagementCount(shareCount)} ${language === 'bn' ? 'শেয়ার' : 'shares'}`}>
+                <Share2 className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
+                <span>{displayEngagementCount(shareCount)}</span>
+              </span>
+            </div>
+          </div>
 
           <HarassmentContextSummary report={report} language={language} />
 
@@ -660,7 +667,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>
                 {language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}
-                {' '}({(report.response ? 1 : 0) + storedResponses.length})
+                {' '}({language === 'bn' ? toBanglaDigits((report.response ? 1 : 0) + storedResponses.length) : (report.response ? 1 : 0) + storedResponses.length})
               </span>
             </h2>
 
