@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { AttachedImagePreview } from './ImageAttachmentPicker';
 import { toBanglaDigits } from '../../utils/formatters';
+import { useDialogLifecycle } from '../ui/useDialogLifecycle';
 
 export interface AttachmentItem {
   id?: string;
@@ -50,35 +51,15 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
 
   // Sync index when initialIndex or isOpen changes
   useEffect(() => {
     if (isOpen) {
-      previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
       setCurrentIndex(Math.max(0, Math.min(initialIndex, images.length - 1)));
-      const timer = setTimeout(() => {
-        closeButtonRef.current?.focus();
-      }, 30);
-
-      // Lock body scroll
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-
-      return () => {
-        clearTimeout(timer);
-        document.body.style.overflow = originalOverflow;
-        if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
-          previouslyFocusedElementRef.current.focus();
-        }
-      };
     }
   }, [initialIndex, isOpen, images.length]);
-
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
@@ -88,51 +69,15 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
     setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   }, [images.length]);
 
-  const handlePrevRef = useRef(handlePrev);
-  handlePrevRef.current = handlePrev;
-  const handleNextRef = useRef(handleNext);
-  handleNextRef.current = handleNext;
-
-  // Keyboard navigation & Focus trap
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCloseRef.current();
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        handlePrevRef.current();
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        handleNextRef.current();
-      } else if (e.key === 'Tab' && modalRef.current) {
-        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusable.length === 0) return;
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-          }
-        } else {
-          if (document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-          }
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  useDialogLifecycle({
+    id: 'attachment-lightbox-modal',
+    isOpen,
+    onClose,
+    containerRef: modalRef,
+    initialFocusRef: closeButtonRef,
+    onArrowLeft: images.length > 1 ? handlePrev : undefined,
+    onArrowRight: images.length > 1 ? handleNext : undefined,
+  });
 
   if (!isOpen || images.length === 0) return null;
 
@@ -187,6 +132,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
       {/* Modal Dialog Card: Full screen on mobile, centered card on md+ */}
       <div
         ref={modalRef}
+        tabIndex={-1}
         className="relative w-full max-w-4xl h-full md:h-auto max-h-none md:max-h-[92vh] flex flex-col rounded-none md:rounded-[var(--radius-card)] md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-ui-media-viewer-border bg-ui-media-viewer-bg text-ui-media-viewer-text shadow-[var(--elevation-2xl)] overflow-hidden z-10"
         onClick={(e) => e.stopPropagation()}
       >
