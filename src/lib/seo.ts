@@ -51,6 +51,21 @@ export function buildBrandedSeoTitle(
   return `${truncateSeoText(cleanTitle, available)}${suffix}`;
 }
 
+export function buildReportSeoTitle(
+  title: string,
+  brand: string,
+  reportId: string,
+  maxLength = 60
+): string {
+  const shortId = String(reportId || '').replace(/^SJ-\d{4}-/i, '').slice(-6);
+  const discriminator = shortId ? ` · ${shortId}` : '';
+  const cleanBrand = String(brand || '').replace(/\s+/g, ' ').trim();
+  const suffix = `${discriminator}${cleanBrand ? ` | ${cleanBrand}` : ''}`;
+  const cleanTitle = String(title || '').replace(/\s+/g, ' ').trim();
+  const available = Math.max(1, maxLength - suffix.length);
+  return `${truncateSeoText(cleanTitle, available)}${suffix}`;
+}
+
 export function normalizeSeoDescription(
   value: string,
   language: 'bn' | 'en',
