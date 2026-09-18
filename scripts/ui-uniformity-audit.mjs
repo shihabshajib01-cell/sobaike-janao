@@ -224,6 +224,51 @@ requireContains(
   'Modal must call useApp unconditionally in accordance with Hooks rules'
 );
 requireContains(
+  'src/components/ui/Modal.tsx',
+  'bg-ui-overlay',
+  'Modal backdrop must use the semantic overlay utility'
+);
+requireNotContains(
+  'src/components/ui/Modal.tsx',
+  "style={{ backgroundColor: 'var(--ui-overlay)' }}",
+  'Modal backdrop must not recreate semantic overlay styling inline'
+);
+requireContains(
+  'src/components/ui/Checkbox.tsx',
+  'labelClassName?: string;',
+  'Checkbox must expose semantic label typography customization without nested overrides'
+);
+requireContains(
+  'src/components/ui/Button.tsx',
+  'disabled:bg-ui-disabled-bg',
+  'Button must own the shared semantic disabled background state'
+);
+requireContains(
+  'src/components/ui/Button.tsx',
+  'disabled:text-ui-disabled-text',
+  'Button must own the shared semantic disabled text state'
+);
+requireNotContains(
+  'src/components/ui/Button.tsx',
+  'disabled:opacity-50',
+  'Button must not use opacity as its primary disabled-state recipe'
+);
+requireContains(
+  'src/components/location/FirstVisitNoticeModal.tsx',
+  'ui-radius-control ui-border-default border-ui-stroke-default',
+  'First-visit instructions must use centralized radius and border utilities'
+);
+requireContains(
+  'src/components/location/FirstVisitNoticeModal.tsx',
+  'labelClassName="type-body text-ui-content-primary"',
+  'First-visit consent must request its typography through the Checkbox API'
+);
+requireNotContains(
+  'src/components/location/FirstVisitNoticeModal.tsx',
+  'disabled:bg-ui-disabled-bg',
+  'First-visit CTA must inherit the shared Button disabled recipe'
+);
+requireContains(
   'src/components/category/CategoryHeroBanner.tsx',
   "loading={active ? 'eager' : 'lazy'}",
   'inactive hero artwork must remain lazy-loaded'
