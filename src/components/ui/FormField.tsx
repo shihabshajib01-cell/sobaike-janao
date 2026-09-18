@@ -10,6 +10,7 @@ export interface FormFieldProps {
   children: React.ReactNode;
   className?: string;
   labelClassName?: string;
+  groupLabel?: boolean;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -21,32 +22,45 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   className = '',
   labelClassName = 'type-label text-role-on-surface',
+  groupLabel = false,
 }) => {
   const { helperId, errorId, labelId } = formFieldIds(id);
 
   return (
     <div className={`w-full text-left space-y-1.5 ${className}`}>
       {label ? (
-        <label id={labelId} htmlFor={id} className={`block ${labelClassName}`}>
-          {label}
-          {required ? (
-            <span className="text-role-validation ml-1" aria-hidden="true">
-              *
-            </span>
-          ) : null}
-        </label>
+        groupLabel ? (
+          <div id={labelId} className={`block ${labelClassName}`}>
+            {label}
+            {required ? (
+              <span className="text-role-validation ml-1" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+          </div>
+        ) : (
+          <label id={labelId} htmlFor={id} className={`block ${labelClassName}`}>
+            {label}
+            {required ? (
+              <span className="text-role-validation ml-1" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+          </label>
+        )
       ) : null}
 
       {children}
 
+      {helperText ? (
+        <div id={helperId} className="type-helper text-role-on-surface-muted">
+          {helperText}
+        </div>
+      ) : null}
       {error ? (
         <p id={errorId} role="alert" className="type-helper text-role-validation font-[var(--font-weight-medium)]">
           {error}
         </p>
-      ) : helperText ? (
-        <div id={helperId} className="type-helper text-role-on-surface-muted">
-          {helperText}
-        </div>
       ) : null}
     </div>
   );
