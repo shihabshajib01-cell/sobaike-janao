@@ -5,7 +5,6 @@ import {
   LayoutGrid,
   TrendingUp,
 } from 'lucide-react';
-import { PublicReportService } from '../services/publicReportService';
 import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
@@ -72,6 +71,7 @@ export const HomePage: React.FC = () => {
     }
 
     try {
+      const { PublicReportService } = await import('../services/publicReportService');
       const page = await PublicReportService.getHomeFeedPage({
         visitorLat,
         visitorLng,
