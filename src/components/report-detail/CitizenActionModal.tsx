@@ -6,7 +6,6 @@ import { ModalActions } from '../ui/ModalActions';
 import { Checkbox } from '../ui/Checkbox';
 import { UnsavedChangesDialog } from '../ui/UnsavedChangesDialog';
 import { TextAreaField } from '../ui/TextAreaField';
-import { TextField } from '../ui/TextField';
 import { DateField } from '../ui/DateField';
 import { ContactField } from '../ui/ContactField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
