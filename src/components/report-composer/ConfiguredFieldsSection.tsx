@@ -19,6 +19,15 @@ import {
   getUpazilaByStoredName,
   getUpazilasByDistrict,
 } from '../../data/upazilas';
+import { Select } from '../ui/Select';
+import { Checkbox } from '../ui/Checkbox';
+import { TextField } from '../ui/TextField';
+import { TextAreaField } from '../ui/TextAreaField';
+import { DateField } from '../ui/DateField';
+import { TimeField } from '../ui/TimeField';
+import { MonthField } from '../ui/MonthField';
+import { RadioGroup } from '../ui/RadioGroup';
+import { isValidEmail, isValidHttpUrl, isValidPhone } from '../ui/formValidation';
 
 export interface ConfiguredFieldsHandle {
   validateAndProceed: () => boolean;
@@ -42,24 +51,6 @@ const isEmpty = (value: unknown): boolean => {
 
 const getLabel = (field: PublicReportingField, language: 'bn' | 'en') =>
   language === 'bn' ? field.labelBn : field.labelEn;
-
-const EMAIL_PATTERN = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-const PHONE_PATTERN = /^\+?[0-9 ()-]{7,25}$/;
-
-const isValidHttpUrl = (value: string): boolean => {
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
-
-const isValidPhone = (value: string): boolean => {
-  if (!PHONE_PATTERN.test(value)) return false;
-  const digits = value.replace(/\D/g, '');
-  return digits.length >= 7 && digits.length <= 15;
-};
 
 export const ConfiguredFieldsSection = forwardRef<
   ConfiguredFieldsHandle,
@@ -139,7 +130,25 @@ export const ConfiguredFieldsSection = forwardRef<
           continue;
         }
 
-        if (field.fieldType === 'evidence' || field.fieldType === 'privacy') {
+        if (field.fieldType === 'evidence') {
+          if (
+            field.required &&
+            pendingImages.length === 0 &&
+            !formData.evidenceDescription?.trim()
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'কমপক্ষে একটি ছবি বা সহায়ক তথ্যের বিবরণ দিন।'
+                : 'Attach at least one image or add supporting information notes.';
+          }
+          continue;
+        }
+
+        if (field.fieldType === 'privacy') {
+          if (field.required && !formData.privacyChoice) {
+            next[field.fieldKey] =
+              language === 'bn' ? 'গোপনীয়তার একটি অপশন নির্বাচন করুন।' : 'Select a privacy option.';
+          }
           continue;
         }
 
@@ -207,7 +216,7 @@ export const ConfiguredFieldsSection = forwardRef<
         if (
           field.fieldType === 'email' &&
           typeof value === 'string' &&
-          !EMAIL_PATTERN.test(value.trim())
+          !isValidEmail(value)
         ) {
           next[field.fieldKey] =
             language === 'bn'
@@ -218,7 +227,7 @@ export const ConfiguredFieldsSection = forwardRef<
         if (
           field.fieldType === 'url' &&
           typeof value === 'string' &&
-          !isValidHttpUrl(value.trim())
+          !isValidHttpUrl(value)
         ) {
           next[field.fieldKey] =
             language === 'bn'
@@ -229,7 +238,7 @@ export const ConfiguredFieldsSection = forwardRef<
         if (
           field.fieldType === 'phone' &&
           typeof value === 'string' &&
-          !isValidPhone(value.trim())
+          !isValidPhone(value)
         ) {
           next[field.fieldKey] =
             language === 'bn'
@@ -264,6 +273,30 @@ export const ConfiguredFieldsSection = forwardRef<
                 ? `সর্বোচ্চ মান ${field.validation.max}।`
                 : `Maximum value is ${field.validation.max}.`;
           }
+
+        if (
+          (field.fieldType === 'date' ||
+            field.fieldType === 'time' ||
+            field.fieldType === 'month') &&
+          typeof value === 'string'
+        ) {
+          const minValue =
+            field.validation?.min !== undefined ? String(field.validation.min) : '';
+          const maxValue =
+            field.validation?.max !== undefined ? String(field.validation.max) : '';
+          if (minValue && value < minValue) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? `সর্বনিম্ন অনুমোদিত মান ${minValue}।`
+                : `Earliest allowed value is ${minValue}.`;
+          }
+          if (maxValue && value > maxValue) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? `সর্বোচ্চ অনুমোদিত মান ${maxValue}।`
+                : `Latest allowed value is ${maxValue}.`;
+          }
+        }
         }
       }
 
