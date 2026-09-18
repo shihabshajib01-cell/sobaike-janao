@@ -3,12 +3,7 @@ import {
   PublicReportingField,
   PublicReportingForm,
 } from '../../services/reportingFormConfig';
-import {
-  MobJusticeDetails,
-  MobJusticeValidationErrors,
-} from '../../data/mobJusticeOptions';
-import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
-import { MentionedParty, ReportFormData } from '../../services/types';
+import { ReportFormData } from '../../services/types';
 import {
   AttachedImagePreview,
   ImageAttachmentPicker,
@@ -36,9 +31,6 @@ interface ConfiguredFieldsSectionProps {
   pendingImages: AttachedImagePreview[];
   onPendingImagesChange: (images: AttachedImagePreview[]) => void;
   onUpdateFormData: (updates: Partial<ReportFormData>) => void;
-  mobJusticeDetails?: MobJusticeDetails;
-  mobJusticeErrors?: MobJusticeValidationErrors;
-  onMobJusticeDetailsChange?: (details: MobJusticeDetails) => void;
 }
 
 const isEmpty = (value: unknown): boolean => {
@@ -63,9 +55,6 @@ export const ConfiguredFieldsSection = forwardRef<
       pendingImages,
       onPendingImagesChange,
       onUpdateFormData,
-      mobJusticeDetails,
-      mobJusticeErrors,
-      onMobJusticeDetailsChange,
     },
     ref
   ) => {
@@ -116,17 +105,7 @@ export const ConfiguredFieldsSection = forwardRef<
       const next: Record<string, string> = {};
 
       for (const field of fields) {
-        if (field.fieldType === 'mob_justice_details') {
-          if (field.required && mobJusticeDetails) {
-            if (!mobJusticeDetails.trigger || !mobJusticeDetails.outcome || !mobJusticeDetails.ongoingStatus) {
-              next[field.fieldKey] =
-                language === 'bn'
-                  ? 'মব সহিংসতার প্রয়োজনীয় তথ্য পূরণ করুন।'
-                  : 'Complete the required Mob Justice details.';
-            }
-          }
-          continue;
-        }
+        if (field.fieldType === 'mob_justice_details') continue;
 
         if (field.fieldType === 'location') {
           if (
@@ -142,20 +121,7 @@ export const ConfiguredFieldsSection = forwardRef<
           continue;
         }
 
-        if (field.fieldType === 'evidence') {
-          continue;
-        }
-
-        if (field.fieldType === 'privacy') {
-          if (
-            formData.privacyChoice === 'public_identity' &&
-            !formData.confirmPublicIdentity
-          ) {
-            next[field.fieldKey] =
-              language === 'bn'
-                ? 'পাবলিক পরিচয় প্রকাশের সম্মতি নিশ্চিত করুন।'
-                : 'Confirm consent before publishing your identity.';
-          }
+        if (field.fieldType === 'evidence' || field.fieldType === 'privacy') {
           continue;
         }
 
@@ -257,43 +223,6 @@ export const ConfiguredFieldsSection = forwardRef<
     const commonInputClass =
       'w-full min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-body text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus';
 
-    const updateMentionedParty = (index: number, patch: Partial<MentionedParty>) => {
-      const next = [...(formData.mentionedParties || [])];
-      next[index] = { ...next[index], ...patch };
-      onUpdateFormData({ mentionedParties: next });
-    };
-
-    const addMentionedParty = () => {
-      const id =
-        typeof crypto !== 'undefined' && 'randomUUID' in crypto
-          ? crypto.randomUUID()
-          : `party-${Date.now()}`;
-      onUpdateFormData({
-        mentionedParties: [
-          ...(formData.mentionedParties || []),
-          {
-            id,
-            type: 'unknown',
-            name: '',
-            roleOrDesignation: '',
-            organization: '',
-            phoneOrContact: '',
-            publicProfileHandle: '',
-            address: '',
-            identifyingDescription: '',
-          },
-        ],
-      });
-    };
-
-    const removeMentionedParty = (index: number) => {
-      onUpdateFormData({
-        mentionedParties: (formData.mentionedParties || []).filter(
-          (_, itemIndex) => itemIndex !== index
-        ),
-      });
-    };
-
     return (
       <section
         id="composer-section-configured-fields"
@@ -307,19 +236,7 @@ export const ConfiguredFieldsSection = forwardRef<
             language === 'bn' ? field.placeholderBn : field.placeholderEn;
           const error = errors[field.fieldKey];
 
-          if (field.fieldType === 'mob_justice_details') {
-            if (!mobJusticeDetails || !onMobJusticeDetailsChange) return null;
-            return (
-              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`}>
-                <MobJusticeDetailsFields
-                  value={mobJusticeDetails}
-                  errors={mobJusticeErrors}
-                  onChange={onMobJusticeDetailsChange}
-                  language={language}
-                />
-              </div>
-            );
-          }
+          if (field.fieldType === 'mob_justice_details') return null;
 
           if (field.fieldType === 'location') {
             return (
@@ -476,50 +393,6 @@ export const ConfiguredFieldsSection = forwardRef<
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-road"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'রাস্তা / সড়ক' : 'Road / street'}
-                    </label>
-                    <input
-                      id="configured-location-road"
-                      value={formData.location?.road || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            road: event.target.value,
-                          },
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-landmark"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'ল্যান্ডমার্ক' : 'Landmark'}
-                    </label>
-                    <input
-                      id="configured-location-landmark"
-                      value={formData.location?.landmark || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            landmark: event.target.value,
-                          },
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
-
                   <div className="space-y-1.5 sm:col-span-2">
                     <label
                       htmlFor="configured-location-address"
@@ -653,10 +526,6 @@ export const ConfiguredFieldsSection = forwardRef<
                               | 'anonymous'
                               | 'admin_only'
                               | 'public_identity',
-                            confirmPublicIdentity:
-                              option.value === 'public_identity'
-                                ? formData.confirmPublicIdentity
-                                : false,
                           })
                         }
                       />
@@ -702,32 +571,6 @@ export const ConfiguredFieldsSection = forwardRef<
                     </div>
                   </div>
                 )}
-
-                {formData.privacyChoice === 'public_identity' && (
-                  <label className="flex min-h-[44px] cursor-pointer items-start gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3">
-                    <input
-                      type="checkbox"
-                      checked={Boolean(formData.confirmPublicIdentity)}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          confirmPublicIdentity: event.target.checked,
-                        })
-                      }
-                      className="mt-1"
-                    />
-                    <span className="type-compact text-ui-content-primary">
-                      {language === 'bn'
-                        ? 'আমি আমার পরিচয় প্রকাশ্যে দেখানোর জন্য সম্মতি দিচ্ছি।'
-                        : 'I consent to displaying my identity publicly.'}
-                    </span>
-                  </label>
-                )}
-
-                {error && (
-                  <p role="alert" className="type-compact text-ui-error-text">
-                    {error}
-                  </p>
-                )}
               </div>
             );
           }
@@ -739,17 +582,16 @@ export const ConfiguredFieldsSection = forwardRef<
                 id={`configured-field-${field.fieldKey}`}
                 className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
               >
-                <div className="space-y-1">
-                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
-                    {label}
-                    {field.required ? ' *' : ''}
-                  </h3>
-                  {helper && <p className="type-compact text-ui-content-secondary">{helper}</p>}
-                </div>
-
+                <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  {label}
+                  {field.required ? ' *' : ''}
+                </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label htmlFor="configured-party-type" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    <label
+                      htmlFor="configured-party-type"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
                       {language === 'bn' ? 'ধরন' : 'Type'}
                     </label>
                     <select
@@ -762,76 +604,79 @@ export const ConfiguredFieldsSection = forwardRef<
                       }
                       className={commonInputClass}
                     >
-                      <option value="unknown">{language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified'}</option>
-                      <option value="individual">{language === 'bn' ? 'ব্যক্তি' : 'Individual'}</option>
-                      <option value="business">{language === 'bn' ? 'ব্যবসা' : 'Business'}</option>
-                      <option value="group">{language === 'bn' ? 'গোষ্ঠী' : 'Group'}</option>
-                      <option value="organization">{language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}</option>
+                      <option value="unknown">
+                        {language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified'}
+                      </option>
+                      <option value="individual">
+                        {language === 'bn' ? 'ব্যক্তি' : 'Individual'}
+                      </option>
+                      <option value="business">
+                        {language === 'bn' ? 'ব্যবসা' : 'Business'}
+                      </option>
+                      <option value="group">
+                        {language === 'bn' ? 'গোষ্ঠী' : 'Group'}
+                      </option>
+                      <option value="organization">
+                        {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
+                      </option>
                     </select>
                   </div>
-
                   <div className="space-y-1.5">
-                    <label htmlFor="configured-party-name" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    <label
+                      htmlFor="configured-party-name"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
                       {language === 'bn' ? 'নাম' : 'Name'}
                     </label>
-                    <input id="configured-party-name" value={formData.reportedSubject || ''} onChange={(event) => onUpdateFormData({ reportedSubject: event.target.value })} className={commonInputClass} />
+                    <input
+                      id="configured-party-name"
+                      value={formData.reportedSubject || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ reportedSubject: event.target.value })
+                      }
+                      className={commonInputClass}
+                    />
                   </div>
-
                   <div className="space-y-1.5">
-                    <label htmlFor="configured-party-role" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    <label
+                      htmlFor="configured-party-role"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
                       {language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
                     </label>
-                    <input id="configured-party-role" value={formData.roleOrDesignation || ''} onChange={(event) => onUpdateFormData({ roleOrDesignation: event.target.value })} className={commonInputClass} />
+                    <input
+                      id="configured-party-role"
+                      value={formData.roleOrDesignation || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          roleOrDesignation: event.target.value,
+                        })
+                      }
+                      className={commonInputClass}
+                    />
                   </div>
-
                   <div className="space-y-1.5">
-                    <label htmlFor="configured-party-org" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    <label
+                      htmlFor="configured-party-org"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
                       {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
                     </label>
-                    <input id="configured-party-org" value={formData.organization || ''} onChange={(event) => onUpdateFormData({ organization: event.target.value })} className={commonInputClass} />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label htmlFor="configured-party-profile" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
-                      {language === 'bn' ? 'পাবলিক প্রোফাইল / হ্যান্ডেল' : 'Public profile / handle'}
-                    </label>
-                    <input id="configured-party-profile" value={formData.publicProfileHandle || ''} onChange={(event) => onUpdateFormData({ publicProfileHandle: event.target.value })} className={commonInputClass} />
-                  </div>
-
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label htmlFor="configured-party-description" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
-                      {language === 'bn' ? 'চেনার জন্য অতিরিক্ত বিবরণ' : 'Additional identifying description'}
-                    </label>
-                    <textarea id="configured-party-description" rows={3} value={formData.identifyingDescription || ''} onChange={(event) => onUpdateFormData({ identifyingDescription: event.target.value })} className={`${commonInputClass} resize-y`} />
+                    <input
+                      id="configured-party-org"
+                      value={formData.organization || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ organization: event.target.value })
+                      }
+                      className={commonInputClass}
+                    />
                   </div>
                 </div>
-
-                {(formData.mentionedParties || []).length > 0 && (
-                  <div className="space-y-3 border-t border-ui-stroke-subtle pt-4">
-                    <h4 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
-                      {language === 'bn' ? 'অতিরিক্ত উল্লেখিত ব্যক্তি / প্রতিষ্ঠান' : 'Additional mentioned people / organizations'}
-                    </h4>
-                    {(formData.mentionedParties || []).map((party, index) => (
-                      <div key={party.id} className="space-y-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3">
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <input aria-label={language === 'bn' ? 'নাম' : 'Name'} placeholder={language === 'bn' ? 'নাম' : 'Name'} value={party.name || ''} onChange={(event) => updateMentionedParty(index, { name: event.target.value })} className={commonInputClass} />
-                          <input aria-label={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'} placeholder={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'} value={party.organization || ''} onChange={(event) => updateMentionedParty(index, { organization: event.target.value })} className={commonInputClass} />
-                          <input aria-label={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'} placeholder={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'} value={party.roleOrDesignation || ''} onChange={(event) => updateMentionedParty(index, { roleOrDesignation: event.target.value })} className={commonInputClass} />
-                          <input aria-label={language === 'bn' ? 'পাবলিক প্রোফাইল' : 'Public profile'} placeholder={language === 'bn' ? 'পাবলিক প্রোফাইল' : 'Public profile'} value={party.publicProfileHandle || ''} onChange={(event) => updateMentionedParty(index, { publicProfileHandle: event.target.value })} className={commonInputClass} />
-                        </div>
-                        <button type="button" onClick={() => removeMentionedParty(index)} className="min-h-[40px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
-                          {language === 'bn' ? 'সরান' : 'Remove'}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                {error && (
+                  <p role="alert" className="type-compact text-ui-error-text">
+                    {error}
+                  </p>
                 )}
-
-                <button type="button" onClick={addMentionedParty} className="min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
-                  {language === 'bn' ? 'আরও ব্যক্তি / প্রতিষ্ঠান যোগ করুন' : 'Add another person / organization'}
-                </button>
-
-                {error && <p role="alert" className="type-compact text-ui-error-text">{error}</p>}
               </div>
             );
           }
