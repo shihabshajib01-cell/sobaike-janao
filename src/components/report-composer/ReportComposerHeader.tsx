@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, Check } from 'lucide-react';
 import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { IconButton } from '../ui/IconButton';
@@ -53,6 +53,17 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
   ];
 
   const currentStepInfo = stepTitles[currentStep - 1] || stepTitles[0];
+  const previousStepRef = useRef(currentStep);
+  const stepStatusRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (previousStepRef.current === currentStep) return;
+    previousStepRef.current = currentStep;
+    const frame = window.requestAnimationFrame(() => {
+      stepStatusRef.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [currentStep]);
 
   const getSegmentStyles = (sec: SectionKey) => ({
     bg: `var(--sec-${sec}-bg)`,
@@ -88,7 +99,14 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               )}
             </div>
 
-            <p className="type-helper text-ui-content-secondary leading-tight mt-1">
+            <p
+              ref={stepStatusRef}
+              id="report-composer-step-status"
+              tabIndex={-1}
+              aria-live="polite"
+              aria-atomic="true"
+              className="type-helper text-ui-content-secondary leading-tight mt-1 focus:outline-none"
+            >
               <span>
                 {language === 'bn'
                   ? `ধাপ ${currentStep} / ${totalSteps}: ${currentStepInfo.titleBn}`

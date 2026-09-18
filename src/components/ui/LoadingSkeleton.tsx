@@ -347,10 +347,14 @@ export const StatCardSkeleton: React.FC<{ id?: string }> = ({ id }) => {
   );
 };
 
-export const ReportDetailSkeleton: React.FC<{ id?: string }> = ({ id = 'report-detail-skeleton' }) => {
+export const ReportDetailSkeleton: React.FC<{ id?: string; language?: 'bn' | 'en' }> = ({
+  id = 'report-detail-skeleton',
+  language = 'bn',
+}) => {
+  const loadingLabel = language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading report...';
   return (
-    <div id={id} className="space-y-6 select-none" role="status" aria-busy="true" aria-label="Loading report...">
-      <span className="sr-only">Loading report...</span>
+    <div id={id} className="space-y-6 select-none" role="status" aria-busy="true" aria-label={loadingLabel}>
+      <span className="sr-only">{loadingLabel}</span>
       {/* Back button */}
       <Skeleton className="w-24 h-8 rounded-[var(--radius-badge-md)]" />
 

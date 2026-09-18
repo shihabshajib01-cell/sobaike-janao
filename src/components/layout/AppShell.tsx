@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -86,7 +86,19 @@ export const AppShell: React.FC = () => {
   } = useApp();
 
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
+  const previousRouteRef = useRef(currentRoute);
   const hideMobileMainNavigation = shouldHideBottomNav(currentRoute);
+
+  useEffect(() => {
+    if (previousRouteRef.current === currentRoute) return;
+    previousRouteRef.current = currentRoute;
+
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById('main-content')?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [currentRoute]);
 
   useEffect(() => {
     const hasNoticeAccepted = hasAcceptedResponsibilityNotice();

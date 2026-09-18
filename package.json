@@ -10,6 +10,7 @@
     "lint": "tsc --noEmit",
     "audit:design-system": "node scripts/design-system-audit.mjs",
     "audit:ui-uniformity": "node scripts/ui-uniformity-audit.mjs",
+    "audit:accessibility": "node scripts/accessibility-audit.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
     "audit:integration-contract": "node scripts/integration-contract-audit.mjs"
   },

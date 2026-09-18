@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { SECTIONS } from '../../theme/tokens';
@@ -16,9 +17,11 @@ export const shouldHideBottomNav = (
   BACK_NAV_ROUTE_PREFIXES.some((prefix) => currentRoute.startsWith(prefix));
 
 export const BottomNav: React.FC = () => {
-  const { currentRoute, navigateTo, language, openReportComposer } = useApp();
+  const { currentRoute, language, openReportComposer } = useApp();
   const { segments } = useTaxonomy();
   const categoryRoutes = Object.values(segments).map((segment) => segment.slug);
+  const localizePath = (path: RoutePath) =>
+    language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 
   if (shouldHideBottomNav(currentRoute, categoryRoutes)) return null;
 
@@ -64,11 +67,10 @@ export const BottomNav: React.FC = () => {
     >
       <div className="pointer-events-auto mx-auto grid max-w-[420px] grid-cols-[1fr_1fr_1fr_auto] items-center gap-1 ui-radius-card border border-ui-stroke-subtle bg-ui-surface/95 p-1.5 shadow-[var(--elevation-lg)] backdrop-blur-md">
         {navItems.map((item) => (
-          <button
+          <Link
             key={item.id}
             id={item.id}
-            type="button"
-            onClick={() => navigateTo(item.path)}
+            to={localizePath(item.path)}
             aria-current={item.isActive ? 'page' : undefined}
             className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center ui-radius-control px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               item.isActive
@@ -84,7 +86,7 @@ export const BottomNav: React.FC = () => {
             >
               {language === 'bn' ? item.nameBn : item.nameEn}
             </span>
-          </button>
+          </Link>
         ))}
 
         <button

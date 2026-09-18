@@ -50,10 +50,16 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
     });
 
     return (
-      <div
+      <button
         key={img.id}
+        type="button"
         onClick={(e) => handleImageClick(e, index)}
-        className={`relative overflow-hidden bg-ui-surface-subtle cursor-pointer select-none group transition-opacity hover:opacity-95 ${className}`}
+        aria-label={
+          language === 'bn'
+            ? `প্রতিবেদনের সহায়ক ছবি ${index + 1} বড় করে দেখুন`
+            : `Expand supporting image ${index + 1}`
+        }
+        className={`relative overflow-hidden bg-ui-surface-subtle cursor-pointer select-none group transition-opacity hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
       >
         {isBroken ? (
           <div className="w-full h-full flex flex-col items-center justify-center p-3 text-ui-content-muted bg-ui-surface-subtle text-center space-y-1">
@@ -88,7 +94,7 @@ export const ReportMediaGrid: React.FC<ReportMediaGridProps> = ({
             </span>
           </div>
         ) : null}
-      </div>
+      </button>
     );
   };
 

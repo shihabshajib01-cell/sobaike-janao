@@ -180,10 +180,20 @@ requireNotContains(
 );
 
 const reportCard = 'src/components/report/ReportCard.tsx';
-requireContains(reportCard, 'role="link"', 'clickable report card must expose link semantics');
-requireContains(reportCard, 'tabIndex={0}', 'clickable report card must be keyboard focusable');
-requireContains(reportCard, 'onKeyDown={handleCardKeyDown}', 'clickable report card must support Enter/Space activation');
-requireContains(reportCard, 'INTERACTIVE_SELECTOR', 'card activation must protect nested interactive actions');
+requireContains(reportCard, '<Link', 'report card must expose a native keyboard-focusable report link');
+requireContains(
+  reportCard,
+  'to={`/report-detail/${encodeURIComponent(report.id)}`}',
+  'report card native link must target the report detail route'
+);
+requireNotContains(
+  reportCard,
+  'role="link"\n      tabIndex={0}',
+  'report card container must not recreate link semantics around nested actions'
+);
+requireNotContains(reportCard, 'tabIndex={0}', 'report card container must not add a second fake-link tab stop');
+requireNotContains(reportCard, 'onKeyDown={handleCardKeyDown}', 'report card must rely on native link keyboard activation');
+requireContains(reportCard, 'INTERACTIVE_SELECTOR', 'pointer-wide card activation must protect nested interactive actions');
 
 const consolidatedPublicUiFiles = [
   'src/pages/ReportPage.tsx',

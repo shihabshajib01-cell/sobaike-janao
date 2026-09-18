@@ -62,13 +62,6 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     openReportDetail();
   };
 
-  const handleCardKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.target !== event.currentTarget) return;
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    openReportDetail();
-  };
-
   const registerShare = () => {
     void PublicEngagementService.trackShare(report.id).then((counts) => {
       if (counts) setEngagement(counts);
@@ -125,11 +118,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
   return (
     <article
       id={`report-card-${report.id}`}
-      role="link"
-      tabIndex={0}
-      aria-label={title}
       onClick={handleCardClick}
-      onKeyDown={handleCardKeyDown}
       className={`group relative ui-card p-4 sm:p-5 transition-all duration-150 cursor-pointer text-left space-y-2.5 sm:space-y-3 select-none hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 ${className}`}
     >
       <div className="flex items-center justify-between gap-3 type-meta">
@@ -141,9 +130,15 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         </p>
       </div>
 
-      <h3 className="type-h3 text-ui-content-primary transition-colors line-clamp-2 break-words">
-        {title}
-      </h3>
+      <Link
+        to={`/report-detail/${encodeURIComponent(report.id)}`}
+        onClick={registerView}
+        className="relative z-10 block rounded-[var(--radius-badge-sm)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+      >
+        <h3 className="type-h3 text-ui-content-primary transition-colors line-clamp-2 break-words">
+          {title}
+        </h3>
+      </Link>
 
       {report.reportedSubject && (
         <div className="type-meta text-ui-content-secondary flex items-center gap-1.5 flex-wrap min-w-0">

@@ -1011,6 +1011,39 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        window.requestAnimationFrame(() => {
+          const controlIds: Array<[string, string]> = [
+            ['title', 'complaint-title-input'],
+            ['description', 'complaint-desc-input'],
+            ['incidentDate', 'complaint-date-input'],
+            ['incidentTime', 'utility-start-time-input'],
+            ['utilityEndTime', 'utility-end-time-input'],
+            ['recentBillMonth', 'recent-bill-month-input'],
+            ['recentBillAmount', 'recent-bill-amount-input'],
+            ['previousBillMonth', 'previous-bill-month-input'],
+            ['previousBillAmount', 'previous-bill-amount-input'],
+            ['briberyAmount', 'bribery-amount-input'],
+            ['affectedPersonAgeGroup', 'harassment-age-group-select'],
+            ['allegedAbuserRelationship', 'harassment-abuser-relationship-select'],
+            ['reportingFor', 'harassment-reporting-for-select'],
+            ['sexualHarassmentType', 'sexual-harassment-type-select'],
+            ['sexualHarassmentContext', 'sexual-harassment-context-select'],
+            ['sexualHarassmentInstitution', 'sexual-harassment-institution-input'],
+            ['division', 'complaint-division-select'],
+            ['district', 'complaint-district-select'],
+            ['upazilaOrThana', 'complaint-thana-select'],
+            ['formattedAddress', 'complaint-address-input'],
+            ['adminName', 'reporter-admin-name'],
+            ['adminContact', 'reporter-admin-contact'],
+          ];
+          const first = controlIds.find(([key]) => Boolean(newErrors[key]))?.[1];
+          if (first) {
+            document.getElementById(first)?.focus({ preventScroll: true });
+          } else if (newErrors.reporterLocation) {
+            document.getElementById('reporter-location-allow-btn')?.focus({ preventScroll: true });
+          }
+        });
+
         return false;
       }
 
@@ -1100,6 +1133,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       </label>
                       <input
                         id="recent-bill-month-input"
+                  aria-invalid={Boolean(errors.recentBillMonth)}
+                  aria-describedby={errors.recentBillMonth ? 'recent-bill-month-input-error' : undefined}
+                  aria-required="true"
                         type="month"
                         value={formData.recentBillMonth || ''}
                         onChange={(e) => {
@@ -1111,7 +1147,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         }`}
                       />
                       {errors.recentBillMonth && (
-                        <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillMonth}</p>
+                        <p id="recent-bill-month-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillMonth}</p>
                       )}
                     </div>
 
@@ -1128,6 +1164,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       </label>
                       <input
                         id="recent-bill-amount-input"
+                  aria-invalid={Boolean(errors.recentBillAmount)}
+                  aria-describedby={errors.recentBillAmount ? 'recent-bill-amount-input-error' : undefined}
+                  aria-required="true"
                         type="number"
                         min="1"
                         step="any"
@@ -1143,7 +1182,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         }`}
                       />
                       {errors.recentBillAmount && (
-                        <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillAmount}</p>
+                        <p id="recent-bill-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillAmount}</p>
                       )}
                     </div>
                   </div>
@@ -1162,6 +1201,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       </label>
                       <input
                         id="previous-bill-month-input"
+                  aria-invalid={Boolean(errors.previousBillMonth)}
+                  aria-describedby={errors.previousBillMonth ? 'previous-bill-month-input-error' : undefined}
+                  aria-required="true"
                         type="month"
                         value={formData.previousBillMonth || ''}
                         onChange={(e) => {
@@ -1173,7 +1215,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         }`}
                       />
                       {errors.previousBillMonth && (
-                        <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillMonth}</p>
+                        <p id="previous-bill-month-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillMonth}</p>
                       )}
                     </div>
 
@@ -1190,6 +1232,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       </label>
                       <input
                         id="previous-bill-amount-input"
+                  aria-invalid={Boolean(errors.previousBillAmount)}
+                  aria-describedby={errors.previousBillAmount ? 'previous-bill-amount-input-error' : undefined}
+                  aria-required="true"
                         type="number"
                         min="1"
                         step="any"
@@ -1205,7 +1250,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         }`}
                       />
                       {errors.previousBillAmount && (
-                        <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillAmount}</p>
+                        <p id="previous-bill-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillAmount}</p>
                       )}
                     </div>
                   </div>
@@ -1226,6 +1271,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </label>
                     <input
                       id="complaint-date-input"
+                  aria-invalid={Boolean(errors.incidentDate)}
+                  aria-describedby={errors.incidentDate ? 'complaint-date-input-error' : undefined}
+                  aria-required="true"
                       type="date"
                       max={todayLocal}
                       value={formData.incidentDate || ''}
@@ -1249,7 +1297,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       }`}
                     />
                     {errors.incidentDate && (
-                      <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
+                      <p id="complaint-date-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
                     )}
                   </div>
 
@@ -1266,6 +1314,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </label>
                     <input
                       id="utility-start-time-input"
+                  aria-invalid={Boolean(errors.incidentTime)}
+                  aria-describedby={errors.incidentTime ? 'utility-start-time-input-error' : undefined}
+                  aria-required="true"
                       type="time"
                       value={formData.incidentTime || ''}
                       onChange={(e) => {
@@ -1280,7 +1331,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       }`}
                     />
                     {errors.incidentTime && (
-                      <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentTime}</p>
+                      <p id="utility-start-time-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentTime}</p>
                     )}
                   </div>
 
@@ -1297,6 +1348,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </label>
                     <input
                       id="utility-end-time-input"
+                  aria-invalid={Boolean(errors.utilityEndTime)}
+                  aria-describedby={errors.utilityEndTime ? 'utility-end-time-input-error' : undefined}
                       type="time"
                       value={formData.utilityEndTime || ''}
                       onChange={(e) => {
@@ -1308,7 +1361,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       }`}
                     />
                     {errors.utilityEndTime && (
-                      <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.utilityEndTime}</p>
+                      <p id="utility-end-time-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.utilityEndTime}</p>
                     )}
                   </div>
                 </div>
@@ -1324,6 +1377,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </label>
                 <textarea
                   id="complaint-desc-input"
+                  aria-invalid={Boolean(errors.description)}
+                  aria-describedby={errors.description ? 'complaint-desc-input-error' : undefined}
+                  aria-required="true"
                   rows={4}
                   maxLength={2000}
                   value={formData.description || ''}
@@ -1350,7 +1406,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 />
                 <div className="flex items-center justify-between gap-2">
                   {errors.description ? (
-                    <p className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
+                    <p id="complaint-desc-input-error" role="alert" className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
                   ) : (
                     <span />
                   )}
@@ -1391,6 +1447,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               </label>
               <textarea
                 id="complaint-desc-input"
+                  aria-invalid={Boolean(errors.description)}
+                  aria-describedby={errors.description ? 'complaint-desc-input-error' : undefined}
+                  aria-required="true"
                 rows={4}
                 maxLength={2000}
                 value={formData.description || ''}
@@ -1409,7 +1468,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               />
               <div className="flex items-center justify-between gap-2">
                 {errors.description ? (
-                  <p className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
+                  <p id="complaint-desc-input-error" role="alert" className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
                 ) : (
                   <span />
                 )}
@@ -1467,6 +1526,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </label>
                     <input
                       id="bribery-amount-input"
+                  aria-invalid={Boolean(errors.briberyAmount)}
+                  aria-describedby={errors.briberyAmount ? 'bribery-amount-input-error' : undefined}
                       type="number"
                       min="1"
                       step="any"
@@ -1479,7 +1540,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
                       className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${errors.briberyAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'}`}
                     />
-                    {errors.briberyAmount && <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.briberyAmount}</p>}
+                    {errors.briberyAmount && <p id="bribery-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.briberyAmount}</p>}
                   </div>
                 </div>
               </div>
@@ -1500,6 +1561,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </label>
                 <input
                   id="complaint-date-input"
+                  aria-invalid={Boolean(errors.incidentDate)}
+                  aria-describedby={errors.incidentDate ? 'complaint-date-input-error' : undefined}
+                  aria-required="true"
                   type="date"
                   max={todayLocal}
                   value={formData.incidentDate || ''}
@@ -1523,7 +1587,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   }`}
                 />
                 {errors.incidentDate && (
-                  <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
+                  <p id="complaint-date-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
                 )}
               </div>
 
@@ -1647,6 +1711,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </label>
                     <input
                       id="sexual-harassment-institution-input"
+                  aria-invalid={Boolean(errors.sexualHarassmentInstitution)}
+                  aria-describedby={errors.sexualHarassmentInstitution ? 'sexual-harassment-institution-input-error' : undefined}
                       type="text"
                       maxLength={200}
                       value={formData.sexualHarassmentInstitution || ''}
@@ -1668,7 +1734,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       }`}
                     />
                     {errors.sexualHarassmentInstitution && (
-                      <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">
+                      <p id="sexual-harassment-institution-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">
                         {errors.sexualHarassmentInstitution}
                       </p>
                     )}
@@ -1843,6 +1909,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
                 <div className="flex justify-start pt-0.5">
                   <button
+                    id="reporter-location-allow-btn"
                     type="button"
                     onClick={handleRetryLocationClick}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-[var(--radius-control)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer shadow-[var(--elevation-xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
@@ -1864,6 +1931,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
                 <div className="flex justify-start pt-0.5">
                   <button
+                    id="reporter-location-allow-btn"
                     type="button"
                     onClick={handleRetryLocationClick}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-[var(--radius-control)] bg-ui-warning-text hover:opacity-90 text-ui-surface type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer shadow-[var(--elevation-xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
@@ -1901,8 +1969,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
                 <div className="flex justify-start pt-0.5">
                   <button
+                    id="reporter-location-allow-btn"
                     type="button"
                     onClick={handleRetryLocationClick}
+                    aria-describedby={errors.reporterLocation ? 'reporter-location-error' : undefined}
                     className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-[var(--radius-control)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer shadow-[var(--elevation-xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
                   >
                     <MapPin className="w-4 h-4 shrink-0" />
@@ -1914,8 +1984,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Prerequisite validation error message */}
             {errors.reporterLocation && (
-              <div className="type-compact text-ui-error-text font-[var(--font-weight-semibold)] flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4 shrink-0 text-ui-error-text" />
+              <div id="reporter-location-error" role="alert" className="type-compact text-ui-error-text font-[var(--font-weight-semibold)] flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-ui-error-text" aria-hidden="true" />
                 <span>{errors.reporterLocation}</span>
               </div>
             )}
@@ -1991,6 +2061,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   </label>
                   <textarea
                     id="complaint-address-input"
+                  aria-invalid={Boolean(errors.formattedAddress)}
+                  aria-describedby={errors.formattedAddress ? 'complaint-address-input-error' : undefined}
                     rows={3}
                     disabled={isLocationLocked}
                     value={formData.location?.formattedAddress || ''}
@@ -2007,7 +2079,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     }`}
                   />
                   {errors.formattedAddress && (
-                    <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.formattedAddress}</p>
+                    <p id="complaint-address-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.formattedAddress}</p>
                   )}
                 </div>
               )}
@@ -2094,6 +2166,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         </label>
                         <input
                           id="reporter-admin-name"
+                  aria-invalid={Boolean(errors.adminName)}
+                  aria-describedby={errors.adminName ? 'reporter-admin-name-error' : undefined}
                           type="text"
                           value={formData.adminName || ''}
                           onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
@@ -2101,7 +2175,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
                         />
                         {errors.adminName && (
-                          <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminName}</p>
+                          <p id="reporter-admin-name-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminName}</p>
                         )}
                       </div>
 
@@ -2115,6 +2189,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         </label>
                         <input
                           id="reporter-admin-contact"
+                  aria-invalid={Boolean(errors.adminContact)}
+                  aria-describedby={errors.adminContact ? 'reporter-admin-contact-error' : undefined}
+                  aria-required="true"
                           type="text"
                           value={formData.adminContact || ''}
                           onChange={(e) => {
@@ -2128,7 +2205,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           }`}
                         />
                         {errors.adminContact && (
-                          <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminContact}</p>
+                          <p id="reporter-admin-contact-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminContact}</p>
                         )}
                       </div>
                     </div>

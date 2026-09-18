@@ -32,9 +32,9 @@ jobs:
       - name: Install project dependencies
         run: npm ci
 
-      - name: Install Playwright runtime
+      - name: Install Playwright accessibility runtime
         run: |
-          npm install --no-save playwright@1.55.0
+          npm install --no-save playwright@1.55.0 @axe-core/playwright@4.10.2
           npx playwright install --with-deps chromium
 
       - name: Run comprehensive non-destructive Public browser smoke
@@ -45,3 +45,6 @@ jobs:
 
       - name: Run complete non-destructive report composer journey
         run: node scripts/public-composer-100-regression-smoke.mjs
+
+      - name: Run Public WCAG accessibility smoke
+        run: node scripts/public-accessibility-smoke.mjs

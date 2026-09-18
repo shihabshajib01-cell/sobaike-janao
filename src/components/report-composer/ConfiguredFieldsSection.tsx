@@ -271,9 +271,14 @@ export const ConfiguredFieldsSection = forwardRef<
       const firstKey = Object.keys(next)[0];
       if (firstKey) {
         window.requestAnimationFrame(() => {
-          document
-            .getElementById(`configured-field-${firstKey}`)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const section = document.getElementById(`configured-field-${firstKey}`);
+          section?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          const directControl = document.getElementById(`configured-input-${firstKey}`) as HTMLElement | null;
+          const fallbackControl = section?.querySelector<HTMLElement>(
+            'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          (directControl || fallbackControl)?.focus({ preventScroll: true });
         });
       }
       return Object.keys(next).length === 0;
@@ -311,6 +316,10 @@ export const ConfiguredFieldsSection = forwardRef<
           const placeholder =
             language === 'bn' ? field.placeholderBn : field.placeholderEn;
           const error = errors[field.fieldKey];
+          const fieldControlId = `configured-input-${field.fieldKey}`;
+          const fieldLabelId = `${fieldControlId}-label`;
+          const fieldHelperId = `${fieldControlId}-helper`;
+          const fieldErrorId = `${fieldControlId}-error`;
 
           if (field.fieldType === 'mob_justice_details') return null;
 
@@ -319,15 +328,19 @@ export const ConfiguredFieldsSection = forwardRef<
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
+                role="group"
+                aria-labelledby={fieldLabelId}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                 className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
               >
                 <div className="space-y-1">
-                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
                     {label}
                     {field.required ? ' *' : ''}
                   </h3>
                   {helper && (
-                    <p className="type-compact text-ui-content-secondary">
+                    <p id={fieldHelperId} className="type-compact text-ui-content-secondary">
                       {helper}
                     </p>
                   )}
@@ -343,6 +356,9 @@ export const ConfiguredFieldsSection = forwardRef<
                     </label>
                     <select
                       id="configured-location-division"
+                      aria-required="true"
+                      aria-invalid={Boolean(error)}
+                      aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                       value={divisionId}
                       onChange={(event) => {
                         const division = DIVISIONS.find(
@@ -381,6 +397,9 @@ export const ConfiguredFieldsSection = forwardRef<
                     </label>
                     <select
                       id="configured-location-district"
+                      aria-required="true"
+                      aria-invalid={Boolean(error)}
+                      aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                       value={districtId}
                       disabled={!divisionId}
                       onChange={(event) => {
@@ -492,7 +511,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   </div>
                 </div>
                 {error && (
-                  <p role="alert" className="type-compact text-ui-error-text">
+                  <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
                     {error}
                   </p>
                 )}
@@ -656,9 +675,13 @@ export const ConfiguredFieldsSection = forwardRef<
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
+                role="group"
+                aria-labelledby={fieldLabelId}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? fieldErrorId : undefined}
                 className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
               >
-                <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
                   {label}
                   {field.required ? ' *' : ''}
                 </h3>
@@ -706,6 +729,9 @@ export const ConfiguredFieldsSection = forwardRef<
                     </label>
                     <input
                       id="configured-party-name"
+                      aria-required={field.required || undefined}
+                      aria-invalid={Boolean(error)}
+                      aria-describedby={error ? fieldErrorId : undefined}
                       value={formData.reportedSubject || ''}
                       onChange={(event) =>
                         onUpdateFormData({ reportedSubject: event.target.value })
@@ -740,6 +766,9 @@ export const ConfiguredFieldsSection = forwardRef<
                     </label>
                     <input
                       id="configured-party-org"
+                      aria-required={field.required || undefined}
+                      aria-invalid={Boolean(error)}
+                      aria-describedby={error ? fieldErrorId : undefined}
                       value={formData.organization || ''}
                       onChange={(event) =>
                         onUpdateFormData({ organization: event.target.value })
@@ -749,7 +778,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   </div>
                 </div>
                 {error && (
-                  <p role="alert" className="type-compact text-ui-error-text">
+                  <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
                     {error}
                   </p>
                 )}
@@ -768,27 +797,44 @@ export const ConfiguredFieldsSection = forwardRef<
                 fullWidth ? '' : ''
               }`}
             >
-              <label
-                htmlFor={`configured-input-${field.fieldKey}`}
-                className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-              >
-                {label}
-                {field.required ? ' *' : ''}
-              </label>
+              {field.fieldType === 'radio' || field.fieldType === 'multiselect' ? (
+                <p
+                  id={fieldLabelId}
+                  className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                >
+                  {label}
+                  {field.required ? ' *' : ''}
+                </p>
+              ) : field.fieldType === 'checkbox' ? null : (
+                <label
+                  id={fieldLabelId}
+                  htmlFor={fieldControlId}
+                  className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                >
+                  {label}
+                  {field.required ? ' *' : ''}
+                </label>
+              )}
 
               {field.fieldType === 'textarea' ? (
                 <textarea
-                  id={`configured-input-${field.fieldKey}`}
+                  id={fieldControlId}
                   rows={5}
                   value={String(value ?? '')}
+                  aria-required={field.required || undefined}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   placeholder={placeholder}
                   onChange={(event) => setValue(field, event.target.value)}
                   className={`${commonInputClass} resize-y`}
                 />
               ) : field.fieldType === 'select' ? (
                 <select
-                  id={`configured-input-${field.fieldKey}`}
+                  id={fieldControlId}
                   value={String(value ?? '')}
+                  aria-required={field.required || undefined}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   onChange={(event) => setValue(field, event.target.value)}
                   className={commonInputClass}
                 >
@@ -804,7 +850,10 @@ export const ConfiguredFieldsSection = forwardRef<
               ) : field.fieldType === 'radio' ? (
                 <div
                   role="radiogroup"
-                  aria-label={label}
+                  aria-labelledby={fieldLabelId}
+                  aria-required={field.required || undefined}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   className="flex flex-wrap gap-2"
                 >
                   {field.options.map((option) => (
@@ -826,15 +875,26 @@ export const ConfiguredFieldsSection = forwardRef<
               ) : field.fieldType === 'checkbox' ? (
                 <label className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary">
                   <input
-                    id={`configured-input-${field.fieldKey}`}
+                    id={fieldControlId}
                     type="checkbox"
                     checked={Boolean(value)}
+                    aria-required={field.required || undefined}
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? fieldErrorId : undefined}
                     onChange={(event) => setValue(field, event.target.checked)}
                   />
                   {helper || label}
+                  {field.required ? ' *' : ''}
                 </label>
               ) : field.fieldType === 'multiselect' ? (
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div
+                  role="group"
+                  aria-labelledby={fieldLabelId}
+                  aria-required={field.required || undefined}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
+                  className="grid gap-2 sm:grid-cols-2"
+                >
                   {field.options.map((option) => {
                     const selected = Array.isArray(value)
                       ? value.includes(option.value)
@@ -864,7 +924,10 @@ export const ConfiguredFieldsSection = forwardRef<
                 </div>
               ) : (
                 <input
-                  id={`configured-input-${field.fieldKey}`}
+                  id={fieldControlId}
+                  aria-required={field.required || undefined}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   type={
                     field.fieldType === 'currency' ||
                     field.fieldType === 'number'
@@ -900,10 +963,10 @@ export const ConfiguredFieldsSection = forwardRef<
               )}
 
               {field.fieldType !== 'checkbox' && helper && (
-                <p className="type-compact text-ui-content-muted">{helper}</p>
+                <p id={fieldHelperId} className="type-compact text-ui-content-muted">{helper}</p>
               )}
               {error && (
-                <p role="alert" className="type-compact text-ui-error-text">
+                <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
                   {error}
                 </p>
               )}
