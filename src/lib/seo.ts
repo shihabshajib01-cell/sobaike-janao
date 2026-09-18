@@ -3,202 +3,260 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export type SeoPageType = 'website' | 'collection' | 'article';
+
 export interface SeoMetadata {
   title: string;
   description: string;
   robots?: string;
   ogType?: 'website' | 'article';
   ogSiteName?: string;
+  canonicalPath?: string;
+  image?: string;
+  imageAlt?: string;
+  pageType?: SeoPageType;
+  publishedTime?: string;
+  modifiedTime?: string;
 }
+
+export const SITE_ORIGIN = 'https://shobaikejanao.com';
 
 export const BRAND_NAME = {
   bn: 'সবাইকে জানাও',
   en: 'Sobaike Janao',
 } as const;
 
+const DEFAULT_SOCIAL_IMAGE = '/brand/icon-512x512.png';
+
 export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
   bn: {
     title: 'সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
-    description: 'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
-    robots: 'index, follow',
+    description:
+      'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
+    robots: 'index, follow, max-image-preview:large',
     ogType: 'website',
     ogSiteName: 'সবাইকে জানাও',
+    canonicalPath: '/',
+    pageType: 'website',
   },
   en: {
     title: 'Sobaike Janao | Citizen Reporting Platform',
-    description: 'Sobaike Janao is a citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
-    robots: 'index, follow',
+    description:
+      'Sobaike Janao is a moderated citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
+    robots: 'index, follow, max-image-preview:large',
     ogType: 'website',
     ogSiteName: 'Sobaike Janao',
+    canonicalPath: '/',
+    pageType: 'website',
   },
 };
+
+const routeSeo = (
+  bn: Pick<SeoMetadata, 'title' | 'description'>,
+  en: Pick<SeoMetadata, 'title' | 'description'>,
+  canonicalPath: string,
+  pageType: SeoPageType = 'website',
+  robots = 'index, follow, max-image-preview:large'
+): Record<'bn' | 'en', SeoMetadata> => ({
+  bn: {
+    ...bn,
+    robots,
+    ogType: pageType === 'article' ? 'article' : 'website',
+    ogSiteName: BRAND_NAME.bn,
+    canonicalPath,
+    pageType,
+  },
+  en: {
+    ...en,
+    robots,
+    ogType: pageType === 'article' ? 'article' : 'website',
+    ogSiteName: BRAND_NAME.en,
+    canonicalPath,
+    pageType,
+  },
+});
 
 export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> = {
-  '/': {
-    bn: {
+  '/': routeSeo(
+    {
       title: 'সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
-      description: 'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+      description:
+        'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
     },
-    en: {
+    {
       title: 'Sobaike Janao | Citizen Reporting Platform',
-      description: 'Sobaike Janao is a citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+      description:
+        'Sobaike Janao is a moderated citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
     },
-  },
-  '/harassment': {
-    bn: {
-      title: 'হয়রানি ও নির্যাতনের বিরুদ্ধে জানান | সবাইকে জানাও',
-      description: 'শারীরিক বা মানসিক নির্যাতন, প্রতারণা ও অনলাইনে হেনস্তার অভিযোগ দায়িত্বশীলভাবে প্রকাশ করুন।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+    '/'
+  ),
+  '/issues': routeSeo(
+    {
+      title: 'নাগরিক প্রতিবেদনের বিষয়সমূহ | সবাইকে জানাও',
+      description:
+        'জননিরাপত্তা, হয়রানি, চাঁদাবাজি, সড়ক, ইউটিলিটি ও অন্যান্য জনস্বার্থ বিষয় অনুযায়ী প্রকাশিত প্রতিবেদন দেখুন।',
     },
-    en: {
-      title: 'Report Harassment & Abuse | Sobaike Janao',
-      description: 'Report physical or psychological abuse, relationship deception, or online harassment responsibly.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+    {
+      title: 'Citizen Reporting Topics | Sobaike Janao',
+      description:
+        'Browse moderated public-interest reports by topic, including public safety, harassment, extortion, roads, utilities, and more.',
     },
-  },
-  '/rickshaw': {
-    bn: {
-      title: 'অবৈধ অটো চার্জিং রিপোর্ট করুন | সবাইকে জানাও',
-      description: 'অবৈধ বা ঝুঁকিপূর্ণ অটো চার্জিং স্টেশনের অবস্থান ও তথ্য জানান।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+    '/issues',
+    'collection'
+  ),
+  '/harassment': routeSeo(
+    {
+      title: 'হয়রানি ও নির্যাতন সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
+      description:
+        'হয়রানি, নির্যাতন, প্রতারণা ও সংশ্লিষ্ট নাগরিক প্রতিবেদন দায়িত্বশীলভাবে প্রকাশ ও অনুসন্ধান করুন।',
     },
-    en: {
-      title: 'Report Illegal Auto-rickshaw Charging | Sobaike Janao',
-      description: 'Report the location and details of illegal or unsafe auto-rickshaw charging stations.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+    {
+      title: 'Harassment & Abuse Reports | Sobaike Janao',
+      description:
+        'Browse and submit moderated citizen reports related to harassment, abuse, deception, and connected concerns.',
     },
-  },
-  '/extortion': {
-    bn: {
-      title: 'চাঁদাবাজির তথ্য প্রকাশ করুন | সবাইকে জানাও',
-      description: 'দোকানপাট, বাজার, পরিবহন স্ট্যান্ড বা নির্মাণকাজে জোরপূর্বক অর্থ আদায় ও হুমকির বিরুদ্ধে তথ্য দিন।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+    '/harassment',
+    'collection'
+  ),
+  '/extortion': routeSeo(
+    {
+      title: 'চাঁদাবাজি ও ঘুষ সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
+      description:
+        'চাঁদাবাজি, জোরপূর্বক অর্থ আদায়, ঘুষ ও সংশ্লিষ্ট জনস্বার্থ অভিযোগের প্রকাশিত প্রতিবেদন দেখুন।',
     },
-    en: {
-      title: 'Report Local Extortion | Sobaike Janao',
-      description: 'Report forced collections, extortion, and coercive illegal demands in local areas.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+    {
+      title: 'Extortion & Bribery Reports | Sobaike Janao',
+      description:
+        'Browse moderated public reports about extortion, coercive collections, bribery, and related public-interest concerns.',
     },
-  },
-  '/load-shedding': {
-    bn: {
+    '/extortion',
+    'collection'
+  ),
+  '/public-safety': routeSeo(
+    {
+      title: 'জননিরাপত্তা সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
+      description:
+        'চুরি, ডাকাতি, ছিনতাই, মব জাস্টিস ও অন্যান্য জননিরাপত্তা সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
+    },
+    {
+      title: 'Public Safety Reports | Sobaike Janao',
+      description:
+        'Browse moderated citizen reports about theft, robbery, snatching, mob violence, and other public-safety concerns.',
+    },
+    '/public-safety',
+    'collection'
+  ),
+  '/road-transport': routeSeo(
+    {
+      title: 'সড়ক ও যাতায়াত সমস্যা | সবাইকে জানাও',
+      description:
+        'সড়ক, ট্রাফিক, পরিবহন, দুর্ঘটনা, প্রতিবন্ধকতা ও যাতায়াত সমস্যার প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
+    },
+    {
+      title: 'Road & Transport Reports | Sobaike Janao',
+      description:
+        'Browse moderated reports about roads, traffic, transport, accidents, obstructions, and mobility issues in Bangladesh.',
+    },
+    '/road-transport',
+    'collection'
+  ),
+  '/load-shedding': routeSeo(
+    {
       title: 'ইউটিলিটি সমস্যা | সবাইকে জানাও',
-      description: 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত সমস্যা দায়িত্বশীলভাবে জানান।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+      description:
+        'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ বিল ও অন্যান্য ইউটিলিটি সমস্যার প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
     },
-    en: {
-      title: 'Utility Issues | Sobaike Janao',
-      description: 'Report load shedding, gas shortages, or excess electricity bill issues responsibly.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+    {
+      title: 'Utility Issue Reports | Sobaike Janao',
+      description:
+        'Browse moderated reports about load shedding, gas shortages, electricity billing, and other utility issues.',
     },
-  },
-  '/illegal-occupation': {
-    bn: {
-      title: 'অবৈধ দখল রিপোর্টিং | সবাইকে জানাও',
-      description: 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+    '/load-shedding',
+    'collection'
+  ),
+  '/illegal-occupation': routeSeo(
+    {
+      title: 'অবৈধ দখল সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
+      description:
+        'রাস্তা, ফুটপাত, সরকারি বা ব্যক্তিগত সম্পত্তি ও জনস্থান দখল সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
     },
-    en: {
-      title: 'Illegal Occupation Reporting | Sobaike Janao',
-      description: 'This reporting service is being prepared and is not available yet.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+    {
+      title: 'Illegal Occupation Reports | Sobaike Janao',
+      description:
+        'Browse moderated citizen reports about illegal occupation of roads, footpaths, public spaces, and property.',
     },
-  },
-  '/explore': {
-    bn: {
+    '/illegal-occupation',
+    'collection'
+  ),
+  '/rickshaw': routeSeo(
+    {
+      title: 'অবৈধ অটো-রিকশা চার্জিং | সবাইকে জানাও',
+      description:
+        'অবৈধ বা ঝুঁকিপূর্ণ অটো-রিকশা চার্জিং অবস্থান ও সংশ্লিষ্ট প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
+    },
+    {
+      title: 'Illegal Auto-rickshaw Charging Reports | Sobaike Janao',
+      description:
+        'Browse moderated reports about illegal or unsafe auto-rickshaw charging locations and related incidents.',
+    },
+    '/rickshaw',
+    'collection'
+  ),
+  '/explore': routeSeo(
+    {
       title: 'প্রতিবেদন খুঁজুন ও মানচিত্র | সবাইকে জানাও',
-      description: 'বিভাগ, জেলা ও এলাকা অনুযায়ী বাংলাদেশে প্রকাশিত নাগরিক প্রতিবেদন এবং মানচিত্র দেখুন।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+      description:
+        'বিভাগ, জেলা ও এলাকা অনুযায়ী বাংলাদেশে প্রকাশিত নাগরিক প্রতিবেদন এবং মানচিত্র দেখুন।',
     },
-    en: {
+    {
       title: 'Explore Reports & Map | Sobaike Janao',
-      description: 'Explore moderated citizen reports and incident maps across Bangladesh districts.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+      description:
+        'Explore moderated citizen reports and incident maps across Bangladesh by division, district, and area.',
     },
-  },
-  '/search': {
-    bn: {
+    '/explore',
+    'collection'
+  ),
+  '/search': routeSeo(
+    {
       title: 'অনুসন্ধান | সবাইকে জানাও',
       description: 'বিষয়, এলাকা বা সংশ্লিষ্ট পক্ষের নাম দিয়ে প্রকাশিত প্রতিবেদন অনুসন্ধান করুন।',
-      robots: 'noindex, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
     },
-    en: {
+    {
       title: 'Search Reports | Sobaike Janao',
       description: 'Search published citizen reports, locations, and reported entities.',
-      robots: 'noindex, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
     },
-  },
-  '/more': {
-    bn: {
-      title: 'তথ্য ও সম্পাদকীয় নির্দেশিকা | সবাইকে জানাও',
-      description: 'নাগরিক সচেতনতা, সুরক্ষানীতি, প্রতিউত্তরের অধিকার এবং জরুরি সহায়তা।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+    '/search',
+    'website',
+    'noindex, follow'
+  ),
+  '/more': routeSeo(
+    {
+      title: 'তথ্য, নীতিমালা ও সহায়তা | সবাইকে জানাও',
+      description:
+        'প্ল্যাটফর্ম নির্দেশিকা, গোপনীয়তা, প্রতিউত্তরের অধিকার, দায়িত্বশীল প্রকাশ ও জরুরি সহায়তার তথ্য দেখুন।',
     },
-    en: {
-      title: 'Information & Guidelines | Sobaike Janao',
-      description: 'Platform guidelines, privacy policies, right of response standards, and emergency helplines.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+    {
+      title: 'Information, Policies & Help | Sobaike Janao',
+      description:
+        'Read platform guidelines, privacy information, right-of-response standards, responsible publishing guidance, and emergency help.',
     },
-  },
-  '/report': {
-    bn: {
-      title: 'অভিযোগ বা ঘটনা জানান | সবাইকে জানাও',
-      description: 'সবাইকে জানাও প্ল্যাটফর্মে জনস্বার্থ সংক্রান্ত ঘটনা বা অভিযোগ দায়িত্বশীলভাবে জানান।',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'সবাইকে জানাও',
+    '/more'
+  ),
+  '/report': routeSeo(
+    {
+      title: 'ঘটনা বা অভিযোগ জানান | সবাইকে জানাও',
+      description:
+        'সবাইকে জানাও প্ল্যাটফর্মে জনস্বার্থ সংক্রান্ত ঘটনা বা অভিযোগ প্রাসঙ্গিক তথ্যসহ দায়িত্বশীলভাবে জমা দিন।',
     },
-    en: {
+    {
       title: 'Report an Incident | Sobaike Janao',
-      description: 'Submit an incident report or public complaint responsibly on Sobaike Janao.',
-      robots: 'index, follow',
-      ogType: 'website',
-      ogSiteName: 'Sobaike Janao',
+      description:
+        'Submit a public-interest incident or complaint responsibly with relevant details on Sobaike Janao.',
     },
-  },
+    '/report'
+  ),
 };
 
-/**
- * Sets or updates a <meta> element in <head> safely without duplicates.
- */
 function setMetaTag(attributeName: 'name' | 'property', key: string, content: string): void {
   if (typeof document === 'undefined') return;
   const selector = `meta[${attributeName}="${key}"]`;
@@ -214,10 +272,43 @@ function setMetaTag(attributeName: 'name' | 'property', key: string, content: st
   element.setAttribute('content', content);
 }
 
-/**
- * Updates or creates the JSON-LD structured data in <head>.
- */
-function updateJsonLd(language: 'bn' | 'en'): void {
+function removeMetaTag(attributeName: 'name' | 'property', key: string): void {
+  if (typeof document === 'undefined') return;
+  document.head.querySelector(`meta[${attributeName}="${key}"]`)?.remove();
+}
+
+function setLinkTag(rel: string, href: string): void {
+  if (typeof document === 'undefined') return;
+  let element = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
+  if (!element) {
+    element = document.createElement('link');
+    element.rel = rel;
+    element.setAttribute('data-seo-managed', 'true');
+    document.head.appendChild(element);
+  }
+  element.href = href;
+}
+
+function normalizeCanonicalPath(pathname?: string): string {
+  const raw = pathname || '/';
+  const clean = raw.split('?')[0].split('#')[0] || '/';
+  if (clean === '/') return '/';
+  return `/${clean.replace(/^\/+|\/+$/g, '')}`;
+}
+
+function absoluteUrl(value: string): string {
+  try {
+    return new URL(value, SITE_ORIGIN).toString();
+  } catch {
+    return `${SITE_ORIGIN}/`;
+  }
+}
+
+function updateJsonLd(
+  metadata: SeoMetadata,
+  language: 'bn' | 'en',
+  canonicalUrl: string
+): void {
   if (typeof document === 'undefined') return;
   let scriptElement = document.head.querySelector<HTMLScriptElement>('#seo-jsonld');
 
@@ -229,100 +320,196 @@ function updateJsonLd(language: 'bn' | 'en'): void {
     document.head.appendChild(scriptElement);
   }
 
-  const structuredData = {
-    '@context': 'https://schema.org',
+  const websiteId = `${SITE_ORIGIN}/#website`;
+  const pageId = `${canonicalUrl}#webpage`;
+  const locale = language === 'bn' ? 'bn-BD' : 'en';
+
+  const website = {
     '@type': 'WebSite',
+    '@id': websiteId,
+    url: `${SITE_ORIGIN}/`,
     name: 'Sobaike Janao',
     alternateName: 'সবাইকে জানাও',
-    inLanguage: [language, language === 'bn' ? 'en' : 'bn'],
+    inLanguage: ['bn-BD', 'en'],
   };
 
-  scriptElement.textContent = JSON.stringify(structuredData);
+  const pageType =
+    metadata.pageType === 'article'
+      ? 'Article'
+      : metadata.pageType === 'collection'
+      ? 'CollectionPage'
+      : 'WebPage';
+
+  const page: Record<string, unknown> = {
+    '@type': pageType,
+    '@id': pageId,
+    url: canonicalUrl,
+    name: metadata.title,
+    description: metadata.description,
+    inLanguage: locale,
+    isPartOf: { '@id': websiteId },
+  };
+
+  if (metadata.image) {
+    page.image = absoluteUrl(metadata.image);
+  }
+
+  if (metadata.pageType === 'article') {
+    page.headline = metadata.title;
+    page.mainEntityOfPage = { '@id': pageId };
+    if (metadata.publishedTime) page.datePublished = metadata.publishedTime;
+    if (metadata.modifiedTime) page.dateModified = metadata.modifiedTime;
+  }
+
+  scriptElement.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [website, page],
+  });
 }
 
-/**
- * Applies full SEO metadata to the active document.
- */
 export function applySeoMetadata(metadata: SeoMetadata, language: 'bn' | 'en'): void {
   if (typeof document === 'undefined') return;
 
-  // 1. Document Title
+  document.documentElement.lang = language === 'bn' ? 'bn' : 'en';
+
   if (metadata.title && document.title !== metadata.title) {
     document.title = metadata.title;
   }
 
-  // 2. Meta Description
   if (metadata.description) {
     setMetaTag('name', 'description', metadata.description);
   }
 
-  // 3. Robots
-  const robots = metadata.robots || 'index, follow';
+  const robots = metadata.robots || 'index, follow, max-image-preview:large';
   setMetaTag('name', 'robots', robots);
+  setMetaTag('name', 'googlebot', robots);
 
-  // 4. Open Graph
+  const canonicalPath = normalizeCanonicalPath(
+    metadata.canonicalPath ||
+      (typeof window !== 'undefined' ? window.location.pathname : '/')
+  );
+  const canonicalUrl = absoluteUrl(canonicalPath);
+  setLinkTag('canonical', canonicalUrl);
+
+  const image = absoluteUrl(metadata.image || DEFAULT_SOCIAL_IMAGE);
+  const imageAlt =
+    metadata.imageAlt ||
+    (language === 'bn' ? 'সবাইকে জানাও' : 'Sobaike Janao');
+
   setMetaTag('property', 'og:title', metadata.title);
   setMetaTag('property', 'og:description', metadata.description);
   setMetaTag('property', 'og:type', metadata.ogType || 'website');
   setMetaTag('property', 'og:site_name', metadata.ogSiteName || BRAND_NAME[language]);
+  setMetaTag('property', 'og:url', canonicalUrl);
+  setMetaTag('property', 'og:locale', language === 'bn' ? 'bn_BD' : 'en_US');
+  setMetaTag('property', 'og:image', image);
+  setMetaTag('property', 'og:image:alt', imageAlt);
 
-  // 5. Twitter / X
   setMetaTag('name', 'twitter:card', 'summary');
   setMetaTag('name', 'twitter:title', metadata.title);
   setMetaTag('name', 'twitter:description', metadata.description);
+  setMetaTag('name', 'twitter:image', image);
+  setMetaTag('name', 'twitter:image:alt', imageAlt);
 
-  // 6. JSON-LD Structured Data
-  updateJsonLd(language);
+  if (metadata.pageType === 'article') {
+    if (metadata.publishedTime) {
+      setMetaTag('property', 'article:published_time', metadata.publishedTime);
+    } else {
+      removeMetaTag('property', 'article:published_time');
+    }
+
+    if (metadata.modifiedTime) {
+      setMetaTag('property', 'article:modified_time', metadata.modifiedTime);
+    } else {
+      removeMetaTag('property', 'article:modified_time');
+    }
+  } else {
+    removeMetaTag('property', 'article:published_time');
+    removeMetaTag('property', 'article:modified_time');
+  }
+
+  updateJsonLd(metadata, language, canonicalUrl);
 }
 
-/**
- * Resolves static SEO metadata for a given path and language.
- */
 export function getStaticSeo(pathname: string, language: 'bn' | 'en'): SeoMetadata {
-  const normalizedPath = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+  const normalizedPath =
+    pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   const routeMatch = STATIC_ROUTE_SEO[normalizedPath];
 
   if (routeMatch) {
     return routeMatch[language];
   }
 
-  // Dynamic route prefixes fallback while loading
   if (normalizedPath.startsWith('/report-detail/')) {
     return {
-      title: language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে... | সবাইকে জানাও' : 'Loading Report... | Sobaike Janao',
+      title:
+        language === 'bn'
+          ? 'প্রতিবেদন লোড হচ্ছে... | সবাইকে জানাও'
+          : 'Loading Report... | Sobaike Janao',
       description: DEFAULT_FALLBACK_SEO[language].description,
       robots: 'noindex, follow',
       ogType: 'article',
       ogSiteName: BRAND_NAME[language],
+      canonicalPath: normalizedPath,
+      pageType: 'article',
     };
   }
 
   if (normalizedPath.startsWith('/location/')) {
     return {
-      title: language === 'bn' ? 'এলাকার প্রতিবেদন লোড হচ্ছে... | সবাইকে জানাও' : 'Loading Location Reports... | Sobaike Janao',
+      title:
+        language === 'bn'
+          ? 'এলাকার প্রতিবেদন লোড হচ্ছে... | সবাইকে জানাও'
+          : 'Loading Location Reports... | Sobaike Janao',
       description: DEFAULT_FALLBACK_SEO[language].description,
       robots: 'noindex, follow',
       ogType: 'website',
       ogSiteName: BRAND_NAME[language],
+      canonicalPath: normalizedPath,
+      pageType: 'collection',
     };
   }
 
   if (normalizedPath.startsWith('/subject/')) {
     return {
-      title: language === 'bn' ? 'সত্ত্বার তথ্য লোড হচ্ছে... | সবাইকে জানাও' : 'Loading Subject Reports... | Sobaike Janao',
+      title:
+        language === 'bn'
+          ? 'সংশ্লিষ্ট পক্ষের প্রতিবেদন | সবাইকে জানাও'
+          : 'Subject Reports | Sobaike Janao',
       description: DEFAULT_FALLBACK_SEO[language].description,
       robots: 'noindex, follow',
       ogType: 'website',
       ogSiteName: BRAND_NAME[language],
+      canonicalPath: normalizedPath,
+      pageType: 'collection',
     };
   }
 
-  // Unknown route
+  if (normalizedPath.startsWith('/category/')) {
+    return {
+      title:
+        language === 'bn'
+          ? 'বিষয়ভিত্তিক প্রতিবেদন | সবাইকে জানাও'
+          : 'Topic Reports | Sobaike Janao',
+      description: DEFAULT_FALLBACK_SEO[language].description,
+      robots: 'noindex, follow',
+      ogType: 'website',
+      ogSiteName: BRAND_NAME[language],
+      canonicalPath: normalizedPath,
+      pageType: 'collection',
+    };
+  }
+
   return {
-    title: language === 'bn' ? 'পৃষ্ঠা পাওয়া যায়নি | সবাইকে জানাও' : 'Page Not Found | Sobaike Janao',
+    title:
+      language === 'bn'
+        ? 'পৃষ্ঠা পাওয়া যায়নি | সবাইকে জানাও'
+        : 'Page Not Found | Sobaike Janao',
     description: DEFAULT_FALLBACK_SEO[language].description,
     robots: 'noindex, nofollow',
     ogType: 'website',
     ogSiteName: BRAND_NAME[language],
+    canonicalPath: normalizedPath,
+    pageType: 'website',
   };
 }
