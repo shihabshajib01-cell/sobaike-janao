@@ -139,7 +139,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       ariaDescribedBy="location-consent-desc"
       footer={
         <ModalActions
-          mobileOrder="primary-first"
           primary={{
             id: 'location-consent-primary-btn',
             type: 'button',
