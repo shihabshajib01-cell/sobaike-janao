@@ -4,7 +4,6 @@ import { Eye } from 'lucide-react';
 import { ReportItem } from '../../types/report';
 import { useApp } from '../../context/AppContext';
 import { CategoryBadge } from '../ui/CategoryBadge';
-import { ReportMediaGrid } from '../media/ReportMediaGrid';
 import { AppIcon } from '../ui/AppIcon';
 import { formatBillingMonth, toBanglaDigits } from '../../utils/formatters';
 import {
@@ -181,12 +180,6 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         <p className="type-body text-ui-content-secondary line-clamp-2 break-words">
           {shortDesc}
         </p>
-      )}
-
-      {((report.media && report.media.images && report.media.images.length > 0) || (report.images && report.images.length > 0)) && (
-        <div className="hidden">
-          <ReportMediaGrid images={report.media?.images || report.images || []} language={language} isCompact={true} />
-        </div>
       )}
 
       <div className="flex items-center pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-muted">
