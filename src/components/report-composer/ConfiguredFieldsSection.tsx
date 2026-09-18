@@ -798,13 +798,12 @@ export const ConfiguredFieldsSection = forwardRef<
                     </>
                   }
                   description={!error ? helper : undefined}
+                  descriptionId={!error && helper ? fieldHelperId : undefined}
                 />
                 {error ? (
                   <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
                     {error}
                   </p>
-                ) : helper ? (
-                  <span id={fieldHelperId} className="sr-only">{helper}</span>
                 ) : null}
               </div>
             );
