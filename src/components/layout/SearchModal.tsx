@@ -3,6 +3,7 @@ import { useApp, RoutePath } from '../../context/AppContext';
 import { Modal } from '../ui/Modal';
 import { SearchInput } from '../ui/SearchInput';
 import { CategoryBadge } from '../ui/CategoryBadge';
+import { Button } from '../ui/Button';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 
 export const SearchModal: React.FC = () => {
@@ -52,13 +53,16 @@ export const SearchModal: React.FC = () => {
             {quickCategories.map((key) => {
               const sec = SECTIONS[key];
               return (
-                <button
+                <Button
                   key={key}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => handleSelectSection(sec.slug as RoutePath)}
-                  className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-control)] min-h-[44px] flex items-center"
+                  className="p-0"
                 >
                   <CategoryBadge section={key} language={language} size="md" />
-                </button>
+                </Button>
               );
             })}
           </div>
