@@ -4,7 +4,7 @@ import {
   EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
   HarassmentClassificationFilterState,
 } from '../../data/harassmentClassification';
-import { Button } from '../ui/Button';
+import { ModalActions } from '../ui/ModalActions';
 import { Modal } from '../ui/Modal';
 import { SearchableSelect } from '../ui/SearchableSelect';
 import { Select } from '../ui/Select';
@@ -78,30 +78,25 @@ export const HarassmentFilterSheet: React.FC<HarassmentFilterSheetProps> = ({
       maxWidth="lg"
       mobilePresentation="sheet"
       footer={
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 w-full">
-          <Button
-            id="harassment-filter-reset-btn"
-            type="button"
-            variant="outline"
-            onClick={resetDraft}
-          >
-            {isBn ? 'ফিল্টার মুছুন' : 'Clear filters'}
-          </Button>
-          <Button
-            id="harassment-filter-apply-btn"
-            type="button"
-            fullWidth
-            onClick={() =>
+        <ModalActions
+          primary={{
+            id: 'harassment-filter-apply-btn',
+            type: 'button',
+            onClick: () =>
               onApply({
                 divisionId: draftDivisionId,
                 districtId: draftDistrictId,
                 classification: draftClassification,
-              })
-            }
-          >
-            {isBn ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters'}
-          </Button>
-        </div>
+              }),
+            label: isBn ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters',
+          }}
+          secondary={{
+            id: 'harassment-filter-reset-btn',
+            type: 'button',
+            onClick: resetDraft,
+            label: isBn ? 'ফিল্টার মুছুন' : 'Clear filters',
+          }}
+        />
       }
     >
       <div className="space-y-5">
