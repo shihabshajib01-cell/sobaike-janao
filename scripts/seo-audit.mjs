@@ -83,6 +83,11 @@ const rootEnAlternate = attr(
 
 record('Homepage title exists', rootTitle.length > 0, rootTitle);
 record(
+  'Homepage exact Latin brand signal',
+  rootTitle.startsWith('Sobaike Janao') && rootHtml.includes('Sobaike Janao (সবাইকে জানাও)'),
+  rootTitle
+);
+record(
   'Homepage title target length',
   [...rootTitle].length >= 50 && [...rootTitle].length <= 60,
   `${[...rootTitle].length} characters`
