@@ -1,14 +1,11 @@
 {
   "application": "sobaike-janao-public",
-  "version": "0.3.0",
-  "release": "sexual-harassment-form-v2",
+  "version": "0.3.1",
+  "release": "public-detail-source-link-scope-fix",
   "releasedAt": "2026-09-18",
   "features": [
-    "sexual harassment type and incident context",
-    "granular relationship options",
-    "separate unknown and prefer-not-to-say values",
-    "ongoing and unknown frequency options",
-    "conditional institution or organization field",
-    "public review and report-detail parity"
+    "remove public verified-source card",
+    "show canonical source URL as plain selectable text only",
+    "preserve existing report form and post structure"
   ]
 }
