@@ -108,7 +108,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
       {/* 1 & 2: Title and Description Header (plus Desktop CTA row) */}
       <div className="hero-slider-content">
         <HeadingTag
-          className="type-h1 tracking-tight text-center md:text-left"
+          className={`hero-banner-title type-h1 tracking-tight text-center md:text-left ${language === 'bn' ? 'hero-banner-title-bn' : 'hero-banner-title-en'}`}
           style={{ color: HERO_TOKENS.text.primary }}
         >
           {language === 'bn' ? titleBn : titleEn}
@@ -117,7 +117,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         {/* Mobile Question / Description (shown < 768px) */}
         {mobileDescription && (
           <p
-            className="block md:hidden type-body text-center max-w-md mx-auto leading-relaxed"
+            className="hero-banner-description block md:hidden type-body text-center max-w-md mx-auto leading-relaxed"
             style={{ color: HERO_TOKENS.text.secondary }}
           >
             {mobileDescription}
