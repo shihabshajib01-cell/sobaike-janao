@@ -265,10 +265,42 @@ function isSeoIndexableReport(report) {
 const canonicalUrl = (path) =>
   path === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${path.replace(/\/$/, '')}`;
 
+function englishPath(path) {
+  const normalized = path === '/' ? '/' : `/${String(path).replace(/^\/+|\/+$/g, '')}`;
+  return normalized === '/' ? '/en' : `/en${normalized}`;
+}
+
 function localizedUrl(path, language) {
-  const url = new URL(canonicalUrl(path));
-  if (language === 'en') url.searchParams.set('lang', 'en');
-  return url.toString();
+  return language === 'en'
+    ? `${SITE_ORIGIN}${englishPath(path)}${path === '/' ? '/' : ''}`
+    : canonicalUrl(path);
+}
+
+function localizePage(page, language) {
+  const logicalPath = page.path;
+  const staticEnglish = STATIC_ENGLISH[logicalPath];
+  const title =
+    language === 'en'
+      ? page.titleEn || staticEnglish?.title || page.title
+      : page.title;
+  const description =
+    language === 'en'
+      ? page.descriptionEn || staticEnglish?.description || page.description
+      : page.description;
+  const socialDescription =
+    language === 'en'
+      ? page.socialDescriptionEn || staticEnglish?.socialDescription || description
+      : page.socialDescription || description;
+
+  return {
+    ...page,
+    logicalPath,
+    language,
+    path: language === 'en' ? englishPath(logicalPath) : logicalPath,
+    title,
+    description,
+    socialDescription,
+  };
 }
 
 function injectStaticFallback(html, page) {
