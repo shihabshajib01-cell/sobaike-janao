@@ -124,7 +124,7 @@ record(
 record('Twitter card', rootTwitterCard === 'summary_large_image', rootTwitterCard);
 record(
   'Language alternate links',
-  rootBnAlternate === `${SITE_ORIGIN}/` && rootEnAlternate === `${SITE_ORIGIN}/?lang=en`,
+  rootBnAlternate === `${SITE_ORIGIN}/` && rootEnAlternate === `${SITE_ORIGIN}/en/`,
   `bn=${rootBnAlternate}; en=${rootEnAlternate}`
 );
 record(
@@ -142,6 +142,29 @@ record(
   /facebook\.com\/sharer/i.test(rootHtml) && /twitter\.com\/intent\/tweet/i.test(rootHtml)
 );
 record('Bangla language declared', /<html\s+[^>]*lang=["']bn["']/i.test(rootHtml));
+
+const englishRootHtml = await readFile(join(DIST, 'en', 'index.html'), 'utf8');
+const englishRootCanonical = getCanonical(englishRootHtml);
+const englishRootDescription = getDescription(englishRootHtml);
+const englishRootText = textContent(
+  englishRootHtml.match(/<!-- SEO_FALLBACK_START -->([\s\S]*?)<!-- SEO_FALLBACK_END -->/i)?.[1] || ''
+);
+record(
+  'English homepage is prerendered',
+  /<html\s+[^>]*lang=["']en["']/i.test(englishRootHtml) &&
+    englishRootCanonical === `${SITE_ORIGIN}/en/`,
+  englishRootCanonical
+);
+record(
+  'English homepage has substantial crawlable content',
+  englishRootText.split(/\s+/).filter(Boolean).length >= 250,
+  `${englishRootText.split(/\s+/).filter(Boolean).length} words`
+);
+record(
+  'English homepage description target length',
+  [...englishRootDescription].length >= 90 && [...englishRootDescription].length <= 160,
+  `${[...englishRootDescription].length} characters`
+);
 
 const schemaRaw =
   rootHtml.match(/<script\s+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i)?.[1] ||
@@ -195,6 +218,12 @@ record(
 );
 record('Sitemap has no duplicates', new Set(sitemapUrls).size === sitemapUrls.length);
 record(
+  'Sitemap lists first-class English URLs',
+  sitemapUrls.some((url) => url === `${SITE_ORIGIN}/en/`) &&
+    sitemapUrls.some((url) => url.startsWith(`${SITE_ORIGIN}/en/`)) &&
+    !sitemapUrls.some((url) => url.includes('?lang=en'))
+);
+record(
   'Sitemap includes language alternates',
   sitemap.includes('xmlns:xhtml="http://www.w3.org/1999/xhtml"') &&
     sitemap.includes('hreflang="bn-BD"') &&
@@ -214,6 +243,8 @@ for (const file of htmlFiles) {
   const description = getDescription(html);
   const robots = getRobots(html);
   const h1Count = count(html, /<h1\b/gi);
+  const isEnglishRoute = rel === 'en/index.html' || rel.startsWith('en/');
+  const htmlLang = attr(html, /<html\s+[^>]*lang=["'][^"']+["'][^>]*>/i, 'lang');
   const bnAlternate = attr(
     html,
     /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']bn-BD["'][^>]*>/i,
@@ -227,6 +258,14 @@ for (const file of htmlFiles) {
 
   if (!canonical.startsWith(SITE_ORIGIN)) {
     failures.push(`Route canonical invalid: ${rel} -> ${canonical}`);
+    routeFailures += 1;
+  }
+  if (isEnglishRoute && (!canonical.startsWith(`${SITE_ORIGIN}/en`) || htmlLang !== 'en')) {
+    failures.push(`English route localization invalid: ${rel} -> ${canonical}; lang=${htmlLang}`);
+    routeFailures += 1;
+  }
+  if (!isEnglishRoute && rel !== 'index.html' && canonical.startsWith(`${SITE_ORIGIN}/en`)) {
+    failures.push(`Bangla route unexpectedly canonicalizes to English: ${rel} -> ${canonical}`);
     routeFailures += 1;
   }
   if (!title || !description) {
@@ -262,6 +301,10 @@ for (const file of htmlFiles) {
     );
     if (!pageNode || pageNode.url !== canonical) {
       failures.push(`Route structured data URL mismatch: ${rel}`);
+      routeFailures += 1;
+    }
+    if (pageNode?.['@type'] === 'Article' && !pageNode.dateModified) {
+      failures.push(`Article dateModified missing: ${rel}`);
       routeFailures += 1;
     }
   } catch {
