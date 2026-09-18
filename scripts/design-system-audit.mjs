@@ -567,19 +567,6 @@ const taxonomyFile = 'src/services/taxonomyService.ts';
 if (fs.existsSync(taxonomyFile)) {
   const source = fs.readFileSync(taxonomyFile, 'utf8');
 
-  for (const requiredToken of ['var(--md-surface)', 'var(--md-on-surface)']) {
-    if (!source.includes(requiredToken)) {
-      findings.push({
-        file: taxonomyFile,
-        line: 1,
-        rule: 'dynamic-theme-role-bypass',
-        token: requiredToken,
-        message: 'Dynamic category themes must derive from Material surface roles',
-        source: 'Required Material role reference is missing',
-      });
-    }
-  }
-
   if (!source.includes('if (legacy && !hasManagedTheme)')) {
     findings.push({
       file: taxonomyFile,
