@@ -44,9 +44,9 @@ export const FormField: React.FC<FormFieldProps> = ({
           {error}
         </p>
       ) : helperText ? (
-        <p id={helperId} className="type-helper text-role-on-surface-muted">
+        <div id={helperId} className="type-helper text-role-on-surface-muted">
           {helperText}
-        </p>
+        </div>
       ) : null}
     </div>
   );
