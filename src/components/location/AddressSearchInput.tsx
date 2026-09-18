@@ -13,6 +13,8 @@ export interface AddressSearchInputProps {
   biasCoords?: { lat: number; lng: number };
   initialValue?: string;
   disabled?: boolean;
+  label?: React.ReactNode;
+  onClear?: () => void;
 }
 
 export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
@@ -21,6 +23,8 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
   biasCoords,
   initialValue = '',
   disabled = false,
+  label,
+  onClear,
 }) => {
   const [query, setQuery] = useState(initialValue);
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
@@ -130,6 +134,7 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
     setActiveIndex(-1);
     setHasNoResults(false);
     setHasError(false);
+    onClear?.();
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -167,9 +172,9 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
     <div ref={containerRef} className="relative w-full text-left space-y-1">
       <label
         htmlFor="address-search-input"
-        className="block type-compact font-[var(--font-weight-bold)] text-primary"
+        className="block type-label font-[var(--font-weight-semibold)] text-role-on-surface"
       >
-        {language === 'bn' ? 'ঠিকানা বা এলাকা' : 'Address or area'}
+        {label || (language === 'bn' ? 'ঠিকানা বা এলাকা' : 'Address or area')}
       </label>
 
       <div className="relative flex items-center">
