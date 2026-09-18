@@ -372,39 +372,35 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
             {/* Role & Org */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label htmlFor="subject-designation-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              <TextField
+                id="subject-designation-input"
+                name="designation"
+                type="text"
+                label={
+                  SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'পদবী / ভূমিকা (ঐচ্ছিক)' : 'Role / designation (optional)')
-                    : (language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)')}
-                </label>
-                <input
-                  id="subject-designation-input"
-                  name="designation"
-                  type="text"
-                  value={designation}
-                  onChange={(e) => setDesignation(e.target.value)}
-                  placeholder={language === 'bn' ? 'উদাহরণ: ম্যানেজার, পরিচালক' : 'e.g. Branch Manager'}
-                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                />
-              </div>
+                    : (language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)')
+                }
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                autoComplete="organization-title"
+                placeholder={language === 'bn' ? 'উদাহরণ: ম্যানেজার, পরিচালক' : 'e.g. Branch Manager'}
+              />
 
-              <div className="space-y-1">
-                <label htmlFor="subject-org-name-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              <TextField
+                id="subject-org-name-input"
+                name="organizationName"
+                type="text"
+                label={
+                  SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'প্রতিষ্ঠান (ঐচ্ছিক)' : 'Organization (optional)')
-                    : (language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)')}
-                </label>
-                <input
-                  id="subject-org-name-input"
-                  name="organizationName"
-                  type="text"
-                  value={organizationName}
-                  onChange={(e) => setOrganizationName(e.target.value)}
-                  placeholder={language === 'bn' ? 'উদাহরণ: রহিম ট্রেডার্স' : 'e.g. Rahim Traders'}
-                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                />
-              </div>
+                    : (language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)')
+                }
+                value={organizationName}
+                onChange={(e) => setOrganizationName(e.target.value)}
+                autoComplete="organization"
+                placeholder={language === 'bn' ? 'উদাহরণ: রহিম ট্রেডার্স' : 'e.g. Rahim Traders'}
+              />
             </div>
 
             {/* Statement / Clarification */}
@@ -447,24 +443,19 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 />
 
                 {requestCorrectionOrRemoval && (
-                  <div>
-                    <label htmlFor="subject-correction-details-input" className="sr-only">
-                      {language === 'bn' ? 'সংশোধনের বিবরণ' : 'Correction details'}
-                    </label>
-                    <input
-                      id="subject-correction-details-input"
-                      name="correctionDetails"
-                      type="text"
-                      value={correctionDetails}
-                      onChange={(e) => setCorrectionDetails(e.target.value)}
-                      placeholder={
-                        language === 'bn'
-                          ? 'কোন অংশটি ভুল এবং সঠিক তথ্য কী, তা সংক্ষেপে উল্লেখ করুন'
-                          : 'Specify what fact is inaccurate and provide correct verifiable info'
-                      }
-                      className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                    />
-                  </div>
+                  <TextField
+                    id="subject-correction-details-input"
+                    name="correctionDetails"
+                    type="text"
+                    label={language === 'bn' ? 'সংশোধনের বিবরণ' : 'Correction details'}
+                    value={correctionDetails}
+                    onChange={(e) => setCorrectionDetails(e.target.value)}
+                    placeholder={
+                      language === 'bn'
+                        ? 'কোন অংশটি ভুল এবং সঠিক তথ্য কী, তা সংক্ষেপে উল্লেখ করুন'
+                        : 'Specify what fact is inaccurate and provide correct verifiable info'
+                    }
+                  />
                 )}
               </div>
             )}
