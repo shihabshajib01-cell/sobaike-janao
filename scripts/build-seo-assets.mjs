@@ -239,6 +239,12 @@ function normalizeSeoDescription(value, language = 'bn', minLength = 90, maxLeng
         : ' Review the relevant details, location, sources, and updates on Sobaike Janao.';
     result = `${result.replace(/[।.!?]+$/, '')}.${suffix}`;
   }
+  if (result.length < minLength) {
+    result +=
+      language === 'bn'
+        ? ' জনস্বার্থের প্রেক্ষাপট ও সর্বশেষ তথ্যও যাচাই করুন।'
+        : ' Check the public-interest context and latest published information as well.';
+  }
   return truncateSeoText(result, maxLength);
 }
 
