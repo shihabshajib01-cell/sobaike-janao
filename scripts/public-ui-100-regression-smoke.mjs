@@ -169,7 +169,17 @@ await check('All seven category pages preserve the shared mobile navigation cont
 
   for (const route of CATEGORY_ROUTES) {
     await page.goto(routeUrl(route), { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await expectVisible(page.locator('#mobile-category-header'), `${route} category header missing`);
+    try {
+      await expectVisible(page.locator('#mobile-category-header'), `${route} category header missing`);
+    } catch (error) {
+      const currentUrl = page.url();
+      const fallbackHeaderVisible = await page.locator('#mobile-header').isVisible().catch(() => false);
+      throw new Error(
+        `${route} category header missing; url=${currentUrl}; genericHeaderVisible=${fallbackHeaderVisible}; ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    }
     if ((await page.locator('#bottom-nav').count()) !== 0) {
       throw new Error(`${route} incorrectly shows the global bottom navigation`);
     }
