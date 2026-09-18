@@ -15,6 +15,7 @@ import { ReportAnalyticsOverview } from '../components/explore/ReportAnalyticsOv
 import { ReportSubcategoryBreakdown } from '../components/explore/ReportSubcategoryBreakdown';
 import { ReportActivityTimeline } from '../components/explore/ReportActivityTimeline';
 import { ReportGeographicBreakdown } from '../components/explore/ReportGeographicBreakdown';
+import { ReportTopicDivisionMatrix } from '../components/explore/ReportTopicDivisionMatrix';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
@@ -327,6 +328,16 @@ export const ExplorePage: React.FC = () => {
   const handleSelectMonthInsight = useCallback((monthKey: string) => {
     setSelectedMonth((current) => (current === monthKey ? null : monthKey));
   }, []);
+
+  const handleSelectTopicDivisionInsight = useCallback(
+    (category: SectionKey, division: string) => {
+      setSelectedSection(category);
+      setSelectedDivision(division);
+      setSelectedDistrict('all');
+      setSelectedSubcategory(null);
+    },
+    []
+  );
 
   const hasActiveFilters =
     Boolean(searchQuery.trim()) ||
@@ -1035,6 +1046,14 @@ export const ExplorePage: React.FC = () => {
                 language={language}
                 activeCategory={selectedSection}
                 onSelectCategory={handleSelectCategoryInsight}
+              />
+
+              <ReportTopicDivisionMatrix
+                reports={filteredReports}
+                language={language}
+                activeCategory={selectedSection}
+                activeDivision={selectedDivision}
+                onSelectCell={handleSelectTopicDivisionInsight}
               />
               {selectedSection === 'harassment' && (
                 <HarassmentClassificationBreakdown
