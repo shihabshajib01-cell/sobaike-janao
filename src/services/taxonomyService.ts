@@ -36,6 +36,8 @@ export interface SupabaseSubcategoryRow {
 export interface SegmentTaxonomyItem {
   key: SectionKey;
   id: string;
+  iconKey?: string;
+  themeKey?: string;
   slug: string;
   nameBn: string;
   nameEn: string;
@@ -53,6 +55,16 @@ export interface SegmentTaxonomyItem {
 }
 
 const sectionKeys = Object.keys(SECTIONS) as SectionKey[];
+
+const THEME_SECTION_FALLBACKS: Record<string, SectionKey> = {
+  sky: 'road_transport',
+  indigo: 'public_safety',
+  emerald: 'rickshaw',
+  amber: 'illegal_occupation',
+  rose: 'harassment',
+  violet: 'extortion',
+  slate: 'load_shedding',
+};
 
 // In-memory cache initialized from the unified local section registry. This keeps
 // local fallbacks and backend taxonomy aligned without duplicating a hard-coded list.
@@ -104,36 +116,16 @@ export const TaxonomyService = {
 
         data.forEach((row: SupabaseSegmentRow) => {
           const key = row.id as SectionKey;
-          const fallback = SECTIONS[key] || {
-            key: row.id as SectionKey,
-            slug: `/${row.id}`,
-            nameBn: row.name_bn || row.id,
-            nameEn: row.name_en || row.id,
-            shortNameBn: row.name_bn || row.id,
-            shortNameEn: row.name_en || row.id,
-            descriptionBn: '',
-            descriptionEn: '',
-            primaryColor: '#3A7CA5',
-            hoverColor: '#1B4D6B',
-            bgColor: '#F0F3F9',
-            borderColor: '#CCD5E8',
-            textColor: '#1B4D6B',
-            colors: {
-              primary: '#3A7CA5',
-              hover: '#1B4D6B',
-              lightBg: '#F0F3F9',
-              bgLight: '#F0F3F9',
-              border: '#CCD5E8',
-              text: '#1B4D6B',
-              textSafe: '#1B4D6B',
-              filledText: '#FFFFFF',
-            },
-          };
+          const themeFallbackKey =
+            THEME_SECTION_FALLBACKS[row.theme_key || ''] || 'road_transport';
+          const fallback = SECTIONS[key] || SECTIONS[themeFallbackKey];
 
           nextSegments[row.id] = {
             ...fallback,
             key,
             id: row.id,
+            iconKey: row.icon_key || 'shield',
+            themeKey: row.theme_key || 'sky',
             slug: row.slug ? `/category/${row.slug}` : fallback.slug,
             nameBn: row.name_bn || fallback.nameBn,
             nameEn: row.name_en || fallback.nameEn,
@@ -237,7 +229,10 @@ export const TaxonomyService = {
   },
 
   getSegment(key: SectionKey): SegmentTaxonomyItem {
-    return cachedSegments[key] || { ...SECTIONS[key], id: key };
+    return (
+      cachedSegments[key] ||
+      ({ ...SECTIONS[key], id: key } as SegmentTaxonomyItem)
+    );
   },
 
   getSubcategories(segment: SectionKey): SubcategoryOption[] {
