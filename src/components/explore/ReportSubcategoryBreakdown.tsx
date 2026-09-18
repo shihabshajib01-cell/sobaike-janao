@@ -174,7 +174,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                       ? () => onSelectSubcategory(item.segment, item.subId)
                       : undefined
                   }
-                  className={`w-full text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  className={`w-full min-h-[44px] text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     onSelectSubcategory ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
                   } ${
                     activeSubcategory?.segment === item.segment &&
