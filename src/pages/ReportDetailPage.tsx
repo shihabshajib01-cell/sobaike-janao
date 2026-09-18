@@ -286,6 +286,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const fullDesc = language === 'bn' ? report.fullDescriptionBn : report.fullDescriptionEn;
   const detailText = fullDesc || shortDesc;
+  const sourceName = report.sources?.[0]?.publisherName || '';
   const sourceUrl = report.sources?.[0]?.canonicalUrl || '';
   const subcategory = language === 'bn' ? report.subcategoryBn : report.subcategoryEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
@@ -503,9 +504,15 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           )}
 
           {sourceUrl && (
-            <p className="type-meta text-ui-content-muted break-all select-text">
-              {sourceUrl}
-            </p>
+            <div className="max-w-[760px] type-compact text-ui-content-primary space-y-1">
+              <p>
+                <span className="font-[var(--font-weight-semibold)]">
+                  {language === 'bn' ? 'উৎস' : 'Source'}:
+                </span>{' '}
+                {sourceName || (language === 'bn' ? 'মূল সূত্র' : 'Original source')}
+              </p>
+              <p className="break-all select-text">{sourceUrl}</p>
+            </div>
           )}
 
           <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
