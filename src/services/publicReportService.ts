@@ -1,4 +1,9 @@
-import { ReportItem, PublicPublishedResponse, PublicConfiguredReportField } from '../types/report';
+import {
+  ReportItem,
+  PublicPublishedResponse,
+  PublicConfiguredReportField,
+  PublicReportSource,
+} from '../types/report';
 import { SectionKey } from '../theme/tokens';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import {
@@ -296,6 +301,39 @@ export const PublicReportService = {
     if (data) {
       let report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
       report = (await enrichHarassmentClassifications([report]))[0] || report;
+
+      // Only verified, final-detail sources are returned by this public RPC.
+      try {
+        const { data: sourceData, error: sourceError } = await fetchWithDeduplication(
+          `rpc:get_public_report_sources:${cleanId}`,
+          () =>
+            supabase!.rpc('get_public_report_sources', {
+              p_report_id: cleanId,
+            })
+        );
+
+        if (sourceError) {
+          console.warn('[PublicReportService.getById] Source load error:', sourceError);
+        } else if (Array.isArray(sourceData)) {
+          report.sources = sourceData
+            .filter((source: any) => source?.canonicalUrl && source?.publisherName)
+            .map(
+              (source: any): PublicReportSource => ({
+                publisherName: String(source.publisherName),
+                sourceTitle: source.sourceTitle ? String(source.sourceTitle) : null,
+                sourceType: String(source.sourceType || 'news') as PublicReportSource['sourceType'],
+                canonicalUrl: String(source.canonicalUrl),
+                sourcePublishedDate: source.sourcePublishedDate
+                  ? String(source.sourcePublishedDate)
+                  : null,
+                verifiedAt: source.verifiedAt ? String(source.verifiedAt) : null,
+                sourceVersion: Number(source.sourceVersion || 1),
+              })
+            );
+        }
+      } catch (sourceLoadError) {
+        console.warn('[PublicReportService.getById] Source enrichment failed:', sourceLoadError);
+      }
 
       try {
         const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports([cleanId]);
