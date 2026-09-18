@@ -86,8 +86,8 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   : 'bg-ui-surface border-ui-stroke-subtle shadow-[var(--elevation-2xs)]'
               }`}
               style={{
-                backgroundColor: isSelected ? srv.bgVar : undefined,
-                borderColor: isSelected ? srv.primaryVar : undefined,
+                backgroundColor: isSelected ? srv.bgColor : undefined,
+                borderColor: isSelected ? srv.primaryColor : undefined,
               }}
             >
               <div
