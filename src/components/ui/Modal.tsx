@@ -191,10 +191,10 @@ export const Modal: React.FC<ModalProps> = ({
 
   const cardShapeClasses =
     effectiveMobilePresentation === 'sheet'
-      ? 'rounded-t-[var(--radius-card)] rounded-b-none md:rounded-[var(--radius-card)] border-t border-x-0 border-b-0 md:border animate-sheet-slide-up'
-      : maxWidth === 'composer'
+      ? 'rounded-t-[var(--radius-modal)] rounded-b-none md:rounded-[var(--radius-modal)] border-t border-x-0 border-b-0 md:border animate-sheet-slide-up'
+      : maxWidth === 'composer' || maxWidth === 'full'
       ? 'rounded-none md:rounded-[var(--radius-modal)] border-0 md:border'
-      : 'rounded-[var(--radius-card)] border';
+      : 'rounded-[var(--radius-modal)] border';
 
   const isHidden = !isOpen && keepMounted;
 
