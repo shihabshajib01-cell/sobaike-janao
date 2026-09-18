@@ -511,17 +511,17 @@ requireContains(
 );
 requireContains(
   'src/components/ui/Modal.tsx',
-  'bg-ui-surface border-t border-ui-stroke-subtle',
+  'bg-role-surface border-t border-role-outline-subtle',
   'Modal footer must use the unified surface and divider recipe'
 );
 requireContains(
   'src/components/ui/Modal.tsx',
-  'bg-ui-overlay',
+  'bg-role-overlay',
   'Modal backdrop must use the semantic overlay utility'
 );
 requireNotContains(
   'src/components/ui/Modal.tsx',
-  "style={{ backgroundColor: 'var(--ui-overlay)' }}",
+  "style={{ backgroundColor: 'var(--md-overlay)' }}",
   'Modal backdrop must not recreate semantic overlay styling inline'
 );
 requireContains(
@@ -531,12 +531,12 @@ requireContains(
 );
 requireContains(
   'src/components/ui/Button.tsx',
-  'disabled:bg-ui-disabled-bg',
+  'disabled:bg-role-disabled-container',
   'Button must own the shared semantic disabled background state'
 );
 requireContains(
   'src/components/ui/Button.tsx',
-  'disabled:text-ui-disabled-text',
+  'disabled:text-role-on-disabled',
   'Button must own the shared semantic disabled text state'
 );
 requireNotContains(
