@@ -186,6 +186,8 @@ class ApiClient {
     const submissionRpc =
       payload?.formEngineMode === 'schema'
         ? 'submit_public_configured_complaint'
+        : payload?.segment === 'harassment' && payload?.subcategoryId === 'sexual-harassment'
+        ? 'submit_public_complaint_v3'
         : 'submit_public_complaint_v2';
 
     const result = await supabase.rpc(submissionRpc, {
