@@ -142,7 +142,20 @@ export const ConfiguredFieldsSection = forwardRef<
           continue;
         }
 
-        if (field.fieldType === 'evidence' || field.fieldType === 'privacy') {
+        if (field.fieldType === 'evidence') {
+          continue;
+        }
+
+        if (field.fieldType === 'privacy') {
+          if (
+            formData.privacyChoice === 'public_identity' &&
+            !formData.confirmPublicIdentity
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'পাবলিক পরিচয় প্রকাশের সম্মতি নিশ্চিত করুন।'
+                : 'Confirm consent before publishing your identity.';
+          }
           continue;
         }
 
@@ -463,6 +476,50 @@ export const ConfiguredFieldsSection = forwardRef<
                     />
                   </div>
 
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-road"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'রাস্তা / সড়ক' : 'Road / street'}
+                    </label>
+                    <input
+                      id="configured-location-road"
+                      value={formData.location?.road || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            road: event.target.value,
+                          },
+                        })
+                      }
+                      className={commonInputClass}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-landmark"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'ল্যান্ডমার্ক' : 'Landmark'}
+                    </label>
+                    <input
+                      id="configured-location-landmark"
+                      value={formData.location?.landmark || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            landmark: event.target.value,
+                          },
+                        })
+                      }
+                      className={commonInputClass}
+                    />
+                  </div>
+
                   <div className="space-y-1.5 sm:col-span-2">
                     <label
                       htmlFor="configured-location-address"
@@ -596,6 +653,10 @@ export const ConfiguredFieldsSection = forwardRef<
                               | 'anonymous'
                               | 'admin_only'
                               | 'public_identity',
+                            confirmPublicIdentity:
+                              option.value === 'public_identity'
+                                ? formData.confirmPublicIdentity
+                                : false,
                           })
                         }
                       />
@@ -640,6 +701,32 @@ export const ConfiguredFieldsSection = forwardRef<
                       />
                     </div>
                   </div>
+                )}
+
+                {formData.privacyChoice === 'public_identity' && (
+                  <label className="flex min-h-[44px] cursor-pointer items-start gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(formData.confirmPublicIdentity)}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          confirmPublicIdentity: event.target.checked,
+                        })
+                      }
+                      className="mt-1"
+                    />
+                    <span className="type-compact text-ui-content-primary">
+                      {language === 'bn'
+                        ? 'আমি আমার পরিচয় প্রকাশ্যে দেখানোর জন্য সম্মতি দিচ্ছি।'
+                        : 'I consent to displaying my identity publicly.'}
+                    </span>
+                  </label>
+                )}
+
+                {error && (
+                  <p role="alert" className="type-compact text-ui-error-text">
+                    {error}
+                  </p>
                 )}
               </div>
             );
