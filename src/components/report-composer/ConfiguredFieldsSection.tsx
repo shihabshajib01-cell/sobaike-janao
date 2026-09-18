@@ -702,107 +702,127 @@ export const ConfiguredFieldsSection = forwardRef<
             );
           }
 
-          const fullWidth =
-            field.fieldType === 'textarea' || field.fieldType === 'multiselect';
+          const cardClass =
+            'rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5';
 
-          return (
-            <div
-              key={field.fieldKey}
-              id={`configured-field-${field.fieldKey}`}
-              className={`space-y-1.5 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5 ${
-                fullWidth ? '' : ''
-              }`}
-            >
-              {field.fieldType === 'radio' || field.fieldType === 'multiselect' ? (
-                <p
-                  id={fieldLabelId}
-                  className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                >
-                  {label}
-                  {field.required ? ' *' : ''}
-                </p>
-              ) : field.fieldType === 'checkbox' ? null : (
-                <label
-                  id={fieldLabelId}
-                  htmlFor={fieldControlId}
-                  className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                >
-                  {label}
-                  {field.required ? ' *' : ''}
-                </label>
-              )}
-
-              {field.fieldType === 'textarea' ? (
-                <textarea
+          if (field.fieldType === 'textarea') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <TextAreaField
                   id={fieldControlId}
                   rows={5}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
                   value={String(value ?? '')}
-                  aria-required={field.required || undefined}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   placeholder={placeholder}
+                  minLength={
+                    field.validation?.minLength !== undefined
+                      ? Number(field.validation.minLength)
+                      : undefined
+                  }
+                  maxLength={
+                    field.validation?.maxLength !== undefined
+                      ? Number(field.validation.maxLength)
+                      : undefined
+                  }
                   onChange={(event) => setValue(field, event.target.value)}
-                  className={`${commonInputClass} resize-y`}
                 />
-              ) : field.fieldType === 'select' ? (
-                <select
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'select') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <Select
                   id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
                   value={String(value ?? '')}
-                  aria-required={field.required || undefined}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   onChange={(event) => setValue(field, event.target.value)}
-                  className={commonInputClass}
-                >
-                  <option value="">
-                    {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                  </option>
-                  {field.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {language === 'bn' ? option.labelBn : option.labelEn}
-                    </option>
-                  ))}
-                </select>
-              ) : field.fieldType === 'radio' ? (
-                <div
-                  role="radiogroup"
-                  aria-labelledby={fieldLabelId}
+                  placeholder={placeholder || (language === 'bn' ? 'নির্বাচন করুন' : 'Select')}
+                  options={field.options.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'radio') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <RadioGroup
+                  id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  onChange={(next) => setValue(field, next)}
+                  options={field.options.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'checkbox') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className={`${cardClass} space-y-1.5`}
+              >
+                <Checkbox
+                  id={fieldControlId}
+                  checked={Boolean(value)}
+                  required={field.required}
                   aria-required={field.required || undefined}
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                  className="flex flex-wrap gap-2"
-                >
-                  {field.options.map((option) => (
-                    <label
-                      key={option.value}
-                      className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
-                    >
-                      <input
-                        type="radio"
-                        name={`configured-${field.fieldKey}`}
-                        value={option.value}
-                        checked={value === option.value}
-                        onChange={() => setValue(field, option.value)}
-                      />
-                      {language === 'bn' ? option.labelBn : option.labelEn}
-                    </label>
-                  ))}
-                </div>
-              ) : field.fieldType === 'checkbox' ? (
-                <label className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary">
-                  <input
-                    id={fieldControlId}
-                    type="checkbox"
-                    checked={Boolean(value)}
-                    aria-required={field.required || undefined}
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? fieldErrorId : undefined}
-                    onChange={(event) => setValue(field, event.target.checked)}
-                  />
-                  {helper || label}
-                  {field.required ? ' *' : ''}
-                </label>
-              ) : field.fieldType === 'multiselect' ? (
+                  onChange={(event) => setValue(field, event.target.checked)}
+                  label={
+                    <>
+                      {label}
+                      {field.required ? (
+                        <span className="text-role-validation ml-1" aria-hidden="true">*</span>
+                      ) : null}
+                    </>
+                  }
+                  description={!error ? helper : undefined}
+                />
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                    {error}
+                  </p>
+                ) : helper ? (
+                  <span id={fieldHelperId} className="sr-only">{helper}</span>
+                ) : null}
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'multiselect') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className={`${cardClass} space-y-2`}
+              >
+                <p id={fieldLabelId} className="type-label text-role-on-surface">
+                  {label}
+                  {field.required ? (
+                    <span className="text-role-validation ml-1" aria-hidden="true">*</span>
+                  ) : null}
+                </p>
                 <div
                   role="group"
                   aria-labelledby={fieldLabelId}
@@ -812,80 +832,150 @@ export const ConfiguredFieldsSection = forwardRef<
                   className="grid gap-2 sm:grid-cols-2"
                 >
                   {field.options.map((option) => {
-                    const selected = Array.isArray(value)
-                      ? value.includes(option.value)
-                      : false;
+                    const selected = Array.isArray(value) ? value.includes(option.value) : false;
                     return (
-                      <label
+                      <Checkbox
                         key={option.value}
-                        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selected}
-                          onChange={(event) => {
-                            const current = Array.isArray(value)
-                              ? [...value]
-                              : [];
-                            const next = event.target.checked
-                              ? [...current, option.value]
-                              : current.filter((item) => item !== option.value);
-                            setValue(field, next);
-                          }}
-                        />
-                        {language === 'bn' ? option.labelBn : option.labelEn}
-                      </label>
+                        id={`${fieldControlId}-${option.value}`}
+                        checked={selected}
+                        onChange={(event) => {
+                          const current = Array.isArray(value) ? [...value] : [];
+                          const next = event.target.checked
+                            ? [...current, option.value]
+                            : current.filter((item) => item !== option.value);
+                          setValue(field, next);
+                        }}
+                        label={language === 'bn' ? option.labelBn : option.labelEn}
+                        labelClassName="type-body text-role-on-surface"
+                      />
                     );
                   })}
                 </div>
-              ) : (
-                <input
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                    {error}
+                  </p>
+                ) : helper ? (
+                  <p id={fieldHelperId} className="type-helper text-role-on-surface-muted">{helper}</p>
+                ) : null}
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'date') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <DateField
                   id={fieldControlId}
-                  aria-required={field.required || undefined}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                  type={
-                    field.fieldType === 'currency' ||
-                    field.fieldType === 'number'
-                      ? 'number'
-                      : field.fieldType === 'phone'
-                        ? 'tel'
+                  language={language}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  min={field.validation?.min !== undefined ? String(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? String(field.validation.max) : undefined}
+                  onChange={(event) => setValue(field, event.target.value)}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'time') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <TimeField
+                  id={fieldControlId}
+                  language={language}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  min={field.validation?.min !== undefined ? String(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? String(field.validation.max) : undefined}
+                  onChange={(event) => setValue(field, event.target.value)}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'month') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <MonthField
+                  id={fieldControlId}
+                  language={language}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  min={field.validation?.min !== undefined ? String(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? String(field.validation.max) : undefined}
+                  onChange={(event) => setValue(field, event.target.value)}
+                />
+              </div>
+            );
+          }
+
+          const inputType =
+            field.fieldType === 'currency' || field.fieldType === 'number'
+              ? 'number'
+              : field.fieldType === 'phone'
+                ? 'tel'
+                : field.fieldType === 'url'
+                  ? 'url'
+                  : field.fieldType === 'email'
+                    ? 'email'
+                    : 'text';
+
+          return (
+            <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+              <TextField
+                id={fieldControlId}
+                type={inputType}
+                label={label}
+                required={field.required}
+                helperText={helper}
+                error={error}
+                value={String(value ?? '')}
+                placeholder={placeholder}
+                min={
+                  (field.fieldType === 'number' || field.fieldType === 'currency') &&
+                  field.validation?.min !== undefined
+                    ? Number(field.validation.min)
+                    : undefined
+                }
+                max={
+                  (field.fieldType === 'number' || field.fieldType === 'currency') &&
+                  field.validation?.max !== undefined
+                    ? Number(field.validation.max)
+                    : undefined
+                }
+                minLength={
+                  field.validation?.minLength !== undefined
+                    ? Number(field.validation.minLength)
+                    : undefined
+                }
+                maxLength={
+                  field.validation?.maxLength !== undefined
+                    ? Number(field.validation.maxLength)
+                    : undefined
+                }
+                inputMode={
+                  field.fieldType === 'number' || field.fieldType === 'currency'
+                    ? 'decimal'
+                    : field.fieldType === 'phone'
+                      ? 'tel'
+                      : field.fieldType === 'email'
+                        ? 'email'
                         : field.fieldType === 'url'
                           ? 'url'
-                          : field.fieldType === 'email'
-                            ? 'email'
-                            : field.fieldType
-                  }
-                  value={String(value ?? '')}
-                  placeholder={placeholder}
-                  min={
-                    field.validation?.min !== undefined
-                      ? Number(field.validation.min)
-                      : undefined
-                  }
-                  max={
-                    field.validation?.max !== undefined
-                      ? Number(field.validation.max)
-                      : undefined
-                  }
-                  maxLength={
-                    field.validation?.maxLength !== undefined
-                      ? Number(field.validation.maxLength)
-                      : undefined
-                  }
-                  onChange={(event) => setValue(field, event.target.value)}
-                  className={commonInputClass}
-                />
-              )}
-
-              {field.fieldType !== 'checkbox' && helper && (
-                <p id={fieldHelperId} className="type-compact text-ui-content-muted">{helper}</p>
-              )}
-              {error && (
-                <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
-                  {error}
-                </p>
-              )}
+                          : undefined
+                }
+                onChange={(event) => setValue(field, event.target.value)}
+              />
             </div>
           );
         })}
