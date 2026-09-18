@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { useApp } from '../../context/AppContext';
+import { useDialogLifecycle } from './useDialogLifecycle';
 
 export interface ModalProps {
   id?: string;
@@ -24,17 +25,12 @@ export interface ModalProps {
   ariaDescribedBy?: string;
   mobilePresentation?: 'sheet' | 'fullscreen' | 'center';
   closeOnBackdrop?: boolean;
+  closeOnEscape?: boolean;
   headerIcon?: React.ReactNode;
   showCloseButton?: boolean;
   headerClassName?: string;
   footerClassName?: string;
 }
-
-// Global reference counter and stack for nested modal scroll locks & keyboard focus handling
-let openModalsCount = 0;
-let savedBodyOverflow: string | null = null;
-let modalInstanceCounter = 0;
-const modalStack: string[] = [];
 
 export const Modal: React.FC<ModalProps> = ({
   id = 'app-modal',
@@ -56,96 +52,27 @@ export const Modal: React.FC<ModalProps> = ({
   contentClassName,
   mobilePresentation,
   closeOnBackdrop = true,
+  closeOnEscape = true,
   headerIcon,
   showCloseButton = true,
   headerClassName = '',
   footerClassName = '',
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
-  const instanceIdRef = useRef<string>('');
-  if (!instanceIdRef.current) {
-    instanceIdRef.current = `${id}-${++modalInstanceCounter}`;
-  }
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+
+  useDialogLifecycle({
+    id,
+    isOpen,
+    onClose,
+    containerRef: modalRef,
+    closeOnEscape,
+  });
 
   const { language: appLanguage } = useApp();
   const activeLang = customLanguage || appLanguage;
   const closeLabel = activeLang === 'bn' ? 'ডায়ালগ বন্ধ করুন' : 'Close dialog';
 
-  useEffect(() => {
-    if (!isOpen) return;
 
-    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
-
-    if (openModalsCount === 0) {
-      savedBodyOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-    }
-    openModalsCount++;
-    modalStack.push(instanceIdRef.current);
-
-    // Keep initial focus inside the dialog without asking mobile Safari to scroll
-    // a button/input into view. Auto-focusing actionable controls was causing the
-    // visual viewport to jump on first open, leaving bottom sheets at a stale Y offset.
-    const timeoutId = window.setTimeout(() => {
-      modalRef.current?.focus({ preventScroll: true });
-    }, 0);
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // ONLY the topmost currently open Modal handles Escape and traps Tab
-      if (modalStack[modalStack.length - 1] !== instanceIdRef.current) {
-        return;
-      }
-
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCloseRef.current();
-        return;
-      }
-
-      // Focus trap
-      if (e.key === 'Tab' && modalRef.current) {
-        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length === 0) return;
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
-            e.preventDefault();
-            lastElement.focus({ preventScroll: true });
-          }
-        } else if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement.focus({ preventScroll: true });
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      clearTimeout(timeoutId);
-      const stackIdx = modalStack.lastIndexOf(instanceIdRef.current);
-      if (stackIdx !== -1) {
-        modalStack.splice(stackIdx, 1);
-      }
-      openModalsCount = Math.max(0, openModalsCount - 1);
-      if (openModalsCount === 0) {
-        document.body.style.overflow = savedBodyOverflow || '';
-        savedBodyOverflow = null;
-      }
-      window.removeEventListener('keydown', handleKeyDown);
-      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
-        previouslyFocusedElementRef.current.focus({ preventScroll: true });
-      }
-    };
-  }, [isOpen]);
 
   if (!isOpen && !keepMounted) return null;
 
