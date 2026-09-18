@@ -286,6 +286,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const fullDesc = language === 'bn' ? report.fullDescriptionBn : report.fullDescriptionEn;
   const detailText = fullDesc || shortDesc;
+  const sourceUrl = report.sources?.[0]?.canonicalUrl || '';
   const subcategory = language === 'bn' ? report.subcategoryBn : report.subcategoryEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const incidentDateRaw = language === 'bn' ? report.incidentDateBn : report.incidentDateEn;
@@ -499,6 +500,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <div className="max-w-[760px] type-body text-ui-content-primary leading-7">
               <p className="whitespace-pre-line">{detailText}</p>
             </div>
+          )}
+
+          {sourceUrl && (
+            <p className="type-meta text-ui-content-muted break-all select-text">
+              {sourceUrl}
+            </p>
           )}
 
           <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
