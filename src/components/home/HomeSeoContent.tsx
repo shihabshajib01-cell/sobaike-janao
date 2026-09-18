@@ -12,6 +12,8 @@ export interface HomeSeoContentProps {
  */
 export const HomeSeoContent: React.FC<HomeSeoContentProps> = ({ language }) => {
   const isBn = language === 'bn';
+  const localizedPath = (path: string) =>
+    language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 
   return (
     <section
@@ -46,23 +48,23 @@ export const HomeSeoContent: React.FC<HomeSeoContentProps> = ({ language }) => {
             <p className="type-body text-ui-content-secondary">
               {isBn ? (
                 <>
-                  বিভাগগুলো দেখুন: <Link to="/public-safety">জননিরাপত্তা</Link>,{' '}
-                  <Link to="/harassment">হয়রানি ও নির্যাতন</Link>,{' '}
-                  <Link to="/extortion">চাঁদাবাজি ও ঘুষ</Link>,{' '}
-                  <Link to="/road-transport">সড়ক ও যাতায়াত</Link>,{' '}
-                  <Link to="/load-shedding">ইউটিলিটি সমস্যা</Link>,{' '}
-                  <Link to="/illegal-occupation">অবৈধ দখল</Link> এবং{' '}
-                  <Link to="/rickshaw">অবৈধ অটো-রিকশা চার্জিং</Link>।
+                  বিভাগগুলো দেখুন: <Link to={localizedPath('/public-safety')}>জননিরাপত্তা</Link>,{' '}
+                  <Link to={localizedPath('/harassment')}>হয়রানি ও নির্যাতন</Link>,{' '}
+                  <Link to={localizedPath('/extortion')}>চাঁদাবাজি ও ঘুষ</Link>,{' '}
+                  <Link to={localizedPath('/road-transport')}>সড়ক ও যাতায়াত</Link>,{' '}
+                  <Link to={localizedPath('/load-shedding')}>ইউটিলিটি সমস্যা</Link>,{' '}
+                  <Link to={localizedPath('/illegal-occupation')}>অবৈধ দখল</Link> এবং{' '}
+                  <Link to={localizedPath('/rickshaw')}>অবৈধ অটো-রিকশা চার্জিং</Link>।
                 </>
               ) : (
                 <>
-                  Browse <Link to="/public-safety">public safety</Link>,{' '}
-                  <Link to="/harassment">harassment and abuse</Link>,{' '}
-                  <Link to="/extortion">extortion and bribery</Link>,{' '}
-                  <Link to="/road-transport">road and transport</Link>,{' '}
-                  <Link to="/load-shedding">utility issues</Link>,{' '}
-                  <Link to="/illegal-occupation">illegal occupation</Link>, and{' '}
-                  <Link to="/rickshaw">unsafe auto-rickshaw charging</Link>.
+                  Browse <Link to={localizedPath('/public-safety')}>public safety</Link>,{' '}
+                  <Link to={localizedPath('/harassment')}>harassment and abuse</Link>,{' '}
+                  <Link to={localizedPath('/extortion')}>extortion and bribery</Link>,{' '}
+                  <Link to={localizedPath('/road-transport')}>road and transport</Link>,{' '}
+                  <Link to={localizedPath('/load-shedding')}>utility issues</Link>,{' '}
+                  <Link to={localizedPath('/illegal-occupation')}>illegal occupation</Link>, and{' '}
+                  <Link to={localizedPath('/rickshaw')}>unsafe auto-rickshaw charging</Link>.
                 </>
               )}
             </p>
@@ -118,17 +120,17 @@ export const HomeSeoContent: React.FC<HomeSeoContentProps> = ({ language }) => {
             <p className="type-body text-ui-content-secondary">
               {isBn ? (
                 <>
-                  <Link to="/explore">এক্সপ্লোর</Link> থেকে বিভাগ, জেলা ও এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন দেখুন।
-                  নির্দিষ্ট বিষয় বা সংশ্লিষ্ট পক্ষ খুঁজতে <Link to="/search">অনুসন্ধান</Link> ব্যবহার করুন।
-                  নতুন ঘটনা জানাতে <Link to="/report">প্রতিবেদন করুন</Link> এবং নীতি, গোপনীয়তা,
-                  প্রতিউত্তরের অধিকার ও জরুরি সহায়তার তথ্যের জন্য <Link to="/more">তথ্য ও নির্দেশিকা</Link> দেখুন।
+                  <Link to={localizedPath('/explore')}>এক্সপ্লোর</Link> থেকে বিভাগ, জেলা ও এলাকা অনুযায়ী প্রকাশিত প্রতিবেদন দেখুন।
+                  নির্দিষ্ট বিষয় বা সংশ্লিষ্ট পক্ষ খুঁজতে <Link to={localizedPath('/search')}>অনুসন্ধান</Link> ব্যবহার করুন।
+                  নতুন ঘটনা জানাতে <Link to={localizedPath('/report')}>প্রতিবেদন করুন</Link> এবং নীতি, গোপনীয়তা,
+                  প্রতিউত্তরের অধিকার ও জরুরি সহায়তার তথ্যের জন্য <Link to={localizedPath('/more')}>তথ্য ও নির্দেশিকা</Link> দেখুন।
                 </>
               ) : (
                 <>
-                  Use <Link to="/explore">Explore</Link> to browse published reports by division, district, and area.
-                  Use <Link to="/search">Search</Link> for a specific topic or reported party.
-                  <Link to="/report"> Submit a report</Link> for a new public-interest incident, and see
-                  <Link to="/more"> information and guidance</Link> for platform policies, privacy, right of response,
+                  Use <Link to={localizedPath('/explore')}>Explore</Link> to browse published reports by division, district, and area.
+                  Use <Link to={localizedPath('/search')}>Search</Link> for a specific topic or reported party.
+                  <Link to={localizedPath('/report')}> Submit a report</Link> for a new public-interest incident, and see
+                  <Link to={localizedPath('/more')}> information and guidance</Link> for platform policies, privacy, right of response,
                   and emergency-help information.
                 </>
               )}

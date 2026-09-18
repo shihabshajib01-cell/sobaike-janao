@@ -34,6 +34,7 @@ import { useSeo } from '../components/seo/SeoManager';
 import {
   BRAND_NAME,
   buildBrandedSeoTitle,
+  buildReportSeoTitle,
   isSeoIndexableReportContent,
   normalizeSeoDescription,
 } from '../lib/seo';
@@ -143,9 +144,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       const rawDescription =
         language === 'bn'
           ? bnDescription
-          : enDescription && enDescription !== bnDescription
+          : enDescription &&
+              enDescription !== bnDescription &&
+              enDescription.trim().length >= 50
             ? enDescription
-            : `Published citizen report about ${report.titleEn || report.titleBn}. Review the report details, location, sources, and updates on Sobaike Janao.`;
+            : `Published citizen report about ${report.titleEn || report.titleBn}. Review the report details, location, available sources, public-interest context, and the latest updates on Sobaike Janao.`;
 
       const description = normalizeSeoDescription(rawDescription, language);
       const indexable = isSeoIndexableReportContent(
@@ -156,7 +159,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       );
 
       setDynamicSeo({
-        title: buildBrandedSeoTitle(publicTitle, BRAND_NAME[language]),
+        title: buildReportSeoTitle(publicTitle, BRAND_NAME[language], report.id),
         description,
         robots: indexable
           ? 'index, follow, max-image-preview:large'
@@ -168,6 +171,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         imageAlt: publicTitle,
         pageType: 'article',
         publishedTime: report.publishedAt || undefined,
+        modifiedTime: report.updatedAt || report.publishedAt || undefined,
       });
       return;
     }

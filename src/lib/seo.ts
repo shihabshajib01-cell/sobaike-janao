@@ -51,6 +51,21 @@ export function buildBrandedSeoTitle(
   return `${truncateSeoText(cleanTitle, available)}${suffix}`;
 }
 
+export function buildReportSeoTitle(
+  title: string,
+  brand: string,
+  reportId: string,
+  maxLength = 60
+): string {
+  const shortId = String(reportId || '').replace(/^SJ-\d{4}-/i, '').slice(-6);
+  const discriminator = shortId ? ` · ${shortId}` : '';
+  const cleanBrand = String(brand || '').replace(/\s+/g, ' ').trim();
+  const suffix = `${discriminator}${cleanBrand ? ` | ${cleanBrand}` : ''}`;
+  const cleanTitle = String(title || '').replace(/\s+/g, ' ').trim();
+  const available = Math.max(1, maxLength - suffix.length);
+  return `${truncateSeoText(cleanTitle, available)}${suffix}`;
+}
+
 export function normalizeSeoDescription(
   value: string,
   language: 'bn' | 'en',
@@ -71,6 +86,13 @@ export function normalizeSeoDescription(
         ? ' বিস্তারিত, এলাকা, উৎস ও পরবর্তী আপডেট সবাইকে জানাও প্ল্যাটফর্মে দেখুন।'
         : ' Review the relevant details, location, sources, and updates on Sobaike Janao.';
     result = `${result.replace(/[।.!?]+$/, '')}.${suffix}`;
+  }
+
+  if (result.length < minLength) {
+    result +=
+      language === 'bn'
+        ? ' জনস্বার্থের প্রেক্ষাপট ও সর্বশেষ তথ্যও যাচাই করুন।'
+        : ' Check the public-interest context and latest published information as well.';
   }
 
   return truncateSeoText(result, maxLength);
@@ -374,13 +396,12 @@ function setAlternateLinkTag(hreflang: string, href: string): void {
 }
 
 function localizedCanonicalUrl(pathname: string, language: 'bn' | 'en'): string {
-  const url = new URL(pathname, SITE_ORIGIN);
+  const normalized = normalizeCanonicalPath(pathname);
   if (language === 'en') {
-    url.searchParams.set('lang', 'en');
-  } else {
-    url.searchParams.delete('lang');
+    const englishPath = normalized === '/' ? '/en/' : `/en${normalized}`;
+    return new URL(englishPath, SITE_ORIGIN).toString();
   }
-  return url.toString();
+  return new URL(normalized, SITE_ORIGIN).toString();
 }
 
 function normalizeCanonicalPath(pathname?: string): string {
