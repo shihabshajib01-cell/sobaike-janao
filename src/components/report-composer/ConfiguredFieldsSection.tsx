@@ -805,7 +805,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   {label}
                   {field.required ? ' *' : ''}
                 </p>
-              ) : (
+              ) : field.fieldType === 'checkbox' ? null : (
                 <label
                   id={fieldLabelId}
                   htmlFor={fieldControlId}
@@ -880,10 +880,11 @@ export const ConfiguredFieldsSection = forwardRef<
                     checked={Boolean(value)}
                     aria-required={field.required || undefined}
                     aria-invalid={Boolean(error)}
-                    aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
+                    aria-describedby={error ? fieldErrorId : undefined}
                     onChange={(event) => setValue(field, event.target.checked)}
                   />
                   {helper || label}
+                  {field.required ? ' *' : ''}
                 </label>
               ) : field.fieldType === 'multiselect' ? (
                 <div
