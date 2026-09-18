@@ -813,7 +813,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       )}
                     </div>
                   </div>
-                  <blockquote className="mt-2.5 type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words whitespace-pre-line">
+                  <blockquote className="mt-2.5 type-body text-ui-content-primary border-l-2 border-ui-stroke-default pl-3 break-words whitespace-pre-line">
                     “{response.content}”
                   </blockquote>
                 </article>
