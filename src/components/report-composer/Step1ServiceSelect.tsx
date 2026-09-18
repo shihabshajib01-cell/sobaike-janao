@@ -62,10 +62,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   const activeComingSoonData = selectedComingSoon ? COMING_SOON_SERVICES[selectedComingSoon] : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="text-left">
-        <h3 className="type-h2 font-[var(--font-weight-bold)] text-ui-content-primary">
-          {language === 'bn' ? 'কোন বিষয়ে জানাতে চান?' : 'What would you like to report?'}
+        <h3 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary">
+          {language === 'bn' ? 'কী বিষয়ে প্রতিবেদন করতে চান?' : 'What would you like to report?'}
         </h3>
       </div>
 
@@ -80,10 +80,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               id={`service-select-card-${srv.key}`}
               onClick={() => handleActiveSelect(srv.key)}
               aria-pressed={isSelected}
-              className={`relative rounded-[var(--radius-card)] px-4 py-3.5 md:px-5 md:py-4 transition-all duration-150 cursor-pointer flex items-center gap-3 text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
+              className={`relative ui-radius-card px-4 py-3.5 md:px-5 md:py-4 transition-colors duration-150 cursor-pointer flex items-center gap-3 text-left ui-border-default focus:outline-none focus:ring-2 focus:ring-ui-focus ${
                 isSelected
-                  ? 'border-2 shadow-[var(--elevation-sm)]'
-                  : 'bg-ui-surface border-ui-stroke-subtle shadow-[var(--elevation-2xs)]'
+                  ? 'ui-elevation-selected'
+                  : 'bg-ui-surface border-ui-stroke-default ui-elevation-control'
               }`}
               style={{
                 backgroundColor: isSelected ? srv.bgColor : undefined,
@@ -91,7 +91,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               }}
             >
               <div
-                className="w-11 h-11 md:w-12 md:h-12 shrink-0 rounded-[var(--radius-control)] flex items-center justify-center transition-colors border shadow-[var(--elevation-2xs)]"
+                className="w-11 h-11 md:w-12 md:h-12 shrink-0 ui-radius-control flex items-center justify-center transition-colors ui-border-default ui-elevation-control"
                 style={{
                   backgroundColor: srv.bgColor,
                   color: srv.textColor,
@@ -102,24 +102,24 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               </div>
 
               <div className="min-w-0 flex-1">
-                <h4 className="type-h3 text-ui-content-primary">
+                <h4 className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary">
                   {language === 'bn' ? srv.titleBn : srv.titleEn}
                 </h4>
-                <p className="type-meta text-ui-content-secondary mt-0.5 truncate">
+                <p className="type-helper text-ui-content-secondary mt-0.5 truncate">
                   {language === 'bn' ? srv.descBn : srv.descEn}
                 </p>
               </div>
 
               <div
                 aria-hidden="true"
-                className={`w-6 h-6 shrink-0 rounded-[var(--radius-pill)] flex items-center justify-center border-2 transition-all ${
+                className={`w-5 h-5 shrink-0 rounded-[var(--radius-pill)] flex items-center justify-center ui-border-default transition-colors ${
                   isSelected
                     ? 'border-ui-accent bg-ui-surface'
-                    : 'border-ui-stroke-subtle bg-ui-surface'
+                    : 'border-ui-stroke-default bg-ui-surface'
                 }`}
               >
                 <span
-                  className={`w-2.5 h-2.5 rounded-[var(--radius-pill)] bg-ui-accent transition-transform ${
+                  className={`w-2 h-2 rounded-[var(--radius-pill)] bg-ui-accent transition-transform ${
                     isSelected ? 'scale-100' : 'scale-0'
                   }`}
                 />
