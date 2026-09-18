@@ -58,6 +58,7 @@ export const Modal: React.FC<ModalProps> = ({
   headerClassName = '',
   footerClassName = '',
 }) => {
+  const modalRootRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useDialogLifecycle({
@@ -65,6 +66,7 @@ export const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
     containerRef: modalRef,
+    dialogRef: modalRootRef,
     closeOnEscape,
   });
 
@@ -100,14 +102,10 @@ export const Modal: React.FC<ModalProps> = ({
     full: defaultMaxWidthClasses.full,
   };
 
-  // The report-draft confirmation has three actions with longer Bengali labels.
-  // Give only this dialog one wider responsive size so actions never clip horizontally.
-  const resolvedMaxWidth = id === 'draft-confirm-close-modal' && maxWidth === 'md' ? 'lg' : maxWidth;
-
   const maxWidthClass =
     effectiveMobilePresentation === 'sheet'
-      ? sheetMaxWidthClasses[resolvedMaxWidth] || sheetMaxWidthClasses.md
-      : defaultMaxWidthClasses[resolvedMaxWidth] || defaultMaxWidthClasses.md;
+      ? sheetMaxWidthClasses[maxWidth] || sheetMaxWidthClasses.md
+      : defaultMaxWidthClasses[maxWidth] || defaultMaxWidthClasses.md;
 
   const rootPositionClasses =
     effectiveMobilePresentation === 'sheet'
@@ -131,6 +129,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const modalNode = (
     <div
+      ref={modalRootRef}
       id={id}
       role="dialog"
       aria-modal="true"
