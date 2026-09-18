@@ -238,7 +238,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const activeHeroBg =
     HERO_TOKENS.sections[activeKey]?.background ??
     activeSegment?.bgColor ??
-    '#F0F3F9';
+    'var(--ui-surface-subtle)';
 
   const containerStyle: React.CSSProperties = {
     ...getHeroSliderCssVars(),
@@ -307,7 +307,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   backgroundColor:
                     HERO_TOKENS.sections[slide.key]?.background ??
                     slideSegment?.bgColor ??
-                    '#F0F3F9',
+                    'var(--ui-surface-subtle)',
                 }}
               >
                 <CategoryHeroBanner
