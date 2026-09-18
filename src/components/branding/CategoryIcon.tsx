@@ -1,6 +1,7 @@
 import React from 'react';
 import { FeatureIcon, FeatureIconSize, FeatureIconVariant } from './FeatureIcon';
 import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 
 export interface CategoryIconProps {
   section: SectionKey;
@@ -12,10 +13,6 @@ export interface CategoryIconProps {
   ariaLabel?: string;
 }
 
-/**
- * CategoryIcon re-exports / wraps standardized FeatureIcon
- * preserving backward compatibility for existing imports.
- */
 export const CategoryIcon: React.FC<CategoryIconProps> = ({
   section,
   className = '',
@@ -25,16 +22,25 @@ export const CategoryIcon: React.FC<CategoryIconProps> = ({
   variant = 'standard',
   ariaLabel,
 }) => {
+  const { getSegment } = useTaxonomy();
+  const config = getSegment(section);
   const mappedVariant: FeatureIconVariant =
     variant === 'marker'
       ? 'marker'
       : withContainer || variant === 'badge'
-      ? 'container'
-      : 'standard';
+        ? 'container'
+        : 'standard';
 
   return (
     <FeatureIcon
       section={section}
+      iconKey={config?.iconKey}
+      palette={{
+        primary: config?.primaryColor,
+        background: config?.bgColor,
+        border: config?.borderColor,
+        text: config?.textColor,
+      }}
       size={size as FeatureIconSize}
       variant={mappedVariant}
       className={className}
