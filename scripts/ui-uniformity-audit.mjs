@@ -3,6 +3,16 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const read = (relative) => fs.readFileSync(path.resolve(ROOT, relative), 'utf8');
+const walkTsx = (dir) => {
+  if (!fs.existsSync(dir)) return [];
+  const files = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) files.push(...walkTsx(full));
+    else if (entry.isFile() && entry.name.endsWith('.tsx')) files.push(full);
+  }
+  return files;
+};
 
 const failures = [];
 const requireContains = (file, token, message) => {
@@ -244,8 +254,8 @@ const approvedSpecializedDialogSurfaces = new Set([
   'src/components/media/AttachmentLightboxModal.tsx',
 ]);
 
-for (const root of PUBLIC_UI_ROOTS) {
-  for (const filePath of walk(root)) {
+for (const root of [path.resolve(ROOT, 'src/components'), path.resolve(ROOT, 'src/pages')]) {
+  for (const filePath of walkTsx(root)) {
     const relative = path.relative(ROOT, filePath).replaceAll('\\', '/');
     if (relative === 'src/components/ui/Modal.tsx' || approvedSpecializedDialogSurfaces.has(relative)) continue;
     const source = fs.readFileSync(filePath, 'utf8');
