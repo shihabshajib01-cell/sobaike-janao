@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { useApp } from '../../context/AppContext';
+import { useDialogLifecycle } from './useDialogLifecycle';
 
 export interface DrawerProps {
   id?: string;
@@ -27,10 +28,16 @@ export const Drawer: React.FC<DrawerProps> = ({
   footer,
   language: customLanguage,
 }) => {
+  const drawerRootRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+
+  useDialogLifecycle({
+    id,
+    isOpen,
+    onClose,
+    containerRef: drawerRef,
+    dialogRef: drawerRootRef,
+  });
 
   let appLanguage: 'bn' | 'en' = 'bn';
   try {
@@ -46,63 +53,13 @@ export const Drawer: React.FC<DrawerProps> = ({
   const activeLang = customLanguage || appLanguage;
   const closeLabel = activeLang === 'bn' ? 'প্যানেল বন্ধ করুন' : 'Close panel';
 
-  useEffect(() => {
-    if (!isOpen) return;
 
-    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    const timeoutId = window.setTimeout(() => {
-      drawerRef.current?.focus({ preventScroll: true });
-    }, 0);
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCloseRef.current();
-        return;
-      }
-
-      // Focus trap
-      if (e.key === 'Tab' && drawerRef.current) {
-        const focusableElements = drawerRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length === 0) return;
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement || document.activeElement === drawerRef.current) {
-            e.preventDefault();
-            lastElement.focus({ preventScroll: true });
-          }
-        } else if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement.focus({ preventScroll: true });
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-      if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
-        previouslyFocusedElementRef.current.focus({ preventScroll: true });
-      }
-    };
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const positionClasses = {
     bottom:
-      'absolute inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl border-t border-ui-stroke-default pb-safe',
+      'absolute inset-x-0 bottom-0 max-h-[85dvh] rounded-t-[var(--radius-modal)] border-t border-ui-stroke-default pb-safe',
     right:
       'absolute inset-y-0 right-0 w-full max-w-md border-l border-ui-stroke-default',
     left:
@@ -111,6 +68,7 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const drawerNode = (
     <div
+      ref={drawerRootRef}
       id={id}
       role="dialog"
       aria-modal="true"
