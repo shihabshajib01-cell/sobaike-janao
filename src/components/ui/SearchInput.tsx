@@ -69,7 +69,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <div className={`relative flex items-center w-full ${className}`}>
       <Search
-        className="absolute left-3.5 w-4 h-4 text-ui-content-muted pointer-events-none shrink-0"
+        className="absolute left-3.5 w-4 h-4 text-role-on-surface-muted pointer-events-none shrink-0"
         aria-hidden="true"
       />
       <input
@@ -82,14 +82,14 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={effectivePlaceholder}
-        className="w-full min-h-[44px] bg-ui-surface-subtle hover:bg-ui-surface focus:bg-ui-surface text-ui-content-primary placeholder:text-ui-content-muted ui-radius-control ui-space-search ui-border-default border-ui-stroke-subtle hover:border-ui-stroke-default focus:ring-1 focus:ring-ui-focus transition-all outline-none"
+        className="w-full min-h-[44px] bg-role-surface-subtle hover:bg-role-surface focus:bg-role-surface text-role-on-surface placeholder:text-role-on-surface-muted ui-radius-control ui-space-search ui-border-default border-role-outline-subtle hover:border-role-outline focus:ring-1 focus:ring-role-focus transition-all outline-none"
       />
       {currentValue.length > 0 && (
         <button
           type="button"
           onClick={handleClear}
           aria-label={resolvedClearLabel}
-          className="absolute right-1 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-[var(--radius-pill)] text-ui-content-muted hover:text-ui-content-primary hover:bg-ui-surface-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus transition-colors cursor-pointer"
+          className="absolute right-1 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-[var(--radius-pill)] text-role-on-surface-muted hover:text-role-on-surface hover:bg-role-surface-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus transition-colors cursor-pointer"
         >
           <X className="w-4 h-4" aria-hidden="true" />
         </button>
