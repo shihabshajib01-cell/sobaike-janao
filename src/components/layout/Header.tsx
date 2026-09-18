@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Menu, PlusCircle, Home, Compass, PhoneCall, Globe } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { CATEGORY_ORDER } from '../../data/categoryOrder';
@@ -15,7 +16,6 @@ import { CategoryIcon } from '../branding/CategoryIcon';
 export const Header: React.FC = () => {
   const {
     currentRoute,
-    navigateTo,
     language,
     toggleLanguage,
     isTabletMenuOpen,
@@ -24,6 +24,8 @@ export const Header: React.FC = () => {
   } = useApp();
   const { segments, getSegment } = useTaxonomy();
   const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
+  const localizePath = (path: RoutePath) =>
+    language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 
   useEffect(() => {
     let active = true;
@@ -82,12 +84,17 @@ export const Header: React.FC = () => {
       >
         <div className="w-full max-w-[900px] mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
-            <BrandLogo
-              id="tablet-brand-logo"
-              size="sm"
-              onClick={() => navigateTo('/')}
-              englishClassName="hidden min-[900px]:block type-meta leading-tight text-ui-content-secondary font-[var(--font-weight-medium)]"
-            />
+            <Link
+              to={localizePath('/')}
+              aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
+              className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <BrandLogo
+                id="tablet-brand-logo"
+                size="sm"
+                englishClassName="hidden min-[900px]:block type-meta leading-tight text-ui-content-secondary font-[var(--font-weight-medium)]"
+              />
+            </Link>
 
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               <Button
@@ -133,13 +140,10 @@ export const Header: React.FC = () => {
               const secConfig = item.sectionKey ? getSegment(item.sectionKey) : null;
 
               return (
-                <button
+                <Link
                   key={item.path}
-                  type="button"
-                  onClick={() => {
-                    setIsTabletMenuOpen(false);
-                    navigateTo(item.path);
-                  }}
+                  to={localizePath(item.path)}
+                  onClick={() => setIsTabletMenuOpen(false)}
                   aria-current={isActive ? 'page' : undefined}
                   className={`w-full flex items-center justify-between px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] transition-colors text-left cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     isActive ? getSectionActiveStyles(item.sectionKey) : 'text-ui-content-secondary'
@@ -167,18 +171,15 @@ export const Header: React.FC = () => {
                       aria-hidden="true"
                     />
                   )}
-                </button>
+                </Link>
               );
             })}
           </nav>
 
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-1">
-            <button
-              type="button"
-              onClick={() => {
-                setIsTabletMenuOpen(false);
-                navigateTo('/search');
-              }}
+            <Link
+              to={localizePath('/search')}
+              onClick={() => setIsTabletMenuOpen(false)}
               aria-current={currentRoute === '/search' ? 'page' : undefined}
               className={`w-full flex items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/search'
@@ -188,14 +189,11 @@ export const Header: React.FC = () => {
             >
               <Search className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'অনুসন্ধান' : 'Search'}</span>
-            </button>
+            </Link>
 
-            <button
-              type="button"
-              onClick={() => {
-                setIsTabletMenuOpen(false);
-                navigateTo('/more');
-              }}
+            <Link
+              to={localizePath('/more')}
+              onClick={() => setIsTabletMenuOpen(false)}
               aria-current={currentRoute === '/more' ? 'page' : undefined}
               className={`w-full flex items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/more'
@@ -205,7 +203,7 @@ export const Header: React.FC = () => {
             >
               <PhoneCall className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'তথ্য ও সহায়তা' : 'Info & support'}</span>
-            </button>
+            </Link>
           </div>
 
           <div className="pt-3 border-t border-ui-stroke-subtle space-y-3">
