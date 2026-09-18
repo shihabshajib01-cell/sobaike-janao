@@ -21,7 +21,10 @@ import { Button } from '../components/ui/Button';
 import { useApp } from '../context/AppContext';
 import { CitizenActionModal } from '../components/report-detail/CitizenActionModal';
 import { SubjectResponseModal } from '../components/report-detail/SubjectResponseModal';
-import { PublicReportService } from '../services/publicReportService';
+import {
+  PublicReportService,
+  PublicConfiguredReportField,
+} from '../services/publicReportService';
 import { PublicEngagementService } from '../services/publicEngagementService';
 import { PUBLIC_RESPONSE_DISPLAY_CONNECTED } from '../services/publicResponseService';
 import { ReportMediaGrid } from '../components/media/ReportMediaGrid';
@@ -31,6 +34,7 @@ import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
 import { BRAND_NAME } from '../lib/seo';
 import { HarassmentContextSummary } from '../components/report/HarassmentContextSummary';
+import { PublicConfiguredFieldsCard } from '../components/report/PublicConfiguredFieldsCard';
 
 export interface ReportDetailPageProps {
   reportId: string;
@@ -55,6 +59,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const [storedResponses, setStoredResponses] = useState<PublicPublishedResponse[]>([]);
   const [responseLoadError, setResponseLoadError] = useState<boolean>(false);
   const [relatedReports, setRelatedReports] = useState<ReportItem[]>([]);
+  const [configuredFields, setConfiguredFields] = useState<PublicConfiguredReportField[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<boolean>(false);
   const [viewCount, setViewCount] = useState(0);
@@ -65,6 +70,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     setFetchError(false);
     setStoredResponses([]);
     setResponseLoadError(false);
+    setConfiguredFields([]);
 
     PublicReportService.getById(reportId)
       .then(async (res) => {
@@ -72,6 +78,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           setReport(res.report);
           setStoredResponses(res.responses || []);
           setResponseLoadError(Boolean(res.responseLoadError));
+          setConfiguredFields(
+            await PublicReportService.getConfiguredFields(res.report.id)
+          );
 
           if (
             res.report.relatedReportIds &&
@@ -449,6 +458,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           )}
 
           <HarassmentContextSummary report={report} language={language} />
+
+          <PublicConfiguredFieldsCard
+            fields={configuredFields}
+            language={language}
+          />
 
           {report.reportedSubject && (
             <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-1.5">
