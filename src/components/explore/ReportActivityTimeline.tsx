@@ -302,19 +302,18 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                     : `${fullLabel} ${m.yearDisplayEn}: ${m.count} ${m.count === 1 ? 'report' : 'reports'}`;
 
                 return (
-                  <button
-                    key={m.key}
-                    id={`timeline-col-${m.key}`}
-                    type="button"
-                    role="listitem"
-                    aria-label={accessibleText}
-                    aria-pressed={activeMonthKey === m.key}
-                    onClick={onSelectMonth ? () => onSelectMonth(m.key) : undefined}
-                    disabled={!onSelectMonth}
-                    className={`flex flex-col items-center min-w-0 rounded-[var(--radius-badge-md)] px-1 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                      onSelectMonth ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
-                    } ${activeMonthKey === m.key ? 'bg-ui-surface-subtle' : ''}`}
-                  >
+                  <div key={m.key} role="listitem" className="min-w-0">
+                    <button
+                      id={`timeline-col-${m.key}`}
+                      type="button"
+                      aria-label={accessibleText}
+                      aria-pressed={activeMonthKey === m.key}
+                      onClick={onSelectMonth ? () => onSelectMonth(m.key) : undefined}
+                      disabled={!onSelectMonth}
+                      className={`w-full min-h-[44px] flex flex-col items-center min-w-0 rounded-[var(--radius-badge-md)] px-1 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                        onSelectMonth ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
+                      } ${activeMonthKey === m.key ? 'bg-ui-surface-subtle' : ''}`}
+                    >
                     {/* Numeric count above bar */}
                     <span
                       className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary mb-1.5 tabular-nums text-center select-none"
@@ -352,7 +351,8 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                         {yearLabel}
                       </span>
                     </div>
-                  </button>
+                    </button>
+                  </div>
                 );
               })}
             </div>
