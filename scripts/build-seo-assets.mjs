@@ -223,6 +223,16 @@ function buildBrandedSeoTitle(title, brand = 'সবাইকে জানাও
   return `${truncateSeoText(cleanTitle, available)}${suffix}`;
 }
 
+function buildReportSeoTitle(title, brand, reportId, maxLength = 60) {
+  const shortId = String(reportId || '').replace(/^SJ-\d{4}-/i, '').slice(-6);
+  const discriminator = shortId ? ` · ${shortId}` : '';
+  const cleanBrand = String(brand || '').replace(/\s+/g, ' ').trim();
+  const suffix = `${discriminator}${cleanBrand ? ` | ${cleanBrand}` : ''}`;
+  const cleanTitle = String(title || '').replace(/\s+/g, ' ').trim();
+  const available = Math.max(1, maxLength - suffix.length);
+  return `${truncateSeoText(cleanTitle, available)}${suffix}`;
+}
+
 function normalizeSeoDescription(value, language = 'bn', minLength = 90, maxLength = 155) {
   const clean = String(value || '').replace(/\s+/g, ' ').trim();
   if (!clean) {
@@ -747,8 +757,8 @@ function reportPage(report) {
 
   return {
     path: `/report-detail/${encodeURIComponent(id)}`,
-    title: buildBrandedSeoTitle(rawTitleBn),
-    titleEn: buildBrandedSeoTitle(rawTitleEn, 'Sobaike Janao'),
+    title: buildReportSeoTitle(rawTitleBn, 'সবাইকে জানাও', id),
+    titleEn: buildReportSeoTitle(rawTitleEn, 'Sobaike Janao', id),
     description: normalizeSeoDescription(rawDescriptionBn, 'bn'),
     descriptionEn: normalizeSeoDescription(rawDescriptionEn, 'en'),
     robots: indexable
