@@ -1373,41 +1373,30 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       keywords: [option.labelBn, option.labelEn],
                     }))}
                   />
-                  <div>
-                    <label htmlFor="bribery-service-input" className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1">
-                      {language === 'bn' ? 'সেবা বা প্রক্রিয়া (ঐচ্ছিক)' : 'Service or process (optional)'}
-                    </label>
-                    <input
-                      id="bribery-service-input"
-                      type="text"
-                      value={formData.briberyService || ''}
-                      onChange={(e) => onUpdateFormData({ briberyService: e.target.value })}
-                      placeholder={language === 'bn' ? 'যেমন: মিউটেশন, পাসপোর্ট নবায়ন, লাইসেন্স' : 'e.g. mutation, passport renewal, licence'}
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="bribery-amount-input" className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1">
-                      {language === 'bn' ? 'টাকার পরিমাণ (ঐচ্ছিক)' : 'Amount (BDT) (optional)'}
-                    </label>
-                    <input
-                      id="bribery-amount-input"
-                  aria-invalid={Boolean(errors.briberyAmount)}
-                  aria-describedby={errors.briberyAmount ? 'bribery-amount-input-error' : undefined}
-                      type="number"
-                      min="1"
-                      step="any"
-                      value={formData.briberyAmount !== undefined && formData.briberyAmount !== null ? formData.briberyAmount : ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        onUpdateFormData({ briberyAmount: value === '' ? undefined : Number(value) });
-                        if (errors.briberyAmount) setErrors((prev) => ({ ...prev, briberyAmount: '' }));
-                      }}
-                      placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${errors.briberyAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'}`}
-                    />
-                    {errors.briberyAmount && <p id="bribery-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.briberyAmount}</p>}
-                  </div>
+                  <TextField
+                    id="bribery-service-input"
+                    type="text"
+                    label={language === 'bn' ? 'সেবা বা প্রক্রিয়া (ঐচ্ছিক)' : 'Service or process (optional)'}
+                    value={formData.briberyService || ''}
+                    onChange={(e) => onUpdateFormData({ briberyService: e.target.value })}
+                    placeholder={language === 'bn' ? 'যেমন: মিউটেশন, পাসপোর্ট নবায়ন, লাইসেন্স' : 'e.g. mutation, passport renewal, licence'}
+                  />
+                  <TextField
+                    id="bribery-amount-input"
+                    type="number"
+                    min="1"
+                    step="any"
+                    inputMode="decimal"
+                    label={language === 'bn' ? 'টাকার পরিমাণ (ঐচ্ছিক)' : 'Amount (BDT) (optional)'}
+                    value={formData.briberyAmount !== undefined && formData.briberyAmount !== null ? formData.briberyAmount : ''}
+                    error={errors.briberyAmount}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      onUpdateFormData({ briberyAmount: value === '' ? undefined : Number(value) });
+                      if (errors.briberyAmount) setErrors((prev) => ({ ...prev, briberyAmount: '' }));
+                    }}
+                    placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
+                  />
                 </div>
               </div>
             )}
