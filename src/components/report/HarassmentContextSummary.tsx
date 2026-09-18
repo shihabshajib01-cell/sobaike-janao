@@ -155,11 +155,11 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
         {language === 'bn' ? 'ঘটনার প্রেক্ষাপট' : 'Incident context'}
       </h2>
       {rows.length > 0 && (
-        <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <dl className="divide-y divide-ui-stroke-subtle">
           {rows.map((row) => (
-            <div key={row.label} className="rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle p-3">
+            <div key={row.label} className="grid grid-cols-1 sm:grid-cols-[minmax(0,220px)_1fr] gap-1 sm:gap-4 py-3 first:pt-1 last:pb-1">
               <dt className="type-compact font-[var(--font-weight-semibold)] text-ui-content-muted">{row.label}</dt>
-              <dd className="mt-1 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">{row.value}</dd>
+              <dd className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">{row.value}</dd>
             </div>
           ))}
         </dl>
