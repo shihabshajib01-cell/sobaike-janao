@@ -59,11 +59,11 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const positionClasses = {
     bottom:
-      'absolute inset-x-0 bottom-0 max-h-[85dvh] rounded-t-[var(--radius-modal)] border-t border-ui-stroke-default pb-safe',
+      'absolute inset-x-0 bottom-0 max-h-[85dvh] rounded-t-[var(--radius-modal)] border-t border-role-outline pb-safe',
     right:
-      'absolute inset-y-0 right-0 w-full max-w-md border-l border-ui-stroke-default',
+      'absolute inset-y-0 right-0 w-full max-w-md border-l border-role-outline',
     left:
-      'absolute inset-y-0 left-0 w-full max-w-md border-r border-ui-stroke-default',
+      'absolute inset-y-0 left-0 w-full max-w-md border-r border-role-outline',
   };
 
   const drawerNode = (
@@ -78,7 +78,7 @@ export const Drawer: React.FC<DrawerProps> = ({
       {/* Backdrop */}
       <div
         className="absolute inset-0 backdrop-blur-xs transition-opacity"
-        style={{ backgroundColor: 'var(--ui-overlay)' }}
+        className="absolute inset-0 backdrop-blur-xs transition-opacity bg-role-overlay"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -87,25 +87,25 @@ export const Drawer: React.FC<DrawerProps> = ({
       <div
         ref={drawerRef}
         tabIndex={-1}
-        className={`bg-ui-surface shadow-[var(--elevation-2xl)] z-10 flex flex-col outline-none ${positionClasses[position]}`}
+        className={`bg-role-surface shadow-[var(--elevation-2xl)] z-10 flex flex-col outline-none ${positionClasses[position]}`}
       >
         {/* Bottom sheet pull indicator on mobile */}
         {position === 'bottom' && (
           <div className="w-full flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1.5 rounded-[var(--radius-pill)] bg-ui-surface-hover" />
+            <div className="w-10 h-1.5 rounded-[var(--radius-pill)] bg-role-surface-hover" />
           </div>
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-ui-stroke-subtle shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-role-outline-subtle shrink-0">
           <div>
             {title && (
-              <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+              <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface leading-snug">
                 {title}
               </h2>
             )}
             {description && (
-              <p className="type-compact leading-[var(--type-line-20)] text-ui-content-muted mt-1">{description}</p>
+              <p className="type-compact leading-[var(--type-line-20)] text-role-on-surface-muted mt-1">{description}</p>
             )}
           </div>
           <IconButton
@@ -114,16 +114,16 @@ export const Drawer: React.FC<DrawerProps> = ({
             aria-label={closeLabel}
             size="md"
             onClick={onClose}
-            className="text-ui-content-muted hover:text-ui-content-primary"
+            className="text-role-on-surface-muted hover:text-role-on-surface"
           />
         </div>
 
         {/* Body Content */}
-        <div className="p-6 overflow-y-auto flex-1 text-ui-content-primary type-label leading-[var(--type-line-24)]">{children}</div>
+        <div className="p-6 overflow-y-auto flex-1 text-role-on-surface type-label leading-[var(--type-line-24)]">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="p-5 border-t border-ui-stroke-subtle bg-ui-surface-subtle shrink-0">
+          <div className="p-5 border-t border-role-outline-subtle bg-role-surface-subtle shrink-0">
             {footer}
           </div>
         )}
