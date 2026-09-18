@@ -3,7 +3,6 @@ import { AlertCircle } from 'lucide-react';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useApp } from '../context/AppContext';
-import { CATEGORY_ORDER } from '../data/categoryOrder';
 import {
   CategoryPopularityMetric,
   CategoryPopularityService,
@@ -12,15 +11,24 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { SectionKey } from '../theme/tokens';
 import { toBanglaDigits } from '../utils/formatters';
 
-const emptyCounts = () =>
-  Object.fromEntries(CATEGORY_ORDER.map((key) => [key, 0])) as Record<SectionKey, number>;
+const emptyCounts = (keys: string[]) =>
+  Object.fromEntries(keys.map((key) => [key, 0])) as Record<string, number>;
 
 export const IssuesPage: React.FC = () => {
   const { language, navigateTo } = useApp();
-  const { getSegment } = useTaxonomy();
-  const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
+  const { segments, getSegment } = useTaxonomy();
+  const taxonomyOrder = useMemo(
+    () =>
+      Object.values(segments)
+        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+        .map((segment) => segment.id),
+    [segments]
+  );
+  const [categoryOrder, setCategoryOrder] = useState<string[]>(taxonomyOrder);
   const [metrics, setMetrics] = useState<CategoryPopularityMetric[]>([]);
-  const [counts, setCounts] = useState<Record<SectionKey, number>>(emptyCounts);
+  const [counts, setCounts] = useState<Record<string, number>>(() =>
+    emptyCounts(taxonomyOrder)
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [hasCountError, setHasCountError] = useState(false);
 
@@ -31,21 +39,21 @@ export const IssuesPage: React.FC = () => {
       CategoryPopularityService.clearCache();
       const ranking = await CategoryPopularityService.getRanking();
       const ordered = await CategoryPopularityService.getOrderedCategoryKeys();
-      const nextCounts = emptyCounts();
+      const nextCounts = emptyCounts(taxonomyOrder);
       ranking.forEach((item) => {
         nextCounts[item.segmentId] = item.publishedPostCount;
       });
       setMetrics(ranking);
       setCounts(nextCounts);
-      setCategoryOrder(ordered);
+      setCategoryOrder(ordered.length > 0 ? ordered : taxonomyOrder);
     } catch (error) {
       console.warn('[IssuesPage popularity load error]', error);
       setHasCountError(true);
-      setCategoryOrder(CATEGORY_ORDER);
+      setCategoryOrder(taxonomyOrder);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [taxonomyOrder]);
 
   useEffect(() => {
     void loadPopularity();
@@ -108,11 +116,11 @@ export const IssuesPage: React.FC = () => {
                 language === 'bn' ? `জনপ্রিয়তার অবস্থান ${toBanglaDigits(rank)}` : `popularity rank ${rank}`
               }`}
               className="min-h-[84px] ui-card px-3.5 py-3 text-left transition-all hover:bg-ui-surface-hover active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              style={{ borderColor: `var(--sec-${key}-border)` }}
+              style={{ borderColor: config.borderColor }}
             >
               <div className="flex items-center gap-3">
                 <CategoryIcon
-                  section={key}
+                  section={key as SectionKey}
                   size="md"
                   withContainer
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
