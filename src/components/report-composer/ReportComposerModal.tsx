@@ -139,6 +139,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Each composer session starts fresh. Legacy persisted drafts are removed and never restored.
   useEffect(() => {
     if (isOpen) {
+      // A reporting session should always resolve the latest Admin-published
+      // schema, but the schema itself is not needed during ordinary browsing.
+      PublicReportingConfigService.invalidate();
       clearLegacyReportDraftStorage();
       setSelectedComingSoon(null);
       setRapePublishingConsentAccepted(false);
