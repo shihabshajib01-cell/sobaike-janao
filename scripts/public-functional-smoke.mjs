@@ -67,9 +67,8 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
   await continueBtn.click();
   const locationModal = page.locator('#location-consent-modal');
   await expectVisible(locationModal, 'location consent did not open after acknowledgement');
-  const modalButtons = locationModal.locator('button');
-  if ((await modalButtons.count()) < 2) throw new Error('location consent actions missing');
-  await modalButtons.nth(1).click();
+  await expectVisible(page.locator('#location-consent-secondary-btn'), 'Not now action missing');
+  await page.locator('#location-consent-secondary-btn').click();
   await locationModal.waitFor({ state: 'hidden', timeout: 10000 });
   await expectVisible(page.locator('#location-reminder-bar'), 'location reminder did not appear after Not now');
   const stored = await page.evaluate(() => ({
@@ -95,9 +94,8 @@ await check('Browse location grant flow works with simulated coordinates', async
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   const locationModal = page.locator('#location-consent-modal');
   await expectVisible(locationModal, 'location consent did not open for undecided visitor');
-  const modalButtons = locationModal.locator('button');
-  if ((await modalButtons.count()) < 2) throw new Error('location consent actions missing');
-  await modalButtons.nth(0).click();
+  await expectVisible(page.locator('#location-consent-primary-btn'), 'Turn on location action missing');
+  await page.locator('#location-consent-primary-btn').click();
   await locationModal.waitFor({ state: 'hidden', timeout: 15000 });
   const choice = await page.evaluate(() => localStorage.getItem('sobaike_location_choice_v1'));
   if (choice !== 'granted') throw new Error(`expected granted location choice; got ${choice}`);
