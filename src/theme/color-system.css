@@ -66,6 +66,7 @@ html[data-theme="light"] {
   --md-secondary-variant: #163B52;
   --md-on-secondary: #FFFFFF;
   --md-secondary-container: color-mix(in srgb, var(--md-secondary) 12%, var(--md-surface));
+  --md-on-secondary-container: #163B52;
   --md-secondary-outline: color-mix(in srgb, var(--md-secondary) 35%, var(--md-surface));
 
   --md-background: #F0F2F5;
@@ -186,6 +187,7 @@ html[data-theme="dark"],
   --md-secondary-variant: #245F82;
   --md-on-secondary: #FFFFFF;
   --md-secondary-container: color-mix(in srgb, var(--md-secondary) 18%, var(--md-surface));
+  --md-on-secondary-container: #BFDBFE;
   --md-secondary-outline: color-mix(in srgb, var(--md-secondary) 40%, var(--md-surface));
 
   --md-background: #18191A;
