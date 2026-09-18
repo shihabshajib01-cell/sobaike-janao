@@ -31,6 +31,12 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
       ? 'অভিযোগের ধরন নির্বাচন করুন।'
       : 'Select a complaint type.';
 
+  const sectionStyles = {
+    background: `var(--sec-${segment}-bg)`,
+    border: `var(--sec-${segment}-primary)`,
+    primary: `var(--sec-${segment}-primary)`,
+  };
+
   const selectAndFocus = (index: number) => {
     const next = allSubcategories[index];
     if (!next) return;
@@ -44,10 +50,10 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
     <div className="space-y-4 sm:space-y-5">
       {/* 1. Minimal Header: Title + Short Helper Text */}
       <div className="space-y-1 text-left">
-        <h3 className="type-h2 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+        <h3 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary leading-tight">
           {headerTitle}
         </h3>
-        <p className="type-h4 leading-normal text-ui-content-secondary">
+        <p className="type-body text-ui-content-secondary">
           {helperText}
         </p>
       </div>
@@ -87,13 +93,17 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
                 const nextIndex = (index + delta + allSubcategories.length) % allSubcategories.length;
                 selectAndFocus(nextIndex);
               }}
-              className={`p-3 sm:p-3.5 rounded-[var(--radius-control)] border text-left cursor-pointer transition-all flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus:ring-2 focus:ring-ui-focus select-none ${
+              className={`p-3 sm:p-3.5 ui-radius-control ui-border-default text-left cursor-pointer transition-colors flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus select-none ${
                 isSingleOption ? 'col-span-full w-full' : ''
               } ${
                 isSelected
-                  ? 'border-2 border-ui-accent bg-ui-accent-soft shadow-[var(--elevation-2xs)]'
-                  : 'border-ui-stroke-subtle bg-ui-surface'
+                  ? 'ui-elevation-selected'
+                  : 'border-ui-stroke-default bg-ui-surface'
               }`}
+              style={{
+                backgroundColor: isSelected ? sectionStyles.background : undefined,
+                borderColor: isSelected ? sectionStyles.border : undefined,
+              }}
             >
               <div className="flex items-start justify-between gap-2.5">
                 <h4 className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
@@ -102,20 +112,26 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
 
                 {/* Radio Selection Visual Indicator */}
                 <div
-                  className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-[var(--radius-pill)] flex items-center justify-center border shrink-0 mt-0.5 transition-colors ${
+                  className={`w-5 h-5 rounded-[var(--radius-pill)] flex items-center justify-center ui-border-default shrink-0 mt-0.5 transition-colors ${
                     isSelected
-                      ? 'border-ui-accent bg-ui-accent text-ui-content-inverse'
-                      : 'border-ui-stroke-subtle bg-ui-surface text-transparent'
+                      ? 'bg-ui-surface'
+                      : 'border-ui-stroke-default bg-ui-surface'
                   }`}
+                  style={{
+                    borderColor: isSelected ? sectionStyles.primary : undefined,
+                  }}
                 >
                   {isSelected ? (
-                    <div className="w-1.5 h-1.5 rounded-[var(--radius-pill)] bg-ui-content-inverse" />
+                    <div
+                      className="w-2 h-2 rounded-[var(--radius-pill)]"
+                      style={{ backgroundColor: sectionStyles.primary }}
+                    />
                   ) : null}
                 </div>
               </div>
 
               {itemDesc && (
-                <p className="type-compact leading-[var(--type-line-ratio-140)] text-ui-content-secondary font-[var(--font-weight-regular)]">
+                <p className="type-helper text-ui-content-secondary">
                   {itemDesc}
                 </p>
               )}
