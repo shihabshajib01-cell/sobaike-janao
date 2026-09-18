@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { SectionKey, SECTIONS, COMING_SOON_SERVICES, ComingSoonServiceKey } from '../../theme/tokens';
+import { SectionKey, COMING_SOON_SERVICES, ComingSoonServiceKey } from '../../theme/tokens';
 import { CategoryIcon } from '../branding/CategoryIcon';
 import { AppIcon } from '../ui/AppIcon';
 import { useTaxonomy } from '../../services/taxonomyService';
