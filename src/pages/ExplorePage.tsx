@@ -21,6 +21,7 @@ import { Modal } from '../components/ui/Modal';
 import { SearchableSelect } from '../components/ui/SearchableSelect';
 import { SearchInput } from '../components/ui/SearchInput';
 import { Button } from '../components/ui/Button';
+import { ModalActions } from '../components/ui/ModalActions';
 import { FilterChip } from '../components/ui/FilterChip';
 import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { HarassmentClassificationFilters } from '../components/report/HarassmentClassificationFilters';
@@ -967,14 +968,20 @@ export const ExplorePage: React.FC = () => {
         mobilePresentation="sheet"
         language={language}
         footer={
-          <div className="flex items-center justify-between w-full gap-3">
-            <Button type="button" variant="secondary" size="md" onClick={handleClearFilterSheet} className="shrink-0">
-              {language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
-            </Button>
-            <Button type="button" variant="primary" size="md" onClick={handleApplyFilterSheet} className="flex-1">
-              {language === 'bn' ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters'}
-            </Button>
-          </div>
+          <ModalActions
+            primary={{
+              type: 'button',
+              size: 'md',
+              onClick: handleApplyFilterSheet,
+              label: language === 'bn' ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters',
+            }}
+            secondary={{
+              type: 'button',
+              size: 'md',
+              onClick: handleClearFilterSheet,
+              label: language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters',
+            }}
+          />
         }
       >
         <div className="space-y-4 py-1">
@@ -1076,19 +1083,19 @@ export const ExplorePage: React.FC = () => {
         mobilePresentation="sheet"
         language={language}
         footer={
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            fullWidth
-            onClick={() => {
-              setViewMode('reports');
-              setIsAreaSheetOpen(false);
+          <ModalActions
+            align="center"
+            primary={{
+              type: 'button',
+              size: 'md',
+              onClick: () => {
+                setViewMode('reports');
+                setIsAreaSheetOpen(false);
+              },
+              leftIcon: <MapIcon name="file-text" size="sm" ariaHidden={true} />,
+              label: language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports',
             }}
-            leftIcon={<MapIcon name="file-text" size="sm" ariaHidden={true} />}
-          >
-            {language === 'bn' ? 'প্রতিবেদন দেখুন' : 'View reports'}
-          </Button>
+          />
         }
       >
         <div className="py-1">
