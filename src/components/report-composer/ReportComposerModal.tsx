@@ -74,6 +74,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Step 3 imperative refs for legacy core sections + Admin-configured fields.
   const step3Ref = useRef<Step3Handle>(null);
   const configuredFieldsRef = useRef<ConfiguredFieldsHandle>(null);
+  const subcategoryConfigRequestRef = useRef(0);
   const [reportingForm, setReportingForm] = useState<PublicReportingForm | null>(null);
 
   // Jump section tracking for Step 3
@@ -337,13 +338,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         formEngineMode: undefined,
         customFieldAnswers: {},
       }));
+      subcategoryConfigRequestRef.current += 1;
       setReportingForm(null);
     },
     [formData.segment, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
   );
 
   const handleSelectSubcategory = useCallback(
-    async (subcategoryId: string, _option: SubcategoryOption) => {
+    (subcategoryId: string, _option: SubcategoryOption) => {
       if (formData.subcategoryId === subcategoryId) return;
 
       if (formData.serverSubmissionState === 'attempted') {
@@ -359,20 +361,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
       setMobJusticeErrors({});
 
-      // State A: pre-submit subcategory switch
-      // Cleanly discard old local evidence attachments and reset idempotency key
+      // Selection must update synchronously so the radiogroup follows native
+      // keyboard semantics. Schema metadata is hydrated immediately afterward.
       revokePreviewUrls(pendingImages);
       setPendingImages([]);
       retryCredentialsRef.current = null;
 
-      let selectedForm: PublicReportingForm | null = null;
-      try {
-        await PublicReportingConfigService.fetch();
-        selectedForm = PublicReportingConfigService.getForm(subcategoryId);
-      } catch {
-        selectedForm = null;
-      }
-      setReportingForm(selectedForm);
+      const requestId = ++subcategoryConfigRequestRef.current;
+      const cachedForm = PublicReportingConfigService.getForm(subcategoryId);
+      setReportingForm(cachedForm);
 
       setFormData((prev) => {
         const isUtilitySwitch =
@@ -389,8 +386,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           evidenceTypes: [],
           evidenceDescription: '',
           title: '',
-          formSchemaVersion: selectedForm?.version,
-          formEngineMode: selectedForm?.engineMode,
+          formSchemaVersion: cachedForm?.version,
+          formEngineMode: cachedForm?.engineMode,
           customFieldAnswers: {},
           subjectType: 'unknown',
           ...(isUtilitySwitch
@@ -410,8 +407,28 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             : {}),
         };
       });
+
+      void PublicReportingConfigService.fetch()
+        .then(() => {
+          if (requestId !== subcategoryConfigRequestRef.current) return;
+          const selectedForm = PublicReportingConfigService.getForm(subcategoryId);
+          setReportingForm(selectedForm);
+          setFormData((prev) =>
+            prev.subcategoryId === subcategoryId
+              ? {
+                  ...prev,
+                  formSchemaVersion: selectedForm?.version,
+                  formEngineMode: selectedForm?.engineMode,
+                }
+              : prev
+          );
+        })
+        .catch(() => {
+          if (requestId !== subcategoryConfigRequestRef.current) return;
+          setReportingForm(null);
+        });
     },
-    [formData.subcategoryId, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
+    [formData.subcategoryId, formData.serverSubmissionState, language, pendingImages]
   );
 
   const handleNextFromStep2 = useCallback(() => {
