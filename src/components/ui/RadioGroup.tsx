@@ -34,6 +34,9 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   optionClassName = '',
 }) => {
   const { helperId, errorId, labelId } = formFieldIds(id);
+  const describedBy = [helperText ? helperId : undefined, error ? errorId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined;
 
   return (
     <FormField
@@ -43,6 +46,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
       error={error}
       required={required}
       className={className}
+      groupLabel
     >
       <div
         id={id}
@@ -51,7 +55,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
         aria-label={!label ? id : undefined}
         aria-required={required || undefined}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : helperText ? helperId : undefined}
+        aria-describedby={describedBy}
         className="grid gap-2 sm:grid-cols-2"
       >
         {options.map((option) => {
