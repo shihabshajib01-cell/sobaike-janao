@@ -150,7 +150,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
   return (
     <div
       className={`flex items-center p-1 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-card)] gap-1 ${className}`}
-      role="radiogroup"
+      role="group"
       aria-label={language === 'bn' ? 'থিম' : 'Theme'}
     >
       {options.map((opt) => {
