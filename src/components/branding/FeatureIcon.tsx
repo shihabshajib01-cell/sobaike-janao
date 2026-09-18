@@ -1,12 +1,15 @@
 import React from 'react';
 import {
+  AlertTriangle,
+  Building2,
+  CircleDot,
   HeartHandshake,
+  LucideIcon,
+  MapPin,
   ShieldAlert,
   ShieldCheck,
   TrafficCone,
-  Building2,
   ZapOff,
-  LucideIcon,
 } from 'lucide-react';
 import { EvStationIcon } from './EvStationIcon';
 import { SectionKey } from '../../theme/tokens';
@@ -14,8 +17,17 @@ import { SectionKey } from '../../theme/tokens';
 export type FeatureIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FeatureIconVariant = 'standard' | 'container' | 'marker' | 'badge';
 
+export interface FeatureIconPalette {
+  primary?: string;
+  background?: string;
+  border?: string;
+  text?: string;
+}
+
 export interface FeatureIconProps {
   section: SectionKey;
+  iconKey?: string;
+  palette?: FeatureIconPalette;
   size?: FeatureIconSize;
   variant?: FeatureIconVariant;
   className?: string;
@@ -23,7 +35,7 @@ export interface FeatureIconProps {
   ariaLabel?: string;
 }
 
-const ICON_MAP: Record<SectionKey, LucideIcon | React.ComponentType<any>> = {
+const ICON_MAP: Partial<Record<SectionKey, LucideIcon | React.ComponentType<any>>> = {
   harassment: HeartHandshake,
   extortion: ShieldAlert,
   public_safety: ShieldCheck,
@@ -31,6 +43,18 @@ const ICON_MAP: Record<SectionKey, LucideIcon | React.ComponentType<any>> = {
   load_shedding: ZapOff,
   illegal_occupation: Building2,
   rickshaw: EvStationIcon,
+};
+
+const CUSTOM_ICON_MAP: Record<string, LucideIcon | React.ComponentType<any>> = {
+  shield: ShieldCheck,
+  alert: ShieldAlert,
+  heart: HeartHandshake,
+  road: TrafficCone,
+  building: Building2,
+  bolt: ZapOff,
+  map: MapPin,
+  warning: AlertTriangle,
+  dot: CircleDot,
 };
 
 const SIZE_CLASSES: Record<FeatureIconSize, string> = {
@@ -49,20 +73,20 @@ const CONTAINER_SIZE_CLASSES: Record<FeatureIconSize, string> = {
   xl: 'w-12 h-12 rounded-[var(--radius-card)] p-3',
 };
 
-/**
- * Standardized unified FeatureIcon component for Sobaike Janao.
- * Ensures identical icon geometry, stroke width (2px), color logic and sizing
- * across sidebars, filters, cards, map markers, summaries and feeds.
- */
 export const FeatureIcon: React.FC<FeatureIconProps> = ({
   section,
+  iconKey,
+  palette,
   size = 'md',
   variant = 'standard',
   className = '',
   strokeWidth = 2,
   ariaLabel,
 }) => {
-  const IconComponent = ICON_MAP[section] || ShieldAlert;
+  const IconComponent =
+    (iconKey ? CUSTOM_ICON_MAP[iconKey] : undefined) ||
+    ICON_MAP[section] ||
+    ShieldAlert;
   const isAccessible = Boolean(ariaLabel);
 
   if (variant === 'marker') {
@@ -70,7 +94,9 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
       <div
         className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-[var(--radius-pill)] flex items-center justify-center text-ui-content-inverse border-2 border-ui-surface shadow-[var(--elevation-md)] transition-all shrink-0 ${className}`}
         style={{
-          backgroundColor: `var(--sec-${section}-primary)`,
+          backgroundColor:
+            palette?.primary ||
+            `var(--sec-${section}-primary, var(--ui-accent))`,
         }}
         role={isAccessible ? 'img' : undefined}
         aria-label={ariaLabel}
@@ -86,9 +112,15 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
       <div
         className={`inline-flex items-center justify-center shrink-0 border shadow-[var(--elevation-2xs)] transition-colors ${CONTAINER_SIZE_CLASSES[size]} ${className}`}
         style={{
-          backgroundColor: `var(--sec-${section}-bg)`,
-          color: `var(--sec-${section}-text)`,
-          borderColor: `var(--sec-${section}-border)`,
+          backgroundColor:
+            palette?.background ||
+            `var(--sec-${section}-bg, var(--ui-surface-subtle))`,
+          color:
+            palette?.text ||
+            `var(--sec-${section}-text, var(--ui-content-primary))`,
+          borderColor:
+            palette?.border ||
+            `var(--sec-${section}-border, var(--ui-stroke-subtle))`,
         }}
         role={isAccessible ? 'img' : undefined}
         aria-label={ariaLabel}
@@ -102,6 +134,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   return (
     <IconComponent
       className={`${SIZE_CLASSES[size]} shrink-0 ${className}`}
+      style={palette?.text ? { color: palette.text } : undefined}
       strokeWidth={strokeWidth}
       role={isAccessible ? 'img' : undefined}
       aria-label={ariaLabel}
