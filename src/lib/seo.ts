@@ -320,9 +320,22 @@ function updateJsonLd(
     document.head.appendChild(scriptElement);
   }
 
+  const organizationId = `${SITE_ORIGIN}/#organization`;
   const websiteId = `${SITE_ORIGIN}/#website`;
   const pageId = `${canonicalUrl}#webpage`;
   const locale = language === 'bn' ? 'bn-BD' : 'en';
+
+  const organization = {
+    '@type': 'Organization',
+    '@id': organizationId,
+    url: `${SITE_ORIGIN}/`,
+    name: 'Sobaike Janao',
+    alternateName: 'সবাইকে জানাও',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${SITE_ORIGIN}/brand/icon-512x512.png`,
+    },
+  };
 
   const website = {
     '@type': 'WebSite',
@@ -330,7 +343,7 @@ function updateJsonLd(
     url: `${SITE_ORIGIN}/`,
     name: 'Sobaike Janao',
     alternateName: 'সবাইকে জানাও',
-    inLanguage: ['bn-BD', 'en'],
+    publisher: { '@id': organizationId },
   };
 
   const pageType =
@@ -348,6 +361,7 @@ function updateJsonLd(
     description: metadata.description,
     inLanguage: locale,
     isPartOf: { '@id': websiteId },
+    publisher: { '@id': organizationId },
   };
 
   if (metadata.image) {
@@ -363,7 +377,7 @@ function updateJsonLd(
 
   scriptElement.textContent = JSON.stringify({
     '@context': 'https://schema.org',
-    '@graph': [website, page],
+    '@graph': [organization, website, page],
   });
 }
 
