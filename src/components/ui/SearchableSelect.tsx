@@ -315,7 +315,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               }
             }
           }}
-          className={`w-full min-h-[44px] bg-role-surface text-left ui-border-default ui-radius-control px-3.5 pr-10 transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
+          className={`w-full min-h-[44px] bg-role-surface text-left type-input ui-border-default ui-radius-control px-3.5 pr-10 transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
             error
               ? 'border-role-validation-outline focus:ring-role-validation-focus focus:border-role-validation-focus'
               : 'border-role-outline hover:border-role-outline-strong focus:ring-role-focus'
