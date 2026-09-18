@@ -8,6 +8,8 @@ import { toBanglaDigits } from '../../utils/formatters';
 export interface ReportSubcategoryBreakdownProps {
   reports: ReportItem[];
   language: 'bn' | 'en';
+  activeSubcategory?: { segment: SectionKey; subId: string } | null;
+  onSelectSubcategory?: (segment: SectionKey, subId: string) => void;
 }
 
 export interface SubcategoryStat {
@@ -26,6 +28,8 @@ export interface SubcategoryStat {
 export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProps> = ({
   reports,
   language,
+  activeSubcategory = null,
+  onSelectSubcategory,
 }) => {
   const totalReports = reports.length;
   const [isExpanded, setIsExpanded] = useState(false);
@@ -122,7 +126,13 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
           {language === 'bn' ? 'সাবক্যাটাগরি অনুযায়ী বিশ্লেষণ' : 'Subcategory breakdown'}
         </h2>
         <span className="type-compact text-ui-content-muted font-[var(--font-weight-regular)]">
-          {language === 'bn' ? 'বর্তমান ফিল্টারের ভিত্তিতে' : 'Based on the current filters'}
+          {onSelectSubcategory
+            ? language === 'bn'
+              ? 'সারি চাপলে ফিল্টার হবে'
+              : 'Select a row to filter'
+            : language === 'bn'
+              ? 'বর্তমান ফিল্টারের ভিত্তিতে'
+              : 'Based on the current filters'}
         </span>
       </div>
 
@@ -151,10 +161,27 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                 language === 'bn' ? toBanglaDigits(item.percentage) : item.percentage;
 
               return (
-                <div
+                <button
                   key={item.compositeKey}
                   id={`subcategory-row-${item.compositeKey}`}
-                  className="space-y-1"
+                  type="button"
+                  aria-pressed={
+                    activeSubcategory?.segment === item.segment &&
+                    activeSubcategory?.subId === item.subId
+                  }
+                  onClick={
+                    onSelectSubcategory
+                      ? () => onSelectSubcategory(item.segment, item.subId)
+                      : undefined
+                  }
+                  className={`w-full text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                    onSelectSubcategory ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
+                  } ${
+                    activeSubcategory?.segment === item.segment &&
+                    activeSubcategory?.subId === item.subId
+                      ? 'bg-ui-surface-subtle'
+                      : ''
+                  }`}
                 >
                   <div className="flex items-baseline justify-between type-compact">
                     <div className="flex items-center gap-2 min-w-0 pr-2">
@@ -180,7 +207,6 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                     </div>
                   </div>
 
-                  {/* Proportional Bar using parent category semantic color */}
                   <div
                     role="presentation"
                     aria-hidden="true"
@@ -194,7 +220,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                       }}
                     />
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
