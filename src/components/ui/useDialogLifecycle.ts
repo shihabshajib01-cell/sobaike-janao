@@ -13,6 +13,28 @@ let openScrollLocks = 0;
 let savedBodyOverflow: string | null = null;
 let dialogInstanceCounter = 0;
 const dialogStack: string[] = [];
+const dialogElements = new Map<string, HTMLElement>();
+
+const setElementInert = (element: HTMLElement, inert: boolean) => {
+  if ('inert' in element) {
+    (element as HTMLElement & { inert: boolean }).inert = inert;
+    return;
+  }
+
+  if (inert) {
+    element.setAttribute('inert', '');
+  } else {
+    element.removeAttribute('inert');
+  }
+};
+
+const syncDialogInertState = () => {
+  const topDialogId = dialogStack[dialogStack.length - 1];
+
+  for (const [dialogId, element] of dialogElements.entries()) {
+    setElementInert(element, dialogId !== topDialogId);
+  }
+};
 
 const getFocusableElements = (container: HTMLElement | null) => {
   if (!container) return [];
@@ -30,6 +52,7 @@ interface UseDialogLifecycleOptions {
   isOpen: boolean;
   onClose: () => void;
   containerRef: RefObject<HTMLElement | null>;
+  dialogRef?: RefObject<HTMLElement | null>;
   initialFocusRef?: RefObject<HTMLElement | null>;
   closeOnEscape?: boolean;
   lockBodyScroll?: boolean;
@@ -43,6 +66,7 @@ export const useDialogLifecycle = ({
   isOpen,
   onClose,
   containerRef,
+  dialogRef,
   initialFocusRef,
   closeOnEscape = true,
   lockBodyScroll = true,
@@ -79,11 +103,29 @@ export const useDialogLifecycle = ({
       openScrollLocks += 1;
     }
 
+    const dialogElement = dialogRef?.current || containerRef.current;
+    if (dialogElement) {
+      dialogElements.set(instanceIdRef.current, dialogElement);
+    }
     dialogStack.push(instanceIdRef.current);
+    syncDialogInertState();
 
     const focusTimer = window.setTimeout(() => {
-      const preferredTarget = initialFocusRef?.current || containerRef.current;
-      preferredTarget?.focus({ preventScroll: true });
+      const container = containerRef.current;
+      if (!container) return;
+
+      const activeElement = document.activeElement as HTMLElement | null;
+      if (activeElement && container.contains(activeElement)) {
+        return;
+      }
+
+      const preferredTarget = initialFocusRef?.current;
+      if (preferredTarget && container.contains(preferredTarget)) {
+        preferredTarget.focus({ preventScroll: true });
+        return;
+      }
+
+      container.focus({ preventScroll: true });
     }, 0);
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -144,7 +186,18 @@ export const useDialogLifecycle = ({
       window.removeEventListener('keydown', handleKeyDown);
 
       const stackIndex = dialogStack.lastIndexOf(instanceIdRef.current);
-      if (stackIndex !== -1) dialogStack.splice(stackIndex, 1);
+      const wasTopDialog = stackIndex === dialogStack.length - 1;
+
+      if (stackIndex !== -1) {
+        dialogStack.splice(stackIndex, 1);
+      }
+
+      const registeredDialog = dialogElements.get(instanceIdRef.current);
+      if (registeredDialog) {
+        setElementInert(registeredDialog, false);
+        dialogElements.delete(instanceIdRef.current);
+      }
+      syncDialogInertState();
 
       if (lockBodyScroll) {
         openScrollLocks = Math.max(0, openScrollLocks - 1);
@@ -154,10 +207,12 @@ export const useDialogLifecycle = ({
         }
       }
 
+      if (!wasTopDialog) return;
+
       const previous = previouslyFocusedElementRef.current;
       if (previous && typeof previous.focus === 'function') {
         previous.focus({ preventScroll: true });
       }
     };
-  }, [containerRef, initialFocusRef, isOpen, lockBodyScroll, trapFocus]);
+  }, [containerRef, dialogRef, initialFocusRef, isOpen, lockBodyScroll, trapFocus]);
 };
