@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Loader2, MapPin, X, AlertCircle } from 'lucide-react';
+import { FormField } from '../ui/FormField';
+import { FORM_CONTROL_BASE, formControlStateClass, joinFormClasses } from '../ui/formSystem';
 import {
   PlaceSuggestion,
   ResolvedPlaceResult,
@@ -170,65 +172,64 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
 
   return (
     <div ref={containerRef} className="relative w-full text-left space-y-1">
-      <label
-        htmlFor="address-search-input"
-        className="block type-label font-[var(--font-weight-semibold)] text-role-on-surface"
+      <FormField
+        id="address-search-input"
+        label={label || (language === 'bn' ? 'ঠিকানা বা এলাকা' : 'Address or area')}
       >
-        {label || (language === 'bn' ? 'ঠিকানা বা এলাকা' : 'Address or area')}
-      </label>
+        <div className="relative flex items-center">
+          <div className="absolute left-3.5 flex items-center pointer-events-none text-role-on-surface-muted">
+            {isLoading || isResolving ? (
+              <Loader2 className="w-4 h-4 text-role-primary animate-spin" aria-hidden="true" />
+            ) : (
+              <Search className="w-4 h-4" aria-hidden="true" />
+            )}
+          </div>
 
-      <div className="relative flex items-center">
-        {/* Left Search / State Icon */}
-        <div className="absolute left-3.5 flex items-center pointer-events-none text-secondary">
-          {isLoading || isResolving ? (
-            <Loader2 className="w-4 h-4 text-accent animate-spin" />
-          ) : (
-            <Search className="w-4 h-4 text-secondary" />
-          )}
-        </div>
-
-        {/* Search Input */}
-        <input
-          ref={inputRef}
-          id="address-search-input"
-          type="text"
-          role="combobox"
-          aria-expanded={isOpen}
-          aria-autocomplete="list"
-          aria-controls="address-suggestions-list"
-          aria-activedescendant={
-            activeIndex >= 0 ? `address-suggestion-${activeIndex}` : undefined
-          }
-          value={query}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => {
-            if (suggestions.length > 0) {
-              setIsOpen(true);
+          <input
+            ref={inputRef}
+            id="address-search-input"
+            type="text"
+            role="combobox"
+            aria-expanded={isOpen}
+            aria-autocomplete="list"
+            aria-controls="address-suggestions-list"
+            aria-activedescendant={
+              activeIndex >= 0 ? `address-suggestion-${activeIndex}` : undefined
             }
-          }}
-          disabled={disabled || isResolving}
-          placeholder={
-            language === 'bn'
-              ? 'এলাকা বা রাস্তার নাম লিখুন'
-              : 'Enter area or street name'
-          }
-          className="w-full pl-10 pr-10 py-2.5 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-[var(--ui-focus)] focus:border-ui-accent min-h-[44px] transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-ui-surface-subtle"
-        />
+            value={query}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => {
+              if (suggestions.length > 0) {
+                setIsOpen(true);
+              }
+            }}
+            disabled={disabled || isResolving}
+            placeholder={
+              language === 'bn'
+                ? 'এলাকা বা রাস্তার নাম লিখুন'
+                : 'Enter area or street name'
+            }
+            className={joinFormClasses(
+              FORM_CONTROL_BASE,
+              formControlStateClass(false),
+              'pl-10 pr-10'
+            )}
+          />
 
-        {/* Clear Button */}
-        {query && !isResolving && !disabled && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="absolute right-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-[var(--radius-pill)] hover:bg-ui-surface-subtle cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            title={language === 'bn' ? 'মুছুন' : 'Clear'}
-            aria-label={language === 'bn' ? 'ঠিকানা মুছুন' : 'Clear address'}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
+          {query && !isResolving && !disabled ? (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="absolute right-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-role-on-surface-muted hover:text-role-on-surface rounded-[var(--radius-pill)] hover:bg-role-surface-subtle cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
+              title={language === 'bn' ? 'মুছুন' : 'Clear'}
+              aria-label={language === 'bn' ? 'ঠিকানা মুছুন' : 'Clear address'}
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+          ) : null}
+        </div>
+      </FormField>
 
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {isLoading
