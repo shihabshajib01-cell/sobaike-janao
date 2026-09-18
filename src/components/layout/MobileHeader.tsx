@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PublicEngagementService } from '../../services/publicEngagementService';
@@ -28,6 +29,8 @@ export const MobileHeader: React.FC = () => {
   } = useApp();
   const [isShareConfirmed, setIsShareConfirmed] = useState(false);
   const { segments } = useTaxonomy();
+  const localizePath = (path: string) =>
+    language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 
   const runtimeCategory =
     Object.values(segments).find((segment) => segment.slug === currentRoute) || null;
@@ -188,22 +191,27 @@ export const MobileHeader: React.FC = () => {
             icon={<Menu className="w-5 h-5" aria-hidden="true" />}
           />
 
-          <BrandLogo
-            id="mobile-header-brand-logo"
-            size="sm"
-            showEnglish={false}
-            onClick={() => navigateTo('/')}
-          />
+          <Link
+            to={localizePath('/')}
+            aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
+            className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          >
+            <BrandLogo
+              id="mobile-header-brand-logo"
+              size="sm"
+              showEnglish={false}
+            />
+          </Link>
         </div>
 
-        <IconButton
+        <Link
           id="mobile-header-search-btn"
-          variant="outline"
-          size="md"
-          onClick={() => navigateTo('/search')}
+          to={localizePath('/search')}
           aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-          icon={<Search className="w-5 h-5" aria-hidden="true" />}
-        />
+          className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        >
+          <Search className="w-5 h-5" aria-hidden="true" />
+        </Link>
       </div>
     </header>
   );
