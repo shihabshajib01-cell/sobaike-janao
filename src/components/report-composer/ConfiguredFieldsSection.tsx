@@ -334,9 +334,6 @@ export const ConfiguredFieldsSection = forwardRef<
       districtId
     );
 
-    const commonInputClass =
-      'w-full min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-body text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus';
-
     return (
       <section
         id="composer-section-configured-fields"
@@ -365,189 +362,127 @@ export const ConfiguredFieldsSection = forwardRef<
                 aria-labelledby={fieldLabelId}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <div className="space-y-1">
-                  <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
                     {label}
                     {field.required ? ' *' : ''}
                   </h3>
-                  {helper && (
-                    <p id={fieldHelperId} className="type-compact text-ui-content-secondary">
+                  {helper ? (
+                    <p id={fieldHelperId} className="type-helper text-role-on-surface-muted">
                       {helper}
                     </p>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-division"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'বিভাগ' : 'Division'} *
-                    </label>
-                    <select
-                      id="configured-location-division"
-                      aria-required="true"
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                      value={divisionId}
-                      onChange={(event) => {
-                        const division = DIVISIONS.find(
-                          (item) => item.id === event.target.value
-                        );
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            division: division?.nameEn || '',
-                            district: '',
-                            upazilaOrThana: '',
-                          },
-                        });
-                      }}
-                      className={commonInputClass}
-                    >
-                      <option value="">
-                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                      </option>
-                      {DIVISIONS.map((division) => (
-                        <option key={division.id} value={division.id}>
-                          {language === 'bn'
-                            ? division.nameBn
-                            : division.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="configured-location-division"
+                    label={language === 'bn' ? 'বিভাগ' : 'Division'}
+                    required={field.required}
+                    value={divisionId}
+                    onChange={(event) => {
+                      const division = DIVISIONS.find((item) => item.id === event.target.value);
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          division: division?.nameEn || '',
+                          district: '',
+                          upazilaOrThana: '',
+                        },
+                      });
+                      if (error) setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                    }}
+                    placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                    options={DIVISIONS.map((division) => ({
+                      value: division.id,
+                      label: language === 'bn' ? division.nameBn : division.nameEn,
+                    }))}
+                  />
 
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-district"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'জেলা' : 'District'} *
-                    </label>
-                    <select
-                      id="configured-location-district"
-                      aria-required="true"
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                      value={districtId}
-                      disabled={!divisionId}
-                      onChange={(event) => {
-                        const district = BANGLADESH_DISTRICTS.find(
-                          (item) => item.id === event.target.value
-                        );
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            district: district?.nameEn || '',
-                            upazilaOrThana: '',
-                          },
-                        });
-                      }}
-                      className={commonInputClass}
-                    >
-                      <option value="">
-                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                      </option>
-                      {districtOptions.map((district) => (
-                        <option key={district.id} value={district.id}>
-                          {language === 'bn'
-                            ? district.nameBn
-                            : district.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="configured-location-district"
+                    label={language === 'bn' ? 'জেলা' : 'District'}
+                    required={field.required}
+                    value={districtId}
+                    disabled={!divisionId}
+                    onChange={(event) => {
+                      const district = BANGLADESH_DISTRICTS.find((item) => item.id === event.target.value);
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          district: district?.nameEn || '',
+                          upazilaOrThana: '',
+                        },
+                      });
+                      if (error) setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                    }}
+                    placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                    options={districtOptions.map((district) => ({
+                      value: district.id,
+                      label: language === 'bn' ? district.nameBn : district.nameEn,
+                    }))}
+                  />
 
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-upazila"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn'
-                        ? 'থানা / উপজেলা'
-                        : 'Thana / Upazila'}
-                    </label>
-                    <select
-                      id="configured-location-upazila"
-                      value={selectedUpazila?.id || ''}
-                      disabled={!districtId}
-                      onChange={(event) => {
-                        const item = upazilaOptions.find(
-                          (option) => option.id === event.target.value
-                        );
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            upazilaOrThana: item?.nameEn || '',
-                          },
-                        });
-                      }}
-                      className={commonInputClass}
-                    >
-                      <option value="">
-                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                      </option>
-                      {upazilaOptions.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {language === 'bn' ? item.nameBn : item.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="configured-location-upazila"
+                    label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
+                    value={selectedUpazila?.id || ''}
+                    disabled={!districtId}
+                    onChange={(event) => {
+                      const item = upazilaOptions.find((option) => option.id === event.target.value);
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          upazilaOrThana: item?.nameEn || '',
+                        },
+                      });
+                    }}
+                    placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                    options={upazilaOptions.map((item) => ({
+                      value: item.id,
+                      label: language === 'bn' ? item.nameBn : item.nameEn,
+                    }))}
+                  />
 
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-area"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'এলাকা' : 'Area'}
-                    </label>
-                    <input
-                      id="configured-location-area"
-                      value={formData.location?.area || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            area: event.target.value,
-                          },
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
+                  <TextField
+                    id="configured-location-area"
+                    type="text"
+                    label={language === 'bn' ? 'এলাকা' : 'Area'}
+                    value={formData.location?.area || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          area: event.target.value,
+                        },
+                      })
+                    }
+                  />
 
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label
-                      htmlFor="configured-location-address"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
-                    </label>
-                    <input
-                      id="configured-location-address"
-                      value={formData.location?.formattedAddress || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            formattedAddress: event.target.value,
-                          },
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
+                  <TextField
+                    id="configured-location-address"
+                    type="text"
+                    fieldClassName="sm:col-span-2"
+                    label={language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
+                    value={formData.location?.formattedAddress || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          formattedAddress: event.target.value,
+                        },
+                      })
+                    }
+                  />
                 </div>
-                {error && (
-                  <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
+
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
                     {error}
                   </p>
-                )}
+                ) : null}
               </div>
             );
           }
