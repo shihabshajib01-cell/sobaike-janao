@@ -348,9 +348,9 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   return (
     <PublicPageContainer
       id="report-detail-page-container"
-      className="w-full max-w-[900px] mx-auto"
+      className="w-full max-w-[1040px] mx-auto"
     >
-      <div className="w-full space-y-5 md:space-y-6">
+      <div className="w-full space-y-0">
         <div className="hidden md:flex items-center justify-between gap-4">
           <Button
             type="button"
@@ -386,7 +386,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </Button>
         </div>
 
-        <article className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-7 space-y-5 ui-elevation-card">
+        <article className="bg-ui-surface px-1 sm:px-2 md:px-0 py-5 md:py-7 space-y-5">
           <div className="flex flex-wrap items-center gap-2 type-meta">
             <CategoryBadge section={report.segment} language={language} size="md" />
             <span className="text-ui-content-muted">·</span>
@@ -431,19 +431,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               <span>{displayEngagementCount(viewCount)} {language === 'bn' ? 'ভিউ' : 'views'}</span>
             </div>
 
-            <div
-              className="flex items-center gap-1.5 text-ui-content-muted min-h-[44px]"
-              aria-label={`${displayEngagementCount(shareCount)} ${language === 'bn' ? 'শেয়ার' : 'shares'}`}
-            >
-              <Share2 className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span>{displayEngagementCount(shareCount)} {language === 'bn' ? 'শেয়ার' : 'shares'}</span>
-            </div>
           </div>
 
           <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
 
           {detailText && (
-            <div className="max-w-[720px] type-body text-ui-content-primary">
+            <div className="max-w-[820px] type-body text-ui-content-primary">
               <p className="whitespace-pre-line">{detailText}</p>
             </div>
           )}
@@ -654,7 +647,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         {hasPublishedResponses && (
           <section
             id="published-responses-section"
-            className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-6 space-y-4 ui-elevation-card"
+            className="border-t border-ui-stroke-subtle py-5 md:py-6 px-1 sm:px-2 md:px-0 space-y-4"
           >
             <h2 className="type-h3 text-ui-content-primary flex items-center gap-2">
               <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
@@ -681,7 +674,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             )}
 
             {report.response && (
-              <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2">
+              <div className="pl-4 border-l-2 border-ui-stroke-subtle space-y-2">
                 <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-[var(--font-weight-semibold)]">
                   <span>
                     {language === 'bn'
@@ -705,7 +698,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               return (
                 <div
                   key={response.id}
-                  className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-2.5"
+                  className="pl-4 border-l-2 border-ui-stroke-subtle space-y-2.5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2 type-meta">
                     <div className="space-y-0.5">
@@ -758,7 +751,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
         <section
           id="report-response-action-box"
-          className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-6 space-y-3 ui-elevation-card"
+          className="border-t border-ui-stroke-subtle py-5 md:py-6 px-1 sm:px-2 md:px-0 space-y-3"
         >
           <h2 className="type-h3 text-ui-content-primary">
             {language === 'bn'
@@ -770,7 +763,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <Button
               id="btn-respond-citizen-info"
               type="button"
-              variant="secondary"
+              variant="primary"
               size="md"
               fullWidth
               onClick={() => setIsCitizenModalOpen(true)}
@@ -797,13 +790,13 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         </section>
 
         {relatedReports.length > 0 && (
-          <section className="space-y-3 pt-2">
+          <section className="border-t border-ui-stroke-subtle py-5 md:py-6 px-1 sm:px-2 md:px-0 space-y-3">
             <h2 className="type-h3 text-ui-content-primary flex items-center gap-1.5">
               <Layers className="w-5 h-5 text-ui-content-muted" aria-hidden="true" />
               <span>{language === 'bn' ? 'সম্পর্কিত প্রতিবেদন' : 'Related reports'}</span>
             </h2>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {relatedReports.map((relatedReport) => (
                 <div
                   key={relatedReport.id}
