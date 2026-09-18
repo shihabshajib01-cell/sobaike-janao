@@ -25,6 +25,10 @@ const address = read('src/components/location/AddressSearchInput.tsx');
 const composerHeader = read('src/components/report-composer/ReportComposerHeader.tsx');
 const step3 = read('src/components/report-composer/Step3ComplaintDetails.tsx');
 const configured = read('src/components/report-composer/ConfiguredFieldsSection.tsx');
+const bottomNav = read('src/components/layout/BottomNav.tsx');
+const desktopRail = read('src/components/layout/DesktopLeftRail.tsx');
+const header = read('src/components/layout/Header.tsx');
+const issues = read('src/pages/IssuesPage.tsx');
 const css = read('src/index.css');
 
 requireContains('SPA route changes move focus to main content', appShell, "document.getElementById('main-content')?.focus");
@@ -47,6 +51,10 @@ requireContains('Configured validation focuses the first invalid control', confi
 requireContains('Legacy report controls expose aria-invalid', step3, 'aria-invalid={Boolean(errors.description)}');
 requireContains('Legacy report controls connect error descriptions', step3, "aria-describedby={errors.description ? 'complaint-desc-input-error' : undefined}");
 requireContains('Legacy validation focuses first invalid control', step3, "document.getElementById(first)?.focus");
+requireContains('Mobile primary navigation uses links', bottomNav, '<Link');
+requireContains('Desktop primary navigation uses links', desktopRail, '<Link');
+requireContains('Tablet navigation uses links', header, '<Link');
+requireContains('Issue category destinations use links', issues, '<Link');
 requireContains('Reduced motion preference is respected', css, '@media (prefers-reduced-motion: reduce)');
 
 const failed = checks.filter((check) => !check.ok);
