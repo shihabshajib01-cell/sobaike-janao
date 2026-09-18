@@ -52,43 +52,44 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
       isOpen={isOpen}
       onClose={() => {}}
       closeOnBackdrop={false}
-      showHeader={false}
       maxWidth="md"
       language={language}
-      ariaLabelledBy="first-visit-notice-title"
+      title={isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
+      headerIcon={
+        <img
+          src={brandMarkSrc}
+          alt=""
+          aria-hidden="true"
+          width={32}
+          height={32}
+          className="w-8 h-8 object-contain select-none"
+        />
+      }
+      showCloseButton={false}
       ariaDescribedBy="first-visit-notice-desc"
+      footer={
+        <Button
+          id="first-visit-acknowledge-btn"
+          type="button"
+          variant="primary"
+          size="lg"
+          fullWidth
+          onClick={handleContinue}
+          disabled={!isChecked}
+        >
+          {isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
+        </Button>
+      }
     >
-      <div className="p-5 sm:p-6 flex flex-col gap-4 text-ui-content-primary">
-        <div className="flex items-center gap-3.5">
-          <img
-            src={brandMarkSrc}
-            alt=""
-            aria-hidden="true"
-            width={44}
-            height={44}
-            className="w-11 h-11 object-contain shrink-0 select-none"
-          />
-          <h1
-            id="first-visit-notice-title"
-            className="type-h2 tracking-tight text-ui-content-primary"
-          >
-            {isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
-          </h1>
-        </div>
-
-        <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
-
+      <div className="flex flex-col gap-4 text-ui-content-primary">
         <div className="flex flex-col gap-2.5">
-          <h2 className="type-h3 text-ui-content-primary">
+          <h3 className="type-h3 text-ui-content-primary">
             {isBn
               ? 'ব্যবহারের আগে কিছু গুরুত্বপূর্ণ কথা'
               : 'A few important things before you continue'}
-          </h2>
+          </h3>
 
-          <div
-            id="first-visit-notice-desc"
-            className="flex flex-col gap-2.5"
-          >
+          <div id="first-visit-notice-desc" className="flex flex-col gap-2.5">
             <p className="type-body text-ui-content-primary">
               {isBn
                 ? 'সবাইকে জানাও কোনো সরকারি বা আইনশৃঙ্খলা রক্ষাকারী সংস্থার ওয়েবসাইট নয়। এটি বাংলাদেশের নাগরিকদের জন্য একটি স্বাধীন প্ল্যাটফর্ম, যেখানে পরিচয় প্রকাশ না করেই জনস্বার্থে সমস্যা, অভিজ্ঞতা ও পর্যবেক্ষণ শেয়ার করা যায়।'
@@ -102,19 +103,14 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           </div>
         </div>
 
-        <div className="ui-radius-control ui-border-default border-ui-stroke-default p-4 bg-ui-surface">
+        <div className="ui-radius-control ui-border-default border-ui-stroke-default p-4 bg-ui-surface-subtle">
           <ol className="space-y-3 list-none">
             {instructions.map((instruction, index) => (
               <li key={instruction} className="flex items-start gap-3">
-                <p
-                  className="type-body text-ui-content-primary shrink-0"
-                  aria-hidden="true"
-                >
+                <p className="type-body text-ui-content-primary shrink-0" aria-hidden="true">
                   {isBn ? `${['১', '২', '৩'][index]}.` : `${index + 1}.`}
                 </p>
-                <p className="type-body text-ui-content-primary">
-                  {instruction}
-                </p>
+                <p className="type-body text-ui-content-primary">{instruction}</p>
               </li>
             ))}
           </ol>
@@ -133,18 +129,6 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             labelClassName="type-body text-ui-content-primary"
           />
         </div>
-
-        <Button
-          id="first-visit-acknowledge-btn"
-          type="button"
-          variant="primary"
-          size="lg"
-          fullWidth
-          onClick={handleContinue}
-          disabled={!isChecked}
-        >
-          {isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
-        </Button>
       </div>
     </Modal>
   );
