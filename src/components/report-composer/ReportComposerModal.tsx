@@ -436,14 +436,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleNextFromStep3 = useCallback(() => {
     if (!validateMobJusticeSection()) return;
-    if (!step3Ref.current) return;
-    const isValid = step3Ref.current.validateAndProceed();
-    if (!isValid) return;
-    if (configuredFieldsRef.current && !configuredFieldsRef.current.validateAndProceed()) {
-      return;
+
+    if (reportingForm?.engineMode === 'schema') {
+      if (!configuredFieldsRef.current?.validateAndProceed()) return;
+    } else {
+      if (!step3Ref.current?.validateAndProceed()) return;
     }
+
     handleGoToStep(4);
-  }, [handleGoToStep, validateMobJusticeSection]);
+  }, [handleGoToStep, reportingForm?.engineMode, validateMobJusticeSection]);
 
   // Rape Consent Modal Handlers
   const handleAgreeRapeConsent = useCallback(() => {
@@ -1058,26 +1059,29 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           language={language}
                         />
                       )}
-                      <Step3ComplaintDetails
-                        ref={step3Ref}
-                        segment={formData.segment}
-                        formData={formData}
-                        pendingImages={pendingImages}
-                        onPendingImagesChange={handlePendingImagesChange}
-                        onUpdateFormData={handleUpdateFormData}
-                        onNext={handleNextFromStep3}
-                        initialOpenSection={step3JumpSection}
-                        language={language}
-                      />
-                      <ConfiguredFieldsSection
-                        ref={configuredFieldsRef}
-                        form={reportingForm}
-                        language={language}
-                        answers={formData.customFieldAnswers || {}}
-                        onChange={(customFieldAnswers) =>
-                          handleUpdateFormData({ customFieldAnswers })
-                        }
-                      />
+                      {reportingForm?.engineMode === 'schema' ? (
+                        <ConfiguredFieldsSection
+                          ref={configuredFieldsRef}
+                          form={reportingForm}
+                          language={language}
+                          formData={formData}
+                          pendingImages={pendingImages}
+                          onPendingImagesChange={handlePendingImagesChange}
+                          onUpdateFormData={handleUpdateFormData}
+                        />
+                      ) : (
+                        <Step3ComplaintDetails
+                          ref={step3Ref}
+                          segment={formData.segment}
+                          formData={formData}
+                          pendingImages={pendingImages}
+                          onPendingImagesChange={handlePendingImagesChange}
+                          onUpdateFormData={handleUpdateFormData}
+                          onNext={handleNextFromStep3}
+                          initialOpenSection={step3JumpSection}
+                          language={language}
+                        />
+                      )}
                     </>
                   )}
 
