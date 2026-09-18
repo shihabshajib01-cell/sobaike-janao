@@ -633,109 +633,71 @@ export const ConfiguredFieldsSection = forwardRef<
                 aria-labelledby={fieldLabelId}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? fieldErrorId : undefined}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
-                <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
                   {label}
                   {field.required ? ' *' : ''}
                 </h3>
+
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-type"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'ধরন' : 'Type'}
-                    </label>
-                    <select
-                      id="configured-party-type"
-                      value={formData.subjectType || 'unknown'}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          subjectType: event.target.value as ReportFormData['subjectType'],
-                        })
+                  <Select
+                    id="configured-party-type"
+                    label={language === 'bn' ? 'ধরন' : 'Type'}
+                    value={formData.subjectType || 'unknown'}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        subjectType: event.target.value as ReportFormData['subjectType'],
+                      })
+                    }
+                    options={[
+                      { value: 'unknown', label: language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified' },
+                      { value: 'individual', label: language === 'bn' ? 'ব্যক্তি' : 'Individual' },
+                      { value: 'business', label: language === 'bn' ? 'ব্যবসা' : 'Business' },
+                      { value: 'group', label: language === 'bn' ? 'গোষ্ঠী' : 'Group' },
+                      { value: 'organization', label: language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization' },
+                    ]}
+                  />
+                  <TextField
+                    id="configured-party-name"
+                    type="text"
+                    label={language === 'bn' ? 'নাম' : 'Name'}
+                    value={formData.reportedSubject || ''}
+                    onChange={(event) => {
+                      onUpdateFormData({ reportedSubject: event.target.value });
+                      if (error && (event.target.value.trim() || formData.organization?.trim())) {
+                        setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
                       }
-                      className={commonInputClass}
-                    >
-                      <option value="unknown">
-                        {language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified'}
-                      </option>
-                      <option value="individual">
-                        {language === 'bn' ? 'ব্যক্তি' : 'Individual'}
-                      </option>
-                      <option value="business">
-                        {language === 'bn' ? 'ব্যবসা' : 'Business'}
-                      </option>
-                      <option value="group">
-                        {language === 'bn' ? 'গোষ্ঠী' : 'Group'}
-                      </option>
-                      <option value="organization">
-                        {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
-                      </option>
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-name"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'নাম' : 'Name'}
-                    </label>
-                    <input
-                      id="configured-party-name"
-                      aria-required={field.required || undefined}
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : undefined}
-                      value={formData.reportedSubject || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({ reportedSubject: event.target.value })
+                    }}
+                  />
+                  <TextField
+                    id="configured-party-role"
+                    type="text"
+                    label={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
+                    value={formData.roleOrDesignation || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({ roleOrDesignation: event.target.value })
+                    }
+                  />
+                  <TextField
+                    id="configured-party-org"
+                    type="text"
+                    label={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
+                    value={formData.organization || ''}
+                    onChange={(event) => {
+                      onUpdateFormData({ organization: event.target.value });
+                      if (error && (event.target.value.trim() || formData.reportedSubject?.trim())) {
+                        setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
                       }
-                      className={commonInputClass}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-role"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
-                    </label>
-                    <input
-                      id="configured-party-role"
-                      value={formData.roleOrDesignation || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          roleOrDesignation: event.target.value,
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-org"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
-                    </label>
-                    <input
-                      id="configured-party-org"
-                      aria-required={field.required || undefined}
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : undefined}
-                      value={formData.organization || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({ organization: event.target.value })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
+                    }}
+                  />
                 </div>
-                {error && (
-                  <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
+
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
                     {error}
                   </p>
-                )}
+                ) : null}
               </div>
             );
           }
