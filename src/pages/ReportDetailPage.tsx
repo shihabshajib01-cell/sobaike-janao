@@ -676,6 +676,34 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           )}
 
           {report.segment === 'extortion' &&
+            report.subcategoryId !== 'bribe-demanded-service' &&
+            (report.incidentTime || report.frequency) && (
+              <div
+                id="extortion-timeline-details"
+                className="pt-4 border-t border-ui-stroke-subtle flex flex-wrap gap-x-5 gap-y-2 type-meta text-ui-content-secondary"
+              >
+                {report.incidentTime && (
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
+                    {language === 'bn' ? `সময়: ${report.incidentTime}` : `Time: ${report.incidentTime}`}
+                  </span>
+                )}
+                {report.frequency && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-ui-content-muted">
+                      {language === 'bn' ? 'পুনরাবৃত্তি:' : 'Frequency:'}
+                    </span>
+                    <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {report.frequency === 'repeated'
+                        ? language === 'bn' ? 'নিয়মিত / একাধিকবার' : 'Repeated / ongoing'
+                        : language === 'bn' ? 'এককালীন' : 'One-time'}
+                    </span>
+                  </span>
+                )}
+              </div>
+            )}
+
+          {report.segment === 'extortion' &&
             report.subcategoryId === 'bribe-demanded-service' &&
             (report.briberyDepartment ||
               report.briberyService ||
