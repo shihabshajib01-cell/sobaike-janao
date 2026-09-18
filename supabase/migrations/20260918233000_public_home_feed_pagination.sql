@@ -127,3 +127,67 @@ grant execute on function public.get_public_home_feed_page(
   integer,
   integer
 ) to anon, authenticated, service_role;
+
+
+-- Reduce category-page network transfer while preserving the existing list
+-- ordering/privacy behavior. The client retains its previous path as fallback.
+create or replace function public.get_public_segment_feed(
+  p_segment text,
+  p_visitor_lat double precision default null,
+  p_visitor_lng double precision default null
+)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path to 'pg_catalog', 'public'
+as $function$
+declare
+  v_segment text := trim(coalesce(p_segment, ''));
+  v_has_visitor_loc boolean := false;
+  v_source jsonb;
+  v_result jsonb;
+begin
+  if v_segment = '' then
+    return '[]'::jsonb;
+  end if;
+
+  if p_visitor_lat is not null and p_visitor_lng is not null
+     and p_visitor_lat >= -90.0 and p_visitor_lat <= 90.0
+     and p_visitor_lng >= -180.0 and p_visitor_lng <= 180.0
+     and not (p_visitor_lat = 0.0 and p_visitor_lng = 0.0) then
+    v_has_visitor_loc := true;
+  end if;
+
+  if v_has_visitor_loc then
+    v_source := public.get_public_home_feed(
+      p_visitor_lat,
+      p_visitor_lng,
+      'all',
+      'all'
+    );
+  else
+    v_source := public.get_public_published_reports();
+  end if;
+
+  select coalesce(jsonb_agg(elem order by ordinality), '[]'::jsonb)
+  into v_result
+  from jsonb_array_elements(coalesce(v_source, '[]'::jsonb))
+    with ordinality as t(elem, ordinality)
+  where elem->>'segment' = v_segment;
+
+  return v_result;
+end;
+$function$;
+
+revoke all on function public.get_public_segment_feed(
+  text,
+  double precision,
+  double precision
+) from public;
+
+grant execute on function public.get_public_segment_feed(
+  text,
+  double precision,
+  double precision
+) to anon, authenticated, service_role;
