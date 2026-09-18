@@ -1062,53 +1062,61 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   )}
 
                   {effectiveCurrentStep === 3 && formData.segment && (
-                    <>
-                      {isMobJusticeReport && (
-                        <MobJusticeDetailsFields
-                          value={mobJusticeDetails}
-                          errors={mobJusticeErrors}
-                          onChange={handleMobJusticeDetailsChange}
-                          language={language}
-                        />
-                      )}
-                      <Step3ComplaintDetails
-                        ref={step3Ref}
-                        segment={formData.segment}
-                        formData={formData}
-                        pendingImages={pendingImages}
-                        onPendingImagesChange={handlePendingImagesChange}
-                        onUpdateFormData={handleUpdateFormData}
-                        onNext={handleNextFromStep3}
-                        initialOpenSection={step3JumpSection}
-                        language={language}
-                      />
+                    isSchemaMode ? (
                       <ConfiguredFieldsSection
                         ref={configuredFieldsRef}
                         form={reportingForm}
                         language={language}
-                        answers={formData.customFieldAnswers || {}}
-                        onChange={(customFieldAnswers) =>
-                          handleUpdateFormData({ customFieldAnswers })
-                        }
+                        formData={formData}
+                        pendingImages={pendingImages}
+                        onPendingImagesChange={handlePendingImagesChange}
+                        onUpdateFormData={handleUpdateFormData}
+                        mobJusticeDetails={mobJusticeDetails}
+                        mobJusticeErrors={mobJusticeErrors}
+                        onMobJusticeDetailsChange={handleMobJusticeDetailsChange}
                       />
-                    </>
+                    ) : (
+                      <>
+                        {isMobJusticeReport && (
+                          <MobJusticeDetailsFields
+                            value={mobJusticeDetails}
+                            errors={mobJusticeErrors}
+                            onChange={handleMobJusticeDetailsChange}
+                            language={language}
+                          />
+                        )}
+                        <Step3ComplaintDetails
+                          ref={step3Ref}
+                          segment={formData.segment}
+                          formData={formData}
+                          pendingImages={pendingImages}
+                          onPendingImagesChange={handlePendingImagesChange}
+                          onUpdateFormData={handleUpdateFormData}
+                          onNext={handleNextFromStep3}
+                          initialOpenSection={step3JumpSection}
+                          language={language}
+                        />
+                      </>
+                    )
                   )}
 
                   {effectiveCurrentStep === 4 && formData.segment && (
                     <>
-                      {isMobJusticeReport && (
+                      {usesMobJusticeDetails && (
                         <MobJusticeReviewSummary
                           details={mobJusticeDetails}
                           language={language}
                           onEdit={() => handleGoToStep(3)}
                         />
                       )}
-                      <ConfiguredFieldsReview
-                        form={reportingForm}
-                        language={language}
-                        answers={formData.customFieldAnswers || {}}
-                        onEdit={() => handleGoToStep(3)}
-                      />
+                      {isSchemaMode && (
+                        <ConfiguredFieldsReview
+                          form={reportingForm}
+                          language={language}
+                          answers={formData.customFieldAnswers || {}}
+                          onEdit={() => handleGoToStep(3)}
+                        />
+                      )}
                       <Step4Review
                         segment={formData.segment}
                         formData={formData}
