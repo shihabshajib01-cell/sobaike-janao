@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PublicReportImage } from '../../types/report';
 import { getResponsiveImageAttrs } from '../../utils/imageUtils';
+import { useDialogLifecycle } from '../ui/useDialogLifecycle';
 
 interface ImageViewerProps {
   images: PublicReportImage[];
@@ -21,28 +22,12 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const viewerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
-      setCurrentIndex(initialIndex);
-      const timeoutId = setTimeout(() => {
-        closeButtonRef.current?.focus();
-      }, 30);
-      return () => {
-        clearTimeout(timeoutId);
-        if (previouslyFocusedElementRef.current && typeof previouslyFocusedElementRef.current.focus === 'function') {
-          previouslyFocusedElementRef.current.focus();
-        }
-      };
-    }
+    if (isOpen) setCurrentIndex(initialIndex);
   }, [initialIndex, isOpen]);
-
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
@@ -52,50 +37,15 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
     setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   }, [images.length]);
 
-  const handlePrevRef = useRef(handlePrev);
-  handlePrevRef.current = handlePrev;
-  const handleNextRef = useRef(handleNext);
-  handleNextRef.current = handleNext;
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCloseRef.current();
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        handlePrevRef.current();
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        handleNextRef.current();
-      } else if (e.key === 'Tab' && viewerRef.current) {
-        const focusableElements = viewerRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length === 0) return;
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  useDialogLifecycle({
+    id: 'image-viewer',
+    isOpen,
+    onClose,
+    containerRef: viewerRef,
+    initialFocusRef: closeButtonRef,
+    onArrowLeft: images.length > 1 ? handlePrev : undefined,
+    onArrowRight: images.length > 1 ? handleNext : undefined,
+  });
 
   if (!isOpen || images.length === 0) return null;
 
@@ -138,6 +88,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   return (
     <div
       ref={viewerRef}
+      tabIndex={-1}
       role="dialog"
       aria-modal="true"
       aria-label={language === 'bn' ? 'ছবির পূর্ণরূপ' : 'Image viewer'}
