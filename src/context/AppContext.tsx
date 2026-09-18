@@ -34,8 +34,24 @@ export type BrowseLocationStatus =
   | 'unavailable'
   | 'error';
 
+const stripLanguagePrefix = (pathname: string): string => {
+  if (pathname === '/en') return '/';
+  if (pathname.startsWith('/en/')) return pathname.slice(3) || '/';
+  return pathname || '/';
+};
+
+const withLanguagePrefix = (pathname: string, language: Language): string => {
+  const logicalPath = stripLanguagePrefix(pathname);
+  if (language === 'en') {
+    return logicalPath === '/' ? '/en' : `/en${logicalPath}`;
+  }
+  return logicalPath;
+};
+
 const normalizeRoutePath = (pathname: string): RoutePath => {
-  const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
+  const logicalPath = stripLanguagePrefix(pathname);
+  const normalized =
+    logicalPath.length > 1 ? logicalPath.replace(/\/+$/, '') : logicalPath;
   return (normalized || '/') as RoutePath;
 };
 
@@ -88,6 +104,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window === 'undefined') return 'bn';
+    const pathname = window.location.pathname;
+    if (pathname === '/en' || pathname.startsWith('/en/')) return 'en';
     return new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'bn';
   });
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
@@ -246,18 +264,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     (lang: Language) => {
       setLanguageState(lang);
 
-      if (typeof window === 'undefined') return;
       const params = new URLSearchParams(location.search);
-      if (lang === 'en') {
-        params.set('lang', 'en');
-      } else {
-        params.delete('lang');
-      }
-
+      params.delete('lang');
       const search = params.toString();
+      const targetPath = withLanguagePrefix(location.pathname, lang);
+
       navigate(
         {
-          pathname: location.pathname,
+          pathname: targetPath,
           search: search ? `?${search}` : '',
           hash: location.hash,
         },
@@ -268,26 +282,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 
   useEffect(() => {
+    const isEnglishPath =
+      location.pathname === '/en' || location.pathname.startsWith('/en/');
+    const urlLanguage: Language = isEnglishPath ? 'en' : 'bn';
     const params = new URLSearchParams(location.search);
-    const currentLangParam = params.get('lang');
+    const legacyEnglishQuery = params.get('lang') === 'en';
 
-    if (language === 'en' && currentLangParam !== 'en') {
-      params.set('lang', 'en');
-    } else if (language === 'bn' && currentLangParam === 'en') {
+    if (legacyEnglishQuery && !isEnglishPath) {
       params.delete('lang');
-    } else {
+      const search = params.toString();
+      navigate(
+        {
+          pathname: withLanguagePrefix(location.pathname, 'en'),
+          search: search ? `?${search}` : '',
+          hash: location.hash,
+        },
+        { replace: true }
+      );
+      setLanguageState('en');
       return;
     }
 
-    const search = params.toString();
-    navigate(
-      {
-        pathname: location.pathname,
-        search: search ? `?${search}` : '',
-        hash: location.hash,
-      },
-      { replace: true }
-    );
+    if (language !== urlLanguage) {
+      setLanguageState(urlLanguage);
+    }
   }, [language, location.hash, location.pathname, location.search, navigate]);
 
   const currentRoute: RoutePath = normalizeRoutePath(location.pathname || '/');
@@ -303,45 +321,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return params;
   }, [location.search]);
 
+  const logicalPathname = useMemo(
+    () => stripLanguagePrefix(location.pathname),
+    [location.pathname]
+  );
+
   const currentReportId = useMemo(() => {
-    if (location.pathname.startsWith('/report-detail/')) {
-      const raw = location.pathname.replace('/report-detail/', '');
+    if (logicalPathname.startsWith('/report-detail/')) {
+      const raw = logicalPathname.replace('/report-detail/', '');
       return decodeURIComponent(raw);
     }
     return null;
-  }, [location.pathname]);
+  }, [logicalPathname]);
 
   const currentLocationId = useMemo(() => {
-    if (location.pathname.startsWith('/location/')) {
-      const raw = location.pathname.replace('/location/', '');
+    if (logicalPathname.startsWith('/location/')) {
+      const raw = logicalPathname.replace('/location/', '');
       return decodeURIComponent(raw);
     }
     return null;
-  }, [location.pathname]);
+  }, [logicalPathname]);
 
   const currentSubjectId = useMemo(() => {
-    if (location.pathname.startsWith('/subject/')) {
-      const raw = location.pathname.replace('/subject/', '');
+    if (logicalPathname.startsWith('/subject/')) {
+      const raw = logicalPathname.replace('/subject/', '');
       return decodeURIComponent(raw);
     }
     return null;
-  }, [location.pathname]);
+  }, [logicalPathname]);
 
   const navigateTo = useCallback((route: RoutePath) => {
     const cleanRoute = route.startsWith('/') ? route : `/${route}`;
-    navigate(cleanRoute);
+    navigate(withLanguagePrefix(cleanRoute, language));
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     setIsTabletMenuOpen(false);
     setIsHarassmentFilterOpen(false);
-  }, [navigate]);
+  }, [language, navigate]);
 
   // Sync report composer state when visiting /report (open modal with no pre-selected segment)
   useEffect(() => {
-    if (location.pathname === '/report') {
+    if (logicalPathname === '/report') {
       setReportComposerInitialSegment(null);
       setIsReportComposerOpen(true);
     }
-  }, [location.pathname]);
+  }, [logicalPathname]);
 
   const openReportComposer = useCallback((segment?: SectionKey | null) => {
     // Always open with no pre-selected segment unless explicitly provided as non-null
@@ -352,10 +375,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const closeReportComposer = useCallback(() => {
     setIsReportComposerOpen(false);
     // If route was /report, navigate to home
-    if (location.pathname.startsWith('/report')) {
+    if (logicalPathname.startsWith('/report')) {
       navigateTo('/');
     }
-  }, [location.pathname, navigateTo]);
+  }, [logicalPathname, navigateTo]);
 
   const toggleLanguage = useCallback(() => {
     setLanguage(language === 'bn' ? 'en' : 'bn');
