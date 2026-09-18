@@ -102,8 +102,8 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
           </h2>
           <p className="type-compact text-ui-content-secondary mt-0.5">
             {language === 'bn'
-              ? 'সারা দেশের প্রকাশিত প্রতিবেদনে কোন বিষয়ে কোন বিভাগে কত প্রতিবেদন আছে।'
-              : 'Compare published-report counts across topics and divisions.'}
+              ? 'বর্তমান নির্বাচনে কোন বিষয়ে কোন বিভাগে কত প্রতিবেদন আছে।'
+              : 'Compare the current report selection across topics and divisions.'}
           </p>
         </div>
         {onSelectCell && (
