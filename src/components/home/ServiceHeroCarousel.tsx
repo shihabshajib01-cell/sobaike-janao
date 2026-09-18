@@ -239,10 +239,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const activeKey = currentSlide.key;
   const activeSegment = segments[activeKey];
   const activeHeroBg = isManagedThemePreset(activeSegment?.themeKey)
-    ? activeSegment?.bgColor || 'var(--ui-surface-subtle)'
+    ? activeSegment?.bgColor || 'var(--md-surface-subtle)'
     : HERO_TOKENS.sections[activeKey]?.background ??
       activeSegment?.bgColor ??
-      'var(--ui-surface-subtle)';
+      'var(--md-surface-subtle)';
 
   const containerStyle: React.CSSProperties = {
     ...getHeroSliderCssVars(),
@@ -277,7 +277,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
-        className="w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        className="w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
         style={containerStyle}
       >
         <div
@@ -309,10 +309,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 className="w-full shrink-0 min-w-full p-0 flex flex-col"
                 style={{
                   backgroundColor: isManagedThemePreset(slideSegment?.themeKey)
-                    ? slideSegment?.bgColor || 'var(--ui-surface-subtle)'
+                    ? slideSegment?.bgColor || 'var(--md-surface-subtle)'
                     : HERO_TOKENS.sections[slide.key]?.background ??
                       slideSegment?.bgColor ??
-                      'var(--ui-surface-subtle)',
+                      'var(--md-surface-subtle)',
                 }}
               >
                 <CategoryHeroBanner
