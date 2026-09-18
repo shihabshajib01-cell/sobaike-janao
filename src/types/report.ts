@@ -133,11 +133,18 @@ export interface PublicPublishedResponse {
 }
 
 
+export interface PublicConfiguredReportFieldOption {
+  value: string;
+  labelEn: string;
+  labelBn: string;
+}
+
 export interface PublicConfiguredReportField {
   fieldKey: string;
   labelEn: string;
   labelBn: string;
   fieldType: string;
   sortOrder: number;
+  options: PublicConfiguredReportFieldOption[];
   value: unknown;
 }
