@@ -74,6 +74,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Step 3 imperative refs for legacy core sections + Admin-configured fields.
   const step3Ref = useRef<Step3Handle>(null);
   const configuredFieldsRef = useRef<ConfiguredFieldsHandle>(null);
+  const subcategorySelectionVersionRef = useRef(0);
   const [reportingForm, setReportingForm] = useState<PublicReportingForm | null>(null);
 
   // Jump section tracking for Step 3
@@ -366,6 +367,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       // Selection state must update synchronously for standards-compliant radio
       // keyboard behavior. Use any already-cached schema immediately, then
       // hydrate the latest published schema without blocking aria-checked.
+      const selectionVersion = ++subcategorySelectionVersionRef.current;
       const cachedForm = PublicReportingConfigService.getForm(subcategoryId);
       setReportingForm(cachedForm);
 
@@ -408,12 +410,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
       void PublicReportingConfigService.fetch()
         .then(() => {
+          if (subcategorySelectionVersionRef.current !== selectionVersion) return;
+
           const selectedForm = PublicReportingConfigService.getForm(subcategoryId);
-          setReportingForm((current) =>
-            formData.subcategoryId && formData.subcategoryId !== subcategoryId
-              ? current
-              : selectedForm
-          );
+          setReportingForm(selectedForm);
           setFormData((prev) =>
             prev.subcategoryId === subcategoryId
               ? {
