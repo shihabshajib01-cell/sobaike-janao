@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Info } from 'lucide-react';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
 import { ReportItem } from '../types/report';
@@ -119,15 +118,6 @@ export const UtilityPage: React.FC = () => {
           },
         ]}
       />
-
-      <div className="flex items-center gap-2 type-meta text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-        <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-        <span>
-          {language === 'bn'
-            ? 'লোডশেডিং, গ্যাস সংকট বা অতিরিক্ত বিদ্যুৎ বিল সংক্রান্ত প্রতিবেদন জমা দিন।'
-            : 'Report load shedding, gas shortages, or excess electricity bills responsibly.'}
-        </span>
-      </div>
 
       <CategoryFeedView
         section="load_shedding"
