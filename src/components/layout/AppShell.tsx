@@ -183,6 +183,34 @@ export const AppShell: React.FC = () => {
                   <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
                   <Route path="/location/:id" element={<LocationRouteWrapper />} />
                   <Route path="/subject/:id" element={<SubjectRouteWrapper />} />
+
+                  {/* English prerendered route family. These mirror the Bangla routes so
+                      /en/... URLs are first-class crawlable pages, not query-state aliases. */}
+                  <Route path="/en" element={<HomePage />} />
+                  <Route path="/en/issues" element={<IssuesPage />} />
+                  <Route path="/en/harassment" element={<HarassmentPage />} />
+                  <Route path="/en/extortion" element={<ExtortionPage />} />
+                  <Route path="/en/public-safety" element={<StandardCategoryPage section="public_safety" />} />
+                  <Route path="/en/road-transport" element={<StandardCategoryPage section="road_transport" />} />
+                  <Route path="/en/load-shedding" element={<UtilityPage />} />
+                  <Route path="/en/illegal-occupation" element={<StandardCategoryPage section="illegal_occupation" />} />
+                  <Route path="/en/rickshaw" element={<RickshawPage />} />
+                  <Route path="/en/category/:slug" element={<DynamicCategoryPage />} />
+                  <Route path="/en/report" element={<ReportPage />} />
+                  <Route
+                    path="/en/explore"
+                    element={
+                      <React.Suspense fallback={<MapExploreSkeleton />}>
+                        <LazyExplorePage />
+                      </React.Suspense>
+                    }
+                  />
+                  <Route path="/en/search" element={<SearchPage />} />
+                  <Route path="/en/more" element={<MorePage />} />
+                  <Route path="/en/report-detail/:id" element={<ReportDetailRouteWrapper />} />
+                  <Route path="/en/location/:id" element={<LocationRouteWrapper />} />
+                  <Route path="/en/subject/:id" element={<SubjectRouteWrapper />} />
+                  <Route path="/en/*" element={<Navigate to="/en" replace />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </ErrorBoundary>
