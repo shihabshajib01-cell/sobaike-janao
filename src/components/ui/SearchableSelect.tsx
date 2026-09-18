@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Search, X } from 'lucide-react';
+import { FormField } from './FormField';
+import { formFieldIds } from './formSystem';
 
 export interface SearchableSelectOption {
   value: string;
@@ -47,6 +49,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const generatedId = useId();
   const controlId = id || `searchable-select-${generatedId.replace(/:/g, '')}`;
   const listboxId = `${controlId}-listbox`;
+  const { helperId, errorId, labelId } = formFieldIds(controlId);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -279,19 +282,15 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       : null;
 
   return (
-    <div ref={rootRef} className={`relative w-full text-left ${className}`}>
-      {label && (
-        <label id={`${controlId}-label`} className="block type-label text-role-on-surface mb-1.5">
-          {label}
-          {required && (
-            <span className="text-role-validation ml-1" aria-hidden="true">
-              *
-            </span>
-          )}
-        </label>
-      )}
-
-      <div className="relative">
+    <FormField
+      id={controlId}
+      label={label}
+      helperText={helperText}
+      error={error}
+      required={required}
+      className={className}
+    >
+      <div ref={rootRef} className="relative w-full">
         <button
           ref={triggerRef}
           id={controlId}
@@ -300,11 +299,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={listboxId}
-          aria-labelledby={label ? `${controlId}-label ${controlId}` : undefined}
+          aria-labelledby={label ? `${labelId} ${controlId}` : undefined}
           aria-label={resolvedAccessibleLabel}
           aria-required={required || undefined}
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${controlId}-error` : helperText ? `${controlId}-helper` : undefined}
+          aria-describedby={error ? errorId : helperText ? helperId : undefined}
           disabled={disabled}
           onClick={() => (isOpen ? close() : open())}
           onKeyDown={(event) => {
@@ -315,7 +314,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               }
             }
           }}
-          className={`w-full min-h-[44px] bg-role-surface text-left ui-border-default ui-radius-control px-3.5 pr-10 transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
+          className={`w-full min-h-[44px] bg-role-surface text-left ui-border-default ui-radius-control px-3.5 ${clearable && value && !disabled ? 'pr-16' : 'pr-10'} type-body transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
             error
               ? 'border-role-validation-outline focus:ring-role-validation-focus focus:border-role-validation-focus'
               : 'border-role-outline hover:border-role-outline-strong focus:ring-role-focus'
@@ -327,7 +326,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </button>
 
         <div className="absolute inset-y-0 right-2 flex items-center gap-0.5">
-          {clearable && value && !disabled && (
+          {clearable && value && !disabled ? (
             <button
               type="button"
               className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-[var(--radius-badge-md)] text-role-on-surface-muted hover:text-role-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
@@ -340,7 +339,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             >
               <X className="w-4 h-4" aria-hidden="true" />
             </button>
-          )}
+          ) : null}
           <ChevronDown
             className={`w-4 h-4 text-role-on-surface-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
             aria-hidden="true"
@@ -349,17 +348,6 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       </div>
 
       {dropdown}
-
-      {error && (
-        <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-role-validation font-[var(--font-weight-medium)]">
-          {error}
-        </p>
-      )}
-      {!error && helperText && (
-        <p id={`${controlId}-helper`} className="mt-1.5 type-helper text-role-on-surface-muted">
-          {helperText}
-        </p>
-      )}
-    </div>
+    </FormField>
   );
 };
