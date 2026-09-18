@@ -4,6 +4,8 @@ import {
   ArrowLeft,
   Calendar,
   Check,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Eye,
   FileCheck,
@@ -472,7 +474,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </Button>
         </div>
 
-        <article className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-7 space-y-5 ui-elevation-card">
+        <article className="bg-ui-surface ui-border-default border-ui-stroke-subtle ui-radius-card p-5 md:p-6 space-y-5 ui-elevation-card">
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2 type-meta min-w-0">
               <CategoryBadge section={report.segment} language={language} size="md" />
@@ -824,14 +826,19 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               <button
                 type="button"
                 onClick={() => setShowAllResponses((current) => !current)}
-                className="w-full min-h-[44px] mt-1 type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary border-t border-ui-stroke-subtle pt-3 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                className="w-full min-h-[44px] mt-1 flex items-center justify-center gap-1.5 type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle border-t border-ui-stroke-subtle cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-control"
                 aria-expanded={showAllResponses}
               >
+                <span>
+                  {showAllResponses
+                    ? language === 'bn' ? 'কম দেখুন' : 'Show less'
+                    : language === 'bn'
+                    ? `আরও ${toBanglaDigits(hiddenResponseCount)}টি প্রতিক্রিয়া দেখুন`
+                    : `Show ${hiddenResponseCount} more response${hiddenResponseCount === 1 ? '' : 's'}`}
+                </span>
                 {showAllResponses
-                  ? language === 'bn' ? 'কম দেখুন ↑' : 'Show less ↑'
-                  : language === 'bn'
-                  ? `আরও ${toBanglaDigits(hiddenResponseCount)}টি প্রতিক্রিয়া দেখুন ↓`
-                  : `Show ${hiddenResponseCount} more response${hiddenResponseCount === 1 ? '' : 's'} ↓`}
+                  ? <ChevronUp className="w-4 h-4 shrink-0" aria-hidden="true" />
+                  : <ChevronDown className="w-4 h-4 shrink-0" aria-hidden="true" />}
               </button>
             )}
           </section>
