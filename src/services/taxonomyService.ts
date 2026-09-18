@@ -222,7 +222,11 @@ export const TaxonomyService = {
             ...fallback,
             key,
             id: row.id,
-            slug: row.slug ? `/category/${row.slug}` : fallback.slug,
+            slug: SECTIONS[key]
+              ? fallback.slug
+              : row.slug
+                ? `/category/${row.slug}`
+                : fallback.slug,
             nameBn: row.name_bn || fallback.nameBn,
             nameEn: row.name_en || fallback.nameEn,
             shortNameBn: row.short_name_bn || row.name_bn || fallback.shortNameBn,
