@@ -6,6 +6,10 @@ import {
   getHeroCtaStyle,
 } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
+import {
+  isManagedThemePreset,
+  useTaxonomy,
+} from '../../services/taxonomyService';
 import { Button } from '../ui/Button';
 
 export interface CategoryHeroBannerProps {
@@ -80,7 +84,19 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   className,
 }) => {
   const { language } = useApp();
+  const { getSegment } = useTaxonomy();
   const sectionKey = section;
+  const segmentMeta = getSegment(sectionKey);
+  const usesManagedTheme = isManagedThemePreset(segmentMeta?.themeKey);
+  const ctaStyle = usesManagedTheme && segmentMeta
+    ? ({
+        '--hero-cta-text': segmentMeta.textColor,
+        '--hero-cta-border': segmentMeta.primaryColor,
+        '--hero-cta-hover-bg': segmentMeta.primaryColor,
+        '--hero-cta-hover-border': segmentMeta.primaryColor,
+        '--hero-cta-hover-text': '#FFFFFF',
+      } as React.CSSProperties)
+    : getHeroCtaStyle(sectionKey);
 
   const resolvedDesktopMediaPosition =
     desktopMediaPosition ??
@@ -152,7 +168,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
               tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
               onClick={action.onClick}
               className="shadow-none btn-hero-cta"
-              style={getHeroCtaStyle(sectionKey)}
+              style={ctaStyle}
             >
               {language === 'bn' ? action.labelBn : action.labelEn}
             </Button>
@@ -202,7 +218,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
             onClick={action.onClick}
             className="shadow-none btn-hero-cta"
-            style={getHeroCtaStyle(sectionKey)}
+            style={ctaStyle}
           >
             {language === 'bn' ? action.labelBn : action.labelEn}
           </Button>
