@@ -399,6 +399,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           sexualHarassmentType: '',
           sexualHarassmentContext: '',
           sexualHarassmentInstitution: '',
+          intimateWhatHappened: '',
+          intimatePlatform: '',
           frequency:
             prev.subcategoryId === 'sexual-harassment' || subcategoryId === 'sexual-harassment'
               ? 'one-time'
@@ -826,8 +828,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           return meaningful.length > 0 ? meaningful : undefined;
         })(),
         relationshipContext: isPartySegment ? (formData.relationshipContext?.trim() || undefined) : undefined,
-        intimateWhatHappened: isHarassment ? (formData.intimateWhatHappened || undefined) : undefined,
-        intimatePlatform: isHarassment ? (formData.intimatePlatform || undefined) : undefined,
+        intimateWhatHappened:
+          isHarassment && formData.subcategoryId === 'blackmail-coercion'
+            ? formData.intimateWhatHappened || undefined
+            : undefined,
+        intimatePlatform:
+          isHarassment && formData.subcategoryId === 'blackmail-coercion'
+            ? formData.intimatePlatform || undefined
+            : undefined,
         location: loc,
         privacyChoice: formData.privacyChoice || 'anonymous',
         formSchemaVersion: reportingForm?.version || formData.formSchemaVersion,
