@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { SectionKey, COMING_SOON_SERVICES, ComingSoonServiceKey } from '../../theme/tokens';
 import { CategoryIcon } from '../branding/CategoryIcon';
 import { AppIcon } from '../ui/AppIcon';
 import { useTaxonomy } from '../../services/taxonomyService';
+import { CategoryPopularityService } from '../../services/categoryPopularityService';
 import { RoutePath } from '../../context/AppContext';
 
 export interface Step1ServiceSelectProps {
@@ -26,12 +27,39 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
 }) => {
   const { segments } = useTaxonomy();
   const [internalComingSoon, setInternalComingSoon] = useState<ComingSoonServiceKey | null>(null);
+  const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(() =>
+    CategoryPopularityService.getFallbackOrder()
+  );
+
+  useEffect(() => {
+    let active = true;
+
+    CategoryPopularityService.getOrderedCategoryKeys().then((keys) => {
+      if (active) setCategoryOrder(keys);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [segments]);
 
   const selectedComingSoon =
     controlledComingSoon !== undefined ? controlledComingSoon : internalComingSoon;
 
+  const categoryOrderIndex = new Map(
+    categoryOrder.map((key, index) => [key, index] as const)
+  );
+
   const activeServices = Object.values(segments)
-    .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+    .sort((a, b) => {
+      const aIndex = categoryOrderIndex.get(a.id as SectionKey);
+      const bIndex = categoryOrderIndex.get(b.id as SectionKey);
+
+      if (aIndex !== undefined && bIndex !== undefined) return aIndex - bIndex;
+      if (aIndex !== undefined) return -1;
+      if (bIndex !== undefined) return 1;
+      return (a.sortOrder ?? 999) - (b.sortOrder ?? 999);
+    })
     .map((service) => ({
       key: service.id as SectionKey,
       titleBn: service.nameBn,
