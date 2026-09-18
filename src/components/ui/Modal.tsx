@@ -208,8 +208,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 backdrop-blur-xs transition-opacity"
-        style={{ backgroundColor: 'var(--ui-overlay)' }}
+        className="absolute inset-0 backdrop-blur-xs transition-opacity bg-ui-overlay"
         onClick={closeOnBackdrop ? onClose : undefined}
         aria-hidden="true"
       />
