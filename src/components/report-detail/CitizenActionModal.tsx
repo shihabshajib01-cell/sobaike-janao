@@ -135,7 +135,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               id="citizen-modal-title"
               className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary"
             >
-              {language === 'bn' ? 'প্রতিবেদনে তথ্য যোগ করুন' : 'Add information to this report'}
+              {language === 'bn' ? 'প্রতিবেদনে তথ্য দিন' : 'Share information about this report'}
             </h3>
             <p className="type-helper text-ui-content-secondary">
               {language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `Report: ${reportTitle}`}
@@ -207,7 +207,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   htmlFor="citizen-description-input"
                   className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary"
                 >
-                  {language === 'bn' ? 'আপনার জানা তথ্য *' : 'What you know *'}
+                  {language === 'bn' ? 'আপনি যা জানেন *' : 'What you know *'}
                 </label>
                 <textarea
                   id="citizen-description-input"
@@ -218,13 +218,13 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   aria-describedby="citizen-description-helper"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder={language === 'bn' ? 'বিস্তারিত লিখুন...' : 'Add the details...'}
+                  placeholder={language === 'bn' ? 'যা দেখেছেন বা জানেন লিখুন...' : 'Write what you saw or know...'}
                   className="w-full ui-space-textarea bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder resize-y"
                 />
                 <p id="citizen-description-helper" className="type-helper text-ui-content-secondary">
                   {language === 'bn'
-                    ? 'তারিখ, সময়, স্থান এবং আপনি যা দেখেছেন বা জানেন—যতটা সম্ভব নির্দিষ্টভাবে লিখুন।'
-                    : 'Include the date, time, place, and what you saw or know. Be as specific as possible.'}
+                    ? 'তারিখ, সময়, স্থান ও প্রাসঙ্গিক তথ্য যতটা সম্ভব নির্দিষ্টভাবে লিখুন।'
+                    : 'Include the date, time, place, and any relevant details as specifically as you can.'}
                 </p>
               </div>
 
@@ -233,35 +233,31 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   htmlFor="citizen-witness-date-input"
                   className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary"
                 >
-                  {language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}
+                  {language === 'bn' ? 'ঘটনার তারিখ (ঐচ্ছিক)' : 'Incident date (optional)'}
                 </label>
                 <input
                   id="citizen-witness-date-input"
                   name="witnessDate"
                   type="date"
-                  lang={language === 'bn' ? 'bn-BD' : 'en'}
+                  lang="en-GB"
                   max={maxIncidentDate}
                   value={witnessDate}
                   onChange={(e) => setWitnessDate(e.target.value)}
-                  aria-describedby="citizen-date-helper"
                   className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control ui-control type-body text-ui-content-primary"
                 />
-                <p id="citizen-date-helper" className="type-helper text-ui-content-secondary">
-                  {language === 'bn' ? 'জানা থাকলে দিন।' : 'Add it if you know it.'}
-                </p>
               </div>
 
-              <div className="p-3.5 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-3">
+              <div className="p-3 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-3">
                 <Checkbox
                   id="citizen-contact-consent-checkbox"
                   checked={contactConsent}
                   onChange={(e) => setContactConsent(e.target.checked)}
                   label={
                     language === 'bn'
-                      ? 'প্রয়োজনে এই তথ্য সম্পর্কে আমার সঙ্গে যোগাযোগ করা যাবে।'
+                      ? 'প্রয়োজনে এ বিষয়ে আমার সঙ্গে যোগাযোগ করা যাবে।'
                       : 'I can be contacted if follow-up is needed.'
                   }
-                  labelClassName="type-body text-ui-content-primary"
+                  labelClassName="type-helper text-ui-content-primary"
                 />
 
                 {contactConsent && (
@@ -278,7 +274,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                       type="text"
                       value={contactInfo}
                       onChange={(e) => setContactInfo(e.target.value)}
-                      placeholder={language === 'bn' ? 'যোগাযোগের তথ্য লিখুন' : 'Enter your contact information'}
+                      placeholder={language === 'bn' ? 'ফোন নম্বর বা ইমেইল লিখুন' : 'Enter a phone number or email'}
                       className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
                     />
                   </div>
