@@ -199,7 +199,7 @@
     --type-helper-weight: var(--font-weight-regular);
 
     --type-compact-size: 14px;
-    --type-compact-line-mobile: 20px;
+    --type-compact-line: 20px;
     --type-compact-weight: var(--font-weight-regular);
 
     /* Central Typography Tokens - Headings */
@@ -512,14 +512,8 @@
 
   .type-compact {
     font-size: var(--type-compact-size) !important;
-  }
-
-  /* Mobile typography closure: keep compact text readable without inheriting 16/26 body rhythm. */
-  @media (max-width: 767.98px) {
-    .type-compact {
-      line-height: var(--type-compact-line-mobile) !important;
-      font-weight: var(--type-compact-weight) !important;
-    }
+    line-height: var(--type-compact-line) !important;
+    font-weight: var(--type-compact-weight) !important;
   }
 
   /* Bengali glyph rhythm should not inherit Latin-oriented letter-spacing utilities. */
