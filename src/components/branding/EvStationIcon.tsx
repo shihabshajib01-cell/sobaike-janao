@@ -1,6 +1,7 @@
 import React from 'react';
 
-export interface EvStationIconProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface EvStationIconProps
+  extends Omit<React.SVGProps<SVGSVGElement>, 'ref'> {
   className?: string;
   size?: number | string;
   strokeWidth?: number | string;
@@ -8,18 +9,27 @@ export interface EvStationIconProps extends React.HTMLAttributes<HTMLSpanElement
   'aria-hidden'?: boolean | 'true' | 'false';
 }
 
+const SIZE_CLASSES: Record<string, string> = {
+  xs: 'w-3 h-3',
+  sm: 'w-3.5 h-3.5',
+  md: 'w-4 h-4',
+  lg: 'w-5 h-5',
+  xl: 'w-6 h-6',
+};
+
 /**
- * Google Material Symbols Outlined icon: `ev_station`
- * Authoritative icon for Illegal Charging Stations / Rickshaw category.
- * Renders the Material Symbols font glyph instead of a custom SVG path.
+ * Self-contained EV charging-station icon used for the Rickshaw / Illegal Charging category.
+ *
+ * This intentionally renders as SVG instead of a font ligature. The previous Material Symbols
+ * implementation depended on the external "Material Symbols Outlined" webfont; when that font was
+ * unavailable, browsers exposed the literal fallback text "ev_station" throughout the UI.
  */
-export const EvStationIcon = React.forwardRef<HTMLSpanElement, EvStationIconProps>(
+export const EvStationIcon = React.forwardRef<SVGSVGElement, EvStationIconProps>(
   (
     {
       className = '',
       size,
-      strokeWidth: _strokeWidth,
-      style,
+      strokeWidth = 2,
       'aria-hidden': ariaHidden,
       'aria-label': ariaLabel,
       role,
@@ -27,56 +37,46 @@ export const EvStationIcon = React.forwardRef<HTMLSpanElement, EvStationIconProp
     },
     ref
   ) => {
-    let resolvedFontSize: string;
-
-    if (typeof size === 'number') {
-      resolvedFontSize = `${size}px`;
-    } else if (typeof size === 'string' && size) {
-      const sizeMap: Record<string, string> = {
-        xs: '12px',
-        sm: '14px',
-        md: '16px',
-        lg: '20px',
-        xl: '24px',
-      };
-      resolvedFontSize = sizeMap[size] || (size.match(/^[0-9]+$/) ? `${size}px` : size);
-    } else {
-      // Resolve optical font size from Tailwind dimensions in className if present
-      if (/\b(?:w|h)-3\b/.test(className)) resolvedFontSize = '12px';
-      else if (/\b(?:w|h)-3\.5\b/.test(className)) resolvedFontSize = '14px';
-      else if (/\b(?:w|h)-4\b/.test(className)) resolvedFontSize = '16px';
-      else if (/\b(?:w|h)-5\b/.test(className)) resolvedFontSize = '20px';
-      else if (/\b(?:w|h)-6\b/.test(className)) resolvedFontSize = '24px';
-      else if (/\b(?:w|h)-7\b/.test(className)) resolvedFontSize = '28px';
-      else if (/\b(?:w|h)-8\b/.test(className)) resolvedFontSize = '32px';
-      else resolvedFontSize = '20px';
-    }
-
+    const namedSizeClass =
+      typeof size === 'string' && SIZE_CLASSES[size] ? SIZE_CLASSES[size] : '';
+    const explicitSize =
+      typeof size === 'number' ||
+      (typeof size === 'string' && size && !SIZE_CLASSES[size])
+        ? size
+        : undefined;
     const isAccessible = Boolean(ariaLabel);
 
     return (
-      <span
+      <svg
         ref={ref}
-        className={`material-symbols-outlined shrink-0 ${className}`.trim()}
-        style={{
-          fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24",
-          fontSize: resolvedFontSize,
-          lineHeight: 1,
-          color: 'currentColor',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          userSelect: 'none',
-          ...(size ? { width: resolvedFontSize, height: resolvedFontSize } : {}),
-          ...style,
-        }}
-        aria-hidden={isAccessible ? undefined : (ariaHidden !== undefined ? ariaHidden : 'true')}
-        aria-label={ariaLabel}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        width={explicitSize}
+        height={explicitSize}
+        className={`shrink-0 ${namedSizeClass} ${className}`.trim()}
         role={role || (isAccessible ? 'img' : undefined)}
+        aria-label={ariaLabel}
+        aria-hidden={
+          isAccessible
+            ? undefined
+            : ariaHidden !== undefined
+              ? ariaHidden
+              : 'true'
+        }
         {...props}
       >
-        ev_station
-      </span>
+        <rect x="4" y="3" width="10" height="18" rx="2" />
+        <path d="M7 7h4" />
+        <path d="M7 17h4" />
+        <path d="m8.4 9.5 2.8 2.4-2.2 3.1" />
+        <path d="M14 7h2a2 2 0 0 1 2 2v2.5" />
+        <path d="M17 11.5h2v3h-2z" />
+        <path d="M18 14.5V18a2 2 0 0 1-2 2h-2" />
+      </svg>
     );
   }
 );
