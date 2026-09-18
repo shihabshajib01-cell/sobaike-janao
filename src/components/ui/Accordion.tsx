@@ -43,10 +43,10 @@ export const Accordion: React.FC<AccordionProps> = ({
       id={id}
       className={`border rounded-[var(--radius-card)] transition-colors duration-150 overflow-hidden ${
         hasError
-          ? 'border-ui-error-border bg-ui-error-bg'
+          ? 'border-role-error-outline bg-role-error-container'
           : isExpanded
-          ? 'border-ui-stroke-strong bg-ui-surface'
-          : 'border-ui-stroke-subtle bg-ui-surface'
+          ? 'border-role-outline-strong bg-role-surface'
+          : 'border-role-outline-subtle bg-role-surface'
       } ${className}`}
     >
       {collapsible ? (
@@ -56,17 +56,17 @@ export const Accordion: React.FC<AccordionProps> = ({
           onClick={onToggle}
           aria-expanded={isExpanded}
           aria-controls={panelId}
-          className={`w-full flex items-center justify-between p-4 md:p-5 text-left transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${headerClassName}`}
+          className={`w-full flex items-center justify-between p-4 md:p-5 text-left transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus ${headerClassName}`}
         >
           <div className="flex items-center gap-3 min-w-0 pr-2">
             {icon && (
               <div
                 className={`w-9 h-9 rounded-[var(--radius-control)] flex items-center justify-center shrink-0 transition-colors ${
                   hasError
-                    ? 'bg-ui-error-bg text-ui-error-text'
+                    ? 'bg-role-error-container text-role-on-error-container'
                     : isExpanded
-                    ? 'bg-ui-accent-soft text-ui-accent'
-                    : 'bg-ui-surface-subtle text-ui-content-secondary'
+                    ? 'bg-role-secondary-container text-role-secondary'
+                    : 'bg-role-surface-subtle text-role-on-surface-secondary'
                 }`}
               >
                 {icon}
@@ -75,12 +75,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+                <span className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 type-compact font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
+                  <span className="inline-flex items-center gap-1 type-compact font-[var(--font-weight-semibold)] text-role-on-error-container bg-role-error-container border border-role-error-outline px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{errorLabel}</span>
                   </span>
@@ -88,7 +88,7 @@ export const Accordion: React.FC<AccordionProps> = ({
               </div>
 
               {summary && !isExpanded && (
-                <div className="type-compact leading-snug text-ui-content-muted mt-1 truncate">
+                <div className="type-compact leading-snug text-role-on-surface-muted mt-1 truncate">
                   {summary}
                 </div>
               )}
@@ -97,8 +97,8 @@ export const Accordion: React.FC<AccordionProps> = ({
 
           <div className="flex items-center gap-2 shrink-0">
             <div
-              className={`w-8 h-8 rounded-[var(--radius-badge-md)] flex items-center justify-center text-ui-content-muted transition-transform duration-200 ${
-                isExpanded ? 'rotate-180 bg-ui-surface-subtle' : ''
+              className={`w-8 h-8 rounded-[var(--radius-badge-md)] flex items-center justify-center text-role-on-surface-muted transition-transform duration-200 ${
+                isExpanded ? 'rotate-180 bg-role-surface-subtle' : ''
               }`}
             >
               <ChevronDown className="w-5 h-5" />
@@ -115,8 +115,8 @@ export const Accordion: React.FC<AccordionProps> = ({
               <div
                 className={`w-9 h-9 rounded-[var(--radius-control)] flex items-center justify-center shrink-0 transition-colors ${
                   hasError
-                    ? 'bg-ui-error-bg text-ui-error-text'
-                    : 'bg-ui-accent-soft text-ui-accent'
+                    ? 'bg-role-error-container text-role-on-error-container'
+                    : 'bg-role-secondary-container text-role-secondary'
                 }`}
               >
                 {icon}
@@ -125,12 +125,12 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+                <span className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface leading-tight">
                   {title}
                 </span>
                 {badge}
                 {hasError && (
-                  <span className="inline-flex items-center gap-1 type-compact font-[var(--font-weight-semibold)] text-ui-error-text bg-ui-error-bg border border-ui-error-border px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
+                  <span className="inline-flex items-center gap-1 type-compact font-[var(--font-weight-semibold)] text-role-on-error-container bg-role-error-container border border-role-error-outline px-2 py-0.5 rounded-[var(--radius-badge-sm)]">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{errorLabel}</span>
                   </span>
@@ -146,7 +146,7 @@ export const Accordion: React.FC<AccordionProps> = ({
           id={panelId}
           role="region"
           aria-labelledby={headerId}
-          className={`px-4 pb-5 md:px-5 md:pb-6 pt-1 border-t border-ui-stroke-subtle ${contentClassName}`}
+          className={`px-4 pb-5 md:px-5 md:pb-6 pt-1 border-t border-role-outline-subtle ${contentClassName}`}
         >
           {children}
         </div>
