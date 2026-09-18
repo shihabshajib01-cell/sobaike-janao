@@ -329,6 +329,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         sexualHarassmentInstitution: '',
         intimateWhatHappened: '',
         intimatePlatform: '',
+        frequency: 'one-time',
         incidentTime: '',
         utilityEndTime: '',
         recentBillMonth: '',
