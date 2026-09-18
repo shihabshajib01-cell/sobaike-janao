@@ -5,6 +5,7 @@ import { PublicEngagementService } from '../../services/publicEngagementService'
 import { useTaxonomy } from '../../services/taxonomyService';
 import { BrandLogo } from '../branding/BrandLogo';
 import { IconButton } from '../ui/IconButton';
+import { SECTIONS } from '../../theme/tokens';
 
 const REPORT_DETAIL_PREFIX = '/report-detail/';
 
@@ -28,9 +29,15 @@ export const MobileHeader: React.FC = () => {
   const [isShareConfirmed, setIsShareConfirmed] = useState(false);
   const { segments } = useTaxonomy();
 
-  const activeCategory = Object.values(segments).find(
-    (segment) => segment.slug === currentRoute
-  ) || null;
+  const runtimeCategory =
+    Object.values(segments).find((segment) => segment.slug === currentRoute) || null;
+  const staticCategoryEntry =
+    Object.entries(SECTIONS).find(([, segment]) => segment.slug === currentRoute) || null;
+  const activeCategory =
+    runtimeCategory ||
+    (staticCategoryEntry
+      ? { ...staticCategoryEntry[1], id: staticCategoryEntry[0] }
+      : null);
   const activeCategoryKey = activeCategory?.id;
   const isHarassmentCategory = activeCategoryKey === 'harassment';
   const isReportDetailRoute = currentRoute.startsWith(REPORT_DETAIL_PREFIX);
