@@ -499,12 +499,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               report.districtEn ? (
                 <button type="button" onClick={() => navigateTo(`/location/${report.districtEn.toLowerCase()}`)}
                   className="flex items-center gap-1.5 min-w-0 font-[var(--font-weight-medium)] text-ui-content-secondary min-h-[44px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md">
-                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
+                  <MapPin className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                   <span className="truncate">{location}</span>
                 </button>
               ) : (
                 <span className="flex items-center gap-1.5 min-w-0">
-                  <MapPin className="w-4 h-4 text-ui-content-secondary shrink-0" aria-hidden="true" />
+                  <MapPin className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                   <span className="truncate">{location}</span>
                 </span>
               )
@@ -512,12 +512,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <div className="flex items-center gap-3 shrink-0">
               <span className="h-5 w-px bg-ui-stroke-subtle" aria-hidden="true" />
               <span className="flex items-center gap-1.5" aria-label={`${displayEngagementCount(viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}>
-                <Eye className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
+                <Eye className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                 <span>{displayEngagementCount(viewCount)}</span>
               </span>
               <span className="h-5 w-px bg-ui-stroke-subtle" aria-hidden="true" />
               <span className="flex items-center gap-1.5" aria-label={`${displayEngagementCount(shareCount)} ${language === 'bn' ? 'শেয়ার' : 'shares'}`}>
-                <Share2 className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
+                <Share2 className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                 <span>{displayEngagementCount(shareCount)}</span>
               </span>
             </div>
@@ -706,7 +706,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           {evidenceList && evidenceList.length > 0 && (
             <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
               <h3 className="type-h4 text-ui-content-primary flex items-center gap-2">
-                <FileCheck className="w-4 h-4 text-ui-content-secondary" aria-hidden="true" />
+                <FileCheck className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                 <span>{language === 'bn' ? 'সহায়ক তথ্য' : 'Supporting information'}</span>
               </h3>
               <ul className="space-y-2 type-meta text-ui-content-secondary">
@@ -802,11 +802,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                       {response.name && (
                         <p className="type-meta text-ui-content-secondary mt-1 break-words">
                           <span className="font-[var(--font-weight-medium)]">{response.name}</span>
-                          {response.subtitle && <span className="text-ui-content-muted"> · {response.subtitle}</span>}
+                          {response.subtitle && <span className="text-ui-content-secondary"> · {response.subtitle}</span>}
                         </p>
                       )}
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-muted sm:justify-end shrink-0">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-secondary sm:justify-end shrink-0">
                       {response.incidentDate && (
                         <span>{language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}{response.incidentDate}</span>
                       )}
@@ -826,7 +826,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               <button
                 type="button"
                 onClick={() => setShowAllResponses((current) => !current)}
-                className="w-full min-h-[44px] mt-1 flex items-center justify-center gap-1.5 type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle border-t border-ui-stroke-subtle cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-control"
+                className="w-full min-h-[44px] mt-1 flex items-center justify-center gap-2 type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle border-t border-ui-stroke-subtle cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-control"
                 aria-expanded={showAllResponses}
               >
                 <span>
