@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://shobaikejanao.com/sitemap.xml
