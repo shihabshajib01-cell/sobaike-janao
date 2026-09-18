@@ -143,9 +143,11 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       const rawDescription =
         language === 'bn'
           ? bnDescription
-          : enDescription && enDescription !== bnDescription
+          : enDescription &&
+              enDescription !== bnDescription &&
+              enDescription.trim().length >= 50
             ? enDescription
-            : `Published citizen report about ${report.titleEn || report.titleBn}. Review the report details, location, sources, and updates on Sobaike Janao.`;
+            : `Published citizen report about ${report.titleEn || report.titleBn}. Review the report details, location, available sources, public-interest context, and the latest updates on Sobaike Janao.`;
 
       const description = normalizeSeoDescription(rawDescription, language);
       const indexable = isSeoIndexableReportContent(
