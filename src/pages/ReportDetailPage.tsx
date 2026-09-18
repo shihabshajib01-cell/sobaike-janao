@@ -168,6 +168,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         imageAlt: publicTitle,
         pageType: 'article',
         publishedTime: report.publishedAt || undefined,
+        modifiedTime: report.updatedAt || report.publishedAt || undefined,
       });
       return;
     }
