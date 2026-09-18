@@ -6,6 +6,14 @@ import {
   HARASSMENT_REPORTING_FOR_OPTIONS,
   getBilingualOptionLabel,
 } from '../../data/harassmentClassification';
+import {
+  SEXUAL_HARASSMENT_AGE_GROUP_OPTIONS,
+  SEXUAL_HARASSMENT_CONTEXT_OPTIONS,
+  SEXUAL_HARASSMENT_FREQUENCY_OPTIONS,
+  SEXUAL_HARASSMENT_RELATIONSHIP_OPTIONS,
+  SEXUAL_HARASSMENT_TYPE_OPTIONS,
+  getSexualHarassmentOptionLabel,
+} from '../../data/sexualHarassmentOptions';
 
 export interface HarassmentContextSummaryProps {
   report: ReportItem;
@@ -21,6 +29,9 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
     (!report.affectedPersonAgeGroup &&
       !report.allegedAbuserRelationship &&
       !report.reportingFor &&
+      !report.sexualHarassmentType &&
+      !report.sexualHarassmentContext &&
+      !report.sexualHarassmentInstitution &&
       !report.reporterName)
   ) {
     return null;
@@ -31,7 +42,9 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
       ? {
           label: language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়স' : "Affected person's age group",
           value: getBilingualOptionLabel(
-            HARASSMENT_AGE_GROUP_OPTIONS,
+            report.subcategoryId === 'sexual-harassment'
+              ? SEXUAL_HARASSMENT_AGE_GROUP_OPTIONS
+              : HARASSMENT_AGE_GROUP_OPTIONS,
             report.affectedPersonAgeGroup,
             language
           ),
@@ -41,7 +54,9 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
       ? {
           label: language === 'bn' ? 'অভিযুক্ত ব্যক্তির সঙ্গে সম্পর্ক' : 'Relationship with alleged abuser',
           value: getBilingualOptionLabel(
-            HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
+            report.subcategoryId === 'sexual-harassment'
+              ? SEXUAL_HARASSMENT_RELATIONSHIP_OPTIONS
+              : HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
             report.allegedAbuserRelationship,
             language
           ),
@@ -57,6 +72,42 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
           ),
         }
       : null,
+    report.subcategoryId === 'sexual-harassment' && report.sexualHarassmentType
+      ? {
+          label: language === 'bn' ? 'হয়রানির ধরন' : 'Type of harassment',
+          value: getSexualHarassmentOptionLabel(
+            SEXUAL_HARASSMENT_TYPE_OPTIONS,
+            report.sexualHarassmentType,
+            language
+          ),
+        }
+      : null,
+    report.subcategoryId === 'sexual-harassment' && report.sexualHarassmentContext
+      ? {
+          label: language === 'bn' ? 'ঘটনার প্রেক্ষাপট' : 'Incident context',
+          value: getSexualHarassmentOptionLabel(
+            SEXUAL_HARASSMENT_CONTEXT_OPTIONS,
+            report.sexualHarassmentContext,
+            language
+          ),
+        }
+      : null,
+    report.subcategoryId === 'sexual-harassment' && report.frequency
+      ? {
+          label: language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency',
+          value: getSexualHarassmentOptionLabel(
+            SEXUAL_HARASSMENT_FREQUENCY_OPTIONS,
+            report.frequency,
+            language
+          ),
+        }
+      : null,
+    report.subcategoryId === 'sexual-harassment' && report.sexualHarassmentInstitution
+      ? {
+          label: language === 'bn' ? 'প্রতিষ্ঠান / সংস্থা' : 'Institution / organization',
+          value: report.sexualHarassmentInstitution,
+        }
+      : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 
   return (
@@ -68,7 +119,7 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
         {language === 'bn' ? 'ঘটনার প্রেক্ষাপট' : 'Incident context'}
       </h2>
       {rows.length > 0 && (
-        <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {rows.map((row) => (
             <div key={row.label} className="rounded-[var(--radius-badge-md)] bg-ui-surface-subtle border border-ui-stroke-subtle p-3">
               <dt className="type-compact font-[var(--font-weight-semibold)] text-ui-content-muted">{row.label}</dt>
