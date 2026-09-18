@@ -22,12 +22,12 @@ export const FormField: React.FC<FormFieldProps> = ({
   className = '',
   labelClassName = 'type-label text-role-on-surface',
 }) => {
-  const { helperId, errorId } = formFieldIds(id);
+  const { helperId, errorId, labelId } = formFieldIds(id);
 
   return (
     <div className={`w-full text-left space-y-1.5 ${className}`}>
       {label ? (
-        <label htmlFor={id} className={`block ${labelClassName}`}>
+        <label id={labelId} htmlFor={id} className={`block ${labelClassName}`}>
           {label}
           {required ? (
             <span className="text-role-validation ml-1" aria-hidden="true">
