@@ -252,6 +252,7 @@ for (const file of standardModalSurfaces) {
 const approvedSpecializedDialogSurfaces = new Set([
   'src/components/media/ImageViewer.tsx',
   'src/components/media/AttachmentLightboxModal.tsx',
+  'src/components/ui/Drawer.tsx',
 ]);
 
 for (const root of [path.resolve(ROOT, 'src/components'), path.resolve(ROOT, 'src/pages')]) {
