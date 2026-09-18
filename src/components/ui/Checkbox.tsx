@@ -5,10 +5,11 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
   label?: React.ReactNode;
   description?: React.ReactNode;
   labelClassName?: string;
+  descriptionId?: string;
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ id, label, description, checked, disabled, className = '', labelClassName = 'type-label text-role-on-surface', onChange, ...props }, ref) => {
+  ({ id, label, description, descriptionId, checked, disabled, className = '', labelClassName = 'type-label text-role-on-surface', onChange, ...props }, ref) => {
     const checkboxId = id || (typeof label === 'string' ? `cb-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined);
 
     return (
@@ -39,7 +40,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           <span className="block">
             {label && <span className={`block ${labelClassName}`}>{label}</span>}
             {description && (
-              <span className="block type-helper text-role-on-surface-muted mt-0.5">
+              <span id={descriptionId} className="block type-helper text-role-on-surface-muted mt-0.5">
                 {description}
               </span>
             )}
