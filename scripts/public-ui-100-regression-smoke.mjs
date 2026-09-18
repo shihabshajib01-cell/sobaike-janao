@@ -254,6 +254,49 @@ await check('Explore analytics provide accessible chart drilldowns', async () =>
   await context.close();
 });
 
+await check('Explore map provides layered geographic analysis', async () => {
+  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  await page.goto(routeUrl('/explore'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+  const mapModeButton = page.locator('#explore-mode-map');
+  await expectVisible(mapModeButton, 'Explore map mode control did not render');
+  await mapModeButton.click();
+
+  await expectVisible(
+    page.locator('#explore-map-insight-summary'),
+    'Map insight summary did not render'
+  );
+  await expectVisible(page.locator('#map-layer-toolbar'), 'Map layer toolbar did not render');
+  await expectVisible(page.locator('#public-heatmap-card'), 'Interactive map did not render');
+
+  for (const selector of ['#map-layer-density', '#map-layer-districts', '#map-layer-points']) {
+    const control = page.locator(selector);
+    await expectVisible(control, `${selector} did not render`);
+    const box = await control.boundingBox();
+    if (!box || box.height < 44) {
+      throw new Error(
+        `${selector} is below 44px: ${box ? Math.round(box.height) : 'not measurable'}`
+      );
+    }
+  }
+
+  const districtMode = page.locator('#map-layer-districts');
+  await districtMode.click();
+  if ((await districtMode.getAttribute('aria-pressed')) !== 'true') {
+    throw new Error('District map layer did not expose selected state');
+  }
+
+  const pointsMode = page.locator('#map-layer-points');
+  await pointsMode.click();
+  if ((await pointsMode.getAttribute('aria-pressed')) !== 'true') {
+    throw new Error('Point map layer did not expose selected state');
+  }
+
+  await context.close();
+});
+
 await check('Key mobile controls preserve the 44px minimum interaction target', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
