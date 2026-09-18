@@ -75,9 +75,9 @@ begin
     normalized as (
       select
         metrics.*,
-        coalesce(published_post_count::numeric / nullif(max(published_post_count) over (), 0), 0) as post_norm,
-        coalesce(view_count::numeric / nullif(max(view_count) over (), 0), 0) as view_norm,
-        coalesce(share_count::numeric / nullif(max(share_count) over (), 0), 0) as share_norm
+        coalesce(metrics.published_post_count::numeric / nullif(max(metrics.published_post_count) over (), 0), 0) as post_norm,
+        coalesce(metrics.view_count::numeric / nullif(max(metrics.view_count) over (), 0), 0) as view_norm,
+        coalesce(metrics.share_count::numeric / nullif(max(metrics.share_count) over (), 0), 0) as share_norm
       from metrics
     ),
     scored as (
