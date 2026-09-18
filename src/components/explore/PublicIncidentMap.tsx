@@ -239,12 +239,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     }
 
     const resolveCategoryColor = (section: SectionKey) => {
-      if (typeof window === 'undefined') return '#3A7CA5';
-      const value = window
-        .getComputedStyle(document.documentElement)
+      if (typeof window === 'undefined') return 'currentColor';
+      const rootStyle = window.getComputedStyle(document.documentElement);
+      const categoryColor = rootStyle
         .getPropertyValue(`--category-${section}-primary`)
         .trim();
-      return value || '#3A7CA5';
+      const fallbackColor = rootStyle.getPropertyValue('--md-secondary').trim();
+      return categoryColor || fallbackColor || rootStyle.color;
     };
 
     const safePoints = heatPoints.filter(
@@ -286,7 +287,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         const topCategory = getTopCategory(item.categoryCounts);
         const color = topCategory
           ? resolveCategoryColor(topCategory.key)
-          : '#3A7CA5';
+          : resolveCategoryColor('public_safety');
         const radius = Math.max(9, Math.min(26, 8 + Math.sqrt(item.count) * 2.5));
 
         const marker = L.circleMarker([lat, lng], {
