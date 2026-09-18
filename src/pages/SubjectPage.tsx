@@ -83,8 +83,6 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
           ogSiteName: BRAND_NAME[language],
           canonicalPath: `/subject/${encodeURIComponent(decodedSubject)}`,
           pageType: 'collection',
-          canonicalPath: `/subject/${encodeURIComponent(decodedSubject)}`,
-          pageType: 'collection',
         });
       } else {
         setDynamicSeo({
@@ -120,6 +118,8 @@ export const SubjectPage: React.FC<SubjectPageProps> = ({ subjectId }) => {
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/subject/${encodeURIComponent(decodedSubject)}`,
+        pageType: 'collection',
       });
     }
   }, [primaryReport, reports.length, isLoading, fetchError, language, setDynamicSeo]);
