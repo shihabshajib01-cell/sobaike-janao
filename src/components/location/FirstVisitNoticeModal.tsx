@@ -37,13 +37,13 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
   const instructions = isBn
     ? [
         'সঠিক, সত্য ও প্রাসঙ্গিক তথ্য দিয়ে প্রতিবেদন প্রকাশ করুন।',
-        'কারও সুনাম নষ্ট করার অসৎ উদ্দেশ্যে ভিত্তিহীন অভিযোগ দেওয়া থেকে বিরত থাকুন।',
-        'জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট হটলাইনে সরাসরি যোগাযোগ করুন।',
+        'কারও সুনাম নষ্ট করার উদ্দেশ্যে ভিত্তিহীন বা মিথ্যা অভিযোগ দেওয়া থেকে বিরত থাকুন।',
+        'জরুরি সহায়তার প্রয়োজন হলে ৯৯৯ অথবা সংশ্লিষ্ট হটলাইনে সরাসরি যোগাযোগ করুন।',
       ]
     : [
-        'Submit accurate, factual, and relevant information.',
-        'Avoid submitting false, malicious, or defamatory complaints.',
-        'For emergencies, contact 999 or the relevant hotline directly.',
+        'Submit accurate, truthful, and relevant information.',
+        'Do not submit false or baseless allegations intended to harm someone’s reputation.',
+        'If you need emergency assistance, contact 999 or the relevant hotline directly.',
       ];
 
   return (
@@ -81,18 +81,25 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
         <div className="flex flex-col gap-2.5">
           <h2 className="type-h3 text-ui-content-primary">
             {isBn
-              ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
-              : 'Independence & Responsible Use Notice'}
+              ? 'ব্যবহারের আগে কিছু গুরুত্বপূর্ণ কথা'
+              : 'A few important things before you continue'}
           </h2>
 
-          <p
+          <div
             id="first-visit-notice-desc"
-            className="type-body text-ui-content-primary"
+            className="flex flex-col gap-2.5"
           >
-            {isBn
-              ? 'এই প্ল্যাটফর্মটি নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ শেয়ার করার একটি স্বাধীন মাধ্যম। সবার জন্য নির্ভরযোগ্য ও নিরাপদ পরিবেশ বজায় রাখতে নিচের নির্দেশনাগুলো অনুসরণ করুন।'
-              : 'This is an independent platform for citizens to share public-interest information, experiences, and observations. Please follow the guidance below to help keep the platform reliable and safe for everyone.'}
-          </p>
+            <p className="type-body text-ui-content-primary">
+              {isBn
+                ? 'সবাইকে জানাও কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী বাহিনীর ওয়েবসাইট নয়। এটি বাংলাদেশের নাগরিকদের জন্য একটি স্বাধীন প্ল্যাটফর্ম, যেখানে আপনি নিজের পরিচয় বা ব্যক্তিগত নিরাপত্তা নিয়ে উদ্বেগ ছাড়াই জনস্বার্থে সমস্যা, অভিজ্ঞতা ও পর্যবেক্ষণ শেয়ার করতে পারেন।'
+                : 'Sobaike Janao is not a government or law-enforcement website. It is an independent platform for people in Bangladesh to share public-interest issues, experiences, and observations without having to publicly reveal their identity.'}
+            </p>
+            <p className="type-body text-ui-content-primary">
+              {isBn
+                ? 'প্রতিবেদন জমা দিতে আমরা আপনার ফোন নম্বর বা ইমেইল চাই না, এবং আপনার ব্যক্তিগত পরিচয় প্রকাশ না করেই আপনি এখানে আপনার কথা জানাতে পারেন। তবে এই স্বাধীনতা যেন সঠিক ও দায়িত্বশীলভাবে ব্যবহৃত হয়, সেজন্য প্রতিবেদন প্রকাশের সময় নিচের বিষয়গুলো মেনে চলুন:'
+                : 'We do not ask for your phone number or email to submit a report, and you can speak here without publicly revealing your personal identity. To make sure this freedom is used responsibly, please follow the guidance below when publishing a report:'}
+            </p>
+          </div>
         </div>
 
         <div className="rounded-[var(--radius-control)] border border-ui-stroke-default p-4 bg-ui-surface">
