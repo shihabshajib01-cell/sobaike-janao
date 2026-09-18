@@ -361,7 +361,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       >
         <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
           <span
-            className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-[var(--radius-badge-sm)] flex items-center justify-center text-[var(--type-fixed-11)] md:text-[var(--type-fixed-12)] font-[var(--font-weight-bold)] shrink-0 border ${
+            className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-[var(--radius-badge-sm)] flex items-center justify-center type-compact font-[var(--font-weight-bold)] shrink-0 border ${
               isSelected
                 ? 'bg-ui-accent text-ui-content-inverse border-ui-accent'
                 : index === 0
@@ -377,10 +377,10 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           </span>
 
           <div className="min-w-0">
-            <span className="text-[var(--type-fixed-13)] md:text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
+            <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
               {language === 'bn' ? item.nameBn : item.nameEn}
             </span>
-            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[var(--type-fixed-11)] md:text-[var(--type-fixed-12)] text-ui-content-muted mt-0.5">
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 type-compact text-ui-content-muted mt-0.5">
               {item.harassmentCount > 0 && (
                 <span className="inline-flex items-center gap-0.5">
                   <CategoryIcon section="harassment" size="xs" />{' '}
@@ -410,7 +410,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums">
+          <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums">
             {countDisplay}
           </span>
           <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
@@ -429,11 +429,11 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-1.5">
             <MapIcon name="map-pin" size="sm" className="text-ui-content-primary shrink-0" />
-            <h3 className="text-[var(--type-fixed-15)] md:text-[var(--type-fixed-16)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight truncate">
+            <h3 className="type-h4 font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight truncate">
               {language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area summary'}
             </h3>
           </div>
-          <div className="flex items-center gap-1 text-[var(--type-fixed-12)] text-ui-content-secondary truncate pl-5">
+          <div className="flex items-center gap-1 type-compact text-ui-content-secondary truncate pl-5">
             <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{geographyContext.primary}</span>
             {geographyContext.isSpecific && (
               <span className="text-ui-content-muted">• {geographyContext.secondary}</span>
@@ -445,7 +445,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <button
             type="button"
             onClick={() => onSelectDistrict('all')}
-            className="text-[var(--type-fixed-12)] font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary inline-flex items-center gap-1.5 cursor-pointer px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary inline-flex items-center gap-1.5 cursor-pointer px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             aria-label={parentGeographyButtonLabel}
           >
             <span className="truncate max-w-[140px] sm:max-w-none">{parentGeographyButtonLabel}</span>
@@ -457,17 +457,17 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       {/* 2. Total Published Reports & 3. Most Reported Topic */}
       <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3 md:p-3.5 space-y-3 sm:space-y-0 sm:flex sm:items-start sm:justify-between sm:gap-3">
         <div className="shrink-0">
-          <span className="text-[var(--type-fixed-11)] md:text-[var(--type-fixed-12)] font-[var(--font-weight-medium)] text-ui-content-muted block">
+          <span className="type-compact font-[var(--font-weight-medium)] text-ui-content-muted block">
             {language === 'bn' ? 'মোট প্রকাশিত প্রতিবেদন' : 'Total published reports'}
           </span>
-          <span className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-26)] font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums leading-tight mt-0.5 block">
+          <span className="type-h1 font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums leading-tight mt-0.5 block">
             {language === 'bn' ? toBanglaDigits(activeReportCount) : activeReportCount}
           </span>
         </div>
 
         {mostReportedTopicAnalysis.status !== 'empty' && (
           <div className="sm:text-right min-w-0 sm:max-w-[65%]">
-            <span className="text-[var(--type-fixed-11)] md:text-[var(--type-fixed-12)] font-[var(--font-weight-medium)] text-ui-content-muted block">
+            <span className="type-compact font-[var(--font-weight-medium)] text-ui-content-muted block">
               {mostReportedTopicAnalysis.heading}
             </span>
             <div className="flex items-start sm:justify-end gap-1.5 mt-1 flex-wrap">
@@ -483,10 +483,10 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   ))}
                 </div>
               )}
-              <div className="text-[var(--type-fixed-13)] md:text-[var(--type-fixed-14)] font-[var(--font-weight-bold)] text-ui-content-primary break-words whitespace-normal leading-snug">
+              <div className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary break-words whitespace-normal leading-snug">
                 <span>{mostReportedTopicAnalysis.label}</span>
                 {mostReportedTopicAnalysis.status === 'tie' && (
-                  <span className="tabular-nums ml-1.5 font-[var(--font-weight-regular)] text-ui-content-muted text-[var(--type-fixed-12)] whitespace-nowrap">
+                  <span className="tabular-nums ml-1.5 font-[var(--font-weight-regular)] text-ui-content-muted type-compact whitespace-nowrap">
                     ({mostReportedTopicAnalysis.countText})
                   </span>
                 )}
@@ -498,9 +498,9 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
       {/* 4. Topic Distribution */}
       <div className="space-y-1.5 md:space-y-2">
-        <div className="flex items-center justify-between text-[var(--type-fixed-12)] md:text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] text-ui-content-secondary">
+        <div className="flex items-center justify-between type-compact font-[var(--font-weight-bold)] text-ui-content-secondary">
           <span>{language === 'bn' ? 'বিষয় অনুযায়ী প্রতিবেদন' : 'Reports by topic'}</span>
-          <span className="text-[var(--type-fixed-11)] font-[var(--font-weight-regular)] text-ui-content-muted">
+          <span className="type-compact font-[var(--font-weight-regular)] text-ui-content-muted">
             {language === 'bn' ? '৪টি বিষয়' : '4 categories'}
           </span>
         </div>
@@ -509,7 +509,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           {categories.map((cat) => (
             <div
               key={cat.key}
-              className="flex items-center justify-between px-3 py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] md:text-[var(--type-fixed-135)]"
+              className="flex items-center justify-between px-3 py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <CategoryIcon section={cat.key} size="xs" />
@@ -517,7 +517,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   {cat.label}
                 </span>
               </div>
-              <span className="font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums text-[var(--type-fixed-13)] md:text-[var(--type-fixed-14)] shrink-0 ml-2">
+              <span className="font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums type-compact shrink-0 ml-2">
                 {language === 'bn' ? toBanglaDigits(cat.count) : cat.count}
               </span>
             </div>
@@ -527,12 +527,12 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
       {/* 5. Explore by District / District Ranking */}
       <div className="space-y-2 pt-1 border-t border-ui-stroke-subtle">
-        <div className="flex items-center justify-between text-[var(--type-fixed-12)] md:text-[var(--type-fixed-13)]">
+        <div className="flex items-center justify-between type-compact">
           <span className="font-[var(--font-weight-bold)] text-ui-content-secondary">
             {language === 'bn' ? 'জেলা অনুযায়ী প্রতিবেদন' : 'Reports by district'}
           </span>
           {rankedDistricts.length > 0 && (
-            <span className="text-[var(--type-fixed-11)] text-ui-content-muted font-[var(--font-weight-medium)]">
+            <span className="type-compact text-ui-content-muted font-[var(--font-weight-medium)]">
               {language === 'bn'
                 ? `${toBanglaDigits(rankedDistricts.length)}টি জেলা`
                 : `${rankedDistricts.length} districts`}
@@ -553,7 +553,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             </div>
           </>
         ) : (
-          <div className="py-4 text-center text-[var(--type-fixed-13)] text-ui-content-muted space-y-1">
+          <div className="py-4 text-center type-compact text-ui-content-muted space-y-1">
             <MapIcon name="map-pin" size="lg" className="mx-auto text-ui-content-muted" />
             <p>{language === 'bn' ? 'কোনো জেলার তথ্য মেলেনি' : 'No district reports'}</p>
           </div>
@@ -567,7 +567,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             type="button"
             aria-expanded={showAllDistricts}
             onClick={() => setShowAllDistricts(!showAllDistricts)}
-            className="w-full py-2.5 px-3 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-13)] font-[var(--font-weight-bold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-hover transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="w-full py-2.5 px-3 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact font-[var(--font-weight-bold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-hover transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <span>
               {showAllDistricts

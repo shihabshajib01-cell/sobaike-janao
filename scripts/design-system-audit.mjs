@@ -42,6 +42,11 @@ const RULES = [
     message: 'Hardcoded font size bypasses semantic typography tokens',
   },
   {
+    id: 'legacy-fixed-type-alias',
+    pattern: /text-\[var\(--type-fixed-[^)]+\)\]/g,
+    message: 'Legacy fixed typography aliases are compatibility-only; use semantic typography roles',
+  },
+  {
     id: 'tailwind-type-scale',
     pattern: /\btext-(?:xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)\b/g,
     message: 'Tailwind font-size utility bypasses semantic typography tokens',

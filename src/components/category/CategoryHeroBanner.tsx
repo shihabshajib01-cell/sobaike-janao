@@ -167,6 +167,9 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             src={resolvePublicAsset(illustrationSrc)}
             alt=""
             aria-hidden="true"
+            loading={active ? 'eager' : 'lazy'}
+            fetchPriority={active ? 'high' : 'low'}
+            decoding="async"
             style={
               {
                 '--hero-desktop-media-position': resolvedDesktopMediaPosition,

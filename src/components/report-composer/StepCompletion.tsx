@@ -29,10 +29,10 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-[var(--type-fixed-22)] md:text-[var(--type-fixed-24)] font-[var(--font-weight-bold)] text-ui-content-primary">
+        <h3 className="type-h2 font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'প্রতিবেদন জমা হয়েছে' : 'Report submitted'}
         </h3>
-        <p className="text-[var(--type-fixed-14)] md:text-[var(--type-fixed-16)] text-ui-content-secondary max-w-lg mx-auto leading-relaxed">
+        <p className="type-label text-ui-content-secondary max-w-lg mx-auto leading-relaxed">
           {language === 'bn'
             ? 'আপনার প্রতিবেদন পর্যালোচনার জন্য জমা হয়েছে।'
             : 'Your report has been submitted for review.'}
@@ -48,7 +48,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
           size="lg"
           onClick={onSubmitAnother}
           leftIcon={<PlusCircle className="w-4 h-4" aria-hidden="true" />}
-          className="w-full md:w-auto min-h-[44px] text-[var(--type-fixed-16)] px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="w-full md:w-auto min-h-[44px] type-label px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           {language === 'bn' ? 'আরেকটি প্রতিবেদন জমা দিন' : 'Submit another report'}
         </Button>
@@ -59,7 +59,7 @@ export const StepCompletion: React.FC<StepCompletionProps> = ({
           variant="outline"
           size="lg"
           onClick={onClose}
-          className="w-full md:w-auto min-h-[44px] text-[var(--type-fixed-16)] px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="w-full md:w-auto min-h-[44px] type-label px-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         >
           {language === 'bn' ? 'হোমে ফিরে যান' : 'Return to home'}
         </Button>

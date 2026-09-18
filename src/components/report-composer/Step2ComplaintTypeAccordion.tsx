@@ -31,25 +31,36 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
       ? 'অভিযোগের ধরন নির্বাচন করুন।'
       : 'Select a complaint type.';
 
+  const selectAndFocus = (index: number) => {
+    const next = allSubcategories[index];
+    if (!next) return;
+    onSelectSubcategory(next.id, next);
+    window.requestAnimationFrame(() => {
+      document.getElementById(`subcategory-option-${next.id}`)?.focus();
+    });
+  };
+
   return (
     <div className="space-y-4 sm:space-y-5">
       {/* 1. Minimal Header: Title + Short Helper Text */}
       <div className="space-y-1 text-left">
-        <h3 className="text-[var(--type-fixed-18)] sm:text-[var(--type-fixed-20)] md:text-[var(--type-fixed-22)] font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+        <h3 className="type-h2 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
           {headerTitle}
         </h3>
-        <p className="text-[var(--type-fixed-13)] sm:text-[var(--type-fixed-14)] md:text-[var(--type-fixed-15)] leading-normal text-ui-content-secondary">
+        <p className="type-h4 leading-normal text-ui-content-secondary">
           {helperText}
         </p>
       </div>
 
       {/* 2. Direct Compact Complaint Category Cards */}
       <div
+        role="radiogroup"
+        aria-label={helperText}
         className={`grid gap-2.5 sm:gap-3 ${
           isSingleOption ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
         }`}
       >
-        {allSubcategories.map((item) => {
+        {allSubcategories.map((item, index) => {
           const isSelected = selectedSubcategoryId === item.id;
           const itemName = language === 'bn' ? item.nameBn : item.nameEn;
           const itemDesc = language === 'bn' ? item.descriptionBn : item.descriptionEn;
@@ -60,13 +71,21 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
               id={`subcategory-option-${item.id}`}
               role="radio"
               aria-checked={isSelected}
-              tabIndex={0}
+              tabIndex={isSelected || (!selectedSubcategoryId && index === 0) ? 0 : -1}
               onClick={() => onSelectSubcategory(item.id, item)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   onSelectSubcategory(item.id, item);
+                  return;
                 }
+                if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+                e.preventDefault();
+                if (e.key === 'Home') return selectAndFocus(0);
+                if (e.key === 'End') return selectAndFocus(allSubcategories.length - 1);
+                const delta = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1;
+                const nextIndex = (index + delta + allSubcategories.length) % allSubcategories.length;
+                selectAndFocus(nextIndex);
               }}
               className={`p-3 sm:p-3.5 rounded-[var(--radius-control)] border text-left cursor-pointer transition-all flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus:ring-2 focus:ring-ui-focus select-none ${
                 isSingleOption ? 'col-span-full w-full' : ''
@@ -77,7 +96,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
               }`}
             >
               <div className="flex items-start justify-between gap-2.5">
-                <h4 className="text-[var(--type-fixed-145)] sm:text-[var(--type-fixed-155)] font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
+                <h4 className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
                   {itemName}
                 </h4>
 
@@ -96,7 +115,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
               </div>
 
               {itemDesc && (
-                <p className="text-[var(--type-fixed-12)] sm:text-[var(--type-fixed-13)] leading-[var(--type-line-ratio-140)] text-ui-content-secondary font-[var(--font-weight-regular)]">
+                <p className="type-compact leading-[var(--type-line-ratio-140)] text-ui-content-secondary font-[var(--font-weight-regular)]">
                   {itemDesc}
                 </p>
               )}

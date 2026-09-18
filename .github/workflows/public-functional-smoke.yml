@@ -42,3 +42,6 @@ jobs:
 
       - name: Run Public UI 100% regression closure smoke
         run: node scripts/public-ui-100-regression-smoke.mjs
+
+      - name: Run complete non-destructive report composer journey
+        run: node scripts/public-composer-100-regression-smoke.mjs

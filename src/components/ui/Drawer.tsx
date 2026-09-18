@@ -142,12 +142,12 @@ export const Drawer: React.FC<DrawerProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-b border-ui-stroke-subtle shrink-0">
           <div>
             {title && (
-              <h2 id={`${id}-title`} className="text-[var(--type-fixed-20)] font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+              <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
                 {title}
               </h2>
             )}
             {description && (
-              <p className="text-[var(--type-fixed-14)] leading-[var(--type-line-20)] text-ui-content-muted mt-1">{description}</p>
+              <p className="type-compact leading-[var(--type-line-20)] text-ui-content-muted mt-1">{description}</p>
             )}
           </div>
           <IconButton
@@ -161,7 +161,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         </div>
 
         {/* Body Content */}
-        <div className="p-6 overflow-y-auto flex-1 text-ui-content-primary text-[var(--type-fixed-16)] leading-[var(--type-line-24)]">{children}</div>
+        <div className="p-6 overflow-y-auto flex-1 text-ui-content-primary type-label leading-[var(--type-line-24)]">{children}</div>
 
         {/* Footer */}
         {footer && (

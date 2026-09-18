@@ -36,7 +36,7 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Skeleton className="w-20 sm:w-24 h-4 sm:h-5 rounded-[var(--radius-badge-sm)]" />
-          <span className="text-ui-content-muted text-[var(--type-fixed-11)] sm:text-[var(--type-fixed-12)] opacity-40">•</span>
+          <span className="text-ui-content-muted type-compact opacity-40">•</span>
           <Skeleton className="w-24 sm:w-32 h-3.5 sm:h-4 rounded" />
         </div>
         <Skeleton className="w-16 sm:w-20 h-4 sm:h-5 rounded-[var(--radius-badge-sm)]" />
@@ -74,12 +74,12 @@ export const ReportCardSkeleton: React.FC<ReportCardSkeletonProps> = ({
       <div className="flex items-center justify-between gap-2 pt-2 sm:pt-2.5 md:pt-3.5 border-t border-ui-stroke-subtle">
         <div className="flex items-center gap-2 sm:gap-3">
           <Skeleton className="w-24 sm:w-32 h-3.5 sm:h-4 rounded" />
-          <span className="text-ui-content-muted text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-12)] opacity-40">•</span>
+          <span className="text-ui-content-muted type-compact opacity-40">•</span>
           <Skeleton className="w-16 sm:w-24 h-3.5 sm:h-4 rounded" />
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3">
           <Skeleton className="w-10 sm:w-14 h-5 sm:h-6 rounded-[var(--radius-badge-md)]" />
-          <span className="text-subtle opacity-40 text-[var(--type-fixed-10)] sm:text-[var(--type-fixed-12)]">|</span>
+          <span className="text-subtle opacity-40 type-compact">|</span>
           <Skeleton className="w-12 sm:w-18 h-5 sm:h-6 rounded-[var(--radius-badge-md)]" />
         </div>
       </div>

@@ -50,25 +50,25 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             <ShieldCheck className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="flex-1">
-            <h2 id="first-visit-notice-title" className="text-[var(--type-fixed-18)] font-[var(--font-weight-bold)] tracking-tight">
+            <h2 id="first-visit-notice-title" className="type-h3 font-[var(--font-weight-bold)] tracking-tight">
               {isBn
                 ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
                 : 'Independence & Responsible Use Notice'}
             </h2>
-            <p className="text-[var(--type-fixed-12)] text-ui-content-muted mt-0.5">
+            <p className="type-compact text-ui-content-muted mt-0.5">
               {isBn ? 'সবাইকে জানাও প্ল্যাটফর্ম' : 'Sobaike Janao Platform'}
             </p>
           </div>
         </div>
 
-        <div id="first-visit-notice-desc" className="text-[var(--type-fixed-14)] text-ui-content-secondary space-y-3 leading-relaxed">
+        <div id="first-visit-notice-desc" className="type-compact text-ui-content-secondary space-y-3 leading-relaxed">
           <p>
             {isBn
               ? 'এটি একটি স্বাধীন নাগরিক তথ্য ও জনস্বার্থ প্ল্যাটফর্ম। নির্ভুল ও তথ্যভিত্তিক নাগরিক পর্যবেক্ষণ বজায় রাখতে নিচের বিষয়গুলো মনে রাখুন:'
               : 'This is an independent citizen reporting and public interest platform. To ensure truthful and constructive records, please note:'}
           </p>
 
-          <ol className="p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle text-[var(--type-fixed-12)] space-y-2 list-none">
+          <ol className="p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact space-y-2 list-none">
             <li className="flex items-start gap-2.5">
               <p className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '১.' : '1.'}</p>
               <p>
@@ -116,7 +116,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
             type="button"
             onClick={handleContinue}
             disabled={!isChecked}
-            className="w-full h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] text-[var(--type-fixed-14)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
+            className="w-full h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] type-compact bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
           >
             <span>{isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}</span>
           </button>

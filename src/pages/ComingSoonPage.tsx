@@ -29,7 +29,7 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         <div className="flex justify-center">
           <span
             id={`coming-soon-badge-${serviceKey}`}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-[var(--radius-pill)] text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)] bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-[var(--elevation-2xs)]"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-[var(--radius-pill)] type-compact font-[var(--font-weight-semibold)] bg-ui-surface-subtle border border-ui-stroke-subtle text-ui-content-secondary shadow-[var(--elevation-2xs)]"
           >
             <span className="w-2 h-2 rounded-[var(--radius-pill)] bg-ui-warning-text animate-pulse" />
             <span>{language === 'bn' ? service.badgeBn : service.badgeEn}</span>
@@ -40,14 +40,14 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ serviceKey }) =>
         <div className="space-y-3">
           <h1
             id={`coming-soon-title-${serviceKey}`}
-            className="text-[var(--type-fixed-26)] sm:text-[var(--type-fixed-30)] font-extrabold text-ui-content-primary tracking-tight leading-snug"
+            className="type-h1 font-extrabold text-ui-content-primary tracking-tight leading-snug"
           >
             {language === 'bn' ? service.nameBn : service.nameEn}
           </h1>
 
           <p
             id={`coming-soon-description-${serviceKey}`}
-            className="text-[var(--type-fixed-16)] leading-[var(--type-line-ratio-160)] text-ui-content-secondary max-w-[480px] mx-auto"
+            className="type-label leading-[var(--type-line-ratio-160)] text-ui-content-secondary max-w-[480px] mx-auto"
           >
             {language === 'bn'
               ? 'এই সেবাটি এখনো চালু হয়নি।'

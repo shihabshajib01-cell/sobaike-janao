@@ -247,7 +247,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
     <div className="space-y-4">
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-3.5 bg-ui-error-bg border border-ui-error-border rounded-[var(--radius-control)] flex items-start gap-2.5 text-[var(--type-fixed-14)] text-ui-error-text">
+        <div className="p-3.5 bg-ui-error-bg border border-ui-error-border rounded-[var(--radius-control)] flex items-start gap-2.5 type-compact text-ui-error-text">
           <AlertCircle className="w-5 h-5 text-ui-error-text shrink-0 mt-0.5" />
           <p className="leading-[var(--type-line-22)]">{language === 'bn' ? errorMessage.bn : errorMessage.en}</p>
         </div>
@@ -292,10 +292,10 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
             <UploadCloud className="w-6 h-6 text-ui-success-text" />
           </div>
           <div className="space-y-1">
-            <p className="text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-primary">
+            <p className="type-compact font-[var(--font-weight-semibold)] text-primary">
               {language === 'bn' ? 'সহায়ক ছবি সংযুক্ত করুন' : 'Attach supporting images'}
             </p>
-            <p className="text-[var(--type-fixed-14)] text-secondary">
+            <p className="type-compact text-secondary">
               {language === 'bn'
                 ? `ঐচ্ছিক · সর্বোচ্চ ${maxImages}টি JPG বা PNG ছবি (প্রতি ছবি ৫MB, মোট ২৫MB)`
                 : `Optional · Up to ${maxImages} JPG or PNG images (5MB each, 25MB total)`}
@@ -307,7 +307,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
       {/* Image Previews Grid */}
       {images.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-[var(--type-fixed-14)] font-[var(--font-weight-semibold)] text-primary">
+          <div className="flex items-center justify-between type-compact font-[var(--font-weight-semibold)] text-primary">
             <span className="flex items-center gap-2">
               <span>
                 {language === 'bn'
@@ -315,7 +315,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                   : `Attached Evidence (${images.length}/${maxImages})`}
               </span>
               {hasAnyCompressing && (
-                <span className="flex items-center gap-1 text-[var(--type-fixed-12)] font-[var(--font-weight-medium)] text-ui-success-text bg-ui-success-bg px-2 py-0.5 rounded-[var(--radius-pill)]">
+                <span className="flex items-center gap-1 type-compact font-[var(--font-weight-medium)] text-ui-success-text bg-ui-success-bg px-2 py-0.5 rounded-[var(--radius-pill)]">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing…'}
                 </span>
@@ -388,7 +388,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     )}
 
                     {/* Order indicator */}
-                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-[var(--radius-badge-sm)] bg-ui-media-overlay-label text-ui-media-viewer-text text-[var(--type-fixed-12)] font-[var(--font-weight-bold)] tracking-wide pointer-events-none">
+                    <div className="absolute top-2 left-2 px-2.5 py-1 rounded-[var(--radius-badge-sm)] bg-ui-media-overlay-label text-ui-media-viewer-text type-compact font-[var(--font-weight-bold)] tracking-wide pointer-events-none">
                       #{index + 1}
                     </div>
 
@@ -396,7 +396,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     {img.isCompressing && (
                       <div className="absolute inset-0 bg-ui-media-viewer-strip backdrop-blur-[2px] flex flex-col items-center justify-center gap-1.5 text-ui-media-viewer-text text-center p-3 pointer-events-none">
                         <Loader2 className="w-6 h-6 animate-spin text-ui-media-viewer-text" />
-                        <span className="text-[var(--type-fixed-13)] font-[var(--font-weight-semibold)]">
+                        <span className="type-compact font-[var(--font-weight-semibold)]">
                           {language === 'bn' ? 'ছবি প্রস্তুত করা হচ্ছে…' : 'Preparing image…'}
                         </span>
                       </div>
@@ -406,7 +406,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
                     {img.compressionError && !img.isCompressing && (
                       <div className="absolute inset-0 bg-ui-error-text/90 p-3 flex flex-col items-center justify-center text-center text-ui-content-inverse gap-1 pointer-events-none">
                         <AlertCircle className="w-5 h-5 text-ui-content-inverse" />
-                        <p className="text-[var(--type-fixed-12)] leading-tight">
+                        <p className="type-compact leading-tight">
                           {language === 'bn' ? img.compressionError.bn : img.compressionError.en}
                         </p>
                       </div>
@@ -428,7 +428,7 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
 
                   {/* File info bar & Reorder controls */}
                   <div className="p-2.5 bg-surface border-t border-subtle flex items-center justify-between gap-2">
-                    <div className="truncate text-[var(--type-fixed-13)] text-primary flex-1 min-w-0">
+                    <div className="truncate type-compact text-primary flex-1 min-w-0">
                       <p className="truncate font-[var(--font-weight-medium)]" title={img.file.name}>
                         {img.originalName || img.file.name}
                       </p>

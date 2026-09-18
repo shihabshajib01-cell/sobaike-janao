@@ -18,8 +18,8 @@ export interface MobJusticeReviewSummaryProps {
 
 const ReviewValue: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="space-y-1">
-    <p className="text-[var(--type-fixed-12)] font-[var(--font-weight-semibold)] text-ui-content-muted">{label}</p>
-    <p className="text-[var(--type-fixed-135)] sm:text-[var(--type-fixed-14)] font-[var(--font-weight-medium)] text-ui-content-primary leading-relaxed">{value}</p>
+    <p className="type-compact font-[var(--font-weight-semibold)] text-ui-content-muted">{label}</p>
+    <p className="type-compact font-[var(--font-weight-medium)] text-ui-content-primary leading-relaxed">{value}</p>
   </div>
 );
 
