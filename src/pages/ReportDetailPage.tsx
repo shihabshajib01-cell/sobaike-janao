@@ -300,7 +300,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
   const openRelatedReport = (relatedReportId: string) => {
     void PublicEngagementService.trackView(relatedReportId);
-    navigateTo(`/report-detail/${relatedReportId}`);
+    navigateTo(`/report-detail/${encodeURIComponent(relatedReportId)}`);
   };
 
   const handleShare = async () => {
