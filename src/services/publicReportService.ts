@@ -281,38 +281,8 @@ export const PublicReportService = {
       mapSupabasePublicReportToItem(raw as SupabasePublicReportRPC)
     );
 
-    // Evidence is enriched only for the currently requested page. This keeps
-    // storage metadata/signing work proportional to what the user can see.
-    if (reports.length > 0) {
-      try {
-        const evidenceMap = await PublicEvidenceService.getPublishedEvidenceForReports(
-          reports.map((report) => report.id)
-        );
-        for (const report of reports) {
-          const reportImages =
-            evidenceMap[report.id.toUpperCase()] || evidenceMap[report.id] || [];
-          report.images = reportImages;
-          report.media = {
-            type:
-              reportImages.length === 0
-                ? 'none'
-                : reportImages.length === 1
-                ? 'single'
-                : 'gallery',
-            images: reportImages,
-          };
-          if (reportImages.length > 0) {
-            report.trustIndicators.evidenceCount = reportImages.length;
-          }
-        }
-      } catch (evErr) {
-        console.warn(
-          '[PublicReportService.getHomeFeedPage] Evidence enrichment error:',
-          evErr
-        );
-      }
-    }
-
+    // Feed cards currently do not render evidence media. Keep feed payloads light;
+    // report detail continues to load and sign evidence only when a user opens it.
     const hasMore = payload.hasMore === true;
     const parsedNextOffset =
       payload.nextOffset === null || payload.nextOffset === undefined
