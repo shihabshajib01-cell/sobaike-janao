@@ -14,6 +14,7 @@ export interface SeoMetadata {
   canonicalPath?: string;
   image?: string;
   imageAlt?: string;
+  socialDescription?: string;
   pageType?: SeoPageType;
   publishedTime?: string;
   modifiedTime?: string;
@@ -26,13 +27,15 @@ export const BRAND_NAME = {
   en: 'Sobaike Janao',
 } as const;
 
-const DEFAULT_SOCIAL_IMAGE = '/brand/icon-512x512.png';
+const DEFAULT_SOCIAL_IMAGE = '/brand/og-social-1200x630.png';
 
 export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
   bn: {
     title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
     description:
       'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
+    socialDescription:
+      'সবাইকে জানাও — বাংলাদেশের নাগরিকদের জনস্বার্থের সমস্যা, অভিজ্ঞতা ও অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণ করার স্বাধীন, নিরাপদ ও মডারেটেড প্ল্যাটফর্ম।',
     robots: 'index, follow, max-image-preview:large',
     ogType: 'website',
     ogSiteName: 'সবাইকে জানাও',
@@ -82,6 +85,8 @@ export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> 
       title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
       description:
         'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
+      socialDescription:
+        'সবাইকে জানাও — বাংলাদেশের নাগরিকদের জনস্বার্থের সমস্যা, অভিজ্ঞতা ও অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণ করার স্বাধীন, নিরাপদ ও মডারেটেড প্ল্যাটফর্ম।',
     },
     {
       title: 'Sobaike Janao | Citizen Reporting Platform',
@@ -406,22 +411,33 @@ export function applySeoMetadata(metadata: SeoMetadata, language: 'bn' | 'en'): 
   setLinkTag('canonical', canonicalUrl);
 
   const image = absoluteUrl(metadata.image || DEFAULT_SOCIAL_IMAGE);
+  const socialDescription = metadata.socialDescription || metadata.description;
+  const isDefaultSocialImage = !metadata.image;
   const imageAlt =
     metadata.imageAlt ||
     (language === 'bn' ? 'সবাইকে জানাও' : 'Sobaike Janao');
 
   setMetaTag('property', 'og:title', metadata.title);
-  setMetaTag('property', 'og:description', metadata.description);
+  setMetaTag('property', 'og:description', socialDescription);
   setMetaTag('property', 'og:type', metadata.ogType || 'website');
   setMetaTag('property', 'og:site_name', metadata.ogSiteName || BRAND_NAME[language]);
   setMetaTag('property', 'og:url', canonicalUrl);
   setMetaTag('property', 'og:locale', language === 'bn' ? 'bn_BD' : 'en_US');
   setMetaTag('property', 'og:image', image);
   setMetaTag('property', 'og:image:alt', imageAlt);
+  if (isDefaultSocialImage) {
+    setMetaTag('property', 'og:image:width', '1200');
+    setMetaTag('property', 'og:image:height', '630');
+    setMetaTag('property', 'og:image:type', 'image/png');
+  } else {
+    removeMetaTag('property', 'og:image:width');
+    removeMetaTag('property', 'og:image:height');
+    removeMetaTag('property', 'og:image:type');
+  }
 
-  setMetaTag('name', 'twitter:card', 'summary');
+  setMetaTag('name', 'twitter:card', isDefaultSocialImage ? 'summary_large_image' : 'summary');
   setMetaTag('name', 'twitter:title', metadata.title);
-  setMetaTag('name', 'twitter:description', metadata.description);
+  setMetaTag('name', 'twitter:description', socialDescription);
   setMetaTag('name', 'twitter:image', image);
   setMetaTag('name', 'twitter:image:alt', imageAlt);
 
