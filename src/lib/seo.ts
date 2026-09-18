@@ -523,12 +523,11 @@ export function applySeoMetadata(metadata: SeoMetadata, language: 'bn' | 'en'): 
     metadata.canonicalPath ||
       (typeof window !== 'undefined' ? window.location.pathname : '/')
   );
-  const baseCanonicalUrl = absoluteUrl(canonicalPath);
-  const canonicalUrl = localizedCanonicalUrl(baseCanonicalUrl, language);
+  const canonicalUrl = localizedCanonicalUrl(canonicalPath, language);
   setLinkTag('canonical', canonicalUrl);
-  setAlternateLinkTag('bn-BD', localizedCanonicalUrl(baseCanonicalUrl, 'bn'));
-  setAlternateLinkTag('en', localizedCanonicalUrl(baseCanonicalUrl, 'en'));
-  setAlternateLinkTag('x-default', localizedCanonicalUrl(baseCanonicalUrl, 'bn'));
+  setAlternateLinkTag('bn-BD', localizedCanonicalUrl(canonicalPath, 'bn'));
+  setAlternateLinkTag('en', localizedCanonicalUrl(canonicalPath, 'en'));
+  setAlternateLinkTag('x-default', localizedCanonicalUrl(canonicalPath, 'bn'));
 
   const image = absoluteUrl(metadata.image || DEFAULT_SOCIAL_IMAGE);
   const socialDescription = normalizeSeoDescription(
