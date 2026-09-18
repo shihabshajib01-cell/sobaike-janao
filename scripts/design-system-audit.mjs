@@ -550,6 +550,46 @@ if (fs.existsSync(typographyFile)) {
     }
   }
 
+  const requiredDesktopRoot = [
+    '--type-h1-size-desktop: 32px;',
+    '--type-h2-size-desktop: 24px;',
+    '--type-h3-size-desktop: 20px;',
+    '--type-h4-size-desktop: 18px;',
+  ];
+
+  for (const token of requiredDesktopRoot) {
+    if (!mobileRoot.includes(token)) {
+      findings.push({
+        file: typographyFile,
+        line: 1,
+        rule: 'desktop-typography-contract',
+        token,
+        message: 'Desktop typography tokens must preserve the approved public scale',
+        source: 'Expected approved desktop typography token is missing',
+      });
+    }
+  }
+
+  const requiredEnglishDesktop = [
+    '--type-h1-size-desktop: 32px;',
+    '--type-h2-size-desktop: 24px;',
+    '--type-h3-size-desktop: 20px;',
+    '--type-h4-size-desktop: 18px;',
+  ];
+
+  for (const token of requiredEnglishDesktop) {
+    if (!mobileEnglish.includes(token)) {
+      findings.push({
+        file: typographyFile,
+        line: 1,
+        rule: 'desktop-english-heading-contract',
+        token,
+        message: 'English desktop headings must preserve the approved H1-H4 scale',
+        source: 'Expected approved English desktop heading token is missing',
+      });
+    }
+  }
+
   const requiredEnglishMobile = [
     '--type-h1-size-mobile: 28px;',
     '--type-h2-size-mobile: 22px;',
@@ -574,9 +614,9 @@ if (fs.existsSync(typographyFile)) {
     findings.push({
       file: typographyFile,
       line: 1,
-      rule: 'mobile-bengali-tracking',
+      rule: 'bengali-tracking',
       token: 'tracking-*',
-      message: 'Bengali mobile typography must neutralize Latin-oriented tracking utilities',
+      message: 'Bengali typography must neutralize Latin-oriented tracking utilities at every breakpoint',
       source: 'Expected Bengali mobile tracking normalization is missing',
     });
   }
