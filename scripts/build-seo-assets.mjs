@@ -3,7 +3,8 @@ import { dirname, join } from 'node:path';
 
 const SITE_ORIGIN = 'https://shobaikejanao.com';
 const DIST_DIR = 'dist';
-const DEFAULT_IMAGE = `${SITE_ORIGIN}/brand/icon-512x512.png`;
+const BRAND_LOGO = `${SITE_ORIGIN}/brand/icon-512x512.png`;
+const DEFAULT_IMAGE = `${SITE_ORIGIN}/brand/og-social-1200x630.png`;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const STATIC_PAGES = [
@@ -12,6 +13,8 @@ const STATIC_PAGES = [
     title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
     description:
       'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
+    socialDescription:
+      'সবাইকে জানাও — বাংলাদেশের নাগরিকদের জনস্বার্থের সমস্যা, অভিজ্ঞতা ও অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণ করার স্বাধীন, নিরাপদ ও মডারেটেড প্ল্যাটফর্ম।',
     robots: 'index, follow, max-image-preview:large',
     sitemap: true,
   },
@@ -202,6 +205,7 @@ function injectMeta(template, page) {
   const canonical = canonicalUrl(page.path);
   const title = htmlEscape(page.title);
   const description = htmlEscape(page.description);
+  const socialDescription = htmlEscape(page.socialDescription || page.description);
   const robots = htmlEscape(page.robots || 'index, follow, max-image-preview:large');
   const type = page.type === 'article' ? 'article' : 'website';
 
@@ -229,7 +233,7 @@ function injectMeta(template, page) {
     )
     .replace(
       /<meta property="og:description" content="[^"]*" \/>/,
-      `<meta property="og:description" content="${description}" />`
+      `<meta property="og:description" content="${socialDescription}" />`
     )
     .replace(
       /<meta property="og:type" content="[^"]*" \/>/,
@@ -245,7 +249,7 @@ function injectMeta(template, page) {
     )
     .replace(
       /<meta name="twitter:description" content="[^"]*" \/>/,
-      `<meta name="twitter:description" content="${description}" />`
+      `<meta name="twitter:description" content="${socialDescription}" />`
     );
 
   if (page.type === 'article' && page.publishedAt) {
@@ -293,7 +297,7 @@ function injectMeta(template, page) {
         alternateName: 'সবাইকে জানাও',
         logo: {
           '@type': 'ImageObject',
-          url: DEFAULT_IMAGE,
+          url: BRAND_LOGO,
         },
       },
       {

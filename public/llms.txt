@@ -2,31 +2,31 @@
 
 > Independent, moderated citizen reporting and public-interest information platform for Bangladesh. This is not a government or law-enforcement website.
 
-Canonical site: https://shobaikejanao.com/
+Canonical site: [https://shobaikejanao.com/](https://shobaikejanao.com/)
 
 ## Main public pages
 
-- Home: https://shobaikejanao.com/
-- Reporting topics: https://shobaikejanao.com/issues
-- Submit a report: https://shobaikejanao.com/report
-- Explore reports and map: https://shobaikejanao.com/explore
-- Search published reports: https://shobaikejanao.com/search
-- Information and guidelines: https://shobaikejanao.com/more
+- [Home](https://shobaikejanao.com/)
+- [Reporting topics](https://shobaikejanao.com/issues)
+- [Submit a report](https://shobaikejanao.com/report)
+- [Explore reports and map](https://shobaikejanao.com/explore)
+- [Search published reports](https://shobaikejanao.com/search)
+- [Information and guidelines](https://shobaikejanao.com/more)
 
 ## Main reporting categories
 
-- Public safety: https://shobaikejanao.com/public-safety
-- Harassment and abuse: https://shobaikejanao.com/harassment
-- Extortion and bribery: https://shobaikejanao.com/extortion
-- Road and transport: https://shobaikejanao.com/road-transport
-- Utility issues: https://shobaikejanao.com/load-shedding
-- Illegal occupation: https://shobaikejanao.com/illegal-occupation
-- Illegal auto-rickshaw charging: https://shobaikejanao.com/rickshaw
+- [Public safety](https://shobaikejanao.com/public-safety)
+- [Harassment and abuse](https://shobaikejanao.com/harassment)
+- [Extortion and bribery](https://shobaikejanao.com/extortion)
+- [Road and transport](https://shobaikejanao.com/road-transport)
+- [Utility issues](https://shobaikejanao.com/load-shedding)
+- [Illegal occupation](https://shobaikejanao.com/illegal-occupation)
+- [Illegal auto-rickshaw charging](https://shobaikejanao.com/rickshaw)
 
 ## Crawling and indexing
 
-- Sitemap: https://shobaikejanao.com/sitemap.xml
-- Robots: https://shobaikejanao.com/robots.txt
+- [XML sitemap](https://shobaikejanao.com/sitemap.xml)
+- [Robots directives](https://shobaikejanao.com/robots.txt)
 - Published report detail pages and valid category/location pages are indexable.
 - Search-result and subject-aggregate pages may intentionally use noindex where appropriate.
 
