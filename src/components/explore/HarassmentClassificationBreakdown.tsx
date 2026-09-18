@@ -5,37 +5,40 @@ import {
   HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
   HARASSMENT_REPORTING_FOR_OPTIONS,
   BilingualOption,
+  HarassmentAgeGroup,
+  HarassmentAbuserRelationship,
+  HarassmentReportingFor,
 } from '../../data/harassmentClassification';
 import { toBanglaDigits } from '../../utils/formatters';
 
 export interface HarassmentClassificationBreakdownProps {
   reports: ReportItem[];
   language: 'bn' | 'en';
-  activeAgeGroup?: string;
-  activeAbuserRelationship?: string;
-  activeReportingFor?: string;
-  onSelectAgeGroup?: (value: string) => void;
-  onSelectAbuserRelationship?: (value: string) => void;
-  onSelectReportingFor?: (value: string) => void;
+  activeAgeGroup?: HarassmentAgeGroup | 'all';
+  activeAbuserRelationship?: HarassmentAbuserRelationship | 'all';
+  activeReportingFor?: HarassmentReportingFor | 'all';
+  onSelectAgeGroup?: (value: HarassmentAgeGroup) => void;
+  onSelectAbuserRelationship?: (value: HarassmentAbuserRelationship) => void;
+  onSelectReportingFor?: (value: HarassmentReportingFor) => void;
 }
 
-interface BreakdownColumnProps {
+interface BreakdownColumnProps<T extends string> {
   title: string;
-  options: BilingualOption<string>[];
+  options: BilingualOption<T>[];
   values: Array<string | undefined>;
   language: 'bn' | 'en';
-  activeValue?: string;
-  onSelectValue?: (value: string) => void;
+  activeValue?: T | 'all';
+  onSelectValue?: (value: T) => void;
 }
 
-const BreakdownColumn: React.FC<BreakdownColumnProps> = ({
+const BreakdownColumn = <T extends string>({
   title,
   options,
   values,
   language,
   activeValue = 'all',
   onSelectValue,
-}) => {
+}: BreakdownColumnProps<T>) => {
   const rows = useMemo(() => {
     return options
       .map((option) => ({
@@ -69,7 +72,7 @@ const BreakdownColumn: React.FC<BreakdownColumnProps> = ({
                   type="button"
                   onClick={onSelectValue ? () => onSelectValue(row.value) : undefined}
                   aria-pressed={isActive}
-                  className={`w-full text-left rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 space-y-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                  className={`w-full min-h-[44px] text-left rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 space-y-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     onSelectValue ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
                   } ${isActive ? 'bg-ui-surface-subtle' : ''}`}
                 >
