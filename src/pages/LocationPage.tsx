@@ -92,6 +92,8 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
           robots: 'noindex, follow',
           ogType: 'website',
           ogSiteName: BRAND_NAME[language],
+          canonicalPath: `/location/${encodeURIComponent(locationId)}`,
+          pageType: 'collection',
         });
       } else {
         setDynamicSeo({
@@ -100,6 +102,8 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
           robots: 'noindex, follow',
           ogType: 'website',
           ogSiteName: BRAND_NAME[language],
+          canonicalPath: `/location/${encodeURIComponent(locationId)}`,
+          pageType: 'collection',
         });
       }
     } else if (!isLoading && !fetchError) {
@@ -116,9 +120,11 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
       setDynamicSeo({
         title,
         description,
-        robots: 'index, follow',
+        robots: 'index, follow, max-image-preview:large',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/location/${encodeURIComponent(district.id)}`,
+        pageType: 'collection',
       });
     } else if (fetchError) {
       setDynamicSeo({
@@ -127,6 +133,8 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/location/${encodeURIComponent(locationId)}`,
+        pageType: 'collection',
       });
     } else {
       setDynamicSeo({
@@ -135,6 +143,8 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/location/${encodeURIComponent(locationId)}`,
+        pageType: 'collection',
       });
     }
   }, [district, isLoading, fetchError, language, setDynamicSeo]);
