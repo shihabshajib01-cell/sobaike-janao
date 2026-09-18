@@ -29,6 +29,7 @@ export interface SupabasePublicReportRPC {
   intimateWhatHappened?: string | null;
   intimatePlatform?: string | null;
   publishedAt?: string | null;
+  updatedAt?: string | null;
   priority?: string | null;
   hasSupportingInfo?: boolean | null;
   status?: string | null;
@@ -202,6 +203,7 @@ export const mapSupabasePublicReportToItem = (
     publishedDateBn,
     publishedDateEn,
     publishedAt: rpc.publishedAt || undefined,
+    updatedAt: rpc.updatedAt || undefined,
     evidenceSummaryBn: [],
     evidenceSummaryEn: [],
     status: 'published',
