@@ -2123,124 +2123,84 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 {language === 'bn' ? subjectConfig.questionBn : subjectConfig.questionEn}
               </p>
               <div className="space-y-3 sm:space-y-3.5">
-                {/* Row 1: Name / Known Identity (col 1) + Phone / Contact (col 2) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label
-                      htmlFor="extortion-subject-name"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      {language === 'bn'
+                  <TextField
+                    id="extortion-subject-name"
+                    type="text"
+                    label={
+                      language === 'bn'
                         ? subjectConfig.nameLabelBn || 'নাম / পরিচিতি'
-                        : subjectConfig.nameLabelEn || 'Name / known identity'}
-                    </label>
-                    <input
-                      id="extortion-subject-name"
-                      type="text"
-                      value={formData.reportedSubject || ''}
-                      onChange={(e) => onUpdateFormData({ reportedSubject: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? subjectConfig.namePlaceholderBn || 'নাম বা পরিচিতি জানা থাকলে লিখুন'
-                          : subjectConfig.namePlaceholderEn || 'Enter the name or known identity if available'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="extortion-contact"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
-                    </label>
-                    <input
-                      id="extortion-contact"
-                      type="text"
-                      value={formData.publicProfileHandle || ''}
-                      onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? 'ফোন নম্বর, অনলাইন পরিচিতি বা অন্য যোগাযোগের তথ্য'
-                          : 'Phone number, online identity, or other contact information'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-                </div>
-
-                {/* Row 2: Role / Designation (col 1) + Group / Organization / Association (col 2) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label
-                      htmlFor="extortion-role"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn'
-                        ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
-                        : subjectConfig.roleLabelEn || 'Role / designation'}
-                    </label>
-                    <input
-                      id="extortion-role"
-                      type="text"
-                      value={formData.roleOrDesignation || ''}
-                      onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? subjectConfig.rolePlaceholderBn || 'ভূমিকা বা পদবি জানা থাকলে লিখুন'
-                          : subjectConfig.rolePlaceholderEn || 'Enter the role or designation if known'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="extortion-org"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn'
-                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
-                        : subjectConfig.organizationLabelEn || 'Group / organization'}
-                    </label>
-                    <input
-                      id="extortion-org"
-                      type="text"
-                      value={formData.organization || ''}
-                      onChange={(e) => onUpdateFormData({ organization: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? subjectConfig.organizationPlaceholderBn || 'সংশ্লিষ্ট দল, প্রতিষ্ঠান বা সংগঠনের নাম জানা থাকলে লিখুন'
-                          : subjectConfig.organizationPlaceholderEn || 'Enter the related group or organization if known'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-                </div>
-
-                {/* Row 3: Other Identifying Details — full width (textarea) */}
-                <div>
-                  <label
-                    htmlFor="extortion-identifying-desc"
-                    className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                  >
-                    {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
-                  </label>
-                  <textarea
-                    id="extortion-identifying-desc"
-                    rows={2}
-                    value={formData.identifyingDescription || ''}
-                    onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
+                        : subjectConfig.nameLabelEn || 'Name / known identity'
+                    }
+                    value={formData.reportedSubject || ''}
+                    onChange={(e) => onUpdateFormData({ reportedSubject: e.target.value })}
                     placeholder={
                       language === 'bn'
-                        ? subjectConfig.identifyingPlaceholderBn || 'চেহারা, যানবাহন, অবস্থান সূত্র বা অন্য কোনো শনাক্তকারী তথ্য'
-                        : subjectConfig.identifyingPlaceholderEn || 'Appearance, vehicle, location clues, or other identifying details'
+                        ? subjectConfig.namePlaceholderBn || 'নাম বা পরিচিতি জানা থাকলে লিখুন'
+                        : subjectConfig.namePlaceholderEn || 'Enter the name or known identity if available'
                     }
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed min-h-[44px]"
+                  />
+                  <TextField
+                    id="extortion-contact"
+                    type="text"
+                    label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                    value={formData.publicProfileHandle || ''}
+                    onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? 'ফোন নম্বর, অনলাইন পরিচিতি বা অন্য যোগাযোগের তথ্য'
+                        : 'Phone number, online identity, or other contact information'
+                    }
                   />
                 </div>
-              </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <TextField
+                    id="extortion-role"
+                    type="text"
+                    label={
+                      language === 'bn'
+                        ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
+                        : subjectConfig.roleLabelEn || 'Role / designation'
+                    }
+                    value={formData.roleOrDesignation || ''}
+                    onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? subjectConfig.rolePlaceholderBn || 'ভূমিকা বা পদবি জানা থাকলে লিখুন'
+                        : subjectConfig.rolePlaceholderEn || 'Enter the role or designation if known'
+                    }
+                  />
+                  <TextField
+                    id="extortion-org"
+                    type="text"
+                    label={
+                      language === 'bn'
+                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
+                        : subjectConfig.organizationLabelEn || 'Group / organization'
+                    }
+                    value={formData.organization || ''}
+                    onChange={(e) => onUpdateFormData({ organization: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? subjectConfig.organizationPlaceholderBn || 'সংশ্লিষ্ট দল, প্রতিষ্ঠান বা সংগঠনের নাম জানা থাকলে লিখুন'
+                        : subjectConfig.organizationPlaceholderEn || 'Enter the related group or organization if known'
+                    }
+                  />
+                </div>
+
+                <TextAreaField
+                  id="extortion-identifying-desc"
+                  rows={2}
+                  label={language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                  value={formData.identifyingDescription || ''}
+                  onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
+                  placeholder={
+                    language === 'bn'
+                      ? subjectConfig.identifyingPlaceholderBn || 'চেহারা, যানবাহন, অবস্থান সূত্র বা অন্য কোনো শনাক্তকারী তথ্য'
+                      : subjectConfig.identifyingPlaceholderEn || 'Appearance, vehicle, location clues, or other identifying details'
+                  }
+                />
 
               {/* Additional Mentioned Parties */}
               <div className="space-y-3 pt-1">
