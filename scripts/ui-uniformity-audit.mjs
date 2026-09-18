@@ -343,8 +343,8 @@ requireContains(
 );
 requireContains(
   'src/components/ui/ModalActions.tsx',
-  "mobileOrder?: 'secondary-first' | 'primary-first';",
-  'ModalActions must centrally control responsive action ordering'
+  "{secondary ? renderAction(secondary, 'outline') : null}",
+  'ModalActions must render secondary before primary consistently'
 );
 requireContains(
   'src/components/ui/Modal.tsx',
