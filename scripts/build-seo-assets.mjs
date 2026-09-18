@@ -715,34 +715,54 @@ function resolveDistrictId(raw, districts) {
 function reportPage(report) {
   const id = cleanText(report.id);
   if (!id) return null;
-  const rawTitle = cleanText(report.titleBn || report.titleEn || id);
-  const rawDescription = cleanText(
+  const rawTitleBn = cleanText(report.titleBn || report.titleEn || id);
+  const rawTitleEn = cleanText(report.titleEn || report.titleBn || id);
+  const rawDescriptionBn = cleanText(
     report.summaryBn ||
-      report.summaryEn ||
       report.descriptionBn ||
+      report.summaryEn ||
       report.descriptionEn ||
       'সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত নাগরিক প্রতিবেদন।'
+  );
+  const rawDescriptionEn = cleanText(
+    report.summaryEn ||
+      report.descriptionEn ||
+      report.summaryBn ||
+      report.descriptionBn ||
+      'Published citizen report on Sobaike Janao.'
   );
   const indexable = isSeoIndexableReport(report);
 
   return {
     path: `/report-detail/${encodeURIComponent(id)}`,
-    title: buildBrandedSeoTitle(rawTitle),
-    description: normalizeSeoDescription(rawDescription, 'bn'),
+    title: buildBrandedSeoTitle(rawTitleBn),
+    titleEn: buildBrandedSeoTitle(rawTitleEn, 'Sobaike Janao'),
+    description: normalizeSeoDescription(rawDescriptionBn, 'bn'),
+    descriptionEn: normalizeSeoDescription(rawDescriptionEn, 'en'),
     robots: indexable
       ? 'index, follow, max-image-preview:large'
       : 'noindex, follow',
     sitemap: indexable,
     type: 'article',
     publishedAt: report.publishedAt || null,
+    modifiedAt: report.updatedAt || report.publishedAt || null,
   };
 }
 
 function subjectPage(subject) {
+  const name = cleanText(subject);
   return {
     path: `/subject/${encodeURIComponent(subject)}`,
-    title: `${cleanText(subject)} সংক্রান্ত প্রতিবেদন | সবাইকে জানাও`,
-    description: `${cleanText(subject)} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য।`,
+    title: buildBrandedSeoTitle(`${name} সংক্রান্ত প্রতিবেদন`),
+    titleEn: buildBrandedSeoTitle(`Reports related to ${name}`, 'Sobaike Janao'),
+    description: normalizeSeoDescription(
+      `${name} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন ও সংশ্লিষ্ট পক্ষের বক্তব্য দেখুন।`,
+      'bn'
+    ),
+    descriptionEn: normalizeSeoDescription(
+      `Browse published citizen reports and available responses related to ${name} on Sobaike Janao.`,
+      'en'
+    ),
     robots: 'noindex, follow',
     sitemap: false,
     collection: true,
@@ -755,24 +775,29 @@ function dynamicCategoryPage(segment) {
 
   // Do not publish a second /category/... URL when this taxonomy item already has
   // an established top-level canonical route (for example /load-shedding).
-  // This protects search engines from duplicate indexable titles/content.
   const establishedStaticPath = `/${slug}`;
   if (STATIC_PAGES.some((page) => page.path === establishedStaticPath)) {
     return null;
   }
 
   const path = `/category/${encodeURIComponent(slug)}`;
-  const name = cleanText(segment.name_bn || segment.name_en || segment.id);
-  const description = cleanText(
+  const nameBn = cleanText(segment.name_bn || segment.name_en || segment.id);
+  const nameEn = cleanText(segment.name_en || segment.name_bn || segment.id);
+  const descriptionBn = cleanText(
     segment.description_bn ||
-      segment.description_en ||
-      `${name} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন দেখুন।`
+      `${nameBn} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন, এলাকা, উৎস ও সর্বশেষ আপডেট দেখুন।`
+  );
+  const descriptionEn = cleanText(
+    segment.description_en ||
+      `Browse moderated citizen reports, locations, sources, and the latest updates about ${nameEn}.`
   );
 
   return {
     path,
-    title: `${name} | সবাইকে জানাও`,
-    description,
+    title: buildBrandedSeoTitle(nameBn),
+    titleEn: buildBrandedSeoTitle(nameEn, 'Sobaike Janao'),
+    description: normalizeSeoDescription(descriptionBn, 'bn'),
+    descriptionEn: normalizeSeoDescription(descriptionEn, 'en'),
     robots: 'index, follow, max-image-preview:large',
     sitemap: true,
     collection: true,
