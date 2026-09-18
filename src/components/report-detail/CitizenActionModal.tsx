@@ -266,20 +266,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             placeholder={language === 'bn' ? 'যা দেখেছেন বা জানেন লিখুন...' : 'Write what you saw or know...'}
           />
 
-          <div className="space-y-1.5">
-            <label
-              htmlFor="citizen-witness-date-input"
-              className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary"
-            >
-              {language === 'bn' ? 'ঘটনার তারিখ (ঐচ্ছিক)' : 'Incident date (optional)'}
-            </label>
-            <input
-              id="citizen-witness-date-input"
-              name="witnessDate"
-              type="date"
-              lang="en-GB"
-              max={maxIncidentDate}
-              value={witn          <DateField
+          <DateField
             id="citizen-witness-date-input"
             name="witnessDate"
             language={language}
