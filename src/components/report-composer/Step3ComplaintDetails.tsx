@@ -2195,6 +2195,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       : subjectConfig.identifyingPlaceholderEn || 'Appearance, vehicle, location clues, or other identifying details'
                   }
                 />
+              </div>
 
               {/* Additional Mentioned Parties */}
               <div className="space-y-3 pt-1">
