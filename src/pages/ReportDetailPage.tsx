@@ -559,7 +559,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             </div>
           </div>
 
-          <HarassmentContextSummary report={report} language={language} />
+          {/* Source-grounded reports must not display citizen-form classifications unless those answers were actually captured through the configured form. */}
+          {!sourceUrl && <HarassmentContextSummary report={report} language={language} />}
 
           {report.reportedSubject && (
             <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-1.5">
