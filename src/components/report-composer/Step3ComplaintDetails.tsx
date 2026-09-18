@@ -73,6 +73,8 @@ import { DateField } from '../ui/DateField';
 import { TimeField } from '../ui/TimeField';
 import { MonthField } from '../ui/MonthField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
+import { NumberField } from '../ui/NumberField';
+import { ContactField } from '../ui/ContactField';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -1172,9 +1174,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         }
                       }}
                     />
-                    <TextField
+                    <NumberField
                       id="recent-bill-amount-input"
-                      type="number"
                       min="1"
                       step="any"
                       inputMode="decimal"
@@ -1205,9 +1206,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
                       }}
                     />
-                    <TextField
+                    <NumberField
                       id="previous-bill-amount-input"
-                      type="number"
                       min="1"
                       step="any"
                       inputMode="decimal"
@@ -1389,9 +1389,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     onChange={(e) => onUpdateFormData({ briberyService: e.target.value })}
                     placeholder={language === 'bn' ? 'যেমন: মিউটেশন, পাসপোর্ট নবায়ন, লাইসেন্স' : 'e.g. mutation, passport renewal, licence'}
                   />
-                  <TextField
+                  <NumberField
                     id="bribery-amount-input"
-                    type="number"
                     min="1"
                     step="any"
                     inputMode="decimal"
@@ -1951,9 +1950,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         autoComplete="name"
                       />
 
-                      <TextField
+                      <ContactField
                         id="reporter-admin-contact"
-                        type="text"
                         required
                         label={language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল' : 'Phone number or email'}
                         value={formData.adminContact || ''}
