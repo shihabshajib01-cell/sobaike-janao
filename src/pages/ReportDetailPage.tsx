@@ -723,55 +723,45 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               </div>
             )}
 
-            {visiblePublishedResponses.map((response, index) => (
-              <article
-                key={response.id}
-                className={`py-3.5 first:pt-1 last:pb-1 space-y-2.5 ${index > 0 ? 'border-t border-ui-stroke-subtle' : ''}`}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-4">
-                  <div className="min-w-0 space-y-0.5">
-                    <p className="type-meta font-[var(--font-weight-semibold)] text-ui-content-primary">
-                      {response.label}
-                    </p>
-                    {response.name && (
-                      <p className="type-meta font-[var(--font-weight-medium)] text-ui-content-secondary break-words">
-                        {response.name}
-                        {response.subtitle && (
-                          <span className="text-ui-content-muted font-[var(--font-weight-regular)]">
-                            {' '}({response.subtitle})
-                          </span>
-                        )}
+            <div className="divide-y divide-ui-stroke-subtle">
+              {visiblePublishedResponses.map((response) => (
+                <article
+                  key={response.id}
+                  className="py-4 first:pt-0 last:pb-0 bg-transparent rounded-none shadow-none"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-4">
+                    <div className="min-w-0">
+                      <p className="type-meta font-[var(--font-weight-semibold)] text-ui-content-primary">
+                        {response.label}
                       </p>
-                    )}
+                      {response.name && (
+                        <p className="type-meta text-ui-content-secondary mt-1 break-words">
+                          <span className="font-[var(--font-weight-medium)]">{response.name}</span>
+                          {response.subtitle && <span className="text-ui-content-muted"> · {response.subtitle}</span>}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-muted sm:justify-end shrink-0">
+                      {response.incidentDate && (
+                        <span>{language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}{response.incidentDate}</span>
+                      )}
+                      {response.publishedDate && (
+                        <span>{language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}{response.publishedDate}</span>
+                      )}
+                    </div>
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-muted sm:justify-end shrink-0">
-                    {response.incidentDate && (
-                      <span>
-                        {language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}
-                        {response.incidentDate}
-                      </span>
-                    )}
-                    {response.publishedDate && (
-                      <span>
-                        {language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}
-                        {response.publishedDate}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words whitespace-pre-line">
-                  “{response.content}”
-                </blockquote>
-              </article>
-            ))}
+                  <blockquote className="mt-2.5 type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words whitespace-pre-line">
+                    “{response.content}”
+                  </blockquote>
+                </article>
+              ))}
+            </div>
 
             {hiddenResponseCount > 0 && (
               <button
                 type="button"
                 onClick={() => setShowAllResponses((current) => !current)}
-                className="w-full min-h-[44px] type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary border-t border-ui-stroke-subtle pt-3 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+                className="w-full min-h-[44px] mt-1 type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary border-t border-ui-stroke-subtle pt-3 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 aria-expanded={showAllResponses}
               >
                 {showAllResponses
