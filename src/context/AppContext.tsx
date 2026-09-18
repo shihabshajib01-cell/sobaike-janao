@@ -267,6 +267,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [location.hash, location.pathname, location.search, navigate]
   );
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const currentLangParam = params.get('lang');
+
+    if (language === 'en' && currentLangParam !== 'en') {
+      params.set('lang', 'en');
+    } else if (language === 'bn' && currentLangParam === 'en') {
+      params.delete('lang');
+    } else {
+      return;
+    }
+
+    const search = params.toString();
+    navigate(
+      {
+        pathname: location.pathname,
+        search: search ? `?${search}` : '',
+        hash: location.hash,
+      },
+      { replace: true }
+    );
+  }, [language, location.hash, location.pathname, location.search, navigate]);
+
   const currentRoute: RoutePath = normalizeRoutePath(location.pathname || '/');
 
   const queryParams = useMemo(() => {
