@@ -193,7 +193,7 @@ export const DesktopLeftRail: React.FC = () => {
           <p className="font-[var(--font-weight-medium)] text-ui-content-secondary">
             {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
           </p>
-          <small className="opacity-80">
+          <small className="text-ui-content-muted">
             {language === 'bn' ? 'বাংলাদেশ ২০২৬' : 'Bangladesh 2026'}
           </small>
         </div>
