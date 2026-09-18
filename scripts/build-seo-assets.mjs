@@ -136,6 +136,68 @@ const cleanText = (value, fallback = '') =>
 const canonicalUrl = (path) =>
   path === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${path.replace(/\/$/, '')}`;
 
+function injectStaticFallback(html, page) {
+  if (page.path === '/') return html;
+
+  const heading = htmlEscape(String(page.title || '').replace(/\s*\|\s*সবাইকে জানাও\s*$/, ''));
+  const description = htmlEscape(page.description || '');
+  const contextCopy =
+    page.type === 'article'
+      ? 'এটি সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত একটি জনস্বার্থ প্রতিবেদন। প্রতিবেদনটি পড়ার সময় ঘটনার বিবরণ, প্রকাশের তারিখ, এলাকা, উপলব্ধ উৎস এবং পরবর্তী আপডেট একসঙ্গে বিবেচনা করুন। প্রকাশিত কোনো প্রতিবেদন নিজে থেকে আদালতের রায়, সরকারি সিদ্ধান্ত বা অপরাধ প্রমাণের সমতুল্য নয়।'
+      : 'এই পৃষ্ঠায় সংশ্লিষ্ট বিষয়ের প্রকাশিত নাগরিক প্রতিবেদন দেখা যায়। সঠিক প্রেক্ষাপট বোঝার জন্য প্রতিটি প্রতিবেদনের শিরোনাম, বিবরণ, এলাকা, প্রকাশের সময়, উৎস এবং উপলব্ধ আপডেট দেখুন। জনস্বার্থের তথ্য দায়িত্বশীলভাবে ব্যবহার করুন এবং জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট সরকারি হটলাইনে যোগাযোগ করুন।';
+
+  const fallback = `
+      <!-- SEO_FALLBACK_START -->
+      <main id="seo-static-fallback" class="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 lg:px-8">
+        <header class="space-y-3">
+          <h1>${heading}</h1>
+          <p>${description}</p>
+        </header>
+
+        <nav aria-label="প্রধান পৃষ্ঠা" class="mt-6">
+          <p><strong>দ্রুত লিংক:</strong></p>
+          <p>
+            <a href="/">হোম</a> ·
+            <a href="/issues">বিষয়সমূহ</a> ·
+            <a href="/report">প্রতিবেদন করুন</a> ·
+            <a href="/explore">মানচিত্র ও এলাকা</a> ·
+            <a href="/search">অনুসন্ধান</a> ·
+            <a href="/more">তথ্য ও নির্দেশিকা</a>
+          </p>
+        </nav>
+
+        <section class="mt-8 space-y-3">
+          <h2>পৃষ্ঠা সম্পর্কে</h2>
+          <p>${htmlEscape(contextCopy)}</p>
+        </section>
+
+        <section class="mt-8 space-y-3">
+          <h2>সম্পর্কিত প্রতিবেদন ও বিষয়</h2>
+          <p>
+            আরও প্রকাশিত তথ্য দেখতে
+            <a href="/public-safety">জননিরাপত্তা</a>,
+            <a href="/harassment">হয়রানি ও নির্যাতন</a>,
+            <a href="/extortion">চাঁদাবাজি ও ঘুষ</a>,
+            <a href="/road-transport">সড়ক ও যাতায়াত</a>,
+            <a href="/load-shedding">ইউটিলিটি সমস্যা</a>,
+            <a href="/illegal-occupation">অবৈধ দখল</a> এবং
+            <a href="/rickshaw">অবৈধ অটো-রিকশা চার্জিং</a> বিভাগগুলো দেখুন।
+          </p>
+          <p>
+            সরকারি তথ্যের জন্য
+            <a href="https://bangladesh.gov.bd/" rel="noopener noreferrer">বাংলাদেশ জাতীয় তথ্য বাতায়ন</a>
+            ব্যবহার করুন।
+          </p>
+        </section>
+      </main>
+      <!-- SEO_FALLBACK_END -->`;
+
+  return html.replace(
+    /<!-- SEO_FALLBACK_START -->[\s\S]*?<!-- SEO_FALLBACK_END -->/,
+    fallback.trim()
+  );
+}
+
 function injectMeta(template, page) {
   const canonical = canonicalUrl(page.path);
   const title = htmlEscape(page.title);
@@ -217,18 +279,35 @@ function injectMeta(template, page) {
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         };
 
+  const organizationId = `${SITE_ORIGIN}/#organization`;
+  const websiteId = `${SITE_ORIGIN}/#website`;
+
   const structured = {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'WebSite',
-        '@id': `${SITE_ORIGIN}/#website`,
+        '@type': 'Organization',
+        '@id': organizationId,
         url: `${SITE_ORIGIN}/`,
         name: 'Sobaike Janao',
         alternateName: 'সবাইকে জানাও',
-        inLanguage: ['bn-BD', 'en'],
+        logo: {
+          '@type': 'ImageObject',
+          url: DEFAULT_IMAGE,
+        },
       },
-      pageSchema,
+      {
+        '@type': 'WebSite',
+        '@id': websiteId,
+        url: `${SITE_ORIGIN}/`,
+        name: 'Sobaike Janao',
+        alternateName: 'সবাইকে জানাও',
+        publisher: { '@id': organizationId },
+      },
+      {
+        ...pageSchema,
+        publisher: { '@id': organizationId },
+      },
     ],
   };
 
@@ -237,7 +316,7 @@ function injectMeta(template, page) {
     `<script type="application/ld+json" id="seo-jsonld">${JSON.stringify(structured)}</script>`
   );
 
-  return html;
+  return injectStaticFallback(html, page);
 }
 
 async function writeRouteHtml(template, page) {
@@ -439,6 +518,11 @@ async function main() {
       collection: true,
     });
     seenPaths.add(path);
+  }
+
+  const rootPage = pages.find((page) => page.path === '/');
+  if (rootPage) {
+    await writeFile(join(DIST_DIR, 'index.html'), injectMeta(template, rootPage), 'utf8');
   }
 
   await Promise.all(pages.map((page) => writeRouteHtml(template, page)));
