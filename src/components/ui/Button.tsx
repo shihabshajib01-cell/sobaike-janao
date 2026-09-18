@@ -28,7 +28,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center type-action transition-colors focus:outline-none focus:ring-2 focus:ring-ui-focus focus:ring-offset-1 select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
+    'inline-flex items-center justify-center type-action transition-colors focus:outline-none focus:ring-2 focus:ring-ui-focus focus:ring-offset-1 select-none cursor-pointer disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-ui-disabled-bg disabled:text-ui-disabled-text disabled:border-ui-stroke-subtle disabled:hover:bg-ui-disabled-bg disabled:hover:text-ui-disabled-text disabled:active:opacity-100';
 
   const sizeClasses: Record<ButtonSize, string> = {
     sm: 'ui-space-button-sm min-h-[44px] ui-radius-control',
