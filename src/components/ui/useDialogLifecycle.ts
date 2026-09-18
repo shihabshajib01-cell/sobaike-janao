@@ -25,6 +25,11 @@ const syncDialogInertState = () => {
   for (const [dialogId, element] of dialogElements.entries()) {
     setElementInert(element, dialogId !== topDialogId);
   }
+
+  const appRoot = document.getElementById('root');
+  if (appRoot) {
+    setElementInert(appRoot, dialogStack.length > 0);
+  }
 };
 
 const getFocusableElements = (container: HTMLElement | null) => {
