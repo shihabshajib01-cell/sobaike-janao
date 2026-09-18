@@ -74,6 +74,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Step 3 imperative refs for legacy core sections + Admin-configured fields.
   const step3Ref = useRef<Step3Handle>(null);
   const configuredFieldsRef = useRef<ConfiguredFieldsHandle>(null);
+  const subcategorySelectionVersionRef = useRef(0);
   const [reportingForm, setReportingForm] = useState<PublicReportingForm | null>(null);
 
   // Jump section tracking for Step 3
@@ -343,7 +344,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   );
 
   const handleSelectSubcategory = useCallback(
-    async (subcategoryId: string, _option: SubcategoryOption) => {
+    (subcategoryId: string, _option: SubcategoryOption) => {
       if (formData.subcategoryId === subcategoryId) return;
 
       if (formData.serverSubmissionState === 'attempted') {
@@ -359,20 +360,16 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
       setMobJusticeErrors({});
 
-      // State A: pre-submit subcategory switch
-      // Cleanly discard old local evidence attachments and reset idempotency key
       revokePreviewUrls(pendingImages);
       setPendingImages([]);
       retryCredentialsRef.current = null;
 
-      let selectedForm: PublicReportingForm | null = null;
-      try {
-        await PublicReportingConfigService.fetch();
-        selectedForm = PublicReportingConfigService.getForm(subcategoryId);
-      } catch {
-        selectedForm = null;
-      }
-      setReportingForm(selectedForm);
+      // Selection state must update synchronously for standards-compliant radio
+      // keyboard behavior. Use any already-cached schema immediately, then
+      // hydrate the latest published schema without blocking aria-checked.
+      const selectionVersion = ++subcategorySelectionVersionRef.current;
+      const cachedForm = PublicReportingConfigService.getForm(subcategoryId);
+      setReportingForm(cachedForm);
 
       setFormData((prev) => {
         const isUtilitySwitch =
@@ -389,8 +386,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           evidenceTypes: [],
           evidenceDescription: '',
           title: '',
-          formSchemaVersion: selectedForm?.version,
-          formEngineMode: selectedForm?.engineMode,
+          formSchemaVersion: cachedForm?.version,
+          formEngineMode: cachedForm?.engineMode,
           customFieldAnswers: {},
           subjectType: 'unknown',
           ...(isUtilitySwitch
@@ -410,8 +407,34 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             : {}),
         };
       });
+
+      void PublicReportingConfigService.fetch()
+        .then(() => {
+          if (subcategorySelectionVersionRef.current !== selectionVersion) return;
+
+          const selectedForm = PublicReportingConfigService.getForm(subcategoryId);
+          setReportingForm(selectedForm);
+          setFormData((prev) =>
+            prev.subcategoryId === subcategoryId
+              ? {
+                  ...prev,
+                  formSchemaVersion: selectedForm?.version,
+                  formEngineMode: selectedForm?.engineMode,
+                }
+              : prev
+          );
+        })
+        .catch(() => {
+          // Existing legacy flows remain usable if the optional configuration
+          // refresh fails; schema-mode categories are still server-guarded.
+        });
     },
-    [formData.subcategoryId, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
+    [
+      formData.subcategoryId,
+      formData.serverSubmissionState,
+      language,
+      pendingImages,
+    ]
   );
 
   const handleNextFromStep2 = useCallback(() => {
