@@ -121,8 +121,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Derived state for rape publishing consent requirements
   const requiresRapeConsent = formData.subcategoryId === 'rape-sexual-violence';
   const rapeConsentMissing = requiresRapeConsent && !rapePublishingConsentAccepted;
+  const isSchemaMode = reportingForm?.engineMode === 'schema';
   const isMobJusticeReport =
     formData.segment === 'public_safety' && formData.subcategoryId === 'mob-justice';
+  const usesMobJusticeDetails =
+    isMobJusticeReport &&
+    (!isSchemaMode ||
+      Boolean(
+        reportingForm?.fields.some(
+          (field) => field.active && field.fieldType === 'mob_justice_details'
+        )
+      ));
 
   // Defensive guard: if formData ever targets Step 3/4 with rape subcategory without consent, open disclaimer and hold step
   useEffect(() => {
@@ -179,7 +188,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   }, []);
 
   const validateMobJusticeSection = useCallback((): boolean => {
-    if (!isMobJusticeReport) return true;
+    if (!usesMobJusticeDetails) return true;
 
     const errors = validateMobJusticeDetails(mobJusticeDetails, language);
     setMobJusticeErrors(errors);
@@ -194,7 +203,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     }
 
     return true;
-  }, [isMobJusticeReport, mobJusticeDetails, language]);
+  }, [usesMobJusticeDetails, mobJusticeDetails, language]);
 
   // Attached images remain in memory for the current composer session only.
   const handlePendingImagesChange = useCallback(
@@ -436,14 +445,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleNextFromStep3 = useCallback(() => {
     if (!validateMobJusticeSection()) return;
-    if (!step3Ref.current) return;
-    const isValid = step3Ref.current.validateAndProceed();
-    if (!isValid) return;
-    if (configuredFieldsRef.current && !configuredFieldsRef.current.validateAndProceed()) {
-      return;
+
+    if (isSchemaMode) {
+      if (!configuredFieldsRef.current) return;
+      if (!configuredFieldsRef.current.validateAndProceed()) return;
+    } else {
+      if (!step3Ref.current) return;
+      if (!step3Ref.current.validateAndProceed()) return;
     }
+
     handleGoToStep(4);
-  }, [handleGoToStep, validateMobJusticeSection]);
+  }, [handleGoToStep, isSchemaMode, validateMobJusticeSection]);
 
   // Rape Consent Modal Handlers
   const handleAgreeRapeConsent = useCallback(() => {
@@ -554,6 +566,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
     // Defense-in-depth: harassment classifications are mandatory before any server call.
     if (
+      !isSchemaMode &&
       formData.segment === 'harassment' &&
       (!formData.affectedPersonAgeGroup || !formData.allegedAbuserRelationship || !formData.reportingFor)
     ) {
