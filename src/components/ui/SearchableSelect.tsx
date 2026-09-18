@@ -238,7 +238,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   aria-activedescendant={
                     activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
                   }
-                  className="w-full min-h-[44px] rounded-[var(--radius-badge-md)] border border-role-outline bg-role-surface pl-9 pr-3 text-role-on-surface placeholder:text-role-on-surface-muted focus:outline-none focus:ring-2 focus:ring-role-focus"
+                  className="w-full min-h-[44px] rounded-[var(--radius-badge-md)] border border-role-outline bg-role-surface pl-9 pr-3 type-input text-role-on-surface placeholder:text-role-on-surface-muted focus:outline-none focus:ring-2 focus:ring-role-focus"
                 />
               </div>
             </div>
@@ -317,7 +317,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               }
             }
           }}
-          className={`w-full min-h-[44px] bg-role-surface text-left ui-border-default ui-radius-control px-3.5 ${clearable && value && !disabled ? 'pr-16' : 'pr-10'} type-body transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
+          className={`w-full min-h-[44px] bg-role-surface text-left ui-border-default ui-radius-control px-3.5 ${clearable && value && !disabled ? 'pr-16' : 'pr-10'} type-input transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
             error
               ? 'border-role-validation-outline focus:ring-role-validation-focus focus:border-role-validation-focus'
               : 'border-role-outline hover:border-role-outline-strong focus:ring-role-focus'
