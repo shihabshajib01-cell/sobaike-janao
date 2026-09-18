@@ -53,6 +53,10 @@ for (const path of ['/', '/issues', '/harassment', '/search', '/more', '/en/', '
   await scan(desktopPage, `desktop ${path}`);
 }
 
+await goto(desktopPage, '/explore');
+await desktopPage.locator('#explore-report-analytics').waitFor({ state: 'visible', timeout: 15000 });
+await scan(desktopPage, 'desktop explore analytics');
+
 await desktopPage.evaluate(() => {
   localStorage.setItem('sobaike-janao-theme', 'dark');
   localStorage.setItem('theme', 'dark');
@@ -78,6 +82,9 @@ await seedReturningVisitor(mobile);
 const mobilePage = await mobile.newPage();
 await goto(mobilePage, '/');
 await scan(mobilePage, 'mobile home');
+await goto(mobilePage, '/explore');
+await mobilePage.locator('#explore-report-analytics').waitFor({ state: 'visible', timeout: 15000 });
+await scan(mobilePage, 'mobile explore analytics');
 await mobilePage.locator('#mobile-nav-report').click();
 await mobilePage.locator('#report-composer-modal').waitFor({ state: 'visible', timeout: 15000 });
 await scan(mobilePage, 'mobile report composer step 1');
