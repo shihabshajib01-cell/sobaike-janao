@@ -246,7 +246,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                 : `Category share of ${totalReports} reports`
             }
           >
-            <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90" aria-hidden="true">
+            <svg id="explore-category-share-donut" viewBox="0 0 120 120" className="w-full h-full -rotate-90" aria-hidden="true">
               <circle
                 cx="60"
                 cy="60"
