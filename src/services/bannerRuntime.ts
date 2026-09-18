@@ -2,7 +2,22 @@ import { CANONICAL_BANNER_CONTENT, CategoryBannerContent } from '../data/bannerC
 import { supabase } from '../lib/supabase';
 import { SectionKey } from '../theme/tokens';
 
-export interface ManagedBannerContent extends CategoryBannerContent {
+export interface RuntimeBannerContent {
+  section: string;
+  titleBn: string;
+  titleEn: string;
+  mobileDescriptionBn: string;
+  mobileDescriptionEn: string;
+  tabletDescriptionBn: string;
+  tabletDescriptionEn: string;
+  desktopDescriptionBn: string;
+  desktopDescriptionEn: string;
+  illustrationSrc: string;
+  primaryCtaBn: string;
+  primaryCtaEn: string;
+}
+
+export interface ManagedBannerContent extends RuntimeBannerContent {
   showOnHome: boolean;
   isActive: boolean;
   sortOrder: number;
@@ -21,17 +36,7 @@ interface PublicBannerRow {
 
 const BANNER_BOOTSTRAP_TIMEOUT_MS = 2500;
 
-const SECTION_KEYS: SectionKey[] = [
-  'harassment',
-  'extortion',
-  'public_safety',
-  'road_transport',
-  'load_shedding',
-  'illegal_occupation',
-  'rickshaw',
-];
-
-const STRING_FIELDS: Array<keyof CategoryBannerContent> = [
+const STRING_FIELDS: Array<keyof Omit<RuntimeBannerContent, 'section'>> = [
   'titleBn',
   'titleEn',
   'mobileDescriptionBn',
@@ -45,13 +50,11 @@ const STRING_FIELDS: Array<keyof CategoryBannerContent> = [
   'primaryCtaEn',
 ];
 
-const publishedSettings = new Map<SectionKey, PublishedBannerSettings>();
-
-const isSectionKey = (value: unknown): value is SectionKey =>
-  typeof value === 'string' && SECTION_KEYS.includes(value as SectionKey);
+const runtimeContent = new Map<string, RuntimeBannerContent>();
+const publishedSettings = new Map<string, PublishedBannerSettings>();
 
 const parseContent = (
-  section: SectionKey,
+  section: string,
   value: unknown
 ): ManagedBannerContent | null => {
   if (!value || typeof value !== 'object') return null;
@@ -119,38 +122,70 @@ const loadPublishedRows = async (): Promise<PublicBannerRow[]> => {
 };
 
 export const getPublishedBannerSettings = (
-  section: SectionKey
+  section: string
 ): PublishedBannerSettings | null => publishedSettings.get(section) ?? null;
 
+export const getRuntimeBannerContent = (
+  section: string
+): RuntimeBannerContent | null => {
+  const remote = runtimeContent.get(section);
+  if (remote) return remote;
+
+  const canonical = CANONICAL_BANNER_CONTENT[section as SectionKey] as
+    | CategoryBannerContent
+    | undefined;
+
+  return canonical
+    ? {
+        ...canonical,
+        section,
+      }
+    : null;
+};
+
+export const getRuntimeBannerEntries = (): Array<[
+  string,
+  RuntimeBannerContent,
+  PublishedBannerSettings
+]> =>
+  Array.from(runtimeContent.entries())
+    .map(([key, value]) => {
+      const settings = publishedSettings.get(key);
+      return settings ? ([key, value, settings] as [string, RuntimeBannerContent, PublishedBannerSettings]) : null;
+    })
+    .filter(
+      (entry): entry is [string, RuntimeBannerContent, PublishedBannerSettings] =>
+        entry !== null
+    );
+
 /**
- * Hydrates the existing canonical in-memory banner content before React mounts.
- * Remote content is trusted only when all seven canonical records validate.
- * On any failure, the existing code-backed banners and ordering remain unchanged.
+ * Hydrates published banner content before React mounts.
+ * Existing seven code-backed banners remain fallback-compatible, while any
+ * additional published category banner is kept in the runtime registry.
  */
 export const hydratePublishedBannerContent = async (): Promise<void> => {
   if (!supabase) return;
 
   try {
     const rows = await loadPublishedRows();
-    const parsed = new Map<SectionKey, ManagedBannerContent>();
+    const parsed = new Map<string, ManagedBannerContent>();
 
     for (const row of rows) {
-      if (!isSectionKey(row.category_key)) continue;
+      if (typeof row.category_key !== 'string' || !row.category_key.trim()) continue;
       const content = parseContent(row.category_key, row.content);
       if (content) parsed.set(row.category_key, content);
     }
 
-    if (parsed.size !== SECTION_KEYS.length) {
-      throw new Error('Incomplete banner contract');
+    if (parsed.size === 0) {
+      throw new Error('Empty banner contract');
     }
 
+    runtimeContent.clear();
     publishedSettings.clear();
 
-    for (const section of SECTION_KEYS) {
-      const remote = parsed.get(section);
-      if (!remote) continue;
-
-      Object.assign(CANONICAL_BANNER_CONTENT[section], {
+    for (const [section, remote] of parsed.entries()) {
+      const banner: RuntimeBannerContent = {
+        section,
         titleBn: remote.titleBn,
         titleEn: remote.titleEn,
         mobileDescriptionBn: remote.mobileDescriptionBn,
@@ -162,15 +197,25 @@ export const hydratePublishedBannerContent = async (): Promise<void> => {
         illustrationSrc: remote.illustrationSrc,
         primaryCtaBn: remote.primaryCtaBn,
         primaryCtaEn: remote.primaryCtaEn,
-      });
+      };
 
+      runtimeContent.set(section, banner);
       publishedSettings.set(section, {
         showOnHome: remote.showOnHome,
         isActive: remote.isActive,
         sortOrder: remote.sortOrder,
       });
+
+      const canonical = CANONICAL_BANNER_CONTENT[section as SectionKey] as
+        | CategoryBannerContent
+        | undefined;
+
+      if (canonical) {
+        Object.assign(canonical, banner);
+      }
     }
   } catch (error) {
+    runtimeContent.clear();
     publishedSettings.clear();
     console.warn('[Banner CMS] Using code-backed banner fallback:', error);
   }
