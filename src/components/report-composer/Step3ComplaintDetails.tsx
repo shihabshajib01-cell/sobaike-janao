@@ -50,6 +50,14 @@ import {
   HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
   HARASSMENT_REPORTING_FOR_OPTIONS,
 } from '../../data/harassmentClassification';
+import {
+  SEXUAL_HARASSMENT_AGE_GROUP_OPTIONS,
+  SEXUAL_HARASSMENT_CONTEXT_OPTIONS,
+  SEXUAL_HARASSMENT_FREQUENCY_OPTIONS,
+  SEXUAL_HARASSMENT_RELATIONSHIP_OPTIONS,
+  SEXUAL_HARASSMENT_TYPE_OPTIONS,
+  needsSexualHarassmentInstitution,
+} from '../../data/sexualHarassmentOptions';
 import { ImageAttachmentPicker, AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { BRIBERY_DEPARTMENT_OPTIONS } from '../../data/briberyOptions';
 import { AddressSearchInput } from '../location/AddressSearchInput';
@@ -154,6 +162,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       segment === 'harassment' &&
       (currentSubcategoryOption?.categoryGroup === 'digital_intimate' ||
         currentSubcategoryOption?.id === 'blackmail-coercion');
+    const isSexualHarassment =
+      segment === 'harassment' && formData.subcategoryId === 'sexual-harassment';
 
     // Contextual subject configuration for categories that benefit from optional party details
     const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
@@ -864,6 +874,24 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             newErrors.reportingFor =
               language === 'bn' ? 'কার জন্য প্রতিবেদন করছেন তা নির্বাচন করুন।' : 'Select who you are reporting for.';
           }
+          if (isSexualHarassment && !formData.sexualHarassmentType) {
+            newErrors.sexualHarassmentType =
+              language === 'bn' ? 'হয়রানির ধরন নির্বাচন করুন।' : 'Select the type of harassment.';
+          }
+          if (isSexualHarassment && !formData.sexualHarassmentContext) {
+            newErrors.sexualHarassmentContext =
+              language === 'bn' ? 'ঘটনার প্রেক্ষাপট নির্বাচন করুন।' : 'Select where the harassment occurred.';
+          }
+          if (
+            isSexualHarassment &&
+            formData.sexualHarassmentInstitution?.trim() &&
+            formData.sexualHarassmentInstitution.trim().length > 200
+          ) {
+            newErrors.sexualHarassmentInstitution =
+              language === 'bn'
+                ? 'প্রতিষ্ঠান বা সংস্থার নাম ২০০ অক্ষরের মধ্যে রাখুন।'
+                : 'Keep the institution or organization within 200 characters.';
+          }
         }
 
         if (reporterGateState !== 'verified' || !VisitorSessionService.hasValidCurrentReporterLocation()) {
@@ -962,7 +990,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           newErrors.previousBillAmount ||
           newErrors.affectedPersonAgeGroup ||
           newErrors.allegedAbuserRelationship ||
-          newErrors.reportingFor
+          newErrors.reportingFor ||
+          newErrors.sexualHarassmentType ||
+          newErrors.sexualHarassmentContext ||
+          newErrors.sexualHarassmentInstitution
         ) {
           const elem = document.getElementById('composer-section-narrative');
           if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1034,7 +1065,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             errors.recentBillAmount ||
             errors.previousBillMonth ||
             errors.previousBillAmount ||
-            errors.briberyAmount
+            errors.briberyAmount ||
+            errors.sexualHarassmentType ||
+            errors.sexualHarassmentContext ||
+            errors.sexualHarassmentInstitution
           )}
           icon={<FileText className="w-5 h-5" />}
         >
@@ -1529,20 +1563,119 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     id="complaint-frequency-select"
                     value={formData.frequency || 'one-time'}
                     onChange={(e) =>
-                      onUpdateFormData({ frequency: e.target.value as 'one-time' | 'repeated' })
+                      onUpdateFormData({ frequency: e.target.value as ReportFormData['frequency'] })
                     }
                     className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[44px]"
                   >
-                    <option value="one-time">
-                      {language === 'bn' ? 'এককালীন (One-time)' : 'One-time'}
-                    </option>
-                    <option value="repeated">
-                      {language === 'bn' ? 'নিয়মিত / একাধিকবার' : 'Repeated / Ongoing'}
-                    </option>
+                    {(isSexualHarassment
+                      ? SEXUAL_HARASSMENT_FREQUENCY_OPTIONS
+                      : [
+                          { value: 'one-time', labelBn: 'এককালীন (One-time)', labelEn: 'One-time' },
+                          { value: 'repeated', labelBn: 'নিয়মিত / একাধিকবার', labelEn: 'Repeated / Ongoing' },
+                        ]
+                    ).map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {language === 'bn' ? option.labelBn : option.labelEn}
+                      </option>
+                    ))}
                   </select>
                 </div>
               )}
             </div>
+
+            {isSexualHarassment && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
+                <Select
+                  id="sexual-harassment-type-select"
+                  label={language === 'bn' ? 'হয়রানির ধরন' : 'Type of harassment'}
+                  required
+                  value={formData.sexualHarassmentType || ''}
+                  onChange={(event) => {
+                    onUpdateFormData({
+                      sexualHarassmentType: event.target.value as ReportFormData['sexualHarassmentType'],
+                    });
+                    if (errors.sexualHarassmentType) {
+                      setErrors((prev) => ({ ...prev, sexualHarassmentType: '' }));
+                    }
+                  }}
+                  placeholder={language === 'bn' ? '-- হয়রানির ধরন নির্বাচন করুন --' : '-- Select harassment type --'}
+                  error={errors.sexualHarassmentType}
+                  options={SEXUAL_HARASSMENT_TYPE_OPTIONS.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+
+                <Select
+                  id="sexual-harassment-context-select"
+                  label={language === 'bn' ? 'ঘটনার প্রেক্ষাপট' : 'Incident context'}
+                  required
+                  value={formData.sexualHarassmentContext || ''}
+                  onChange={(event) => {
+                    const value = event.target.value as ReportFormData['sexualHarassmentContext'];
+                    onUpdateFormData({
+                      sexualHarassmentContext: value,
+                      sexualHarassmentInstitution: needsSexualHarassmentInstitution(value)
+                        ? formData.sexualHarassmentInstitution
+                        : '',
+                    });
+                    if (errors.sexualHarassmentContext || errors.sexualHarassmentInstitution) {
+                      setErrors((prev) => ({
+                        ...prev,
+                        sexualHarassmentContext: '',
+                        sexualHarassmentInstitution: '',
+                      }));
+                    }
+                  }}
+                  placeholder={language === 'bn' ? '-- কোথায় / কোন প্রেক্ষাপটে --' : '-- Select incident context --'}
+                  error={errors.sexualHarassmentContext}
+                  options={SEXUAL_HARASSMENT_CONTEXT_OPTIONS.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+
+                {needsSexualHarassmentInstitution(formData.sexualHarassmentContext) && (
+                  <div>
+                    <label
+                      htmlFor="sexual-harassment-institution-input"
+                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
+                    >
+                      {language === 'bn'
+                        ? 'প্রতিষ্ঠান / সংস্থার নাম (ঐচ্ছিক)'
+                        : 'Institution / organization (optional)'}
+                    </label>
+                    <input
+                      id="sexual-harassment-institution-input"
+                      type="text"
+                      maxLength={200}
+                      value={formData.sexualHarassmentInstitution || ''}
+                      onChange={(event) => {
+                        onUpdateFormData({ sexualHarassmentInstitution: event.target.value });
+                        if (errors.sexualHarassmentInstitution) {
+                          setErrors((prev) => ({ ...prev, sexualHarassmentInstitution: '' }));
+                        }
+                      }}
+                      placeholder={
+                        language === 'bn'
+                          ? 'উৎস বা ঘটনার তথ্য অনুযায়ী প্রতিষ্ঠানের নাম'
+                          : 'Institution name, if known'
+                      }
+                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
+                        errors.sexualHarassmentInstitution
+                          ? 'border-ui-error-border bg-ui-error-bg'
+                          : 'border-ui-stroke-subtle'
+                      }`}
+                    />
+                    {errors.sexualHarassmentInstitution && (
+                      <p className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">
+                        {errors.sexualHarassmentInstitution}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {segment === 'harassment' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
@@ -1557,7 +1690,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   }}
                   placeholder={language === 'bn' ? '-- বয়সের গ্রুপ নির্বাচন করুন --' : '-- Select age group --'}
                   error={errors.affectedPersonAgeGroup}
-                  options={HARASSMENT_AGE_GROUP_OPTIONS.map((option) => ({
+                  options={(isSexualHarassment
+                    ? SEXUAL_HARASSMENT_AGE_GROUP_OPTIONS
+                    : HARASSMENT_AGE_GROUP_OPTIONS
+                  ).map((option) => ({
                     value: option.value,
                     label: language === 'bn' ? option.labelBn : option.labelEn,
                   }))}
@@ -1576,7 +1712,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   searchPlaceholder={language === 'bn' ? 'সম্পর্ক খুঁজুন...' : 'Search relationship...'}
                   noResultsText={language === 'bn' ? 'কোনো মিল পাওয়া যায়নি' : 'No matching relationship'}
                   error={errors.allegedAbuserRelationship}
-                  options={HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS.map((option) => ({
+                  options={(isSexualHarassment
+                    ? SEXUAL_HARASSMENT_RELATIONSHIP_OPTIONS
+                    : HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS
+                  ).map((option) => ({
                     value: option.value,
                     label: language === 'bn' ? option.labelBn : option.labelEn,
                     keywords: [option.labelBn, option.labelEn],
