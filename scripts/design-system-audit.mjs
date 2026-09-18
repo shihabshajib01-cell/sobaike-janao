@@ -514,6 +514,74 @@ for (const legacyAuthorityFile of ['src/index.css', 'src/theme/design-system.css
   }
 }
 
+const typographyFile = 'src/index.css';
+if (fs.existsSync(typographyFile)) {
+  const source = fs.readFileSync(typographyFile, 'utf8');
+  const rootStart = source.indexOf('@layer base {');
+  const englishStart = source.indexOf('  html[lang="en"] {', rootStart);
+  const tabletStart = source.indexOf('  @media (min-width: 768px) {', englishStart);
+  const mobileRoot = source.slice(rootStart, englishStart);
+  const mobileEnglish = source.slice(englishStart, tabletStart);
+
+  const requiredMobileRoot = [
+    '--type-body-size: 16px;',
+    '--type-body-line: 26px;',
+    '--type-h1-size-mobile: 28px;',
+    '--type-h2-size-mobile: 22px;',
+    '--type-h3-size-mobile: 18px;',
+    '--type-h4-size-mobile: 16px;',
+    '--type-label-size: 16px;',
+    '--type-meta-size: 14px;',
+    '--type-helper-size: 14px;',
+    '--type-compact-size: 14px;',
+    '--type-compact-line-mobile: 20px;',
+  ];
+
+  for (const token of requiredMobileRoot) {
+    if (!mobileRoot.includes(token)) {
+      findings.push({
+        file: typographyFile,
+        line: 1,
+        rule: 'mobile-typography-contract',
+        token,
+        message: 'Mobile typography tokens must preserve the approved public scale',
+        source: 'Expected approved mobile typography token is missing',
+      });
+    }
+  }
+
+  const requiredEnglishMobile = [
+    '--type-h1-size-mobile: 28px;',
+    '--type-h2-size-mobile: 22px;',
+    '--type-h3-size-mobile: 18px;',
+    '--type-h4-size-mobile: 16px;',
+  ];
+
+  for (const token of requiredEnglishMobile) {
+    if (!mobileEnglish.includes(token)) {
+      findings.push({
+        file: typographyFile,
+        line: 1,
+        rule: 'mobile-english-heading-contract',
+        token,
+        message: 'English mobile headings must preserve the approved H1-H4 scale',
+        source: 'Expected approved English mobile heading token is missing',
+      });
+    }
+  }
+
+  if (!source.includes('html[lang="bn"] .tracking-tight') || !source.includes('letter-spacing: normal !important;')) {
+    findings.push({
+      file: typographyFile,
+      line: 1,
+      rule: 'mobile-bengali-tracking',
+      token: 'tracking-*',
+      message: 'Bengali mobile typography must neutralize Latin-oriented tracking utilities',
+      source: 'Expected Bengali mobile tracking normalization is missing',
+    });
+  }
+}
+
 const mainFile = 'src/main.tsx';
 if (fs.existsSync(mainFile)) {
   const source = fs.readFileSync(mainFile, 'utf8');
