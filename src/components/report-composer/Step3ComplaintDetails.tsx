@@ -7,16 +7,12 @@ import {
   ChevronDown,
   Lock,
   Info,
-  Calendar,
-  Clock,
-  Repeat,
   Users,
   Plus,
   Trash2,
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Coins,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
