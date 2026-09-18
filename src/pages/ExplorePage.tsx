@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { useApp } from '../context/AppContext';
 import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';

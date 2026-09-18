@@ -17,6 +17,32 @@ if (!fs.existsSync(indexPath)) {
 }
 
 const html = fs.readFileSync(indexPath, 'utf8');
+
+if (/Material\+Symbols|Material%20Symbols|Material Symbols/i.test(html)) {
+  fail('Unused Material Symbols font must not be loaded by the initial document.');
+}
+
+const mainSourcePath = path.join(root, 'src', 'main.tsx');
+if (fs.existsSync(mainSourcePath)) {
+  const mainSource = fs.readFileSync(mainSourcePath, 'utf8');
+  if (mainSource.includes("leaflet/dist/leaflet.css")) {
+    fail('Leaflet CSS must stay route-scoped and out of the initial entry.');
+  }
+}
+
+const reportCardSourcePath = path.join(
+  root,
+  'src',
+  'components',
+  'report',
+  'ReportCard.tsx'
+);
+if (fs.existsSync(reportCardSourcePath)) {
+  const reportCardSource = fs.readFileSync(reportCardSourcePath, 'utf8');
+  if (reportCardSource.includes('ReportMediaGrid')) {
+    fail('ReportCard must not import or mount hidden media-grid code.');
+  }
+}
 const toLocalPath = (url) => {
   const clean = url.split('?')[0].split('#')[0].replace(/^\.?\//, '').replace(/^\//, '');
   return path.join(distDir, clean);
