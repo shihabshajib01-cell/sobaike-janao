@@ -33,6 +33,8 @@ export interface SupabasePublicReportRPC {
   priority?: string | null;
   hasSupportingInfo?: boolean | null;
   status?: string | null;
+  viewCount?: number | string | null;
+  shareCount?: number | string | null;
   recentBillMonth?: string | null;
   recentBillAmount?: number | null;
   previousBillMonth?: string | null;
@@ -204,6 +206,8 @@ export const mapSupabasePublicReportToItem = (
     publishedDateEn,
     publishedAt: rpc.publishedAt || undefined,
     updatedAt: rpc.updatedAt || undefined,
+    viewCount: Math.max(0, Number(rpc.viewCount) || 0),
+    shareCount: Math.max(0, Number(rpc.shareCount) || 0),
     evidenceSummaryBn: [],
     evidenceSummaryEn: [],
     status: 'published',
