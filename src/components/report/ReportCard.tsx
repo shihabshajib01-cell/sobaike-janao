@@ -52,12 +52,13 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
   const openReportDetail = () => {
     registerView();
-    navigateTo(`/report-detail/${report.id}`);
+    navigateTo(`/report-detail/${encodeURIComponent(report.id)}`);
   };
 
   const handleCardClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement | null;
-    if (target && target !== event.currentTarget && target.closest(INTERACTIVE_SELECTOR)) return;
+    const interactiveTarget = target?.closest(INTERACTIVE_SELECTOR);
+    if (interactiveTarget && interactiveTarget !== event.currentTarget) return;
     openReportDetail();
   };
 
@@ -76,7 +77,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const shareUrl = `${window.location.origin}${window.location.pathname}#/report-detail/${report.id}`;
+    const shareUrl = `${window.location.origin}/report-detail/${encodeURIComponent(report.id)}`;
 
     try {
       if (navigator.share) {
