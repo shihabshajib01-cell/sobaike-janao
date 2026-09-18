@@ -1143,250 +1143,138 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               {isExcessElectricityBill ? (
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Recent Bill Month */}
-                    <div>
-                      <label
-                        htmlFor="recent-bill-month-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent bill month *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="recent-bill-month-input"
-                  aria-invalid={Boolean(errors.recentBillMonth)}
-                  aria-describedby={errors.recentBillMonth ? 'recent-bill-month-input-error' : undefined}
-                  aria-required="true"
-                        type="month"
-                        value={formData.recentBillMonth || ''}
-                        onChange={(e) => {
-                          onUpdateFormData({ recentBillMonth: e.target.value });
-                          if (errors.recentBillMonth) setErrors((prev) => ({ ...prev, recentBillMonth: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.recentBillMonth ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.recentBillMonth && (
-                        <p id="recent-bill-month-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillMonth}</p>
-                      )}
-                    </div>
-
-                    {/* Recent Bill Amount */}
-                    <div>
-                      <label
-                        htmlFor="recent-bill-amount-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Coins className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent bill amount (BDT) *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="recent-bill-amount-input"
-                  aria-invalid={Boolean(errors.recentBillAmount)}
-                  aria-describedby={errors.recentBillAmount ? 'recent-bill-amount-input-error' : undefined}
-                  aria-required="true"
-                        type="number"
-                        min="1"
-                        step="any"
-                        placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
-                        value={formData.recentBillAmount !== undefined && formData.recentBillAmount !== null ? formData.recentBillAmount : ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          onUpdateFormData({ recentBillAmount: val === '' ? undefined : Number(val) });
-                          if (errors.recentBillAmount) setErrors((prev) => ({ ...prev, recentBillAmount: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.recentBillAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.recentBillAmount && (
-                        <p id="recent-bill-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillAmount}</p>
-                      )}
-                    </div>
+                    <MonthField
+                      id="recent-bill-month-input"
+                      language={language}
+                      required
+                      label={language === 'bn' ? 'সাম্প্রতিক বিলের মাস' : 'Recent bill month'}
+                      max={currentMonthLocal}
+                      value={formData.recentBillMonth || ''}
+                      error={errors.recentBillMonth}
+                      onChange={(e) => {
+                        onUpdateFormData({ recentBillMonth: e.target.value });
+                        if (errors.recentBillMonth) setErrors((prev) => ({ ...prev, recentBillMonth: '' }));
+                        if (
+                          errors.previousBillMonth &&
+                          formData.previousBillMonth &&
+                          e.target.value &&
+                          formData.previousBillMonth < e.target.value
+                        ) {
+                          setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
+                        }
+                      }}
+                    />
+                    <TextField
+                      id="recent-bill-amount-input"
+                      type="number"
+                      min="1"
+                      step="any"
+                      inputMode="decimal"
+                      required
+                      label={language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা)' : 'Recent bill amount (BDT)'}
+                      placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
+                      value={formData.recentBillAmount !== undefined && formData.recentBillAmount !== null ? formData.recentBillAmount : ''}
+                      error={errors.recentBillAmount}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onUpdateFormData({ recentBillAmount: val === '' ? undefined : Number(val) });
+                        if (errors.recentBillAmount) setErrors((prev) => ({ ...prev, recentBillAmount: '' }));
+                      }}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Previous Bill Month */}
-                    <div>
-                      <label
-                        htmlFor="previous-bill-month-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous bill month *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="previous-bill-month-input"
-                  aria-invalid={Boolean(errors.previousBillMonth)}
-                  aria-describedby={errors.previousBillMonth ? 'previous-bill-month-input-error' : undefined}
-                  aria-required="true"
-                        type="month"
-                        value={formData.previousBillMonth || ''}
-                        onChange={(e) => {
-                          onUpdateFormData({ previousBillMonth: e.target.value });
-                          if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.previousBillMonth ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.previousBillMonth && (
-                        <p id="previous-bill-month-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillMonth}</p>
-                      )}
-                    </div>
-
-                    {/* Previous Bill Amount */}
-                    <div>
-                      <label
-                        htmlFor="previous-bill-amount-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Coins className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous bill amount (BDT) *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="previous-bill-amount-input"
-                  aria-invalid={Boolean(errors.previousBillAmount)}
-                  aria-describedby={errors.previousBillAmount ? 'previous-bill-amount-input-error' : undefined}
-                  aria-required="true"
-                        type="number"
-                        min="1"
-                        step="any"
-                        placeholder={language === 'bn' ? 'যেমন: ১৫০০' : 'e.g. 1500'}
-                        value={formData.previousBillAmount !== undefined && formData.previousBillAmount !== null ? formData.previousBillAmount : ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          onUpdateFormData({ previousBillAmount: val === '' ? undefined : Number(val) });
-                          if (errors.previousBillAmount) setErrors((prev) => ({ ...prev, previousBillAmount: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.previousBillAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.previousBillAmount && (
-                        <p id="previous-bill-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillAmount}</p>
-                      )}
-                    </div>
+                    <MonthField
+                      id="previous-bill-month-input"
+                      language={language}
+                      required
+                      label={language === 'bn' ? 'আগের বিলের মাস' : 'Previous bill month'}
+                      max={formData.recentBillMonth || currentMonthLocal}
+                      value={formData.previousBillMonth || ''}
+                      error={errors.previousBillMonth}
+                      onChange={(e) => {
+                        onUpdateFormData({ previousBillMonth: e.target.value });
+                        if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
+                      }}
+                    />
+                    <TextField
+                      id="previous-bill-amount-input"
+                      type="number"
+                      min="1"
+                      step="any"
+                      inputMode="decimal"
+                      required
+                      label={language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা)' : 'Previous bill amount (BDT)'}
+                      placeholder={language === 'bn' ? 'যেমন: ১৫০০' : 'e.g. 1500'}
+                      value={formData.previousBillAmount !== undefined && formData.previousBillAmount !== null ? formData.previousBillAmount : ''}
+                      error={errors.previousBillAmount}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onUpdateFormData({ previousBillAmount: val === '' ? undefined : Number(val) });
+                        if (errors.previousBillAmount) setErrors((prev) => ({ ...prev, previousBillAmount: '' }));
+                      }}
+                    />
                   </div>
                 </div>
               ) : (
-                /* Date, Start Time & End Time in 3 columns on sm+ screens */
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Incident Date */}
-                  <div>
-                    <label
-                      htmlFor="complaint-date-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                        <span>{language === 'bn' ? 'তারিখ *' : 'Date *'}</span>
-                      </div>
-                    </label>
-                    <input
-                      id="complaint-date-input"
-                  aria-invalid={Boolean(errors.incidentDate)}
-                  aria-describedby={errors.incidentDate ? 'complaint-date-input-error' : undefined}
-                  aria-required="true"
-                      type="date"
-                      max={todayLocal}
-                      value={formData.incidentDate || ''}
-                      onChange={(e) => {
-                        const selectedDate = e.target.value;
-                        if (selectedDate && selectedDate > todayLocal) {
-                          setErrors((prev) => ({
-                            ...prev,
-                            incidentDate:
-                              language === 'bn'
-                                ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                                : 'Select today or an earlier date.',
-                          }));
-                          return;
-                        }
-                        onUpdateFormData({ incidentDate: selectedDate });
-                        if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
-                      }}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.incidentDate ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.incidentDate && (
-                      <p id="complaint-date-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
-                    )}
-                  </div>
-
-                  {/* Start Time (Required) */}
-                  <div>
-                    <label
-                      htmlFor="utility-start-time-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-ui-content-primary" />
-                        <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start time *'}</span>
-                      </div>
-                    </label>
-                    <input
-                      id="utility-start-time-input"
-                  aria-invalid={Boolean(errors.incidentTime)}
-                  aria-describedby={errors.incidentTime ? 'utility-start-time-input-error' : undefined}
-                  aria-required="true"
-                      type="time"
-                      value={formData.incidentTime || ''}
-                      onChange={(e) => {
-                        onUpdateFormData({ incidentTime: e.target.value });
-                        if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
-                        if (errors.utilityEndTime && formData.utilityEndTime && e.target.value !== formData.utilityEndTime) {
-                          setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
-                        }
-                      }}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.incidentTime ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.incidentTime && (
-                      <p id="utility-start-time-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentTime}</p>
-                    )}
-                  </div>
-
-                  {/* End Time (Optional) */}
-                  <div>
-                    <label
-                      htmlFor="utility-end-time-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                        <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End time (optional)'}</span>
-                      </div>
-                    </label>
-                    <input
-                      id="utility-end-time-input"
-                  aria-invalid={Boolean(errors.utilityEndTime)}
-                  aria-describedby={errors.utilityEndTime ? 'utility-end-time-input-error' : undefined}
-                      type="time"
-                      value={formData.utilityEndTime || ''}
-                      onChange={(e) => {
-                        onUpdateFormData({ utilityEndTime: e.target.value });
-                        if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
-                      }}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.utilityEndTime ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.utilityEndTime && (
-                      <p id="utility-end-time-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.utilityEndTime}</p>
-                    )}
-                  </div>
+                  <DateField
+                    id="complaint-date-input"
+                    language={language}
+                    required
+                    label={language === 'bn' ? 'তারিখ' : 'Date'}
+                    max={todayLocal}
+                    value={formData.incidentDate || ''}
+                    error={errors.incidentDate}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      if (selectedDate && selectedDate > todayLocal) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          incidentDate:
+                            language === 'bn'
+                              ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
+                              : 'Select today or an earlier date.',
+                        }));
+                        return;
+                      }
+                      onUpdateFormData({ incidentDate: selectedDate });
+                      if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
+                    }}
+                  />
+                  <TimeField
+                    id="utility-start-time-input"
+                    language={language}
+                    required
+                    label={language === 'bn' ? 'শুরুর সময়' : 'Start time'}
+                    value={formData.incidentTime || ''}
+                    error={errors.incidentTime}
+                    onChange={(e) => {
+                      onUpdateFormData({ incidentTime: e.target.value });
+                      if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
+                      if (errors.utilityEndTime && formData.utilityEndTime && e.target.value !== formData.utilityEndTime) {
+                        setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                      }
+                    }}
+                  />
+                  <TimeField
+                    id="utility-end-time-input"
+                    language={language}
+                    label={language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End time (optional)'}
+                    helperText={
+                      formData.incidentTime && formData.utilityEndTime && formData.utilityEndTime < formData.incidentTime
+                        ? language === 'bn'
+                          ? 'শেষ সময়টি পরের দিনের হিসেবে ধরা হবে।'
+                          : 'This end time is treated as the following day.'
+                        : undefined
+                    }
+                    value={formData.utilityEndTime || ''}
+                    error={errors.utilityEndTime}
+                    onChange={(e) => {
+                      onUpdateFormData({ utilityEndTime: e.target.value });
+                      if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                    }}
+                  />
                 </div>
               )}
 
