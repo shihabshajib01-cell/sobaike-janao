@@ -25,8 +25,8 @@ const attr = (html, selectorPattern, attrName) => {
   const match = html.match(selectorPattern);
   if (!match) return '';
   const tag = match[0];
-  const value = tag.match(new RegExp(`${attrName}=["']([^"']+)["']`, 'i'));
-  return value?.[1] || '';
+  const value = tag.match(new RegExp(`${attrName}=(["'])(.*?)\\1`, 'i'));
+  return value?.[2] || '';
 };
 
 const getTitle = (html) => html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || '';
