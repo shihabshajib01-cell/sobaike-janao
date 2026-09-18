@@ -48,7 +48,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
         selected && !config
           ? 'bg-role-primary text-role-on-primary border-role-primary font-[var(--font-weight-semibold)] ui-elevation-selected'
           : !selected
-          ? 'bg-role-surface text-role-on-surface-secondary hover:text-role-on-surface border-role-outline hover:border-role-outline-strong hover:bg-role-surface-hover'
+          ? 'bg-role-surface text-role-on-surface-secondary hover:text-role-on-surface border-role-outline-subtle hover:border-role-outline hover:bg-role-surface-hover'
           : ''
       } ${className}`}
     >
@@ -56,10 +56,8 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       <span className="truncate">{label}</span>
       {count !== undefined && (
         <small
-          className={`ml-0.5 px-1.5 py-0.5 ui-radius-pill font-[var(--font-weight-semibold)] leading-none ${
-            selected
-              ? 'bg-current/20 text-current'
-              : 'bg-role-surface-subtle text-role-on-surface-muted'
+          className={`ml-1 font-[var(--font-weight-semibold)] leading-none tabular-nums ${
+            selected ? 'text-current' : 'text-role-on-surface-muted'
           }`}
         >
           {count}
