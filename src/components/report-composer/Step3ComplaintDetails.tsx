@@ -2563,92 +2563,76 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           </button>
                         </div>
 
-                        {/* Row 1: Name + Phone */}
+                        {/* Unified additional-party fields */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn'
-                        ? subjectConfig.nameLabelBn || 'নাম / পরিচিতি'
-                        : subjectConfig.nameLabelEn || 'Name / known identity'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.name || ''}
-                              onChange={(e) => handleUpdateAdditionalParty(party.id, { name: e.target.value })}
-                              placeholder={language === 'bn' ? 'নাম বা পরিচিত নাম' : 'Name or known identity'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.phoneOrContact || party.publicProfileHandle || ''}
-                              onChange={(e) =>
-                                handleUpdateAdditionalParty(party.id, {
-                                  phoneOrContact: e.target.value,
-                                  publicProfileHandle: e.target.value,
-                                })
-                              }
-                              placeholder={language === 'bn' ? 'ফোন নম্বর বা যোগাযোগের তথ্য' : 'Phone number or contact info'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Row 2: Role + Group/Organization */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn'
-                        ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
-                        : subjectConfig.roleLabelEn || 'Role / designation'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.roleOrDesignation || ''}
-                              onChange={(e) =>
-                                handleUpdateAdditionalParty(party.id, { roleOrDesignation: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'ভূমিকা বা পদবি' : 'Role or designation'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn'
-                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
-                        : subjectConfig.organizationLabelEn || 'Group / organization'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.organization || ''}
-                              onChange={(e) =>
-                                handleUpdateAdditionalParty(party.id, { organization: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'দল, সমিতি বা প্রতিষ্ঠানের নাম' : 'Group, association, or organization'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Row 3: Other Identifying Details */}
-                        <div>
-                          <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                            {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
-                          </label>
-                          <textarea
-                            rows={2}
-                            value={party.identifyingDescription || ''}
-                            onChange={(e) =>
-                              handleUpdateAdditionalParty(party.id, { identifyingDescription: e.target.value })
+                          <TextField
+                            id={`party-${party.id}-name`}
+                            type="text"
+                            label={
+                              language === 'bn'
+                                ? subjectConfig.nameLabelBn || 'নাম / পরিচিতি'
+                                : subjectConfig.nameLabelEn || 'Name / known identity'
                             }
-                            placeholder={language === 'bn' ? 'চেহারা, যানবাহন বা অন্য শনাক্তকারী তথ্য' : 'Appearance, vehicle, or identifying details'}
-                            className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px] leading-relaxed"
+                            value={party.name || ''}
+                            onChange={(e) => handleUpdateAdditionalParty(party.id, { name: e.target.value })}
+                            placeholder={language === 'bn' ? 'নাম বা পরিচিত নাম' : 'Name or known identity'}
+                          />
+                          <TextField
+                            id={`party-${party.id}-contact`}
+                            type="text"
+                            label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                            value={party.phoneOrContact || party.publicProfileHandle || ''}
+                            onChange={(e) =>
+                              handleUpdateAdditionalParty(party.id, {
+                                phoneOrContact: e.target.value,
+                                publicProfileHandle: e.target.value,
+                              })
+                            }
+                            placeholder={language === 'bn' ? 'ফোন নম্বর বা যোগাযোগের তথ্য' : 'Phone number or contact info'}
                           />
                         </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <TextField
+                            id={`party-${party.id}-role`}
+                            type="text"
+                            label={
+                              language === 'bn'
+                                ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
+                                : subjectConfig.roleLabelEn || 'Role / designation'
+                            }
+                            value={party.roleOrDesignation || ''}
+                            onChange={(e) =>
+                              handleUpdateAdditionalParty(party.id, { roleOrDesignation: e.target.value })
+                            }
+                            placeholder={language === 'bn' ? 'ভূমিকা বা পদবি' : 'Role or designation'}
+                          />
+                          <TextField
+                            id={`party-${party.id}-organization`}
+                            type="text"
+                            label={
+                              language === 'bn'
+                                ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
+                                : subjectConfig.organizationLabelEn || 'Group / organization'
+                            }
+                            value={party.organization || ''}
+                            onChange={(e) =>
+                              handleUpdateAdditionalParty(party.id, { organization: e.target.value })
+                            }
+                            placeholder={language === 'bn' ? 'দল, সমিতি বা প্রতিষ্ঠানের নাম' : 'Group, association, or organization'}
+                          />
+                        </div>
+
+                        <TextAreaField
+                          id={`party-${party.id}-identifying`}
+                          rows={2}
+                          label={language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                          value={party.identifyingDescription || ''}
+                          onChange={(e) =>
+                            handleUpdateAdditionalParty(party.id, { identifyingDescription: e.target.value })
+                          }
+                          placeholder={language === 'bn' ? 'চেহারা, যানবাহন বা অন্য শনাক্তকারী তথ্য' : 'Appearance, vehicle, or identifying details'}
+                        />
                       </div>
                     ))}
                   </div>
