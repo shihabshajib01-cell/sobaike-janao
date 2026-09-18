@@ -302,6 +302,53 @@ export const PublicReportService = {
       let report = mapSupabasePublicReportToItem(data as SupabasePublicReportRPC);
       report = (await enrichHarassmentClassifications([report]))[0] || report;
 
+      if (
+        report.segment === 'harassment' &&
+        report.subcategoryId === 'sexual-harassment'
+      ) {
+        try {
+          const { data: harassmentContext, error: harassmentContextError } =
+            await fetchWithDeduplication(
+              `rpc:get_public_sexual_harassment_context:${cleanId}`,
+              () =>
+                supabase!.rpc('get_public_sexual_harassment_context', {
+                  p_report_id: cleanId,
+                })
+            );
+
+          if (harassmentContextError) {
+            console.warn(
+              '[PublicReportService.getById] Sexual harassment context load error:',
+              harassmentContextError
+            );
+          } else if (
+            harassmentContext &&
+            typeof harassmentContext === 'object' &&
+            !Array.isArray(harassmentContext)
+          ) {
+            const context = harassmentContext as any;
+            report.sexualHarassmentType =
+              context.sexualHarassmentType || undefined;
+            report.sexualHarassmentContext =
+              context.sexualHarassmentContext || undefined;
+            report.sexualHarassmentInstitution =
+              context.sexualHarassmentInstitution || undefined;
+            report.frequency = context.frequency || report.frequency;
+            report.affectedPersonAgeGroup =
+              context.affectedPersonAgeGroup || report.affectedPersonAgeGroup;
+            report.allegedAbuserRelationship =
+              context.allegedAbuserRelationship ||
+              report.allegedAbuserRelationship;
+            report.reportingFor = context.reportingFor || report.reportingFor;
+          }
+        } catch (harassmentContextLoadError) {
+          console.warn(
+            '[PublicReportService.getById] Sexual harassment context enrichment failed:',
+            harassmentContextLoadError
+          );
+        }
+      }
+
       // Only verified, final-detail sources are returned by this public RPC.
       try {
         const { data: sourceData, error: sourceError } = await fetchWithDeduplication(
