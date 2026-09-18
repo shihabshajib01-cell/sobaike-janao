@@ -2,8 +2,8 @@
  * Sobaike Janao public design-system authority layer.
  *
  * Imported after legacy/base styles so every public surface resolves through one
- * semantic visual contract. Keep page/component code on semantic `ui-*` and
- * `sec-*` variables; do not introduce page-specific colors here.
+ * semantic visual contract. Color values live in `color-system.css`. New shared UI should consume Material-style
+ * `role-*` utilities; legacy `ui-*` / `sec-*` names remain compatibility-only.
  */
 
 /* Color roles are defined exclusively in color-system.css. */
@@ -17,8 +17,8 @@
 }
 
 .ui-card {
-  background-color: var(--ui-surface);
-  border: var(--border-width-default) var(--border-style-default) var(--ui-border-subtle);
+  background-color: var(--md-surface);
+  border: var(--border-width-default) var(--border-style-default) var(--md-outline-subtle);
   border-radius: var(--radius-card);
   box-shadow: var(--elevation-card);
 }
