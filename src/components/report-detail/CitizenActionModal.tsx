@@ -5,6 +5,10 @@ import { Modal } from '../ui/Modal';
 import { ModalActions } from '../ui/ModalActions';
 import { Checkbox } from '../ui/Checkbox';
 import { UnsavedChangesDialog } from '../ui/UnsavedChangesDialog';
+import { TextAreaField } from '../ui/TextAreaField';
+import { TextField } from '../ui/TextField';
+import { DateField } from '../ui/DateField';
+import { isValidEmailOrPhone } from '../ui/formValidation';
 
 interface CitizenActionModalProps {
   isOpen: boolean;
@@ -36,6 +40,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false);
   const maxIncidentDate = getLocalDateInputValue();
 
@@ -45,6 +50,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       setIsSubmitting(false);
       setResponseId(null);
       setError(null);
+      setFieldErrors({});
       setIsDiscardConfirmOpen(false);
     }
   }, [isOpen]);
@@ -55,33 +61,48 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     e.preventDefault();
     if (isSubmitting) return;
 
-    if (!description.trim() || description.trim().length < 10) {
-      setError(
+    const nextFieldErrors: Record<string, string> = {};
+    if (!description.trim()) {
+      nextFieldErrors.description =
+        language === 'bn' ? 'আপনি যা জানেন তা লিখুন।' : 'Enter what you know.';
+    } else if (description.trim().length < 10) {
+      nextFieldErrors.description =
         language === 'bn'
           ? 'আরও একটু বিস্তারিত লিখুন (কমপক্ষে ১০ অক্ষর)।'
-          : 'Please add a little more detail (at least 10 characters).'
-      );
-      return;
+          : 'Please add a little more detail (at least 10 characters).';
     }
 
     if (witnessDate.trim() && witnessDate > maxIncidentDate) {
-      setError(
+      nextFieldErrors.witnessDate =
         language === 'bn'
           ? 'ঘটনার তারিখ ভবিষ্যতের হতে পারে না।'
-          : 'Incident date cannot be in the future.'
-      );
-      return;
+          : 'Incident date cannot be in the future.';
     }
 
     if (contactConsent && !contactInfo.trim()) {
-      setError(
+      nextFieldErrors.contactInfo =
         language === 'bn'
           ? 'যোগাযোগের জন্য ফোন নম্বর বা ইমেইল লিখুন।'
-          : 'Enter a phone number or email for follow-up.'
-      );
+          : 'Enter a phone number or email for follow-up.';
+    } else if (contactConsent && !isValidEmailOrPhone(contactInfo)) {
+      nextFieldErrors.contactInfo =
+        language === 'bn'
+          ? 'সঠিক ফোন নম্বর বা ইমেইল লিখুন।'
+          : 'Enter a valid phone number or email.';
+    }
+
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors);
+      const firstId = nextFieldErrors.description
+        ? 'citizen-description-input'
+        : nextFieldErrors.witnessDate
+          ? 'citizen-witness-date-input'
+          : 'citizen-contact-info-input';
+      window.requestAnimationFrame(() => document.getElementById(firstId)?.focus());
       return;
     }
 
+    setFieldErrors({});
     setIsSubmitting(true);
     setError(null);
 
@@ -122,6 +143,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     setIsSubmitting(false);
     setResponseId(null);
     setError(null);
+    setFieldErrors({});
     setIsDiscardConfirmOpen(false);
     onClose();
   };
@@ -214,7 +236,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
           )}
         </div>
       ) : (
-        <form id="citizen-action-form" onSubmit={handleSubmit} className="space-y-4">
+        <form id="citizen-action-form" onSubmit={handleSubmit} noValidate className="space-y-4">
           {error && (
             <div
               role="alert"
@@ -224,31 +246,25 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             </div>
           )}
 
-          <div className="space-y-1.5">
-            <label
-              htmlFor="citizen-description-input"
-              className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary"
-            >
-              {language === 'bn' ? 'আপনি যা জানেন *' : 'What you know *'}
-            </label>
-            <textarea
-              id="citizen-description-input"
-              name="description"
-              rows={4}
-              required
-              aria-required="true"
-              aria-describedby="citizen-description-helper"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={language === 'bn' ? 'যা দেখেছেন বা জানেন লিখুন...' : 'Write what you saw or know...'}
-              className="w-full ui-space-textarea bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder resize-y"
-            />
-            <p id="citizen-description-helper" className="type-helper text-ui-content-secondary">
-              {language === 'bn'
+          <TextAreaField
+            id="citizen-description-input"
+            name="description"
+            rows={4}
+            required
+            label={language === 'bn' ? 'আপনি যা জানেন' : 'What you know'}
+            helperText={
+              language === 'bn'
                 ? 'তারিখ, সময়, স্থান ও প্রাসঙ্গিক তথ্য যতটা সম্ভব নির্দিষ্টভাবে লিখুন।'
-                : 'Include the date, time, place, and any relevant details as specifically as you can.'}
-            </p>
-          </div>
+                : 'Include the date, time, place, and any relevant details as specifically as you can.'
+            }
+            error={fieldErrors.description}
+            value={description}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              if (fieldErrors.description) setFieldErrors((current) => ({ ...current, description: '' }));
+            }}
+            placeholder={language === 'bn' ? 'যা দেখেছেন বা জানেন লিখুন...' : 'Write what you saw or know...'}
+          />
 
           <div className="space-y-1.5">
             <label
@@ -263,11 +279,19 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               type="date"
               lang="en-GB"
               max={maxIncidentDate}
-              value={witnessDate}
-              onChange={(e) => setWitnessDate(e.target.value)}
-              className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control ui-control type-body text-ui-content-primary"
-            />
-          </div>
+              value={witn          <DateField
+            id="citizen-witness-date-input"
+            name="witnessDate"
+            language={language}
+            label={language === 'bn' ? 'ঘটনার তারিখ (ঐচ্ছিক)' : 'Incident date (optional)'}
+            max={maxIncidentDate}
+            value={witnessDate}
+            error={fieldErrors.witnessDate}
+            onChange={(e) => {
+              setWitnessDate(e.target.value);
+              if (fieldErrors.witnessDate) setFieldErrors((current) => ({ ...current, witnessDate: '' }));
+            }}
+          />
 
           <div className="p-3 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-3">
             <Checkbox
@@ -283,23 +307,21 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             />
 
             {contactConsent && (
-              <div className="space-y-1.5 pl-8">
-                <label
-                  htmlFor="citizen-contact-info-input"
-                  className="block type-helper font-[var(--font-weight-medium)] text-ui-content-secondary"
-                >
-                  {language === 'bn' ? 'ফোন নম্বর বা ইমেইল' : 'Phone number or email'}
-                </label>
-                <input
-                  id="citizen-contact-info-input"
-                  name="contactInfo"
-                  type="text"
-                  value={contactInfo}
-                  onChange={(e) => setContactInfo(e.target.value)}
-                  placeholder={language === 'bn' ? 'ফোন নম্বর বা ইমেইল লিখুন' : 'Enter a phone number or email'}
-                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                />
-              </div>
+              <TextField
+                id="citizen-contact-info-input"
+                name="contactInfo"
+                type="text"
+                required
+                fieldClassName="pl-8"
+                label={language === 'bn' ? 'ফোন নম্বর বা ইমেইল' : 'Phone number or email'}
+                value={contactInfo}
+                error={fieldErrors.contactInfo}
+                onChange={(e) => {
+                  setContactInfo(e.target.value);
+                  if (fieldErrors.contactInfo) setFieldErrors((current) => ({ ...current, contactInfo: '' }));
+                }}
+                placeholder={language === 'bn' ? 'ফোন নম্বর বা ইমেইল লিখুন' : 'Enter a phone number or email'}
+              />
             )}
           </div>
         </form>
