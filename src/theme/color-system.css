@@ -67,10 +67,10 @@ html[data-theme="light"] {
   --md-surface-elevated: #FFFFFF;
   --md-surface-hover: #E4E6EB;
   --md-on-surface: #050505;
-  --md-on-surface-secondary: #65676B;
-  --md-on-surface-muted: #6B6E72;
+  --md-on-surface-secondary: #4F5459;
+  --md-on-surface-muted: #65676B;
 
-  --md-outline-subtle: #CED0D4;
+  --md-outline-subtle: #E4E6EB;
   --md-outline: #85888C;
   --md-outline-strong: #65676B;
 
@@ -117,13 +117,13 @@ html[data-theme="light"] {
   /* Hero roles - Light */
   --hero-text-primary: #102A43;
   --hero-text-secondary: #596579;
-  --hero-harassment-container: #FEEAEC;
-  --hero-extortion-container: #FEEADE;
+  --hero-harassment-container: #FDF2F4;
+  --hero-extortion-container: #F0F3F9;
   --hero-public-safety-container: #EFF6FF;
   --hero-road-transport-container: #FFFBEB;
-  --hero-load-shedding-container: #FEEDD4;
+  --hero-load-shedding-container: #F0FDFA;
   --hero-illegal-occupation-container: #F8FAFC;
-  --hero-rickshaw-container: #E4F8EE;
+  --hero-rickshaw-container: #FEF7EE;
 
   /* Admin-managed category theme presets - Light */
   --theme-preset-sky-primary: #0284C7;
