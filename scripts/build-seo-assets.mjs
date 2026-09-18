@@ -9,7 +9,7 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const STATIC_PAGES = [
   {
     path: '/',
-    title: 'সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
+    title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
     description:
       'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
     robots: 'index, follow, max-image-preview:large',
