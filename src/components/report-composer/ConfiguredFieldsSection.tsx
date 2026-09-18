@@ -3,7 +3,7 @@ import {
   PublicReportingField,
   PublicReportingForm,
 } from '../../services/reportingFormConfig';
-import { ReportFormData } from '../../services/types';
+import { MentionedParty, ReportFormData } from '../../services/types';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { Button } from '../ui/Button';
 import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
@@ -115,6 +115,41 @@ export const ConfiguredFieldsSection = forwardRef<
         return (formData as unknown as Record<string, unknown>)[field.storageKey];
       }
       return undefined;
+    };
+
+    const addMentionedParty = () => {
+      const nextParty: MentionedParty = {
+        id: `party-${Date.now()}-${(formData.mentionedParties || []).length + 1}`,
+        type: 'unknown',
+        name: '',
+        roleOrDesignation: '',
+        organization: '',
+        phoneOrContact: '',
+        publicProfileHandle: '',
+        identifyingDescription: '',
+      };
+      onUpdateFormData({
+        mentionedParties: [...(formData.mentionedParties || []), nextParty],
+      });
+    };
+
+    const updateMentionedParty = (
+      id: string,
+      patch: Partial<MentionedParty>
+    ) => {
+      onUpdateFormData({
+        mentionedParties: (formData.mentionedParties || []).map((party) =>
+          party.id === id ? { ...party, ...patch } : party
+        ),
+      });
+    };
+
+    const removeMentionedParty = (id: string) => {
+      onUpdateFormData({
+        mentionedParties: (formData.mentionedParties || []).filter(
+          (party) => party.id !== id
+        ),
+      });
     };
 
     const setValue = (field: PublicReportingField, value: unknown) => {
@@ -765,6 +800,168 @@ export const ConfiguredFieldsSection = forwardRef<
                       className={commonInputClass}
                     />
                   </div>
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-party-profile"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'যোগাযোগ / পাবলিক প্রোফাইল' : 'Contact / public profile'}
+                    </label>
+                    <input
+                      id="configured-party-profile"
+                      value={formData.publicProfileHandle || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ publicProfileHandle: event.target.value })
+                      }
+                      className={commonInputClass}
+                    />
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label
+                      htmlFor="configured-party-description"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'শনাক্তকরণ / অতিরিক্ত বিবরণ' : 'Identifying / additional description'}
+                    </label>
+                    <textarea
+                      id="configured-party-description"
+                      rows={3}
+                      value={formData.identifyingDescription || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ identifyingDescription: event.target.value })
+                      }
+                      className={`${commonInputClass} resize-y`}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3 border-t border-ui-stroke-subtle pt-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                        {language === 'bn' ? 'অতিরিক্ত ব্যক্তি / প্রতিষ্ঠান' : 'Additional people / organizations'}
+                      </p>
+                      <p className="type-helper text-ui-content-secondary">
+                        {language === 'bn'
+                          ? 'একাধিক সংশ্লিষ্ট পক্ষ থাকলে আলাদা করে যোগ করুন।'
+                          : 'Add each additional related party separately.'}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={addMentionedParty}
+                    >
+                      {language === 'bn' ? 'আরও যোগ করুন' : 'Add another'}
+                    </Button>
+                  </div>
+
+                  {(formData.mentionedParties || []).map((party, partyIndex) => (
+                    <div
+                      key={party.id}
+                      className="space-y-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                          {language === 'bn'
+                            ? `সংশ্লিষ্ট পক্ষ ${partyIndex + 2}`
+                            : `Related party ${partyIndex + 2}`}
+                        </p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeMentionedParty(party.id)}
+                        >
+                          {language === 'bn' ? 'সরান' : 'Remove'}
+                        </Button>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <select
+                          value={party.type || 'unknown'}
+                          aria-label={language === 'bn' ? 'পক্ষের ধরন' : 'Party type'}
+                          onChange={(event) =>
+                            updateMentionedParty(party.id, {
+                              type: event.target.value as MentionedParty['type'],
+                            })
+                          }
+                          className={commonInputClass}
+                        >
+                          <option value="unknown">{language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified'}</option>
+                          <option value="individual">{language === 'bn' ? 'ব্যক্তি' : 'Individual'}</option>
+                          <option value="business">{language === 'bn' ? 'ব্যবসা' : 'Business'}</option>
+                          <option value="group">{language === 'bn' ? 'গোষ্ঠী' : 'Group'}</option>
+                          <option value="organization">{language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}</option>
+                        </select>
+                        <input
+                          value={party.name || ''}
+                          aria-label={language === 'bn' ? 'নাম' : 'Name'}
+                          placeholder={language === 'bn' ? 'নাম' : 'Name'}
+                          onChange={(event) =>
+                            updateMentionedParty(party.id, { name: event.target.value })
+                          }
+                          className={commonInputClass}
+                        />
+                        <input
+                          value={party.roleOrDesignation || ''}
+                          aria-label={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
+                          placeholder={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
+                          onChange={(event) =>
+                            updateMentionedParty(party.id, {
+                              roleOrDesignation: event.target.value,
+                            })
+                          }
+                          className={commonInputClass}
+                        />
+                        <input
+                          value={party.organization || ''}
+                          aria-label={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
+                          placeholder={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
+                          onChange={(event) =>
+                            updateMentionedParty(party.id, {
+                              organization: event.target.value,
+                            })
+                          }
+                          className={commonInputClass}
+                        />
+                        <input
+                          value={party.phoneOrContact || ''}
+                          aria-label={language === 'bn' ? 'যোগাযোগ' : 'Contact'}
+                          placeholder={language === 'bn' ? 'যোগাযোগ' : 'Contact'}
+                          onChange={(event) =>
+                            updateMentionedParty(party.id, {
+                              phoneOrContact: event.target.value,
+                            })
+                          }
+                          className={commonInputClass}
+                        />
+                        <input
+                          value={party.publicProfileHandle || ''}
+                          aria-label={language === 'bn' ? 'পাবলিক প্রোফাইল' : 'Public profile'}
+                          placeholder={language === 'bn' ? 'পাবলিক প্রোফাইল' : 'Public profile'}
+                          onChange={(event) =>
+                            updateMentionedParty(party.id, {
+                              publicProfileHandle: event.target.value,
+                            })
+                          }
+                          className={commonInputClass}
+                        />
+                        <textarea
+                          rows={2}
+                          value={party.identifyingDescription || ''}
+                          aria-label={language === 'bn' ? 'অতিরিক্ত বিবরণ' : 'Additional description'}
+                          placeholder={language === 'bn' ? 'অতিরিক্ত বিবরণ' : 'Additional description'}
+                          onChange={(event) =>
+                            updateMentionedParty(party.id, {
+                              identifyingDescription: event.target.value,
+                            })
+                          }
+                          className={`${commonInputClass} resize-y sm:col-span-2`}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
                 {error && (
                   <p role="alert" className="type-compact text-ui-error-text">
