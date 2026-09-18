@@ -436,14 +436,23 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleNextFromStep3 = useCallback(() => {
     if (!validateMobJusticeSection()) return;
+
+    if (reportingForm?.engineMode === 'schema') {
+      if (
+        configuredFieldsRef.current &&
+        !configuredFieldsRef.current.validateAndProceed()
+      ) {
+        return;
+      }
+      handleGoToStep(4);
+      return;
+    }
+
     if (!step3Ref.current) return;
     const isValid = step3Ref.current.validateAndProceed();
     if (!isValid) return;
-    if (configuredFieldsRef.current && !configuredFieldsRef.current.validateAndProceed()) {
-      return;
-    }
     handleGoToStep(4);
-  }, [handleGoToStep, validateMobJusticeSection]);
+  }, [handleGoToStep, reportingForm?.engineMode, validateMobJusticeSection]);
 
   // Rape Consent Modal Handlers
   const handleAgreeRapeConsent = useCallback(() => {
@@ -1049,36 +1058,44 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   )}
 
                   {effectiveCurrentStep === 3 && formData.segment && (
-                    <>
-                      {isMobJusticeReport && (
-                        <MobJusticeDetailsFields
-                          value={mobJusticeDetails}
-                          errors={mobJusticeErrors}
-                          onChange={handleMobJusticeDetailsChange}
-                          language={language}
-                        />
-                      )}
-                      <Step3ComplaintDetails
-                        ref={step3Ref}
-                        segment={formData.segment}
-                        formData={formData}
-                        pendingImages={pendingImages}
-                        onPendingImagesChange={handlePendingImagesChange}
-                        onUpdateFormData={handleUpdateFormData}
-                        onNext={handleNextFromStep3}
-                        initialOpenSection={step3JumpSection}
-                        language={language}
-                      />
+                    reportingForm?.engineMode === 'schema' ? (
                       <ConfiguredFieldsSection
                         ref={configuredFieldsRef}
                         form={reportingForm}
                         language={language}
-                        answers={formData.customFieldAnswers || {}}
-                        onChange={(customFieldAnswers) =>
-                          handleUpdateFormData({ customFieldAnswers })
+                        formData={formData}
+                        pendingImages={pendingImages}
+                        onPendingImagesChange={handlePendingImagesChange}
+                        onUpdateFormData={handleUpdateFormData}
+                        mobJusticeDetails={isMobJusticeReport ? mobJusticeDetails : undefined}
+                        mobJusticeErrors={isMobJusticeReport ? mobJusticeErrors : undefined}
+                        onMobJusticeDetailsChange={
+                          isMobJusticeReport ? handleMobJusticeDetailsChange : undefined
                         }
                       />
-                    </>
+                    ) : (
+                      <>
+                        {isMobJusticeReport && (
+                          <MobJusticeDetailsFields
+                            value={mobJusticeDetails}
+                            errors={mobJusticeErrors}
+                            onChange={handleMobJusticeDetailsChange}
+                            language={language}
+                          />
+                        )}
+                        <Step3ComplaintDetails
+                          ref={step3Ref}
+                          segment={formData.segment}
+                          formData={formData}
+                          pendingImages={pendingImages}
+                          onPendingImagesChange={handlePendingImagesChange}
+                          onUpdateFormData={handleUpdateFormData}
+                          onNext={handleNextFromStep3}
+                          initialOpenSection={step3JumpSection}
+                          language={language}
+                        />
+                      </>
+                    )
                   )}
 
                   {effectiveCurrentStep === 4 && formData.segment && (
