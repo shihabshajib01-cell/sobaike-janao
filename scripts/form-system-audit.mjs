@@ -24,6 +24,8 @@ const primitives = [
   'src/components/ui/DateField.tsx',
   'src/components/ui/TimeField.tsx',
   'src/components/ui/MonthField.tsx',
+  'src/components/ui/NumberField.tsx',
+  'src/components/ui/ContactField.tsx',
   'src/components/ui/Select.tsx',
   'src/components/ui/SearchableSelect.tsx',
   'src/components/ui/RadioGroup.tsx',
@@ -69,6 +71,16 @@ requireContains(
   'src/components/ui/TextAreaField.tsx',
   'aria-invalid={Boolean(error)}',
   'TextAreaField must own invalid-state semantics'
+);
+requireContains(
+  'src/components/ui/NumberField.tsx',
+  '<TextField',
+  'NumberField must inherit the shared text-field contract'
+);
+requireContains(
+  'src/components/ui/ContactField.tsx',
+  '<TextField',
+  'ContactField must inherit the shared text-field contract'
 );
 requireContains(
   'src/components/ui/Select.tsx',
@@ -150,6 +162,7 @@ for (const token of [
   '<DateField',
   '<TimeField',
   '<MonthField',
+  '<NumberField',
 ]) {
   if (!configured.includes(token)) {
     failures.push(`ConfiguredFieldsSection.tsx: missing schema form contract ${token}`);
