@@ -74,7 +74,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Step 3 imperative refs for legacy core sections + Admin-configured fields.
   const step3Ref = useRef<Step3Handle>(null);
   const configuredFieldsRef = useRef<ConfiguredFieldsHandle>(null);
-  const subcategorySelectionVersionRef = useRef(0);
   const [reportingForm, setReportingForm] = useState<PublicReportingForm | null>(null);
 
   // Jump section tracking for Step 3
@@ -344,7 +343,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   );
 
   const handleSelectSubcategory = useCallback(
-    (subcategoryId: string, _option: SubcategoryOption) => {
+    async (subcategoryId: string, _option: SubcategoryOption) => {
       if (formData.subcategoryId === subcategoryId) return;
 
       if (formData.serverSubmissionState === 'attempted') {
@@ -360,16 +359,20 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
       setMobJusticeErrors({});
 
+      // State A: pre-submit subcategory switch
+      // Cleanly discard old local evidence attachments and reset idempotency key
       revokePreviewUrls(pendingImages);
       setPendingImages([]);
       retryCredentialsRef.current = null;
 
-      // Selection state must update synchronously for standards-compliant radio
-      // keyboard behavior. Use any already-cached schema immediately, then
-      // hydrate the latest published schema without blocking aria-checked.
-      const selectionVersion = ++subcategorySelectionVersionRef.current;
-      const cachedForm = PublicReportingConfigService.getForm(subcategoryId);
-      setReportingForm(cachedForm);
+      let selectedForm: PublicReportingForm | null = null;
+      try {
+        await PublicReportingConfigService.fetch();
+        selectedForm = PublicReportingConfigService.getForm(subcategoryId);
+      } catch {
+        selectedForm = null;
+      }
+      setReportingForm(selectedForm);
 
       setFormData((prev) => {
         const isUtilitySwitch =
@@ -386,8 +389,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           evidenceTypes: [],
           evidenceDescription: '',
           title: '',
-          formSchemaVersion: cachedForm?.version,
-          formEngineMode: cachedForm?.engineMode,
+          formSchemaVersion: selectedForm?.version,
+          formEngineMode: selectedForm?.engineMode,
           customFieldAnswers: {},
           subjectType: 'unknown',
           ...(isUtilitySwitch
@@ -407,34 +410,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             : {}),
         };
       });
-
-      void PublicReportingConfigService.fetch()
-        .then(() => {
-          if (subcategorySelectionVersionRef.current !== selectionVersion) return;
-
-          const selectedForm = PublicReportingConfigService.getForm(subcategoryId);
-          setReportingForm(selectedForm);
-          setFormData((prev) =>
-            prev.subcategoryId === subcategoryId
-              ? {
-                  ...prev,
-                  formSchemaVersion: selectedForm?.version,
-                  formEngineMode: selectedForm?.engineMode,
-                }
-              : prev
-          );
-        })
-        .catch(() => {
-          // Existing legacy flows remain usable if the optional configuration
-          // refresh fails; schema-mode categories are still server-guarded.
-        });
     },
-    [
-      formData.subcategoryId,
-      formData.serverSubmissionState,
-      language,
-      pendingImages,
-    ]
+    [formData.subcategoryId, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
   );
 
   const handleNextFromStep2 = useCallback(() => {
@@ -461,19 +438,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (!validateMobJusticeSection()) return;
 
     if (reportingForm?.engineMode === 'schema') {
-      if (
-        configuredFieldsRef.current &&
-        !configuredFieldsRef.current.validateAndProceed()
-      ) {
-        return;
-      }
-      handleGoToStep(4);
-      return;
+      if (!configuredFieldsRef.current?.validateAndProceed()) return;
+    } else {
+      if (!step3Ref.current?.validateAndProceed()) return;
     }
 
-    if (!step3Ref.current) return;
-    const isValid = step3Ref.current.validateAndProceed();
-    if (!isValid) return;
     handleGoToStep(4);
   }, [handleGoToStep, reportingForm?.engineMode, validateMobJusticeSection]);
 
@@ -1081,31 +1050,26 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                   )}
 
                   {effectiveCurrentStep === 3 && formData.segment && (
-                    reportingForm?.engineMode === 'schema' ? (
-                      <ConfiguredFieldsSection
-                        ref={configuredFieldsRef}
-                        form={reportingForm}
-                        language={language}
-                        formData={formData}
-                        pendingImages={pendingImages}
-                        onPendingImagesChange={handlePendingImagesChange}
-                        onUpdateFormData={handleUpdateFormData}
-                        mobJusticeDetails={isMobJusticeReport ? mobJusticeDetails : undefined}
-                        mobJusticeErrors={isMobJusticeReport ? mobJusticeErrors : undefined}
-                        onMobJusticeDetailsChange={
-                          isMobJusticeReport ? handleMobJusticeDetailsChange : undefined
-                        }
-                      />
-                    ) : (
-                      <>
-                        {isMobJusticeReport && (
-                          <MobJusticeDetailsFields
-                            value={mobJusticeDetails}
-                            errors={mobJusticeErrors}
-                            onChange={handleMobJusticeDetailsChange}
-                            language={language}
-                          />
-                        )}
+                    <>
+                      {isMobJusticeReport && (
+                        <MobJusticeDetailsFields
+                          value={mobJusticeDetails}
+                          errors={mobJusticeErrors}
+                          onChange={handleMobJusticeDetailsChange}
+                          language={language}
+                        />
+                      )}
+                      {reportingForm?.engineMode === 'schema' ? (
+                        <ConfiguredFieldsSection
+                          ref={configuredFieldsRef}
+                          form={reportingForm}
+                          language={language}
+                          formData={formData}
+                          pendingImages={pendingImages}
+                          onPendingImagesChange={handlePendingImagesChange}
+                          onUpdateFormData={handleUpdateFormData}
+                        />
+                      ) : (
                         <Step3ComplaintDetails
                           ref={step3Ref}
                           segment={formData.segment}
@@ -1117,8 +1081,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           initialOpenSection={step3JumpSection}
                           language={language}
                         />
-                      </>
-                    )
+                      )}
+                    </>
                   )}
 
                   {effectiveCurrentStep === 4 && formData.segment && (
