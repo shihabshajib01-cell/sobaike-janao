@@ -40,6 +40,13 @@ export interface SupabasePublicReportRPC {
   recent_bill_amount?: number | null;
   previous_bill_month?: string | null;
   previous_bill_amount?: number | null;
+  briberyDepartment?: string | null;
+  briberyService?: string | null;
+  briberyAmount?: number | null;
+  bribery_department?: string | null;
+  bribery_service?: string | null;
+  bribery_amount?: number | null;
+  frequency?: ReportItem['frequency'] | null;
   utilityEndTime?: string | null;
   utility_end_time?: string | null;
 }
@@ -182,6 +189,15 @@ export const mapSupabasePublicReportToItem = (
         : rpc.previous_bill_amount !== undefined && rpc.previous_bill_amount !== null
         ? Number(rpc.previous_bill_amount)
         : undefined,
+    briberyDepartment: rpc.briberyDepartment || rpc.bribery_department || undefined,
+    briberyService: rpc.briberyService || rpc.bribery_service || undefined,
+    briberyAmount:
+      rpc.briberyAmount !== undefined && rpc.briberyAmount !== null
+        ? Number(rpc.briberyAmount)
+        : rpc.bribery_amount !== undefined && rpc.bribery_amount !== null
+        ? Number(rpc.bribery_amount)
+        : undefined,
+    frequency: rpc.frequency || undefined,
     utilityEndTime: rpc.utilityEndTime || rpc.utility_end_time || undefined,
     publishedDateBn,
     publishedDateEn,
