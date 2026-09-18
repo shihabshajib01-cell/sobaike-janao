@@ -38,6 +38,7 @@ export const UnsavedChangesDialog: React.FC<UnsavedChangesDialogProps> = ({
     footer={
       <ModalActions
         primary={{
+          id: `${id}-discard-btn`,
           type: 'button',
           variant: 'destructive',
           size: 'md',
@@ -45,6 +46,7 @@ export const UnsavedChangesDialog: React.FC<UnsavedChangesDialogProps> = ({
           label: language === 'bn' ? 'তথ্য বাতিল করুন' : 'Discard and close',
         }}
         secondary={{
+          id: `${id}-keep-editing-btn`,
           type: 'button',
           size: 'md',
           onClick: onKeepEditing,
