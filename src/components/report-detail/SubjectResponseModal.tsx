@@ -5,6 +5,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { ModalActions } from '../ui/ModalActions';
+import { UnsavedChangesDialog } from '../ui/UnsavedChangesDialog';
 
 /**
  * Rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -40,6 +41,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -47,6 +49,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       setIsSubmitting(false);
       setResponseId(null);
       setError(null);
+      setIsDiscardConfirmOpen(false);
     }
   }, [isOpen]);
 
@@ -119,7 +122,20 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     }
   };
 
+  const isDirty = Boolean(
+    responderName.trim() ||
+    designation.trim() ||
+    organizationName.trim() ||
+    contactEmailOrPhone.trim() ||
+    officialStatement.trim() ||
+    supportingDocumentsNote.trim() ||
+    requestCorrectionOrRemoval ||
+    correctionDetails.trim() ||
+    responderType !== 'mentioned_person'
+  );
+
   const handleResetAndClose = () => {
+    setResponderType('mentioned_person');
     setResponderName('');
     setDesignation('');
     setOrganizationName('');
@@ -132,16 +148,29 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     setIsSubmitting(false);
     setResponseId(null);
     setError(null);
+    setIsDiscardConfirmOpen(false);
     onClose();
   };
 
+  const handleRequestClose = () => {
+    if (isSubmitting) return;
+
+    if (!isSubmitted && isDirty) {
+      setIsDiscardConfirmOpen(true);
+      return;
+    }
+
+    handleResetAndClose();
+  };
+
   return (
-    <Modal
+    <>
+      <Modal
       id="subject-response-modal"
       isOpen={isOpen}
-      onClose={handleResetAndClose}
+      onClose={handleRequestClose}
       closeOnBackdrop={false}
-      closeOnEscape={false}
+      closeOnEscape={true}
       maxWidth="lg"
       language={language}
       title={
@@ -186,7 +215,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             secondary={{
               type: 'button',
               size: 'md',
-              onClick: handleResetAndClose,
+              onClick: handleRequestClose,
               disabled: isSubmitting,
               label: language === 'bn' ? 'বাতিল' : 'Cancel',
             }}
@@ -440,7 +469,16 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
         </form>
       )}
-    </Modal>
+      </Modal>
+
+      <UnsavedChangesDialog
+        id="subject-response-discard-confirm-modal"
+        isOpen={isDiscardConfirmOpen}
+        language={language}
+        onKeepEditing={() => setIsDiscardConfirmOpen(false)}
+        onDiscard={handleResetAndClose}
+      />
+    </>
   );
 };
 
