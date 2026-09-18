@@ -57,6 +57,9 @@ export const INITIAL_REPORT_FORM: ReportFormData = {
     showGeneralLocation: true,
     showDescription: true,
   },
+  formSchemaVersion: undefined,
+  formEngineMode: undefined,
+  customFieldAnswers: {},
 };
 
 export function generateSecureIdempotencyKey(): string {
@@ -104,6 +107,14 @@ export function hasMeaningfulReportInput(
   if (Boolean(form.intimateWhatHappened?.trim())) return true;
   if (Boolean(form.intimatePlatform?.trim())) return true;
   if (Boolean(form.relationshipContext?.trim())) return true;
+  if (
+    form.customFieldAnswers &&
+    Object.values(form.customFieldAnswers).some((value) => {
+      if (Array.isArray(value)) return value.length > 0;
+      if (typeof value === 'boolean') return value;
+      return value !== null && value !== undefined && String(value).trim() !== '';
+    })
+  ) return true;
   if (Boolean(form.location?.district?.trim())) return true;
   if (Boolean(form.location?.area?.trim())) return true;
   if (Boolean(form.location?.formattedAddress?.trim())) return true;
