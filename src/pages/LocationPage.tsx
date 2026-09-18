@@ -133,6 +133,8 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/location/${encodeURIComponent(locationId)}`,
+        pageType: 'collection',
       });
     } else {
       setDynamicSeo({
@@ -141,6 +143,8 @@ export const LocationPage: React.FC<LocationPageProps> = ({ locationId }) => {
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/location/${encodeURIComponent(locationId)}`,
+        pageType: 'collection',
       });
     }
   }, [district, isLoading, fetchError, language, setDynamicSeo]);
