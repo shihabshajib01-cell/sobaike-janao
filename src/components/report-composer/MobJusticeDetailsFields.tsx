@@ -2,7 +2,7 @@ import React from 'react';
 import { Users } from 'lucide-react';
 import { Accordion } from '../ui/Accordion';
 import { Select } from '../ui/Select';
-import { TextField } from '../ui/TextField';
+import { NumberField } from '../ui/NumberField';
 import {
   MobJusticeDetails,
   MobJusticeValidationErrors,
@@ -101,13 +101,11 @@ export const MobJusticeDetailsFields: React.FC<MobJusticeDetailsFieldsProps> = (
           />
         </div>
 
-        <TextField
+        <NumberField
           id="mob-justice-targeted-count"
-          type="number"
           min={1}
           max={9999}
-          step={1}
-          inputMode="numeric"
+          integer
           fieldClassName="max-w-sm"
           label={language === 'bn' ? 'কতজন ব্যক্তি মবের লক্ষ্য হয়েছেন?' : 'How many people were targeted?'}
           helperText={language === 'bn' ? 'ঐচ্ছিক' : 'Optional'}
