@@ -10,7 +10,6 @@ export interface ModalActionConfig
 export interface ModalActionsProps {
   primary: ModalActionConfig;
   secondary?: ModalActionConfig;
-  mobileOrder?: 'secondary-first' | 'primary-first';
   align?: 'end' | 'center';
   className?: string;
 }
@@ -18,32 +17,30 @@ export interface ModalActionsProps {
 export const ModalActions: React.FC<ModalActionsProps> = ({
   primary,
   secondary,
-  mobileOrder = 'secondary-first',
   align = 'end',
   className = '',
 }) => {
   const renderAction = (
     action: ModalActionConfig,
-    fallbackVariant: ButtonVariant,
-    orderClass: string
+    fallbackVariant: ButtonVariant
   ) => {
-    const { label, variant = fallbackVariant, className: actionClassName = '', ...buttonProps } = action;
+    const {
+      label,
+      variant = fallbackVariant,
+      className: actionClassName = '',
+      ...buttonProps
+    } = action;
 
     return (
       <Button
         {...buttonProps}
         variant={variant}
-        className={`w-full sm:w-auto ${orderClass} ${actionClassName}`}
+        className={`w-full sm:w-auto ${actionClassName}`}
       >
         {label}
       </Button>
     );
   };
-
-  const primaryOrder =
-    mobileOrder === 'primary-first' ? 'order-1 sm:order-2' : 'order-2 sm:order-2';
-  const secondaryOrder =
-    mobileOrder === 'primary-first' ? 'order-2 sm:order-1' : 'order-1 sm:order-1';
 
   return (
     <div
@@ -51,8 +48,8 @@ export const ModalActions: React.FC<ModalActionsProps> = ({
         align === 'center' ? 'sm:justify-center' : 'sm:justify-end'
       } ${className}`}
     >
-      {secondary ? renderAction(secondary, 'outline', secondaryOrder) : null}
-      {renderAction(primary, 'primary', primaryOrder)}
+      {secondary ? renderAction(secondary, 'outline') : null}
+      {renderAction(primary, 'primary')}
     </div>
   );
 };
