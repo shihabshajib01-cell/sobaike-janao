@@ -3,7 +3,7 @@ import { MapPin, AlertCircle } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { useApp } from '../../context/AppContext';
 import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
+import { ModalActions } from '../ui/ModalActions';
 
 interface LocationConsentModalProps {
   isOpen: boolean;
@@ -138,28 +138,27 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       showCloseButton={false}
       ariaDescribedBy="location-consent-desc"
       footer={
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            onClick={handleNotNow}
-            disabled={isLoading}
-            fullWidth
-          >
-            {isBn ? 'এখন নয়' : 'Not now'}
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            onClick={handleShareLocation}
-            isLoading={isLoading}
-            fullWidth
-          >
-            {isLoading ? (isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...') : (isBn ? 'লোকেশন চালু করুন' : 'Turn on location')}
-          </Button>
-        </div>
+        <ModalActions
+          mobileOrder="primary-first"
+          primary={{
+            id: 'location-consent-primary-btn',
+            type: 'button',
+            size: 'lg',
+            onClick: handleShareLocation,
+            isLoading,
+            label: isLoading
+              ? (isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...')
+              : (isBn ? 'লোকেশন চালু করুন' : 'Turn on location'),
+          }}
+          secondary={{
+            id: 'location-consent-secondary-btn',
+            type: 'button',
+            size: 'lg',
+            onClick: handleNotNow,
+            disabled: isLoading,
+            label: isBn ? 'এখন নয়' : 'Not now',
+          }}
+        />
       }
     >
       <div id="location-consent-desc" className="space-y-3">
