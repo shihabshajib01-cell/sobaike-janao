@@ -140,9 +140,14 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       setDynamicSeo({
         title: `${publicTitle} | ${BRAND_NAME[language]}`,
         description: publicDesc,
-        robots: 'index, follow',
+        robots: 'index, follow, max-image-preview:large',
         ogType: 'article',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/report-detail/${encodeURIComponent(report.id)}`,
+        image: report.images?.[0],
+        imageAlt: publicTitle,
+        pageType: 'article',
+        publishedTime: report.publishedAt || undefined,
       });
       return;
     }
@@ -157,6 +162,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         robots: 'noindex, follow',
         ogType: 'website',
         ogSiteName: BRAND_NAME[language],
+        canonicalPath: `/report-detail/${encodeURIComponent(reportId)}`,
+        pageType: 'website',
       });
       return;
     }
@@ -170,6 +177,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       robots: 'noindex, follow',
       ogType: 'article',
       ogSiteName: BRAND_NAME[language],
+      canonicalPath: `/report-detail/${encodeURIComponent(reportId)}`,
+      pageType: 'article',
     });
   }, [report, isLoading, language, setDynamicSeo]);
 
