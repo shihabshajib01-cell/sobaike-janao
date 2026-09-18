@@ -100,7 +100,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         className="absolute top-0 inset-x-0 p-4 flex items-center justify-between z-10 bg-gradient-to-b from-ui-media-gradient to-transparent"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-ui-media-viewer-text type-compact font-[var(--font-weight-medium)] tracking-wide">
+        <div role="status" aria-live="polite" aria-atomic="true" className="text-ui-media-viewer-text type-compact font-[var(--font-weight-medium)] tracking-wide">
           <span>
             {language === 'bn'
               ? `ছবি ${toBanglaNum(currentIndex + 1)} / ${toBanglaNum(images.length)}`
@@ -188,6 +188,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     ? `ছবি ${toBanglaNum(idx + 1)} দেখুন`
                     : `Go to image ${idx + 1}`
                 }
+                aria-current={idx === currentIndex ? 'true' : undefined}
                 className={`w-12 h-12 rounded-[var(--radius-badge-md)] overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus ${
                   idx === currentIndex
                     ? 'border-ui-accent scale-105 opacity-100'
