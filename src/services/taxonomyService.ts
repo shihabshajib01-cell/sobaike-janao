@@ -1,8 +1,6 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { SectionKey, SECTIONS } from '../theme/tokens';
 import { SubcategoryOption, SEGMENT_SUBCATEGORIES } from '../data/reportOptions';
 import { useState, useEffect } from 'react';
-import { PublicReportingConfigService } from './reportingFormConfig';
 
 export interface SupabaseSegmentRow {
   id: string;
@@ -170,6 +168,7 @@ export const TaxonomyService = {
    * Fetch active segments from Supabase with automatic fallback to local SECTIONS.
    */
   async fetchSegments(): Promise<Record<string, SegmentTaxonomyItem>> {
+    const { supabase, isSupabaseConfigured } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) {
       return cachedSegments;
     }
@@ -253,6 +252,7 @@ export const TaxonomyService = {
    * Fetch active subcategories from Supabase with automatic fallback to local SEGMENT_SUBCATEGORIES.
    */
   async fetchSubcategories(): Promise<Record<string, SubcategoryOption[]>> {
+    const { supabase, isSupabaseConfigured } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) {
       return cachedSubcategories;
     }
@@ -322,10 +322,6 @@ export const TaxonomyService = {
         this.fetchSegments(),
         this.fetchSubcategories(),
       ]);
-      // Form schemas are only needed inside the reporting workflow. Invalidate
-      // any older cached schema here, but defer the network request until the
-      // composer actually needs it.
-      PublicReportingConfigService.invalidate();
       isFetched = true;
       lastFetchedAt = Date.now();
       notifyListeners();
