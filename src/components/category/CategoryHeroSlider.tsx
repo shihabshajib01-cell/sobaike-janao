@@ -62,10 +62,12 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
 
   // Section key for CSS variables & art background override
   const sectionKey = section;
-  const isSectionActive = Boolean(segments[sectionKey]);
+  const sectionMeta = segments[sectionKey];
+  const isSectionActive = Boolean(sectionMeta);
   const heroBackground =
     HERO_TOKENS.sections[sectionKey]?.background ??
-    `var(--sec-${sectionKey}-bg)`;
+    sectionMeta?.bgColor ??
+    '#F0F3F9';
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
@@ -222,7 +224,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   const containerStyle: React.CSSProperties = {
     ...getHeroSliderCssVars(),
     backgroundColor: heroBackground,
-    borderColor: `var(--sec-${sectionKey}-border)`,
+    borderColor: sectionMeta?.borderColor ?? '#CCD5E8',
     touchAction: 'pan-y',
   };
 
