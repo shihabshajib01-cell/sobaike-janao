@@ -183,7 +183,13 @@ function isSeoIndexableReport(report) {
   ]
     .filter(Boolean)
     .join(' ');
-  return !SEO_TEST_MARKER_PATTERN.test(haystack);
+
+  const longestDescription = Math.max(
+    String(report.summaryBn || report.descriptionBn || '').trim().length,
+    String(report.summaryEn || report.descriptionEn || '').trim().length
+  );
+
+  return !SEO_TEST_MARKER_PATTERN.test(haystack) && longestDescription >= 50;
 }
 
 const canonicalUrl = (path) =>
