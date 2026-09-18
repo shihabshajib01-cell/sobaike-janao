@@ -192,7 +192,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
             <span className="type-meta whitespace-nowrap">{displayCount(engagement.viewCount)}</span>
           </div>
           <span className="h-5 w-px bg-ui-stroke-default mx-3 shrink-0" aria-hidden="true" />
-          <button type="button" onClick={handleShare} aria-label={language === 'bn' ? 'প্রতিবেদন শেয়ার করুন' : 'Share report'} className="inline-flex items-center justify-center w-10 h-10 min-w-10 min-h-10 rounded-full bg-ui-surface-subtle text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95">
+          <button type="button" onClick={handleShare} aria-label={language === 'bn' ? 'প্রতিবেদন শেয়ার করুন' : 'Share report'} className="inline-flex items-center justify-center w-10 h-10 min-w-10 min-h-10 ui-radius-pill bg-ui-surface-subtle text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95">
             {isCopied ? <AppIcon name="check" size="sm" className="text-ui-success-text" /> : <AppIcon name="share" size="sm" className="text-ui-content-secondary" />}
           </button>
         </div>
