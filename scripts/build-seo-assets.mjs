@@ -511,6 +511,22 @@ function injectStaticFallback(html, page) {
         ? 'This page contains moderated public-interest citizen reports for the selected topic or area. Review each report together with its description, location, publication time, sources, supporting information, and available updates. For emergencies, contact 999 or the appropriate official service.'
         : 'এই পৃষ্ঠায় সংশ্লিষ্ট বিষয়ের প্রকাশিত নাগরিক প্রতিবেদন দেখা যায়। সঠিক প্রেক্ষাপট বোঝার জন্য প্রতিটি প্রতিবেদনের শিরোনাম, বিবরণ, এলাকা, প্রকাশের সময়, উৎস এবং উপলব্ধ আপডেট দেখুন। জনস্বার্থের তথ্য দায়িত্বশীলভাবে ব্যবহার করুন এবং জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট সরকারি হটলাইনে যোগাযোগ করুন।';
 
+  const relatedReportLinks = (page.relatedReports || [])
+    .map((report) => {
+      const reportPath =
+        report.sourceLanguage === 'en' ? englishPath(report.path) : report.path;
+      return `<li><a href="${reportPath}">${htmlEscape(report.title)}</a></li>`;
+    })
+    .join('\n');
+
+  const relatedReportSection = relatedReportLinks
+    ? `
+        <section class="mt-8 space-y-3">
+          <h2>${isEnglish ? 'Published reports' : 'প্রকাশিত প্রতিবেদন'}</h2>
+          <ul>${relatedReportLinks}</ul>
+        </section>`
+    : '';
+
   const fallback = `
       <!-- SEO_FALLBACK_START -->
       <main id="seo-static-fallback" class="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 lg:px-8">
