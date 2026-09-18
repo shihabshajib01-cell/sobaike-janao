@@ -239,6 +239,22 @@ for (const file of standardModalSurfaces) {
   requireNotContains(file, 'showHeader={false}', 'standard dialogs must use the unified Modal header anatomy');
 }
 
+const approvedSpecializedDialogSurfaces = new Set([
+  'src/components/media/ImageViewer.tsx',
+  'src/components/media/AttachmentLightboxModal.tsx',
+]);
+
+for (const root of PUBLIC_UI_ROOTS) {
+  for (const filePath of walk(root)) {
+    const relative = path.relative(ROOT, filePath).replaceAll('\\', '/');
+    if (relative === 'src/components/ui/Modal.tsx' || approvedSpecializedDialogSurfaces.has(relative)) continue;
+    const source = fs.readFileSync(filePath, 'utf8');
+    if (source.includes('role="dialog"') || source.includes("role='dialog'")) {
+      failures.push(`${relative}: raw dialog shells are forbidden; use the shared Modal system`);
+    }
+  }
+}
+
 requireContains(
   'src/components/ui/Modal.tsx',
   'headerIcon?: React.ReactNode;',
