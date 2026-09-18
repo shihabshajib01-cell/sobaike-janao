@@ -49,6 +49,9 @@ jobs:
           test -f supabase/migrations/20260915164500_public_security_surface_limits.sql
           test -f supabase/migrations/20260915165000_public_security_policy_cleanup.sql
 
+      - name: Integration contract audit
+        run: npm run audit:integration-contract
+
       - name: Design-system source audit
         run: npm run audit:design-system
 
