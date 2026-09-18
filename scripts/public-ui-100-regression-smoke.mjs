@@ -185,9 +185,16 @@ await check('All seven category pages preserve the shared mobile navigation cont
     if ((await page.locator('#bottom-nav').count()) !== 0) {
       throw new Error(`${route} incorrectly shows the global bottom navigation`);
     }
-    if ((await page.locator('#desktop-category-filter-slot').count()) !== 1) {
-      throw new Error(`${route} does not resolve through the shared CategoryFeedView`);
-    }
+    const sectionId = route.replace(/^\//, '').replace(/-/g, '_');
+    const sharedFeedSection = page.locator(
+      sectionId === 'load_shedding'
+        ? '#load_shedding-filter-section'
+        : `#${sectionId}-filter-section`
+    );
+    await expectVisible(
+      sharedFeedSection,
+      `${route} does not render the shared CategoryFeedView section`
+    );
   }
 
   await context.close();
@@ -201,7 +208,7 @@ await check('Explore analytics provide accessible chart drilldowns', async () =>
 
   await expectVisible(page.locator('#explore-report-analytics'), 'Explore report summary did not load');
   await expectVisible(
-    page.locator('#explore-category-distribution svg'),
+    page.locator('#explore-category-share-donut'),
     'Category share chart did not render'
   );
   await expectVisible(
@@ -279,7 +286,7 @@ await check('Dark semantic surfaces retain distinct visual hierarchy', async () 
   if (themeOptionCount !== 3) {
     throw new Error(`expected 3 theme options, found ${themeOptionCount}`);
   }
-  const darkOption = themeOptions.filter({ hasText: 'Dark' }).first();
+  const darkOption = themeOptions.nth(1);
   await expectVisible(darkOption, 'dark theme control missing');
   await darkOption.click();
   await page.waitForTimeout(150);
