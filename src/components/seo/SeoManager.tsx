@@ -32,14 +32,25 @@ export const SeoManager: React.FC<SeoManagerProps> = ({ children }) => {
     setDynamicSeo(null);
   }, [location.pathname]);
 
-  // Apply SEO metadata whenever route, language, or dynamic override changes
+  // Apply SEO metadata whenever route, language, or dynamic override changes.
+  // Server-generated dynamic routes already ship with their final crawlable metadata.
+  // Preserve that metadata until the page data resolves instead of replacing it with
+  // a temporary noindex/loading state during hydration.
   useEffect(() => {
     if (dynamicSeo) {
       applySeoMetadata(dynamicSeo, language);
-    } else {
-      const staticMeta = getStaticSeo(location.pathname, language);
-      applySeoMetadata(staticMeta, language);
+      return;
     }
+
+    const isServerBackedDynamicRoute =
+      location.pathname.startsWith('/report-detail/') ||
+      location.pathname.startsWith('/location/') ||
+      location.pathname.startsWith('/category/');
+
+    if (isServerBackedDynamicRoute) return;
+
+    const staticMeta = getStaticSeo(location.pathname, language);
+    applySeoMetadata(staticMeta, language);
   }, [location.pathname, language, dynamicSeo]);
 
   const value = useMemo(
