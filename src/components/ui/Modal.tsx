@@ -142,7 +142,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 backdrop-blur-xs transition-opacity bg-ui-overlay"
+        className="absolute inset-0 backdrop-blur-xs transition-opacity bg-role-overlay"
         onClick={closeOnBackdrop ? onClose : undefined}
         aria-hidden="true"
       />
@@ -151,32 +151,32 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className={`relative ${maxWidthClass} ${cardShapeClasses} bg-ui-surface border-ui-stroke-subtle shadow-[var(--elevation-2xl)] flex flex-col overflow-hidden z-10 text-left outline-none ${containerClassName}`}
+        className={`relative ${maxWidthClass} ${cardShapeClasses} bg-role-surface border-role-outline-subtle shadow-[var(--elevation-2xl)] flex flex-col overflow-hidden z-10 text-left outline-none ${containerClassName}`}
       >
         {/* Grab handle for bottom sheet on mobile */}
         {effectiveMobilePresentation === 'sheet' && (
           <div className="w-full flex justify-center pt-3 pb-1 md:hidden shrink-0" aria-hidden="true">
-            <div className="w-10 h-1.5 rounded-[var(--radius-pill)] bg-ui-surface-hover" />
+            <div className="w-10 h-1.5 rounded-[var(--radius-pill)] bg-role-surface-hover" />
           </div>
         )}
 
         {/* Unified modal header */}
         {showHeader && (title || description || headerIcon) && (
-          <div className={`flex items-start justify-between px-5 sm:px-6 py-4 sm:py-5 border-b border-ui-stroke-subtle bg-ui-surface shrink-0 gap-3 ${headerClassName}`}>
+          <div className={`flex items-start justify-between px-5 sm:px-6 py-4 sm:py-5 border-b border-role-outline-subtle bg-role-surface shrink-0 gap-3 ${headerClassName}`}>
             <div className="flex items-start gap-3.5 min-w-0 flex-1">
               {headerIcon && (
-                <div className="w-11 h-11 ui-radius-control bg-ui-surface-subtle text-ui-content-secondary ui-border-default border-ui-stroke-subtle flex items-center justify-center shrink-0">
+                <div className="w-11 h-11 ui-radius-control bg-role-surface-subtle text-role-on-surface-secondary ui-border-default border-role-outline-subtle flex items-center justify-center shrink-0">
                   {headerIcon}
                 </div>
               )}
               <div className="min-w-0 flex-1 pt-0.5">
                 {title && (
-                  <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
+                  <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-semibold)] text-role-on-surface leading-snug">
                     {title}
                   </h2>
                 )}
                 {description && (
-                  <p id={`${id}-desc`} className="type-helper text-ui-content-secondary mt-1 leading-normal">
+                  <p id={`${id}-desc`} className="type-helper text-role-on-surface-secondary mt-1 leading-normal">
                     {description}
                   </p>
                 )}
@@ -189,7 +189,7 @@ export const Modal: React.FC<ModalProps> = ({
                 aria-label={closeLabel}
                 size="md"
                 onClick={onClose}
-                className="text-ui-content-secondary -mt-1"
+                className="text-role-on-surface-secondary -mt-1"
               />
             )}
           </div>
@@ -203,7 +203,7 @@ export const Modal: React.FC<ModalProps> = ({
               : maxWidth === 'composer'
               ? 'flex flex-col overflow-hidden'
               : 'overflow-y-auto overscroll-contain'
-          } text-ui-content-primary ${
+          } text-role-on-surface ${
             showHeader && (title || description || headerIcon)
               ? !footer && effectiveMobilePresentation === 'sheet'
                 ? 'px-5 sm:px-6 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-6'
@@ -219,7 +219,7 @@ export const Modal: React.FC<ModalProps> = ({
         {/* Footer */}
         {footer && (
           <div
-            className={`flex items-center justify-end gap-2.5 px-5 sm:px-6 py-3.5 sm:py-4 bg-ui-surface border-t border-ui-stroke-subtle shrink-0 ${
+            className={`flex items-center justify-end gap-2.5 px-5 sm:px-6 py-3.5 sm:py-4 bg-role-surface border-t border-role-outline-subtle shrink-0 ${
               effectiveMobilePresentation === 'sheet'
                 ? 'pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-4'
                 : ''

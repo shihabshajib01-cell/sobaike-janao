@@ -2,169 +2,11 @@
  * Sobaike Janao public design-system authority layer.
  *
  * Imported after legacy/base styles so every public surface resolves through one
- * semantic visual contract. Keep page/component code on semantic `ui-*` and
- * `sec-*` variables; do not introduce page-specific colors here.
+ * semantic visual contract. Color values live in `color-system.css`. New shared UI should consume Material-style
+ * `role-*` utilities; legacy `ui-*` / `sec-*` names remain compatibility-only.
  */
 
-:root,
-html[data-theme="light"] {
-  --ui-page: #F0F2F5;
-  --ui-surface: #FFFFFF;
-  --ui-surface-subtle: #F0F2F5;
-  --ui-surface-elevated: #FFFFFF;
-  --ui-surface-hover: #E4E6EB;
-
-  --ui-text-primary: #050505;
-  --ui-text-secondary: #65676B;
-  --ui-text-muted: #65676B;
-  --ui-text-inverse: #FFFFFF;
-
-  --ui-border-subtle: #E4E6EB;
-  --ui-border: #E4E6EB;
-  --ui-border-strong: #E4E6EB;
-
-  --ui-input: #FFFFFF;
-  --ui-input-placeholder: #65676B;
-  --ui-disabled-bg: #E4E6EB;
-  --ui-disabled-text: #65676B;
-  --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.14);
-
-  --sec-harassment-primary: #B84A62;
-  --sec-harassment-hover: #9E384E;
-  --sec-harassment-bg: #FDF2F4;
-  --sec-harassment-border: #F7CCD5;
-  --sec-harassment-text: #8B293E;
-  --sec-harassment-on-primary: #FFFFFF;
-
-  --sec-extortion-primary: #4F5D95;
-  --sec-extortion-hover: #3E4A7A;
-  --sec-extortion-bg: #F0F3F9;
-  --sec-extortion-border: #CCD5E8;
-  --sec-extortion-text: #333E67;
-  --sec-extortion-on-primary: #FFFFFF;
-
-  --sec-public_safety-primary: #2563EB;
-  --sec-public_safety-hover: #1D4ED8;
-  --sec-public_safety-bg: #EFF6FF;
-  --sec-public_safety-border: #BFDBFE;
-  --sec-public_safety-text: #1E40AF;
-  --sec-public_safety-on-primary: #FFFFFF;
-
-  --sec-road_transport-primary: #A16207;
-  --sec-road_transport-hover: #854D0E;
-  --sec-road_transport-bg: #FFFBEB;
-  --sec-road_transport-border: #FDE68A;
-  --sec-road_transport-text: #854D0E;
-  --sec-road_transport-on-primary: #FFFFFF;
-
-  --sec-load_shedding-primary: #0D9488;
-  --sec-load_shedding-hover: #0F766E;
-  --sec-load_shedding-bg: #F0FDFA;
-  --sec-load_shedding-border: #CCFBF1;
-  --sec-load_shedding-text: #115E59;
-  --sec-load_shedding-on-primary: #050505;
-
-  --sec-load-shedding-primary: var(--sec-load_shedding-primary);
-  --sec-load-shedding-hover: var(--sec-load_shedding-hover);
-  --sec-load-shedding-bg: var(--sec-load_shedding-bg);
-  --sec-load-shedding-border: var(--sec-load_shedding-border);
-  --sec-load-shedding-text: var(--sec-load_shedding-text);
-  --sec-load-shedding-on-primary: var(--sec-load_shedding-on-primary);
-
-  --sec-illegal_occupation-primary: #64748B;
-  --sec-illegal_occupation-hover: #475569;
-  --sec-illegal_occupation-bg: #F8FAFC;
-  --sec-illegal_occupation-border: #CBD5E1;
-  --sec-illegal_occupation-text: #334155;
-  --sec-illegal_occupation-on-primary: #FFFFFF;
-
-  --sec-rickshaw-primary: #D9822B;
-  --sec-rickshaw-hover: #B8681A;
-  --sec-rickshaw-bg: #FEF7EE;
-  --sec-rickshaw-border: #FBDDB9;
-  --sec-rickshaw-text: #9A530C;
-  --sec-rickshaw-on-primary: #050505;
-}
-
-html[data-theme="dark"],
-.dark {
-  --ui-page: #18191A;
-  --ui-surface: #242526;
-  --ui-surface-subtle: #242526;
-  --ui-surface-elevated: #242526;
-  --ui-surface-hover: #3A3B3C;
-
-  --ui-text-primary: #E4E6EB;
-  --ui-text-secondary: #B0B3B8;
-  --ui-text-muted: #B0B3B8;
-  --ui-text-inverse: #FFFFFF;
-
-  --ui-border-subtle: #3A3B3C;
-  --ui-border: #3A3B3C;
-  --ui-border-strong: #3A3B3C;
-
-  --ui-input: #242526;
-  --ui-input-placeholder: #B0B3B8;
-  --ui-disabled-bg: #3A3B3C;
-  --ui-disabled-text: #B0B3B8;
-  --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.32);
-
-  --sec-harassment-primary: #B84A62;
-  --sec-harassment-hover: #D05B75;
-  --sec-harassment-bg: #211619;
-  --sec-harassment-border: #4A2931;
-  --sec-harassment-text: #E7AAB8;
-  --sec-harassment-on-primary: #FFFFFF;
-
-  --sec-extortion-primary: #4F5D95;
-  --sec-extortion-hover: #6777B8;
-  --sec-extortion-bg: #171A25;
-  --sec-extortion-border: #333B5D;
-  --sec-extortion-text: #AFB9E1;
-  --sec-extortion-on-primary: #FFFFFF;
-
-  --sec-public_safety-primary: #60A5FA;
-  --sec-public_safety-hover: #93C5FD;
-  --sec-public_safety-bg: #101E32;
-  --sec-public_safety-border: #254B78;
-  --sec-public_safety-text: #BFDBFE;
-  --sec-public_safety-on-primary: #050505;
-
-  --sec-road_transport-primary: #FBBF24;
-  --sec-road_transport-hover: #FCD34D;
-  --sec-road_transport-bg: #2A2110;
-  --sec-road_transport-border: #6B4E12;
-  --sec-road_transport-text: #FDE68A;
-  --sec-road_transport-on-primary: #050505;
-
-  --sec-load_shedding-primary: #14B8A6;
-  --sec-load_shedding-hover: #2DD4BF;
-  --sec-load_shedding-bg: #112220;
-  --sec-load_shedding-border: #1D433F;
-  --sec-load_shedding-text: #99F6E4;
-  --sec-load_shedding-on-primary: #050505;
-
-  --sec-load-shedding-primary: var(--sec-load_shedding-primary);
-  --sec-load-shedding-hover: var(--sec-load_shedding-hover);
-  --sec-load-shedding-bg: var(--sec-load_shedding-bg);
-  --sec-load-shedding-border: var(--sec-load_shedding-border);
-  --sec-load-shedding-text: var(--sec-load_shedding-text);
-  --sec-load-shedding-on-primary: var(--sec-load_shedding-on-primary);
-
-  --sec-illegal_occupation-primary: #94A3B8;
-  --sec-illegal_occupation-hover: #CBD5E1;
-  --sec-illegal_occupation-bg: #1E293B;
-  --sec-illegal_occupation-border: #475569;
-  --sec-illegal_occupation-text: #E2E8F0;
-  --sec-illegal_occupation-on-primary: #050505;
-
-  --sec-rickshaw-primary: #D9822B;
-  --sec-rickshaw-hover: #E89540;
-  --sec-rickshaw-bg: #21190F;
-  --sec-rickshaw-border: #54371C;
-  --sec-rickshaw-text: #E9B579;
-  --sec-rickshaw-on-primary: #050505;
-}
+/* Color roles are defined exclusively in color-system.css. */
 
 :root {
   --layout-rail-desktop: 240px;
@@ -175,8 +17,8 @@ html[data-theme="dark"],
 }
 
 .ui-card {
-  background-color: var(--ui-surface);
-  border: var(--border-width-default) var(--border-style-default) var(--ui-border-subtle);
+  background-color: var(--md-surface);
+  border: var(--border-width-default) var(--border-style-default) var(--md-outline-subtle);
   border-radius: var(--radius-card);
   box-shadow: var(--elevation-card);
 }

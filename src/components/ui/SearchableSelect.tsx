@@ -207,12 +207,12 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div
             ref={panelRef}
             style={panelStyle}
-            className="z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-control)] border border-ui-stroke-default bg-ui-surface shadow-[var(--elevation-xl)]"
+            className="z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-control)] border border-role-outline bg-role-surface shadow-[var(--elevation-xl)]"
           >
-            <div className="shrink-0 p-2 border-b border-ui-stroke-subtle bg-ui-surface">
+            <div className="shrink-0 p-2 border-b border-role-outline-subtle bg-role-surface">
               <div className="relative">
                 <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ui-content-muted pointer-events-none"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-role-on-surface-muted pointer-events-none"
                   aria-hidden="true"
                 />
                 <input
@@ -227,7 +227,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   aria-activedescendant={
                     activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
                   }
-                  className="w-full min-h-[44px] rounded-[var(--radius-badge-md)] border border-ui-stroke-default bg-ui-surface pl-9 pr-3 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus"
+                  className="w-full min-h-[44px] rounded-[var(--radius-badge-md)] border border-role-outline bg-role-surface pl-9 pr-3 text-role-on-surface placeholder:text-role-on-surface-muted focus:outline-none focus:ring-2 focus:ring-role-focus"
                 />
               </div>
             </div>
@@ -238,7 +238,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               className="min-h-0 flex-1 overflow-y-auto p-1.5 overscroll-contain"
             >
               {filteredOptions.length === 0 ? (
-                <p className="px-3 py-4 type-compact text-ui-content-muted text-center">
+                <p className="px-3 py-4 type-compact text-role-on-surface-muted text-center">
                   {noResultsText}
                 </p>
               ) : (
@@ -255,13 +255,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                       disabled={option.disabled}
                       onMouseEnter={() => !option.disabled && setActiveIndex(index)}
                       onClick={() => selectValue(option.value)}
-                      className={`w-full min-h-[44px] px-3 py-2 rounded-[var(--radius-badge-md)] flex items-center justify-between gap-3 text-left type-compact text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus disabled:opacity-50 disabled:cursor-not-allowed ${
-                        isActive ? 'bg-ui-surface-subtle' : 'hover:bg-ui-surface-subtle'
+                      className={`w-full min-h-[44px] px-3 py-2 rounded-[var(--radius-badge-md)] flex items-center justify-between gap-3 text-left type-compact text-role-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isActive ? 'bg-role-surface-subtle' : 'hover:bg-role-surface-subtle'
                       }`}
                     >
                       <span>{option.label}</span>
                       {isSelected && (
-                        <Check className="w-4 h-4 shrink-0 text-ui-accent" aria-hidden="true" />
+                        <Check className="w-4 h-4 shrink-0 text-role-secondary" aria-hidden="true" />
                       )}
                     </button>
                   );
@@ -276,10 +276,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   return (
     <div ref={rootRef} className={`relative w-full text-left ${className}`}>
       {label && (
-        <label id={`${controlId}-label`} className="block type-label text-ui-content-primary mb-1.5">
+        <label id={`${controlId}-label`} className="block type-label text-role-on-surface mb-1.5">
           {label}
           {required && (
-            <span className="text-ui-validation-text ml-1" aria-hidden="true">
+            <span className="text-role-validation ml-1" aria-hidden="true">
               *
             </span>
           )}
@@ -309,13 +309,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               }
             }
           }}
-          className={`w-full min-h-[44px] bg-ui-surface text-left ui-border-default ui-radius-control px-3.5 pr-10 transition-colors focus:outline-none focus:ring-2 disabled:bg-ui-surface-subtle disabled:text-ui-content-muted disabled:cursor-not-allowed ${
+          className={`w-full min-h-[44px] bg-role-surface text-left ui-border-default ui-radius-control px-3.5 pr-10 transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
             error
-              ? 'border-ui-validation-border focus:ring-ui-validation-focus focus:border-ui-validation-focus'
-              : 'border-ui-stroke-default hover:border-ui-stroke-strong focus:ring-ui-focus'
+              ? 'border-role-validation-outline focus:ring-role-validation-focus focus:border-role-validation-focus'
+              : 'border-role-outline hover:border-role-outline-strong focus:ring-role-focus'
           }`}
         >
-          <span className={selected ? 'text-ui-content-primary' : 'text-ui-content-muted'}>
+          <span className={selected ? 'text-role-on-surface' : 'text-role-on-surface-muted'}>
             {selected?.label || placeholder}
           </span>
         </button>
@@ -324,7 +324,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           {clearable && value && !disabled && (
             <button
               type="button"
-              className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-[var(--radius-badge-md)] text-ui-content-muted hover:text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-[var(--radius-badge-md)] text-role-on-surface-muted hover:text-role-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
               aria-label={resolvedClearLabel}
               onClick={(event) => {
                 event.stopPropagation();
@@ -336,7 +336,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             </button>
           )}
           <ChevronDown
-            className={`w-4 h-4 text-ui-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-role-on-surface-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
             aria-hidden="true"
           />
         </div>
@@ -345,12 +345,12 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       {dropdown}
 
       {error && (
-        <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-ui-validation-text font-[var(--font-weight-medium)]">
+        <p id={`${controlId}-error`} role="alert" className="mt-1.5 type-helper text-role-validation font-[var(--font-weight-medium)]">
           {error}
         </p>
       )}
       {!error && helperText && (
-        <p id={`${controlId}-helper`} className="mt-1.5 type-helper text-ui-content-muted">
+        <p id={`${controlId}-helper`} className="mt-1.5 type-helper text-role-on-surface-muted">
           {helperText}
         </p>
       )}

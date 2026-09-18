@@ -28,7 +28,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center type-action transition-colors focus:outline-none focus:ring-2 focus:ring-ui-focus focus:ring-offset-1 select-none cursor-pointer disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-ui-disabled-bg disabled:text-ui-disabled-text disabled:border-ui-stroke-subtle disabled:hover:bg-ui-disabled-bg disabled:hover:text-ui-disabled-text disabled:active:opacity-100';
+    'inline-flex items-center justify-center type-action transition-colors focus:outline-none focus:ring-2 focus:ring-role-focus focus:ring-offset-1 select-none cursor-pointer disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-role-disabled-container disabled:text-role-on-disabled disabled:border-role-outline-subtle disabled:hover:bg-role-disabled-container disabled:hover:text-role-on-disabled disabled:active:opacity-100';
 
   const sizeClasses: Record<ButtonSize, string> = {
     sm: 'ui-space-button-sm min-h-[44px] ui-radius-control',
@@ -38,15 +38,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantClasses: Record<ButtonVariant, string> = {
     primary:
-      'bg-ui-action-bg text-ui-action-text hover:bg-ui-action-hover active:opacity-90 ui-border-default border-transparent ui-elevation-control',
+      'bg-role-primary text-role-on-primary hover:bg-role-primary-variant active:opacity-90 ui-border-default border-transparent ui-elevation-control',
     secondary:
-      'bg-ui-surface-subtle text-ui-content-primary hover:bg-ui-surface-elevated active:bg-ui-surface-hover ui-border-default border-ui-stroke-subtle',
+      'bg-role-surface-subtle text-role-on-surface hover:bg-role-surface-elevated active:bg-role-surface-hover ui-border-default border-role-outline-subtle',
     outline:
-      'bg-ui-surface text-ui-content-primary hover:bg-ui-surface-subtle active:bg-ui-surface-hover ui-border-default border-ui-stroke-default ui-elevation-control',
+      'bg-role-surface text-role-on-surface hover:bg-role-surface-subtle active:bg-role-surface-hover ui-border-default border-role-outline ui-elevation-control',
     ghost:
-      'bg-transparent text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle active:bg-ui-surface-hover ui-border-default border-transparent',
+      'bg-transparent text-role-on-surface-secondary hover:text-role-on-surface hover:bg-role-surface-subtle active:bg-role-surface-hover ui-border-default border-transparent',
     destructive:
-      'bg-ui-destructive-bg text-ui-destructive-text hover:bg-ui-destructive-hover active:bg-ui-destructive-active ui-border-default border-ui-destructive-border ui-elevation-control',
+      'bg-role-destructive text-role-on-destructive hover:bg-role-destructive-hover active:bg-role-destructive-active ui-border-default border-role-destructive-outline ui-elevation-control',
   };
 
   const widthClass = fullWidth ? 'w-full' : '';

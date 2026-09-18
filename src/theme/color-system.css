@@ -1,0 +1,454 @@
+/*
+ * Sobaike Janao Public color system.
+ *
+ * Material Design 2 inspired role architecture:
+ * product roles -> surface roles -> semantic roles -> category roles.
+ *
+ * This file is the single authority for public color VALUES.
+ * Other theme files may expose utilities/aliases but must not redefine these values.
+ */
+
+:root {
+  /* Specialized media/viewer roles (theme-independent dark canvas). */
+  --media-viewer-background: #171717;
+  --media-viewer-background-elevated: rgba(23, 23, 23, 0.94);
+  --media-viewer-on-background: #FFFFFF;
+  --media-viewer-on-background-muted: rgba(255, 255, 255, 0.55);
+  --media-viewer-outline: rgba(255, 255, 255, 0.16);
+  --media-viewer-control: rgba(23, 23, 23, 0.82);
+  --media-viewer-control-hover: #171717;
+  --media-viewer-focus: #FFFFFF;
+  --media-viewer-backdrop: rgba(0, 0, 0, 0.85);
+  --media-viewer-stage: rgba(0, 0, 0, 0.95);
+  --media-viewer-chip: rgba(255, 255, 255, 0.10);
+  --media-viewer-chip-hover: rgba(255, 255, 255, 0.20);
+  --media-viewer-strip: rgba(0, 0, 0, 0.40);
+  --media-viewer-outline-soft: rgba(255, 255, 255, 0.05);
+  --media-viewer-outline-strong: rgba(255, 255, 255, 0.20);
+  --media-overlay-soft: rgba(0, 0, 0, 0.25);
+  --media-overlay-strong: rgba(0, 0, 0, 0.60);
+  --media-overlay-label: rgba(0, 0, 0, 0.75);
+  --media-overlay-max: rgba(0, 0, 0, 0.90);
+  --media-gradient: rgba(0, 0, 0, 0.80);
+  --debug-overlay: rgba(0, 0, 0, 0.80);
+  --debug-on-overlay: #FFFFFF;
+  --debug-on-overlay-muted: rgba(255, 255, 255, 0.55);
+  --debug-outline: rgba(255, 255, 255, 0.20);
+
+  /* Destructive action is intentionally distinct from passive error messaging. */
+  --md-destructive: oklch(57.7% .245 27.325);
+  --md-destructive-hover: oklch(50.5% .213 27.518);
+  --md-destructive-active: oklch(44.4% .177 26.899);
+  --md-on-destructive: #FFFFFF;
+  --md-destructive-outline: var(--md-destructive);
+
+  /* Hero artwork text/backgrounds preserve the approved current visual identity. */
+  --hero-text-primary: #102A43;
+  --hero-text-secondary: #596579;
+  --hero-harassment-container: #FEEAEC;
+  --hero-extortion-container: #FEEADE;
+  --hero-public-safety-container: #EFF6FF;
+  --hero-road-transport-container: #FFFBEB;
+  --hero-load-shedding-container: #FEEDD4;
+  --hero-illegal-occupation-container: #F8FAFC;
+  --hero-rickshaw-container: #E4F8EE;
+}
+
+:root,
+html[data-theme="light"] {
+  /* Material product roles */
+  --md-primary: #1B4D6B;
+  --md-primary-variant: #163B52;
+  --md-primary-active: #245F82;
+  --md-on-primary: #FFFFFF;
+
+  --md-secondary: #3A7CA5;
+  --md-secondary-variant: #163B52;
+  --md-on-secondary: #FFFFFF;
+  --md-secondary-container: color-mix(in srgb, var(--md-secondary) 12%, var(--md-surface));
+  --md-on-secondary-container: #163B52;
+  --md-secondary-outline: color-mix(in srgb, var(--md-secondary) 35%, var(--md-surface));
+
+  --md-background: #F0F2F5;
+  --md-on-background: #050505;
+
+  --md-surface: #FFFFFF;
+  --md-surface-subtle: #F0F2F5;
+  --md-surface-elevated: #FFFFFF;
+  --md-surface-hover: #E4E6EB;
+  --md-on-surface: #050505;
+  --md-on-surface-secondary: #65676B;
+  --md-on-surface-muted: #65676B;
+
+  --md-outline-subtle: #E4E6EB;
+  --md-outline: #E4E6EB;
+  --md-outline-strong: #E4E6EB;
+
+  --md-focus: #3A7CA5;
+  --md-overlay: rgba(5, 5, 5, 0.55);
+
+  --md-disabled-container: #E4E6EB;
+  --md-on-disabled: #65676B;
+
+  /* Extended semantic roles */
+  --md-success: #15803D;
+  --md-on-success: #FFFFFF;
+  --md-success-container: #F0FDF4;
+  --md-on-success-container: #15803D;
+  --md-success-outline: #BBF7D0;
+
+  --md-warning: #B45309;
+  --md-on-warning: #FFFFFF;
+  --md-warning-container: #FFFBEB;
+  --md-on-warning-container: #B45309;
+  --md-warning-outline: #FDE68A;
+
+  --md-error: #B91C1C;
+  --md-on-error: #FFFFFF;
+  --md-error-container: #FEF2F2;
+  --md-on-error-container: #B91C1C;
+  --md-error-outline: #FECACA;
+
+  --md-info: #1D4ED8;
+  --md-on-info: #FFFFFF;
+  --md-info-container: #EFF6FF;
+  --md-on-info-container: #1D4ED8;
+  --md-info-outline: #BFDBFE;
+
+  --md-validation: oklch(57.7% .245 27.325);
+  --md-validation-outline: oklch(63.7% .237 25.331);
+  --md-validation-focus: oklch(63.7% .237 25.331);
+
+  --md-sensitive-container: #FFF5F7;
+  --md-sensitive-outline: #F3C7D1;
+  --md-on-sensitive-container: #7A2338;
+  --md-on-sensitive-container-muted: #9B5364;
+
+  /* Category alternative-color roles */
+  --category-harassment-primary: #B84A62;
+  --category-harassment-hover: #9E384E;
+  --category-harassment-on-primary: #FFFFFF;
+  --category-harassment-container: #FDF2F4;
+  --category-harassment-on-container: #8B293E;
+  --category-harassment-outline: #F7CCD5;
+
+  --category-extortion-primary: #4F5D95;
+  --category-extortion-hover: #3E4A7A;
+  --category-extortion-on-primary: #FFFFFF;
+  --category-extortion-container: #F0F3F9;
+  --category-extortion-on-container: #333E67;
+  --category-extortion-outline: #CCD5E8;
+
+  --category-public_safety-primary: #2563EB;
+  --category-public_safety-hover: #1D4ED8;
+  --category-public_safety-on-primary: #FFFFFF;
+  --category-public_safety-container: #EFF6FF;
+  --category-public_safety-on-container: #1E40AF;
+  --category-public_safety-outline: #BFDBFE;
+
+  --category-road_transport-primary: #A16207;
+  --category-road_transport-hover: #854D0E;
+  --category-road_transport-on-primary: #FFFFFF;
+  --category-road_transport-container: #FFFBEB;
+  --category-road_transport-on-container: #854D0E;
+  --category-road_transport-outline: #FDE68A;
+
+  --category-load_shedding-primary: #0D9488;
+  --category-load_shedding-hover: #0F766E;
+  --category-load_shedding-on-primary: #050505;
+  --category-load_shedding-container: #F0FDFA;
+  --category-load_shedding-on-container: #115E59;
+  --category-load_shedding-outline: #CCFBF1;
+
+  --category-illegal_occupation-primary: #64748B;
+  --category-illegal_occupation-hover: #475569;
+  --category-illegal_occupation-on-primary: #FFFFFF;
+  --category-illegal_occupation-container: #F8FAFC;
+  --category-illegal_occupation-on-container: #334155;
+  --category-illegal_occupation-outline: #CBD5E1;
+
+  --category-rickshaw-primary: #D9822B;
+  --category-rickshaw-hover: #B8681A;
+  --category-rickshaw-on-primary: #050505;
+  --category-rickshaw-container: #FEF7EE;
+  --category-rickshaw-on-container: #9A530C;
+  --category-rickshaw-outline: #FBDDB9;
+}
+
+html[data-theme="dark"],
+.dark {
+  /* Material product roles */
+  --md-primary: #1B4D6B;
+  --md-primary-variant: #163B52;
+  --md-primary-active: #245F82;
+  --md-on-primary: #FFFFFF;
+
+  --md-secondary: #3A7CA5;
+  --md-secondary-variant: #245F82;
+  --md-on-secondary: #FFFFFF;
+  --md-secondary-container: color-mix(in srgb, var(--md-secondary) 18%, var(--md-surface));
+  --md-on-secondary-container: #BFDBFE;
+  --md-secondary-outline: color-mix(in srgb, var(--md-secondary) 40%, var(--md-surface));
+
+  --md-background: #18191A;
+  --md-on-background: #E4E6EB;
+
+  --md-surface: #242526;
+  --md-surface-subtle: #242526;
+  --md-surface-elevated: #242526;
+  --md-surface-hover: #3A3B3C;
+  --md-on-surface: #E4E6EB;
+  --md-on-surface-secondary: #B0B3B8;
+  --md-on-surface-muted: #B0B3B8;
+
+  --md-outline-subtle: #3A3B3C;
+  --md-outline: #3A3B3C;
+  --md-outline-strong: #3A3B3C;
+
+  --md-focus: #3A7CA5;
+  --md-overlay: rgba(0, 0, 0, 0.72);
+
+  --md-disabled-container: #3A3B3C;
+  --md-on-disabled: #B0B3B8;
+
+  /* Extended semantic roles */
+  --md-success: #86EFAC;
+  --md-on-success: #050505;
+  --md-success-container: #10261A;
+  --md-on-success-container: #86EFAC;
+  --md-success-outline: #1F5A35;
+
+  --md-warning: #FCD34D;
+  --md-on-warning: #050505;
+  --md-warning-container: #2A2110;
+  --md-on-warning-container: #FCD34D;
+  --md-warning-outline: #6B4E12;
+
+  --md-error: #FCA5A5;
+  --md-on-error: #050505;
+  --md-error-container: #2B1416;
+  --md-on-error-container: #FCA5A5;
+  --md-error-outline: #6B252A;
+
+  --md-info: #93C5FD;
+  --md-on-info: #050505;
+  --md-info-container: #101E32;
+  --md-on-info-container: #93C5FD;
+  --md-info-outline: #254B78;
+
+  --md-validation: oklch(70.4% .191 22.216);
+  --md-validation-outline: oklch(70.4% .191 22.216);
+  --md-validation-focus: oklch(63.7% .237 25.331);
+
+  --md-sensitive-container: #24151A;
+  --md-sensitive-outline: #56303A;
+  --md-on-sensitive-container: #F0B5C2;
+  --md-on-sensitive-container-muted: #C38A97;
+
+  /* Category alternative-color roles */
+  --category-harassment-primary: #B84A62;
+  --category-harassment-hover: #D05B75;
+  --category-harassment-on-primary: #FFFFFF;
+  --category-harassment-container: #211619;
+  --category-harassment-on-container: #E7AAB8;
+  --category-harassment-outline: #4A2931;
+
+  --category-extortion-primary: #4F5D95;
+  --category-extortion-hover: #6777B8;
+  --category-extortion-on-primary: #FFFFFF;
+  --category-extortion-container: #171A25;
+  --category-extortion-on-container: #AFB9E1;
+  --category-extortion-outline: #333B5D;
+
+  --category-public_safety-primary: #60A5FA;
+  --category-public_safety-hover: #93C5FD;
+  --category-public_safety-on-primary: #050505;
+  --category-public_safety-container: #101E32;
+  --category-public_safety-on-container: #BFDBFE;
+  --category-public_safety-outline: #254B78;
+
+  --category-road_transport-primary: #FBBF24;
+  --category-road_transport-hover: #FCD34D;
+  --category-road_transport-on-primary: #050505;
+  --category-road_transport-container: #2A2110;
+  --category-road_transport-on-container: #FDE68A;
+  --category-road_transport-outline: #6B4E12;
+
+  --category-load_shedding-primary: #14B8A6;
+  --category-load_shedding-hover: #2DD4BF;
+  --category-load_shedding-on-primary: #050505;
+  --category-load_shedding-container: #112220;
+  --category-load_shedding-on-container: #99F6E4;
+  --category-load_shedding-outline: #1D433F;
+
+  --category-illegal_occupation-primary: #94A3B8;
+  --category-illegal_occupation-hover: #CBD5E1;
+  --category-illegal_occupation-on-primary: #050505;
+  --category-illegal_occupation-container: #1E293B;
+  --category-illegal_occupation-on-container: #E2E8F0;
+  --category-illegal_occupation-outline: #475569;
+
+  --category-rickshaw-primary: #D9822B;
+  --category-rickshaw-hover: #E89540;
+  --category-rickshaw-on-primary: #050505;
+  --category-rickshaw-container: #21190F;
+  --category-rickshaw-on-container: #E9B579;
+  --category-rickshaw-outline: #54371C;
+}
+
+/* Compatibility aliases: existing UI continues working while shared primitives migrate
+   to the Material-style role names above. These aliases contain no color literals. */
+:root,
+html[data-theme="light"],
+html[data-theme="dark"],
+.dark {
+  --ui-page: var(--md-background);
+  --ui-surface: var(--md-surface);
+  --ui-surface-subtle: var(--md-surface-subtle);
+  --ui-surface-elevated: var(--md-surface-elevated);
+  --ui-surface-hover: var(--md-surface-hover);
+
+  --ui-text-primary: var(--md-on-surface);
+  --ui-text-secondary: var(--md-on-surface-secondary);
+  --ui-text-muted: var(--md-on-surface-muted);
+  --ui-text-inverse: var(--md-on-primary);
+
+  --text-primary: var(--md-on-surface);
+  --text-secondary: var(--md-on-surface-secondary);
+  --text-muted: var(--md-on-surface-muted);
+  --text-inverse: var(--md-on-primary);
+
+  --ui-border-subtle: var(--md-outline-subtle);
+  --ui-border: var(--md-outline);
+  --ui-border-strong: var(--md-outline-strong);
+  --border-subtle: var(--md-outline-subtle);
+
+  --ui-input: var(--md-surface);
+  --ui-input-placeholder: var(--md-on-surface-muted);
+  --ui-disabled-bg: var(--md-disabled-container);
+  --ui-disabled-text: var(--md-on-disabled);
+
+  --ui-accent: var(--md-secondary);
+  --ui-accent-soft: var(--md-secondary-container);
+  --ui-accent-border: var(--md-secondary-outline);
+  --ui-accent-hover: var(--md-secondary-variant);
+  --ui-focus: var(--md-focus);
+  --ui-overlay: var(--md-overlay);
+
+  --ui-primary-action-bg: var(--md-primary);
+  --ui-primary-action-hover: var(--md-primary-variant);
+  --ui-primary-action-active: var(--md-primary-active);
+  --ui-primary-action-text: var(--md-on-primary);
+
+  --ui-success-text: var(--md-on-success-container);
+  --ui-success-bg: var(--md-success-container);
+  --ui-success-border: var(--md-success-outline);
+
+  --ui-warning-text: var(--md-on-warning-container);
+  --ui-warning-bg: var(--md-warning-container);
+  --ui-warning-border: var(--md-warning-outline);
+
+  --ui-error-text: var(--md-on-error-container);
+  --ui-error-bg: var(--md-error-container);
+  --ui-error-border: var(--md-error-outline);
+
+  --ui-info-text: var(--md-on-info-container);
+  --ui-info-bg: var(--md-info-container);
+  --ui-info-border: var(--md-info-outline);
+
+  --ui-validation-text: var(--md-validation);
+  --ui-validation-border: var(--md-validation-outline);
+  --ui-validation-focus: var(--md-validation-focus);
+
+  --ui-sensitive-bg: var(--md-sensitive-container);
+  --ui-sensitive-border: var(--md-sensitive-outline);
+  --ui-sensitive-text: var(--md-on-sensitive-container);
+  --ui-sensitive-muted: var(--md-on-sensitive-container-muted);
+
+  --ui-destructive-bg: var(--md-destructive);
+  --ui-destructive-hover: var(--md-destructive-hover);
+  --ui-destructive-active: var(--md-destructive-active);
+  --ui-destructive-border: var(--md-destructive-outline);
+
+  --ui-media-viewer-bg: var(--media-viewer-background);
+  --ui-media-viewer-bg-elevated: var(--media-viewer-background-elevated);
+  --ui-media-viewer-text: var(--media-viewer-on-background);
+  --ui-media-viewer-muted: var(--media-viewer-on-background-muted);
+  --ui-media-viewer-border: var(--media-viewer-outline);
+  --ui-media-viewer-control: var(--media-viewer-control);
+  --ui-media-viewer-control-hover: var(--media-viewer-control-hover);
+  --ui-media-viewer-focus: var(--media-viewer-focus);
+  --ui-media-viewer-backdrop: var(--media-viewer-backdrop);
+  --ui-media-viewer-stage: var(--media-viewer-stage);
+  --ui-media-viewer-chip: var(--media-viewer-chip);
+  --ui-media-viewer-chip-hover: var(--media-viewer-chip-hover);
+  --ui-media-viewer-strip: var(--media-viewer-strip);
+  --ui-media-viewer-border-soft: var(--media-viewer-outline-soft);
+  --ui-media-viewer-border-strong: var(--media-viewer-outline-strong);
+  --ui-media-overlay-soft: var(--media-overlay-soft);
+  --ui-media-overlay-strong: var(--media-overlay-strong);
+  --ui-media-overlay-label: var(--media-overlay-label);
+  --ui-media-overlay-max: var(--media-overlay-max);
+  --ui-media-gradient: var(--media-gradient);
+  --ui-debug-overlay: var(--debug-overlay);
+  --ui-debug-text: var(--debug-on-overlay);
+  --ui-debug-muted: var(--debug-on-overlay-muted);
+  --ui-debug-border: var(--debug-outline);
+
+  /* Existing section-token API -> Material alternative category roles. */
+  --sec-harassment-primary: var(--category-harassment-primary);
+  --sec-harassment-hover: var(--category-harassment-hover);
+  --sec-harassment-bg: var(--category-harassment-container);
+  --sec-harassment-border: var(--category-harassment-outline);
+  --sec-harassment-text: var(--category-harassment-on-container);
+  --sec-harassment-on-primary: var(--category-harassment-on-primary);
+
+  --sec-extortion-primary: var(--category-extortion-primary);
+  --sec-extortion-hover: var(--category-extortion-hover);
+  --sec-extortion-bg: var(--category-extortion-container);
+  --sec-extortion-border: var(--category-extortion-outline);
+  --sec-extortion-text: var(--category-extortion-on-container);
+  --sec-extortion-on-primary: var(--category-extortion-on-primary);
+
+  --sec-public_safety-primary: var(--category-public_safety-primary);
+  --sec-public_safety-hover: var(--category-public_safety-hover);
+  --sec-public_safety-bg: var(--category-public_safety-container);
+  --sec-public_safety-border: var(--category-public_safety-outline);
+  --sec-public_safety-text: var(--category-public_safety-on-container);
+  --sec-public_safety-on-primary: var(--category-public_safety-on-primary);
+
+  --sec-road_transport-primary: var(--category-road_transport-primary);
+  --sec-road_transport-hover: var(--category-road_transport-hover);
+  --sec-road_transport-bg: var(--category-road_transport-container);
+  --sec-road_transport-border: var(--category-road_transport-outline);
+  --sec-road_transport-text: var(--category-road_transport-on-container);
+  --sec-road_transport-on-primary: var(--category-road_transport-on-primary);
+
+  --sec-load_shedding-primary: var(--category-load_shedding-primary);
+  --sec-load_shedding-hover: var(--category-load_shedding-hover);
+  --sec-load_shedding-bg: var(--category-load_shedding-container);
+  --sec-load_shedding-border: var(--category-load_shedding-outline);
+  --sec-load_shedding-text: var(--category-load_shedding-on-container);
+  --sec-load_shedding-on-primary: var(--category-load_shedding-on-primary);
+
+  --sec-load-shedding-primary: var(--category-load_shedding-primary);
+  --sec-load-shedding-hover: var(--category-load_shedding-hover);
+  --sec-load-shedding-bg: var(--category-load_shedding-container);
+  --sec-load-shedding-border: var(--category-load_shedding-outline);
+  --sec-load-shedding-text: var(--category-load_shedding-on-container);
+  --sec-load-shedding-on-primary: var(--category-load_shedding-on-primary);
+
+  --sec-illegal_occupation-primary: var(--category-illegal_occupation-primary);
+  --sec-illegal_occupation-hover: var(--category-illegal_occupation-hover);
+  --sec-illegal_occupation-bg: var(--category-illegal_occupation-container);
+  --sec-illegal_occupation-border: var(--category-illegal_occupation-outline);
+  --sec-illegal_occupation-text: var(--category-illegal_occupation-on-container);
+  --sec-illegal_occupation-on-primary: var(--category-illegal_occupation-on-primary);
+
+  --sec-rickshaw-primary: var(--category-rickshaw-primary);
+  --sec-rickshaw-hover: var(--category-rickshaw-hover);
+  --sec-rickshaw-bg: var(--category-rickshaw-container);
+  --sec-rickshaw-border: var(--category-rickshaw-outline);
+  --sec-rickshaw-text: var(--category-rickshaw-on-container);
+  --sec-rickshaw-on-primary: var(--category-rickshaw-on-primary);
+}

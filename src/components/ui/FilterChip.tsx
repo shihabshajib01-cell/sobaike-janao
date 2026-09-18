@@ -38,17 +38,17 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       style={
         selected && section
           ? {
-              backgroundColor: config?.primaryColor || 'var(--ui-action-bg)',
-              borderColor: config?.primaryColor || 'var(--ui-action-bg)',
-              color: 'var(--ui-action-text)',
+              backgroundColor: config?.primaryColor || 'var(--md-primary)',
+              borderColor: config?.primaryColor || 'var(--md-primary)',
+              color: config?.colors.filledText || 'var(--md-on-primary)',
             }
           : undefined
       }
-      className={`inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] type-compact font-[var(--font-weight-medium)] ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 active:scale-95 ${
+      className={`inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] type-compact font-[var(--font-weight-medium)] ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus focus-visible:ring-offset-1 active:scale-95 ${
         selected && !config
-          ? 'bg-ui-action-bg text-ui-action-text border-ui-action-bg font-[var(--font-weight-semibold)] ui-elevation-selected'
+          ? 'bg-role-primary text-role-on-primary border-role-primary font-[var(--font-weight-semibold)] ui-elevation-selected'
           : !selected
-          ? 'bg-ui-surface text-ui-content-secondary hover:text-ui-content-primary border-ui-stroke-default hover:border-ui-stroke-strong hover:bg-ui-surface-hover'
+          ? 'bg-role-surface text-role-on-surface-secondary hover:text-role-on-surface border-role-outline hover:border-role-outline-strong hover:bg-role-surface-hover'
           : ''
       } ${className}`}
     >
@@ -59,7 +59,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
           className={`ml-0.5 px-1.5 py-0.5 ui-radius-pill font-[var(--font-weight-semibold)] leading-none ${
             selected
               ? 'bg-current/20 text-current'
-              : 'bg-ui-surface-subtle text-ui-content-muted'
+              : 'bg-role-surface-subtle text-role-on-surface-muted'
           }`}
         >
           {count}

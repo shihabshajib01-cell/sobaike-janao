@@ -8,7 +8,7 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ id, label, description, checked, disabled, className = '', labelClassName = 'type-label text-ui-content-primary', onChange, ...props }, ref) => {
+  ({ id, label, description, checked, disabled, className = '', labelClassName = 'type-label text-role-on-surface', onChange, ...props }, ref) => {
     const checkboxId = id || (typeof label === 'string' ? `cb-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined);
 
     return (
@@ -29,16 +29,16 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             className="peer sr-only"
             {...props}
           />
-          <div className={`w-5 h-5 rounded-[var(--radius-badge-md)] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-ui-focus peer-focus-visible:ring-offset-1 flex items-center justify-center ${
-            checked ? 'bg-ui-action-bg border-ui-action-bg' : 'border-ui-stroke-default bg-ui-surface'
+          <div className={`w-5 h-5 rounded-[var(--radius-badge-md)] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-role-focus peer-focus-visible:ring-offset-1 flex items-center justify-center ${
+            checked ? 'bg-role-primary border-role-primary' : 'border-role-outline bg-role-surface'
           }`}>
-            {checked && <Check className="w-3.5 h-3.5 text-ui-action-text stroke-[2.5]" />}
+            {checked && <Check className="w-3.5 h-3.5 text-role-on-primary stroke-[2.5]" />}
           </div>
         </div>
         {(label || description) && (
           <div>
             {label && <p className={labelClassName}>{label}</p>}
-            {description && <p className="type-helper text-ui-content-muted mt-0.5">{description}</p>}
+            {description && <p className="type-helper text-role-on-surface-muted mt-0.5">{description}</p>}
           </div>
         )}
       </label>
