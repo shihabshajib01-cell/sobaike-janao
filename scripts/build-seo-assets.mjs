@@ -279,18 +279,35 @@ function injectMeta(template, page) {
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         };
 
+  const organizationId = `${SITE_ORIGIN}/#organization`;
+  const websiteId = `${SITE_ORIGIN}/#website`;
+
   const structured = {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'WebSite',
-        '@id': `${SITE_ORIGIN}/#website`,
+        '@type': 'Organization',
+        '@id': organizationId,
         url: `${SITE_ORIGIN}/`,
         name: 'Sobaike Janao',
         alternateName: 'সবাইকে জানাও',
-        inLanguage: ['bn-BD', 'en'],
+        logo: {
+          '@type': 'ImageObject',
+          url: DEFAULT_IMAGE,
+        },
       },
-      pageSchema,
+      {
+        '@type': 'WebSite',
+        '@id': websiteId,
+        url: `${SITE_ORIGIN}/`,
+        name: 'Sobaike Janao',
+        alternateName: 'সবাইকে জানাও',
+        publisher: { '@id': organizationId },
+      },
+      {
+        ...pageSchema,
+        publisher: { '@id': organizationId },
+      },
     ],
   };
 
