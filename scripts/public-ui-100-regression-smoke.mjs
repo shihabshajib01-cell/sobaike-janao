@@ -193,6 +193,60 @@ await check('All seven category pages preserve the shared mobile navigation cont
   await context.close();
 });
 
+await check('Explore analytics provide accessible chart drilldowns', async () => {
+  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  await page.goto(routeUrl('/explore'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+  await expectVisible(page.locator('#explore-report-analytics'), 'Explore report summary did not load');
+  await expectVisible(
+    page.locator('#explore-category-distribution svg'),
+    'Category share chart did not render'
+  );
+  await expectVisible(
+    page.locator('#explore-topic-division-matrix'),
+    'Topic by division comparison did not render'
+  );
+
+  const firstMatrixCell = page.locator('#explore-topic-division-matrix td button:not([disabled])').first();
+  await expectVisible(firstMatrixCell, 'No interactive topic/division matrix cell found');
+  const matrixBox = await firstMatrixCell.boundingBox();
+  if (!matrixBox || matrixBox.width < 44 || matrixBox.height < 44) {
+    throw new Error(
+      `Topic/division matrix cell is below 44px: ${matrixBox ? `${Math.round(matrixBox.width)}x${Math.round(matrixBox.height)}` : 'not measurable'}`
+    );
+  }
+
+  const firstCategory = page.locator('#explore-category-distribution button[id^="distribution-row-"]').first();
+  await expectVisible(firstCategory, 'No interactive category distribution row found');
+  const categoryBox = await firstCategory.boundingBox();
+  if (!categoryBox || categoryBox.height < 44) {
+    throw new Error(
+      `Category drilldown target is below 44px: ${categoryBox ? Math.round(categoryBox.height) : 'not measurable'}`
+    );
+  }
+  await firstCategory.click();
+  await page.waitForTimeout(300);
+  if ((await firstCategory.getAttribute('aria-pressed')) !== 'true') {
+    throw new Error('Category chart drilldown did not expose its selected state');
+  }
+  await expectVisible(
+    page.locator('[aria-label="Active filters"], [aria-label="সক্রিয় ফিল্টার"]'),
+    'Chart drilldown did not surface active-filter context'
+  );
+
+  const divisionButton = page.locator('#geographic-breakdown-divisions button').first();
+  if (await divisionButton.count()) {
+    const divisionBox = await divisionButton.boundingBox();
+    if (!divisionBox || divisionBox.width < 44 || divisionBox.height < 44) {
+      throw new Error('Division chart target is below the 44px interaction minimum');
+    }
+  }
+
+  await context.close();
+});
+
 await check('Key mobile controls preserve the 44px minimum interaction target', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);

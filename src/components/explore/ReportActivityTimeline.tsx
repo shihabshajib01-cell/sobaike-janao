@@ -5,6 +5,8 @@ import { toBanglaDigits } from '../../utils/formatters';
 export interface ReportActivityTimelineProps {
   reports: ReportItem[];
   language: 'bn' | 'en';
+  activeMonthKey?: string | null;
+  onSelectMonth?: (monthKey: string) => void;
 }
 
 interface MonthBucket {
@@ -83,6 +85,8 @@ const ENGLISH_MONTH_FULL = [
 export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
   reports,
   language,
+  activeMonthKey = null,
+  onSelectMonth,
 }) => {
   const totalReports = reports.length;
 
@@ -232,9 +236,13 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
           {language === 'bn' ? 'সময় অনুযায়ী প্রতিবেদন' : 'Reports over time'}
         </h2>
         <span className="type-compact text-ui-content-secondary font-[var(--font-weight-regular)]">
-          {language === 'bn'
-            ? 'সর্বশেষ প্রকাশিত প্রতিবেদনের মাস পর্যন্ত ৬ মাস'
-            : 'Six months ending with the latest published report'}
+          {onSelectMonth
+            ? language === 'bn'
+              ? 'মাস চাপলে ওই সময়ের প্রতিবেদন দেখাবে'
+              : 'Select a month to filter reports'
+            : language === 'bn'
+              ? 'সর্বশেষ প্রকাশিত প্রতিবেদনের মাস পর্যন্ত ৬ মাস'
+              : 'Six months ending with the latest published report'}
         </span>
       </div>
 
@@ -294,13 +302,18 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                     : `${fullLabel} ${m.yearDisplayEn}: ${m.count} ${m.count === 1 ? 'report' : 'reports'}`;
 
                 return (
-                  <div
-                    key={m.key}
-                    id={`timeline-col-${m.key}`}
-                    role="listitem"
-                    aria-label={accessibleText}
-                    className="flex flex-col items-center min-w-0"
-                  >
+                  <div key={m.key} role="listitem" className="min-w-0">
+                    <button
+                      id={`timeline-col-${m.key}`}
+                      type="button"
+                      aria-label={accessibleText}
+                      aria-pressed={activeMonthKey === m.key}
+                      onClick={onSelectMonth ? () => onSelectMonth(m.key) : undefined}
+                      disabled={!onSelectMonth}
+                      className={`w-full min-h-[44px] flex flex-col items-center min-w-0 rounded-[var(--radius-badge-md)] px-1 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                        onSelectMonth ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
+                      } ${activeMonthKey === m.key ? 'bg-ui-surface-subtle' : ''}`}
+                    >
                     {/* Numeric count above bar */}
                     <span
                       className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary mb-1.5 tabular-nums text-center select-none"
@@ -338,6 +351,7 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                         {yearLabel}
                       </span>
                     </div>
+                    </button>
                   </div>
                 );
               })}

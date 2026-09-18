@@ -6,6 +6,10 @@ import { toBanglaDigits } from '../../utils/formatters';
 export interface ReportGeographicBreakdownProps {
   reports: ReportItem[];
   language: 'bn' | 'en';
+  activeDivision?: string;
+  activeDistrict?: string;
+  onSelectDivision?: (division: string) => void;
+  onSelectDistrict?: (district: string) => void;
 }
 
 export interface DistrictStat {
@@ -29,6 +33,10 @@ export interface DivisionStat {
 export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps> = ({
   reports,
   language,
+  activeDivision = 'all',
+  activeDistrict = 'all',
+  onSelectDivision,
+  onSelectDistrict,
 }) => {
   const totalReports = reports.length;
   const [isExpanded, setIsExpanded] = useState(false);
@@ -157,6 +165,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
   const visibleDistricts = isExpanded
     ? districtStats
     : districtStats.slice(0, 5);
+  const maxDivisionCount = Math.max(1, ...divisionStats.map((item) => item.count));
 
   return (
     <section
@@ -213,10 +222,19 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                       : item.percentage;
 
                   return (
-                    <div
+                    <button
                       key={item.id}
                       id={`district-row-${item.id}`}
-                      className="space-y-1"
+                      type="button"
+                      onClick={onSelectDistrict ? () => onSelectDistrict(item.nameEn) : undefined}
+                      aria-pressed={activeDistrict.toLowerCase() === item.nameEn.toLowerCase()}
+                      className={`w-full min-h-[44px] text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                        onSelectDistrict ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
+                      } ${
+                        activeDistrict.toLowerCase() === item.nameEn.toLowerCase()
+                          ? 'bg-ui-surface-subtle'
+                          : ''
+                      }`}
                     >
                       <div className="flex items-baseline justify-between type-compact">
                         <div className="flex items-baseline gap-1.5 min-w-0 pr-2">
@@ -237,7 +255,6 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                         </div>
                       </div>
 
-                      {/* Proportional Bar */}
                       <div
                         role="presentation"
                         aria-hidden="true"
@@ -250,7 +267,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                           }}
                         />
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -282,59 +299,66 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
             id="geographic-breakdown-divisions"
             className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 space-y-3 shadow-[var(--elevation-2xs)]"
           >
-            <h3 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
-              {language === 'bn' ? 'বিভাগ অনুযায়ী প্রতিবেদন' : 'Reports by division'}
-            </h3>
+            <div className="flex items-baseline justify-between gap-2">
+              <h3 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                {language === 'bn' ? 'বিভাগ অনুযায়ী প্রতিবেদন' : 'Reports by division'}
+              </h3>
+              {onSelectDivision && (
+                <span className="type-compact text-ui-content-muted">
+                  {language === 'bn' ? 'বার চাপলে ফিল্টার হবে' : 'Select a bar to filter'}
+                </span>
+              )}
+            </div>
 
-            <div className="space-y-2.5">
-              {divisionStats.map((item) => {
-                const displayDivisionName =
-                  language === 'bn'
-                    ? `${item.nameBn} বিভাগ`
-                    : `${item.nameEn} Division`;
-                const displayCount =
-                  language === 'bn' ? toBanglaDigits(item.count) : item.count;
-                const displayPercent =
-                  language === 'bn'
-                    ? toBanglaDigits(item.percentage)
-                    : item.percentage;
+            <div
+              role="region"
+              aria-label={language === 'bn' ? 'বিভাগ অনুযায়ী কলাম চার্ট' : 'Division column chart'}
+              className="overflow-x-auto pb-1"
+            >
+              <div className="min-w-max flex items-end gap-2">
+                {divisionStats.map((item) => {
+                  const displayDivisionName =
+                    language === 'bn' ? item.nameBn : item.nameEn;
+                  const displayCount =
+                    language === 'bn' ? toBanglaDigits(item.count) : item.count;
+                  const height = Math.max(8, Math.round((item.count / maxDivisionCount) * 100));
+                  const isActive =
+                    activeDivision.toLowerCase() === item.nameEn.toLowerCase();
 
-                return (
-                  <div
-                    key={item.id}
-                    id={`division-row-${item.id}`}
-                    className="space-y-1"
-                  >
-                    <div className="flex items-baseline justify-between type-compact">
-                      <div className="font-[var(--font-weight-semibold)] text-ui-content-primary min-w-0 pr-2 truncate">
-                        {displayDivisionName}
-                      </div>
-                      <div className="shrink-0 type-compact font-[var(--font-weight-medium)] text-ui-content-secondary">
-                        <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
-                          {displayCount}
-                        </span>
-                        <span className="text-ui-content-secondary ml-1">
-                          ({displayPercent}%)
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Proportional Bar */}
-                    <div
-                      role="presentation"
-                      aria-hidden="true"
-                      className="w-full h-1.5 rounded-[var(--radius-pill)] bg-ui-surface-subtle overflow-hidden"
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={onSelectDivision ? () => onSelectDivision(item.nameEn) : undefined}
+                      aria-pressed={isActive}
+                      aria-label={
+                        language === 'bn'
+                          ? `${displayDivisionName} বিভাগ: ${displayCount}টি প্রতিবেদন`
+                          : `${displayDivisionName} Division: ${displayCount} reports`
+                      }
+                      className={`w-14 sm:w-16 shrink-0 min-h-[44px] rounded-[var(--radius-badge-md)] px-1.5 py-2 flex flex-col items-center gap-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                        onSelectDivision ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
+                      } ${isActive ? 'bg-ui-surface-subtle' : ''}`}
                     >
-                      <div
-                        className="h-full rounded-[var(--radius-pill)] bg-ui-accent transition-all duration-300"
-                        style={{
-                          width: `${item.percentage}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                      <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums">
+                        {displayCount}
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="w-7 h-24 rounded-[var(--radius-badge-sm)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-end overflow-hidden"
+                      >
+                        <span
+                          className="w-full bg-ui-accent rounded-t-[var(--radius-compact)] transition-all duration-300"
+                          style={{ height: `${height}%` }}
+                        />
+                      </span>
+                      <span className="type-compact text-ui-content-secondary leading-tight text-center line-clamp-2">
+                        {displayDivisionName}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
