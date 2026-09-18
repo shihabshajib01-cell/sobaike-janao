@@ -4,10 +4,11 @@ import { Check } from 'lucide-react';
 export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: React.ReactNode;
   description?: React.ReactNode;
+  labelClassName?: string;
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ id, label, description, checked, disabled, className = '', onChange, ...props }, ref) => {
+  ({ id, label, description, checked, disabled, className = '', labelClassName = 'type-label text-ui-content-primary', onChange, ...props }, ref) => {
     const checkboxId = id || (typeof label === 'string' ? `cb-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined);
 
     return (
@@ -36,7 +37,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         </div>
         {(label || description) && (
           <div>
-            {label && <p className="type-label text-ui-content-primary">{label}</p>}
+            {label && <p className={labelClassName}>{label}</p>}
             {description && <p className="type-helper text-ui-content-muted mt-0.5">{description}</p>}
           </div>
         )}
