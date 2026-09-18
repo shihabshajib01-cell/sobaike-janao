@@ -31,7 +31,12 @@ import { ReportItem, PublicPublishedResponse, PublicConfiguredReportField } from
 import { ReportDetailSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
-import { BRAND_NAME } from '../lib/seo';
+import {
+  BRAND_NAME,
+  buildBrandedSeoTitle,
+  isSeoIndexableReportContent,
+  normalizeSeoDescription,
+} from '../lib/seo';
 import { HarassmentContextSummary } from '../components/report/HarassmentContextSummary';
 
 export interface ReportDetailPageProps {
@@ -128,17 +133,33 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   }, [reportId]);
 
   useEffect(() => {
+    if (isLoading) return;
+
     if (report) {
       const publicTitle = language === 'bn' ? report.titleBn : report.titleEn;
-      const publicDesc =
+      const bnDescription = report.shortDescriptionBn || report.fullDescriptionBn || '';
+      const enDescription = report.shortDescriptionEn || report.fullDescriptionEn || '';
+      const rawDescription =
         language === 'bn'
-          ? report.shortDescriptionBn || report.fullDescriptionBn || ''
-          : report.shortDescriptionEn || report.fullDescriptionEn || '';
+          ? bnDescription
+          : enDescription && enDescription !== bnDescription
+            ? enDescription
+            : `Published citizen report about ${report.titleEn || report.titleBn}. Review the report details, location, sources, and updates on Sobaike Janao.`;
+
+      const description = normalizeSeoDescription(rawDescription, language);
+      const indexable = isSeoIndexableReportContent(
+        report.titleBn,
+        report.titleEn,
+        bnDescription,
+        enDescription
+      );
 
       setDynamicSeo({
-        title: `${publicTitle} | ${BRAND_NAME[language]}`,
-        description: publicDesc,
-        robots: 'index, follow, max-image-preview:large',
+        title: buildBrandedSeoTitle(publicTitle, BRAND_NAME[language]),
+        description,
+        robots: indexable
+          ? 'index, follow, max-image-preview:large'
+          : 'noindex, follow',
         ogType: 'article',
         ogSiteName: BRAND_NAME[language],
         canonicalPath: `/report-detail/${encodeURIComponent(report.id)}`,
@@ -150,35 +171,22 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       return;
     }
 
-    if (!isLoading) {
-      setDynamicSeo({
-        title: `${language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি' : 'Report Unavailable / Not Found'} | ${BRAND_NAME[language]}`,
-        description:
-          language === 'bn'
-            ? 'অনুরোধকৃত প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ।'
-            : 'The requested report could not be found or is unavailable.',
-        robots: 'noindex, follow',
-        ogType: 'website',
-        ogSiteName: BRAND_NAME[language],
-        canonicalPath: `/report-detail/${encodeURIComponent(reportId)}`,
-        pageType: 'website',
-      });
-      return;
-    }
-
     setDynamicSeo({
-      title: `${language === 'bn' ? 'প্রতিবেদন লোড হচ্ছে...' : 'Loading Report...'} | ${BRAND_NAME[language]}`,
+      title: buildBrandedSeoTitle(
+        language === 'bn' ? 'প্রতিবেদনটি পাওয়া যায়নি' : 'Report unavailable',
+        BRAND_NAME[language]
+      ),
       description:
         language === 'bn'
-          ? 'সবাইকে জানাও প্ল্যাটফর্মের প্রতিবেদন লোড হচ্ছে।'
-          : 'Loading report on Sobaike Janao platform.',
+          ? 'অনুরোধকৃত প্রতিবেদনটি পাওয়া যায়নি বা অনুপলব্ধ।'
+          : 'The requested report could not be found or is unavailable.',
       robots: 'noindex, follow',
-      ogType: 'article',
+      ogType: 'website',
       ogSiteName: BRAND_NAME[language],
       canonicalPath: `/report-detail/${encodeURIComponent(reportId)}`,
-      pageType: 'article',
+      pageType: 'website',
     });
-  }, [report, isLoading, language, setDynamicSeo]);
+  }, [report, reportId, isLoading, language, setDynamicSeo]);
 
   if (isLoading) {
     return (
