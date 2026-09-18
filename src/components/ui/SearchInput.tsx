@@ -82,7 +82,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={effectivePlaceholder}
-        className="w-full min-h-[44px] bg-role-surface-subtle hover:bg-role-surface focus:bg-role-surface text-role-on-surface placeholder:text-role-on-surface-muted ui-radius-control ui-space-search ui-border-default border-role-outline-subtle hover:border-role-outline focus:ring-1 focus:ring-role-focus transition-all outline-none"
+        className="w-full min-h-[44px] bg-role-surface-subtle hover:bg-role-surface focus:bg-role-surface text-role-on-surface placeholder:text-role-on-surface-muted ui-radius-control ui-space-search ui-border-default border-role-outline hover:border-role-outline-strong focus:ring-1 focus:ring-role-focus transition-all outline-none"
       />
       {currentValue.length > 0 && (
         <button
