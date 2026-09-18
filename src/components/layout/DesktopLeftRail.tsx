@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { CATEGORY_ORDER } from '../../data/categoryOrder';
 import { CategoryPopularityService } from '../../services/categoryPopularityService';
@@ -19,8 +20,10 @@ const SECTION_ICON_NAMES: Record<SectionKey, AppIconName> = {
 };
 
 export const DesktopLeftRail: React.FC = () => {
-  const { currentRoute, navigateTo, language, toggleLanguage, openReportComposer } = useApp();
+  const { currentRoute, language, toggleLanguage, openReportComposer } = useApp();
   const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
+  const localizePath = (path: RoutePath) =>
+    language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 
   useEffect(() => {
     let active = true;
@@ -92,12 +95,17 @@ export const DesktopLeftRail: React.FC = () => {
       className="hidden min-[1440px]:flex flex-col fixed top-0 bottom-0 left-0 h-[100dvh] overflow-y-auto w-[var(--layout-rail-desktop)] min-[1536px]:w-[var(--layout-rail-large)] min-[1920px]:w-[var(--layout-rail-xl)] px-4 min-[1920px]:px-5 py-5 bg-ui-surface border-r border-ui-stroke-subtle justify-between select-none z-30"
     >
       <div className="space-y-5">
-        <BrandLogo
-          id="rail-brand-logo"
-          size="md"
-          onClick={() => navigateTo('/')}
-          className="transition-colors ui-radius-control px-1 py-1 w-full"
-        />
+        <Link
+          to={localizePath('/')}
+          aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
+          className="block rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        >
+          <BrandLogo
+            id="rail-brand-logo"
+            size="md"
+            className="transition-colors ui-radius-control px-1 py-1 w-full"
+          />
+        </Link>
 
         <div>
           <Button
@@ -119,10 +127,10 @@ export const DesktopLeftRail: React.FC = () => {
             const secConfig = item.sectionKey ? SECTIONS[item.sectionKey] : null;
 
             return (
-              <button
+              <Link
                 key={item.id}
                 id={item.id}
-                onClick={() => navigateTo(item.path)}
+                to={localizePath(item.path)}
                 aria-current={isActive ? 'page' : undefined}
                 className={`w-full flex items-center justify-between px-3 py-2.5 ui-radius-control type-action transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isActive ? getSectionActiveStyles(item.sectionKey) : 'text-ui-content-secondary'
@@ -160,7 +168,7 @@ export const DesktopLeftRail: React.FC = () => {
                     style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
                   />
                 )}
-              </button>
+              </Link>
             );
           })}
         </nav>
