@@ -5,6 +5,9 @@ on:
     workflows: ["Deploy"]
     types: [completed]
   workflow_dispatch:
+  schedule:
+    # Regularly re-check the live search surface even when there is no deployment.
+    - cron: '23 */6 * * *'
 
 permissions:
   contents: read
