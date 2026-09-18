@@ -1279,61 +1279,39 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               )}
 
               {/* Incident Description */}
-              <div className="space-y-1">
-                <label
-                  htmlFor="complaint-desc-input"
-                  className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
-                >
-                  {language === 'bn' ? 'বিবরণ *' : 'Description *'}
-                </label>
-                <textarea
-                  id="complaint-desc-input"
-                  aria-invalid={Boolean(errors.description)}
-                  aria-describedby={errors.description ? 'complaint-desc-input-error' : undefined}
-                  aria-required="true"
-                  rows={4}
-                  maxLength={2000}
-                  value={formData.description || ''}
-                  onChange={(e) => {
-                    onUpdateFormData({ description: e.target.value });
-                    if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
-                  }}
-                  placeholder={
-                    isExcessElectricityBill
-                      ? language === 'bn'
-                        ? 'বিদ্যুৎ বিলটি অস্বাভাবিক বেশি বা ভুল মনে হওয়ার কারণ লিখুন।'
-                        : 'Describe why you believe the electricity bill is unusually high or incorrect.'
-                      : isLoadShedding
+              <TextAreaField
+                id="complaint-desc-input"
+                rows={4}
+                maxLength={2000}
+                required
+                label={language === 'bn' ? 'বিবরণ' : 'Description'}
+                value={formData.description || ''}
+                error={errors.description}
+                onChange={(e) => {
+                  onUpdateFormData({ description: e.target.value });
+                  if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
+                }}
+                placeholder={
+                  isExcessElectricityBill
+                    ? language === 'bn'
+                      ? 'বিদ্যুৎ বিলটি অস্বাভাবিক বেশি বা ভুল মনে হওয়ার কারণ লিখুন।'
+                      : 'Describe why you believe the electricity bill is unusually high or incorrect.'
+                    : isLoadShedding
                       ? language === 'bn'
                         ? 'লোডশেডিংয়ের প্রভাব, এলাকা বা সময়কাল সম্পর্কিত বিবরণ লিখুন...'
                         : 'Describe the load shedding outage, area affected, or duration details...'
                       : language === 'bn'
-                      ? 'গ্যাস সংকট, চাপ কম বা সম্পূর্ণ সরবরাহ বন্ধ থাকার বিবরণ লিখুন...'
-                      : 'Describe the gas shortage, low pressure, or outage details...'
-                  }
-                  className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-[var(--radius-control)] type-h4 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
-                    errors.description ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                  }`}
-                />
-                <div className="flex items-center justify-between gap-2">
-                  {errors.description ? (
-                    <p id="complaint-desc-input-error" role="alert" className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
-                  ) : (
-                    <span />
-                  )}
-                  {(formData.description?.length || 0) >= 1600 && (
-                    <span
-                      className={`type-compact tabular-nums shrink-0 ml-auto ${
-                        (formData.description?.length || 0) > 2000
-                          ? 'text-ui-error-text font-[var(--font-weight-bold)]'
-                          : 'text-ui-content-muted'
-                      }`}
-                    >
+                        ? 'গ্যাস সংকট, চাপ কম বা সম্পূর্ণ সরবরাহ বন্ধ থাকার বিবরণ লিখুন...'
+                        : 'Describe the gas shortage, low pressure, or outage details...'
+                }
+                helperText={
+                  (formData.description?.length || 0) >= 1600 ? (
+                    <div className="text-right type-meta tabular-nums">
                       {formData.description?.length || 0} / 2000
-                    </span>
-                  )}
-                </div>
-              </div>
+                    </div>
+                  ) : undefined
+                }
+              />
             </div>
           ) : (
           <div className="space-y-4 pt-1 text-left">
@@ -1348,54 +1326,31 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             />
 
             {/* Incident Narrative */}
-            <div className="space-y-1">
-              <label
-                htmlFor="complaint-desc-input"
-                className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
-              >
-                <span>{language === 'bn' ? 'কী ঘটেছিল?' : 'What happened?'}</span>
-                <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
-              </label>
-              <textarea
-                id="complaint-desc-input"
-                  aria-invalid={Boolean(errors.description)}
-                  aria-describedby={errors.description ? 'complaint-desc-input-error' : undefined}
-                  aria-required="true"
-                rows={4}
-                maxLength={2000}
-                value={formData.description || ''}
-                onChange={(e) => {
-                  onUpdateFormData({ description: e.target.value });
-                  if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
-                }}
-                placeholder={
-                  language === 'bn'
-                    ? 'ঘটনাটি সংক্ষেপে ও স্পষ্টভাবে লিখুন...'
-                    : 'Describe the incident clearly...'
-                }
-                className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-[var(--radius-control)] type-h4 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
-                  errors.description ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                }`}
-              />
-              <div className="flex items-center justify-between gap-2">
-                {errors.description ? (
-                  <p id="complaint-desc-input-error" role="alert" className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
-                ) : (
-                  <span />
-                )}
-                {(formData.description?.length || 0) >= 1600 && (
-                  <span
-                    className={`type-compact tabular-nums shrink-0 ml-auto ${
-                      (formData.description?.length || 0) > 2000
-                        ? 'text-ui-error-text font-[var(--font-weight-bold)]'
-                        : 'text-ui-content-muted'
-                    }`}
-                  >
+            <TextAreaField
+              id="complaint-desc-input"
+              rows={4}
+              maxLength={2000}
+              required
+              label={language === 'bn' ? 'কী ঘটেছিল?' : 'What happened?'}
+              value={formData.description || ''}
+              error={errors.description}
+              onChange={(e) => {
+                onUpdateFormData({ description: e.target.value });
+                if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
+              }}
+              placeholder={
+                language === 'bn'
+                  ? 'ঘটনাটি সংক্ষেপে ও স্পষ্টভাবে লিখুন...'
+                  : 'Describe the incident clearly...'
+              }
+              helperText={
+                (formData.description?.length || 0) >= 1600 ? (
+                  <div className="text-right type-meta tabular-nums">
                     {formData.description?.length || 0} / 2000
-                  </span>
-                )}
-              </div>
-            </div>
+                  </div>
+                ) : undefined
+              }
+            />
 
             {isBriberyReport && (
               <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
