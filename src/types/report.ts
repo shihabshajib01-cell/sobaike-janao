@@ -119,6 +119,8 @@ export interface ReportItem {
   publishedDateEn: string;
   publishedAt?: string;
   updatedAt?: string;
+  viewCount?: number;
+  shareCount?: number;
   evidenceSummaryBn: string[];
   evidenceSummaryEn: string[];
   relatedReportCount?: number;

@@ -148,6 +148,10 @@ export const PublicReportingConfigService = {
     }
   },
 
+  invalidate(): void {
+    cached = null;
+  },
+
   getCached(): PublicReportingConfiguration {
     return cached || emptyConfig();
   },

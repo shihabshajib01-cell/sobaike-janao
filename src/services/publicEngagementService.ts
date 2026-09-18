@@ -1,4 +1,3 @@
-import { isSupabaseConfigured, supabase } from '../lib/supabase';
 
 export interface PublicEngagementCounts {
   viewCount: number;
@@ -33,9 +32,10 @@ export const PublicEngagementService = {
   async getAllCounts(): Promise<Map<string, PublicEngagementCounts>> {
     if (countsCache) return countsCache;
     if (countsRequest) return countsRequest;
-    if (!isSupabaseConfigured() || !supabase) return new Map();
 
     countsRequest = (async () => {
+      const { isSupabaseConfigured, supabase } = await import('../lib/supabase');
+      if (!isSupabaseConfigured() || !supabase) return new Map();
       try {
         const { data, error } = await supabase!.rpc('get_public_report_engagement_counts');
         if (error) throw error;
@@ -66,6 +66,7 @@ export const PublicEngagementService = {
   },
 
   async trackView(reportId: string): Promise<PublicEngagementCounts | null> {
+    const { isSupabaseConfigured, supabase } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) return null;
     try {
       const { data, error } = await supabase.rpc('track_public_report_view', {
@@ -83,6 +84,7 @@ export const PublicEngagementService = {
   },
 
   async trackShare(reportId: string): Promise<PublicEngagementCounts | null> {
+    const { isSupabaseConfigured, supabase } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) return null;
     try {
       const { data, error } = await supabase.rpc('track_public_report_share', {

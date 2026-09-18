@@ -1,4 +1,3 @@
-import { isSupabaseConfigured, supabase } from '../lib/supabase';
 
 export interface PublicFeedUpdateState {
   newCount: number;
@@ -17,6 +16,7 @@ function readString(value: unknown): string | null {
 
 export const PublicFeedUpdateService = {
   async getState(params?: PublicFeedUpdateParams): Promise<PublicFeedUpdateState> {
+    const { isSupabaseConfigured, supabase } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) {
       throw new Error('Public feed update service is currently unavailable.');
     }

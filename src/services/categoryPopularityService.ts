@@ -1,5 +1,4 @@
 import { CATEGORY_ORDER } from '../data/categoryOrder';
-import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { SectionKey } from '../theme/tokens';
 import { TaxonomyService } from './taxonomyService';
 
@@ -67,9 +66,11 @@ export const CategoryPopularityService = {
   async getRanking(): Promise<CategoryPopularityMetric[]> {
     if (rankingCache) return rankingCache;
     if (rankingRequest) return rankingRequest;
-    if (!isSupabaseConfigured() || !supabase) return [];
 
     rankingRequest = (async () => {
+      const { isSupabaseConfigured, supabase } = await import('../lib/supabase');
+      if (!isSupabaseConfigured() || !supabase) return [];
+
       try {
         const { data, error } = await supabase!.rpc('get_public_category_popularity');
         if (error) throw error;

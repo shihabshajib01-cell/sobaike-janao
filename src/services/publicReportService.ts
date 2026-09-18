@@ -39,6 +39,18 @@ export interface HomeFeedParams {
   district?: string;
 }
 
+export interface HomeFeedPageParams extends HomeFeedParams {
+  offset?: number;
+  limit?: number;
+}
+
+export interface HomeFeedPageResult {
+  reports: ReportItem[];
+  hasMore: boolean;
+  nextOffset: number | null;
+  totalCount: number;
+}
+
 // In-flight request deduplication map to prevent redundant concurrent network bursts
 const inFlightRequests = new Map<string, Promise<any>>();
 
@@ -204,6 +216,94 @@ export const PublicReportService = {
     }
 
     return list;
+  },
+
+  /**
+   * Fetch one paginated Home feed window. The new RPC preserves the existing
+   * ranking/privacy contract and returns only the records the Home screen needs.
+   * If the paginated RPC is unavailable, fall back to the current full-feed path
+   * so deployment order cannot break production.
+   */
+  async getHomeFeedPage(params?: HomeFeedPageParams): Promise<HomeFeedPageResult> {
+    const offset = Math.max(0, Math.floor(params?.offset || 0));
+    const limit = Math.min(50, Math.max(1, Math.floor(params?.limit || 10)));
+
+    const fallbackToCurrentFeed = async (): Promise<HomeFeedPageResult> => {
+      const full = await this.getHomeFeed({
+        visitorLat: params?.visitorLat,
+        visitorLng: params?.visitorLng,
+        filter: params?.filter,
+        district: params?.district,
+      });
+      const reports = full.slice(offset, offset + limit);
+      const hasMore = offset + reports.length < full.length;
+      return {
+        reports,
+        hasMore,
+        nextOffset: hasMore ? offset + limit : null,
+        totalCount: full.length,
+      };
+    };
+
+    if (!isSupabaseConfigured() || !supabase) {
+      return fallbackToCurrentFeed();
+    }
+
+    const dedupKey =
+      `rpc:get_public_home_feed_page:${params?.visitorLat ?? 'null'}:${params?.visitorLng ?? 'null'}:${params?.filter || 'all'}:${params?.district || 'all'}:${offset}:${limit}`;
+
+    const { data, error } = await fetchWithDeduplication(dedupKey, () =>
+      supabase!.rpc('get_public_home_feed_page', {
+        p_visitor_lat: params?.visitorLat ?? null,
+        p_visitor_lng: params?.visitorLng ?? null,
+        p_filter: params?.filter || 'all',
+        p_district: params?.district || 'all',
+        p_offset: offset,
+        p_limit: limit,
+      })
+    );
+
+    if (error) {
+      console.warn(
+        '[PublicReportService.getHomeFeedPage] Paginated RPC unavailable; using compatibility fallback:',
+        error
+      );
+      return fallbackToCurrentFeed();
+    }
+
+    const payload =
+      data && typeof data === 'object' && !Array.isArray(data)
+        ? (data as Record<string, unknown>)
+        : {};
+    const rawItems = Array.isArray(payload.items) ? payload.items : [];
+
+    const reports = rawItems.map((raw) =>
+      mapSupabasePublicReportToItem(raw as SupabasePublicReportRPC)
+    );
+
+    // Feed cards currently do not render evidence media. Keep feed payloads light;
+    // report detail continues to load and sign evidence only when a user opens it.
+    const hasMore = payload.hasMore === true;
+    const parsedNextOffset =
+      payload.nextOffset === null || payload.nextOffset === undefined
+        ? null
+        : Number(payload.nextOffset);
+
+    const parsedTotalCount = Number(payload.totalCount);
+
+    return {
+      reports,
+      hasMore,
+      nextOffset:
+        hasMore && Number.isFinite(parsedNextOffset)
+          ? Math.max(0, Math.floor(parsedNextOffset as number))
+          : hasMore
+          ? offset + limit
+          : null,
+      totalCount: Number.isFinite(parsedTotalCount)
+        ? Math.max(0, Math.floor(parsedTotalCount))
+        : offset + reports.length + (hasMore ? 1 : 0),
+    };
   },
 
   /**
@@ -473,30 +573,91 @@ export const PublicReportService = {
     segment: SectionKey,
     filters?: Omit<PublicReportFilters, 'segment'>
   ): Promise<ReportItem[]> {
+    const applySegmentFilters = (items: ReportItem[]): ReportItem[] => {
+      let result = items.filter((report) => report.segment === segment);
+
+      if (filters?.subcategory && filters.subcategory !== 'all') {
+        result = result.filter((report) => report.subcategoryId === filters.subcategory);
+      }
+      if (
+        filters?.affectedPersonAgeGroup &&
+        filters.affectedPersonAgeGroup !== 'all'
+      ) {
+        result = result.filter(
+          (report) =>
+            report.affectedPersonAgeGroup === filters.affectedPersonAgeGroup
+        );
+      }
+      if (
+        filters?.allegedAbuserRelationship &&
+        filters.allegedAbuserRelationship !== 'all'
+      ) {
+        result = result.filter(
+          (report) =>
+            report.allegedAbuserRelationship ===
+            filters.allegedAbuserRelationship
+        );
+      }
+      if (filters?.reportingFor && filters.reportingFor !== 'all') {
+        result = result.filter(
+          (report) => report.reportingFor === filters.reportingFor
+        );
+      }
+      if (filters?.limit && filters.limit > 0) {
+        result = result.slice(0, filters.limit);
+      }
+      return result;
+    };
+
+    const canUseSegmentRpc =
+      isSupabaseConfigured() &&
+      supabase &&
+      (!filters?.district || filters.district === 'all');
+
+    if (canUseSegmentRpc) {
+      const dedupKey =
+        `rpc:get_public_segment_feed:${segment}:${filters?.visitorLat ?? 'null'}:${filters?.visitorLng ?? 'null'}`;
+
+      try {
+        const { data, error } = await fetchWithDeduplication(dedupKey, () =>
+          supabase!.rpc('get_public_segment_feed', {
+            p_segment: segment,
+            p_visitor_lat: filters?.visitorLat ?? null,
+            p_visitor_lng: filters?.visitorLng ?? null,
+          })
+        );
+
+        if (!error && Array.isArray(data)) {
+          return applySegmentFilters(
+            data.map((raw: SupabasePublicReportRPC) =>
+              mapSupabasePublicReportToItem(raw)
+            )
+          );
+        }
+
+        if (error) {
+          console.warn(
+            '[PublicReportService.getBySegment] Segment RPC unavailable; using compatibility fallback:',
+            error
+          );
+        }
+      } catch (error) {
+        console.warn(
+          '[PublicReportService.getBySegment] Segment RPC failed; using compatibility fallback:',
+          error
+        );
+      }
+    }
+
     if (filters?.visitorLat != null && filters?.visitorLng != null) {
       const ranked = await this.getHomeFeed({
         visitorLat: filters.visitorLat,
         visitorLng: filters.visitorLng,
         district: filters.district || 'all',
       });
-      let result = ranked.filter((r) => r.segment === segment);
-      if (filters.subcategory && filters.subcategory !== 'all') {
-        result = result.filter((r) => r.subcategoryId === filters.subcategory);
-      }
-      if (filters.affectedPersonAgeGroup && filters.affectedPersonAgeGroup !== 'all') {
-        result = result.filter((r) => r.affectedPersonAgeGroup === filters.affectedPersonAgeGroup);
-      }
-      if (filters.allegedAbuserRelationship && filters.allegedAbuserRelationship !== 'all') {
-        result = result.filter((r) => r.allegedAbuserRelationship === filters.allegedAbuserRelationship);
-      }
-      if (filters.reportingFor && filters.reportingFor !== 'all') {
-        result = result.filter((r) => r.reportingFor === filters.reportingFor);
-      }
-      if (filters.limit && filters.limit > 0) {
-        result = result.slice(0, filters.limit);
-      }
-      return result;
+      return applySegmentFilters(ranked);
     }
+
     return this.getAll({ ...filters, segment });
   },
 

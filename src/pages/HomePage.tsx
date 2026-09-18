@@ -5,8 +5,6 @@ import {
   LayoutGrid,
   TrendingUp,
 } from 'lucide-react';
-import { PublicReportService } from '../services/publicReportService';
-import { PublicEngagementService } from '../services/publicEngagementService';
 import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
 import { ReportItem } from '../types/report';
 import { ReportCard } from '../components/report/ReportCard';
@@ -27,10 +25,11 @@ type FeedFilterType = 'all' | 'latest' | 'popular';
 
 interface LoadReportsOptions {
   background?: boolean;
+  append?: boolean;
+  offset?: number;
 }
 
-const INITIAL_VISIBLE_REPORT_COUNT = 10;
-const LOAD_MORE_REPORT_COUNT = 10;
+const HOME_FEED_PAGE_SIZE = 10;
 const FEED_UPDATE_POLL_INTERVAL_MS = 30_000;
 
 export const HomePage: React.FC = () => {
@@ -42,7 +41,10 @@ export const HomePage: React.FC = () => {
 
   const [feedFilter, setFeedFilter] = useState<FeedFilterType>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
-  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_VISIBLE_REPORT_COUNT);
+  const [hasMoreReports, setHasMoreReports] = useState(false);
+  const [nextOffset, setNextOffset] = useState<number | null>(0);
+  const [totalReportCount, setTotalReportCount] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [feedWatermark, setFeedWatermark] = useState<string | null>(null);
   const [newReportCount, setNewReportCount] = useState<number>(0);
   const [pendingNewestPublishedAt, setPendingNewestPublishedAt] = useState<string | null>(null);
@@ -60,45 +62,43 @@ export const HomePage: React.FC = () => {
 
   const loadReports = useCallback(async (options?: LoadReportsOptions): Promise<boolean> => {
     const background = options?.background === true;
+    const append = options?.append === true;
+    const offset = Math.max(0, options?.offset || 0);
 
-    if (!background) {
+    if (!background && !append) {
       setIsLoading(true);
       setFetchError(null);
     }
 
     try {
-      const reports = await PublicReportService.getHomeFeed({
+      const { PublicReportService } = await import('../services/publicReportService');
+      const page = await PublicReportService.getHomeFeedPage({
         visitorLat,
         visitorLng,
-        filter: feedFilter === 'popular' ? 'all' : feedFilter,
+        filter: feedFilter,
         district: selectedDistrict,
+        offset,
+        limit: HOME_FEED_PAGE_SIZE,
       });
 
-      if (feedFilter === 'popular') {
-        const counts = await PublicEngagementService.getAllCounts();
-        reports.sort((a, b) => {
-          const aCounts = counts.get(a.id.trim().toUpperCase()) || { viewCount: 0, shareCount: 0 };
-          const bCounts = counts.get(b.id.trim().toUpperCase()) || { viewCount: 0, shareCount: 0 };
-          if (bCounts.viewCount !== aCounts.viewCount) {
-            return bCounts.viewCount - aCounts.viewCount;
-          }
-          if (bCounts.shareCount !== aCounts.shareCount) {
-            return bCounts.shareCount - aCounts.shareCount;
-          }
-          return (b.publishedAt || '').localeCompare(a.publishedAt || '');
-        });
-      }
-
-      setAllReports(reports);
+      setAllReports((current) => {
+        if (!append) return page.reports;
+        const existingIds = new Set(current.map((report) => report.id));
+        const nextReports = page.reports.filter((report) => !existingIds.has(report.id));
+        return [...current, ...nextReports];
+      });
+      setHasMoreReports(page.hasMore);
+      setNextOffset(page.nextOffset);
+      setTotalReportCount(page.totalCount);
       return true;
     } catch (err) {
       console.warn('[HomePage data load error]', err);
-      if (!background) {
+      if (!background && !append) {
         setFetchError('LOAD_ERROR');
       }
       return false;
     } finally {
-      if (!background) {
+      if (!background && !append) {
         setIsLoading(false);
       }
     }
@@ -109,7 +109,9 @@ export const HomePage: React.FC = () => {
   }, [loadReports]);
 
   useEffect(() => {
-    setVisibleCount(INITIAL_VISIBLE_REPORT_COUNT);
+    setHasMoreReports(false);
+    setNextOffset(0);
+    setTotalReportCount(0);
     setFeedWatermark(null);
     setNewReportCount(0);
     setPendingNewestPublishedAt(null);
@@ -216,7 +218,6 @@ export const HomePage: React.FC = () => {
       setFeedWatermark(pendingNewestPublishedAt || new Date().toISOString());
       setNewReportCount(0);
       setPendingNewestPublishedAt(null);
-      setVisibleCount(INITIAL_VISIBLE_REPORT_COUNT);
 
       document.getElementById('home-feed-section')?.scrollIntoView({
         behavior: 'smooth',
@@ -229,15 +230,20 @@ export const HomePage: React.FC = () => {
 
   const filteredReports = useMemo(() => allReports, [allReports]);
 
-  const visibleReports = useMemo(() => {
-    return filteredReports.slice(0, visibleCount);
-  }, [filteredReports, visibleCount]);
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMoreReports || nextOffset === null) return;
 
-  const hasMoreReports = visibleReports.length < filteredReports.length;
-
-  const handleLoadMore = useCallback(() => {
-    setVisibleCount((prev) => prev + LOAD_MORE_REPORT_COUNT);
-  }, []);
+    setIsLoadingMore(true);
+    try {
+      await loadReports({
+        background: true,
+        append: true,
+        offset: nextOffset,
+      });
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [hasMoreReports, isLoadingMore, loadReports, nextOffset]);
 
   return (
     <PublicPageContainer id="home-page-container">
@@ -274,7 +280,7 @@ export const HomePage: React.FC = () => {
             label={language === 'bn' ? 'সব' : 'All'}
             icon={<LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'all'}
-            count={filteredReports.length}
+            count={totalReportCount}
             onClick={() => setFeedFilter('all')}
           />
           <FilterChip
@@ -320,9 +326,9 @@ export const HomePage: React.FC = () => {
           </div>
         )}
 
-        {!isLoading && !fetchError && visibleReports.length > 0 && (
+        {!isLoading && !fetchError && filteredReports.length > 0 && (
           <div className="space-y-3">
-            {visibleReports.map((report) => (
+            {filteredReports.map((report) => (
               <ReportCard key={report.id} report={report} />
             ))}
 
@@ -332,7 +338,8 @@ export const HomePage: React.FC = () => {
                   id="home-load-more-button"
                   variant="secondary"
                   size="md"
-                  onClick={handleLoadMore}
+                  onClick={() => void handleLoadMore()}
+                  isLoading={isLoadingMore}
                   className="w-full sm:w-auto min-w-[200px]"
                 >
                   {language === 'bn' ? 'আরও প্রতিবেদন দেখুন' : 'Load more reports'}
