@@ -67,7 +67,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   const heroBackground =
     HERO_TOKENS.sections[sectionKey]?.background ??
     sectionMeta?.bgColor ??
-    '#F0F3F9';
+    'var(--ui-surface-subtle)';
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
