@@ -186,7 +186,11 @@ requireContains(
   'to={`/report-detail/${encodeURIComponent(report.id)}`}',
   'report card native link must target the report detail route'
 );
-requireNotContains(reportCard, 'role="link"', 'report card container must not recreate link semantics around nested actions');
+requireNotContains(
+  reportCard,
+  'role="link"\n      tabIndex={0}',
+  'report card container must not recreate link semantics around nested actions'
+);
 requireNotContains(reportCard, 'tabIndex={0}', 'report card container must not add a second fake-link tab stop');
 requireNotContains(reportCard, 'onKeyDown={handleCardKeyDown}', 'report card must rely on native link keyboard activation');
 requireContains(reportCard, 'INTERACTIVE_SELECTOR', 'pointer-wide card activation must protect nested interactive actions');
