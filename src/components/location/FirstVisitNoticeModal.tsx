@@ -49,45 +49,69 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           <div className="w-12 h-12 rounded-[var(--radius-control)] bg-ui-brand-bg text-ui-brand-text border border-ui-brand-border flex items-center justify-center shrink-0">
             <ShieldCheck className="w-6 h-6" aria-hidden="true" />
           </div>
-          <div className="flex-1">
-            <h2 id="first-visit-notice-title" className="type-h3 font-[var(--font-weight-bold)] tracking-tight">
+
+          <div className="flex-1 min-w-0">
+            <p className="type-label font-[var(--font-weight-bold)] text-ui-brand-text mb-1">
+              {isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
+            </p>
+            <h2
+              id="first-visit-notice-title"
+              className="type-h2 font-[var(--font-weight-bold)] tracking-tight text-ui-content-primary"
+            >
               {isBn
                 ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
                 : 'Independence & Responsible Use Notice'}
             </h2>
-            <p className="type-compact text-ui-content-muted mt-0.5">
-              {isBn ? 'সবাইকে জানাও প্ল্যাটফর্ম' : 'Sobaike Janao Platform'}
-            </p>
           </div>
         </div>
 
-        <div id="first-visit-notice-desc" className="type-compact text-ui-content-secondary space-y-3 leading-relaxed">
+        <div
+          id="first-visit-notice-desc"
+          className="type-body text-ui-content-primary space-y-4 leading-relaxed"
+        >
           <p>
             {isBn
               ? 'এটি একটি স্বাধীন নাগরিক তথ্য ও জনস্বার্থ প্ল্যাটফর্ম। নির্ভুল ও তথ্যভিত্তিক নাগরিক পর্যবেক্ষণ বজায় রাখতে নিচের বিষয়গুলো মনে রাখুন:'
               : 'This is an independent citizen reporting and public interest platform. To ensure truthful and constructive records, please note:'}
           </p>
 
-          <ol className="p-3.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact space-y-2 list-none">
-            <li className="flex items-start gap-2.5">
-              <p className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '১.' : '1.'}</p>
-              <p>
+          <ol className="space-y-3 list-none">
+            <li className="flex items-start gap-3">
+              <p
+                className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0"
+                aria-hidden="true"
+              >
+                {isBn ? '১.' : '1.'}
+              </p>
+              <p className="text-ui-content-primary">
                 {isBn
                   ? 'সঠিক, সত্য ও প্রাসঙ্গিক তথ্য দিয়ে প্রতিবেদন প্রকাশ করুন।'
                   : 'Submit accurate, factual, and relevant information.'}
               </p>
             </li>
-            <li className="flex items-start gap-2.5">
-              <p className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '২.' : '2.'}</p>
-              <p>
+
+            <li className="flex items-start gap-3">
+              <p
+                className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0"
+                aria-hidden="true"
+              >
+                {isBn ? '২.' : '2.'}
+              </p>
+              <p className="text-ui-content-primary">
                 {isBn
                   ? 'কারও সুনাম নষ্ট করার অসৎ উদ্দেশ্যে ভিত্তিহীন অভিযোগ দেওয়া থেকে বিরত থাকুন।'
                   : 'Avoid submitting false, malicious, or defamatory complaints.'}
               </p>
             </li>
-            <li className="flex items-start gap-2.5">
-              <p className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0" aria-hidden="true">{isBn ? '৩.' : '3.'}</p>
-              <p>
+
+            <li className="flex items-start gap-3">
+              <p
+                className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0"
+                aria-hidden="true"
+              >
+                {isBn ? '৩.' : '3.'}
+              </p>
+              <p className="text-ui-content-primary">
                 {isBn
                   ? 'জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট হটলাইনে সরাসরি যোগাযোগ করুন।'
                   : 'For life-threatening emergencies, call national hotlines (999) directly.'}
@@ -96,27 +120,29 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           </ol>
         </div>
 
-        <div className="pt-1 border-t border-ui-stroke-subtle">
+        <div className="pt-2 border-t border-ui-stroke-subtle">
           <Checkbox
             id="first-visit-ack-checkbox"
             checked={isChecked}
             onChange={(e) => setIsChecked(e.target.checked)}
             label={
-              isBn
-                ? 'আমি নিয়মগুলো পড়েছি এবং দায়িত্বশীলভাবে ব্যবহার করতে সম্মত।'
-                : 'I have read and agree to use this platform responsibly.'
+              <span className="type-body font-[var(--font-weight-medium)] text-ui-content-primary">
+                {isBn
+                  ? 'আমি নিয়মগুলো পড়েছি এবং দায়িত্বশীলভাবে ব্যবহার করতে সম্মত।'
+                  : 'I have read and agree to use this platform responsibly.'}
+              </span>
             }
           />
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1">
           <button
             ref={acknowledgeBtnRef}
             id="first-visit-acknowledge-btn"
             type="button"
             onClick={handleContinue}
             disabled={!isChecked}
-            className="w-full h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] type-compact bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
+            className="w-full h-12 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-semibold)] type-body bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
           >
             <span>{isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}</span>
           </button>
