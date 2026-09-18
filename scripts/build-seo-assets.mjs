@@ -448,6 +448,14 @@ function dynamicCategoryPage(segment) {
   const slug = cleanText(segment.slug || segment.id).replace(/^\/category\//, '').replace(/^\//, '');
   if (!slug) return null;
 
+  // Do not publish a second /category/... URL when this taxonomy item already has
+  // an established top-level canonical route (for example /load-shedding).
+  // This protects search engines from duplicate indexable titles/content.
+  const establishedStaticPath = `/${slug}`;
+  if (STATIC_PAGES.some((page) => page.path === establishedStaticPath)) {
+    return null;
+  }
+
   const path = `/category/${encodeURIComponent(slug)}`;
   const name = cleanText(segment.name_bn || segment.name_en || segment.id);
   const description = cleanText(
