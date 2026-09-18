@@ -299,7 +299,6 @@ export const ConfiguredFieldsSection = forwardRef<
                 : `Latest allowed value is ${maxValue}.`;
           }
         }
-        }
       }
 
       setErrors(next);
