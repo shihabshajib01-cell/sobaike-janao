@@ -358,8 +358,8 @@
     font-size: var(--type-body-size);
     line-height: var(--type-body-line);
     font-weight: var(--type-body-weight);
-    background-color: var(--ui-page);
-    color: var(--ui-text-primary);
+    background-color: var(--md-background);
+    color: var(--md-on-surface);
   }
 
   .material-symbols-outlined {
@@ -371,7 +371,7 @@
     font-size: var(--type-h1-size-mobile) !important;
     line-height: var(--type-h1-line-mobile) !important;
     font-weight: var(--type-h1-weight) !important;
-    color: var(--ui-text-primary);
+    color: var(--md-on-surface);
   }
 
   @media (min-width: 768px) {
@@ -392,7 +392,7 @@
     font-size: var(--type-h2-size-mobile) !important;
     line-height: var(--type-h2-line-mobile) !important;
     font-weight: var(--type-h2-weight) !important;
-    color: var(--ui-text-primary);
+    color: var(--md-on-surface);
   }
 
   @media (min-width: 768px) {
@@ -406,7 +406,7 @@
     font-size: var(--type-h3-size-mobile) !important;
     line-height: var(--type-h3-line-mobile) !important;
     font-weight: var(--type-h3-weight) !important;
-    color: var(--ui-text-primary);
+    color: var(--md-on-surface);
   }
 
   @media (min-width: 768px) {
@@ -420,7 +420,7 @@
     font-size: var(--type-h4-size-mobile) !important;
     line-height: var(--type-h4-line-mobile) !important;
     font-weight: var(--type-h4-weight) !important;
-    color: var(--ui-text-primary);
+    color: var(--md-on-surface);
   }
 
   @media (min-width: 768px) {
@@ -434,7 +434,7 @@
     font-size: var(--type-h5-size);
     line-height: var(--type-h5-line);
     font-weight: var(--type-h5-weight);
-    color: var(--ui-text-primary);
+    color: var(--md-on-surface);
   }
 
   p, .type-body {
@@ -604,21 +604,21 @@
 }
 
 /* Explicit Semantic Color Utility Helpers */
-.bg-page { background-color: var(--ui-page) !important; }
-.bg-surface { background-color: var(--ui-surface) !important; }
-.bg-surface-subtle { background-color: var(--ui-surface-subtle) !important; }
-.bg-surface-elevated { background-color: var(--ui-surface-elevated) !important; }
-.bg-surface-hover { background-color: var(--ui-surface-hover) !important; }
-.bg-surface-hover:hover { background-color: var(--ui-surface-hover) !important; }
+.bg-page { background-color: var(--md-background) !important; }
+.bg-surface { background-color: var(--md-surface) !important; }
+.bg-surface-subtle { background-color: var(--md-surface-subtle) !important; }
+.bg-surface-elevated { background-color: var(--md-surface-elevated) !important; }
+.bg-surface-hover { background-color: var(--md-surface-hover) !important; }
+.bg-surface-hover:hover { background-color: var(--md-surface-hover) !important; }
 
-.text-primary { color: var(--ui-text-primary) !important; }
-.text-secondary { color: var(--ui-text-secondary) !important; }
-.text-muted { color: var(--ui-text-muted) !important; }
-.text-inverse { color: var(--ui-text-inverse) !important; }
+.text-primary { color: var(--md-on-surface) !important; }
+.text-secondary { color: var(--md-on-surface-secondary) !important; }
+.text-muted { color: var(--md-on-surface-muted) !important; }
+.text-inverse { color: var(--md-on-primary) !important; }
 
-.border-subtle { border-color: var(--ui-border-subtle) !important; }
-.border-theme { border-color: var(--ui-border) !important; }
-.border-strong { border-color: var(--ui-border-strong) !important; }
+.border-subtle { border-color: var(--md-outline-subtle) !important; }
+.border-theme { border-color: var(--md-outline) !important; }
+.border-strong { border-color: var(--md-outline-strong) !important; }
 
 /* Safe-area insets for modern mobile devices */
 .pb-safe {
@@ -694,27 +694,27 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--ui-border-strong);
+  background: var(--md-outline-strong);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--ui-text-muted);
+  background: var(--md-on-surface-muted);
 }
 
-.text-accent { color: var(--ui-accent) !important; }
-.bg-accent { background-color: var(--ui-accent) !important; }
-.bg-accent-soft { background-color: var(--ui-accent-soft) !important; }
-.border-accent { border-color: var(--ui-accent-border) !important; }
-.ring-accent { --tw-ring-color: var(--ui-accent) !important; }
+.text-accent { color: var(--md-secondary) !important; }
+.bg-accent { background-color: var(--md-secondary) !important; }
+.bg-accent-soft { background-color: var(--md-secondary-container) !important; }
+.border-accent { border-color: var(--md-secondary-outline) !important; }
+.ring-accent { --tw-ring-color: var(--md-secondary) !important; }
 
 /* Primary Action Buttons */
 .btn-primary-action {
-  background-color: var(--ui-primary-action-bg) !important;
-  color: var(--ui-primary-action-text) !important;
+  background-color: var(--md-primary) !important;
+  color: var(--md-on-primary) !important;
 }
 .btn-primary-action:hover {
-  background-color: var(--ui-primary-action-hover) !important;
+  background-color: var(--md-primary-variant) !important;
 }
 
 /* Hero Carousel & Slider CTA Button Recipe */
@@ -730,8 +730,8 @@
 }
 
 ::selection {
-  background-color: var(--ui-accent-soft);
-  color: var(--ui-text-primary);
+  background-color: var(--md-secondary-container);
+  color: var(--md-on-surface);
 }
 
 /* Strict Responsive Navigation Visibility System */
@@ -1004,9 +1004,9 @@
   width: var(--hero-slider-arrow-size, 44px);
   height: var(--hero-slider-arrow-size, 44px);
   border-radius: 9999px;
-  background-color: color-mix(in srgb, var(--ui-surface) 90%, transparent);
-  color: var(--ui-text-primary);
-  border: 1px solid var(--ui-border-subtle);
+  background-color: color-mix(in srgb, var(--md-surface) 90%, transparent);
+  color: var(--md-on-surface);
+  border: 1px solid var(--md-outline-subtle);
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   backdrop-filter: blur(4px);
   align-items: center;
@@ -1023,7 +1023,7 @@
 }
 
 .hero-slider-arrow:hover {
-  background-color: var(--ui-surface);
+  background-color: var(--md-surface);
 }
 
 .group:hover .hero-slider-arrow,
@@ -1037,7 +1037,7 @@
 
 .hero-slider-arrow:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--ui-surface), 0 0 0 4px var(--ui-focus), 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  box-shadow: 0 0 0 2px var(--md-surface), 0 0 0 4px var(--md-focus), 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 .hero-slider-arrow-prev {
