@@ -57,41 +57,43 @@ export interface SegmentTaxonomyItem {
 
 const sectionKeys = Object.keys(SECTIONS) as SectionKey[];
 
-const THEME_PRESETS: Record<string, { primary: string; onPrimary: string }> = {
-  sky: { primary: '#0284C7', onPrimary: '#050505' },
-  indigo: { primary: '#4F46E5', onPrimary: '#FFFFFF' },
-  emerald: { primary: '#059669', onPrimary: '#050505' },
-  amber: { primary: '#D97706', onPrimary: '#050505' },
-  rose: { primary: '#E11D48', onPrimary: '#FFFFFF' },
-  violet: { primary: '#7C3AED', onPrimary: '#FFFFFF' },
-  slate: { primary: '#64748B', onPrimary: '#FFFFFF' },
-};
+const MANAGED_THEME_PRESETS = new Set([
+  'sky',
+  'indigo',
+  'emerald',
+  'amber',
+  'rose',
+  'violet',
+  'slate',
+]);
 
 export const isManagedThemePreset = (themeKey?: string): boolean =>
-  Boolean(themeKey && THEME_PRESETS[themeKey]);
+  Boolean(themeKey && MANAGED_THEME_PRESETS.has(themeKey));
 
 const buildDynamicTheme = (themeKey?: string) => {
-  const preset = THEME_PRESETS[themeKey || ''] || THEME_PRESETS.sky;
-  const primary = preset.primary;
-  const background = `color-mix(in srgb, ${primary} 10%, var(--md-surface))`;
-  const border = `color-mix(in srgb, ${primary} 35%, var(--md-surface))`;
-  const text = `color-mix(in srgb, ${primary} 72%, var(--md-on-surface))`;
+  const presetKey = isManagedThemePreset(themeKey) ? themeKey! : 'sky';
+  const primary = `var(--theme-preset-${presetKey}-primary)`;
+  const hover = `var(--theme-preset-${presetKey}-hover)`;
+  const onPrimary = `var(--theme-preset-${presetKey}-on-primary)`;
+  const container = `var(--theme-preset-${presetKey}-container)`;
+  const onContainer = `var(--theme-preset-${presetKey}-on-container)`;
+  const outline = `var(--theme-preset-${presetKey}-outline)`;
 
   return {
     primaryColor: primary,
-    hoverColor: primary,
-    bgColor: background,
-    borderColor: border,
-    textColor: text,
+    hoverColor: hover,
+    bgColor: container,
+    borderColor: outline,
+    textColor: onContainer,
     colors: {
       primary,
-      hover: primary,
-      lightBg: background,
-      bgLight: background,
-      border,
-      text,
-      textSafe: text,
-      filledText: preset.onPrimary,
+      hover,
+      lightBg: container,
+      bgLight: container,
+      border: outline,
+      text: onContainer,
+      textSafe: onContainer,
+      filledText: onPrimary,
     },
   };
 };

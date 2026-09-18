@@ -93,7 +93,7 @@ Category colors identify category context. They should not control generic butto
 
 Admin-managed theme presets must produce the same category role contract.
 
-Runtime category colors derive containers and text from the current Material surface roles, so light/dark behavior remains coherent.
+Admin-managed presets define explicit light and dark `primary`, `hover`, `on-primary`, `container`, `on-container`, and `outline` roles in `color-system.css`. Runtime taxonomy only binds a category to those preset roles, so theme switching does not depend on stale inline light-mode values.
 
 Existing built-in categories must never receive inline runtime overrides; their light/dark roles come from `color-system.css`.
 
@@ -110,10 +110,16 @@ Do not add new UI code using legacy color utilities when a `role-*` utility exis
 Automated design-system checks enforce:
 
 - normal text contrast of at least 4.5:1 for protected role pairs
+- non-text/control and focus contrast of at least 3:1 where boundaries or indicators are required
+- distinct outline subtle/default/strong roles
+- distinct dark surface/subtle/elevated roles
+- distinct secondary/muted content roles
 - category on-primary contrast
 - category on-container contrast
 - semantic solid and container contrast
-- managed Admin theme contrast
+- managed Admin theme contrast in both light and dark themes
+- hero light/dark parity and hero text contrast
+- category marker use of the category `on-primary` role
 - no duplicate core color authority
 - no raw static category/hero hex values outside the color authority
 - no legacy color utilities in migrated shared primitives

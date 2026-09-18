@@ -77,17 +77,18 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   const iconKey = config?.iconKey || section;
   const IconComponent = ICON_MAP[iconKey] || ICON_MAP[section] || ShieldAlert;
   const isAccessible = Boolean(ariaLabel);
-  const primary = config?.primaryColor || 'var(--ui-action-bg)';
-  const background = config?.bgColor || 'var(--ui-surface-subtle)';
-  const text = config?.textColor || 'var(--ui-content-primary)';
-  const border = config?.borderColor || 'var(--ui-stroke-default)';
+  const primary = config?.primaryColor || 'var(--md-primary)';
+  const background = config?.bgColor || 'var(--md-surface-subtle)';
+  const text = config?.textColor || 'var(--md-on-surface)';
+  const border = config?.borderColor || 'var(--md-outline)';
 
   if (variant === 'marker') {
     return (
       <div
-        className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-[var(--radius-pill)] flex items-center justify-center text-ui-content-inverse border-2 border-ui-surface shadow-[var(--elevation-md)] transition-all shrink-0 ${className}`}
+        className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-[var(--radius-pill)] flex items-center justify-center border-2 border-role-surface shadow-[var(--elevation-md)] transition-all shrink-0 ${className}`}
         style={{
           backgroundColor: primary,
+          color: config?.colors.filledText || 'var(--md-on-primary)',
         }}
         role={isAccessible ? 'img' : undefined}
         aria-label={ariaLabel}

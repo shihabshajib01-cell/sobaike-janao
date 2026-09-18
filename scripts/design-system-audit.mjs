@@ -119,17 +119,17 @@ const APPROVED_MATERIAL_CORE = {
     '--md-surface-hover': '#E4E6EB',
     '--md-on-surface': '#050505',
     '--md-on-surface-secondary': '#65676B',
-    '--md-on-surface-muted': '#65676B',
-    '--md-outline-subtle': '#E4E6EB',
-    '--md-outline': '#E4E6EB',
-    '--md-outline-strong': '#E4E6EB',
+    '--md-on-surface-muted': '#6B6E72',
+    '--md-outline-subtle': '#CED0D4',
+    '--md-outline': '#85888C',
+    '--md-outline-strong': '#65676B',
     '--md-disabled-container': '#E4E6EB',
     '--md-on-disabled': '#65676B',
   },
   dark: {
-    '--md-primary': '#1B4D6B',
-    '--md-primary-variant': '#163B52',
-    '--md-primary-active': '#245F82',
+    '--md-primary': '#327DA8',
+    '--md-primary-variant': '#3B7DA4',
+    '--md-primary-active': '#2B79A4',
     '--md-on-primary': '#FFFFFF',
     '--md-secondary': '#3A7CA5',
     '--md-secondary-variant': '#245F82',
@@ -138,15 +138,15 @@ const APPROVED_MATERIAL_CORE = {
     '--md-background': '#18191A',
     '--md-on-background': '#E4E6EB',
     '--md-surface': '#242526',
-    '--md-surface-subtle': '#242526',
-    '--md-surface-elevated': '#242526',
-    '--md-surface-hover': '#3A3B3C',
+    '--md-surface-subtle': '#202122',
+    '--md-surface-elevated': '#2B2D2F',
+    '--md-surface-hover': '#303234',
     '--md-on-surface': '#E4E6EB',
     '--md-on-surface-secondary': '#B0B3B8',
-    '--md-on-surface-muted': '#B0B3B8',
-    '--md-outline-subtle': '#3A3B3C',
-    '--md-outline': '#3A3B3C',
-    '--md-outline-strong': '#3A3B3C',
+    '--md-on-surface-muted': '#9CA0A6',
+    '--md-outline-subtle': '#4E4F50',
+    '--md-outline': '#7C8086',
+    '--md-outline-strong': '#B0B3B8',
     '--md-disabled-container': '#3A3B3C',
     '--md-on-disabled': '#B0B3B8',
   },
@@ -259,6 +259,98 @@ if (!fs.existsSync(colorSystemFile)) {
     addContrastFinding(colorSystemFile, theme, 'on-surface-secondary', values['--md-on-surface-secondary'], values['--md-surface']);
     addContrastFinding(colorSystemFile, theme, 'on-surface-muted', values['--md-on-surface-muted'], values['--md-surface']);
 
+    // WCAG non-text/UI contrast: control boundaries and focus indicators.
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'outline-on-surface',
+      values['--md-outline'],
+      values['--md-surface'],
+      3
+    );
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'outline-on-subtle-surface',
+      values['--md-outline'],
+      values['--md-surface-subtle'],
+      3
+    );
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'focus-on-surface',
+      values['--md-focus'],
+      values['--md-surface'],
+      3
+    );
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'focus-on-subtle-surface',
+      values['--md-focus'],
+      values['--md-surface-subtle'],
+      3
+    );
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'focus-on-elevated-surface',
+      values['--md-focus'],
+      values['--md-surface-elevated'],
+      3
+    );
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'primary-on-surface',
+      values['--md-primary'],
+      values['--md-surface'],
+      3
+    );
+
+    if (
+      values['--md-outline-subtle'] === values['--md-outline'] ||
+      values['--md-outline'] === values['--md-outline-strong'] ||
+      values['--md-outline-subtle'] === values['--md-outline-strong']
+    ) {
+      findings.push({
+        file: colorSystemFile,
+        line: 1,
+        rule: 'outline-role-collapse',
+        token: theme,
+        message: 'Outline subtle/default/strong roles must remain visually distinct',
+        source: `${values['--md-outline-subtle']} / ${values['--md-outline']} / ${values['--md-outline-strong']}`,
+      });
+    }
+
+    if (values['--md-on-surface-secondary'] === values['--md-on-surface-muted']) {
+      findings.push({
+        file: colorSystemFile,
+        line: 1,
+        rule: 'content-role-collapse',
+        token: theme,
+        message: 'Secondary and muted content roles must remain visually distinct',
+        source: values['--md-on-surface-secondary'],
+      });
+    }
+
+    if (
+      theme === 'dark' &&
+      (values['--md-surface'] === values['--md-surface-subtle'] ||
+        values['--md-surface'] === values['--md-surface-elevated'] ||
+        values['--md-surface-subtle'] === values['--md-surface-elevated'])
+    ) {
+      findings.push({
+        file: colorSystemFile,
+        line: 1,
+        rule: 'dark-surface-role-collapse',
+        token: 'dark-surfaces',
+        message: 'Dark surface, subtle and elevated roles must remain visually distinct',
+        source: `${values['--md-surface']} / ${values['--md-surface-subtle']} / ${values['--md-surface-elevated']}`,
+      });
+    }
+
     for (const semantic of ['success', 'warning', 'error', 'info']) {
       addContrastFinding(
         colorSystemFile,
@@ -298,6 +390,98 @@ if (!fs.existsSync(colorSystemFile)) {
         `${category}-on-container`,
         values[`--category-${category}-on-container`],
         values[`--category-${category}-container`]
+      );
+    }
+  }
+
+  const lightValues = parseVariables(extractThemeBlock(source, 'light'));
+  const darkValues = parseVariables(extractThemeBlock(source, 'dark'));
+
+  for (const category of [
+    'harassment',
+    'extortion',
+    'public-safety',
+    'road-transport',
+    'load-shedding',
+    'illegal-occupation',
+    'rickshaw',
+  ]) {
+    const heroToken = `--hero-${category}-container`;
+    const lightHero = lightValues[heroToken];
+    const darkHero = darkValues[heroToken];
+
+    if (!lightHero || !darkHero || lightHero === darkHero) {
+      findings.push({
+        file: colorSystemFile,
+        line: 1,
+        rule: 'hero-theme-parity',
+        token: heroToken,
+        message: 'Built-in hero backgrounds must define distinct light and dark values',
+        source: `light=${lightHero || 'missing'}, dark=${darkHero || 'missing'}`,
+      });
+    }
+
+    addContrastFinding(
+      colorSystemFile,
+      'light',
+      `${category}-hero-primary-text`,
+      lightValues['--hero-text-primary'],
+      lightHero
+    );
+    addContrastFinding(
+      colorSystemFile,
+      'light',
+      `${category}-hero-secondary-text`,
+      lightValues['--hero-text-secondary'],
+      lightHero
+    );
+    addContrastFinding(
+      colorSystemFile,
+      'dark',
+      `${category}-hero-primary-text`,
+      darkValues['--hero-text-primary'],
+      darkHero
+    );
+    addContrastFinding(
+      colorSystemFile,
+      'dark',
+      `${category}-hero-secondary-text`,
+      darkValues['--hero-text-secondary'],
+      darkHero
+    );
+  }
+
+  for (const preset of ['sky', 'indigo', 'emerald', 'amber', 'rose', 'violet', 'slate']) {
+    for (const [theme, values] of [
+      ['light', lightValues],
+      ['dark', darkValues],
+    ]) {
+      const primary = values[`--theme-preset-${preset}-primary`];
+      const onPrimary = values[`--theme-preset-${preset}-on-primary`];
+      const container = values[`--theme-preset-${preset}-container`];
+      const onContainer = values[`--theme-preset-${preset}-on-container`];
+
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        `${preset}-managed-on-primary`,
+        onPrimary,
+        primary
+      );
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        `${preset}-managed-on-container`,
+        onContainer,
+        container
+      );
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        `${preset}-managed-primary-on-surface`,
+        primary,
+        values['--md-surface'],
+        3
       );
     }
   }
@@ -394,19 +578,6 @@ const taxonomyFile = 'src/services/taxonomyService.ts';
 if (fs.existsSync(taxonomyFile)) {
   const source = fs.readFileSync(taxonomyFile, 'utf8');
 
-  for (const requiredToken of ['var(--md-surface)', 'var(--md-on-surface)']) {
-    if (!source.includes(requiredToken)) {
-      findings.push({
-        file: taxonomyFile,
-        line: 1,
-        rule: 'dynamic-theme-role-bypass',
-        token: requiredToken,
-        message: 'Dynamic category themes must derive from Material surface roles',
-        source: 'Required Material role reference is missing',
-      });
-    }
-  }
-
   if (!source.includes('if (legacy && !hasManagedTheme)')) {
     findings.push({
       file: taxonomyFile,
@@ -442,22 +613,76 @@ if (fs.existsSync(taxonomyFile)) {
     }
   }
 
-  const presetPattern =
-    /(\w+):\s*\{\s*primary:\s*'(#[0-9a-fA-F]{6})',\s*onPrimary:\s*'(#[0-9a-fA-F]{6})'\s*\}/g;
+  if (/#[0-9a-fA-F]{3,8}\b/.test(source)) {
+    findings.push({
+      file: taxonomyFile,
+      line: 1,
+      rule: 'managed-theme-literal',
+      token: '#...',
+      message: 'Managed theme values must resolve through light/dark preset roles in color-system.css',
+      source: 'Raw theme color found in taxonomyService.ts',
+    });
+  }
 
-  for (const match of source.matchAll(presetPattern)) {
-    const [, preset, primary, onPrimary] = match;
-    const ratio = contrastRatio(primary, onPrimary);
-    if (ratio < 4.5) {
+  for (const role of ['primary', 'hover', 'on-primary', 'container', 'on-container', 'outline']) {
+    if (!source.includes(`--theme-preset-${'${presetKey}'}-${role}`)) {
       findings.push({
         file: taxonomyFile,
         line: 1,
-        rule: 'managed-theme-contrast',
-        token: preset,
-        message: `Managed theme CTA contrast is ${ratio.toFixed(2)}:1; minimum is 4.5:1`,
-        source: `${primary} on ${onPrimary}`,
+        rule: 'managed-theme-role-missing',
+        token: role,
+        message: 'Admin-managed themes must consume the complete light/dark preset role contract',
+        source: `Missing managed preset role: ${role}`,
       });
     }
+  }
+}
+
+const featureIconFile = 'src/components/branding/FeatureIcon.tsx';
+if (fs.existsSync(featureIconFile)) {
+  const source = fs.readFileSync(featureIconFile, 'utf8');
+  if (!source.includes("color: config?.colors.filledText || 'var(--md-on-primary)'")) {
+    findings.push({
+      file: featureIconFile,
+      line: 1,
+      rule: 'category-marker-on-primary',
+      token: 'filledText',
+      message: 'Category markers must use the category on-primary role instead of generic inverse text',
+      source: 'Expected category filledText marker color is missing',
+    });
+  }
+}
+
+const searchInputFile = 'src/components/ui/SearchInput.tsx';
+if (fs.existsSync(searchInputFile)) {
+  const source = fs.readFileSync(searchInputFile, 'utf8');
+  if (!source.includes('border-role-outline hover:border-role-outline-strong')) {
+    findings.push({
+      file: searchInputFile,
+      line: 1,
+      rule: 'control-boundary-role',
+      token: 'border-role-outline',
+      message: 'Search input must use the default control outline, reserving subtle outline for separators',
+      source: 'Expected default/strong outline recipe is missing',
+    });
+  }
+}
+
+for (const heroFile of [
+  'src/components/category/CategoryHeroSlider.tsx',
+  'src/components/home/ServiceHeroCarousel.tsx',
+]) {
+  if (!fs.existsSync(heroFile)) continue;
+  const source = fs.readFileSync(heroFile, 'utf8');
+  if (source.includes('var(--ui-surface-subtle)') || source.includes('ring-ui-focus')) {
+    findings.push({
+      file: heroFile,
+      line: 1,
+      rule: 'hero-legacy-color-role',
+      token: 'ui-*',
+      message: 'Hero rendering must consume Material roles so dark-mode parity is preserved',
+      source: 'Legacy hero color role reference found',
+    });
   }
 }
 

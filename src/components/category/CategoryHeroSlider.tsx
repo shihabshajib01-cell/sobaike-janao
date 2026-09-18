@@ -69,10 +69,10 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   const isSectionActive = Boolean(sectionMeta);
   const usesManagedTheme = isManagedThemePreset(sectionMeta?.themeKey);
   const heroBackground = usesManagedTheme
-    ? sectionMeta?.bgColor || 'var(--ui-surface-subtle)'
+    ? sectionMeta?.bgColor || 'var(--md-surface-subtle)'
     : HERO_TOKENS.sections[sectionKey]?.background ??
       sectionMeta?.bgColor ??
-      'var(--ui-surface-subtle)';
+      'var(--md-surface-subtle)';
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;
@@ -290,7 +290,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchCancel}
-      className={`group w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${className}`}
+      className={`group w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus ${className}`}
       style={containerStyle}
     >
       {/* Slides Track */}
