@@ -1459,102 +1459,60 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Incident timeline */}
             <div className={`grid grid-cols-1 ${hideIncidentTime && hideFrequency ? 'sm:grid-cols-1' : hideFrequency ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3`}>
-              <div>
-                <label
-                  htmlFor="complaint-date-input"
-                  className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                    <span>{language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}</span>
-                    <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
-                  </div>
-                </label>
-                <input
-                  id="complaint-date-input"
-                  aria-invalid={Boolean(errors.incidentDate)}
-                  aria-describedby={errors.incidentDate ? 'complaint-date-input-error' : undefined}
-                  aria-required="true"
-                  type="date"
-                  max={todayLocal}
-                  value={formData.incidentDate || ''}
-                  onChange={(e) => {
-                    const selectedDate = e.target.value;
-                    if (selectedDate && selectedDate > todayLocal) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        incidentDate:
-                          language === 'bn'
-                            ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                            : 'Select today or an earlier date.',
-                      }));
-                      return;
-                    }
-                    onUpdateFormData({ incidentDate: selectedDate });
-                    if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
-                  }}
-                  className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                    errors.incidentDate ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                  }`}
-                />
-                {errors.incidentDate && (
-                  <p id="complaint-date-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
-                )}
-              </div>
+              <DateField
+                id="complaint-date-input"
+                language={language}
+                required
+                label={language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}
+                max={todayLocal}
+                value={formData.incidentDate || ''}
+                error={errors.incidentDate}
+                onChange={(e) => {
+                  const selectedDate = e.target.value;
+                  if (selectedDate && selectedDate > todayLocal) {
+                    setErrors((prev) => ({
+                      ...prev,
+                      incidentDate:
+                        language === 'bn'
+                          ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
+                          : 'Select today or an earlier date.',
+                    }));
+                    return;
+                  }
+                  onUpdateFormData({ incidentDate: selectedDate });
+                  if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
+                }}
+              />
 
               {!hideIncidentTime && (
-                <div>
-                  <label
-                    htmlFor="complaint-time-input"
-                    className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                      <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}</span>
-                    </div>
-                  </label>
-                  <input
-                    id="complaint-time-input"
-                    type="time"
-                    value={formData.incidentTime || ''}
-                    onChange={(e) => onUpdateFormData({ incidentTime: e.target.value })}
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                  />
-                </div>
+                <TimeField
+                  id="complaint-time-input"
+                  language={language}
+                  label={language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}
+                  value={formData.incidentTime || ''}
+                  onChange={(e) => onUpdateFormData({ incidentTime: e.target.value })}
+                />
               )}
 
               {!hideFrequency && (
-                <div>
-                  <label
-                    htmlFor="complaint-frequency-select"
-                    className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Repeat className="w-3.5 h-3.5 text-ui-content-secondary" />
-                      <span>{language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}</span>
-                    </div>
-                  </label>
-                  <select
-                    id="complaint-frequency-select"
-                    value={formData.frequency || 'one-time'}
-                    onChange={(e) =>
-                      onUpdateFormData({ frequency: e.target.value as ReportFormData['frequency'] })
-                    }
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[44px]"
-                  >
-                    {(isSexualHarassment
-                      ? SEXUAL_HARASSMENT_FREQUENCY_OPTIONS
-                      : [
-                          { value: 'one-time', labelBn: 'এককালীন (One-time)', labelEn: 'One-time' },
-                          { value: 'repeated', labelBn: 'নিয়মিত / একাধিকবার', labelEn: 'Repeated / Ongoing' },
-                        ]
-                    ).map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {language === 'bn' ? option.labelBn : option.labelEn}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  id="complaint-frequency-select"
+                  label={language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}
+                  value={formData.frequency || 'one-time'}
+                  onChange={(e) =>
+                    onUpdateFormData({ frequency: e.target.value as ReportFormData['frequency'] })
+                  }
+                  options={(isSexualHarassment
+                    ? SEXUAL_HARASSMENT_FREQUENCY_OPTIONS
+                    : [
+                        { value: 'one-time', labelBn: 'এককালীন (One-time)', labelEn: 'One-time' },
+                        { value: 'repeated', labelBn: 'নিয়মিত / একাধিকবার', labelEn: 'Repeated / Ongoing' },
+                      ]
+                  ).map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
               )}
             </div>
 
@@ -1611,45 +1569,29 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 />
 
                 {needsSexualHarassmentInstitution(formData.sexualHarassmentContext) && (
-                  <div>
-                    <label
-                      htmlFor="sexual-harassment-institution-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      {language === 'bn'
+                  <TextField
+                    id="sexual-harassment-institution-input"
+                    type="text"
+                    maxLength={200}
+                    label={
+                      language === 'bn'
                         ? 'প্রতিষ্ঠান / সংস্থার নাম (ঐচ্ছিক)'
-                        : 'Institution / organization (optional)'}
-                    </label>
-                    <input
-                      id="sexual-harassment-institution-input"
-                  aria-invalid={Boolean(errors.sexualHarassmentInstitution)}
-                  aria-describedby={errors.sexualHarassmentInstitution ? 'sexual-harassment-institution-input-error' : undefined}
-                      type="text"
-                      maxLength={200}
-                      value={formData.sexualHarassmentInstitution || ''}
-                      onChange={(event) => {
-                        onUpdateFormData({ sexualHarassmentInstitution: event.target.value });
-                        if (errors.sexualHarassmentInstitution) {
-                          setErrors((prev) => ({ ...prev, sexualHarassmentInstitution: '' }));
-                        }
-                      }}
-                      placeholder={
-                        language === 'bn'
-                          ? 'উৎস বা ঘটনার তথ্য অনুযায়ী প্রতিষ্ঠানের নাম'
-                          : 'Institution name, if known'
+                        : 'Institution / organization (optional)'
+                    }
+                    value={formData.sexualHarassmentInstitution || ''}
+                    error={errors.sexualHarassmentInstitution}
+                    onChange={(event) => {
+                      onUpdateFormData({ sexualHarassmentInstitution: event.target.value });
+                      if (errors.sexualHarassmentInstitution) {
+                        setErrors((prev) => ({ ...prev, sexualHarassmentInstitution: '' }));
                       }
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.sexualHarassmentInstitution
-                          ? 'border-ui-error-border bg-ui-error-bg'
-                          : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.sexualHarassmentInstitution && (
-                      <p id="sexual-harassment-institution-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">
-                        {errors.sexualHarassmentInstitution}
-                      </p>
-                    )}
-                  </div>
+                    }}
+                    placeholder={
+                      language === 'bn'
+                        ? 'উৎস বা ঘটনার তথ্য অনুযায়ী প্রতিষ্ঠানের নাম'
+                        : 'Institution name, if known'
+                    }
+                  />
                 )}
               </div>
             )}
