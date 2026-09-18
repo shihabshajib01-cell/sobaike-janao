@@ -8,14 +8,12 @@ import {
   ChevronUp,
   Clock,
   Eye,
-  ExternalLink,
   FileCheck,
   Home,
   Layers,
   MapPin,
   Scale,
   Share2,
-  ShieldCheck,
   UserX,
   Zap,
 } from 'lucide-react';
@@ -501,66 +499,6 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <div className="max-w-[760px] type-body text-ui-content-primary leading-7">
               <p className="whitespace-pre-line">{detailText}</p>
             </div>
-          )}
-
-          {report.sources && report.sources.length > 0 && (
-            <section
-              id="verified-report-sources"
-              className="pt-4 border-t border-ui-stroke-subtle space-y-3"
-              aria-labelledby="verified-report-sources-title"
-            >
-              <div className="flex items-center gap-2">
-                <ShieldCheck
-                  className="w-[18px] h-[18px] text-ui-success-text shrink-0"
-                  aria-hidden="true"
-                />
-                <h2
-                  id="verified-report-sources-title"
-                  className="type-h4 text-ui-content-primary"
-                >
-                  {language === 'bn' ? 'যাচাইকৃত উৎস' : 'Verified sources'}
-                </h2>
-              </div>
-
-              <div className="space-y-2">
-                {report.sources.map((source, index) => (
-                  <div
-                    key={`${source.canonicalUrl}-${index}`}
-                    className="p-3 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5"
-                  >
-                    <div className="min-w-0">
-                      <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary break-words">
-                        {source.sourceTitle || source.publisherName}
-                      </p>
-                      <p className="type-meta text-ui-content-secondary mt-0.5">
-                        {source.publisherName}
-                        {source.sourcePublishedDate ? ` · ${source.sourcePublishedDate}` : ''}
-                      </p>
-                    </div>
-                    <a
-                      href={source.canonicalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="min-h-[44px] inline-flex items-center justify-center gap-1.5 px-3 type-meta font-[var(--font-weight-semibold)] text-ui-action-text bg-ui-action-bg hover:bg-ui-action-bg-hover ui-radius-control shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-                      aria-label={
-                        language === 'bn'
-                          ? `${source.publisherName} উৎসের বিস্তারিত পাতা খুলুন`
-                          : `Open the full source detail page from ${source.publisherName}`
-                      }
-                    >
-                      <span>{language === 'bn' ? 'মূল প্রতিবেদন খুলুন' : 'Open full source'}</span>
-                      <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-                    </a>
-                  </div>
-                ))}
-              </div>
-
-              <p className="type-meta text-ui-content-muted">
-                {language === 'bn'
-                  ? 'শুধু যাচাইকৃত মূল আর্টিকেল/ডিটেইল পেজের লিংক দেখানো হয়।'
-                  : 'Only verified canonical article/detail-page links are shown.'}
-              </p>
-            </section>
           )}
 
           <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
