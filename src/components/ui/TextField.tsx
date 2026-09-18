@@ -13,6 +13,11 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
   ({ id, label, helperText, error, required, className = '', fieldClassName = '', ...props }, ref) => {
     if (!id) throw new Error('TextField requires a stable id');
     const { helperId, errorId } = formFieldIds(id);
+    const describedBy = [
+      props['aria-describedby'],
+      helperText ? helperId : undefined,
+      error ? errorId : undefined,
+    ].filter(Boolean).join(' ') || undefined;
 
     return (
       <FormField
@@ -30,7 +35,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
           required={required}
           aria-required={required ? 'true' : undefined}
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? errorId : helperText ? helperId : props['aria-describedby']}
+          aria-describedby={describedBy}
           className={joinFormClasses(FORM_CONTROL_BASE, formControlStateClass(Boolean(error)), className)}
         />
       </FormField>
