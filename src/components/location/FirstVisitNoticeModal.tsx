@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Checkbox } from '../ui/Checkbox';
-import { Button } from '../ui/Button';
+import { ModalActions } from '../ui/ModalActions';
 
 interface FirstVisitNoticeModalProps {
   isOpen: boolean;
@@ -52,6 +52,7 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
       isOpen={isOpen}
       onClose={() => {}}
       closeOnBackdrop={false}
+      closeOnEscape={false}
       maxWidth="md"
       language={language}
       title={isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
@@ -68,17 +69,17 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
       showCloseButton={false}
       ariaDescribedBy="first-visit-notice-desc"
       footer={
-        <Button
-          id="first-visit-acknowledge-btn"
-          type="button"
-          variant="primary"
-          size="lg"
-          fullWidth
-          onClick={handleContinue}
-          disabled={!isChecked}
-        >
-          {isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
-        </Button>
+        <ModalActions
+          align="center"
+          primary={{
+            id: 'first-visit-acknowledge-btn',
+            type: 'button',
+            size: 'lg',
+            onClick: handleContinue,
+            disabled: !isChecked,
+            label: isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue',
+          }}
+        />
       }
     >
       <div className="flex flex-col gap-4 text-ui-content-primary">
