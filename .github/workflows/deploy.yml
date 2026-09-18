@@ -8,6 +8,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    # Refresh prerendered report pages and sitemap from the live database every hour.
+    # This keeps newly published reports discoverable without requiring a code change.
+    - cron: '17 * * * *'
 
 permissions:
   contents: read
@@ -69,7 +73,10 @@ jobs:
           path: ./dist
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
 
