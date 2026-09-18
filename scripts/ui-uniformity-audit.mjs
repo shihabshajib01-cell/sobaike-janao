@@ -14,21 +14,27 @@ const walkTsx = (dir) => {
   return files;
 };
 
-const extractJsxPropExpressions = (source, propName) => {
-  const token = `${propName}={`;
-  const expressions = [];
+const extractJsxOpeningTags = (source, tagName) => {
+  const marker = `<${tagName}`;
+  const tags = [];
   let cursor = 0;
 
   while (cursor < source.length) {
-    const start = source.indexOf(token, cursor);
+    const start = source.indexOf(marker, cursor);
     if (start === -1) break;
 
-    let index = start + token.length;
-    let depth = 1;
+    const nextChar = source[start + marker.length] || '';
+    if (nextChar && !/[\s/>]/.test(nextChar)) {
+      cursor = start + marker.length;
+      continue;
+    }
+
+    let index = start + marker.length;
+    let braceDepth = 0;
     let quote = null;
     let escaped = false;
 
-    while (index < source.length && depth > 0) {
+    while (index < source.length) {
       const char = source[index];
 
       if (quote) {
@@ -46,19 +52,22 @@ const extractJsxPropExpressions = (source, propName) => {
       if (char === "'" || char === '"' || char === '`') {
         quote = char;
       } else if (char === '{') {
-        depth += 1;
+        braceDepth += 1;
       } else if (char === '}') {
-        depth -= 1;
+        braceDepth = Math.max(0, braceDepth - 1);
+      } else if (char === '>' && braceDepth === 0) {
+        index += 1;
+        break;
       }
 
       index += 1;
     }
 
-    expressions.push(source.slice(start + token.length, Math.max(start + token.length, index - 1)));
+    tags.push(source.slice(start, index));
     cursor = index;
   }
 
-  return expressions;
+  return tags;
 };
 
 const failures = [];
@@ -281,32 +290,29 @@ requireContains(
   'Modal must call useApp unconditionally in accordance with Hooks rules'
 );
 
-const standardModalSurfaces = [
-  'src/components/layout/SearchModal.tsx',
-  'src/components/location/FirstVisitNoticeModal.tsx',
-  'src/components/location/LocationConsentModal.tsx',
-  'src/components/report-detail/CitizenActionModal.tsx',
-  'src/components/report-detail/SubjectResponseModal.tsx',
-  'src/components/report/CategoryFilterSheet.tsx',
-  'src/components/report/HarassmentFilterSheet.tsx',
-];
-
-for (const file of standardModalSurfaces) {
-  requireContains(file, '<Modal', 'standard dialogs must use the shared Modal shell');
-  requireNotContains(file, 'showHeader={false}', 'standard dialogs must use the unified Modal header anatomy');
-}
+const approvedHeaderlessModalIds = new Set(['report-composer-modal']);
 
 for (const root of [path.resolve(ROOT, 'src/components'), path.resolve(ROOT, 'src/pages')]) {
   for (const filePath of walkTsx(root)) {
     const relative = path.relative(ROOT, filePath).replaceAll('\\', '/');
     const source = fs.readFileSync(filePath, 'utf8');
-    if (!source.includes('<Modal')) continue;
+    const modalTags = extractJsxOpeningTags(source, 'Modal');
 
-    const footerExpressions = extractJsxPropExpressions(source, 'footer');
-    footerExpressions.forEach((footerExpression, index) => {
-      if (!footerExpression.includes('<ModalActions')) {
+    modalTags.forEach((modalTag, index) => {
+      const literalId = modalTag.match(/\bid=["']([^"']+)["']/)?.[1] || null;
+
+      if (
+        modalTag.includes('showHeader={false}') &&
+        (!literalId || !approvedHeaderlessModalIds.has(literalId))
+      ) {
         failures.push(
-          `${relative}: Modal footer #${index + 1} must use the shared ModalActions layout`
+          `${relative}: Modal #${index + 1} may not bypass the unified header without an approved workflow-shell id`
+        );
+      }
+
+      if (modalTag.includes('footer={') && !modalTag.includes('<ModalActions')) {
+        failures.push(
+          `${relative}: Modal #${index + 1} footer must use the shared ModalActions layout`
         );
       }
     });
