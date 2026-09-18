@@ -16,16 +16,7 @@ const dialogStack: string[] = [];
 const dialogElements = new Map<string, HTMLElement>();
 
 const setElementInert = (element: HTMLElement, inert: boolean) => {
-  if ('inert' in element) {
-    (element as HTMLElement & { inert: boolean }).inert = inert;
-    return;
-  }
-
-  if (inert) {
-    element.setAttribute('inert', '');
-  } else {
-    element.removeAttribute('inert');
-  }
+  (element as HTMLElement & { inert: boolean }).inert = inert;
 };
 
 const syncDialogInertState = () => {
