@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { MapPin, AlertCircle } from 'lucide-react';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { useApp } from '../../context/AppContext';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
 
 interface LocationConsentModalProps {
   isOpen: boolean;
@@ -126,71 +127,58 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       isOpen={isOpen}
       onClose={handleModalClose}
       closeOnBackdrop={false}
-      showHeader={false}
       maxWidth="md"
       language={language}
-      ariaLabelledBy="location-consent-title"
+      title={
+        isReportMode
+          ? (isBn ? 'প্রতিবেদন জমা দিতে লোকেশন চালু করুন' : 'Turn on location to submit report')
+          : (isBn ? 'আপনার লোকেশন ব্যবহার করুন' : 'Use your location')
+      }
+      headerIcon={<MapPin className="w-5 h-5" aria-hidden="true" />}
+      showCloseButton={false}
       ariaDescribedBy="location-consent-desc"
-    >
-      <div className="p-5 sm:p-6 flex flex-col gap-5 text-ui-content-primary text-left">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-[var(--radius-control)] bg-ui-info-bg text-ui-info-text border border-ui-info-border flex items-center justify-center shrink-0">
-            <MapPin className="w-6 h-6" aria-hidden="true" />
-          </div>
-          <div className="flex-1">
-            <h2 id="location-consent-title" className="type-h3 font-[var(--font-weight-bold)] tracking-tight">
-              {isReportMode
-                ? (isBn ? 'প্রতিবেদন জমা দিতে লোকেশন চালু করুন' : 'Turn on location to submit report')
-                : (isBn ? 'আপনার লোকেশন ব্যবহার করুন' : 'Use your location')}
-            </h2>
-          </div>
-        </div>
-
-        <div id="location-consent-desc" className="type-compact text-ui-content-secondary leading-relaxed space-y-3">
-          <p>
-            {isReportMode
-              ? (isBn
-                  ? 'প্রতিবেদন জমা দিতে আপনার ডিভাইসের লোকেশন প্রয়োজন। লোকেশন চালু করে আবার চেষ্টা করুন।'
-                  : 'Your device location is required to submit a report. Turn on location and try again.')
-              : (isBn
-                  ? 'আপনার ব্রাউজিং অভিজ্ঞতা ব্যক্তিগতকরণ করতে লোকেশন ব্যবহারের অনুমতি দিন। আপনার লোকেশন জনসমক্ষে দেখানো হবে না।'
-                  : 'Allow location access to personalize your browsing experience. Your location will not be displayed publicly.')}
-          </p>
-
-          {errorMessage && (
-            <div className="p-3 rounded-[var(--radius-control)] border border-ui-error-border bg-ui-error-bg text-ui-error-text type-compact flex items-start gap-2" role="alert">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
-              <p>{errorMessage}</p>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col sm:flex-row-reverse gap-2.5 pt-2">
-          <button
+      footer={
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+          <Button
             type="button"
-            onClick={handleShareLocation}
-            disabled={isLoading}
-            className="w-full sm:flex-1 h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] type-compact bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                <span>{isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...'}</span>
-              </>
-            ) : (
-              <span>{isBn ? 'লোকেশন চালু করুন' : 'Turn on location'}</span>
-            )}
-          </button>
-          <button
-            type="button"
+            variant="outline"
+            size="lg"
             onClick={handleNotNow}
             disabled={isLoading}
-            className="w-full sm:flex-1 h-11 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-medium)] type-compact bg-ui-surface-subtle hover:bg-ui-surface-subtle/80 text-ui-content-secondary border border-ui-stroke-subtle transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            fullWidth
           >
-            <span>{isBn ? 'এখন নয়' : 'Not now'}</span>
-          </button>
+            {isBn ? 'এখন নয়' : 'Not now'}
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="lg"
+            onClick={handleShareLocation}
+            isLoading={isLoading}
+            fullWidth
+          >
+            {isLoading ? (isBn ? 'অনুমতি চাওয়া হচ্ছে...' : 'Requesting...') : (isBn ? 'লোকেশন চালু করুন' : 'Turn on location')}
+          </Button>
         </div>
+      }
+    >
+      <div id="location-consent-desc" className="space-y-3">
+        <p className="type-body text-ui-content-secondary">
+          {isReportMode
+            ? (isBn
+                ? 'প্রতিবেদন জমা দিতে আপনার ডিভাইসের লোকেশন প্রয়োজন। লোকেশন চালু করে আবার চেষ্টা করুন।'
+                : 'Your device location is required to submit a report. Turn on location and try again.')
+            : (isBn
+                ? 'আপনার ব্রাউজিং অভিজ্ঞতা ব্যক্তিগতকরণ করতে লোকেশন ব্যবহারের অনুমতি দিন। আপনার লোকেশন জনসমক্ষে দেখানো হবে না।'
+                : 'Allow location access to personalize your browsing experience. Your location will not be displayed publicly.')}
+        </p>
+
+        {errorMessage && (
+          <div className="p-3 ui-radius-control ui-border-default border-ui-error-border bg-ui-error-bg text-ui-error-text type-helper flex items-start gap-2" role="alert">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+            <p>{errorMessage}</p>
+          </div>
+        )}
       </div>
     </Modal>
-  );
-};
+  );};
