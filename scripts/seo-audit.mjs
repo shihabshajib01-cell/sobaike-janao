@@ -37,6 +37,8 @@ const getCanonical = (html) =>
 const getRobots = (html) =>
   attr(html, /<meta\s+[^>]*name=["']robots["'][^>]*>/i, 'content');
 const count = (html, regex) => (html.match(regex) || []).length;
+const isIndexableRobots = (robots) =>
+  !/noindex/i.test(robots) && /(?:^|[,\s])index(?:[,\s]|$)/i.test(robots);
 
 async function walk(dir) {
   const entries = await readdir(dir);
@@ -100,7 +102,14 @@ record(
 record('HTTPS canonical', rootCanonical === `${SITE_ORIGIN}/`, rootCanonical);
 record(
   'Index/follow robots',
-  /index/i.test(rootRobots) && /follow/i.test(rootRobots),
+  isIndexableRobots(rootRobots) && /follow/i.test(rootRobots),
+  rootRobots
+);
+record(
+  'Full search preview controls',
+  /max-image-preview:large/i.test(rootRobots) &&
+    /max-snippet:-1/i.test(rootRobots) &&
+    /max-video-preview:-1/i.test(rootRobots),
   rootRobots
 );
 record('Exactly one H1', count(rootHtml, /<h1\b/gi) === 1, `${count(rootHtml, /<h1\b/gi)} H1`);
@@ -175,19 +184,29 @@ const schemaRaw =
   rootHtml.match(/<script\s+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i)?.[1] ||
   '';
 let schemaValid = false;
+let siteIdentityValid = false;
 try {
   const parsed = JSON.parse(schemaRaw);
   const graph = Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [parsed];
+  const organization = graph.find((item) => item?.['@type'] === 'Organization');
+  const website = graph.find((item) => item?.['@type'] === 'WebSite');
   schemaValid =
-    graph.some((item) => item?.['@type'] === 'Organization') &&
-    graph.some((item) => item?.['@type'] === 'WebSite') &&
+    Boolean(organization) &&
+    Boolean(website) &&
     graph.some((item) =>
       ['WebPage', 'CollectionPage', 'Article'].includes(item?.['@type'])
     );
+  siteIdentityValid =
+    website?.name === 'Sobaike Janao' &&
+    website?.alternateName === 'সবাইকে জানাও' &&
+    organization?.name === 'Sobaike Janao' &&
+    organization?.alternateName === 'সবাইকে জানাও';
 } catch {
   schemaValid = false;
+  siteIdentityValid = false;
 }
 record('Structured data graph valid', schemaValid);
+record('Structured site identity is consistent', siteIdentityValid);
 
 const robotsTxt = await readFile(join(DIST, 'robots.txt'), 'utf8');
 record(
@@ -234,6 +253,19 @@ record(
     sitemap.includes('hreflang="bn-BD"') &&
     sitemap.includes('hreflang="en"')
 );
+const sitemapReportUrls = sitemapUrls.filter((url) => url.includes('/report-detail/'));
+const sitemapReportIds = sitemapReportUrls.map((url) =>
+  decodeURIComponent(url.split('/report-detail/')[1] || '')
+);
+const reportDataAvailable = sitemapReportIds.length > 0;
+record(
+  'Sitemap has one canonical URL per report',
+  !reportDataAvailable ||
+    new Set(sitemapReportIds).size === sitemapReportIds.length,
+  reportDataAvailable
+    ? `${sitemapReportIds.length} report URLs`
+    : 'skipped — report data unavailable in this build environment'
+);
 
 const htmlFiles = (await walk(DIST)).filter((file) => file.endsWith(`${sep}index.html`));
 const seenCanonicals = new Set();
@@ -249,6 +281,8 @@ for (const file of htmlFiles) {
   const robots = getRobots(html);
   const h1Count = count(html, /<h1\b/gi);
   const isEnglishRoute = rel === 'en/index.html' || rel.startsWith('en/');
+  const isReportRoute = rel.includes('report-detail/');
+  const indexable = isIndexableRobots(robots);
   const htmlLang = attr(html, /<html\s+[^>]*lang=["'][^"']+["'][^>]*>/i, 'lang');
   const bnAlternate = attr(
     html,
@@ -260,24 +294,44 @@ for (const file of htmlFiles) {
     /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']en["'][^>]*>/i,
     'href'
   );
+  const defaultAlternate = attr(
+    html,
+    /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']x-default["'][^>]*>/i,
+    'href'
+  );
 
   if (!canonical.startsWith(SITE_ORIGIN)) {
     failures.push(`Route canonical invalid: ${rel} -> ${canonical}`);
     routeFailures += 1;
   }
-  if (isEnglishRoute && (!canonical.startsWith(`${SITE_ORIGIN}/en`) || htmlLang !== 'en')) {
-    failures.push(`English route localization invalid: ${rel} -> ${canonical}; lang=${htmlLang}`);
-    routeFailures += 1;
-  }
-  if (!isEnglishRoute && rel !== 'index.html' && canonical.startsWith(`${SITE_ORIGIN}/en`)) {
-    failures.push(`Bangla route unexpectedly canonicalizes to English: ${rel} -> ${canonical}`);
-    routeFailures += 1;
+  if (!isReportRoute) {
+    if (isEnglishRoute && (!canonical.startsWith(`${SITE_ORIGIN}/en`) || htmlLang !== 'en')) {
+      failures.push(`English route localization invalid: ${rel} -> ${canonical}; lang=${htmlLang}`);
+      routeFailures += 1;
+    }
+    if (!isEnglishRoute && rel !== 'index.html' && canonical.startsWith(`${SITE_ORIGIN}/en`)) {
+      failures.push(`Bangla route unexpectedly canonicalizes to English: ${rel} -> ${canonical}`);
+      routeFailures += 1;
+    }
+  } else {
+    const canonicalIsEnglish = canonical.startsWith(`${SITE_ORIGIN}/en/`);
+    const languageMatchesCanonical =
+      (htmlLang === 'en' && canonicalIsEnglish) ||
+      (htmlLang === 'bn' && !canonicalIsEnglish);
+    if (!languageMatchesCanonical) {
+      failures.push(`Report source-language canonical mismatch: ${rel} -> ${canonical}; lang=${htmlLang}`);
+      routeFailures += 1;
+    }
+    if (indexable && isEnglishRoute !== canonicalIsEnglish) {
+      failures.push(`Indexable report route is not its canonical language route: ${rel}`);
+      routeFailures += 1;
+    }
   }
   if (!title || !description) {
     failures.push(`Route metadata missing: ${rel}`);
     routeFailures += 1;
   }
-  if (/index/i.test(robots) && !/noindex/i.test(robots)) {
+  if (indexable) {
     if ([...title].length > 60) {
       failures.push(`Indexable route title too long: ${rel} -> ${[...title].length}`);
       routeFailures += 1;
@@ -287,7 +341,13 @@ for (const file of htmlFiles) {
       routeFailures += 1;
     }
   }
-  if (!bnAlternate || !enAlternate) {
+  if (isReportRoute) {
+    const exactlyOneLanguageAlternate = Boolean(bnAlternate) !== Boolean(enAlternate);
+    if (!exactlyOneLanguageAlternate || !defaultAlternate) {
+      failures.push(`Report source-language alternate invalid: ${rel}`);
+      routeFailures += 1;
+    }
+  } else if (!bnAlternate || !enAlternate || !defaultAlternate) {
     failures.push(`Route language alternates missing: ${rel}`);
     routeFailures += 1;
   }
@@ -312,18 +372,25 @@ for (const file of htmlFiles) {
       failures.push(`Article dateModified missing: ${rel}`);
       routeFailures += 1;
     }
+    if (indexable && rel !== 'index.html' && rel !== 'en/index.html') {
+      const breadcrumb = graph.find((item) => item?.['@type'] === 'BreadcrumbList');
+      if (!breadcrumb || !Array.isArray(breadcrumb.itemListElement) || breadcrumb.itemListElement.length < 2) {
+        failures.push(`Breadcrumb structured data missing: ${rel}`);
+        routeFailures += 1;
+      }
+    }
   } catch {
     failures.push(`Route structured data invalid: ${rel}`);
     routeFailures += 1;
   }
 
-  if (/index/i.test(robots) && seenCanonicals.has(canonical)) {
+  if (indexable && seenCanonicals.has(canonical)) {
     failures.push(`Duplicate indexable canonical: ${canonical}`);
     routeFailures += 1;
   }
-  if (/index/i.test(robots)) seenCanonicals.add(canonical);
+  if (indexable) seenCanonicals.add(canonical);
 
-  if (/index/i.test(robots)) {
+  if (indexable) {
     const prior = seenTitles.get(title);
     if (prior && prior !== rel) {
       failures.push(`Duplicate indexable title: "${title}" in ${prior} and ${rel}`);
@@ -337,6 +404,25 @@ record(
   'Generated route pages pass SEO invariants',
   routeFailures === 0,
   `${htmlFiles.length} route entry files checked`
+);
+
+let collectionPagesWithReportLinks = 0;
+for (const file of htmlFiles) {
+  const html = await readFile(file, 'utf8');
+  const rel = relative(DIST, file).split(sep).join('/');
+  if (
+    !rel.includes('report-detail/') &&
+    /href=["'][^"']*report-detail\//i.test(html)
+  ) {
+    collectionPagesWithReportLinks += 1;
+  }
+}
+record(
+  'Crawlable internal report-link graph exists',
+  !reportDataAvailable || collectionPagesWithReportLinks >= 3,
+  reportDataAvailable
+    ? `${collectionPagesWithReportLinks} collection/home pages link to reports`
+    : 'skipped — report data unavailable in this build environment'
 );
 
 for (const item of checks) {
