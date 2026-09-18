@@ -127,6 +127,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       isOpen={isOpen}
       onClose={handleModalClose}
       closeOnBackdrop={false}
+      closeOnEscape={true}
       maxWidth="md"
       language={language}
       title={
@@ -179,4 +180,5 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         )}
       </div>
     </Modal>
-  );};
+  );
+};
