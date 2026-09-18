@@ -34,6 +34,11 @@ export type BrowseLocationStatus =
   | 'unavailable'
   | 'error';
 
+const normalizeRoutePath = (pathname: string): RoutePath => {
+  const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
+  return (normalized || '/') as RoutePath;
+};
+
 export type { StoredLocation };
 
 export interface LocationConsentOptions {
@@ -234,7 +239,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     document.documentElement.lang = language;
   }, [language]);
 
-  const currentRoute: RoutePath = (location.pathname || '/') as RoutePath;
+  const currentRoute: RoutePath = normalizeRoutePath(location.pathname || '/');
 
   const queryParams = useMemo(() => {
     const params: Record<string, string> = {};
