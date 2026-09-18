@@ -534,7 +534,7 @@ if (fs.existsSync(typographyFile)) {
     '--type-meta-size: 14px;',
     '--type-helper-size: 14px;',
     '--type-compact-size: 14px;',
-    '--type-compact-line-mobile: 20px;',
+    '--type-compact-line: 20px;',
   ];
 
   for (const token of requiredMobileRoot) {
