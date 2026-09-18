@@ -11,6 +11,7 @@ import {
   MobJusticeDetails,
   MobJusticeValidationErrors,
 } from '../../data/mobJusticeOptions';
+import { EVIDENCE_TYPES } from '../../data/reportOptions';
 import {
   AttachedImagePreview,
   ImageAttachmentPicker,
@@ -178,7 +179,12 @@ export const ConfiguredFieldsSection = forwardRef<
         if (field.fieldType === 'mob_justice_details') continue;
 
         if (field.fieldType === 'location') {
-          if (
+          if (reporterLocationState !== 'verified') {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'রিপোর্ট চালিয়ে যেতে ডিভাইস লোকেশন যাচাই করুন।'
+                : 'Verify device location before continuing.';
+          } else if (
             field.required &&
             (!formData.location?.division?.trim() ||
               !formData.location?.district?.trim())
@@ -191,7 +197,20 @@ export const ConfiguredFieldsSection = forwardRef<
           continue;
         }
 
-        if (field.fieldType === 'evidence' || field.fieldType === 'privacy') {
+        if (field.fieldType === 'privacy') {
+          if (
+            formData.privacyChoice === 'public_identity' &&
+            !formData.confirmPublicIdentity
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'পাবলিক পরিচয় প্রকাশের সম্মতি নিশ্চিত করুন।'
+                : 'Confirm consent before requesting public identity.';
+          }
+          continue;
+        }
+
+        if (field.fieldType === 'evidence') {
           continue;
         }
 
@@ -570,6 +589,41 @@ export const ConfiguredFieldsSection = forwardRef<
                     </p>
                   )}
                 </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {EVIDENCE_TYPES.map((evidenceType) => {
+                    const selected = (formData.evidenceTypes || []).includes(
+                      evidenceType.id
+                    );
+                    return (
+                      <label
+                        key={evidenceType.id}
+                        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={(event) => {
+                            const current = formData.evidenceTypes || [];
+                            const evidenceTypes = event.target.checked
+                              ? [...current, evidenceType.id]
+                              : current.filter((item) => item !== evidenceType.id);
+                            onUpdateFormData({
+                              evidenceTypes,
+                              hasSupportingInfo:
+                                evidenceTypes.length > 0 ||
+                                pendingImages.length > 0 ||
+                                Boolean(formData.evidenceDescription?.trim()),
+                            });
+                          }}
+                        />
+                        {language === 'bn'
+                          ? evidenceType.nameBn
+                          : evidenceType.nameEn}
+                      </label>
+                    );
+                  })}
+                </div>
+
                 <ImageAttachmentPicker
                   images={pendingImages}
                   onChange={(images) => {
@@ -577,6 +631,7 @@ export const ConfiguredFieldsSection = forwardRef<
                     onUpdateFormData({
                       hasSupportingInfo:
                         images.length > 0 ||
+                        (formData.evidenceTypes || []).length > 0 ||
                         Boolean(formData.evidenceDescription?.trim()),
                     });
                   }}
@@ -699,6 +754,69 @@ export const ConfiguredFieldsSection = forwardRef<
                       />
                     </div>
                   </div>
+                )}
+
+                <div className="space-y-2 border-t border-ui-stroke-subtle pt-4">
+                  <p className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    {language === 'bn' ? 'প্রকাশনা পছন্দ' : 'Publication preferences'}
+                  </p>
+                  {[
+                    ['showSubjectName', 'ব্যক্তি / পক্ষের নাম', 'Subject / party name'],
+                    ['showOrganization', 'প্রতিষ্ঠান', 'Organization'],
+                    ['showGeneralLocation', 'সাধারণ লোকেশন', 'General location'],
+                    ['showDescription', 'বিবরণ', 'Description'],
+                  ].map(([key, bn, en]) => (
+                    <label
+                      key={key}
+                      className="flex min-h-[44px] items-center justify-between gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact"
+                    >
+                      <span className="text-ui-content-primary">
+                        {language === 'bn' ? bn : en}
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(
+                          formData.publicationPreferences?.[
+                            key as keyof ReportFormData['publicationPreferences']
+                          ]
+                        )}
+                        onChange={(event) =>
+                          onUpdateFormData({
+                            publicationPreferences: {
+                              ...formData.publicationPreferences,
+                              [key]: event.target.checked,
+                            },
+                          })
+                        }
+                      />
+                    </label>
+                  ))}
+                </div>
+
+                {formData.privacyChoice === 'public_identity' && (
+                  <label className="flex min-h-[44px] items-start gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact">
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={Boolean(formData.confirmPublicIdentity)}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          confirmPublicIdentity: event.target.checked,
+                        })
+                      }
+                    />
+                    <span className="text-ui-content-primary">
+                      {language === 'bn'
+                        ? 'আমি প্রকাশিত প্রতিবেদনে আমার পরিচয় দেখানোর জন্য সম্মতি দিচ্ছি।'
+                        : 'I consent to showing my identity on the published report.'}
+                    </span>
+                  </label>
+                )}
+
+                {error && (
+                  <p role="alert" className="type-compact text-ui-error-text">
+                    {error}
+                  </p>
                 )}
               </div>
             );
@@ -1100,9 +1218,11 @@ export const ConfiguredFieldsSection = forwardRef<
                       : undefined
                   }
                   max={
-                    field.validation?.max !== undefined
-                      ? Number(field.validation.max)
-                      : undefined
+                    field.fieldType === 'date' && field.storageKey === 'incidentDate'
+                      ? new Date().toISOString().slice(0, 10)
+                      : field.validation?.max !== undefined
+                        ? Number(field.validation.max)
+                        : undefined
                   }
                   maxLength={
                     field.validation?.maxLength !== undefined
