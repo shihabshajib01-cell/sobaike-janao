@@ -67,7 +67,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             aria-invalid={Boolean(error)}
             aria-describedby={describedBy}
             className={joinFormClasses(
-              'w-full appearance-none min-h-[44px] bg-role-surface text-role-on-surface ui-border-default ui-radius-control ui-space-select type-body transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed',
+              'w-full appearance-none min-h-[44px] bg-role-surface text-role-on-surface ui-border-default ui-radius-control ui-space-select type-input transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed',
               formControlStateClass(Boolean(error)),
               className
             )}
