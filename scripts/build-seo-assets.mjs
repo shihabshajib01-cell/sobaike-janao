@@ -304,14 +304,118 @@ function localizePage(page, language) {
 }
 
 function injectStaticFallback(html, page) {
-  if (page.path === '/') return html;
+  const language = page.language || 'bn';
+  const logicalPath = page.logicalPath || page.path;
+  const isEnglish = language === 'en';
 
-  const heading = htmlEscape(String(page.title || '').replace(/\s*\|\s*সবাইকে জানাও\s*$/, ''));
+  // The source template already contains the full Bangla homepage fallback.
+  if (logicalPath === '/' && !isEnglish) return html;
+
+  const brandPattern = isEnglish
+    ? /\s*\|\s*Sobaike Janao\s*$/
+    : /\s*\|\s*সবাইকে জানাও\s*$/;
+  const heading = htmlEscape(String(page.title || '').replace(brandPattern, ''));
   const description = htmlEscape(page.description || '');
+  const href = (path) => (isEnglish ? englishPath(path) : path);
+
+  if (logicalPath === '/' && isEnglish) {
+    const fallback = `
+      <!-- SEO_FALLBACK_START -->
+      <main id="seo-static-fallback" class="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 lg:px-8">
+        <header class="space-y-3">
+          <h1>${heading}</h1>
+          <p>${description}</p>
+        </header>
+
+        <nav aria-label="Main pages" class="mt-6">
+          <p><strong>Quick links:</strong></p>
+          <p>
+            <a href="${href('/')}">Home</a> ·
+            <a href="${href('/issues')}">Topics</a> ·
+            <a href="${href('/report')}">Submit a report</a> ·
+            <a href="${href('/explore')}">Explore map and areas</a> ·
+            <a href="${href('/search')}">Search</a> ·
+            <a href="${href('/more')}">Information and guidance</a>
+          </p>
+        </nav>
+
+        <section class="mt-8 space-y-3">
+          <h2>What can be reported</h2>
+          <p>
+            Sobaike Janao is an independent, moderated public-interest reporting platform for people in Bangladesh.
+            Reports can cover public safety, harassment and abuse, extortion and bribery, road and transport
+            problems, utility issues, illegal occupation, unsafe auto-rickshaw charging, and other community
+            concerns. A useful report should explain what happened, where and when it happened, and include
+            relevant supporting information when it is appropriate and safe to publish.
+          </p>
+          <p>
+            Browse <a href="${href('/public-safety')}">public safety</a>,
+            <a href="${href('/harassment')}">harassment and abuse</a>,
+            <a href="${href('/extortion')}">extortion and bribery</a>,
+            <a href="${href('/road-transport')}">road and transport</a>,
+            <a href="${href('/load-shedding')}">utility issues</a>,
+            <a href="${href('/illegal-occupation')}">illegal occupation</a>, and
+            <a href="${href('/rickshaw')}">auto-rickshaw charging</a> reports.
+          </p>
+        </section>
+
+        <section class="mt-8 space-y-3">
+          <h2>Responsible reporting and verification</h2>
+          <p>
+            Submit information accurately, in good faith, and with enough context for readers to understand the
+            public-interest issue. Do not present assumptions as confirmed facts, use the platform to make
+            knowingly baseless accusations, or expose unnecessary private information. Moderation helps keep
+            reports clear and relevant, and later updates or responses from relevant parties may add important
+            context to a published report.
+          </p>
+          <p>
+            A published report is not, by itself, a court judgment, an official government determination, or proof
+            of criminal liability. Readers should consider the report description, location, publication date,
+            available sources, supporting material, responses, and subsequent updates together.
+          </p>
+        </section>
+
+        <section class="mt-8 space-y-3">
+          <h2>Privacy, response and safe use</h2>
+          <p>
+            Avoid publishing unnecessary phone numbers, identity-document numbers, private addresses, or other
+            sensitive information that could create avoidable privacy or safety risks. If a report directly
+            concerns you, review the platform guidance for response and correction options. Sobaike Janao is not
+            an emergency-response service and does not replace a government investigative authority.
+          </p>
+          <p>
+            If there is an immediate risk to life or safety, or an ongoing crime, contact 999 or the appropriate
+            authority instead of waiting to publish a report on the website.
+          </p>
+        </section>
+
+        <section class="mt-8 space-y-3">
+          <h2>Find reports and local information</h2>
+          <p>
+            Use <a href="${href('/explore')}">Explore</a> to browse published reports by division, district and
+            area. Use <a href="${href('/search')}">Search</a> for a topic or reported party.
+            <a href="${href('/report')}">Submit a report</a> for a new public-interest incident and see
+            <a href="${href('/more')}">information and guidance</a> for platform rules, privacy, right of response
+            and emergency-help information.
+          </p>
+        </section>
+      </main>
+      <!-- SEO_FALLBACK_END -->`;
+
+    return html.replace(
+      /<!-- SEO_FALLBACK_START -->[\s\S]*?<!-- SEO_FALLBACK_END -->/,
+      fallback.trim()
+    );
+  }
+
   const contextCopy =
     page.type === 'article'
-      ? 'এটি সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত একটি জনস্বার্থ প্রতিবেদন। প্রতিবেদনটি পড়ার সময় ঘটনার বিবরণ, প্রকাশের তারিখ, এলাকা, উপলব্ধ উৎস এবং পরবর্তী আপডেট একসঙ্গে বিবেচনা করুন। প্রকাশিত কোনো প্রতিবেদন নিজে থেকে আদালতের রায়, সরকারি সিদ্ধান্ত বা অপরাধ প্রমাণের সমতুল্য নয়।'
-      : 'এই পৃষ্ঠায় সংশ্লিষ্ট বিষয়ের প্রকাশিত নাগরিক প্রতিবেদন দেখা যায়। সঠিক প্রেক্ষাপট বোঝার জন্য প্রতিটি প্রতিবেদনের শিরোনাম, বিবরণ, এলাকা, প্রকাশের সময়, উৎস এবং উপলব্ধ আপডেট দেখুন। জনস্বার্থের তথ্য দায়িত্বশীলভাবে ব্যবহার করুন এবং জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট সরকারি হটলাইনে যোগাযোগ করুন।';
+      ? isEnglish
+        ? 'This is a public-interest report published on Sobaike Janao. Read the report together with its publication date, location, available sources, supporting information, responses, and later updates. A published report is not by itself a court judgment, an official government decision, or proof of criminal liability.'
+        : 'এটি সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত একটি জনস্বার্থ প্রতিবেদন। প্রতিবেদনটি পড়ার সময় ঘটনার বিবরণ, প্রকাশের তারিখ, এলাকা, উপলব্ধ উৎস এবং পরবর্তী আপডেট একসঙ্গে বিবেচনা করুন। প্রকাশিত কোনো প্রতিবেদন নিজে থেকে আদালতের রায়, সরকারি সিদ্ধান্ত বা অপরাধ প্রমাণের সমতুল্য নয়।'
+      : isEnglish
+        ? 'This page contains moderated public-interest citizen reports for the selected topic or area. Review each report together with its description, location, publication time, sources, supporting information, and available updates. For emergencies, contact 999 or the appropriate official service.'
+        : 'এই পৃষ্ঠায় সংশ্লিষ্ট বিষয়ের প্রকাশিত নাগরিক প্রতিবেদন দেখা যায়। সঠিক প্রেক্ষাপট বোঝার জন্য প্রতিটি প্রতিবেদনের শিরোনাম, বিবরণ, এলাকা, প্রকাশের সময়, উৎস এবং উপলব্ধ আপডেট দেখুন। জনস্বার্থের তথ্য দায়িত্বশীলভাবে ব্যবহার করুন এবং জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট সরকারি হটলাইনে যোগাযোগ করুন।';
 
   const fallback = `
       <!-- SEO_FALLBACK_START -->
@@ -321,39 +425,34 @@ function injectStaticFallback(html, page) {
           <p>${description}</p>
         </header>
 
-        <nav aria-label="প্রধান পৃষ্ঠা" class="mt-6">
-          <p><strong>দ্রুত লিংক:</strong></p>
+        <nav aria-label="${isEnglish ? 'Main pages' : 'প্রধান পৃষ্ঠা'}" class="mt-6">
+          <p><strong>${isEnglish ? 'Quick links:' : 'দ্রুত লিংক:'}</strong></p>
           <p>
-            <a href="/">হোম</a> ·
-            <a href="/issues">বিষয়সমূহ</a> ·
-            <a href="/report">প্রতিবেদন করুন</a> ·
-            <a href="/explore">মানচিত্র ও এলাকা</a> ·
-            <a href="/search">অনুসন্ধান</a> ·
-            <a href="/more">তথ্য ও নির্দেশিকা</a>
+            <a href="${href('/')}">${isEnglish ? 'Home' : 'হোম'}</a> ·
+            <a href="${href('/issues')}">${isEnglish ? 'Topics' : 'বিষয়সমূহ'}</a> ·
+            <a href="${href('/report')}">${isEnglish ? 'Submit a report' : 'প্রতিবেদন করুন'}</a> ·
+            <a href="${href('/explore')}">${isEnglish ? 'Explore' : 'মানচিত্র ও এলাকা'}</a> ·
+            <a href="${href('/search')}">${isEnglish ? 'Search' : 'অনুসন্ধান'}</a> ·
+            <a href="${href('/more')}">${isEnglish ? 'Information' : 'তথ্য ও নির্দেশিকা'}</a>
           </p>
         </nav>
 
         <section class="mt-8 space-y-3">
-          <h2>পৃষ্ঠা সম্পর্কে</h2>
+          <h2>${isEnglish ? 'About this page' : 'পৃষ্ঠা সম্পর্কে'}</h2>
           <p>${htmlEscape(contextCopy)}</p>
         </section>
 
         <section class="mt-8 space-y-3">
-          <h2>সম্পর্কিত প্রতিবেদন ও বিষয়</h2>
+          <h2>${isEnglish ? 'Related reports and topics' : 'সম্পর্কিত প্রতিবেদন ও বিষয়'}</h2>
           <p>
-            আরও প্রকাশিত তথ্য দেখতে
-            <a href="/public-safety">জননিরাপত্তা</a>,
-            <a href="/harassment">হয়রানি ও নির্যাতন</a>,
-            <a href="/extortion">চাঁদাবাজি ও ঘুষ</a>,
-            <a href="/road-transport">সড়ক ও যাতায়াত</a>,
-            <a href="/load-shedding">ইউটিলিটি সমস্যা</a>,
-            <a href="/illegal-occupation">অবৈধ দখল</a> এবং
-            <a href="/rickshaw">অবৈধ অটো-রিকশা চার্জিং</a> বিভাগগুলো দেখুন।
-          </p>
-          <p>
-            সরকারি তথ্যের জন্য
-            <a href="https://bangladesh.gov.bd/" rel="noopener noreferrer">বাংলাদেশ জাতীয় তথ্য বাতায়ন</a>
-            ব্যবহার করুন।
+            <a href="${href('/public-safety')}">${isEnglish ? 'Public safety' : 'জননিরাপত্তা'}</a>,
+            <a href="${href('/harassment')}">${isEnglish ? 'harassment and abuse' : 'হয়রানি ও নির্যাতন'}</a>,
+            <a href="${href('/extortion')}">${isEnglish ? 'extortion and bribery' : 'চাঁদাবাজি ও ঘুষ'}</a>,
+            <a href="${href('/road-transport')}">${isEnglish ? 'road and transport' : 'সড়ক ও যাতায়াত'}</a>,
+            <a href="${href('/load-shedding')}">${isEnglish ? 'utility issues' : 'ইউটিলিটি সমস্যা'}</a>,
+            <a href="${href('/illegal-occupation')}">${isEnglish ? 'illegal occupation' : 'অবৈধ দখল'}</a>
+            ${isEnglish ? 'and' : 'এবং'}
+            <a href="${href('/rickshaw')}">${isEnglish ? 'auto-rickshaw charging' : 'অবৈধ অটো-রিকশা চার্জিং'}</a>.
           </p>
         </section>
       </main>
