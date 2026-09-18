@@ -49,6 +49,16 @@ export interface PublicReportImage {
   sizes?: string;
 }
 
+export interface PublicReportSource {
+  publisherName: string;
+  sourceTitle?: string | null;
+  sourceType: 'news' | 'official' | 'social' | 'article' | 'other';
+  canonicalUrl: string;
+  sourcePublishedDate?: string | null;
+  verifiedAt?: string | null;
+  sourceVersion: number;
+}
+
 export type ReportMediaType = 'none' | 'single' | 'gallery';
 
 export interface ReportMedia {
@@ -109,6 +119,8 @@ export interface ReportItem {
   updates?: ReportUpdate[];
   response?: ReportResponse;
   relatedReportIds?: string[];
+  /** Verified canonical sources are loaded only on the public detail view. */
+  sources?: PublicReportSource[];
 }
 
 export type PublicResponseType =
