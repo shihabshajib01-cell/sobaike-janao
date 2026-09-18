@@ -140,7 +140,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
         <div className="px-4 sm:px-6 pb-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] md:pt-3.5 border-b border-ui-media-viewer-border bg-ui-media-viewer-bg-elevated backdrop-blur-md flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Image Counter Badge */}
-            <p className="shrink-0 px-2.5 py-1 rounded-[var(--radius-pill)] bg-ui-media-viewer-chip text-ui-media-viewer-text type-compact font-[var(--font-weight-semibold)] tracking-wide">
+            <p role="status" aria-live="polite" aria-atomic="true" className="shrink-0 px-2.5 py-1 rounded-[var(--radius-pill)] bg-ui-media-viewer-chip text-ui-media-viewer-text type-compact font-[var(--font-weight-semibold)] tracking-wide">
               {language === 'bn'
                 ? `ছবি ${toBanglaDigits(safeIndex + 1)} / ${toBanglaDigits(images.length)}`
                 : `Image ${safeIndex + 1} of ${images.length}`}
@@ -243,6 +243,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
                         ? `ছবি ${toBanglaDigits(idx + 1)}-এ যান`
                         : `Go to image ${idx + 1}`
                     }
+                    aria-current={isSelected ? 'true' : undefined}
                     className={`relative w-12 h-12 rounded-[var(--radius-badge-md)] overflow-hidden border-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-media-viewer-focus shrink-0 ${
                       isSelected
                         ? 'border-ui-success-border scale-105 opacity-100 ring-2 ring-ui-success-border'
