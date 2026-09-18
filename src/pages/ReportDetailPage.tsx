@@ -292,6 +292,25 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     storedResponses.length > 0 ||
     (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError);
 
+  const formatResponseDate = (
+    dateStr: string | null | undefined,
+    lang: 'bn' | 'en'
+  ): string => {
+    if (!dateStr) return '';
+
+    try {
+      const date = new Date(dateStr);
+      if (Number.isNaN(date.getTime())) return dateStr;
+      return date.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
   const publishedResponseItems = [
     ...(report.response
       ? [{
@@ -409,25 +428,6 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       if ((error as DOMException)?.name !== 'AbortError') {
         console.warn('[ReportDetailPage share error]', error);
       }
-    }
-  };
-
-  const formatResponseDate = (
-    dateStr: string | null | undefined,
-    lang: 'bn' | 'en'
-  ): string => {
-    if (!dateStr) return '';
-
-    try {
-      const date = new Date(dateStr);
-      if (Number.isNaN(date.getTime())) return dateStr;
-      return date.toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-GB', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 
