@@ -161,11 +161,22 @@ export const TaxonomyService = {
           const key = row.id as SectionKey;
           const legacy = SECTIONS[key];
           const dynamicTheme = buildDynamicTheme(row.theme_key);
-          const fallback = legacy || {
-            ...SECTIONS.public_safety,
-            ...dynamicTheme,
-            colors: dynamicTheme.colors,
-          };
+          const hasManagedTheme = Boolean(
+            row.theme_key && THEME_PRIMARY[row.theme_key]
+          );
+          const fallback = legacy
+            ? hasManagedTheme
+              ? {
+                  ...legacy,
+                  ...dynamicTheme,
+                  colors: dynamicTheme.colors,
+                }
+              : legacy
+            : {
+                ...SECTIONS.public_safety,
+                ...dynamicTheme,
+                colors: dynamicTheme.colors,
+              };
 
           const segment: SegmentTaxonomyItem = {
             ...fallback,
