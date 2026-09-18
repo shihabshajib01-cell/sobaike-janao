@@ -321,11 +321,11 @@ export const TaxonomyService = {
       await Promise.all([
         this.fetchSegments(),
         this.fetchSubcategories(),
-        // Taxonomy and form schemas are one public reporting contract. Refresh
-        // them together so a newly published complaint type cannot appear
-        // without its matching form configuration in a long-running session.
-        PublicReportingConfigService.fetch(true),
       ]);
+      // Form schemas are only needed inside the reporting workflow. Invalidate
+      // any older cached schema here, but defer the network request until the
+      // composer actually needs it.
+      PublicReportingConfigService.invalidate();
       isFetched = true;
       lastFetchedAt = Date.now();
       notifyListeners();
