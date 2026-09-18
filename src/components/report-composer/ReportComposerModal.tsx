@@ -36,6 +36,7 @@ import { AlertCircle, MapPin, Shield, RotateCcw } from 'lucide-react';
 
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
+import { Checkbox } from '../ui/Checkbox';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { PublicReportingConfigService, PublicReportingForm } from '../../services/reportingFormConfig';
 
@@ -1167,60 +1168,111 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         zIndexClass="z-[60]"
         showHeader={false}
         language={language}
-        ariaLabel={language === 'bn' ? 'রিপোর্ট প্রকাশনা নীতি সম্মতি' : 'Report publishing policy consent'}
+        ariaLabelledBy="rape-consent-title"
+        ariaDescribedBy="rape-consent-description"
       >
-        <div className="p-5 sm:p-6 md:p-8 space-y-4 sm:space-y-5 text-left">
-          <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-[var(--radius-card)] bg-ui-accent-soft text-ui-accent flex items-center justify-center shrink-0 border border-ui-accent/20 mt-0.5">
-              <Shield className="w-5 h-5" />
+        <div className="p-5 sm:p-6 flex flex-col gap-4 text-ui-content-primary">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 ui-radius-control bg-ui-accent-soft text-ui-accent flex items-center justify-center shrink-0 ui-border-default border-ui-accent-border">
+              <Shield className="w-5 h-5" aria-hidden="true" />
             </div>
-            <div className="space-y-1">
-              <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
-                {language === 'bn' ? 'প্রতিবেদন শুরুর আগে' : 'Before you begin'}
-              </h3>
+            <div className="min-w-0">
+              <h1
+                id="rape-consent-title"
+                className="type-h2 tracking-tight text-ui-content-primary"
+              >
+                {language === 'bn' ? 'নিরাপদভাবে প্রতিবেদন করুন' : 'Report safely'}
+              </h1>
             </div>
           </div>
 
-          <div className="space-y-3 type-compact leading-relaxed text-ui-content-secondary bg-ui-surface-subtle p-3.5 sm:p-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
-            <p>
-              {language === 'bn'
-                ? 'এই প্ল্যাটফর্ম কোনো আইনি বা বিচারিক সেবা নয়। এখানে প্রতিবেদন প্রকাশের উদ্দেশ্য জনস্বার্থে তথ্য তুলে ধরা—কারও অপরাধ প্রমাণ করা নয়।'
-                : 'This platform is not a legal or judicial service. Reports are published to document matters of public interest, not to establish legal guilt.'}
-            </p>
-            <p>
-              {language === 'bn'
-                ? 'নিরাপত্তা ও অপব্যবহার রোধে প্রকাশিত প্রতিবেদনে উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আসল নাম দেখানো হবে না। সুরক্ষার স্বার্থে মডারেশন টিম তথ্য সম্পাদনা বা গোপন করতে পারে। নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশ নাও হতে পারে।'
-                : 'To prevent harm and misuse, published reports will not display the real name of a mentioned person or organization. Details may be redacted or edited for safety, and reports may not be published if they cannot be shared safely.'}
-            </p>
-          </div>
+          <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
 
-          <div className="pt-1">
-            <label
-              htmlFor="rape-consent-checkbox"
-              className="flex items-start gap-3 cursor-pointer select-none group min-h-[44px] py-1"
+          <div className="flex flex-col gap-2.5">
+            <h2 className="type-h3 text-ui-content-primary">
+              {language === 'bn' ? 'গল্পটি বলুন, পরিচয় নয়' : 'Share the story, not the identity'}
+            </h2>
+
+            <div
+              id="rape-consent-description"
+              className="flex flex-col gap-2.5"
             >
-              <input
-                id="rape-consent-checkbox"
-                type="checkbox"
-                checked={rapeConsentCheckbox}
-                onChange={(e) => setRapeConsentCheckbox(e.target.checked)}
-                className="mt-1 w-4 h-4 rounded border-ui-stroke-subtle text-ui-accent focus:ring-2 focus:ring-ui-focus shrink-0 cursor-pointer"
-              />
-              <span className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
+              <p className="type-body text-ui-content-primary">
                 {language === 'bn'
-                  ? 'আমি এই প্রকাশনা নীতি পড়েছি এবং সম্মত।'
-                  : 'I have read and agree to this publishing policy.'}
-              </span>
-            </label>
+                  ? 'সবাইকে জানাও কোনো সরকারি, আইনশৃঙ্খলা রক্ষাকারী বা বিচারিক সেবা নয়। এখানে প্রকাশিত প্রতিবেদন কারও অপরাধ প্রমাণ করে না।'
+                  : 'Sobaike Janao is not a government, law-enforcement, or judicial service. A published report does not establish anyone’s legal guilt.'}
+              </p>
+              <p className="type-body text-ui-content-primary">
+                {language === 'bn'
+                  ? 'হয়রানি ও নির্যাতনের মতো সংবেদনশীল বিষয়ে আমাদের কাছে গুরুত্বপূর্ণ হলো কী ঘটেছে, তার প্রেক্ষাপট ও প্রভাব। কারও আসল পরিচয় নয়।'
+                  : 'For sensitive harassment and abuse reports, what matters is what happened, the context, and the impact — not anyone’s real identity.'}
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-3 border-t border-ui-stroke-subtle">
+          <div className="ui-radius-control ui-border-default border-ui-stroke-default p-4 bg-ui-surface">
+            <ol className="space-y-3 list-none">
+              <li className="flex items-start gap-3">
+                <p className="type-body text-ui-content-primary shrink-0" aria-hidden="true">
+                  {language === 'bn' ? '১.' : '1.'}
+                </p>
+                <p className="type-body text-ui-content-primary">
+                  {language === 'bn'
+                    ? 'কী ঘটেছে, কোথায় বা কখন ঘটেছে এবং কীভাবে প্রভাব ফেলেছে—যতটা সম্ভব নির্দিষ্টভাবে লিখুন।'
+                    : 'Describe what happened, where or when it happened, and how it affected people as specifically as you can.'}
+                </p>
+              </li>
+              <li className="flex items-start gap-3">
+                <p className="type-body text-ui-content-primary shrink-0" aria-hidden="true">
+                  {language === 'bn' ? '২.' : '2.'}
+                </p>
+                <p className="type-body text-ui-content-primary">
+                  {language === 'bn'
+                    ? 'আসল নাম, ফোন নম্বর, ঠিকানা, ছবি বা অন্য শনাক্তযোগ্য তথ্য দেবেন না। প্রয়োজন হলে ছদ্মনাম ব্যবহার করুন।'
+                    : 'Do not include real names, phone numbers, addresses, photos, or other identifying details. Use a pseudonym when needed.'}
+                </p>
+              </li>
+              <li className="flex items-start gap-3">
+                <p className="type-body text-ui-content-primary shrink-0" aria-hidden="true">
+                  {language === 'bn' ? '৩.' : '3.'}
+                </p>
+                <p className="type-body text-ui-content-primary">
+                  {language === 'bn'
+                    ? 'মিথ্যা, ভিত্তিহীন বা কাউকে ইচ্ছাকৃতভাবে হেয় করার উদ্দেশ্যে অভিযোগ দেবেন না। জরুরি সহায়তার প্রয়োজন হলে ৯৯৯-এ যোগাযোগ করুন।'
+                    : 'Do not submit false, baseless, or deliberately harmful allegations. If emergency help is needed, contact 999.'}
+                </p>
+              </li>
+            </ol>
+          </div>
+
+          <p className="type-helper text-ui-content-secondary">
+            {language === 'bn'
+              ? 'নিরাপত্তার স্বার্থে মডারেশন টিম শনাক্তযোগ্য তথ্য সম্পাদনা বা আড়াল করতে পারে। নিরাপদভাবে প্রকাশ করা সম্ভব না হলে প্রতিবেদনটি প্রকাশ নাও হতে পারে।'
+              : 'For safety, the moderation team may edit or hide identifying details. A report may not be published if it cannot be shared safely.'}
+          </p>
+
+          <div className="pt-1 border-t border-ui-stroke-subtle">
+            <Checkbox
+              id="rape-consent-checkbox"
+              checked={rapeConsentCheckbox}
+              onChange={(e) => setRapeConsentCheckbox(e.target.checked)}
+              label={
+                language === 'bn'
+                  ? 'আমি বুঝেছি—এখানে ব্যক্তির পরিচয় নয়, ঘটনার বিবরণ শেয়ার করতে হবে; মিথ্যা বা শনাক্তযোগ্য অভিযোগ দেওয়া যাবে না।'
+                  : 'I understand that this service is for sharing the incident, not identifying people, and that false or identifying allegations must not be submitted.'
+              }
+              labelClassName="type-body text-ui-content-primary"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
             <Button
               id="rape-consent-back-btn"
               type="button"
               variant="outline"
+              size="lg"
               onClick={handleCancelRapeConsent}
-              className="min-h-[44px] type-h4"
+              fullWidth
             >
               {language === 'bn' ? 'ফিরে যান' : 'Go back'}
             </Button>
@@ -1229,11 +1281,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               id="rape-consent-agree-btn"
               type="button"
               variant="primary"
+              size="lg"
               disabled={!rapeConsentCheckbox}
               onClick={handleAgreeRapeConsent}
-              className="min-h-[44px] type-h4 px-5"
+              fullWidth
             >
-              {language === 'bn' ? 'সম্মত হয়ে এগিয়ে যান' : 'Agree and continue'}
+              {language === 'bn' ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
             </Button>
           </div>
         </div>
