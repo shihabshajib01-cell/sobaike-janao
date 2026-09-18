@@ -183,7 +183,12 @@ class ApiClient {
       reporterContext,
     };
 
-    const result = await supabase.rpc('submit_public_complaint_v2', {
+    const submissionRpc =
+      payload?.formEngineMode === 'schema'
+        ? 'submit_public_configured_complaint'
+        : 'submit_public_complaint_v2';
+
+    const result = await supabase.rpc(submissionRpc, {
       p_payload: enrichedPayload,
       p_client_submission_id: clientSubmissionId,
       p_reporter_context: reporterContext,
