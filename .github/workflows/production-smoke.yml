@@ -5,6 +5,9 @@ on:
     workflows: ["Deploy"]
     types: [completed]
   workflow_dispatch:
+  schedule:
+    # Regularly re-check the live search surface even when there is no deployment.
+    - cron: '23 */6 * * *'
 
 permissions:
   contents: read
@@ -43,6 +46,141 @@ jobs:
           if '/src/main.tsx' in html:
               raise SystemExit('ERROR: production page references source entry instead of bundled assets')
           print('Public site smoke check passed')
+          PY
+
+      - name: Verify live SEO surface
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl --fail-with-body -L -sS "${SITE_URL}robots.txt" -o /tmp/robots.txt
+          curl --fail-with-body -L -sS "${SITE_URL}sitemap.xml" -o /tmp/sitemap.xml
+
+          python - <<'PY'
+          import json
+          import re
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          origin = 'https://shobaikejanao.com'
+          html = Path('/tmp/public-index.html').read_text(errors='replace')
+          robots = Path('/tmp/robots.txt').read_text(errors='replace')
+          sitemap = Path('/tmp/sitemap.xml').read_text(errors='replace')
+
+          def must(pattern, label, flags=0):
+              match = re.search(pattern, html, flags)
+              if not match:
+                  raise SystemExit(f'ERROR: missing {label}')
+              return match
+
+          title = must(r'<title>(.*?)</title>', 'homepage title', re.S).group(1).strip()
+          if not title.startswith('Sobaike Janao'):
+              raise SystemExit(f'ERROR: exact brand signal missing from title: {title}')
+
+          canonical = must(
+              r'<link\s+rel=["\']canonical["\']\s+href=["\']([^"\']+)["\']',
+              'homepage canonical',
+              re.I,
+          ).group(1)
+          if canonical != f'{origin}/':
+              raise SystemExit(f'ERROR: homepage canonical mismatch: {canonical}')
+
+          robots_meta = must(
+              r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)["\']',
+              'robots meta',
+              re.I,
+          ).group(1).lower()
+          if 'index' not in robots_meta or 'follow' not in robots_meta or 'noindex' in robots_meta:
+              raise SystemExit(f'ERROR: homepage robots meta is not indexable: {robots_meta}')
+
+          schema_match = must(
+              r'<script\s+type=["\']application/ld\+json["\'][^>]*id=["\']seo-jsonld["\'][^>]*>(.*?)</script>',
+              'SEO JSON-LD',
+              re.I | re.S,
+          )
+          data = json.loads(schema_match.group(1))
+          graph = data.get('@graph', [data]) if isinstance(data, dict) else data
+          if not any(node.get('@type') == 'WebSite' and node.get('name') == 'Sobaike Janao' for node in graph):
+              raise SystemExit('ERROR: WebSite brand structured data is missing')
+          if not any(node.get('@type') == 'Organization' and node.get('name') == 'Sobaike Janao' for node in graph):
+              raise SystemExit('ERROR: Organization structured data is missing')
+
+          if f'Sitemap: {origin}/sitemap.xml' not in robots:
+              raise SystemExit('ERROR: robots.txt does not advertise the canonical sitemap')
+
+          root = ET.fromstring(sitemap)
+          ns = {'sm': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+          locs = [
+              node.text.strip()
+              for node in root.findall('sm:url/sm:loc', ns)
+              if node.text and node.text.strip()
+          ]
+          if len(locs) != len(set(locs)):
+              raise SystemExit('ERROR: duplicate sitemap <loc> entries detected')
+          if f'{origin}/' not in locs:
+              raise SystemExit('ERROR: Bangla homepage missing from sitemap')
+          if f'{origin}/en/' not in locs:
+              raise SystemExit('ERROR: English homepage missing from sitemap')
+
+          report_urls = [url for url in locs if '/report-detail/' in url]
+          if not report_urls:
+              raise SystemExit('ERROR: no indexable report-detail URL found in sitemap')
+
+          Path('/tmp/seo-report-url.txt').write_text(report_urls[0])
+          print(f'Live SEO homepage/sitemap checks passed ({len(locs)} sitemap URLs)')
+          PY
+
+          report_url=$(cat /tmp/seo-report-url.txt)
+          curl --fail-with-body -L -sS "$report_url" -o /tmp/seo-report.html
+
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          url = Path('/tmp/seo-report-url.txt').read_text().strip()
+          html = Path('/tmp/seo-report.html').read_text(errors='replace')
+
+          canonical = re.search(
+              r'<link\s+rel=["\']canonical["\']\s+href=["\']([^"\']+)["\']',
+              html,
+              re.I,
+          )
+          if not canonical or canonical.group(1) != url:
+              raise SystemExit(
+                  f'ERROR: report canonical mismatch: expected {url}, got {canonical.group(1) if canonical else "missing"}'
+              )
+
+          robots = re.search(
+              r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)["\']',
+              html,
+              re.I,
+          )
+          if not robots or 'noindex' in robots.group(1).lower():
+              raise SystemExit('ERROR: sitemap report URL is not indexable')
+
+          schema = re.search(
+              r'<script\s+type=["\']application/ld\+json["\'][^>]*id=["\']seo-jsonld["\'][^>]*>(.*?)</script>',
+              html,
+              re.I | re.S,
+          )
+          if not schema:
+              raise SystemExit('ERROR: report JSON-LD is missing')
+          data = json.loads(schema.group(1))
+          graph = data.get('@graph', [data]) if isinstance(data, dict) else data
+          article = next((node for node in graph if node.get('@type') == 'Article'), None)
+          if not article:
+              raise SystemExit('ERROR: report Article structured data is missing')
+          if article.get('url') != url:
+              raise SystemExit(f'ERROR: report Article URL mismatch: {article.get("url")}')
+          if not article.get('dateModified'):
+              raise SystemExit('ERROR: report Article dateModified is missing')
+
+          breadcrumb = next((node for node in graph if node.get('@type') == 'BreadcrumbList'), None)
+          if not breadcrumb or len(breadcrumb.get('itemListElement', [])) < 2:
+              raise SystemExit('ERROR: report breadcrumb structured data is incomplete')
+
+          print('Live report SEO checks passed')
           PY
 
       - name: Verify public Supabase payload privacy
