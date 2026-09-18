@@ -136,14 +136,16 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#home-feed-filter-rail'), 'Home shared filter rail missing');
 
-  const firstCard = page.locator('[id^="report-card-"][role="link"]').first();
-  await expectVisible(firstCard, 'No keyboard-addressable report card found on Home');
-  if ((await firstCard.getAttribute('tabindex')) !== '0') {
-    throw new Error('Report card is not in the keyboard tab order');
-  }
+  const firstCard = page.locator('[id^="report-card-"]').first();
+  await expectVisible(firstCard, 'No report card found on Home');
+  const firstCardLink = firstCard.locator('a[href*="/report-detail/"]').first();
+  await expectVisible(firstCardLink, 'Report card does not expose a native keyboard-addressable detail link');
 
   const cardId = await firstCard.getAttribute('id');
-  await firstCard.focus();
+  await firstCardLink.focus();
+  if (!(await firstCardLink.evaluate((element) => element === document.activeElement))) {
+    throw new Error('Report detail link did not receive keyboard focus');
+  }
   await page.keyboard.press('Enter');
   await page.waitForTimeout(350);
   if (!new URL(page.url()).pathname.startsWith('/report-detail/')) {
@@ -151,9 +153,9 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   }
 
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
-  const childClickCard = page.locator('[id^="report-card-"][role="link"]').first();
-  await expectVisible(childClickCard, 'No report card found for child-click navigation check');
-  await childClickCard.locator('h3').click();
+  const childClickCard = page.locator('[id^="report-card-"]').first();
+  await expectVisible(childClickCard, 'No report card found for title-click navigation check');
+  await childClickCard.locator('a[href*="/report-detail/"] h3').click();
   await page.waitForTimeout(350);
   if (!new URL(page.url()).pathname.startsWith('/report-detail/')) {
     throw new Error(`Clicking report-card title did not open detail; got ${page.url()}`);
@@ -218,15 +220,18 @@ await check('Dark semantic surfaces retain distinct visual hierarchy', async () 
   await page.locator('#tablet-menu-button').click();
   await expectVisible(page.locator('#tablet-drawer'), 'tablet drawer missing');
 
-  const themeOptions = page.locator('#tablet-drawer [role="radiogroup"] [role="radio"]');
+  const themeOptions = page.locator('#tablet-drawer button[aria-pressed]');
   const themeOptionCount = await themeOptions.count();
   if (themeOptionCount !== 3) {
     throw new Error(`expected 3 theme options, found ${themeOptionCount}`);
   }
-  const darkOption = themeOptions.nth(1);
+  const darkOption = themeOptions.filter({ hasText: 'Dark' }).first();
   await expectVisible(darkOption, 'dark theme control missing');
   await darkOption.click();
   await page.waitForTimeout(150);
+  if ((await darkOption.getAttribute('aria-pressed')) !== 'true') {
+    throw new Error('dark theme control did not expose selected state');
+  }
 
   const tokens = await page.evaluate(() => {
     const style = getComputedStyle(document.documentElement);
