@@ -143,6 +143,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     ref
   ) => {
     const todayLocal = getLocalToday();
+    const currentMonthLocal = todayLocal.slice(0, 7);
 
     // Segment structure conditions
     const showsPartySection =
@@ -713,6 +714,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (!formData.recentBillMonth?.trim()) {
             newErrors.recentBillMonth =
               language === 'bn' ? 'সাম্প্রতিক বিলের মাস নির্বাচন করুন।' : 'Select the recent bill month.';
+          } else if (formData.recentBillMonth > currentMonthLocal) {
+            newErrors.recentBillMonth =
+              language === 'bn' ? 'ভবিষ্যতের বিলের মাস নির্বাচন করা যাবে না।' : 'Recent bill month cannot be in the future.';
           }
 
           // 2. Validate Recent Bill Amount (Required, numeric > 0)
@@ -730,6 +734,17 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (!formData.previousBillMonth?.trim()) {
             newErrors.previousBillMonth =
               language === 'bn' ? 'আগের বিলের মাস নির্বাচন করুন।' : 'Select the previous bill month.';
+          } else if (formData.previousBillMonth > currentMonthLocal) {
+            newErrors.previousBillMonth =
+              language === 'bn' ? 'ভবিষ্যতের বিলের মাস নির্বাচন করা যাবে না।' : 'Previous bill month cannot be in the future.';
+          } else if (
+            formData.recentBillMonth?.trim() &&
+            formData.previousBillMonth >= formData.recentBillMonth
+          ) {
+            newErrors.previousBillMonth =
+              language === 'bn'
+                ? 'আগের বিলের মাস সাম্প্রতিক বিলের মাসের আগে হতে হবে।'
+                : 'Previous bill month must be earlier than the recent bill month.';
           }
 
           // 4. Validate Previous Bill Amount (Required, numeric > 0)
@@ -761,14 +776,17 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               language === 'bn' ? 'শুরুর সময় নির্বাচন করুন।' : 'Select a start time.';
           }
 
-          // 3. Validate End Time (Optional, but if both provided, validate end time > start time)
-          if (formData.incidentTime?.trim() && formData.utilityEndTime?.trim()) {
-            if (formData.utilityEndTime.trim() <= formData.incidentTime.trim()) {
-              newErrors.utilityEndTime =
-                language === 'bn'
-                  ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে।'
-                  : 'End time must be after start time.';
-            }
+          // 3. End time is optional. An earlier clock time is valid and represents
+          // an incident that continued past midnight into the next day.
+          if (
+            formData.incidentTime?.trim() &&
+            formData.utilityEndTime?.trim() &&
+            formData.utilityEndTime.trim() === formData.incidentTime.trim()
+          ) {
+            newErrors.utilityEndTime =
+              language === 'bn'
+                ? 'শেষ সময় শুরুর সময়ের সমান হতে পারে না।'
+                : 'End time cannot be the same as the start time.';
           }
         }
 
@@ -1327,7 +1345,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       onChange={(e) => {
                         onUpdateFormData({ incidentTime: e.target.value });
                         if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
-                        if (errors.utilityEndTime && formData.utilityEndTime && e.target.value < formData.utilityEndTime) {
+                        if (errors.utilityEndTime && formData.utilityEndTime && e.target.value !== formData.utilityEndTime) {
                           setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
                         }
                       }}
