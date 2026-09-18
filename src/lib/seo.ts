@@ -374,13 +374,12 @@ function setAlternateLinkTag(hreflang: string, href: string): void {
 }
 
 function localizedCanonicalUrl(pathname: string, language: 'bn' | 'en'): string {
-  const url = new URL(pathname, SITE_ORIGIN);
+  const normalized = normalizeCanonicalPath(pathname);
   if (language === 'en') {
-    url.searchParams.set('lang', 'en');
-  } else {
-    url.searchParams.delete('lang');
+    const englishPath = normalized === '/' ? '/en/' : `/en${normalized}`;
+    return new URL(englishPath, SITE_ORIGIN).toString();
   }
-  return url.toString();
+  return new URL(normalized, SITE_ORIGIN).toString();
 }
 
 function normalizeCanonicalPath(pathname?: string): string {
