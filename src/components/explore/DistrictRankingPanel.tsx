@@ -23,11 +23,10 @@ interface RankedDistrict {
   divisionBn: string;
   divisionEn: string;
   count: number;
-  harassmentCount: number;
-  rickshawCount: number;
-  extortionCount: number;
-  loadSheddingCount: number;
+  categoryCounts: Partial<Record<SectionKey, number>>;
 }
+
+const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
 
 export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   reports,
@@ -40,150 +39,123 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 }) => {
   const [showAllDistricts, setShowAllDistricts] = useState(false);
 
-  // Compute district level aggregations from rankingReports (or fallback to reports)
   const rankingSource = rankingReports || reports;
 
-  const {
-    rankedDistricts,
-    currentDistrictInfo,
-    totalCount,
-    totalHarass,
-    totalRickshaw,
-    totalExtortion,
-    totalLoadShedding,
-  } = useMemo(() => {
+  const { rankedDistricts, currentDistrictInfo } = useMemo(() => {
     const map = new Map<string, RankedDistrict>();
-    let harass = 0;
-    let rickshaw = 0;
-    let extortion = 0;
-    let loadShedding = 0;
 
-    rankingSource.forEach((rep) => {
-      if (selectedSection !== 'all' && rep.segment !== selectedSection) return;
+    rankingSource.forEach((report) => {
+      if (selectedSection !== 'all' && report.segment !== selectedSection) return;
 
-      if (rep.segment === 'harassment') harass += 1;
-      if (rep.segment === 'rickshaw') rickshaw += 1;
-      if (rep.segment === 'extortion') extortion += 1;
-      if (rep.segment === 'load_shedding') loadShedding += 1;
+      const districtEn = (report.districtEn || '').toLowerCase().trim();
+      const districtBn = (report.districtBn || '').trim();
+      if (!districtBn && !districtEn) return;
 
-      const dEn = rep.districtEn || '';
-      const dBn = rep.districtBn || '';
-      if (!dBn && !dEn) return;
-
-      const distKey = dEn.toLowerCase().trim() || dBn;
       const foundDistrict = BANGLADESH_DISTRICTS.find(
-        (d) =>
-          d.nameEn.toLowerCase() === distKey ||
-          d.nameBn === dBn ||
-          d.id === distKey
+        (district) =>
+          district.nameEn.toLowerCase() === districtEn ||
+          district.nameBn === districtBn ||
+          district.id === districtEn
       );
 
-      const id = foundDistrict?.id || distKey;
-      const nameBn = foundDistrict?.nameBn || dBn;
-      const nameEn = foundDistrict?.nameEn || dEn;
-      const divisionBn = foundDistrict?.divisionBn || '';
-      const divisionEn = foundDistrict?.divisionEn || '';
+      const id = foundDistrict?.id || districtEn || districtBn;
+      if (!id) return;
 
       if (!map.has(id)) {
         map.set(id, {
           id,
-          nameBn,
-          nameEn,
-          divisionBn,
-          divisionEn,
+          nameBn: foundDistrict?.nameBn || districtBn,
+          nameEn: foundDistrict?.nameEn || report.districtEn || districtBn,
+          divisionBn: foundDistrict?.divisionBn || '',
+          divisionEn: foundDistrict?.divisionEn || '',
           count: 0,
-          harassmentCount: 0,
-          rickshawCount: 0,
-          extortionCount: 0,
-          loadSheddingCount: 0,
+          categoryCounts: {},
         });
       }
 
       const entry = map.get(id)!;
       entry.count += 1;
-      if (rep.segment === 'harassment') entry.harassmentCount += 1;
-      if (rep.segment === 'rickshaw') entry.rickshawCount += 1;
-      if (rep.segment === 'extortion') entry.extortionCount += 1;
-      if (rep.segment === 'load_shedding') entry.loadSheddingCount += 1;
+      entry.categoryCounts[report.segment] =
+        (entry.categoryCounts[report.segment] || 0) + 1;
     });
 
-    const list = Array.from(map.values());
-    list.sort((a, b) => b.count - a.count);
+    const list = Array.from(map.values()).sort((a, b) => b.count - a.count);
 
-    // If a district is selected, find or compute its summary
-    let curDist: RankedDistrict | null = null;
+    let current: RankedDistrict | null = null;
     if (selectedDistrict !== 'all') {
       const canonical = BANGLADESH_DISTRICTS.find(
-        (d) =>
-          d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
-          d.nameBn === selectedDistrict ||
-          d.id === selectedDistrict.toLowerCase()
-      );
-      const foundInRanking = list.find(
-        (d) =>
-          d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
-          d.nameBn === selectedDistrict ||
-          d.id === selectedDistrict.toLowerCase()
+        (district) =>
+          district.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+          district.nameBn === selectedDistrict ||
+          district.id === selectedDistrict.toLowerCase()
       );
 
-      if (foundInRanking) {
-        curDist = foundInRanking;
-      } else if (canonical) {
-        curDist = {
+      current =
+        list.find(
+          (district) =>
+            district.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+            district.nameBn === selectedDistrict ||
+            district.id === selectedDistrict.toLowerCase()
+        ) || null;
+
+      if (!current && canonical) {
+        current = {
           id: canonical.id,
           nameBn: canonical.nameBn,
           nameEn: canonical.nameEn,
           divisionBn: canonical.divisionBn,
           divisionEn: canonical.divisionEn,
           count: 0,
-          harassmentCount: 0,
-          rickshawCount: 0,
-          extortionCount: 0,
-          loadSheddingCount: 0,
+          categoryCounts: {},
         };
       }
     }
 
     return {
       rankedDistricts: list,
-      currentDistrictInfo: curDist,
-      totalCount: rankingSource.length,
-      totalHarass: harass,
-      totalRickshaw: rickshaw,
-      totalExtortion: extortion,
-      totalLoadShedding: loadShedding,
+      currentDistrictInfo: current,
     };
-  }, [rankingSource, selectedSection, selectedDistrict]);
+  }, [rankingSource, selectedDistrict, selectedSection]);
 
-  const isDistrictSelected = selectedDistrict !== 'all' && currentDistrictInfo !== null;
-  const mobileDisplayedDistricts = showAllDistricts ? rankedDistricts : rankedDistricts.slice(0, 5);
+  const isDistrictSelected =
+    selectedDistrict !== 'all' && currentDistrictInfo !== null;
 
-  // Active geography context computation
+  const mobileDisplayedDistricts = showAllDistricts
+    ? rankedDistricts
+    : rankedDistricts.slice(0, 5);
+
   const geographyContext = useMemo(() => {
     if (isDistrictSelected && currentDistrictInfo) {
-      const distName = language === 'bn' ? `${currentDistrictInfo.nameBn} জেলা` : `${currentDistrictInfo.nameEn} District`;
-      const divName = language === 'bn' ? `${currentDistrictInfo.divisionBn} বিভাগ` : `${currentDistrictInfo.divisionEn} Division`;
       return {
-        primary: distName,
-        secondary: divName,
+        primary:
+          language === 'bn'
+            ? `${currentDistrictInfo.nameBn} জেলা`
+            : `${currentDistrictInfo.nameEn} District`,
+        secondary:
+          language === 'bn'
+            ? `${currentDistrictInfo.divisionBn} বিভাগ`
+            : `${currentDistrictInfo.divisionEn} Division`,
         isSpecific: true,
       };
     }
 
     if (selectedDivision && selectedDivision !== 'all') {
-      const divObj = DIVISIONS.find(
-        (d) =>
-          d.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
-          d.nameBn === selectedDivision ||
-          d.id === selectedDivision.toLowerCase()
+      const division = DIVISIONS.find(
+        (item) =>
+          item.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
+          item.nameBn === selectedDivision ||
+          item.id === selectedDivision.toLowerCase()
       );
-      const divName = divObj
+      const divisionName = division
         ? language === 'bn'
-          ? `${divObj.nameBn} বিভাগ`
-          : `${divObj.nameEn} Division`
-        : `${selectedDivision} Division`;
+          ? `${division.nameBn} বিভাগ`
+          : `${division.nameEn} Division`
+        : language === 'bn'
+          ? `${selectedDivision} বিভাগ`
+          : `${selectedDivision} Division`;
+
       return {
-        primary: divName,
+        primary: divisionName,
         secondary: language === 'bn' ? 'বাংলাদেশ' : 'Bangladesh',
         isSpecific: true,
       };
@@ -194,92 +166,64 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       secondary: language === 'bn' ? 'সকল এলাকা' : 'All regions',
       isSpecific: false,
     };
-  }, [isDistrictSelected, currentDistrictInfo, selectedDivision, language]);
+  }, [
+    currentDistrictInfo,
+    isDistrictSelected,
+    language,
+    selectedDivision,
+  ]);
 
-  // Truthful parent geography reset button label
   const parentGeographyButtonLabel = useMemo(() => {
     if (selectedDivision && selectedDivision !== 'all') {
-      const divObj = DIVISIONS.find(
-        (d) =>
-          d.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
-          d.nameBn === selectedDivision ||
-          d.id === selectedDivision.toLowerCase()
+      const division = DIVISIONS.find(
+        (item) =>
+          item.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
+          item.nameBn === selectedDivision ||
+          item.id === selectedDivision.toLowerCase()
       );
-      const divName = divObj
+      const divisionName = division
         ? language === 'bn'
-          ? divObj.nameBn
-          : divObj.nameEn
+          ? division.nameBn
+          : division.nameEn
         : selectedDivision;
-      return language === 'bn'
-        ? `${divName} বিভাগের সব জেলা`
-        : `All in ${divName}`;
-    }
-    return language === 'bn' ? 'সারাদেশ দেখুন' : 'All regions';
-  }, [selectedDivision, language]);
 
-  // Topic counts for active area
+      return language === 'bn'
+        ? `${divisionName} বিভাগের সব জেলা`
+        : `All in ${divisionName}`;
+    }
+
+    return language === 'bn' ? 'সারাদেশ দেখুন' : 'All regions';
+  }, [language, selectedDivision]);
+
+  const activeCategoryCounts = useMemo(() => {
+    const counts = new Map<SectionKey, number>(
+      CATEGORY_KEYS.map((key) => [key, 0])
+    );
+    reports.forEach((report) => {
+      counts.set(report.segment, (counts.get(report.segment) || 0) + 1);
+    });
+    return counts;
+  }, [reports]);
+
+  const activeReportCount = reports.length;
+
   const categories = useMemo(
-    () => [
-      {
-        key: 'harassment' as const,
+    () =>
+      CATEGORY_KEYS.map((key) => ({
+        key,
         label:
           language === 'bn'
-            ? SECTIONS.harassment.shortNameBn
-            : SECTIONS.harassment.shortNameEn,
-        count: isDistrictSelected
-          ? currentDistrictInfo?.harassmentCount ?? 0
-          : totalHarass,
-      },
-      {
-        key: 'rickshaw' as const,
-        label:
-          language === 'bn'
-            ? SECTIONS.rickshaw.shortNameBn
-            : SECTIONS.rickshaw.shortNameEn,
-        count: isDistrictSelected
-          ? currentDistrictInfo?.rickshawCount ?? 0
-          : totalRickshaw,
-      },
-      {
-        key: 'extortion' as const,
-        label:
-          language === 'bn'
-            ? SECTIONS.extortion.shortNameBn
-            : SECTIONS.extortion.shortNameEn,
-        count: isDistrictSelected
-          ? currentDistrictInfo?.extortionCount ?? 0
-          : totalExtortion,
-      },
-      {
-        key: 'load_shedding' as const,
-        label:
-          language === 'bn'
-            ? SECTIONS.load_shedding.shortNameBn
-            : SECTIONS.load_shedding.shortNameEn,
-        count: isDistrictSelected
-          ? currentDistrictInfo?.loadSheddingCount ?? 0
-          : totalLoadShedding,
-      },
-    ],
-    [
-      language,
-      isDistrictSelected,
-      currentDistrictInfo,
-      totalHarass,
-      totalRickshaw,
-      totalExtortion,
-      totalLoadShedding,
-    ]
+            ? SECTIONS[key].shortNameBn
+            : SECTIONS[key].shortNameEn,
+        count: activeCategoryCounts.get(key) || 0,
+      }))
+        .filter((item) => item.count > 0)
+        .sort((a, b) => b.count - a.count),
+    [activeCategoryCounts, language]
   );
 
-  // Active area total report count
-  const activeReportCount = isDistrictSelected
-    ? (currentDistrictInfo?.count ?? 0)
-    : (selectedDivision !== 'all' ? reports.length : totalCount);
-
-  // Most reported topic analysis with neutral tie handling
   const mostReportedTopicAnalysis = useMemo(() => {
-    if (activeReportCount === 0) {
+    if (activeReportCount === 0 || categories.length === 0) {
       return {
         status: 'empty' as const,
         topCategories: [],
@@ -287,59 +231,72 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         heading: language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No published reports',
         label: '',
         countText: '',
+        share: 0,
       };
     }
 
-    const maxCount = Math.max(...categories.map((c) => c.count));
-    if (maxCount === 0) {
-      return {
-        status: 'empty' as const,
-        topCategories: [],
-        maxCount: 0,
-        heading: language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No published reports',
-        label: '',
-        countText: '',
-      };
-    }
+    const maxCount = categories[0].count;
+    const topCategories = categories.filter((item) => item.count === maxCount);
+    const share = Math.round((maxCount / activeReportCount) * 100);
 
-    const topCats = categories.filter((c) => c.count === maxCount);
-
-    if (topCats.length === 1) {
-      const isSingleReport = activeReportCount === 1;
+    if (topCategories.length === 1) {
       return {
         status: 'single' as const,
-        topCategories: topCats,
+        topCategories,
         maxCount,
-        heading: isSingleReport
-          ? (language === 'bn' ? 'প্রতিবেদন পাওয়া বিষয়' : 'Reported topic')
-          : (language === 'bn' ? 'সর্বাধিক প্রতিবেদন পাওয়া বিষয়' : 'Most reported topic'),
-        label: topCats[0].label,
-        countText: language === 'bn' ? toBanglaDigits(maxCount) : String(maxCount),
+        heading:
+          language === 'bn'
+            ? 'সর্বাধিক প্রতিবেদন পাওয়া বিষয়'
+            : 'Most reported topic',
+        label: topCategories[0].label,
+        countText:
+          language === 'bn' ? toBanglaDigits(maxCount) : String(maxCount),
+        share,
       };
     }
-
-    // Multiple categories tied for highest count
-    const countDisplay = language === 'bn' ? toBanglaDigits(maxCount) : String(maxCount);
-    const countText = language === 'bn' ? `প্রতিটিতে ${countDisplay}` : `${countDisplay} each`;
 
     return {
       status: 'tie' as const,
-      topCategories: topCats,
+      topCategories,
       maxCount,
-      heading: language === 'bn' ? 'সর্বাধিক প্রতিবেদন পাওয়া বিষয়সমূহ' : 'Top reported topics',
-      label: topCats.map((c) => c.label).join(', '),
-      countText,
+      heading:
+        language === 'bn'
+          ? 'সর্বাধিক প্রতিবেদন পাওয়া বিষয়সমূহ'
+          : 'Top reported topics',
+      label: topCategories.map((item) => item.label).join(', '),
+      countText:
+        language === 'bn'
+          ? `প্রতিটিতে ${toBanglaDigits(maxCount)}`
+          : `${maxCount} each`,
+      share,
     };
-  }, [categories, activeReportCount, language]);
+  }, [activeReportCount, categories, language]);
+
+  const formatNumber = (value: number) =>
+    language === 'bn' ? toBanglaDigits(value) : String(value);
+
+  const formatPercentage = (value: number) =>
+    language === 'bn' ? `${toBanglaDigits(value)}%` : `${value}%`;
 
   const renderDistrictItem = (item: RankedDistrict, index: number) => {
     const rankDisplay = formatRankNumber(index + 1, language);
-    const countDisplay =
-      language === 'bn' ? toBanglaDigits(item.count) : item.count;
     const isSelected =
       selectedDistrict.toLowerCase() === item.nameEn.toLowerCase() ||
       selectedDistrict.toLowerCase() === item.id.toLowerCase() ||
       selectedDistrict === item.nameBn;
+
+    const share =
+      rankingSource.length > 0
+        ? Math.round((item.count / rankingSource.length) * 100)
+        : 0;
+
+    const topCategories = CATEGORY_KEYS.map((key) => ({
+      key,
+      count: item.categoryCounts[key] || 0,
+    }))
+      .filter((entry) => entry.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
 
     const accessibleLabel =
       language === 'bn'
@@ -353,90 +310,94 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         onClick={() => onSelectDistrict(item.nameEn)}
         aria-label={accessibleLabel}
         aria-current={isSelected ? 'true' : undefined}
-        className={`w-full flex items-center justify-between p-2 md:p-2.5 rounded-[var(--radius-control)] text-left transition-all cursor-pointer border group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+        className={`w-full flex items-center justify-between p-2.5 md:p-3 rounded-[var(--radius-control)] text-left transition-all cursor-pointer border group min-h-[58px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
           isSelected
             ? 'bg-ui-accent-soft border-ui-accent/40 text-ui-content-primary ring-1 ring-ui-accent/30 font-[var(--font-weight-medium)] shadow-[var(--elevation-2xs)]'
             : 'bg-ui-surface-subtle border-ui-stroke-subtle hover:border-ui-stroke-default text-ui-content-primary'
         }`}
       >
-        <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
+        <div className="flex items-start gap-2.5 min-w-0">
           <span
-            className={`w-5.5 h-5.5 md:w-6 md:h-6 rounded-[var(--radius-badge-sm)] flex items-center justify-center type-compact font-[var(--font-weight-bold)] shrink-0 border ${
+            className={`w-6 h-6 rounded-[var(--radius-badge-sm)] flex items-center justify-center type-compact font-[var(--font-weight-bold)] shrink-0 border mt-0.5 ${
               isSelected
                 ? 'bg-ui-accent text-ui-content-inverse border-ui-accent'
                 : index === 0
-                ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30 font-extrabold'
-                : index === 1
-                ? 'bg-ui-surface-elevated text-ui-content-primary border-ui-stroke-default font-[var(--font-weight-bold)]'
-                : index === 2
-                ? 'bg-ui-warning-bg text-ui-warning-text border-ui-warning-border font-[var(--font-weight-bold)]'
-                : 'bg-ui-surface text-ui-content-muted border-ui-stroke-subtle'
+                  ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30'
+                  : 'bg-ui-surface text-ui-content-muted border-ui-stroke-subtle'
             }`}
           >
             {rankDisplay}
           </span>
 
           <div className="min-w-0">
-            <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary group-hover:text-ui-content-primary transition-colors truncate block">
-              {language === 'bn' ? item.nameBn : item.nameEn}
-            </span>
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary truncate">
+                {language === 'bn' ? item.nameBn : item.nameEn}
+              </span>
+              <span className="type-compact text-ui-content-muted shrink-0">
+                {formatPercentage(share)}
+              </span>
+            </div>
+
             <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 type-compact text-ui-content-muted mt-0.5">
-              {item.harassmentCount > 0 && (
-                <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="harassment" size="xs" />{' '}
-                  {language === 'bn' ? toBanglaDigits(item.harassmentCount) : item.harassmentCount}
+              {topCategories.map((category) => (
+                <span
+                  key={category.key}
+                  className="inline-flex items-center gap-1"
+                  title={
+                    language === 'bn'
+                      ? SECTIONS[category.key].shortNameBn
+                      : SECTIONS[category.key].shortNameEn
+                  }
+                >
+                  <CategoryIcon section={category.key} size="xs" />
+                  <span className="tabular-nums">{formatNumber(category.count)}</span>
                 </span>
-              )}
-              {item.rickshawCount > 0 && (
-                <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="rickshaw" size="xs" />{' '}
-                  {language === 'bn' ? toBanglaDigits(item.rickshawCount) : item.rickshawCount}
-                </span>
-              )}
-              {item.extortionCount > 0 && (
-                <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="extortion" size="xs" />{' '}
-                  {language === 'bn' ? toBanglaDigits(item.extortionCount) : item.extortionCount}
-                </span>
-              )}
-              {item.loadSheddingCount > 0 && (
-                <span className="inline-flex items-center gap-0.5">
-                  <CategoryIcon section="load_shedding" size="xs" />{' '}
-                  {language === 'bn' ? toBanglaDigits(item.loadSheddingCount) : item.loadSheddingCount}
-                </span>
-              )}
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0 pl-2">
           <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums">
-            {countDisplay}
+            {formatNumber(item.count)}
           </span>
-          <MapIcon name="arrow-right" size="sm" className="text-ui-content-muted transition-transform group-hover:translate-x-0.5" />
+          <MapIcon
+            name="arrow-right"
+            size="sm"
+            className="text-ui-content-muted transition-transform group-hover:translate-x-0.5"
+          />
         </div>
       </button>
     );
   };
 
   return (
-    <div
+    <section
       id="area-summary-panel"
-      className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-3.5 sm:p-4 md:p-5 shadow-[var(--elevation-xs)] flex flex-col justify-between space-y-3.5 md:space-y-4"
+      aria-label={language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area summary'}
+      className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-3.5 sm:p-4 md:p-5 shadow-[var(--elevation-xs)] space-y-4"
     >
-      {/* 1. Header & Geography Context */}
-      <div className="flex items-start justify-between border-b border-ui-stroke-subtle pb-2.5 md:pb-3 gap-2">
+      <div className="flex items-start justify-between border-b border-ui-stroke-subtle pb-3 gap-2">
         <div className="min-w-0 space-y-0.5">
           <div className="flex items-center gap-1.5">
-            <MapIcon name="map-pin" size="sm" className="text-ui-content-primary shrink-0" />
+            <MapIcon
+              name="map-pin"
+              size="sm"
+              className="text-ui-content-primary shrink-0"
+            />
             <h3 className="type-h4 font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight truncate">
               {language === 'bn' ? 'এলাকার সারসংক্ষেপ' : 'Area summary'}
             </h3>
           </div>
           <div className="flex items-center gap-1 type-compact text-ui-content-secondary truncate pl-5">
-            <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{geographyContext.primary}</span>
+            <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">
+              {geographyContext.primary}
+            </span>
             {geographyContext.isSpecific && (
-              <span className="text-ui-content-muted">• {geographyContext.secondary}</span>
+              <span className="text-ui-content-muted">
+                • {geographyContext.secondary}
+              </span>
             )}
           </div>
         </div>
@@ -448,91 +409,147 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             className="type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary inline-flex items-center gap-1.5 cursor-pointer px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             aria-label={parentGeographyButtonLabel}
           >
-            <span className="truncate max-w-[140px] sm:max-w-none">{parentGeographyButtonLabel}</span>
+            <span className="truncate max-w-[140px] sm:max-w-none">
+              {parentGeographyButtonLabel}
+            </span>
             <MapIcon name="close" size="xs" ariaHidden={true} />
           </button>
         )}
       </div>
 
-      {/* 2. Total Published Reports & 3. Most Reported Topic */}
-      <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3 md:p-3.5 space-y-3 sm:space-y-0 sm:flex sm:items-start sm:justify-between sm:gap-3">
-        <div className="shrink-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5">
           <span className="type-compact font-[var(--font-weight-medium)] text-ui-content-muted block">
-            {language === 'bn' ? 'মোট প্রকাশিত প্রতিবেদন' : 'Total published reports'}
+            {language === 'bn'
+              ? 'বর্তমান নির্বাচনে প্রতিবেদন'
+              : 'Reports in current selection'}
           </span>
-          <span className="type-h1 font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums leading-tight mt-0.5 block">
-            {language === 'bn' ? toBanglaDigits(activeReportCount) : activeReportCount}
+          <span className="type-h1 font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums leading-tight mt-1 block">
+            {formatNumber(activeReportCount)}
+          </span>
+          <p className="type-compact text-ui-content-secondary mt-1">
+            {language === 'bn'
+              ? 'উপরের ফিল্টার ও মানচিত্র নির্বাচনের ভিত্তিতে'
+              : 'Based on the active filters and map selection'}
+          </p>
+        </div>
+
+        <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5">
+          <span className="type-compact font-[var(--font-weight-medium)] text-ui-content-muted block">
+            {mostReportedTopicAnalysis.heading}
+          </span>
+
+          {mostReportedTopicAnalysis.status !== 'empty' ? (
+            <>
+              <div className="flex items-start gap-1.5 mt-1.5 min-w-0">
+                <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                  {mostReportedTopicAnalysis.topCategories
+                    .slice(0, 3)
+                    .map((category) => (
+                      <CategoryIcon
+                        key={category.key}
+                        section={category.key}
+                        size="xs"
+                      />
+                    ))}
+                </div>
+                <span className="type-h4 font-[var(--font-weight-bold)] text-ui-content-primary break-words leading-snug">
+                  {mostReportedTopicAnalysis.label}
+                </span>
+              </div>
+              <p className="type-compact text-ui-content-secondary mt-1">
+                {mostReportedTopicAnalysis.countText} ·{' '}
+                {formatPercentage(mostReportedTopicAnalysis.share)}
+              </p>
+            </>
+          ) : (
+            <p className="type-compact text-ui-content-secondary mt-1.5">
+              {language === 'bn'
+                ? 'এই নির্বাচনে বিষয়ভিত্তিক তথ্য নেই'
+                : 'No topic data in this selection'}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between type-compact">
+          <span className="font-[var(--font-weight-bold)] text-ui-content-secondary">
+            {language === 'bn' ? 'বিষয় অনুযায়ী বণ্টন' : 'Topic distribution'}
+          </span>
+          <span className="text-ui-content-muted">
+            {language === 'bn'
+              ? `${toBanglaDigits(categories.length)}টি বিষয়`
+              : `${categories.length} topics`}
           </span>
         </div>
 
-        {mostReportedTopicAnalysis.status !== 'empty' && (
-          <div className="sm:text-right min-w-0 sm:max-w-[65%]">
-            <span className="type-compact font-[var(--font-weight-medium)] text-ui-content-muted block">
-              {mostReportedTopicAnalysis.heading}
-            </span>
-            <div className="flex items-start sm:justify-end gap-1.5 mt-1 flex-wrap">
-              {mostReportedTopicAnalysis.status === 'single' && mostReportedTopicAnalysis.topCategories[0] && (
-                <span className="shrink-0 mt-0.5">
-                  <CategoryIcon section={mostReportedTopicAnalysis.topCategories[0].key} size="xs" />
-                </span>
-              )}
-              {mostReportedTopicAnalysis.status === 'tie' && (
-                <div className="flex items-center gap-1 shrink-0 mt-0.5">
-                  {mostReportedTopicAnalysis.topCategories.map((tc) => (
-                    <CategoryIcon key={tc.key} section={tc.key} size="xs" />
-                  ))}
+        {categories.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {categories.map((category) => {
+              const share =
+                activeReportCount > 0
+                  ? Math.round((category.count / activeReportCount) * 100)
+                  : 0;
+
+              return (
+                <div
+                  key={category.key}
+                  className="px-3 py-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact min-w-0"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <CategoryIcon section={category.key} size="xs" />
+                      <span className="font-[var(--font-weight-semibold)] text-ui-content-primary truncate">
+                        {category.label}
+                      </span>
+                    </div>
+                    <span className="font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums shrink-0">
+                      {formatNumber(category.count)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <progress
+                      value={category.count}
+                      max={Math.max(activeReportCount, 1)}
+                      className="h-1.5 flex-1 min-w-0 accent-ui-accent"
+                      aria-label={
+                        language === 'bn'
+                          ? `${category.label}: ${formatPercentage(share)}`
+                          : `${category.label}: ${share}%`
+                      }
+                    />
+                    <span className="text-ui-content-muted tabular-nums shrink-0">
+                      {formatPercentage(share)}
+                    </span>
+                  </div>
                 </div>
-              )}
-              <div className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary break-words whitespace-normal leading-snug">
-                <span>{mostReportedTopicAnalysis.label}</span>
-                {mostReportedTopicAnalysis.status === 'tie' && (
-                  <span className="tabular-nums ml-1.5 font-[var(--font-weight-regular)] text-ui-content-muted type-compact whitespace-nowrap">
-                    ({mostReportedTopicAnalysis.countText})
-                  </span>
-                )}
-              </div>
-            </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="py-4 text-center type-compact text-ui-content-muted">
+            {language === 'bn'
+              ? 'বিষয়ভিত্তিক তথ্য পাওয়া যায়নি'
+              : 'No topic distribution available'}
           </div>
         )}
       </div>
 
-      {/* 4. Topic Distribution */}
-      <div className="space-y-1.5 md:space-y-2">
-        <div className="flex items-center justify-between type-compact font-[var(--font-weight-bold)] text-ui-content-secondary">
-          <span>{language === 'bn' ? 'বিষয় অনুযায়ী প্রতিবেদন' : 'Reports by topic'}</span>
-          <span className="type-compact font-[var(--font-weight-regular)] text-ui-content-muted">
-            {language === 'bn' ? '৪টি বিষয়' : '4 categories'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 md:gap-2">
-          {categories.map((cat) => (
-            <div
-              key={cat.key}
-              className="flex items-center justify-between px-3 py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                <CategoryIcon section={cat.key} size="xs" />
-                <span className="font-[var(--font-weight-medium)] text-ui-content-primary truncate">
-                  {cat.label}
-                </span>
-              </div>
-              <span className="font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums type-compact shrink-0 ml-2">
-                {language === 'bn' ? toBanglaDigits(cat.count) : cat.count}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 5. Explore by District / District Ranking */}
-      <div className="space-y-2 pt-1 border-t border-ui-stroke-subtle">
-        <div className="flex items-center justify-between type-compact">
-          <span className="font-[var(--font-weight-bold)] text-ui-content-secondary">
-            {language === 'bn' ? 'জেলা অনুযায়ী প্রতিবেদন' : 'Reports by district'}
-          </span>
+      <div className="space-y-2.5 pt-1 border-t border-ui-stroke-subtle">
+        <div className="flex items-end justify-between gap-3 type-compact">
+          <div>
+            <span className="font-[var(--font-weight-bold)] text-ui-content-secondary block">
+              {language === 'bn' ? 'জেলা তুলনা' : 'District comparison'}
+            </span>
+            <span className="text-ui-content-muted block mt-0.5">
+              {language === 'bn'
+                ? 'প্রতিবেদন সংখ্যার ভিত্তিতে র‍্যাঙ্ক'
+                : 'Ranked by published report volume'}
+            </span>
+          </div>
           {rankedDistricts.length > 0 && (
-            <span className="type-compact text-ui-content-muted font-[var(--font-weight-medium)]">
+            <span className="text-ui-content-muted font-[var(--font-weight-medium)] shrink-0">
               {language === 'bn'
                 ? `${toBanglaDigits(rankedDistricts.length)}টি জেলা`
                 : `${rankedDistricts.length} districts`}
@@ -542,25 +559,30 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
         {rankedDistricts.length > 0 ? (
           <>
-            {/* Mobile District List (<768px): Top 5 by default, expandable to full */}
             <div className="space-y-1.5 max-h-none overflow-visible md:hidden">
               {mobileDisplayedDistricts.map(renderDistrictItem)}
             </div>
 
-            {/* Desktop / Tablet District List (>=768px): Always full ranking, internal vertical scroll */}
-            <div className="hidden md:grid md:grid-cols-2 gap-1.5 md:max-h-[260px] md:overflow-y-auto md:pr-1">
+            <div className="hidden md:grid md:grid-cols-2 gap-2 md:max-h-[300px] md:overflow-y-auto md:pr-1">
               {rankedDistricts.map(renderDistrictItem)}
             </div>
           </>
         ) : (
           <div className="py-4 text-center type-compact text-ui-content-muted space-y-1">
-            <MapIcon name="map-pin" size="lg" className="mx-auto text-ui-content-muted" />
-            <p>{language === 'bn' ? 'কোনো জেলার তথ্য মেলেনি' : 'No district reports'}</p>
+            <MapIcon
+              name="map-pin"
+              size="lg"
+              className="mx-auto text-ui-content-muted"
+            />
+            <p>
+              {language === 'bn'
+                ? 'কোনো জেলার তথ্য মেলেনি'
+                : 'No district reports'}
+            </p>
           </div>
         )}
       </div>
 
-      {/* Show All / Less Toggle for District List (Mobile only, <768px) */}
       {rankedDistricts.length > 5 && (
         <div className="pt-2 border-t border-ui-stroke-subtle md:hidden">
           <button
@@ -571,22 +593,23 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           >
             <span>
               {showAllDistricts
-                ? (language === 'bn' ? 'কম দেখুন' : 'Show less')
-                : (language === 'bn' ? 'সব জেলা দেখুন' : 'Show all districts')}
+                ? language === 'bn'
+                  ? 'কম দেখুন'
+                  : 'Show less'
+                : language === 'bn'
+                  ? 'সব জেলা দেখুন'
+                  : 'Show all districts'}
             </span>
-            {showAllDistricts ? (
-              <MapIcon name="chevron-up" size="xs" ariaHidden={true} />
-            ) : (
-              <MapIcon name="chevron-down" size="xs" ariaHidden={true} />
-            )}
+            <MapIcon
+              name={showAllDistricts ? 'chevron-up' : 'chevron-down'}
+              size="xs"
+              ariaHidden={true}
+            />
           </button>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 
 export default DistrictRankingPanel;
-
-
-

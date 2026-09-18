@@ -9,6 +9,7 @@ import { SUBCATEGORIES } from '../data/categories';
 import { ReportFeedSkeleton, MapExploreSkeleton } from '../components/ui/LoadingSkeleton';
 import type { ExploreViewMode } from '../components/explore/MapSectionHeader';
 import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
+import { MapInsightSummary } from '../components/explore/MapInsightSummary';
 import { DistrictRankingPanel } from '../components/explore/DistrictRankingPanel';
 import { RecentAreaReports } from '../components/explore/RecentAreaReports';
 import { ReportAnalyticsOverview } from '../components/explore/ReportAnalyticsOverview';
@@ -858,6 +859,7 @@ export const ExplorePage: React.FC = () => {
           className="flex items-center bg-ui-surface-subtle p-1 ui-radius-control border border-ui-stroke-subtle w-fit shadow-[var(--elevation-2xs)]"
         >
           <button
+            id="explore-mode-reports"
             type="button"
             aria-pressed={viewMode === 'reports'}
             onClick={() => setViewMode('reports')}
@@ -872,6 +874,7 @@ export const ExplorePage: React.FC = () => {
           </button>
 
           <button
+            id="explore-mode-map"
             type="button"
             aria-pressed={viewMode === 'heatmap'}
             onClick={() => setViewMode('heatmap')}
@@ -964,8 +967,13 @@ export const ExplorePage: React.FC = () => {
             </div>
           ) : viewMode === 'heatmap' ? (
             /* MAP VIEW */
-            <div className="space-y-4 md:space-y-6">
-              {/* Row 1: Full-Width Map */}
+            <div className="space-y-4 md:space-y-5">
+              <MapInsightSummary
+                reports={filteredReports}
+                language={language}
+              />
+
+              {/* Interactive geographic map */}
               <div className="w-full">
                 <PublicIncidentMap
                   reports={filteredReports}
