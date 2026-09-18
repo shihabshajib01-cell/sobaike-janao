@@ -77,7 +77,6 @@ export const Drawer: React.FC<DrawerProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 backdrop-blur-xs transition-opacity"
         className="absolute inset-0 backdrop-blur-xs transition-opacity bg-role-overlay"
         onClick={onClose}
         aria-hidden="true"
