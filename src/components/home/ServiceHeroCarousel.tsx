@@ -246,7 +246,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const containerStyle: React.CSSProperties = {
     ...getHeroSliderCssVars(),
     backgroundColor: activeHeroBg,
-    borderColor: `var(--sec-${activeKey}-border)`,
     touchAction: 'pan-y',
   };
 
@@ -277,7 +276,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
-        className="w-full ui-radius-card ui-border-default ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+        className="w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
         style={containerStyle}
       >
         <div
