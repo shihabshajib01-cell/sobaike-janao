@@ -10,23 +10,23 @@
 html[data-theme="light"] {
   --ui-page: #F0F2F5;
   --ui-surface: #FFFFFF;
-  --ui-surface-subtle: #F7F8FA;
+  --ui-surface-subtle: #F0F2F5;
   --ui-surface-elevated: #FFFFFF;
-  --ui-surface-hover: #ECEEF1;
+  --ui-surface-hover: #E4E6EB;
 
   --ui-text-primary: #050505;
   --ui-text-secondary: #65676B;
-  --ui-text-muted: #8A8D91;
+  --ui-text-muted: #65676B;
   --ui-text-inverse: #FFFFFF;
 
   --ui-border-subtle: #E4E6EB;
-  --ui-border: #CED0D4;
-  --ui-border-strong: #B0B3B8;
+  --ui-border: #E4E6EB;
+  --ui-border-strong: #E4E6EB;
 
   --ui-input: #FFFFFF;
-  --ui-input-placeholder: #8A8D91;
+  --ui-input-placeholder: #65676B;
   --ui-disabled-bg: #E4E6EB;
-  --ui-disabled-text: #8A8D91;
+  --ui-disabled-text: #65676B;
   --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.14);
 
   --sec-harassment-primary: #B84A62;
@@ -90,23 +90,23 @@ html[data-theme="dark"],
 .dark {
   --ui-page: #18191A;
   --ui-surface: #242526;
-  --ui-surface-subtle: #202122;
-  --ui-surface-elevated: #2B2D2F;
-  --ui-surface-hover: #303234;
+  --ui-surface-subtle: #242526;
+  --ui-surface-elevated: #242526;
+  --ui-surface-hover: #3A3B3C;
 
   --ui-text-primary: #E4E6EB;
   --ui-text-secondary: #B0B3B8;
-  --ui-text-muted: #8A8D91;
+  --ui-text-muted: #B0B3B8;
   --ui-text-inverse: #FFFFFF;
 
-  --ui-border-subtle: #303234;
+  --ui-border-subtle: #3A3B3C;
   --ui-border: #3A3B3C;
-  --ui-border-strong: #4E4F50;
+  --ui-border-strong: #3A3B3C;
 
   --ui-input: #242526;
-  --ui-input-placeholder: #8A8D91;
-  --ui-disabled-bg: #303234;
-  --ui-disabled-text: #8A8D91;
+  --ui-input-placeholder: #B0B3B8;
+  --ui-disabled-bg: #3A3B3C;
+  --ui-disabled-text: #B0B3B8;
   --elevation-floating: 0 8px 24px rgb(0 0 0 / 0.32);
 
   --sec-harassment-primary: #B84A62;
