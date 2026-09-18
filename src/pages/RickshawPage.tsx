@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Info } from 'lucide-react';
 import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
 import { MobileCategoryFilterPortal } from '../components/feed/MobileCategoryFilterPortal';
@@ -95,15 +94,6 @@ export const RickshawPage: React.FC = () => {
           },
         ]}
       />
-
-      <div className="flex items-center gap-2 type-meta text-ui-content-secondary bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] px-3 sm:px-3.5 py-2 sm:py-2.5 text-left">
-        <Info className="w-4 h-4 text-ui-content-muted shrink-0" aria-hidden="true" />
-        <span>
-          {language === 'bn'
-            ? 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।'
-            : 'Share the location and details of illegal or unsafe charging stations.'}
-        </span>
-      </div>
 
       <CategoryFeedView
         section="rickshaw"
