@@ -31,7 +31,7 @@ interface BreakdownColumnProps<T extends string> {
   onSelectValue?: (value: T) => void;
 }
 
-const BreakdownColumn = <T extends string>({
+const BreakdownColumn = <T extends string,>({
   title,
   options,
   values,
