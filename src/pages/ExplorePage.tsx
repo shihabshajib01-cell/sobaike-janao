@@ -281,13 +281,22 @@ export const ExplorePage: React.FC = () => {
     if (selectedSection !== 'all') count++;
     if (selectedDivision !== 'all') count++;
     if (selectedDistrict !== 'all') count++;
+    if (selectedSubcategory !== null) count++;
+    if (selectedMonth !== null) count++;
     if (selectedSection === 'harassment') {
       if (harassmentFilters.ageGroup !== 'all') count++;
       if (harassmentFilters.abuserRelationship !== 'all') count++;
       if (harassmentFilters.reportingFor !== 'all') count++;
     }
     return count;
-  }, [selectedSection, selectedDivision, selectedDistrict, harassmentFilters]);
+  }, [
+    selectedSection,
+    selectedDivision,
+    selectedDistrict,
+    selectedSubcategory,
+    selectedMonth,
+    harassmentFilters,
+  ]);
 
   const handleSelectDistrict = useCallback((districtValue: string) => {
     if (!districtValue || districtValue === 'all') {
