@@ -273,6 +273,11 @@ requireContains(
   'search-modal quick actions must use the shared Button primitive'
 );
 requireNotContains(
+  'src/components/layout/SearchModal.tsx',
+  '<button',
+  'search modal must not recreate raw button controls'
+);
+requireNotContains(
   'src/components/report-detail/SubjectResponseModal.tsx',
   '<button',
   'subject-response modal must not retain raw legacy button controls'
@@ -316,6 +321,29 @@ requireContains(
   'closeOnEscape?: boolean;',
   'Modal must expose an explicit Escape-dismiss policy'
 );
+
+for (const file of [
+  'src/components/location/FirstVisitNoticeModal.tsx',
+  'src/components/report-detail/CitizenActionModal.tsx',
+  'src/components/report-detail/SubjectResponseModal.tsx',
+]) {
+  requireContains(
+    file,
+    'closeOnEscape={false}',
+    'mandatory or data-entry modals must explicitly protect against accidental Escape dismissal'
+  );
+}
+
+requireContains(
+  'src/components/location/LocationConsentModal.tsx',
+  'closeOnEscape={true}',
+  'location permission modal must explicitly define its Escape dismissal policy'
+);
+requireContains(
+  'src/components/report-composer/ReportComposerModal.tsx',
+  'closeOnEscape={true}',
+  'nested report-composer dialogs must explicitly define safe Escape behavior'
+);
 requireContains(
   'src/components/ui/Modal.tsx',
   'useDialogLifecycle',
@@ -341,6 +369,27 @@ requireContains(
   'useDialogLifecycle',
   'attachment viewer must reuse shared dialog lifecycle behavior'
 );
+
+for (const file of [
+  'src/components/media/ImageViewer.tsx',
+  'src/components/media/AttachmentLightboxModal.tsx',
+]) {
+  requireNotContains(
+    file,
+    "window.addEventListener('keydown'",
+    'specialized media dialogs must not recreate keyboard lifecycle handling'
+  );
+  requireNotContains(
+    file,
+    "document.body.style.overflow",
+    'specialized media dialogs must not recreate scroll-lock handling'
+  );
+  requireContains(
+    file,
+    'tabIndex={-1}',
+    'specialized media dialogs must provide a safe lifecycle focus target'
+  );
+}
 requireContains(
   'src/components/ui/ModalActions.tsx',
   "{secondary ? renderAction(secondary, 'outline') : null}",
