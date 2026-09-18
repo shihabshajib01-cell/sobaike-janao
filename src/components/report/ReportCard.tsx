@@ -23,7 +23,10 @@ const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"
 export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
-  const [engagement, setEngagement] = useState<PublicEngagementCounts>(INITIAL_ENGAGEMENT);
+  const [engagement, setEngagement] = useState<PublicEngagementCounts>(() => ({
+    viewCount: Math.max(0, Number(report.viewCount) || 0),
+    shareCount: Math.max(0, Number(report.shareCount) || 0),
+  }));
 
   const title = language === 'bn' ? report.titleBn : report.titleEn;
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
@@ -35,6 +38,17 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
   const shouldShowDescription = normalizedDesc.length > 0 && normalizedDesc !== normalizedTitle;
 
   useEffect(() => {
+    const hasEmbeddedCounts =
+      report.viewCount !== undefined || report.shareCount !== undefined;
+
+    if (hasEmbeddedCounts) {
+      setEngagement({
+        viewCount: Math.max(0, Number(report.viewCount) || 0),
+        shareCount: Math.max(0, Number(report.shareCount) || 0),
+      });
+      return;
+    }
+
     let active = true;
     PublicEngagementService.getCounts(report.id).then((counts) => {
       if (active) setEngagement(counts);
@@ -42,7 +56,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     return () => {
       active = false;
     };
-  }, [report.id]);
+  }, [report.id, report.viewCount, report.shareCount]);
 
   const registerView = () => {
     void PublicEngagementService.trackView(report.id).then((counts) => {
