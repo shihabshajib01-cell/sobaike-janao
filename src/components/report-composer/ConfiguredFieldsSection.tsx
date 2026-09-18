@@ -273,6 +273,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 ? `সর্বোচ্চ মান ${field.validation.max}।`
                 : `Maximum value is ${field.validation.max}.`;
           }
+        }
 
         if (
           (field.fieldType === 'date' ||
