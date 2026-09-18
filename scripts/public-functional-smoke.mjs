@@ -299,6 +299,77 @@ await check('Search page accepts a query without crashing', async () => {
   await context.close();
 });
 
+await check('Issues category counts match the live published report feed', async () => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_KEY;
+  if (!supabaseUrl || !supabaseKey) throw new Error('Supabase test credentials are unavailable');
+
+  const headers = {
+    apikey: supabaseKey,
+    Authorization: `Bearer ${supabaseKey}`,
+    'Content-Type': 'application/json',
+  };
+
+  const [popularityResponse, reportsResponse] = await Promise.all([
+    fetch(`${supabaseUrl}/rest/v1/rpc/get_public_category_popularity`, {
+      method: 'POST',
+      headers,
+      body: '{}',
+    }),
+    fetch(`${supabaseUrl}/rest/v1/rpc/get_public_published_reports`, {
+      method: 'POST',
+      headers,
+      body: '{}',
+    }),
+  ]);
+
+  if (!popularityResponse.ok) {
+    throw new Error(`category popularity RPC returned ${popularityResponse.status}`);
+  }
+  if (!reportsResponse.ok) {
+    throw new Error(`published reports RPC returned ${reportsResponse.status}`);
+  }
+
+  const popularityRows = await popularityResponse.json();
+  const publishedPayload = await reportsResponse.json();
+
+  if (!Array.isArray(popularityRows)) {
+    throw new Error('category popularity RPC did not return a row array');
+  }
+
+  const liveCounts = new Map();
+  const queue = [publishedPayload];
+  while (queue.length) {
+    const item = queue.shift();
+    if (Array.isArray(item)) {
+      queue.push(...item);
+      continue;
+    }
+    if (!item || typeof item !== 'object') continue;
+
+    if (typeof item.segment === 'string' && item.segment) {
+      liveCounts.set(item.segment, (liveCounts.get(item.segment) || 0) + 1);
+      continue;
+    }
+
+    queue.push(...Object.values(item));
+  }
+
+  for (const row of popularityRows) {
+    const segmentId = row?.segment_id;
+    if (typeof segmentId !== 'string' || !segmentId) continue;
+
+    const issuesCount = Number(row.published_post_count || 0);
+    const liveCount = Number(liveCounts.get(segmentId) || 0);
+
+    if (issuesCount !== liveCount) {
+      throw new Error(
+        `issues count mismatch for ${segmentId}: issues=${issuesCount}, live-feed=${liveCount}`
+      );
+    }
+  }
+});
+
 await check('Public report detail route renders when a published report is available', async () => {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_KEY;
