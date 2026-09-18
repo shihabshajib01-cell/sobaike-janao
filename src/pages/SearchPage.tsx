@@ -33,7 +33,8 @@ export const SearchPage: React.FC = () => {
   const [harassmentFilters, setHarassmentFilters] = useState(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
 
   const [allReports, setAllReports] = useState<ReportItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasLoadedReports, setHasLoadedReports] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
@@ -42,6 +43,7 @@ export const SearchPage: React.FC = () => {
     try {
       const data = await PublicReportService.getAll();
       setAllReports(data);
+      setHasLoadedReports(true);
     } catch (err) {
       console.warn('[SearchPage load error]', err);
       setFetchError('LOAD_ERROR');
@@ -49,10 +51,6 @@ export const SearchPage: React.FC = () => {
       setIsLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   useEffect(() => {
     if (queryParams.q !== undefined && queryParams.q !== query) {
@@ -64,6 +62,11 @@ export const SearchPage: React.FC = () => {
     (selectedReportSegment === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) ||
     selectedReportSegment !== 'all';
   const hasSearchIntent = Boolean(query.trim()) || hasReportFilters;
+
+  useEffect(() => {
+    if (!hasSearchIntent || hasLoadedReports || isLoading) return;
+    void loadData();
+  }, [hasLoadedReports, hasSearchIntent, isLoading, loadData]);
 
   useEffect(() => {
     if (selectedReportSegment !== 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) {
