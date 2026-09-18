@@ -65,7 +65,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                   hasError
                     ? 'bg-role-error-container text-role-on-error-container'
                     : isExpanded
-                    ? 'bg-role-secondary-container text-role-secondary'
+                    ? 'bg-role-secondary-container text-role-on-secondary-container'
                     : 'bg-role-surface-subtle text-role-on-surface-secondary'
                 }`}
               >
@@ -116,7 +116,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                 className={`w-9 h-9 rounded-[var(--radius-control)] flex items-center justify-center shrink-0 transition-colors ${
                   hasError
                     ? 'bg-role-error-container text-role-on-error-container'
-                    : 'bg-role-secondary-container text-role-secondary'
+                    : 'bg-role-secondary-container text-role-on-secondary-container'
                 }`}
               >
                 {icon}
