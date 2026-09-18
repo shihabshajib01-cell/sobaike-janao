@@ -38,10 +38,6 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       titleEn: service.nameEn,
       descBn: service.descriptionBn || service.shortNameBn,
       descEn: service.descriptionEn || service.shortNameEn,
-      bgColor: service.bgColor,
-      textColor: service.textColor,
-      borderColor: service.borderColor,
-      primaryColor: service.primaryColor,
     }));
 
   const comingSoonList = Object.values(COMING_SOON_SERVICES).filter(
@@ -60,6 +56,13 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   };
 
   const activeComingSoonData = selectedComingSoon ? COMING_SOON_SERVICES[selectedComingSoon] : null;
+
+  const getSectionStyles = (section: SectionKey) => ({
+    background: `var(--sec-${section}-bg)`,
+    text: `var(--sec-${section}-text)`,
+    border: `var(--sec-${section}-border)`,
+    primary: `var(--sec-${section}-primary)`,
+  });
 
   return (
     <div className="space-y-5">
@@ -80,22 +83,22 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               id={`service-select-card-${srv.key}`}
               onClick={() => handleActiveSelect(srv.key)}
               aria-pressed={isSelected}
-              className={`relative ui-radius-card px-4 py-3.5 md:px-5 md:py-4 transition-colors duration-150 cursor-pointer flex items-center gap-3 text-left ui-border-default focus:outline-none focus:ring-2 focus:ring-ui-focus ${
+              className={`relative ui-radius-card px-4 py-3.5 md:px-5 md:py-4 transition-colors duration-150 cursor-pointer flex items-center gap-3 text-left ui-border-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isSelected
                   ? 'ui-elevation-selected'
                   : 'bg-ui-surface border-ui-stroke-default ui-elevation-control'
               }`}
               style={{
-                backgroundColor: isSelected ? srv.bgColor : undefined,
-                borderColor: isSelected ? srv.primaryColor : undefined,
+                backgroundColor: isSelected ? getSectionStyles(srv.key).background : undefined,
+                borderColor: isSelected ? getSectionStyles(srv.key).primary : undefined,
               }}
             >
               <div
                 className="w-11 h-11 md:w-12 md:h-12 shrink-0 ui-radius-control flex items-center justify-center transition-colors ui-border-default ui-elevation-control"
                 style={{
-                  backgroundColor: srv.bgColor,
-                  color: srv.textColor,
-                  borderColor: srv.borderColor,
+                  backgroundColor: getSectionStyles(srv.key).background,
+                  color: getSectionStyles(srv.key).text,
+                  borderColor: getSectionStyles(srv.key).border,
                 }}
               >
                 <CategoryIcon section={srv.key} size="md" />
@@ -114,14 +117,18 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                 aria-hidden="true"
                 className={`w-5 h-5 shrink-0 rounded-[var(--radius-pill)] flex items-center justify-center ui-border-default transition-colors ${
                   isSelected
-                    ? 'border-ui-accent bg-ui-surface'
+                    ? 'bg-ui-surface'
                     : 'border-ui-stroke-default bg-ui-surface'
                 }`}
+                style={{
+                  borderColor: isSelected ? getSectionStyles(srv.key).primary : undefined,
+                }}
               >
                 <span
-                  className={`w-2 h-2 rounded-[var(--radius-pill)] bg-ui-accent transition-transform ${
+                  className={`w-2 h-2 rounded-[var(--radius-pill)] transition-transform ${
                     isSelected ? 'scale-100' : 'scale-0'
                   }`}
+                  style={{ backgroundColor: getSectionStyles(srv.key).primary }}
                 />
               </div>
             </button>
