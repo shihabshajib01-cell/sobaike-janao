@@ -6,16 +6,14 @@ import {
   HERO_SLIDER_BEHAVIOR,
   getHeroSliderCssVars,
 } from '../../theme/tokens';
-import { useApp, RoutePath } from '../../context/AppContext';
+import { useApp } from '../../context/AppContext';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
-import { CANONICAL_BANNER_CONTENT } from '../../data/bannerContent';
-import { getPublishedBannerSettings } from '../../services/bannerRuntime';
+import { getPublishedBannerSettings, getRuntimeBannerContent } from '../../services/bannerRuntime';
 import { IconButton } from '../ui/IconButton';
 
 export interface ServiceSlide {
   key: SectionKey;
-  path: RoutePath;
 }
 
 export interface ServiceHeroCarouselProps {
@@ -43,17 +41,12 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const sliderRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const availableSlides: ServiceSlide[] = [
-    { key: 'harassment', path: '/harassment' },
-    { key: 'load_shedding', path: '/load-shedding' },
-    { key: 'extortion', path: '/extortion' },
-    { key: 'public_safety', path: '/public-safety' },
-    { key: 'road_transport', path: '/road-transport' },
-    { key: 'illegal_occupation', path: '/illegal-occupation' },
-    { key: 'rickshaw', path: '/rickshaw' },
-  ];
+  const availableSlides: ServiceSlide[] = Object.values(segments)
+    .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+    .map((segment) => ({ key: segment.id as SectionKey }));
+
   const slides = availableSlides
-    .filter((slide) => Boolean(segments[slide.key]))
+    .filter((slide) => Boolean(getRuntimeBannerContent(slide.key)))
     .filter((slide) => {
       const settings = getPublishedBannerSettings(slide.key);
       return settings ? settings.isActive && settings.showOnHome : true;
@@ -61,8 +54,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     .sort((a, b) => {
       const aSettings = getPublishedBannerSettings(a.key);
       const bSettings = getPublishedBannerSettings(b.key);
-      const aFallback = availableSlides.findIndex((slide) => slide.key === a.key) + 1;
-      const bFallback = availableSlides.findIndex((slide) => slide.key === b.key) + 1;
+      const aFallback = segments[a.key]?.sortOrder ?? 999;
+      const bFallback = segments[b.key]?.sortOrder ?? 999;
       return (aSettings?.sortOrder ?? aFallback) - (bSettings?.sortOrder ?? bFallback);
     });
 
@@ -240,12 +233,16 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
   const currentSlide = slides[safeIndex];
   const activeKey = currentSlide.key;
-  const activeHeroBg = HERO_TOKENS.sections[activeKey]?.background ?? `var(--sec-${activeKey}-bg)`;
+  const activeSegment = segments[activeKey];
+  const activeHeroBg =
+    HERO_TOKENS.sections[activeKey]?.background ??
+    activeSegment?.bgColor ??
+    '#F0F3F9';
 
   const containerStyle: React.CSSProperties = {
     ...getHeroSliderCssVars(),
     backgroundColor: activeHeroBg,
-    borderColor: `var(--sec-${activeKey}-border)`,
+    borderColor: activeSegment?.borderColor ?? '#CCD5E8',
     touchAction: 'pan-y',
   };
 
@@ -290,7 +287,9 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         >
           {slides.map((slide, index) => {
             const isActive = index === safeIndex;
-            const content = CANONICAL_BANNER_CONTENT[slide.key];
+            const content = getRuntimeBannerContent(slide.key);
+            if (!content) return null;
+            const slideSegment = segments[slide.key];
 
             return (
               <div
@@ -305,7 +304,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 aria-hidden={!isActive}
                 className="w-full shrink-0 min-w-full p-0 flex flex-col"
                 style={{
-                  backgroundColor: HERO_TOKENS.sections[slide.key]?.background ?? `var(--sec-${slide.key}-bg)`,
+                  backgroundColor:
+                    HERO_TOKENS.sections[slide.key]?.background ??
+                    slideSegment?.bgColor ??
+                    '#F0F3F9',
                 }}
               >
                 <CategoryHeroBanner
