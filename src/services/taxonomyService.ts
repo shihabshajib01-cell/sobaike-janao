@@ -67,6 +67,9 @@ const THEME_PRIMARY: Record<string, string> = {
   slate: '#64748B',
 };
 
+export const isManagedThemePreset = (themeKey?: string): boolean =>
+  Boolean(themeKey && THEME_PRIMARY[themeKey]);
+
 const buildDynamicTheme = (themeKey?: string) => {
   const primary = THEME_PRIMARY[themeKey || ''] || THEME_PRIMARY.sky;
   const background = `color-mix(in srgb, ${primary} 10%, var(--ui-surface))`;
@@ -161,9 +164,7 @@ export const TaxonomyService = {
           const key = row.id as SectionKey;
           const legacy = SECTIONS[key];
           const dynamicTheme = buildDynamicTheme(row.theme_key);
-          const hasManagedTheme = Boolean(
-            row.theme_key && THEME_PRIMARY[row.theme_key]
-          );
+          const hasManagedTheme = isManagedThemePreset(row.theme_key);
           const fallback = legacy
             ? hasManagedTheme
               ? {
