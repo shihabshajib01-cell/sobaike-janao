@@ -8,6 +8,7 @@ import { ModalActions } from '../ui/ModalActions';
 import { UnsavedChangesDialog } from '../ui/UnsavedChangesDialog';
 import { TextField } from '../ui/TextField';
 import { TextAreaField } from '../ui/TextAreaField';
+import { ContactField } from '../ui/ContactField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
 
 /**
@@ -332,7 +333,6 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               <TextField
                 id="subject-responder-name-input"
                 name="responderName"
-                type="text"
                 required
                 label={
                   SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
@@ -349,7 +349,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 placeholder={language === 'bn' ? 'উদাঃ মোস্তাফিজুর রহমান' : 'e.g. Mostafizur Rahman'}
               />
 
-              <TextField
+              <ContactField
                 id="subject-contact-email-phone-input"
                 name="contactEmailOrPhone"
                 type="text"
