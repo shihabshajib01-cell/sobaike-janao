@@ -1,20 +1,24 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { SECTIONS } from '../../theme/tokens';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
+import { useTaxonomy } from '../../services/taxonomyService';
 
-const CATEGORY_ROUTES = Object.values(SECTIONS).map((section) => section.slug);
 const BACK_NAV_ROUTE_PREFIXES = ['/report-detail/', '/location/', '/subject/'];
 
-export const shouldHideBottomNav = (currentRoute: string): boolean =>
-  CATEGORY_ROUTES.includes(currentRoute) ||
+export const shouldHideBottomNav = (
+  currentRoute: string,
+  categoryRoutes: string[] = []
+): boolean =>
+  categoryRoutes.includes(currentRoute) ||
   BACK_NAV_ROUTE_PREFIXES.some((prefix) => currentRoute.startsWith(prefix));
 
 export const BottomNav: React.FC = () => {
   const { currentRoute, navigateTo, language, openReportComposer } = useApp();
+  const { segments } = useTaxonomy();
+  const categoryRoutes = Object.values(segments).map((segment) => segment.slug);
 
-  if (shouldHideBottomNav(currentRoute)) return null;
+  if (shouldHideBottomNav(currentRoute, categoryRoutes)) return null;
 
   const navItems: Array<{
     id: string;

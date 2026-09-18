@@ -234,6 +234,9 @@ export interface ReportFormData {
     showGeneralLocation: boolean;
     showDescription: boolean;
   };
+  formSchemaVersion?: number;
+  formEngineMode?: 'legacy' | 'schema';
+  customFieldAnswers?: Record<string, unknown>;
 }
 
 export interface SubjectResponseRequest {

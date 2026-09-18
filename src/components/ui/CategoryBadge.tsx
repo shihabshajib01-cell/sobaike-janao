@@ -1,5 +1,5 @@
 import React from 'react';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryIcon } from '../branding/CategoryIcon';
 
@@ -21,7 +21,7 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
   className = '',
 }) => {
   const { getSegment } = useTaxonomy();
-  const config = getSegment(section) || SECTIONS[section];
+  const config = getSegment(section);
   if (!config) return null;
 
   const label = language === 'bn' ? config.shortNameBn : config.shortNameEn;
@@ -42,9 +42,9 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
     <span
       id={id}
       style={{
-        backgroundColor: `var(--sec-${section}-bg)`,
-        color: `var(--sec-${section}-text)`,
-        borderColor: `var(--sec-${section}-border)`,
+        backgroundColor: config.bgColor,
+        color: config.textColor,
+        borderColor: config.borderColor,
       }}
       className={`inline-flex items-center justify-center border whitespace-nowrap leading-none select-none ${sizeClasses[size]} ${className}`}
     >

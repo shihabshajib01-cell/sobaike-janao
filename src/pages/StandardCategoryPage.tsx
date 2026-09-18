@@ -10,8 +10,7 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
-import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
-import { usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { getRuntimeBannerContent, usePublishedBannerRuntime } from '../services/bannerRuntime';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
@@ -26,7 +25,7 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
   usePublishedBannerRuntime();
-  const bannerContent = CANONICAL_BANNER_CONTENT[section];
+  const bannerContent = getRuntimeBannerContent(section);
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
@@ -93,6 +92,10 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
       }).length,
     [reports, section, feedFilters]
   );
+
+  if (!bannerContent) {
+    return null;
+  }
 
   return (
     <PublicPageContainer id={`${section}-page-container`}>

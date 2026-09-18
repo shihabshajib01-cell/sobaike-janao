@@ -34,6 +34,15 @@ export interface HomeFeedParams {
   district?: string;
 }
 
+export interface PublicConfiguredReportField {
+  fieldKey: string;
+  labelEn: string;
+  labelBn: string;
+  fieldType: string;
+  sortOrder: number;
+  value: unknown;
+}
+
 // In-flight request deduplication map to prevent redundant concurrent network bursts
 const inFlightRequests = new Map<string, Promise<any>>();
 
@@ -337,6 +346,39 @@ export const PublicReportService = {
     }
 
     return null;
+  },
+
+  async getConfiguredFields(reportId: string): Promise<PublicConfiguredReportField[]> {
+    if (!isSupabaseConfigured() || !supabase) return [];
+
+    const cleanId = reportId.trim().toUpperCase();
+    const { data, error } = await fetchWithDeduplication(
+      `rpc:get_public_report_configured_fields:${cleanId}`,
+      () =>
+        supabase!.rpc('get_public_report_configured_fields', {
+          p_report_id: cleanId,
+        })
+    );
+
+    if (error) {
+      console.warn('[PublicReportService.getConfiguredFields] RPC error:', error);
+      return [];
+    }
+
+    const fields = (data as any)?.fields;
+    if (!Array.isArray(fields)) return [];
+
+    return fields
+      .filter((field: any) => field && field.value !== undefined && field.value !== null)
+      .map((field: any) => ({
+        fieldKey: String(field.fieldKey || ''),
+        labelEn: String(field.labelEn || field.fieldKey || ''),
+        labelBn: String(field.labelBn || field.labelEn || field.fieldKey || ''),
+        fieldType: String(field.fieldType || 'text'),
+        sortOrder: Number(field.sortOrder || 0),
+        value: field.value,
+      }))
+      .sort((a: PublicConfiguredReportField, b: PublicConfiguredReportField) => a.sortOrder - b.sortOrder);
   },
 
   /**
