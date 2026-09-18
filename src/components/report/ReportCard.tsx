@@ -129,7 +129,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       aria-label={title}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
-      className={`group relative ui-card p-3.5 sm:p-4 md:p-6 transition-all duration-150 cursor-pointer text-left space-y-2 sm:space-y-2.5 md:space-y-3 select-none hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 ${className}`}
+      className={`group relative ui-card p-4 sm:p-5 transition-all duration-150 cursor-pointer text-left space-y-2.5 sm:space-y-3 select-none hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 ${className}`}
     >
       <div className="flex items-center justify-between gap-3 type-meta">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
@@ -169,7 +169,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       )}
 
       {shouldShowDescription && (
-        <p className="type-body text-ui-content-secondary line-clamp-2 md:line-clamp-3 break-words">
+        <p className="type-body text-ui-content-secondary line-clamp-2 break-words">
           {shortDesc}
         </p>
       )}
@@ -180,61 +180,21 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-2 pt-2.5 md:pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-muted">
-        <div className="flex items-center flex-wrap gap-x-2.5 sm:gap-x-3 gap-y-0.5 min-w-0 flex-1">
-          <div className="flex items-center gap-1 sm:gap-1.5 text-ui-content-secondary font-[var(--font-weight-medium)] min-w-0">
-            <AppIcon name="map-pin" size="xs" className="text-ui-content-muted shrink-0 md:hidden" />
-            <AppIcon name="map-pin" size="sm" className="text-ui-content-muted shrink-0 hidden md:inline-block" />
-            <p className="type-meta truncate max-w-[210px] sm:max-w-[280px] md:max-w-xs">{location}</p>
+      <div className="flex items-center pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-muted">
+        <div className="flex items-center min-w-0 w-full">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <AppIcon name="map-pin" size="sm" className="text-ui-accent shrink-0" />
+            <p className="type-meta text-ui-content-secondary font-[var(--font-weight-medium)] truncate">{location}</p>
           </div>
-          <span className="hidden" aria-hidden="true">•</span>
-          <div
-            className="flex items-center gap-1 text-ui-content-muted shrink-0"
-            aria-label={`${displayCount(engagement.viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}
-          >
-            <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+          <span className="h-5 w-px bg-ui-stroke-default mx-3 shrink-0" aria-hidden="true" />
+          <div className="flex items-center gap-1.5 text-ui-content-secondary shrink-0" aria-label={`${displayCount(engagement.viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}>
+            <Eye className="w-4 h-4" aria-hidden="true" />
             <span className="type-meta whitespace-nowrap">{displayCount(engagement.viewCount)}</span>
           </div>
-        </div>
-
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 type-action">
-          <button
-            type="button"
-            onClick={handleShare}
-            aria-label={language === 'bn' ? 'প্রতিবেদন শেয়ার করুন' : 'Share report'}
-            className="inline-flex items-center justify-center gap-1 sm:gap-1.5 text-ui-content-secondary transition-colors cursor-pointer py-1.5 px-2 min-h-[44px] min-w-[44px] ui-radius-badge-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
-          >
-            {isCopied ? (
-              <span className="inline-flex items-center gap-1" aria-live="polite">
-                <AppIcon name="check" size="xs" className="text-ui-success-text md:hidden" />
-                <AppIcon name="check" size="sm" className="text-ui-success-text hidden md:inline-block" />
-                <span className="text-ui-success-text font-[var(--font-weight-semibold)]">{language === 'bn' ? 'কপি হয়েছে' : 'Copied'}</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1">
-                <AppIcon name="share" size="xs" className="text-ui-content-muted md:hidden" />
-                <AppIcon name="share" size="sm" className="text-ui-content-muted hidden md:inline-block" />
-                <span className="hidden">{language === 'bn' ? 'শেয়ার' : 'Share'}</span>
-                <span className="hidden type-meta text-ui-content-muted">{displayCount(engagement.shareCount)}</span>
-              </span>
-            )}
+          <span className="h-5 w-px bg-ui-stroke-default mx-3 shrink-0" aria-hidden="true" />
+          <button type="button" onClick={handleShare} aria-label={language === 'bn' ? 'প্রতিবেদন শেয়ার করুন' : 'Share report'} className="inline-flex items-center justify-center w-10 h-10 min-w-10 min-h-10 rounded-full bg-ui-surface-subtle text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95">
+            {isCopied ? <AppIcon name="check" size="sm" className="text-ui-success-text" /> : <AppIcon name="share" size="sm" className="text-ui-content-secondary" />}
           </button>
-
-          <span className="hidden" aria-hidden="true">|</span>
-
-          <Link
-            to={`/report-detail/${report.id}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              registerView();
-            }}
-            aria-label={language === 'bn' ? `${title} - বিস্তারিত দেখুন` : `View details for ${title}`}
-            className="hidden"
-          >
-            <span>{language === 'bn' ? 'বিস্তারিত' : 'Details'}</span>
-            <AppIcon name="arrow-right" size="xs" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform md:hidden" />
-            <AppIcon name="arrow-right" size="sm" className="text-ui-content-muted group-hover:translate-x-0.5 transition-transform hidden md:inline-block" />
-          </Link>
         </div>
       </div>
     </article>
