@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "vite build && node scripts/build-seo-assets.mjs && npm run audit:seo",
+    "build": "vite build && node scripts/build-seo-assets.mjs && npm run audit:seo && npm run audit:performance",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "audit:design-system": "node scripts/design-system-audit.mjs",
     "audit:ui-uniformity": "node scripts/ui-uniformity-audit.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
-    "audit:integration-contract": "node scripts/integration-contract-audit.mjs"
+    "audit:integration-contract": "node scripts/integration-contract-audit.mjs",
+    "audit:performance": "node scripts/performance-budget-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
