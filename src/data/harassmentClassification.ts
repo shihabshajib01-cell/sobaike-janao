@@ -3,7 +3,8 @@ export type HarassmentAgeGroup =
   | '18_29'
   | '30_59'
   | '60_plus'
-  | 'prefer_not_to_say';
+  | 'prefer_not_to_say'
+  | 'unknown_not_stated';
 
 export type HarassmentAbuserRelationship =
   | 'intimate_partner'
@@ -13,7 +14,16 @@ export type HarassmentAbuserRelationship =
   | 'coworker_classmate'
   | 'authority_caregiver_service_provider'
   | 'stranger'
-  | 'other_or_unknown';
+  | 'other_or_unknown'
+  | 'neighbor'
+  | 'teacher_tutor'
+  | 'supervisor_employer'
+  | 'service_health_worker'
+  | 'transport_worker'
+  | 'law_enforcement_authority'
+  | 'multiple_people'
+  | 'other'
+  | 'unknown_not_stated';
 
 export type HarassmentReportingFor = 'self' | 'someone_else';
 
@@ -42,8 +52,13 @@ export const HARASSMENT_AGE_GROUP_OPTIONS: BilingualOption<HarassmentAgeGroup>[]
   { value: '60_plus', labelEn: '60+', labelBn: '৬০+' },
   {
     value: 'prefer_not_to_say',
-    labelEn: 'Prefer not to say / Unknown',
-    labelBn: 'বলতে অনিচ্ছুক / জানা নেই',
+    labelEn: 'Prefer not to say',
+    labelBn: 'বলতে অনিচ্ছুক',
+  },
+  {
+    value: 'unknown_not_stated',
+    labelEn: 'Unknown / not stated',
+    labelBn: 'জানা নেই / উল্লেখ নেই',
   },
 ];
 
@@ -77,9 +92,18 @@ export const HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS: BilingualOption<HarassmentA
   { value: 'stranger', labelEn: 'Stranger', labelBn: 'অপরিচিত ব্যক্তি' },
   {
     value: 'other_or_unknown',
-    labelEn: 'Other known person / Unknown',
-    labelBn: 'অন্যান্য পরিচিত ব্যক্তি / জানা নেই',
+    labelEn: 'Other known person / Unknown (legacy)',
+    labelBn: 'অন্যান্য পরিচিত ব্যক্তি / জানা নেই (পুরোনো)',
   },
+  { value: 'neighbor', labelEn: 'Neighbor', labelBn: 'প্রতিবেশী' },
+  { value: 'teacher_tutor', labelEn: 'Teacher / tutor', labelBn: 'শিক্ষক / টিউটর' },
+  { value: 'supervisor_employer', labelEn: 'Supervisor / employer', labelBn: 'সুপারভাইজার / নিয়োগকর্তা' },
+  { value: 'service_health_worker', labelEn: 'Service provider / healthcare worker', labelBn: 'সেবাদানকারী / স্বাস্থ্যকর্মী' },
+  { value: 'transport_worker', labelEn: 'Transport worker', labelBn: 'পরিবহন কর্মী' },
+  { value: 'law_enforcement_authority', labelEn: 'Law enforcement / authority', labelBn: 'আইনশৃঙ্খলা / কর্তৃপক্ষ' },
+  { value: 'multiple_people', labelEn: 'Multiple people', labelBn: 'একাধিক ব্যক্তি' },
+  { value: 'other', labelEn: 'Other', labelBn: 'অন্যান্য' },
+  { value: 'unknown_not_stated', labelEn: 'Unknown / not stated', labelBn: 'জানা নেই / উল্লেখ নেই' },
 ];
 
 export const HARASSMENT_REPORTING_FOR_OPTIONS: BilingualOption<HarassmentReportingFor>[] = [
