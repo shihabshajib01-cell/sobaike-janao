@@ -5,6 +5,18 @@ const SITE_ORIGIN = 'https://shobaikejanao.com';
 const DIST_DIR = 'dist';
 const BRAND_LOGO = `${SITE_ORIGIN}/brand/icon-512x512.png`;
 const DEFAULT_IMAGE = `${SITE_ORIGIN}/brand/og-social-1200x630.png`;
+const FULL_INDEX_ROBOTS =
+  'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+const BRAND_NAME = 'Sobaike Janao';
+const BRAND_NAME_BN = 'সবাইকে জানাও';
+
+function detectPrimaryLanguage(...values) {
+  const text = values.filter(Boolean).join(' ');
+  return /[\u0980-\u09FF]/.test(text) ? 'bn' : 'en';
+}
+
+const languageCode = (language) => (language === 'en' ? 'en' : 'bn-BD');
+const languageLabel = (language) => (language === 'en' ? BRAND_NAME : BRAND_NAME_BN);
 
 const STATIC_PAGES = [
   {
@@ -14,7 +26,7 @@ const STATIC_PAGES = [
       'Sobaike Janao (সবাইকে জানাও) — বাংলাদেশে জনস্বার্থের সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণ করার মডারেটেড প্ল্যাটফর্ম।',
     socialDescription:
       'Sobaike Janao (সবাইকে জানাও) — বাংলাদেশের নাগরিকদের জনস্বার্থের সমস্যা ও অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণের স্বাধীন, নিরাপদ ও মডারেটেড প্ল্যাটফর্ম।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -22,7 +34,7 @@ const STATIC_PAGES = [
     title: 'নাগরিক প্রতিবেদনের বিষয়সমূহ | সবাইকে জানাও',
     description:
       'জননিরাপত্তা, হয়রানি, চাঁদাবাজি, সড়ক, ইউটিলিটি ও অন্যান্য জনস্বার্থ বিষয় অনুযায়ী প্রকাশিত প্রতিবেদন দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -30,7 +42,7 @@ const STATIC_PAGES = [
     title: 'হয়রানি ও নির্যাতন সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
     description:
       'হয়রানি, নির্যাতন, প্রতারণা ও সংশ্লিষ্ট নাগরিক প্রতিবেদন দায়িত্বশীলভাবে প্রকাশ ও অনুসন্ধান করুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -38,7 +50,7 @@ const STATIC_PAGES = [
     title: 'চাঁদাবাজি ও ঘুষ সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
     description:
       'চাঁদাবাজি, জোরপূর্বক অর্থ আদায়, ঘুষ ও সংশ্লিষ্ট জনস্বার্থ অভিযোগের প্রকাশিত প্রতিবেদন দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -46,7 +58,7 @@ const STATIC_PAGES = [
     title: 'জননিরাপত্তা সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
     description:
       'চুরি, ডাকাতি, ছিনতাই, মব জাস্টিস ও অন্যান্য জননিরাপত্তা সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -54,7 +66,7 @@ const STATIC_PAGES = [
     title: 'সড়ক ও যাতায়াত সমস্যা | সবাইকে জানাও',
     description:
       'সড়ক, ট্রাফিক, পরিবহন, দুর্ঘটনা, প্রতিবন্ধকতা ও যাতায়াত সমস্যার প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -62,7 +74,7 @@ const STATIC_PAGES = [
     title: 'ইউটিলিটি সমস্যা | সবাইকে জানাও',
     description:
       'লোডশেডিং, গ্যাস সংকট, বিদ্যুৎ বিল ও অন্যান্য ইউটিলিটি সমস্যার প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -70,7 +82,7 @@ const STATIC_PAGES = [
     title: 'অবৈধ দখল সংক্রান্ত প্রতিবেদন | সবাইকে জানাও',
     description:
       'রাস্তা, ফুটপাত, সরকারি বা ব্যক্তিগত সম্পত্তি ও জনস্থান দখল সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -78,7 +90,7 @@ const STATIC_PAGES = [
     title: 'অবৈধ অটো-রিকশা চার্জিং | সবাইকে জানাও',
     description:
       'অবৈধ বা ঝুঁকিপূর্ণ অটো-রিকশা চার্জিং অবস্থান ও সংশ্লিষ্ট প্রকাশিত নাগরিক প্রতিবেদন দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -86,7 +98,7 @@ const STATIC_PAGES = [
     title: 'প্রতিবেদন খুঁজুন ও মানচিত্র | সবাইকে জানাও',
     description:
       'বিভাগ, জেলা ও এলাকা অনুযায়ী বাংলাদেশে প্রকাশিত নাগরিক প্রতিবেদন এবং মানচিত্র দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -94,7 +106,7 @@ const STATIC_PAGES = [
     title: 'তথ্য, নীতিমালা ও সহায়তা | সবাইকে জানাও',
     description:
       'প্ল্যাটফর্ম নির্দেশিকা, গোপনীয়তা, প্রতিউত্তরের অধিকার, দায়িত্বশীল প্রকাশ ও জরুরি সহায়তার তথ্য দেখুন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -102,7 +114,7 @@ const STATIC_PAGES = [
     title: 'ঘটনা বা অভিযোগ জানান | সবাইকে জানাও',
     description:
       'সবাইকে জানাও প্ল্যাটফর্মে জনস্বার্থ সংক্রান্ত ঘটনা বা অভিযোগ প্রাসঙ্গিক তথ্যসহ দায়িত্বশীলভাবে জমা দিন।',
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
   },
   {
@@ -292,30 +304,80 @@ function localizedUrl(path, language) {
     : canonicalUrl(path);
 }
 
-function localizePage(page, language) {
+function localizePage(page, routeLanguage) {
   const logicalPath = page.path;
+  const sourceLanguage = page.sourceLanguage || null;
+  const contentLanguage = sourceLanguage || routeLanguage;
+  const canonicalLanguage = sourceLanguage || routeLanguage;
   const staticEnglish = STATIC_ENGLISH[logicalPath];
-  const title =
-    language === 'en'
+
+  const title = sourceLanguage
+    ? page.title
+    : routeLanguage === 'en'
       ? page.titleEn || staticEnglish?.title || page.title
       : page.title;
-  const description =
-    language === 'en'
+
+  const description = sourceLanguage
+    ? page.description
+    : routeLanguage === 'en'
       ? page.descriptionEn || staticEnglish?.description || page.description
       : page.description;
-  const socialDescription =
-    language === 'en'
+
+  const socialDescription = sourceLanguage
+    ? page.socialDescription || description
+    : routeLanguage === 'en'
       ? page.socialDescriptionEn || staticEnglish?.socialDescription || description
       : page.socialDescription || description;
+
+  const canonical = localizedUrl(logicalPath, canonicalLanguage);
+  const currentLabel = String(title || '')
+    .replace(/\s*\|\s*(?:Sobaike Janao|সবাইকে জানাও)\s*$/, '')
+    .trim();
+
+  const breadcrumbs =
+    logicalPath === '/'
+      ? []
+      : [
+          {
+            name: languageLabel(contentLanguage),
+            url: localizedUrl('/', canonicalLanguage),
+          },
+          ...(page.categoryPath
+            ? [
+                {
+                  name:
+                    contentLanguage === 'en'
+                      ? page.categoryNameEn || page.categoryNameBn || 'Reports'
+                      : page.categoryNameBn || page.categoryNameEn || 'প্রতিবেদন',
+                  url: localizedUrl(page.categoryPath, canonicalLanguage),
+                },
+              ]
+            : []),
+          {
+            name: currentLabel,
+            url: canonical,
+          },
+        ];
 
   return {
     ...page,
     logicalPath,
-    language,
-    path: language === 'en' ? englishPath(logicalPath) : logicalPath,
+    routeLanguage,
+    language: contentLanguage,
+    canonicalLanguage,
+    path: routeLanguage === 'en' ? englishPath(logicalPath) : logicalPath,
     title,
     description,
     socialDescription,
+    breadcrumbs,
+    robots:
+      sourceLanguage && routeLanguage !== sourceLanguage
+        ? 'noindex, follow'
+        : page.robots,
+    sitemap:
+      sourceLanguage && routeLanguage !== sourceLanguage
+        ? false
+        : page.sitemap,
   };
 }
 
@@ -335,7 +397,23 @@ function injectStaticFallback(html, page) {
   const href = (path) => (isEnglish ? englishPath(path) : path);
 
   if (logicalPath === '/' && isEnglish) {
-    const fallback = `
+    const relatedReportLinks = (page.relatedReports || [])
+    .map((report) => {
+      const reportPath =
+        report.sourceLanguage === 'en' ? englishPath(report.path) : report.path;
+      return `<li><a href="${reportPath}">${htmlEscape(report.title)}</a></li>`;
+    })
+    .join('\n');
+
+  const relatedReportSection = relatedReportLinks
+    ? `
+        <section class="mt-8 space-y-3">
+          <h2>${isEnglish ? 'Published reports' : 'প্রকাশিত প্রতিবেদন'}</h2>
+          <ul>${relatedReportLinks}</ul>
+        </section>`
+    : '';
+
+  const fallback = `
       <!-- SEO_FALLBACK_START -->
       <main id="seo-static-fallback" class="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 lg:px-8">
         <header class="space-y-3">
@@ -471,6 +549,7 @@ function injectStaticFallback(html, page) {
             <a href="${href('/rickshaw')}">${isEnglish ? 'auto-rickshaw charging' : 'অবৈধ অটো-রিকশা চার্জিং'}</a>.
           </p>
         </section>
+        ${relatedReportSection}
       </main>
       <!-- SEO_FALLBACK_END -->`;
 
@@ -483,9 +562,11 @@ function injectStaticFallback(html, page) {
 function injectMeta(template, page) {
   const language = page.language || 'bn';
   const logicalPath = page.logicalPath || page.path;
-  const canonical = localizedUrl(logicalPath, language);
+  const canonicalLanguage = page.canonicalLanguage || language;
+  const canonical = localizedUrl(logicalPath, canonicalLanguage);
   const bnCanonical = localizedUrl(logicalPath, 'bn');
   const enCanonical = localizedUrl(logicalPath, 'en');
+  const defaultCanonical = page.sourceLanguage ? canonical : bnCanonical;
   const titleText = truncateSeoText(page.title, 60);
   const descriptionText = normalizeSeoDescription(page.description, language);
   const socialDescriptionText = page.socialDescription
@@ -494,7 +575,7 @@ function injectMeta(template, page) {
   const title = htmlEscape(titleText);
   const description = htmlEscape(descriptionText);
   const socialDescription = htmlEscape(socialDescriptionText);
-  const robots = htmlEscape(page.robots || 'index, follow, max-image-preview:large');
+  const robots = htmlEscape(page.robots || FULL_INDEX_ROBOTS);
   const type = page.type === 'article' ? 'article' : 'website';
 
   let html = template
@@ -529,7 +610,7 @@ function injectMeta(template, page) {
     )
     .replace(
       /<link rel="alternate" hreflang="x-default" href="[^"]*" \/>/,
-      `<link rel="alternate" hreflang="x-default" href="${htmlEscape(bnCanonical)}" />`
+      `<link rel="alternate" hreflang="x-default" href="${htmlEscape(defaultCanonical)}" />`
     )
     .replace(
       /<meta property="og:title" content="[^"]*" \/>/,
@@ -560,6 +641,24 @@ function injectMeta(template, page) {
       `<meta name="twitter:description" content="${socialDescription}" />`
     );
 
+  if (page.sourceLanguage === 'bn') {
+    html = html.replace(/\s*<link rel="alternate" hreflang="en" href="[^"]*" \/>/, '');
+  } else if (page.sourceLanguage === 'en') {
+    html = html.replace(/\s*<link rel="alternate" hreflang="bn-BD" href="[^"]*" \/>/, '');
+  }
+
+  const googleVerification = String(
+    process.env.GOOGLE_SITE_VERIFICATION ||
+      process.env.VITE_GOOGLE_SITE_VERIFICATION ||
+      ''
+  ).trim();
+  if (googleVerification) {
+    html = html.replace(
+      '</head>',
+      `    <meta name="google-site-verification" content="${htmlEscape(googleVerification)}" />\n  </head>`
+    );
+  }
+
   if (page.type === 'article' && page.publishedAt) {
     const articleMeta = [
       `    <meta property="article:published_time" content="${htmlEscape(page.publishedAt)}" />`,
@@ -586,6 +685,18 @@ function injectMeta(template, page) {
           ...(page.publishedAt ? { datePublished: page.publishedAt } : {}),
           ...(page.modifiedAt ? { dateModified: page.modifiedAt } : {}),
           image: DEFAULT_IMAGE,
+          ...(page.articleSection ? { articleSection: page.articleSection } : {}),
+          ...(page.contentLocation
+            ? {
+                contentLocation: {
+                  '@type': 'Place',
+                  name: page.contentLocation,
+                },
+              }
+            : {}),
+          ...(page.breadcrumbs?.length >= 2
+            ? { breadcrumb: { '@id': `${canonical}#breadcrumb` } }
+            : {}),
         }
       : {
           '@type': page.collection ? 'CollectionPage' : 'WebPage',
@@ -595,6 +706,9 @@ function injectMeta(template, page) {
           description: descriptionText,
           inLanguage: language === 'en' ? 'en' : 'bn-BD',
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+          ...(page.breadcrumbs?.length >= 2
+            ? { breadcrumb: { '@id': `${canonical}#breadcrumb` } }
+            : {}),
         };
 
   const organizationId = `${SITE_ORIGIN}/#organization`;
@@ -609,9 +723,17 @@ function injectMeta(template, page) {
         url: `${SITE_ORIGIN}/`,
         name: 'Sobaike Janao',
         alternateName: 'সবাইকে জানাও',
+        description:
+          'Independent, moderated citizen reporting platform for public-interest issues in Bangladesh.',
+        areaServed: {
+          '@type': 'Country',
+          name: 'Bangladesh',
+        },
         logo: {
           '@type': 'ImageObject',
           url: BRAND_LOGO,
+          width: 512,
+          height: 512,
         },
       },
       {
@@ -620,12 +742,27 @@ function injectMeta(template, page) {
         url: `${SITE_ORIGIN}/`,
         name: 'Sobaike Janao',
         alternateName: 'সবাইকে জানাও',
+        inLanguage: ['bn-BD', 'en'],
         publisher: { '@id': organizationId },
       },
       {
         ...pageSchema,
         publisher: { '@id': organizationId },
       },
+      ...(page.breadcrumbs?.length >= 2
+        ? [
+            {
+              '@type': 'BreadcrumbList',
+              '@id': `${canonical}#breadcrumb`,
+              itemListElement: page.breadcrumbs.map((item, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: item.name,
+                item: item.url,
+              })),
+            },
+          ]
+        : []),
     ],
   };
 
@@ -728,42 +865,55 @@ function resolveDistrictId(raw, districts) {
   return match?.id || null;
 }
 
-function reportPage(report) {
+function reportPage(report, segmentById) {
   const id = cleanText(report.id);
   if (!id) return null;
-  const rawTitleBn = cleanText(report.titleBn || report.titleEn || id);
-  const rawTitleEn = cleanText(report.titleEn || report.titleBn || id);
-  const rawDescriptionBn = cleanText(
+
+  const sourceTitle = cleanText(report.titleBn || report.titleEn || id);
+  const sourceDescription = cleanText(
     report.summaryBn ||
       report.descriptionBn ||
       report.summaryEn ||
       report.descriptionEn ||
-      'সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত নাগরিক প্রতিবেদন।'
+      'Published citizen report on Sobaike Janao.'
   );
-  const englishCandidate = cleanText(
-    report.summaryEn ||
-      report.descriptionEn ||
-      ''
-  );
-  const rawDescriptionEn =
-    englishCandidate &&
-    englishCandidate !== rawDescriptionBn &&
-    englishCandidate.length >= 50
-      ? englishCandidate
-      : cleanText(
-          `Published citizen report about ${rawTitleEn}. Review the report details, location, available sources, public-interest context, and the latest updates on Sobaike Janao.`
-        );
+  const sourceLanguage = detectPrimaryLanguage(sourceTitle, sourceDescription);
+  const brand = sourceLanguage === 'en' ? BRAND_NAME : BRAND_NAME_BN;
+  const segment = segmentById.get(report.segment) || null;
+  const segmentSlug = cleanText(segment?.slug || report.segment || '')
+    .replace(/^\/category\//, '')
+    .replace(/^\//, '')
+    .replaceAll('_', '-');
+  const categoryPath = segmentSlug
+    ? STATIC_PAGES.some((page) => page.path === `/${segmentSlug}`)
+      ? `/${segmentSlug}`
+      : `/category/${encodeURIComponent(segmentSlug)}`
+    : '/issues';
+
   const indexable = isSeoIndexableReport(report);
+  const title = buildReportSeoTitle(sourceTitle, brand, id);
+  const description = normalizeSeoDescription(sourceDescription, sourceLanguage);
 
   return {
     path: `/report-detail/${encodeURIComponent(id)}`,
-    title: buildReportSeoTitle(rawTitleBn, 'সবাইকে জানাও', id),
-    titleEn: buildReportSeoTitle(rawTitleEn, 'Sobaike Janao', id),
-    description: normalizeSeoDescription(rawDescriptionBn, 'bn'),
-    descriptionEn: normalizeSeoDescription(rawDescriptionEn, 'en'),
-    robots: indexable
-      ? 'index, follow, max-image-preview:large'
-      : 'noindex, follow',
+    title,
+    titleEn: title,
+    description,
+    descriptionEn: description,
+    socialDescription: description,
+    socialDescriptionEn: description,
+    sourceLanguage,
+    categoryPath,
+    categoryNameBn: cleanText(segment?.name_bn || report.subcategoryBn || 'বিষয়সমূহ'),
+    categoryNameEn: cleanText(segment?.name_en || report.subcategoryEn || 'Topics'),
+    articleSection:
+      sourceLanguage === 'en'
+        ? cleanText(report.subcategoryEn || segment?.name_en || '')
+        : cleanText(report.subcategoryBn || segment?.name_bn || ''),
+    contentLocation: cleanText(report.location || report.area || report.district || ''),
+    district: cleanText(report.district || ''),
+    segmentId: cleanText(report.segment || ''),
+    robots: indexable ? FULL_INDEX_ROBOTS : 'noindex, follow',
     sitemap: indexable,
     type: 'article',
     publishedAt: report.publishedAt || null,
@@ -820,7 +970,7 @@ function dynamicCategoryPage(segment) {
     titleEn: buildBrandedSeoTitle(nameEn, 'Sobaike Janao'),
     description: normalizeSeoDescription(descriptionBn, 'bn'),
     descriptionEn: normalizeSeoDescription(descriptionEn, 'en'),
-    robots: 'index, follow, max-image-preview:large',
+    robots: FULL_INDEX_ROBOTS,
     sitemap: true,
     collection: true,
   };
@@ -833,6 +983,8 @@ async function main() {
 
   const basePages = [...STATIC_PAGES];
   const seenPaths = new Set(basePages.map((page) => page.path));
+  const segmentById = new Map(segments.map((segment) => [segment.id, segment]));
+  const reportPages = [];
 
   for (const segment of segments) {
     const page = dynamicCategoryPage(segment);
@@ -845,9 +997,10 @@ async function main() {
   const districtIdsWithReports = new Set();
 
   for (const report of reports) {
-    const page = reportPage(report);
+    const page = reportPage(report, segmentById);
     if (page && !seenPaths.has(page.path)) {
       basePages.push(page);
+      reportPages.push(page);
       seenPaths.add(page.path);
     }
 
@@ -881,11 +1034,50 @@ async function main() {
         `Browse published citizen reports, public-interest incidents, related topics, and the latest updates from ${district.nameEn}, Bangladesh.`,
         'en'
       ),
-      robots: 'index, follow, max-image-preview:large',
+      robots: FULL_INDEX_ROBOTS,
       sitemap: true,
       collection: true,
+      districtId: district.id,
     });
     seenPaths.add(path);
+  }
+
+  const staticSegmentByPath = new Map(
+    segments.map((segment) => {
+      const slug = cleanText(segment.slug || segment.id).replaceAll('_', '-');
+      return [`/${slug}`, segment.id];
+    })
+  );
+
+  for (const page of basePages) {
+    if (page.type === 'article') continue;
+
+    const segmentId = page.segmentId || staticSegmentByPath.get(page.path) || null;
+    const related = reportPages
+      .filter((reportPage) => {
+        if (segmentId && reportPage.segmentId === segmentId) return true;
+        if (page.districtId) {
+          return resolveDistrictId(reportPage.district, districts) === page.districtId;
+        }
+        return false;
+      })
+      .slice(0, 12)
+      .map((reportPage) => ({
+        path: reportPage.path,
+        title: reportPage.title,
+        sourceLanguage: reportPage.sourceLanguage,
+      }));
+
+    if (related.length) page.relatedReports = related;
+  }
+
+  const homePage = basePages.find((page) => page.path === '/');
+  if (homePage) {
+    homePage.relatedReports = reportPages.slice(0, 12).map((reportPage) => ({
+      path: reportPage.path,
+      title: reportPage.title,
+      sourceLanguage: reportPage.sourceLanguage,
+    }));
   }
 
   const pages = basePages.flatMap((page) => [
@@ -905,13 +1097,22 @@ async function main() {
   const sitemapEntries = pages
     .filter((page) => page.sitemap)
     .map((page) => {
-      const lines = [
-        '  <url>',
-        `    <loc>${xmlEscape(localizedUrl(page.logicalPath, page.language))}</loc>`,
-        `    <xhtml:link rel="alternate" hreflang="bn-BD" href="${xmlEscape(localizedUrl(page.logicalPath, 'bn'))}" />`,
-        `    <xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(localizedUrl(page.logicalPath, 'en'))}" />`,
-        `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(localizedUrl(page.logicalPath, 'bn'))}" />`,
-      ];
+      const canonicalLanguage = page.canonicalLanguage || page.language;
+      const canonical = localizedUrl(page.logicalPath, canonicalLanguage);
+      const lines = ['  <url>', `    <loc>${xmlEscape(canonical)}</loc>`];
+
+      if (page.sourceLanguage) {
+        lines.push(
+          `    <xhtml:link rel="alternate" hreflang="${languageCode(page.sourceLanguage)}" href="${xmlEscape(canonical)}" />`,
+          `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(canonical)}" />`
+        );
+      } else {
+        lines.push(
+          `    <xhtml:link rel="alternate" hreflang="bn-BD" href="${xmlEscape(localizedUrl(page.logicalPath, 'bn'))}" />`,
+          `    <xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(localizedUrl(page.logicalPath, 'en'))}" />`,
+          `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(localizedUrl(page.logicalPath, 'bn'))}" />`
+        );
+      }
       const freshness = page.modifiedAt || page.publishedAt;
       if (freshness) {
         lines.push(`    <lastmod>${new Date(freshness).toISOString().slice(0, 10)}</lastmod>`);
