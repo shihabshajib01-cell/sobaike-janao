@@ -1,6 +1,7 @@
 import { CATEGORY_ORDER } from '../data/categoryOrder';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { SectionKey } from '../theme/tokens';
+import { TaxonomyService } from './taxonomyService';
 
 export interface CategoryPopularityMetric {
   segmentId: SectionKey;
@@ -20,7 +21,6 @@ interface CategoryPopularityRow {
   popularity_rank: number | string | null;
 }
 
-const SECTION_KEYS = new Set<SectionKey>(CATEGORY_ORDER);
 let rankingCache: CategoryPopularityMetric[] | null = null;
 let rankingRequest: Promise<CategoryPopularityMetric[]> | null = null;
 
@@ -33,7 +33,6 @@ const normalizeRows = (rows: unknown): CategoryPopularityMetric[] => {
   if (!Array.isArray(rows)) return [];
 
   return (rows as CategoryPopularityRow[])
-    .filter((row) => SECTION_KEYS.has(row.segment_id as SectionKey))
     .map((row) => ({
       segmentId: row.segment_id as SectionKey,
       publishedPostCount: toNumber(row.published_post_count),
@@ -45,10 +44,23 @@ const normalizeRows = (rows: unknown): CategoryPopularityMetric[] => {
     .sort((a, b) => a.popularityRank - b.popularityRank);
 };
 
+const getActiveTaxonomyOrder = (): SectionKey[] => {
+  const dynamic = Object.values(TaxonomyService.getSegments())
+    .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+    .map((segment) => segment.id as SectionKey);
+
+  if (dynamic.length > 0) return dynamic;
+  return [...CATEGORY_ORDER];
+};
+
 const withFallbackOrder = (metrics: CategoryPopularityMetric[]): SectionKey[] => {
-  const ranked = metrics.map((item) => item.segmentId);
+  const activeOrder = getActiveTaxonomyOrder();
+  const activeSet = new Set(activeOrder);
+  const ranked = metrics
+    .map((item) => item.segmentId)
+    .filter((key) => activeSet.has(key));
   const rankedSet = new Set(ranked);
-  return [...ranked, ...CATEGORY_ORDER.filter((key) => !rankedSet.has(key))];
+  return [...ranked, ...activeOrder.filter((key) => !rankedSet.has(key))];
 };
 
 export const CategoryPopularityService = {
@@ -80,7 +92,7 @@ export const CategoryPopularityService = {
   },
 
   getFallbackOrder(): SectionKey[] {
-    return [...CATEGORY_ORDER];
+    return getActiveTaxonomyOrder();
   },
 
   clearCache() {
