@@ -28,6 +28,7 @@ import { TimeField } from '../ui/TimeField';
 import { MonthField } from '../ui/MonthField';
 import { RadioGroup } from '../ui/RadioGroup';
 import { isValidEmail, isValidHttpUrl, isValidPhone } from '../ui/formValidation';
+import { NumberField } from '../ui/NumberField';
 
 export interface ConfiguredFieldsHandle {
   validateAndProceed: () => boolean;
@@ -918,16 +919,33 @@ export const ConfiguredFieldsSection = forwardRef<
             );
           }
 
+          if (field.fieldType === 'number' || field.fieldType === 'currency') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <NumberField
+                  id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  placeholder={placeholder}
+                  min={field.validation?.min !== undefined ? Number(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? Number(field.validation.max) : undefined}
+                  onChange={(event) => setValue(field, event.target.value)}
+                />
+              </div>
+            );
+          }
+
           const inputType =
-            field.fieldType === 'currency' || field.fieldType === 'number'
-              ? 'number'
-              : field.fieldType === 'phone'
-                ? 'tel'
-                : field.fieldType === 'url'
-                  ? 'url'
-                  : field.fieldType === 'email'
-                    ? 'email'
-                    : 'text';
+            field.fieldType === 'phone'
+              ? 'tel'
+              : field.fieldType === 'url'
+                ? 'url'
+                : field.fieldType === 'email'
+                  ? 'email'
+                  : 'text';
 
           return (
             <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
@@ -940,18 +958,6 @@ export const ConfiguredFieldsSection = forwardRef<
                 error={error}
                 value={String(value ?? '')}
                 placeholder={placeholder}
-                min={
-                  (field.fieldType === 'number' || field.fieldType === 'currency') &&
-                  field.validation?.min !== undefined
-                    ? Number(field.validation.min)
-                    : undefined
-                }
-                max={
-                  (field.fieldType === 'number' || field.fieldType === 'currency') &&
-                  field.validation?.max !== undefined
-                    ? Number(field.validation.max)
-                    : undefined
-                }
                 minLength={
                   field.validation?.minLength !== undefined
                     ? Number(field.validation.minLength)
@@ -963,15 +969,13 @@ export const ConfiguredFieldsSection = forwardRef<
                     : undefined
                 }
                 inputMode={
-                  field.fieldType === 'number' || field.fieldType === 'currency'
-                    ? 'decimal'
-                    : field.fieldType === 'phone'
-                      ? 'tel'
-                      : field.fieldType === 'email'
-                        ? 'email'
-                        : field.fieldType === 'url'
-                          ? 'url'
-                          : undefined
+                  field.fieldType === 'phone'
+                    ? 'tel'
+                    : field.fieldType === 'email'
+                      ? 'email'
+                      : field.fieldType === 'url'
+                        ? 'url'
+                        : undefined
                 }
                 onChange={(event) => setValue(field, event.target.value)}
               />
