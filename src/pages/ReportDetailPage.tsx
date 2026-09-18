@@ -300,7 +300,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
   const openRelatedReport = (relatedReportId: string) => {
     void PublicEngagementService.trackView(relatedReportId);
-    navigateTo(`/report-detail/${relatedReportId}`);
+    navigateTo(`/report-detail/${encodeURIComponent(relatedReportId)}`);
   };
 
   const handleShare = async () => {
@@ -393,7 +393,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subcategory}</span>
           </div>
 
-          <h1 className="type-h1 text-ui-content-primary tracking-tight leading-[1.35]">{title}</h1>
+          <h1 className="type-h1 text-ui-content-primary tracking-tight">{title}</h1>
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-secondary">
             {location && (

@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 import { CANONICAL_BANNER_CONTENT, CategoryBannerContent } from '../data/bannerContent';
 import { supabase } from '../lib/supabase';
 import { SectionKey } from '../theme/tokens';
@@ -46,6 +47,25 @@ const STRING_FIELDS: Array<keyof CategoryBannerContent> = [
 ];
 
 const publishedSettings = new Map<SectionKey, PublishedBannerSettings>();
+let publishedBannerVersion = 0;
+const publishedBannerListeners = new Set<() => void>();
+
+const notifyPublishedBannerListeners = () => {
+  publishedBannerVersion += 1;
+  publishedBannerListeners.forEach((listener) => listener());
+};
+
+export const subscribePublishedBannerContent = (listener: () => void): (() => void) => {
+  publishedBannerListeners.add(listener);
+  return () => publishedBannerListeners.delete(listener);
+};
+
+export const usePublishedBannerRuntime = (): number =>
+  useSyncExternalStore(
+    subscribePublishedBannerContent,
+    () => publishedBannerVersion,
+    () => publishedBannerVersion
+  );
 
 const isSectionKey = (value: unknown): value is SectionKey =>
   typeof value === 'string' && SECTION_KEYS.includes(value as SectionKey);
@@ -170,6 +190,8 @@ export const hydratePublishedBannerContent = async (): Promise<void> => {
         sortOrder: remote.sortOrder,
       });
     }
+
+    notifyPublishedBannerListeners();
   } catch (error) {
     publishedSettings.clear();
     console.warn('[Banner CMS] Using code-backed banner fallback:', error);

@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const SITE_URL = (process.env.SITE_URL || 'https://shihabshajib01-cell.github.io/sobaike-janao/').replace(/\/?$/, '/');
+const SITE_URL = (process.env.SITE_URL || 'https://shobaikejanao.com/').replace(/\/?$/, '/');
 const failures = [];
 const warnings = [];
 const results = [];
@@ -18,7 +18,12 @@ async function check(name, fn) {
   try { await fn(); pass(name); } catch (error) { fail(name, error); }
 }
 function routeUrl(path) {
-  return `${SITE_URL}#${path.startsWith('/') ? path : `/${path}`}`;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return new URL(normalized.replace(/^\//, ''), SITE_URL).toString();
+}
+
+function currentPath(page) {
+  return new URL(page.url()).pathname;
 }
 function attachRuntimeGuards(page, label) {
   page.on('pageerror', (error) => failures.push(`${label} pageerror: ${error.message}`));
@@ -125,14 +130,14 @@ await check('Mobile navigation, issue rows and category controls follow the appr
   await expectVisible(page.locator('#bottom-nav'), 'mobile bottom navigation missing');
 
   const cases = [
-    ['#bottom-nav-home', '#/'],
-    ['#bottom-nav-issues', '#/issues'],
-    ['#bottom-nav-explore', '#/explore'],
+    ['#bottom-nav-home', '/'],
+    ['#bottom-nav-issues', '/issues'],
+    ['#bottom-nav-explore', '/explore'],
   ];
-  for (const [selector, hash] of cases) {
+  for (const [selector, path] of cases) {
     await page.locator(selector).click();
-    await page.waitForTimeout(hash === '#/explore' ? 900 : 350);
-    if (!page.url().includes(hash)) throw new Error(`${selector} did not navigate to ${hash}; got ${page.url()}`);
+    await page.waitForTimeout(path === '/explore' ? 900 : 350);
+    if (currentPath(page) !== path) throw new Error(`${selector} did not navigate to ${path}; got ${page.url()}`);
     await expectVisible(page.locator('#main-content'), `${selector} destination did not render`);
   }
 
@@ -145,7 +150,7 @@ await check('Mobile navigation, issue rows and category controls follow the appr
 
   await page.locator('#issues-card-harassment').click();
   await page.waitForTimeout(350);
-  if (!page.url().includes('#/harassment')) throw new Error(`Issue card did not navigate to harassment; got ${page.url()}`);
+  if (currentPath(page) !== '/harassment') throw new Error(`Issue card did not navigate to harassment; got ${page.url()}`);
   await expectVisible(page.locator('#mobile-category-header'), 'contextual category header missing');
   await expectVisible(page.locator('#mobile-category-filter-btn'), 'Harassment category filter action missing');
   if ((await page.locator('#bottom-nav').count()) !== 0) throw new Error('Bottom navigation should be hidden on category pages');
@@ -153,11 +158,11 @@ await check('Mobile navigation, issue rows and category controls follow the appr
 
   await page.locator('#mobile-category-back-btn').click();
   await page.waitForTimeout(350);
-  if (!page.url().includes('#/issues')) throw new Error(`category back did not return to Issues; got ${page.url()}`);
+  if (currentPath(page) !== '/issues') throw new Error(`category back did not return to Issues; got ${page.url()}`);
 
   await page.locator('#issues-card-extortion').click();
   await page.waitForTimeout(350);
-  if (!page.url().includes('#/extortion')) throw new Error(`Issue card did not navigate to extortion; got ${page.url()}`);
+  if (currentPath(page) !== '/extortion') throw new Error(`Issue card did not navigate to extortion; got ${page.url()}`);
   await expectVisible(page.locator('#mobile-category-filter-btn'), 'mobile category filter action missing');
   await page.locator('#mobile-category-filter-btn').click();
   await expectVisible(page.locator('#extortion-filter-sheet'), 'mobile category filter sheet did not open');
@@ -168,6 +173,22 @@ await check('Mobile navigation, issue rows and category controls follow the appr
   if ((await page.locator('#bottom-nav').count()) !== 0) throw new Error('Bottom navigation should be hidden on extortion category page');
   if ((await page.getByText('জরুরি সহায়তার জন্য ৯৯৯', { exact: false }).count()) !== 0) throw new Error('Removed emergency assistance strip is still visible');
 
+  await context.close();
+});
+
+await check('Legacy hash links migrate to clean URLs', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'legacy-hash');
+  await page.goto(`${SITE_URL}#/harassment`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(350);
+  if (currentPath(page) !== '/harassment') {
+    throw new Error(`legacy hash route did not migrate; got ${page.url()}`);
+  }
+  if (new URL(page.url()).hash.startsWith('#/')) {
+    throw new Error(`legacy hash fragment was not removed; got ${page.url()}`);
+  }
   await context.close();
 });
 

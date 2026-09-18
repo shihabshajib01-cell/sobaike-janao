@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const SITE_URL = (process.env.SITE_URL || 'https://shihabshajib01-cell.github.io/sobaike-janao/').replace(/\/?$/, '/');
+const SITE_URL = (process.env.SITE_URL || 'https://shobaikejanao.com/').replace(/\/?$/, '/');
 
 const CATEGORY_ROUTES = [
   '/harassment',
@@ -25,7 +25,8 @@ const EXPECTED_ISSUE_CARD_IDS = [
 const failures = [];
 
 function routeUrl(path) {
-  return `${SITE_URL}#${path.startsWith('/') ? path : `/${path}`}`;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return new URL(normalized.replace(/^\//, ''), SITE_URL).toString();
 }
 
 async function seedReturningVisitor(context) {
@@ -145,8 +146,17 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   await firstCard.focus();
   await page.keyboard.press('Enter');
   await page.waitForTimeout(350);
-  if (!page.url().includes('#/report-detail/')) {
+  if (!new URL(page.url()).pathname.startsWith('/report-detail/')) {
     throw new Error(`Enter did not open report detail from ${cardId}; got ${page.url()}`);
+  }
+
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const childClickCard = page.locator('[id^="report-card-"][role="link"]').first();
+  await expectVisible(childClickCard, 'No report card found for child-click navigation check');
+  await childClickCard.locator('h3').click();
+  await page.waitForTimeout(350);
+  if (!new URL(page.url()).pathname.startsWith('/report-detail/')) {
+    throw new Error(`Clicking report-card title did not open detail; got ${page.url()}`);
   }
 
   await context.close();

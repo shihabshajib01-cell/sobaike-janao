@@ -10,7 +10,7 @@ import { useApp, RoutePath } from '../../context/AppContext';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 import { CANONICAL_BANNER_CONTENT } from '../../data/bannerContent';
-import { getPublishedBannerSettings } from '../../services/bannerRuntime';
+import { getPublishedBannerSettings, usePublishedBannerRuntime } from '../../services/bannerRuntime';
 import { IconButton } from '../ui/IconButton';
 
 export interface ServiceSlide {
@@ -31,6 +31,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 }) => {
   const { language, openReportComposer } = useApp();
   const { segments } = useTaxonomy();
+  usePublishedBannerRuntime();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);

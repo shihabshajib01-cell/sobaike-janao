@@ -9,6 +9,7 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { usePublishedBannerRuntime } from '../services/bannerRuntime';
 import { BANGLADESH_DISTRICTS } from '../data/districts';
 import {
   EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
@@ -64,6 +65,7 @@ export const HarassmentPage: React.FC = () => {
     setIsHarassmentFilterOpen,
   } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
+  usePublishedBannerRuntime();
   const bannerContent = CANONICAL_BANNER_CONTENT.harassment;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
