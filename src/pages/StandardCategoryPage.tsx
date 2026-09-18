@@ -11,6 +11,7 @@ import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { usePublishedBannerRuntime } from '../services/bannerRuntime';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
@@ -24,6 +25,7 @@ export interface StandardCategoryPageProps {
 export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ section }) => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
+  usePublishedBannerRuntime();
   const bannerContent = CANONICAL_BANNER_CONTENT[section];
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
