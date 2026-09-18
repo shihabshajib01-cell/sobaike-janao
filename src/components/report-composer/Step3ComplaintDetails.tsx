@@ -72,6 +72,7 @@ import { TextAreaField } from '../ui/TextAreaField';
 import { DateField } from '../ui/DateField';
 import { TimeField } from '../ui/TimeField';
 import { MonthField } from '../ui/MonthField';
+import { isValidEmailOrPhone } from '../ui/formValidation';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -978,22 +979,29 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
         // Harassment Identity Validation
         if (showsIdentitySection) {
-          if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
+          const needsContact =
+            formData.privacyChoice === 'admin_only' ||
+            formData.privacyChoice === 'public_identity';
+
+          if (needsContact && !formData.adminContact?.trim()) {
             newErrors.adminContact =
               language === 'bn'
                 ? 'যোগাযোগের জন্য ইমেইল বা ফোন নম্বর লিখুন।'
                 : 'Enter an email or phone number for follow-up.';
+          } else if (
+            needsContact &&
+            formData.adminContact?.trim() &&
+            !isValidEmailOrPhone(formData.adminContact)
+          ) {
+            newErrors.adminContact =
+              language === 'bn'
+                ? 'সঠিক ইমেইল বা ফোন নম্বর লিখুন।'
+                : 'Enter a valid email address or phone number.';
           }
 
-          if (formData.privacyChoice === 'public_identity') {
-            if (!formData.adminName?.trim()) {
-              newErrors.adminName =
-                language === 'bn' ? 'আপনার নাম লিখুন।' : 'Enter your name.';
-            }
-            if (!formData.adminContact?.trim()) {
-              newErrors.adminContact =
-                language === 'bn' ? 'আপনার যোগাযোগের তথ্য লিখুন।' : 'Enter your contact information.';
-            }
+          if (formData.privacyChoice === 'public_identity' && !formData.adminName?.trim()) {
+            newErrors.adminName =
+              language === 'bn' ? 'আপনার নাম লিখুন।' : 'Enter your name.';
           }
         }
       }
