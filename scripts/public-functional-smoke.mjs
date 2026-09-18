@@ -272,13 +272,13 @@ await check('English SEO variant is prerendered, URL-addressable and self-canoni
   }
 
   const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-  if (canonical !== `${SITE_URL}/en/`) {
+  if (canonical !== routeUrl('/en/')) {
     throw new Error(`English URL is not self-canonical: ${canonical}`);
   }
 
   const bnAlternate = await page.locator('link[rel="alternate"][hreflang="bn-BD"]').getAttribute('href');
   const enAlternate = await page.locator('link[rel="alternate"][hreflang="en"]').getAttribute('href');
-  if (bnAlternate !== `${SITE_URL}/` || enAlternate !== `${SITE_URL}/en/`) {
+  if (bnAlternate !== routeUrl('/') || enAlternate !== routeUrl('/en/')) {
     throw new Error(`language alternates invalid: bn=${bnAlternate}, en=${enAlternate}`);
   }
 
@@ -288,7 +288,7 @@ await check('English SEO variant is prerendered, URL-addressable and self-canoni
     throw new Error('English category route lost html lang=en');
   }
   const categoryCanonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-  if (categoryCanonical !== `${SITE_URL}/en/public-safety`) {
+  if (categoryCanonical !== routeUrl('/en/public-safety')) {
     throw new Error(`English category canonical is incorrect: ${categoryCanonical}`);
   }
 
