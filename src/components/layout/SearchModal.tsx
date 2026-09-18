@@ -3,13 +3,17 @@ import { useApp, RoutePath } from '../../context/AppContext';
 import { Modal } from '../ui/Modal';
 import { SearchInput } from '../ui/SearchInput';
 import { CategoryBadge } from '../ui/CategoryBadge';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 
 export const SearchModal: React.FC = () => {
   const { isSearchModalOpen, setIsSearchModalOpen, navigateTo, language } = useApp();
+  const { segments } = useTaxonomy();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const quickCategories: SectionKey[] = ['harassment', 'rickshaw', 'extortion'];
+  const quickCategories = Object.values(segments)
+    .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+    .slice(0, 3);
 
   const handleSelectSection = (path: RoutePath) => {
     setIsSearchModalOpen(false);
@@ -49,18 +53,19 @@ export const SearchModal: React.FC = () => {
             {language === 'bn' ? 'বিভাগ' : 'Categories'}
           </p>
           <div className="flex flex-wrap gap-2">
-            {quickCategories.map((key) => {
-              const sec = SECTIONS[key];
-              return (
-                <button
-                  key={key}
-                  onClick={() => handleSelectSection(sec.slug as RoutePath)}
-                  className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-control)] min-h-[44px] flex items-center"
-                >
-                  <CategoryBadge section={key} language={language} size="md" />
-                </button>
-              );
-            })}
+            {quickCategories.map((sec) => (
+              <button
+                key={sec.id}
+                onClick={() => handleSelectSection(sec.slug as RoutePath)}
+                className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-control)] min-h-[44px] flex items-center"
+              >
+                <CategoryBadge
+                  section={sec.id as SectionKey}
+                  language={language}
+                  size="md"
+                />
+              </button>
+            ))}
           </div>
         </div>
       </div>
