@@ -69,7 +69,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
         <div className="flex items-center gap-3 min-w-0">
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight">
+              <h2 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary leading-tight">
                 {language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
               </h2>
 
@@ -88,7 +88,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               )}
             </div>
 
-            <p className="type-compact text-ui-content-muted leading-tight mt-1">
+            <p className="type-helper text-ui-content-secondary leading-tight mt-1">
               <span>
                 {language === 'bn'
                   ? `ধাপ ${currentStep} / ${totalSteps}: ${currentStepInfo.titleBn}`
@@ -104,7 +104,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
           aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close composer'}
           size="md"
           onClick={onClose}
-          className="text-ui-content-muted min-h-[44px] min-w-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+          className="text-ui-content-secondary"
         />
       </div>
 
@@ -122,12 +122,12 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               disabled={!isAccessible}
               aria-current={isCurrent ? 'step' : undefined}
               onClick={() => isAccessible && onSelectStep && onSelectStep(st.step)}
-              className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-2 rounded-[var(--radius-control)] type-compact font-[var(--font-weight-medium)] transition-all whitespace-nowrap cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`flex items-center justify-center w-full gap-1.5 sm:gap-2 px-1.5 sm:px-2 md:px-3.5 py-2 ui-radius-control type-helper font-[var(--font-weight-medium)] transition-colors whitespace-nowrap cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isCurrent
-                  ? 'bg-ui-accent text-ui-content-inverse font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
+                  ? 'bg-ui-accent text-ui-content-inverse font-[var(--font-weight-semibold)] ui-elevation-selected ui-border-default border-ui-accent'
                   : isCompleted
-                  ? 'bg-ui-accent-soft text-ui-content-primary border font-[var(--font-weight-semibold)]'
-                  : 'bg-ui-surface-subtle text-ui-content-secondary border border-ui-stroke-subtle disabled:opacity-50 disabled:cursor-not-allowed'
+                  ? 'bg-ui-accent-soft text-ui-content-primary ui-border-default border-ui-accent-border font-[var(--font-weight-semibold)]'
+                  : 'bg-ui-surface-subtle text-ui-content-muted ui-border-default border-ui-stroke-subtle disabled:cursor-not-allowed'
               }`}
             >
               <span
@@ -136,7 +136,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
                     ? 'bg-ui-content-inverse/25 text-ui-content-inverse'
                     : isCompleted
                     ? 'bg-ui-accent text-ui-content-inverse'
-                    : 'bg-ui-surface text-ui-content-muted border border-ui-stroke-subtle'
+                    : 'bg-ui-surface text-ui-content-muted ui-border-default border-ui-stroke-default'
                 }`}
               >
                 {isCompleted ? <Check className="w-3 h-3 text-ui-content-inverse" aria-hidden="true" /> : st.step}
