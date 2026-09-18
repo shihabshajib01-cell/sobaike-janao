@@ -259,29 +259,52 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   await context.close();
 });
 
-await check('English SEO variant is URL-addressable and self-canonical', async () => {
+await check('English SEO variant is prerendered, URL-addressable and self-canonical', async () => {
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'english-seo');
-  await page.goto(routeUrl('/?lang=en'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.goto(routeUrl('/en/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(500);
 
   if ((await page.locator('html').getAttribute('lang')) !== 'en') {
-    throw new Error('English URL did not render with html lang=en');
+    throw new Error('English /en/ URL did not render with html lang=en');
   }
 
   const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-  if (!canonical || !canonical.includes('lang=en')) {
+  if (canonical !== `${SITE_URL}/en/`) {
     throw new Error(`English URL is not self-canonical: ${canonical}`);
   }
 
   const bnAlternate = await page.locator('link[rel="alternate"][hreflang="bn-BD"]').getAttribute('href');
   const enAlternate = await page.locator('link[rel="alternate"][hreflang="en"]').getAttribute('href');
-  if (!bnAlternate?.startsWith(SITE_URL) || !enAlternate?.includes('lang=en')) {
+  if (bnAlternate !== `${SITE_URL}/` || enAlternate !== `${SITE_URL}/en/`) {
     throw new Error(`language alternates invalid: bn=${bnAlternate}, en=${enAlternate}`);
   }
 
+  await page.goto(routeUrl('/en/public-safety'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(300);
+  if ((await page.locator('html').getAttribute('lang')) !== 'en') {
+    throw new Error('English category route lost html lang=en');
+  }
+  const categoryCanonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+  if (categoryCanonical !== `${SITE_URL}/en/public-safety`) {
+    throw new Error(`English category canonical is incorrect: ${categoryCanonical}`);
+  }
+
+  await context.close();
+});
+
+await check('Legacy ?lang=en links migrate to /en paths', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'legacy-english-url');
+  await page.goto(routeUrl('/public-safety?lang=en'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(500);
+  if (!page.url().includes('/en/public-safety') || page.url().includes('lang=en')) {
+    throw new Error(`legacy English URL was not migrated: ${page.url()}`);
+  }
   await context.close();
 });
 
