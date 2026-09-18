@@ -15,7 +15,11 @@ import { SectionKey, SECTIONS } from '../../theme/tokens';
 import { ReportFormData, isMeaningfulMentionedParty } from '../../services/types';
 import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { AttachmentLightboxModal } from '../media/AttachmentLightboxModal';
-import { SEGMENT_SUBCATEGORIES } from '../../data/reportOptions';
+import {
+  SEGMENT_SUBCATEGORIES,
+  INTIMATE_WHAT_HAPPENED_OPTIONS,
+  INTIMATE_PLATFORMS,
+} from '../../data/reportOptions';
 import {
   getReportSubjectConfig,
   getSubjectOptionLabel,
@@ -71,6 +75,8 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const isIllegalOccupation = segment === 'illegal_occupation';
   const isSexualHarassment =
     segment === 'harassment' && formData.subcategoryId === 'sexual-harassment';
+  const isBlackmailCoercion =
+    segment === 'harassment' && formData.subcategoryId === 'blackmail-coercion';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -485,6 +491,49 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     </span>
                     <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
                       {formData.sexualHarassmentInstitution.trim()}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isBlackmailCoercion && (formData.intimateWhatHappened || formData.intimatePlatform) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-ui-stroke-subtle">
+                {formData.intimateWhatHappened && (
+                  <div>
+                    <span className="type-compact text-ui-content-muted block mb-0.5">
+                      {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে' : 'Threat status / action'}
+                    </span>
+                    <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                      {(() => {
+                        const option = INTIMATE_WHAT_HAPPENED_OPTIONS.find(
+                          (item) => item.id === formData.intimateWhatHappened
+                        );
+                        return option
+                          ? language === 'bn'
+                            ? option.nameBn
+                            : option.nameEn
+                          : formData.intimateWhatHappened;
+                      })()}
+                    </p>
+                  </div>
+                )}
+                {formData.intimatePlatform && (
+                  <div>
+                    <span className="type-compact text-ui-content-muted block mb-0.5">
+                      {language === 'bn' ? 'মাধ্যম / প্ল্যাটফর্ম' : 'Platform / channel'}
+                    </span>
+                    <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                      {(() => {
+                        const option = INTIMATE_PLATFORMS.find(
+                          (item) => item.id === formData.intimatePlatform
+                        );
+                        return option
+                          ? language === 'bn'
+                            ? option.nameBn
+                            : option.nameEn
+                          : formData.intimatePlatform;
+                      })()}
                     </p>
                   </div>
                 )}
