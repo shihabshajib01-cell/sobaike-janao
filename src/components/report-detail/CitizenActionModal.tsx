@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { Checkbox } from '../ui/Checkbox';
+import { IconButton } from '../ui/IconButton';
 
 interface CitizenActionModalProps {
   isOpen: boolean;
@@ -10,6 +13,13 @@ interface CitizenActionModalProps {
   reportTitle: string;
   language: 'bn' | 'en';
 }
+
+const getLocalDateInputValue = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   isOpen,
@@ -26,6 +36,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const maxIncidentDate = getLocalDateInputValue();
 
   useEffect(() => {
     if (isOpen) {
@@ -45,29 +56,26 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     if (!description.trim() || description.trim().length < 10) {
       setError(
         language === 'bn'
-          ? 'অন্তত ১০ অক্ষর লিখুন।'
-          : 'Enter at least 10 characters.'
+          ? 'আরও একটু বিস্তারিত লিখুন (কমপক্ষে ১০ অক্ষর)।'
+          : 'Please add a little more detail (at least 10 characters).'
       );
       return;
     }
 
-    if (witnessDate.trim()) {
-      const today = new Date().toISOString().split('T')[0];
-      if (witnessDate > today) {
-        setError(
-          language === 'bn'
-            ? 'ঘটনার তারিখ ভবিষ্যতের হতে পারে না।'
-            : 'Incident date cannot be in the future.'
-        );
-        return;
-      }
+    if (witnessDate.trim() && witnessDate > maxIncidentDate) {
+      setError(
+        language === 'bn'
+          ? 'ঘটনার তারিখ ভবিষ্যতের হতে পারে না।'
+          : 'Incident date cannot be in the future.'
+      );
+      return;
     }
 
     if (contactConsent && !contactInfo.trim()) {
       setError(
         language === 'bn'
-          ? 'যোগাযোগের সম্মতি দিলে অনুগ্রহ করে আপনার ফোন নম্বর বা ইমেইল লিখুন।'
-          : 'Please provide your phone number or email if you consent to follow-up.'
+          ? 'যোগাযোগের জন্য ফোন নম্বর বা ইমেইল লিখুন।'
+          : 'Enter a phone number or email for follow-up.'
       );
       return;
     }
@@ -88,7 +96,7 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
     } catch (err: any) {
       const msg =
         language === 'bn'
-          ? err?.messageBn || err?.message || 'তথ্য জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।'
+          ? err?.messageBn || err?.message || 'তথ্য জমা দেওয়া সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।'
           : err?.message || 'Failed to submit information. Please try again.';
       setError(msg);
     } finally {
@@ -120,81 +128,86 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       language={language}
       ariaLabelledBy="citizen-modal-title"
     >
-      <div className="flex flex-col h-full min-h-0 text-left md:block md:h-auto md:p-6 sm:md:p-7 md:space-y-5">
-        {/* Header */}
+      <div className="flex flex-col h-full min-h-0 text-left md:block md:h-auto md:p-6 md:space-y-5">
         <header className="shrink-0 flex items-start justify-between gap-3 p-5 sm:p-6 md:p-0 pb-3.5 sm:pb-4 md:pb-3.5 border-b border-ui-stroke-subtle">
-          <div className="space-y-1">
-            <h3 id="citizen-modal-title" className="type-h3 leading-[var(--type-line-26)] sm:leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary">
-              {language === 'bn'
-                ? 'তথ্য দিন'
-                : 'Share information'}
+          <div className="min-w-0 flex-1 space-y-1">
+            <h3
+              id="citizen-modal-title"
+              className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary"
+            >
+              {language === 'bn' ? 'প্রতিবেদনে তথ্য যোগ করুন' : 'Add information to this report'}
             </h3>
-            <p className="type-compact text-ui-content-muted">
-              {language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `About: ${reportTitle}`}
+            <p className="type-helper text-ui-content-secondary">
+              {language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `Report: ${reportTitle}`}
             </p>
           </div>
 
-          <button
+          <IconButton
             type="button"
             onClick={handleResetAndClose}
             aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-            className="p-2 text-ui-content-secondary rounded-[var(--radius-badge-md)] transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <X className="w-5 h-5" />
-          </button>
+            icon={<X className="w-5 h-5" aria-hidden="true" />}
+            variant="ghost"
+            size="md"
+            className="-mt-1"
+          />
         </header>
 
         {isSubmitted ? (
           <div className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
-            <div role="status" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible py-6 text-center space-y-4">
-              <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text border border-ui-success-border rounded-[var(--radius-pill)] flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-7 h-7" />
+            <div
+              role="status"
+              aria-live="polite"
+              className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible py-6 text-center space-y-4"
+            >
+              <div className="w-12 h-12 bg-ui-success-bg text-ui-success-text ui-border-default border-ui-success-border rounded-[var(--radius-pill)] flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-7 h-7" aria-hidden="true" />
               </div>
               <div className="space-y-1">
-                <h4 className="type-h3 leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h4 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary">
                   {language === 'bn' ? 'তথ্য জমা হয়েছে' : 'Information submitted'}
                 </h4>
-                <p className="type-h4 leading-[var(--type-line-22)] sm:leading-[var(--type-line-24)] text-ui-content-secondary max-w-sm mx-auto">
+                <p className="type-body text-ui-content-secondary max-w-sm mx-auto">
                   {language === 'bn'
                     ? 'আপনার তথ্য পর্যালোচনার জন্য পাঠানো হয়েছে।'
                     : 'Your information has been sent for review.'}
                 </p>
               </div>
               {responseId && (
-                <div className="p-3 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle text-center inline-block max-w-xs mx-auto">
-                  <span className="type-compact text-ui-content-muted block">
+                <div className="p-3 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle text-center inline-block max-w-xs mx-auto">
+                  <p className="type-helper text-ui-content-secondary">
                     {language === 'bn' ? 'রেসপন্স আইডি' : 'Response ID'}
-                  </span>
-                  <span className="tabular-nums type-h4 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  </p>
+                  <p className="tabular-nums type-label font-[var(--font-weight-semibold)] text-ui-content-primary">
                     {responseId}
-                  </span>
+                  </p>
                 </div>
               )}
             </div>
             <footer className="shrink-0 p-4 sm:p-5 md:p-0 border-t md:border-0 border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-              <button
-                type="button"
-                onClick={handleResetAndClose}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text type-h4 font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
-                {language === 'bn' ? 'সম্পন্ন করুন' : 'Done'}
-              </button>
+              <Button type="button" variant="primary" size="md" onClick={handleResetAndClose}>
+                {language === 'bn' ? 'সম্পন্ন' : 'Done'}
+              </Button>
             </footer>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 md:block md:space-y-4">
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 md:p-0 md:overflow-visible space-y-4">
               {error && (
-                <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] type-compact font-[var(--font-weight-medium)]">
+                <div
+                  role="alert"
+                  className="p-3.5 bg-ui-error-bg ui-border-default border-ui-error-border text-ui-error-text ui-radius-control type-helper font-[var(--font-weight-medium)]"
+                >
                   {error}
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label htmlFor="citizen-description-input" className="block type-h4 font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {language === 'bn'
-                    ? 'আপনি কী তথ্য দিতে চান? *'
-                    : 'What would you like to share? *'}
+                <label
+                  htmlFor="citizen-description-input"
+                  className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary"
+                >
+                  {language === 'bn' ? 'আপনার জানা তথ্য *' : 'What you know *'}
                 </label>
                 <textarea
                   id="citizen-description-input"
@@ -202,52 +215,62 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                   rows={4}
                   required
                   aria-required="true"
+                  aria-describedby="citizen-description-helper"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder={
-                    language === 'bn'
-                      ? 'তারিখ, সময়, স্থান বা যা দেখেছেন—প্রাসঙ্গিক তথ্য লিখুন...'
-                      : 'Add relevant details such as date, time, place or what you observed...'
-                  }
-                  className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent focus:ring-1 focus:ring-ui-accent rounded-[var(--radius-control)] type-h4 text-ui-content-primary placeholder:text-ui-content-muted"
+                  placeholder={language === 'bn' ? 'বিস্তারিত লিখুন...' : 'Add the details...'}
+                  className="w-full ui-space-textarea bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder resize-y"
                 />
+                <p id="citizen-description-helper" className="type-helper text-ui-content-secondary">
+                  {language === 'bn'
+                    ? 'তারিখ, সময়, স্থান এবং আপনি যা দেখেছেন বা জানেন—যতটা সম্ভব নির্দিষ্টভাবে লিখুন।'
+                    : 'Include the date, time, place, and what you saw or know. Be as specific as possible.'}
+                </p>
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="citizen-witness-date-input" className="block type-h4 font-[var(--font-weight-medium)] text-ui-content-secondary">
-                  {language === 'bn' ? 'ঘটনার তারিখ (ঐচ্ছিক)' : 'Incident date (optional)'}
+                <label
+                  htmlFor="citizen-witness-date-input"
+                  className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary"
+                >
+                  {language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}
                 </label>
                 <input
                   id="citizen-witness-date-input"
                   name="witnessDate"
                   type="date"
-                  max={new Date().toISOString().split('T')[0]}
+                  lang={language === 'bn' ? 'bn-BD' : 'en'}
+                  max={maxIncidentDate}
                   value={witnessDate}
                   onChange={(e) => setWitnessDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent focus:ring-1 focus:ring-ui-accent rounded-[var(--radius-control)] type-h4 text-ui-content-primary min-h-[44px]"
+                  aria-describedby="citizen-date-helper"
+                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control ui-control type-body text-ui-content-primary"
                 />
+                <p id="citizen-date-helper" className="type-helper text-ui-content-secondary">
+                  {language === 'bn' ? 'জানা থাকলে দিন।' : 'Add it if you know it.'}
+                </p>
               </div>
 
-              <div className="p-3.5 bg-ui-surface-subtle rounded-[var(--radius-control)] border border-ui-stroke-subtle space-y-2.5">
-                <label htmlFor="citizen-contact-consent-checkbox" className="flex items-start gap-2 cursor-pointer type-compact text-ui-content-secondary">
-                  <input
-                    id="citizen-contact-consent-checkbox"
-                    type="checkbox"
-                    checked={contactConsent}
-                    onChange={(e) => setContactConsent(e.target.checked)}
-                    className="mt-1 rounded border-ui-stroke-subtle text-accent focus:ring-accent accent-[var(--ui-accent)] min-h-[16px] min-w-[16px]"
-                  />
-                  <span>
-                    {language === 'bn'
-                      ? 'এই তথ্য সম্পর্কে প্রয়োজন হলে আমার সাথে যোগাযোগ করা যেতে পারে।'
-                      : 'You may contact me for follow-up about this information.'}
-                  </span>
-                </label>
+              <div className="p-3.5 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-3">
+                <Checkbox
+                  id="citizen-contact-consent-checkbox"
+                  checked={contactConsent}
+                  onChange={(e) => setContactConsent(e.target.checked)}
+                  label={
+                    language === 'bn'
+                      ? 'প্রয়োজনে এই তথ্য সম্পর্কে আমার সঙ্গে যোগাযোগ করা যাবে।'
+                      : 'I can be contacted if follow-up is needed.'
+                  }
+                  labelClassName="type-body text-ui-content-primary"
+                />
 
                 {contactConsent && (
-                  <div>
-                    <label htmlFor="citizen-contact-info-input" className="sr-only">
-                      {language === 'bn' ? 'যোগাযোগের তথ্য' : 'Contact information'}
+                  <div className="space-y-1.5 pl-8">
+                    <label
+                      htmlFor="citizen-contact-info-input"
+                      className="block type-helper font-[var(--font-weight-medium)] text-ui-content-secondary"
+                    >
+                      {language === 'bn' ? 'ফোন নম্বর বা ইমেইল' : 'Phone number or email'}
                     </label>
                     <input
                       id="citizen-contact-info-input"
@@ -255,8 +278,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
                       type="text"
                       value={contactInfo}
                       onChange={(e) => setContactInfo(e.target.value)}
-                      placeholder={language === 'bn' ? 'ফোন নম্বর বা ইমেইল ঠিকানা' : 'Phone number or email address'}
-                      className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:border-ui-accent focus:ring-1 focus:ring-ui-accent rounded-[var(--radius-control)] type-h4 text-ui-content-primary min-h-[44px]"
+                      placeholder={language === 'bn' ? 'যোগাযোগের তথ্য লিখুন' : 'Enter your contact information'}
+                      className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:border-ui-accent focus:outline-none focus:ring-2 focus:ring-ui-focus ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
                     />
                   </div>
                 )}
@@ -264,32 +287,31 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             </div>
 
             <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-0 md:py-0 md:pt-2 border-t border-ui-stroke-subtle bg-ui-surface md:bg-transparent flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="md"
                 onClick={handleResetAndClose}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary type-h4 font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover disabled:opacity-50 disabled:cursor-not-allowed text-ui-action-text type-h4 font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                variant="primary"
+                size="md"
+                isLoading={isSubmitting}
+                leftIcon={<Send className="w-4 h-4" aria-hidden="true" />}
               >
-                {isSubmitting ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-[var(--radius-pill)] animate-spin" />
-                    <span>{language === 'bn' ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>{language === 'bn' ? 'তথ্য জমা দিন' : 'Submit information'}</span>
-                  </>
-                )}
-              </button>
+                {isSubmitting
+                  ? language === 'bn'
+                    ? 'জমা দেওয়া হচ্ছে...'
+                    : 'Submitting...'
+                  : language === 'bn'
+                    ? 'তথ্য জমা দিন'
+                    : 'Submit information'}
+              </Button>
             </footer>
           </form>
         )}
