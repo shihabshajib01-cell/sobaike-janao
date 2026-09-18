@@ -61,6 +61,15 @@ const rootText = textContent(
 const rootWords = rootText.split(/\s+/).filter(Boolean).length;
 const rootInternalLinks = count(rootHtml, /href=["']\/(?!\/)[^"']*["']/gi);
 const rootExternalLinks = count(rootHtml, /href=["']https:\/\/[^"']+["']/gi);
+const rootOgDescription = attr(
+  rootHtml,
+  /<meta\s+[^>]*property=["']og:description["'][^>]*>/i,
+  'content'
+);
+const rootOgImage = attr(rootHtml, /<meta\s+[^>]*property=["']og:image["'][^>]*>/i, 'content');
+const rootOgWidth = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:width["'][^>]*>/i, 'content');
+const rootOgHeight = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:height["'][^>]*>/i, 'content');
+const rootTwitterCard = attr(rootHtml, /<meta\s+[^>]*name=["']twitter:card["'][^>]*>/i, 'content');
 
 record('Homepage title exists', rootTitle.length > 0, rootTitle);
 record(
@@ -86,14 +95,28 @@ record('Internal linking', rootInternalLinks >= 10, `${rootInternalLinks} links`
 record('Relevant external linking', rootExternalLinks >= 2, `${rootExternalLinks} links`);
 record('Open Graph title', /property=["']og:title["']/i.test(rootHtml));
 record('Open Graph description', /property=["']og:description["']/i.test(rootHtml));
+record(
+  'Open Graph description target length',
+  [...rootOgDescription].length >= 150 && [...rootOgDescription].length <= 160,
+  `${[...rootOgDescription].length} characters`
+);
 record('Open Graph URL', /property=["']og:url["']/i.test(rootHtml));
-record('Open Graph image', /property=["']og:image["']/i.test(rootHtml));
+record(
+  'Open Graph image',
+  rootOgImage === `${SITE_ORIGIN}/brand/og-social-1200x630.png`,
+  rootOgImage
+);
 record(
   'Open Graph image dimensions',
-  /property=["']og:image:width["']/i.test(rootHtml) &&
-    /property=["']og:image:height["']/i.test(rootHtml)
+  rootOgWidth === '1200' && rootOgHeight === '630',
+  `${rootOgWidth}x${rootOgHeight}`
 );
-record('Twitter card', /name=["']twitter:card["']/i.test(rootHtml));
+record('Twitter card', rootTwitterCard === 'summary_large_image', rootTwitterCard);
+record(
+  'Prepaint fallback guard',
+  rootHtml.includes("document.documentElement.classList.add('js')") &&
+    rootHtml.includes('.js #seo-static-fallback{display:none!important}')
+);
 record(
   'Social sharing links',
   /facebook\.com\/sharer/i.test(rootHtml) && /twitter\.com\/intent\/tweet/i.test(rootHtml)
@@ -128,6 +151,11 @@ const llmsTxt = await readFile(join(DIST, 'llms.txt'), 'utf8');
 record(
   'llms.txt available',
   llmsTxt.includes('Sobaike Janao') && llmsTxt.includes(`${SITE_ORIGIN}/sitemap.xml`)
+);
+record(
+  'llms.txt uses Markdown links',
+  /\[[^\]]+\]\(https:\/\/[^)]+\)/.test(llmsTxt),
+  `${(llmsTxt.match(/\[[^\]]+\]\(https:\/\/[^)]+\)/g) || []).length} Markdown links`
 );
 
 const sitemap = await readFile(join(DIST, 'sitemap.xml'), 'utf8');
