@@ -228,7 +228,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                       type="button"
                       onClick={onSelectDistrict ? () => onSelectDistrict(item.nameEn) : undefined}
                       aria-pressed={activeDistrict.toLowerCase() === item.nameEn.toLowerCase()}
-                      className={`w-full text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                      className={`w-full min-h-[44px] text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                         onSelectDistrict ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
                       } ${
                         activeDistrict.toLowerCase() === item.nameEn.toLowerCase()
@@ -315,7 +315,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
               aria-label={language === 'bn' ? 'বিভাগ অনুযায়ী কলাম চার্ট' : 'Division column chart'}
               className="overflow-x-auto pb-1"
             >
-              <div className="min-w-[430px] grid grid-cols-8 gap-2 items-end">
+              <div className="min-w-max flex items-end gap-2">
                 {divisionStats.map((item) => {
                   const displayDivisionName =
                     language === 'bn' ? item.nameBn : item.nameEn;
@@ -336,7 +336,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                           ? `${displayDivisionName} বিভাগ: ${displayCount}টি প্রতিবেদন`
                           : `${displayDivisionName} Division: ${displayCount} reports`
                       }
-                      className={`min-w-[44px] rounded-[var(--radius-badge-md)] px-1.5 py-2 flex flex-col items-center gap-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                      className={`w-14 sm:w-16 shrink-0 min-h-[44px] rounded-[var(--radius-badge-md)] px-1.5 py-2 flex flex-col items-center gap-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                         onSelectDivision ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
                       } ${isActive ? 'bg-ui-surface-subtle' : ''}`}
                     >
