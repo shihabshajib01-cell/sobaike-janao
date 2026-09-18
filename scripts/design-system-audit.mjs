@@ -101,42 +101,52 @@ const files = [
 
 const findings = [];
 
-const APPROVED_CORE_COLORS = {
+const APPROVED_MATERIAL_CORE = {
   light: {
-    '--ui-page': '#F0F2F5',
-    '--ui-surface': '#FFFFFF',
-    '--ui-surface-subtle': '#F0F2F5',
-    '--ui-surface-elevated': '#FFFFFF',
-    '--ui-surface-hover': '#E4E6EB',
-    '--ui-text-primary': '#050505',
-    '--ui-text-secondary': '#65676B',
-    '--ui-text-muted': '#65676B',
-    '--ui-text-inverse': '#FFFFFF',
-    '--ui-border-subtle': '#E4E6EB',
-    '--ui-border': '#E4E6EB',
-    '--ui-border-strong': '#E4E6EB',
-    '--ui-input': '#FFFFFF',
-    '--ui-input-placeholder': '#65676B',
-    '--ui-disabled-bg': '#E4E6EB',
-    '--ui-disabled-text': '#65676B',
+    '--md-primary': '#1B4D6B',
+    '--md-primary-variant': '#163B52',
+    '--md-primary-active': '#245F82',
+    '--md-on-primary': '#FFFFFF',
+    '--md-secondary': '#3A7CA5',
+    '--md-secondary-variant': '#163B52',
+    '--md-on-secondary': '#FFFFFF',
+    '--md-background': '#F0F2F5',
+    '--md-on-background': '#050505',
+    '--md-surface': '#FFFFFF',
+    '--md-surface-subtle': '#F0F2F5',
+    '--md-surface-elevated': '#FFFFFF',
+    '--md-surface-hover': '#E4E6EB',
+    '--md-on-surface': '#050505',
+    '--md-on-surface-secondary': '#65676B',
+    '--md-on-surface-muted': '#65676B',
+    '--md-outline-subtle': '#E4E6EB',
+    '--md-outline': '#E4E6EB',
+    '--md-outline-strong': '#E4E6EB',
+    '--md-disabled-container': '#E4E6EB',
+    '--md-on-disabled': '#65676B',
   },
   dark: {
-    '--ui-page': '#18191A',
-    '--ui-surface': '#242526',
-    '--ui-surface-subtle': '#242526',
-    '--ui-surface-elevated': '#242526',
-    '--ui-surface-hover': '#3A3B3C',
-    '--ui-text-primary': '#E4E6EB',
-    '--ui-text-secondary': '#B0B3B8',
-    '--ui-text-muted': '#B0B3B8',
-    '--ui-text-inverse': '#FFFFFF',
-    '--ui-border-subtle': '#3A3B3C',
-    '--ui-border': '#3A3B3C',
-    '--ui-border-strong': '#3A3B3C',
-    '--ui-input': '#242526',
-    '--ui-input-placeholder': '#B0B3B8',
-    '--ui-disabled-bg': '#3A3B3C',
-    '--ui-disabled-text': '#B0B3B8',
+    '--md-primary': '#1B4D6B',
+    '--md-primary-variant': '#163B52',
+    '--md-primary-active': '#245F82',
+    '--md-on-primary': '#FFFFFF',
+    '--md-secondary': '#3A7CA5',
+    '--md-secondary-variant': '#245F82',
+    '--md-on-secondary': '#FFFFFF',
+    '--md-background': '#18191A',
+    '--md-on-background': '#E4E6EB',
+    '--md-surface': '#242526',
+    '--md-surface-subtle': '#242526',
+    '--md-surface-elevated': '#242526',
+    '--md-surface-hover': '#3A3B3C',
+    '--md-on-surface': '#E4E6EB',
+    '--md-on-surface-secondary': '#B0B3B8',
+    '--md-on-surface-muted': '#B0B3B8',
+    '--md-outline-subtle': '#3A3B3C',
+    '--md-outline': '#3A3B3C',
+    '--md-outline-strong': '#3A3B3C',
+    '--md-disabled-container': '#3A3B3C',
+    '--md-on-disabled': '#B0B3B8',
   },
 };
 
@@ -148,36 +158,21 @@ const parseVariables = (source) =>
     ])
   );
 
-const getThemeBlock = (source, theme) => {
-  const pattern =
+const extractThemeBlock = (source, theme) => {
+  const startMarker =
     theme === 'light'
-      ? /(?:^|\n)\s*:root,\s*\n\s*html\[data-theme="light"\]\s*\{([\s\S]*?)\n\s*\}\s*\n\s*html\[data-theme="dark"\]/
-      : /html\[data-theme="dark"\],\s*\n\s*\.dark\s*\{([\s\S]*?)\n\s*\}\s*(?:\n\s*:root\s*\{|\n\s*html,)/;
+      ? ':root,\nhtml[data-theme="light"] {'
+      : 'html[data-theme="dark"],\n.dark {';
+  const endMarker =
+    theme === 'light'
+      ? '\n}\n\nhtml[data-theme="dark"],'
+      : '\n}\n\n/* Compatibility aliases';
 
-  return source.match(pattern)?.[1] || '';
+  const blockStart = source.indexOf(startMarker);
+  const blockEnd = source.indexOf(endMarker, blockStart + startMarker.length);
+  if (blockStart < 0 || blockEnd < 0) return '';
+  return source.slice(blockStart + startMarker.length, blockEnd);
 };
-
-const colorSystemFile = 'src/theme/design-system.css';
-if (fs.existsSync(colorSystemFile)) {
-  const source = fs.readFileSync(colorSystemFile, 'utf8');
-
-  for (const theme of ['light', 'dark']) {
-    const values = parseVariables(getThemeBlock(source, theme));
-    for (const [token, expected] of Object.entries(APPROVED_CORE_COLORS[theme])) {
-      const actual = values[token];
-      if (actual !== expected) {
-        findings.push({
-          file: colorSystemFile,
-          line: 1,
-          rule: 'semantic-color-drift',
-          token,
-          message: `Approved ${theme} semantic color changed from ${expected} to ${actual || 'missing'}`,
-          source: `${token}: ${actual || 'missing'}`,
-        });
-      }
-    }
-  }
-}
 
 const relativeLuminance = (hex) => {
   const channels = hex
@@ -200,19 +195,183 @@ const contrastRatio = (a, b) => {
   return (lighter + 0.05) / (darker + 0.05);
 };
 
+const addContrastFinding = (file, theme, token, foreground, background, minimum = 4.5) => {
+  if (!/^#[0-9a-fA-F]{6}$/.test(foreground) || !/^#[0-9a-fA-F]{6}$/.test(background)) return;
+  const ratio = contrastRatio(foreground, background);
+  if (ratio < minimum) {
+    findings.push({
+      file,
+      line: 1,
+      rule: 'color-role-contrast',
+      token,
+      message: `${theme} ${token} contrast is ${ratio.toFixed(2)}:1; minimum is ${minimum}:1`,
+      source: `${foreground} on ${background}`,
+    });
+  }
+};
+
+const colorSystemFile = 'src/theme/color-system.css';
+if (!fs.existsSync(colorSystemFile)) {
+  findings.push({
+    file: colorSystemFile,
+    line: 1,
+    rule: 'missing-color-authority',
+    token: colorSystemFile,
+    message: 'Public color system must have one dedicated authority file',
+    source: 'File not found',
+  });
+} else {
+  const source = fs.readFileSync(colorSystemFile, 'utf8');
+
+  for (const theme of ['light', 'dark']) {
+    const values = parseVariables(extractThemeBlock(source, theme));
+
+    for (const [token, expected] of Object.entries(APPROVED_MATERIAL_CORE[theme])) {
+      const actual = values[token];
+      if (actual !== expected) {
+        findings.push({
+          file: colorSystemFile,
+          line: 1,
+          rule: 'semantic-color-drift',
+          token,
+          message: `Approved ${theme} Material role changed from ${expected} to ${actual || 'missing'}`,
+          source: `${token}: ${actual || 'missing'}`,
+        });
+      }
+    }
+
+    addContrastFinding(colorSystemFile, theme, 'on-primary', values['--md-on-primary'], values['--md-primary']);
+    addContrastFinding(colorSystemFile, theme, 'on-secondary', values['--md-on-secondary'], values['--md-secondary']);
+    addContrastFinding(colorSystemFile, theme, 'on-background', values['--md-on-background'], values['--md-background']);
+    addContrastFinding(colorSystemFile, theme, 'on-surface', values['--md-on-surface'], values['--md-surface']);
+    addContrastFinding(colorSystemFile, theme, 'on-surface-secondary', values['--md-on-surface-secondary'], values['--md-surface']);
+    addContrastFinding(colorSystemFile, theme, 'on-surface-muted', values['--md-on-surface-muted'], values['--md-surface']);
+
+    for (const category of [
+      'harassment',
+      'extortion',
+      'public_safety',
+      'road_transport',
+      'load_shedding',
+      'illegal_occupation',
+      'rickshaw',
+    ]) {
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        `${category}-on-primary`,
+        values[`--category-${category}-on-primary`],
+        values[`--category-${category}-primary`]
+      );
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        `${category}-on-container`,
+        values[`--category-${category}-on-container`],
+        values[`--category-${category}-container`]
+      );
+    }
+  }
+
+  const compatibilityBlock = source.slice(source.indexOf('/* Compatibility aliases'));
+  if (/#[0-9a-fA-F]{3,8}\b|\b(?:rgb|rgba|hsl|hsla|oklch)\s*\(/.test(compatibilityBlock)) {
+    findings.push({
+      file: colorSystemFile,
+      line: 1,
+      rule: 'compatibility-alias-literal',
+      token: 'compatibility-alias',
+      message: 'Compatibility aliases must reference Material/category roles and contain no color literals',
+      source: 'Literal color found after compatibility alias marker',
+    });
+  }
+}
+
+for (const legacyAuthorityFile of ['src/index.css', 'src/theme/design-system.css']) {
+  if (!fs.existsSync(legacyAuthorityFile)) continue;
+  const source = fs.readFileSync(legacyAuthorityFile, 'utf8');
+  if (/--ui-(?:page|surface|text-primary|border|primary-action-bg)\s*:/.test(source)) {
+    findings.push({
+      file: legacyAuthorityFile,
+      line: 1,
+      rule: 'duplicate-color-authority',
+      token: '--ui-*',
+      message: 'Core public color values must be owned only by theme/color-system.css',
+      source: 'Legacy core color assignment found',
+    });
+  }
+}
+
+const mainFile = 'src/main.tsx';
+if (fs.existsSync(mainFile)) {
+  const source = fs.readFileSync(mainFile, 'utf8');
+  if (!source.includes("import './theme/color-system.css';")) {
+    findings.push({
+      file: mainFile,
+      line: 1,
+      rule: 'missing-color-system-import',
+      token: 'color-system.css',
+      message: 'Public app must load the centralized color-system authority',
+      source: 'Expected color-system.css import is missing',
+    });
+  }
+}
+
+const tokensFile = 'src/theme/tokens.ts';
+if (fs.existsSync(tokensFile)) {
+  const source = fs.readFileSync(tokensFile, 'utf8');
+  if (/#[0-9a-fA-F]{3,8}\b/.test(source)) {
+    findings.push({
+      file: tokensFile,
+      line: 1,
+      rule: 'token-color-literal',
+      token: '#...',
+      message: 'Static category/hero color values must resolve through theme/color-system.css',
+      source: 'Raw hex color found in theme/tokens.ts',
+    });
+  }
+}
+
+const roleMigratedPrimitives = [
+  'src/components/ui/Button.tsx',
+  'src/components/ui/IconButton.tsx',
+  'src/components/ui/FilterChip.tsx',
+  'src/components/ui/Modal.tsx',
+  'src/components/ui/Drawer.tsx',
+  'src/components/ui/SearchInput.tsx',
+  'src/components/ui/SearchableSelect.tsx',
+];
+
+for (const file of roleMigratedPrimitives) {
+  if (!fs.existsSync(file)) continue;
+  const source = fs.readFileSync(file, 'utf8');
+  const legacyColorUtility = source.match(/\b(?:bg|text|border|ring|outline|fill|stroke)-ui-[a-z0-9-]+\b/);
+  if (legacyColorUtility) {
+    findings.push({
+      file,
+      line: 1,
+      rule: 'legacy-color-utility-in-primitive',
+      token: legacyColorUtility[0],
+      message: 'Migrated shared primitives must consume Material role utilities directly',
+      source: legacyColorUtility[0],
+    });
+  }
+}
+
 const taxonomyFile = 'src/services/taxonomyService.ts';
 if (fs.existsSync(taxonomyFile)) {
   const source = fs.readFileSync(taxonomyFile, 'utf8');
 
-  if (source.includes('var(--ui-content-primary)')) {
-    findings.push({
-      file: taxonomyFile,
-      line: 1,
-      rule: 'undefined-semantic-color-token',
-      token: '--ui-content-primary',
-      message: 'Dynamic themes must reference the real --ui-text-primary CSS token',
-      source: 'var(--ui-content-primary)',
-    });
+  for (const requiredToken of ['var(--md-surface)', 'var(--md-on-surface)']) {
+    if (!source.includes(requiredToken)) {
+      findings.push({
+        file: taxonomyFile,
+        line: 1,
+        rule: 'dynamic-theme-role-bypass',
+        token: requiredToken,
+        message: 'Dynamic category themes must derive from Material surface roles',
+        source: 'Required Material role reference is missing',
+      });
+    }
   }
 
   if (!source.includes('if (legacy && !hasManagedTheme)')) {
@@ -221,7 +380,7 @@ if (fs.existsSync(taxonomyFile)) {
       line: 1,
       rule: 'legacy-theme-inline-override',
       token: 'legacy-category-runtime-theme',
-      message: 'Built-in categories must not receive inline runtime colors that override dark-mode CSS tokens',
+      message: 'Built-in categories must not receive inline runtime colors that override dark-mode category roles',
       source: 'Expected legacy theme guard is missing',
     });
   }
@@ -232,20 +391,22 @@ if (fs.existsSync(taxonomyFile)) {
       line: 1,
       rule: 'stale-runtime-theme',
       token: 'clearRuntimeSectionCssVariables',
-      message: 'Switching back to a built-in theme must clear stale inline category color variables',
+      message: 'Switching back to a built-in theme must clear stale inline category role variables',
       source: 'Expected runtime color cleanup is missing',
     });
   }
 
-  if (!source.includes('segment.colors.filledText')) {
-    findings.push({
-      file: taxonomyFile,
-      line: 1,
-      rule: 'managed-theme-on-primary',
-      token: 'filledText',
-      message: 'Managed category themes must publish an accessible on-primary text color',
-      source: 'Expected on-primary runtime token is missing',
-    });
+  for (const role of ['primary', 'container', 'on-container', 'outline', 'on-primary']) {
+    if (!source.includes(`--category-${'${safeId}'}-${role}`)) {
+      findings.push({
+        file: taxonomyFile,
+        line: 1,
+        rule: 'dynamic-category-role-missing',
+        token: role,
+        message: 'Runtime categories must publish the complete category role contract',
+        source: `Missing category role: ${role}`,
+      });
+    }
   }
 
   const presetPattern =
@@ -266,6 +427,7 @@ if (fs.existsSync(taxonomyFile)) {
     }
   }
 }
+
 for (const file of files) {
   const relative = path.relative(process.cwd(), file).replaceAll('\\', '/');
   const source = fs.readFileSync(file, 'utf8');
