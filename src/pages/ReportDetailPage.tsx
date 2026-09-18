@@ -658,7 +658,10 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           >
             <h2 className="type-h3 text-ui-content-primary flex items-center gap-2">
               <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
-              <span>{language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}</span>
+              <span>
+                {language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}
+                {' '}({(report.response ? 1 : 0) + storedResponses.length})
+              </span>
             </h2>
 
             {PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError && (
@@ -681,7 +684,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             )}
 
             {report.response && (
-              <div className="py-1 pl-4 border-l-2 border-ui-stroke-default space-y-2">
+              <div className="bg-ui-surface-subtle ui-radius-control p-4 space-y-2">
                 <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-[var(--font-weight-semibold)]">
                   <span>
                     {language === 'bn'
@@ -692,7 +695,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     {language === 'bn' ? report.response.dateBn : report.response.dateEn}
                   </span>
                 </div>
-                <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words">
+                <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words">
                   “{language === 'bn' ? report.response.statementBn : report.response.statementEn}”
                 </blockquote>
               </div>
@@ -705,7 +708,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               return (
                 <div
                   key={response.id}
-                  className="py-1 pl-4 border-l-2 border-ui-stroke-default space-y-2.5"
+                  className="bg-ui-surface-subtle ui-radius-control p-4 space-y-2.5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2 type-meta">
                     <div className="space-y-0.5">
@@ -747,7 +750,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                     </div>
                   </div>
 
-                  <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-subtle pl-3 break-words whitespace-pre-line">
+                  <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words whitespace-pre-line">
                     “{response.content}”
                   </blockquote>
                 </div>
