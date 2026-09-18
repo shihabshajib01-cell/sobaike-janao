@@ -5,7 +5,6 @@ const SITE_ORIGIN = 'https://shobaikejanao.com';
 const DIST_DIR = 'dist';
 const BRAND_LOGO = `${SITE_ORIGIN}/brand/icon-512x512.png`;
 const DEFAULT_IMAGE = `${SITE_ORIGIN}/brand/og-social-1200x630.png`;
-const TODAY = new Date().toISOString().slice(0, 10);
 
 const STATIC_PAGES = [
   {
@@ -136,8 +135,65 @@ const cleanText = (value, fallback = '') =>
     .trim()
     .slice(0, 300);
 
+const SEO_TEST_MARKER_PATTERN =
+  /(test only|system verification|test post|পরীক্ষামূলক পোস্ট)/i;
+
+function truncateSeoText(value, maxLength) {
+  const clean = String(value || '').replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  if (maxLength <= 1) return clean.slice(0, maxLength);
+  return `${clean.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+function buildBrandedSeoTitle(title, brand = 'সবাইকে জানাও', maxLength = 60) {
+  const cleanTitle = String(title || '').replace(/\s+/g, ' ').trim();
+  const cleanBrand = String(brand || '').replace(/\s+/g, ' ').trim();
+  const suffix = cleanBrand ? ` | ${cleanBrand}` : '';
+  const available = Math.max(1, maxLength - suffix.length);
+  return `${truncateSeoText(cleanTitle, available)}${suffix}`;
+}
+
+function normalizeSeoDescription(value, language = 'bn', minLength = 90, maxLength = 155) {
+  const clean = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!clean) {
+    return language === 'bn'
+      ? 'সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত নাগরিক প্রতিবেদন, প্রাসঙ্গিক তথ্য, এলাকা, উৎস ও আপডেট দেখুন।'
+      : 'Read this published citizen report on Sobaike Janao with its relevant details, location, sources, and updates.';
+  }
+
+  let result = clean;
+  if (result.length < minLength) {
+    const suffix =
+      language === 'bn'
+        ? ' বিস্তারিত, এলাকা, উৎস ও পরবর্তী আপডেট সবাইকে জানাও প্ল্যাটফর্মে দেখুন।'
+        : ' Review the relevant details, location, sources, and updates on Sobaike Janao.';
+    result = `${result.replace(/[।.!?]+$/, '')}.${suffix}`;
+  }
+  return truncateSeoText(result, maxLength);
+}
+
+function isSeoIndexableReport(report) {
+  const haystack = [
+    report.titleBn,
+    report.titleEn,
+    report.summaryBn,
+    report.summaryEn,
+    report.descriptionBn,
+    report.descriptionEn,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return !SEO_TEST_MARKER_PATTERN.test(haystack);
+}
+
 const canonicalUrl = (path) =>
   path === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${path.replace(/\/$/, '')}`;
+
+function localizedUrl(path, language) {
+  const url = new URL(canonicalUrl(path));
+  if (language === 'en') url.searchParams.set('lang', 'en');
+  return url.toString();
+}
 
 function injectStaticFallback(html, page) {
   if (page.path === '/') return html;
@@ -202,10 +258,18 @@ function injectStaticFallback(html, page) {
 }
 
 function injectMeta(template, page) {
-  const canonical = canonicalUrl(page.path);
-  const title = htmlEscape(page.title);
-  const description = htmlEscape(page.description);
-  const socialDescription = htmlEscape(page.socialDescription || page.description);
+  const language = page.language || 'bn';
+  const canonical = localizedUrl(page.path, language);
+  const bnCanonical = localizedUrl(page.path, 'bn');
+  const enCanonical = localizedUrl(page.path, 'en');
+  const titleText = truncateSeoText(page.title, 60);
+  const descriptionText = normalizeSeoDescription(page.description, language);
+  const socialDescriptionText = page.socialDescription
+    ? truncateSeoText(page.socialDescription, 160)
+    : descriptionText;
+  const title = htmlEscape(titleText);
+  const description = htmlEscape(descriptionText);
+  const socialDescription = htmlEscape(socialDescriptionText);
   const robots = htmlEscape(page.robots || 'index, follow, max-image-preview:large');
   const type = page.type === 'article' ? 'article' : 'website';
 
@@ -226,6 +290,18 @@ function injectMeta(template, page) {
     .replace(
       /<link rel="canonical" href="[^"]*" \/>/,
       `<link rel="canonical" href="${htmlEscape(canonical)}" />`
+    )
+    .replace(
+      /<link rel="alternate" hreflang="bn-BD" href="[^"]*" \/>/,
+      `<link rel="alternate" hreflang="bn-BD" href="${htmlEscape(bnCanonical)}" />`
+    )
+    .replace(
+      /<link rel="alternate" hreflang="en" href="[^"]*" \/>/,
+      `<link rel="alternate" hreflang="en" href="${htmlEscape(enCanonical)}" />`
+    )
+    .replace(
+      /<link rel="alternate" hreflang="x-default" href="[^"]*" \/>/,
+      `<link rel="alternate" hreflang="x-default" href="${htmlEscape(bnCanonical)}" />`
     )
     .replace(
       /<meta property="og:title" content="[^"]*" \/>/,
@@ -265,8 +341,8 @@ function injectMeta(template, page) {
           '@type': 'Article',
           '@id': `${canonical}#webpage`,
           url: canonical,
-          headline: page.title,
-          description: page.description,
+          headline: titleText,
+          description: descriptionText,
           inLanguage: 'bn-BD',
           mainEntityOfPage: { '@id': `${canonical}#webpage` },
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
@@ -277,8 +353,8 @@ function injectMeta(template, page) {
           '@type': page.collection ? 'CollectionPage' : 'WebPage',
           '@id': `${canonical}#webpage`,
           url: canonical,
-          name: page.title,
-          description: page.description,
+          name: titleText,
+          description: descriptionText,
           inLanguage: 'bn-BD',
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         };
@@ -417,21 +493,24 @@ function resolveDistrictId(raw, districts) {
 function reportPage(report) {
   const id = cleanText(report.id);
   if (!id) return null;
-  const title = cleanText(report.titleBn || report.titleEn || id);
-  const description = cleanText(
+  const rawTitle = cleanText(report.titleBn || report.titleEn || id);
+  const rawDescription = cleanText(
     report.summaryBn ||
       report.summaryEn ||
       report.descriptionBn ||
       report.descriptionEn ||
       'সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত নাগরিক প্রতিবেদন।'
   );
+  const indexable = isSeoIndexableReport(report);
 
   return {
     path: `/report-detail/${encodeURIComponent(id)}`,
-    title: `${title} | সবাইকে জানাও`,
-    description,
-    robots: 'index, follow, max-image-preview:large',
-    sitemap: true,
+    title: buildBrandedSeoTitle(rawTitle),
+    description: normalizeSeoDescription(rawDescription, 'bn'),
+    robots: indexable
+      ? 'index, follow, max-image-preview:large'
+      : 'noindex, follow',
+    sitemap: indexable,
     type: 'article',
     publishedAt: report.publishedAt || null,
   };
@@ -542,20 +621,23 @@ async function main() {
   const sitemapEntries = pages
     .filter((page) => page.sitemap)
     .map((page) => {
-      const lastmod = page.publishedAt
-        ? new Date(page.publishedAt).toISOString().slice(0, 10)
-        : TODAY;
-      return [
+      const lines = [
         '  <url>',
         `    <loc>${xmlEscape(canonicalUrl(page.path))}</loc>`,
-        `    <lastmod>${lastmod}</lastmod>`,
-        '  </url>',
-      ].join('\n');
+        `    <xhtml:link rel="alternate" hreflang="bn-BD" href="${xmlEscape(localizedUrl(page.path, 'bn'))}" />`,
+        `    <xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(localizedUrl(page.path, 'en'))}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(localizedUrl(page.path, 'bn'))}" />`,
+      ];
+      if (page.publishedAt) {
+        lines.push(`    <lastmod>${new Date(page.publishedAt).toISOString().slice(0, 10)}</lastmod>`);
+      }
+      lines.push('  </url>');
+      return lines.join('\n');
     });
 
   const sitemap = [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ...sitemapEntries,
     '</urlset>',
     '',
