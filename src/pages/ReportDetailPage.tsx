@@ -592,14 +592,14 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
           {(report.recentBillMonth || report.recentBillAmount !== undefined) && (
             <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-3">
-              <h2 className="type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary flex items-center gap-2">
+              <p className="type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary flex items-center gap-2">
                 <Zap className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                 <span>
                   {language === 'bn'
                     ? 'বিদ্যুৎ বিল সংক্রান্ত বিবরণ'
                     : 'Electricity billing details'}
                 </span>
-              </h2>
+              </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="p-3 bg-ui-surface ui-radius-badge-md ui-border-default border-ui-stroke-subtle space-y-1">
