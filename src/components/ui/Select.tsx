@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { FormField } from './FormField';
+import { formControlStateClass, formFieldIds, joinFormClasses } from './formSystem';
 
 export interface SelectOption {
   value: string;
@@ -8,25 +10,48 @@ export interface SelectOption {
 }
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string;
-  helperText?: string;
-  error?: string;
+  label?: React.ReactNode;
+  helperText?: React.ReactNode;
+  error?: React.ReactNode;
   options: SelectOption[];
   placeholder?: string;
+  fieldClassName?: string;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ id, label, helperText, error, options, placeholder, required, disabled, className = '', ...props }, ref) => {
-    const selectId = id || (label ? `select-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined);
+  (
+    {
+      id,
+      label,
+      helperText,
+      error,
+      options,
+      placeholder,
+      required,
+      disabled,
+      className = '',
+      fieldClassName = '',
+      ...props
+    },
+    ref
+  ) => {
+    const generatedId = useId().replace(/:/g, '');
+    const selectId =
+      id ||
+      (typeof label === 'string'
+        ? `select-${label.toLowerCase().replace(/\s+/g, '-')}`
+        : `select-${generatedId}`);
+    const { helperId, errorId } = formFieldIds(selectId);
 
     return (
-      <div className="w-full text-left">
-        {label && (
-          <label htmlFor={selectId} className="block type-label text-role-on-surface mb-1.5">
-            {label}
-            {required && <span className="text-role-validation ml-1" aria-hidden="true">*</span>}
-          </label>
-        )}
+      <FormField
+        id={selectId}
+        label={label}
+        helperText={helperText}
+        error={error}
+        required={Boolean(required)}
+        className={fieldClassName}
+      >
         <div className="relative">
           <select
             id={selectId}
@@ -35,36 +60,32 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             required={required}
             aria-required={required ? 'true' : undefined}
             aria-invalid={Boolean(error)}
-            aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}
-            className={`w-full appearance-none min-h-[44px] bg-role-surface text-role-on-surface ui-border-default ui-radius-control ui-space-select transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
-              error
-                ? 'border-role-validation-outline focus:ring-role-validation-focus focus:border-role-validation-focus'
-                : 'border-role-outline hover:border-role-outline-strong focus:ring-role-focus'
-            } ${className}`}
+            aria-describedby={error ? errorId : helperText ? helperId : props['aria-describedby']}
+            className={joinFormClasses(
+              'w-full appearance-none min-h-[44px] bg-role-surface text-role-on-surface ui-border-default ui-radius-control ui-space-select type-body transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed',
+              formControlStateClass(Boolean(error)),
+              className
+            )}
             {...props}
           >
-            {placeholder && <option value="">{placeholder}</option>}
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value} disabled={opt.disabled} className="bg-role-surface text-role-on-surface">
-                {opt.label}
+            {placeholder ? <option value="">{placeholder}</option> : null}
+            {options.map((option) => (
+              <option
+                key={option.value}
+                value={option.value}
+                disabled={option.disabled}
+                className="bg-role-surface text-role-on-surface"
+              >
+                {option.label}
               </option>
             ))}
           </select>
-          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-role-on-surface-muted">
-            <ChevronDown className="w-4 h-4" />
-          </div>
+          <ChevronDown
+            className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-role-on-surface-muted"
+            aria-hidden="true"
+          />
         </div>
-        {error && (
-          <p id={`${selectId}-error`} role="alert" className="mt-1.5 type-helper text-role-validation font-[var(--font-weight-medium)]">
-            {error}
-          </p>
-        )}
-        {!error && helperText && (
-          <p id={`${selectId}-helper`} className="mt-1.5 type-helper text-role-on-surface-muted">
-            {helperText}
-          </p>
-        )}
-      </div>
+      </FormField>
     );
   }
 );
