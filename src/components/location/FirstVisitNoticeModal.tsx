@@ -91,13 +91,13 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           >
             <p className="type-body text-ui-content-primary">
               {isBn
-                ? 'সবাইকে জানাও কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী বাহিনীর ওয়েবসাইট নয়। এটি বাংলাদেশের নাগরিকদের জন্য একটি স্বাধীন প্ল্যাটফর্ম, যেখানে আপনি নিজের পরিচয় বা ব্যক্তিগত নিরাপত্তা নিয়ে উদ্বেগ ছাড়াই জনস্বার্থে সমস্যা, অভিজ্ঞতা ও পর্যবেক্ষণ শেয়ার করতে পারেন।'
-                : 'Sobaike Janao is not a government or law-enforcement website. It is an independent platform for people in Bangladesh to share public-interest issues, experiences, and observations without having to publicly reveal their identity.'}
+                ? 'সবাইকে জানাও কোনো সরকারি বা আইনশৃঙ্খলা রক্ষাকারী সংস্থার ওয়েবসাইট নয়। এটি বাংলাদেশের নাগরিকদের জন্য একটি স্বাধীন প্ল্যাটফর্ম, যেখানে পরিচয় প্রকাশ না করেই জনস্বার্থে সমস্যা, অভিজ্ঞতা ও পর্যবেক্ষণ শেয়ার করা যায়।'
+                : 'Sobaike Janao is not a government or law-enforcement website. It is an independent platform for people in Bangladesh to share public-interest issues, experiences, and observations without publicly revealing their identity.'}
             </p>
             <p className="type-body text-ui-content-primary">
               {isBn
-                ? 'প্রতিবেদন জমা দিতে আমরা আপনার ফোন নম্বর বা ইমেইল চাই না, এবং আপনার ব্যক্তিগত পরিচয় প্রকাশ না করেই আপনি এখানে আপনার কথা জানাতে পারেন। তবে এই স্বাধীনতা যেন সঠিক ও দায়িত্বশীলভাবে ব্যবহৃত হয়, সেজন্য প্রতিবেদন প্রকাশের সময় নিচের বিষয়গুলো মেনে চলুন:'
-                : 'We do not ask for your phone number or email to submit a report, and you can speak here without publicly revealing your personal identity. To make sure this freedom is used responsibly, please follow the guidance below when publishing a report:'}
+                ? 'প্রতিবেদন দিতে আমরা আপনার ফোন নম্বর বা ইমেইল চাই না। তবে এই স্বাধীনতা দায়িত্বশীলভাবে ব্যবহার করতে নিচের নির্দেশনাগুলো মেনে চলুন:'
+                : 'We do not ask for your phone number or email to submit a report. Please follow the guidance below to use this freedom responsibly:'}
             </p>
           </div>
         </div>
