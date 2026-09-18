@@ -42,6 +42,7 @@ jobs:
       - name: Verify Vite output
         run: |
           test -f dist/index.html
+          test -f dist/404.html
           echo "Checking generated index"
           cat dist/index.html
           if grep -q "/src/main.tsx" dist/index.html
