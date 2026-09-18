@@ -367,6 +367,13 @@ export const PublicReportService = {
         labelBn: String(field.labelBn || field.labelEn || field.fieldKey || ''),
         fieldType: String(field.fieldType || 'text'),
         sortOrder: Number(field.sortOrder || 0),
+        options: Array.isArray(field.options)
+          ? field.options.map((option: any) => ({
+              value: String(option?.value || ''),
+              labelEn: String(option?.labelEn || option?.value || ''),
+              labelBn: String(option?.labelBn || option?.labelEn || option?.value || ''),
+            }))
+          : [],
         value: field.value,
       }))
       .sort((a: PublicConfiguredReportField, b: PublicConfiguredReportField) => a.sortOrder - b.sortOrder);
