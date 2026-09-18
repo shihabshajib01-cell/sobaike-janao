@@ -247,12 +247,18 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   await lang.click();
   await page.waitForTimeout(150);
   if ((await page.locator('html').getAttribute('lang')) !== 'en') throw new Error('language did not switch to English');
-  const themeDark = page.locator('[role="radio"]').filter({ hasText: 'Dark' }).first();
+  const themeDark = page
+    .locator('#tablet-drawer button[aria-pressed]')
+    .filter({ hasText: 'Dark' })
+    .first();
   if (await themeDark.count()) {
     await themeDark.click();
     await page.waitForTimeout(150);
     const className = await page.locator('html').getAttribute('class');
     if (!String(className).includes('dark')) throw new Error('dark theme did not apply');
+    if ((await themeDark.getAttribute('aria-pressed')) !== 'true') {
+      throw new Error('dark theme control did not expose the selected state');
+    }
   } else {
     throw new Error('dark theme control not found');
   }
