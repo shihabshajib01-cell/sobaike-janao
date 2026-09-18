@@ -5,6 +5,11 @@ import {
   HarassmentAbuserRelationship,
   HarassmentReportingFor,
 } from '../data/harassmentClassification';
+import {
+  SexualHarassmentContext,
+  SexualHarassmentFrequency,
+  SexualHarassmentType,
+} from '../data/sexualHarassmentOptions';
 
 export type { PublicReportImage };
 
@@ -148,10 +153,13 @@ export interface SubmittedReport {
   briberyDepartment?: string;
   briberyService?: string;
   briberyAmount?: number | string;
-  frequency: 'one-time' | 'repeated';
+  frequency: 'one-time' | 'repeated' | 'ongoing' | 'unknown_not_stated';
   affectedPersonAgeGroup?: HarassmentAgeGroup;
   allegedAbuserRelationship?: HarassmentAbuserRelationship;
   reportingFor?: HarassmentReportingFor;
+  sexualHarassmentType?: SexualHarassmentType;
+  sexualHarassmentContext?: SexualHarassmentContext;
+  sexualHarassmentInstitution?: string;
   relationshipContext?: string;
   intimateWhatHappened?: string;
   intimatePlatform?: string;
@@ -211,10 +219,13 @@ export interface ReportFormData {
   briberyDepartment: string;
   briberyService: string;
   briberyAmount?: number | string;
-  frequency: 'one-time' | 'repeated';
+  frequency: SexualHarassmentFrequency;
   affectedPersonAgeGroup: HarassmentAgeGroup | '';
   allegedAbuserRelationship: HarassmentAbuserRelationship | '';
   reportingFor: HarassmentReportingFor | '';
+  sexualHarassmentType: SexualHarassmentType | '';
+  sexualHarassmentContext: SexualHarassmentContext | '';
+  sexualHarassmentInstitution: string;
   relationshipContext: string;
   intimateWhatHappened: string;
   intimatePlatform: string;
