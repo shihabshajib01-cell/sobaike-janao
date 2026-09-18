@@ -38,6 +38,7 @@ import {
   normalizeSeoDescription,
 } from '../lib/seo';
 import { HarassmentContextSummary } from '../components/report/HarassmentContextSummary';
+import { getBriberyDepartmentLabel } from '../data/briberyOptions';
 
 export interface ReportDetailPageProps {
   reportId: string;
@@ -673,6 +674,77 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 )}
             </div>
           )}
+
+          {report.segment === 'extortion' &&
+            report.subcategoryId === 'bribe-demanded-service' &&
+            (report.briberyDepartment ||
+              report.briberyService ||
+              report.briberyAmount !== undefined ||
+              report.incidentTime ||
+              report.frequency) && (
+              <div
+                id="bribery-report-details"
+                className="pt-4 border-t border-ui-stroke-subtle space-y-3"
+              >
+                <h2 className="type-h4 text-ui-content-primary">
+                  {language === 'bn' ? 'ঘুষ সংক্রান্ত তথ্য' : 'Bribery details'}
+                </h2>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {report.briberyDepartment && (
+                    <div className="p-3 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle">
+                      <dt className="type-meta text-ui-content-muted">
+                        {language === 'bn' ? 'দপ্তর' : 'Department'}
+                      </dt>
+                      <dd className="mt-1 type-body font-[var(--font-weight-semibold)] text-ui-content-primary break-words">
+                        {getBriberyDepartmentLabel(report.briberyDepartment, language)}
+                      </dd>
+                    </div>
+                  )}
+                  {report.briberyService && (
+                    <div className="p-3 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle">
+                      <dt className="type-meta text-ui-content-muted">
+                        {language === 'bn' ? 'সেবা বা প্রক্রিয়া' : 'Service or process'}
+                      </dt>
+                      <dd className="mt-1 type-body font-[var(--font-weight-semibold)] text-ui-content-primary break-words">
+                        {report.briberyService}
+                      </dd>
+                    </div>
+                  )}
+                  {report.briberyAmount !== undefined && (
+                    <div className="p-3 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle">
+                      <dt className="type-meta text-ui-content-muted">
+                        {language === 'bn' ? 'টাকার পরিমাণ' : 'Amount (BDT)'}
+                      </dt>
+                      <dd className="mt-1 type-body font-[var(--font-weight-semibold)] text-ui-content-primary">
+                        ৳ {language === 'bn' ? toBanglaDigits(report.briberyAmount) : report.briberyAmount.toLocaleString()}
+                      </dd>
+                    </div>
+                  )}
+                  {report.incidentTime && (
+                    <div className="p-3 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle">
+                      <dt className="type-meta text-ui-content-muted">
+                        {language === 'bn' ? 'সময়' : 'Time'}
+                      </dt>
+                      <dd className="mt-1 type-body font-[var(--font-weight-semibold)] text-ui-content-primary">
+                        {report.incidentTime}
+                      </dd>
+                    </div>
+                  )}
+                  {report.frequency && (
+                    <div className="p-3 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle">
+                      <dt className="type-meta text-ui-content-muted">
+                        {language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}
+                      </dt>
+                      <dd className="mt-1 type-body font-[var(--font-weight-semibold)] text-ui-content-primary">
+                        {report.frequency === 'repeated'
+                          ? language === 'bn' ? 'নিয়মিত' : 'Repeated'
+                          : language === 'bn' ? 'এককালীন' : 'One-time'}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            )}
 
           {report.incidentTime &&
             report.segment === 'load_shedding' &&
