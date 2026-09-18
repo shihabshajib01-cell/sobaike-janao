@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from 'react';
 import { CANONICAL_BANNER_CONTENT, CategoryBannerContent } from '../data/bannerContent';
-import { supabase } from '../lib/supabase';
 import { SectionKey } from '../theme/tokens';
 
 export interface RuntimeBannerContent {
@@ -115,6 +114,7 @@ const parseContent = (
 };
 
 const loadPublishedRows = async (): Promise<PublicBannerRow[]> => {
+  const { supabase } = await import('../lib/supabase');
   if (!supabase) return [];
 
   let timeoutId: number | undefined;
@@ -181,8 +181,6 @@ export const getRuntimeBannerEntries = (): Array<[
  * category banner is added to the runtime registry.
  */
 export const hydratePublishedBannerContent = async (): Promise<void> => {
-  if (!supabase) return;
-
   try {
     const rows = await loadPublishedRows();
     const parsed = new Map<string, ManagedBannerContent>();
