@@ -104,6 +104,8 @@ export interface ReportItem {
   sexualHarassmentType?: SexualHarassmentType;
   sexualHarassmentContext?: SexualHarassmentContext;
   sexualHarassmentInstitution?: string;
+  intimateWhatHappened?: string;
+  intimatePlatform?: string;
   frequency?: 'one-time' | 'repeated' | 'ongoing' | 'unknown_not_stated';
   recentBillMonth?: string;
   recentBillAmount?: number;
