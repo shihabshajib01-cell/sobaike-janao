@@ -11,6 +11,8 @@ import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { getRuntimeBannerContent, usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { useSeo } from '../components/seo/SeoManager';
+import { BRAND_NAME } from '../lib/seo';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
@@ -23,9 +25,11 @@ export interface StandardCategoryPageProps {
 
 export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ section }) => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
-  const { getFeedSubcategories } = useTaxonomy();
+  const { segments, getFeedSubcategories } = useTaxonomy();
+  const { setDynamicSeo } = useSeo();
   usePublishedBannerRuntime();
   const bannerContent = getRuntimeBannerContent(section);
+  const segmentSeo = segments[section];
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
@@ -37,6 +41,36 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const subcategories = getFeedSubcategories(section);
+
+  useEffect(() => {
+    if (!segmentSeo) return;
+
+    const name = language === 'bn' ? segmentSeo.nameBn : segmentSeo.nameEn;
+    const description =
+      language === 'bn' ? segmentSeo.descriptionBn : segmentSeo.descriptionEn;
+
+    setDynamicSeo({
+      title: `${name} | ${BRAND_NAME[language]}`,
+      description:
+        description ||
+        (language === 'bn'
+          ? `${name} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন দেখুন।`
+          : `Browse moderated citizen reports about ${name}.`),
+      robots: 'index, follow, max-image-preview:large',
+      ogType: 'website',
+      ogSiteName: BRAND_NAME[language],
+      canonicalPath: segmentSeo.slug,
+      pageType: 'collection',
+    });
+  }, [
+    language,
+    segmentSeo?.nameBn,
+    segmentSeo?.nameEn,
+    segmentSeo?.descriptionBn,
+    segmentSeo?.descriptionEn,
+    segmentSeo?.slug,
+    setDynamicSeo,
+  ]);
 
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
