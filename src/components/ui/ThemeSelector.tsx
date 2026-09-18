@@ -160,8 +160,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
           <button
             key={opt.id}
             type="button"
-            role="radio"
-            aria-checked={isSelected}
+            aria-pressed={isSelected}
             onClick={() => setThemePreference(opt.id)}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-[var(--radius-control)] type-label font-[var(--font-weight-medium)] transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isSelected
