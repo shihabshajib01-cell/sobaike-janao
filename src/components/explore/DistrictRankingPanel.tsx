@@ -313,7 +313,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         className={`w-full flex items-center justify-between p-2.5 md:p-3 rounded-[var(--radius-control)] text-left transition-all cursor-pointer border group min-h-[58px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
           isSelected
             ? 'bg-ui-accent-soft border-ui-accent/40 text-ui-content-primary ring-1 ring-ui-accent/30 font-[var(--font-weight-medium)] shadow-[var(--elevation-2xs)]'
-            : 'bg-ui-surface-subtle border-ui-stroke-subtle hover:border-ui-stroke-default text-ui-content-primary'
+            : 'bg-ui-surface dark:bg-ui-surface-elevated border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover text-ui-content-primary'
         }`}
       >
         <div className="flex items-start gap-2.5 min-w-0">
@@ -406,7 +406,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           <button
             type="button"
             onClick={() => onSelectDistrict('all')}
-            className="type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary inline-flex items-center gap-1.5 cursor-pointer px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary inline-flex items-center gap-1.5 cursor-pointer px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-[var(--radius-control)] bg-ui-surface dark:bg-ui-surface-elevated border border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover transition-colors min-h-[44px] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             aria-label={parentGeographyButtonLabel}
           >
             <span className="truncate max-w-[140px] sm:max-w-none">
@@ -418,7 +418,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5">
+        <div className="bg-ui-surface dark:bg-ui-surface-elevated border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5">
           <span className="type-compact font-[var(--font-weight-medium)] text-ui-content-muted block">
             {language === 'bn'
               ? 'বর্তমান নির্বাচনে প্রতিবেদন'
@@ -434,7 +434,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
           </p>
         </div>
 
-        <div className="bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5">
+        <div className="bg-ui-surface dark:bg-ui-surface-elevated border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5">
           <span className="type-compact font-[var(--font-weight-medium)] text-ui-content-muted block">
             {mostReportedTopicAnalysis.heading}
           </span>
@@ -495,7 +495,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               return (
                 <div
                   key={category.key}
-                  className="px-3 py-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact min-w-0"
+                  className="px-3 py-2.5 rounded-[var(--radius-control)] bg-ui-surface dark:bg-ui-surface-elevated border border-ui-stroke-subtle type-compact min-w-0"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
@@ -512,7 +512,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                     <progress
                       value={category.count}
                       max={Math.max(activeReportCount, 1)}
-                      className="h-1.5 flex-1 min-w-0 accent-ui-accent"
+                      className="h-1.5 flex-1 min-w-0 appearance-none overflow-hidden rounded-[var(--radius-pill)] [&::-webkit-progress-bar]:bg-ui-stroke-subtle [&::-webkit-progress-value]:bg-ui-accent [&::-moz-progress-bar]:bg-ui-accent"
                       aria-label={
                         language === 'bn'
                           ? `${category.label}: ${formatPercentage(share)}`
@@ -589,7 +589,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
             type="button"
             aria-expanded={showAllDistricts}
             onClick={() => setShowAllDistricts(!showAllDistricts)}
-            className="w-full py-2.5 px-3 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle type-compact font-[var(--font-weight-bold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-hover transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            className="w-full py-2.5 px-3 rounded-[var(--radius-control)] bg-ui-surface dark:bg-ui-surface-elevated border border-ui-stroke-subtle type-compact font-[var(--font-weight-bold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-hover transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
             <span>
               {showAllDistricts
