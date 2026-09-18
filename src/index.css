@@ -11,6 +11,8 @@
   --color-role-secondary: var(--md-secondary);
   --color-role-secondary-variant: var(--md-secondary-variant);
   --color-role-on-secondary: var(--md-on-secondary);
+  --color-role-secondary-container: var(--md-secondary-container);
+  --color-role-secondary-outline: var(--md-secondary-outline);
   --color-role-background: var(--md-background);
   --color-role-on-background: var(--md-on-background);
   --color-role-surface: var(--md-surface);
