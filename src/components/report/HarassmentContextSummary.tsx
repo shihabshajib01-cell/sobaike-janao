@@ -14,6 +14,10 @@ import {
   SEXUAL_HARASSMENT_TYPE_OPTIONS,
   getSexualHarassmentOptionLabel,
 } from '../../data/sexualHarassmentOptions';
+import {
+  INTIMATE_WHAT_HAPPENED_OPTIONS,
+  INTIMATE_PLATFORMS,
+} from '../../data/reportOptions';
 
 export interface HarassmentContextSummaryProps {
   report: ReportItem;
@@ -32,6 +36,8 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
       !report.sexualHarassmentType &&
       !report.sexualHarassmentContext &&
       !report.sexualHarassmentInstitution &&
+      !report.intimateWhatHappened &&
+      !report.intimatePlatform &&
       !report.reporterName)
   ) {
     return null;
@@ -106,6 +112,36 @@ export const HarassmentContextSummary: React.FC<HarassmentContextSummaryProps> =
       ? {
           label: language === 'bn' ? 'প্রতিষ্ঠান / সংস্থা' : 'Institution / organization',
           value: report.sexualHarassmentInstitution,
+        }
+      : null,
+    report.subcategoryId === 'blackmail-coercion' && report.intimateWhatHappened
+      ? {
+          label: language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে' : 'Threat status / action',
+          value: (() => {
+            const option = INTIMATE_WHAT_HAPPENED_OPTIONS.find(
+              (item) => item.id === report.intimateWhatHappened
+            );
+            return option
+              ? language === 'bn'
+                ? option.nameBn
+                : option.nameEn
+              : report.intimateWhatHappened;
+          })(),
+        }
+      : null,
+    report.subcategoryId === 'blackmail-coercion' && report.intimatePlatform
+      ? {
+          label: language === 'bn' ? 'মাধ্যম / প্ল্যাটফর্ম' : 'Platform / channel',
+          value: (() => {
+            const option = INTIMATE_PLATFORMS.find(
+              (item) => item.id === report.intimatePlatform
+            );
+            return option
+              ? language === 'bn'
+                ? option.nameBn
+                : option.nameEn
+              : report.intimatePlatform;
+          })(),
         }
       : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
