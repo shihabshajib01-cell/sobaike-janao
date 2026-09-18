@@ -17,6 +17,8 @@ import { ReportComposerFooter } from './ReportComposerFooter';
 import { Step1ServiceSelect } from './Step1ServiceSelect';
 import { Step2ComplaintTypeAccordion } from './Step2ComplaintTypeAccordion';
 import { Step3ComplaintDetails, Step3Handle } from './Step3ComplaintDetails';
+import { ConfiguredFieldsSection, ConfiguredFieldsHandle } from './ConfiguredFieldsSection';
+import { ConfiguredFieldsReview } from './ConfiguredFieldsReview';
 import { Step4Review } from './Step4Review';
 import { StepCompletion } from './StepCompletion';
 import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
@@ -35,6 +37,7 @@ import { AlertCircle, MapPin, Shield, RotateCcw } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { CategoryBadge } from '../ui/CategoryBadge';
+import { PublicReportingConfigService, PublicReportingForm } from '../../services/reportingFormConfig';
 
 export interface ReportComposerModalProps {
   isOpen: boolean;
@@ -68,8 +71,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Attached media state (in-memory files)
   const [pendingImages, setPendingImages] = useState<AttachedImagePreview[]>([]);
 
-  // Step 3 imperative ref for validation
+  // Step 3 imperative refs for legacy core sections + Admin-configured fields.
   const step3Ref = useRef<Step3Handle>(null);
+  const configuredFieldsRef = useRef<ConfiguredFieldsHandle>(null);
+  const [reportingForm, setReportingForm] = useState<PublicReportingForm | null>(null);
 
   // Jump section tracking for Step 3
   const [step3JumpSection, setStep3JumpSection] = useState<
@@ -138,6 +143,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setIsRapeConsentModalOpen(false);
       setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
       setMobJusticeErrors({});
+      setReportingForm(null);
       pendingTargetStepRef.current = null;
       retryCredentialsRef.current = null;
       setSubmitError(null);
@@ -327,7 +333,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         briberyDepartment: '',
         briberyService: '',
         briberyAmount: undefined,
+        formSchemaVersion: undefined,
+        formEngineMode: undefined,
+        customFieldAnswers: {},
       }));
+      setReportingForm(null);
     },
     [formData.segment, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
   );
@@ -355,6 +365,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setPendingImages([]);
       retryCredentialsRef.current = null;
 
+      let selectedForm: PublicReportingForm | null = null;
+      try {
+        await PublicReportingConfigService.fetch();
+        selectedForm = PublicReportingConfigService.getForm(subcategoryId);
+      } catch {
+        selectedForm = null;
+      }
+      setReportingForm(selectedForm);
+
       setFormData((prev) => {
         const isUtilitySwitch =
           prev.segment === 'load_shedding' &&
@@ -370,6 +389,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           evidenceTypes: [],
           evidenceDescription: '',
           title: '',
+          formSchemaVersion: selectedForm?.version,
+          formEngineMode: selectedForm?.engineMode,
+          customFieldAnswers: {},
           subjectType: 'unknown',
           ...(isUtilitySwitch
             ? {
@@ -417,6 +439,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (!step3Ref.current) return;
     const isValid = step3Ref.current.validateAndProceed();
     if (!isValid) return;
+    if (configuredFieldsRef.current && !configuredFieldsRef.current.validateAndProceed()) {
+      return;
+    }
     handleGoToStep(4);
   }, [handleGoToStep, validateMobJusticeSection]);
 
@@ -644,10 +669,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const isHarassment = formData.segment === 'harassment';
       const isBribery = formData.segment === 'extortion' && formData.subcategoryId === 'bribe-demanded-service';
       const isIllegalOccupation = formData.segment === 'illegal_occupation';
+      const hasSchemaPartyBlock = Boolean(
+        reportingForm?.engineMode === 'schema' &&
+          reportingForm.fields.some(
+            (field) => field.active && field.fieldType === 'subject_party'
+          )
+      );
       const isPartySegment =
         formData.segment === 'rickshaw' ||
         formData.segment === 'extortion' ||
-        formData.segment === 'public_safety';
+        formData.segment === 'public_safety' ||
+        hasSchemaPartyBlock;
       const isChargingStation = isPartySegment && formData.segment === 'rickshaw' && (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
       const resolvedReportedSubject = isChargingStation
@@ -723,7 +755,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         intimateWhatHappened: isHarassment ? (formData.intimateWhatHappened || undefined) : undefined,
         intimatePlatform: isHarassment ? (formData.intimatePlatform || undefined) : undefined,
         location: loc,
-        privacyChoice: isHarassment ? (formData.privacyChoice || 'anonymous') : 'anonymous',
+        privacyChoice: formData.privacyChoice || 'anonymous',
+        formSchemaVersion: reportingForm?.version || formData.formSchemaVersion,
+        formEngineMode: reportingForm?.engineMode || formData.formEngineMode,
+        customFieldAnswers: formData.customFieldAnswers || {},
         publicationPreferences: formData.publicationPreferences || {
           showSubjectName: false,
           showOrganization: false,
@@ -731,7 +766,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           showDescription: true,
         },
         adminContact:
-          isHarassment && (formData.adminName || formData.adminContact)
+          (isHarassment || reportingForm?.engineMode === 'schema') &&
+          (formData.adminName || formData.adminContact)
             ? {
                 name: formData.adminName || '',
                 contact: formData.adminContact || '',
@@ -785,6 +821,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         setRapePublishingConsentAccepted(false);
         setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
         setMobJusticeErrors({});
+        setReportingForm(null);
         setFormData({
           ...INITIAL_REPORT_FORM,
           segment: initialSegment,
@@ -831,6 +868,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     isMobJusticeReport,
     mobJusticeDetails,
     validateMobJusticeSection,
+    reportingForm,
     initialSegment,
   ]);
 
@@ -841,6 +879,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     setRapeConsentCheckbox(false);
     setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
     setMobJusticeErrors({});
+    setReportingForm(null);
     setFormData({
       ...INITIAL_REPORT_FORM,
       segment: initialSegment,
@@ -1030,6 +1069,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                         initialOpenSection={step3JumpSection}
                         language={language}
                       />
+                      <ConfiguredFieldsSection
+                        ref={configuredFieldsRef}
+                        form={reportingForm}
+                        language={language}
+                        answers={formData.customFieldAnswers || {}}
+                        onChange={(customFieldAnswers) =>
+                          handleUpdateFormData({ customFieldAnswers })
+                        }
+                      />
                     </>
                   )}
 
@@ -1042,6 +1090,12 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           onEdit={() => handleGoToStep(3)}
                         />
                       )}
+                      <ConfiguredFieldsReview
+                        form={reportingForm}
+                        language={language}
+                        answers={formData.customFieldAnswers || {}}
+                        onEdit={() => handleGoToStep(3)}
+                      />
                       <Step4Review
                         segment={formData.segment}
                         formData={formData}
