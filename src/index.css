@@ -185,6 +185,10 @@
     --type-label-line: 24px;
     --type-label-weight: var(--font-weight-medium);
 
+    --type-input-size: 16px;
+    --type-input-line: 24px;
+    --type-input-weight: var(--font-weight-regular);
+
     --type-action-size: var(--type-body-size);
     --type-action-line: var(--type-body-line);
     --type-action-weight: var(--font-weight-semibold);
@@ -493,9 +497,16 @@
     font-weight: var(--type-action-weight) !important;
   }
 
-  input, select, textarea {
-    font-size: var(--type-body-size);
-    line-height: var(--type-label-line);
+  input,
+  select,
+  textarea,
+  .type-input,
+  input.type-body,
+  select.type-body,
+  textarea.type-body {
+    font-size: var(--type-input-size) !important;
+    line-height: var(--type-input-line) !important;
+    font-weight: var(--type-input-weight) !important;
   }
 
   small, .type-meta {

@@ -826,9 +826,9 @@ export const ExplorePage: React.FC = () => {
         <div className="space-y-2">
           {/* Dynamic Result Context */}
           <div className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control px-4 py-3 shadow-[var(--elevation-2xs)] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4">
-            <h3 className="type-meta  font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+            <p className="type-meta font-[var(--font-weight-bold)] text-ui-content-primary">
               {dynamicAnswerHeading}
-            </h3>
+            </p>
             <p className="type-meta font-[var(--font-weight-medium)] text-ui-content-secondary shrink-0">
               {countMessage}
             </p>
@@ -946,11 +946,11 @@ export const ExplorePage: React.FC = () => {
                 ariaHidden={true}
               />
               <div className="space-y-1.5 max-w-md mx-auto">
-                <h3 className="type-body  font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h2 className="type-h4 font-[var(--font-weight-bold)] text-ui-content-primary">
                   {language === 'bn'
                     ? 'এই ফিল্টারে কোনো প্রতিবেদন পাওয়া যায়নি'
                     : 'No reports found for these filters'}
-                </h3>
+                </h2>
                 <p className="type-meta  text-ui-content-secondary leading-relaxed">
                   {language === 'bn'
                     ? 'অন্য এলাকা বা বিষয় নির্বাচন করুন, অনুসন্ধান পরিবর্তন করুন, অথবা কিছু ফিল্টার সরিয়ে আবার দেখুন।'
@@ -994,7 +994,7 @@ export const ExplorePage: React.FC = () => {
                         <MapIcon name="map-pin" size="md" ariaHidden={true} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="type-body font-[var(--font-weight-bold)] text-ui-content-primary whitespace-normal break-words line-clamp-2 leading-snug">
+                        <h3 className="type-h4 font-[var(--font-weight-bold)] text-ui-content-primary whitespace-normal break-words line-clamp-2">
                           {activeDistrictName || selectedDistrict}
                         </h3>
                         <p className="type-meta text-ui-content-secondary whitespace-normal break-words leading-tight mt-0.5">
@@ -1104,9 +1104,9 @@ export const ExplorePage: React.FC = () => {
               {/* 2. Detailed analysis (Directly visible by default) */}
               <div id="detailed-analysis-section" className="space-y-4 pt-1">
                 <div className="border-b border-ui-stroke-subtle pb-2.5">
-                  <h3 className="type-h2 text-ui-content-primary">
+                  <h2 className="type-h2 text-ui-content-primary">
                     {language === 'bn' ? 'বিস্তারিত বিশ্লেষণ' : 'Detailed analysis'}
-                  </h3>
+                  </h2>
                   <p className="type-meta text-ui-content-secondary mt-0.5">
                     {language === 'bn'
                       ? 'বিষয়, এলাকা ও সময় অনুযায়ী বিস্তারিত বিশ্লেষণ দেখুন।'

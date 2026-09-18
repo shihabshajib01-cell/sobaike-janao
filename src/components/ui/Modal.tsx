@@ -171,12 +171,12 @@ export const Modal: React.FC<ModalProps> = ({
               )}
               <div className="min-w-0 flex-1 pt-0.5">
                 {title && (
-                  <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-semibold)] text-role-on-surface leading-snug">
+                  <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-semibold)] text-role-on-surface">
                     {title}
                   </h2>
                 )}
                 {description && (
-                  <p id={`${id}-desc`} className="type-helper text-role-on-surface-secondary mt-1 leading-normal">
+                  <p id={`${id}-desc`} className="type-helper text-role-on-surface-secondary mt-1">
                     {description}
                   </p>
                 )}
