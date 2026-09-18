@@ -8,6 +8,7 @@ import { UnsavedChangesDialog } from '../ui/UnsavedChangesDialog';
 import { TextAreaField } from '../ui/TextAreaField';
 import { TextField } from '../ui/TextField';
 import { DateField } from '../ui/DateField';
+import { ContactField } from '../ui/ContactField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
 
 interface CitizenActionModalProps {
@@ -294,10 +295,9 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
             />
 
             {contactConsent && (
-              <TextField
+              <ContactField
                 id="citizen-contact-info-input"
                 name="contactInfo"
-                type="text"
                 required
                 fieldClassName="pl-8"
                 label={language === 'bn' ? 'ফোন নম্বর বা ইমেইল' : 'Phone number or email'}
