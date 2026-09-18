@@ -86,7 +86,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [language, setLanguage] = useState<Language>('bn');
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === 'undefined') return 'bn';
+    return new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'bn';
+  });
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
   const [isTabletMenuOpen, setIsTabletMenuOpen] = useState<boolean>(false);
   const [isHarassmentFilterOpen, setIsHarassmentFilterOpen] = useState<boolean>(false);
@@ -239,6 +242,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     document.documentElement.lang = language;
   }, [language]);
 
+  const setLanguage = useCallback(
+    (lang: Language) => {
+      setLanguageState(lang);
+
+      if (typeof window === 'undefined') return;
+      const params = new URLSearchParams(location.search);
+      if (lang === 'en') {
+        params.set('lang', 'en');
+      } else {
+        params.delete('lang');
+      }
+
+      const search = params.toString();
+      navigate(
+        {
+          pathname: location.pathname,
+          search: search ? `?${search}` : '',
+          hash: location.hash,
+        },
+        { replace: true }
+      );
+    },
+    [location.hash, location.pathname, location.search, navigate]
+  );
+
   const currentRoute: RoutePath = normalizeRoutePath(location.pathname || '/');
 
   const queryParams = useMemo(() => {
@@ -307,8 +335,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [location.pathname, navigateTo]);
 
   const toggleLanguage = useCallback(() => {
-    setLanguage((prev) => (prev === 'bn' ? 'en' : 'bn'));
-  }, []);
+    setLanguage(language === 'bn' ? 'en' : 'bn');
+  }, [language, setLanguage]);
 
   const value = useMemo<AppContextType>(
     () => ({
