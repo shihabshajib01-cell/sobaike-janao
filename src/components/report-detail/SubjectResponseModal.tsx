@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, ShieldCheck, Scale, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { IconButton } from '../ui/IconButton';
 
 /**
  * Rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -161,27 +163,28 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 <span>{language === 'bn' ? 'প্রতিউত্তরের অধিকার (Right of Response)' : 'Formal Right of Response'}</span>
               </div>
             )}
-            <h3 id="subject-modal-title" className="type-h3 leading-[var(--type-line-28)] font-[var(--font-weight-bold)] text-ui-content-primary">
+            <h3 id="subject-modal-title" className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary">
               {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                ? (language === 'bn' ? 'এই প্রতিবেদনের জবাব দিন' : 'Respond to this report')
+                ? (language === 'bn' ? 'প্রতিবেদনের জবাব দিন' : 'Respond to this report')
                 : (language === 'bn'
                     ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠানের আনুষ্ঠানিক বক্তব্য জমা দিন'
                     : 'Submit Official Response or Clarification')}
             </h3>
-            <p className="type-compact text-ui-content-secondary">
+            <p className="type-helper text-ui-content-secondary">
               {language === 'bn' ? 'উল্লেখিত ব্যক্তি বা প্রতিষ্ঠান:' : 'Mentioned person or organization:'}{' '}
               <span className="font-[var(--font-weight-semibold)] text-ui-content-primary">{subjectName}</span>
             </p>
           </div>
 
-          <button
+          <IconButton
             type="button"
             onClick={handleResetAndClose}
             aria-label={language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-            className="p-2 text-ui-content-secondary rounded-[var(--radius-badge-md)] transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <X className="w-5 h-5" />
-          </button>
+            icon={<X className="w-5 h-5" aria-hidden="true" />}
+            variant="ghost"
+            size="md"
+            className="-mt-1"
+          />
         </header>
 
         {isSubmitted ? (
@@ -218,13 +221,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               )}
             </div>
             <footer className="shrink-0 p-4 sm:p-5 md:p-0 border-t md:border-0 border-ui-stroke-subtle bg-ui-surface flex items-center justify-center pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-              <button
-                type="button"
-                onClick={handleResetAndClose}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text type-label font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
+              <Button type="button" variant="primary" size="md" onClick={handleResetAndClose}>
                 {language === 'bn' ? 'বন্ধ করুন' : 'Close'}
-              </button>
+              </Button>
             </footer>
           </div>
         ) : (
@@ -283,7 +282,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             {/* Name and Contact */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label htmlFor="subject-responder-name-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-secondary">
+                <label htmlFor="subject-responder-name-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'পূর্ণ নাম *' : 'Full name *')
                     : (language === 'bn' ? 'আপনার পূর্ণ নাম *' : 'Full Legal Name *')}
@@ -297,12 +296,12 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   value={responderName}
                   onChange={(e) => setResponderName(e.target.value)}
                   placeholder={language === 'bn' ? 'উদাঃ মোস্তাফিজুর রহমান' : 'e.g. Mostafizur Rahman'}
-                  className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent rounded-[var(--radius-control)] type-label text-ui-content-primary min-h-[44px]"
+                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
                 />
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="subject-contact-email-phone-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-secondary">
+                <label htmlFor="subject-contact-email-phone-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'ইমেইল বা ফোন *' : 'Email or phone *')
                     : (language === 'bn' ? 'যাচাইযোগ্য ইমেইল বা ফোন *' : 'Contact Email or Phone *')}
@@ -315,8 +314,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   aria-required="true"
                   value={contactEmailOrPhone}
                   onChange={(e) => setContactEmailOrPhone(e.target.value)}
-                  placeholder={language === 'bn' ? 'editor@sobaikejanao.org' : 'name@company.com / 017...'}
-                  className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent rounded-[var(--radius-control)] type-label text-ui-content-primary min-h-[44px]"
+                  placeholder={language === 'bn' ? 'name@example.com / 01XXXXXXXXX' : 'name@example.com / 01XXXXXXXXX'}
+                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
                 />
               </div>
             </div>
@@ -324,9 +323,9 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             {/* Role & Org */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label htmlFor="subject-designation-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-secondary">
+                <label htmlFor="subject-designation-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                    ? (language === 'bn' ? 'পদবী / ভূমিকা' : 'Role / designation')
+                    ? (language === 'bn' ? 'পদবী / ভূমিকা (ঐচ্ছিক)' : 'Role / designation (optional)')
                     : (language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)')}
                 </label>
                 <input
@@ -335,15 +334,15 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   type="text"
                   value={designation}
                   onChange={(e) => setDesignation(e.target.value)}
-                  placeholder={language === 'bn' ? 'উদাঃ ম্যানেজার, পরিচালক' : 'e.g. Branch Manager'}
-                  className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent rounded-[var(--radius-control)] type-label text-ui-content-primary min-h-[44px]"
+                  placeholder={language === 'bn' ? 'উদাহরণ: ম্যানেজার, পরিচালক' : 'e.g. Branch Manager'}
+                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
                 />
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="subject-org-name-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-secondary">
+                <label htmlFor="subject-org-name-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
                   {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                    ? (language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization')
+                    ? (language === 'bn' ? 'প্রতিষ্ঠান (ঐচ্ছিক)' : 'Organization (optional)')
                     : (language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)')}
                 </label>
                 <input
@@ -352,8 +351,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                   type="text"
                   value={organizationName}
                   onChange={(e) => setOrganizationName(e.target.value)}
-                  placeholder={language === 'bn' ? 'উদাঃ মেসার্স রহিম ট্রেডার্স' : 'e.g. Rahim Traders'}
-                  className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent rounded-[var(--radius-control)] type-label text-ui-content-primary min-h-[44px]"
+                  placeholder={language === 'bn' ? 'উদাহরণ: রহিম ট্রেডার্স' : 'e.g. Rahim Traders'}
+                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
                 />
               </div>
             </div>
@@ -362,7 +361,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
             <div className="space-y-1">
               <label htmlFor="subject-official-statement-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
                 {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                  ? (language === 'bn' ? 'আপনার জবাব বা ব্যাখ্যা *' : 'Your response or clarification *')
+                  ? (language === 'bn' ? 'আপনার জবাব *' : 'Your response *')
                   : (language === 'bn' ? 'আপনার বক্তব্য বা স্পষ্টীকরণ *' : 'Statement or Clarification *')}
               </label>
               <textarea
@@ -375,10 +374,10 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 onChange={(e) => setOfficialStatement(e.target.value)}
                 placeholder={
                   language === 'bn'
-                    ? 'প্রতিবেদনে উল্লেখিত বিষয়ে আপনার অবস্থান বা স্পষ্টীকরণ বিস্তারিত লিখুন...'
-                    : 'Detail your stance, clarification, or context regarding this report...'
+                    ? 'আপনার অবস্থান, ব্যাখ্যা বা প্রাসঙ্গিক তথ্য লিখুন...'
+                    : 'Write your response, clarification, or relevant context...'
                 }
-                className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-label text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
+                className="w-full ui-space-textarea bg-ui-input ui-border-default border-ui-stroke-default ui-radius-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent resize-y"
               />
             </div>
 
@@ -416,7 +415,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                           ? 'কোন অংশটি ভুল এবং সঠিক তথ্য কী, তা সংক্ষেপে উল্লেখ করুন'
                           : 'Specify what fact is inaccurate and provide correct verifiable info'
                       }
-                      className="w-full px-3.5 py-2.5 bg-ui-surface border border-ui-stroke-subtle focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent rounded-[var(--radius-control)] type-label text-ui-content-primary min-h-[44px]"
+                      className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
                     />
                   </div>
                 )}
@@ -439,36 +438,31 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
             {/* Footer Buttons */}
             <footer className="shrink-0 px-5 py-3.5 sm:px-6 md:px-0 md:py-0 md:pt-2 border-t border-ui-stroke-subtle bg-ui-surface md:bg-transparent flex items-center justify-end gap-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="md"
                 onClick={handleResetAndClose}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 border border-ui-stroke-subtle disabled:opacity-50 text-ui-content-secondary type-label font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] cursor-pointer min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
                 {language === 'bn' ? 'বাতিল' : 'Cancel'}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="px-5 py-2.5 bg-ui-action-bg hover:bg-ui-action-hover disabled:opacity-50 disabled:cursor-not-allowed text-ui-action-text type-label font-[var(--font-weight-semibold)] rounded-[var(--radius-control)] flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+                variant="primary"
+                size="md"
+                isLoading={isSubmitting}
+                leftIcon={<Send className="w-4 h-4" aria-hidden="true" />}
               >
-                {isSubmitting ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-[var(--radius-pill)] animate-spin" />
-                    <span>{language === 'bn' ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>
-                      {language === 'bn'
-                        ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? 'জবাব জমা দিন' : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
-                        : 'Submit response'}
-                    </span>
-                  </>
-                )}
-              </button>
+                {isSubmitting
+                  ? language === 'bn'
+                    ? 'জমা দেওয়া হচ্ছে...'
+                    : 'Submitting...'
+                  : language === 'bn'
+                    ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED ? 'জবাব জমা দিন' : 'আনুষ্ঠানিক প্রতিউত্তর জমা দিন')
+                    : 'Submit response'}
+              </Button>
             </footer>
           </form>
         )}
