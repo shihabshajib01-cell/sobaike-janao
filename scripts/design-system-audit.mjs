@@ -110,6 +110,7 @@ const APPROVED_MATERIAL_CORE = {
     '--md-secondary': '#3A7CA5',
     '--md-secondary-variant': '#163B52',
     '--md-on-secondary': '#FFFFFF',
+    '--md-on-secondary-container': '#163B52',
     '--md-background': '#F0F2F5',
     '--md-on-background': '#050505',
     '--md-surface': '#FFFFFF',
@@ -133,6 +134,7 @@ const APPROVED_MATERIAL_CORE = {
     '--md-secondary': '#3A7CA5',
     '--md-secondary-variant': '#245F82',
     '--md-on-secondary': '#FFFFFF',
+    '--md-on-secondary-container': '#BFDBFE',
     '--md-background': '#18191A',
     '--md-on-background': '#E4E6EB',
     '--md-surface': '#242526',
@@ -242,6 +244,16 @@ if (!fs.existsSync(colorSystemFile)) {
 
     addContrastFinding(colorSystemFile, theme, 'on-primary', values['--md-on-primary'], values['--md-primary']);
     addContrastFinding(colorSystemFile, theme, 'on-secondary', values['--md-on-secondary'], values['--md-secondary']);
+    if (values['--md-secondary-container']?.startsWith('color-mix')) {
+      const secondaryContainer = theme === 'light' ? '#E7EFF4' : '#28353D';
+      addContrastFinding(
+        colorSystemFile,
+        theme,
+        'on-secondary-container',
+        values['--md-on-secondary-container'],
+        secondaryContainer
+      );
+    }
     addContrastFinding(colorSystemFile, theme, 'on-background', values['--md-on-background'], values['--md-background']);
     addContrastFinding(colorSystemFile, theme, 'on-surface', values['--md-on-surface'], values['--md-surface']);
     addContrastFinding(colorSystemFile, theme, 'on-surface-secondary', values['--md-on-surface-secondary'], values['--md-surface']);
@@ -356,6 +368,10 @@ const roleMigratedPrimitives = [
   'src/components/ui/Drawer.tsx',
   'src/components/ui/SearchInput.tsx',
   'src/components/ui/SearchableSelect.tsx',
+  'src/components/ui/Checkbox.tsx',
+  'src/components/ui/Accordion.tsx',
+  'src/components/ui/EmptyState.tsx',
+  'src/components/ui/Select.tsx',
 ];
 
 for (const file of roleMigratedPrimitives) {
