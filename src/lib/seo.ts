@@ -30,7 +30,7 @@ const DEFAULT_SOCIAL_IMAGE = '/brand/icon-512x512.png';
 
 export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
   bn: {
-    title: 'সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
+    title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
     description:
       'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
     robots: 'index, follow, max-image-preview:large',
@@ -79,7 +79,7 @@ const routeSeo = (
 export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> = {
   '/': routeSeo(
     {
-      title: 'সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
+      title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
       description:
         'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
     },
