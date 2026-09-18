@@ -5,6 +5,7 @@ import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
 import { BANGLADESH_DISTRICTS, DIVISIONS } from '../data/districts';
 import { SECTIONS, SectionKey } from '../theme/tokens';
+import { SUBCATEGORIES } from '../data/categories';
 import { ReportFeedSkeleton, MapExploreSkeleton } from '../components/ui/LoadingSkeleton';
 import type { ExploreViewMode } from '../components/explore/MapSectionHeader';
 import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
@@ -47,6 +48,8 @@ export const ExplorePage: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<SectionKey | 'all'>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<{ segment: SectionKey; subId: string } | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [harassmentFilters, setHarassmentFilters] = useState(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
 
   // Mobile UX Phase 6 Sheet States
@@ -86,7 +89,10 @@ export const ExplorePage: React.FC = () => {
     if (selectedSection !== 'harassment') {
       setHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
     }
-  }, [selectedSection]);
+    if (selectedSubcategory && selectedSubcategory.segment !== selectedSection) {
+      setSelectedSubcategory(null);
+    }
+  }, [selectedSection, selectedSubcategory]);
 
   // Responsive resize safety: automatically close mobile sheets when transitioning to tablet/desktop (>= 768px)
   useEffect(() => {
@@ -152,8 +158,7 @@ export const ExplorePage: React.FC = () => {
     });
   }, [allReports, searchQuery, selectedSection, selectedDivision, harassmentFilters]);
 
-  // Shared Filtered Reports - single source of truth for Heatmap, Reports modes, and selected area data
-  const filteredReports: ReportItem[] = useMemo(() => {
+  const areaFilteredReports: ReportItem[] = useMemo(() => {
     if (selectedDistrict === 'all') return baseFilteredReports;
     return baseFilteredReports.filter((r) => {
       const matchDist =
@@ -163,6 +168,49 @@ export const ExplorePage: React.FC = () => {
       return matchDist;
     });
   }, [baseFilteredReports, selectedDistrict]);
+
+  const matchesSelectedMonth = useCallback(
+    (report: ReportItem) => {
+      if (!selectedMonth) return true;
+      if (!report.publishedAt || typeof report.publishedAt !== 'string') return false;
+      const date = new Date(report.publishedAt);
+      if (Number.isNaN(date.getTime())) return false;
+      const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+      return key === selectedMonth;
+    },
+    [selectedMonth]
+  );
+
+  const matchesSelectedSubcategory = useCallback(
+    (report: ReportItem) => {
+      if (!selectedSubcategory) return true;
+      return (
+        report.segment === selectedSubcategory.segment &&
+        report.subcategoryId === selectedSubcategory.subId
+      );
+    },
+    [selectedSubcategory]
+  );
+
+  // Keep the selected dimension visible in its own chart so users can switch drilldowns.
+  const subcategoryChartReports = useMemo(
+    () => areaFilteredReports.filter(matchesSelectedMonth),
+    [areaFilteredReports, matchesSelectedMonth]
+  );
+
+  const timelineChartReports = useMemo(
+    () => areaFilteredReports.filter(matchesSelectedSubcategory),
+    [areaFilteredReports, matchesSelectedSubcategory]
+  );
+
+  // Final shared report set used by the answer strip, map and summary.
+  const filteredReports: ReportItem[] = useMemo(
+    () =>
+      areaFilteredReports.filter(
+        (report) => matchesSelectedSubcategory(report) && matchesSelectedMonth(report)
+      ),
+    [areaFilteredReports, matchesSelectedMonth, matchesSelectedSubcategory]
+  );
 
   // Available districts filtered by selected division if set
   const availableDistricts = useMemo(() => {
@@ -191,6 +239,8 @@ export const ExplorePage: React.FC = () => {
     setSelectedSection('all');
     setSelectedDivision('all');
     setSelectedDistrict('all');
+    setSelectedSubcategory(null);
+    setSelectedMonth(null);
     setHarassmentFilters(EMPTY_HARASSMENT_CLASSIFICATION_FILTERS);
   };
 
@@ -257,12 +307,35 @@ export const ExplorePage: React.FC = () => {
     }
   }, []);
 
+  const handleSelectCategoryInsight = useCallback((category: SectionKey) => {
+    setSelectedSection(category);
+    setSelectedSubcategory(null);
+  }, []);
+
+  const handleSelectDivisionInsight = useCallback((division: string) => {
+    setSelectedDivision(division);
+    setSelectedDistrict('all');
+  }, []);
+
+  const handleSelectSubcategoryInsight = useCallback((segment: SectionKey, subId: string) => {
+    setSelectedSection(segment);
+    setSelectedSubcategory((current) =>
+      current?.segment === segment && current.subId === subId ? null : { segment, subId }
+    );
+  }, []);
+
+  const handleSelectMonthInsight = useCallback((monthKey: string) => {
+    setSelectedMonth((current) => (current === monthKey ? null : monthKey));
+  }, []);
+
   const hasActiveFilters =
     Boolean(searchQuery.trim()) ||
     (selectedSection === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) ||
     selectedSection !== 'all' ||
     selectedDivision !== 'all' ||
-    selectedDistrict !== 'all';
+    selectedDistrict !== 'all' ||
+    selectedSubcategory !== null ||
+    selectedMonth !== null;
 
   // Active filter canonical display helpers
   const activeDivisionName = useMemo(() => {
@@ -299,6 +372,29 @@ export const ExplorePage: React.FC = () => {
     if (!sectionObj) return null;
     return language === 'bn' ? sectionObj.shortNameBn : sectionObj.shortNameEn;
   }, [selectedSection, language]);
+
+  const activeSubcategoryName = useMemo(() => {
+    if (!selectedSubcategory) return null;
+    const match = SUBCATEGORIES[selectedSubcategory.segment]?.find(
+      (item) => item.id === selectedSubcategory.subId
+    );
+    if (!match) return selectedSubcategory.subId;
+    return language === 'bn' ? match.nameBn : match.nameEn;
+  }, [selectedSubcategory, language]);
+
+  const activeMonthName = useMemo(() => {
+    if (!selectedMonth) return null;
+    const [yearText, monthText] = selectedMonth.split('-');
+    const year = Number(yearText);
+    const month = Number(monthText);
+    if (!Number.isFinite(year) || !Number.isFinite(month)) return selectedMonth;
+    const date = new Date(Date.UTC(year, month - 1, 1));
+    return new Intl.DateTimeFormat(language === 'bn' ? 'bn-BD' : 'en-US', {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(date);
+  }, [selectedMonth, language]);
 
   // Dynamic Answer Heading computation
   const dynamicAnswerHeading = useMemo(() => {
@@ -466,7 +562,7 @@ export const ExplorePage: React.FC = () => {
               size="sm"
               variant={selectedSection === 'all' ? 'primary' : 'secondary'}
               aria-pressed={selectedSection === 'all'}
-              onClick={() => setSelectedSection('all')}
+              onClick={() => { setSelectedSection('all'); setSelectedSubcategory(null); }}
               className="shrink-0"
             >
               {language === 'bn' ? 'সব' : 'All'}
@@ -481,7 +577,7 @@ export const ExplorePage: React.FC = () => {
                   section={sectionKey}
                   selected={selectedSection === sectionKey}
                   icon={<CategoryIcon section={sectionKey} size="xs" />}
-                  onClick={() => setSelectedSection(sectionKey)}
+                  onClick={() => { setSelectedSection(sectionKey); setSelectedSubcategory(null); }}
                 />
               );
             })}
@@ -607,6 +703,42 @@ export const ExplorePage: React.FC = () => {
                   language === 'bn'
                     ? `${activeCategoryName} ফিল্টার সরান`
                     : `Remove ${activeCategoryName} filter`
+                }
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <MapIcon name="close" size="xs" ariaHidden={true} />
+              </button>
+            </span>
+          )}
+
+          {selectedSubcategory && activeSubcategoryName && (
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+              <span className="truncate">{activeSubcategoryName}</span>
+              <button
+                type="button"
+                onClick={() => setSelectedSubcategory(null)}
+                aria-label={
+                  language === 'bn'
+                    ? `${activeSubcategoryName} সাবক্যাটাগরি ফিল্টার সরান`
+                    : `Remove ${activeSubcategoryName} subcategory filter`
+                }
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <MapIcon name="close" size="xs" ariaHidden={true} />
+              </button>
+            </span>
+          )}
+
+          {selectedMonth && activeMonthName && (
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+              <span className="truncate">{activeMonthName}</span>
+              <button
+                type="button"
+                onClick={() => setSelectedMonth(null)}
+                aria-label={
+                  language === 'bn'
+                    ? `${activeMonthName} সময় ফিল্টার সরান`
+                    : `Remove ${activeMonthName} time filter`
                 }
                 className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-r-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
@@ -901,9 +1033,36 @@ export const ExplorePage: React.FC = () => {
               <ReportAnalyticsOverview
                 reports={filteredReports}
                 language={language}
+                activeCategory={selectedSection}
+                onSelectCategory={handleSelectCategoryInsight}
               />
               {selectedSection === 'harassment' && (
-                <HarassmentClassificationBreakdown reports={filteredReports} language={language} />
+                <HarassmentClassificationBreakdown
+                  reports={filteredReports}
+                  language={language}
+                  activeAgeGroup={harassmentFilters.ageGroup}
+                  activeAbuserRelationship={harassmentFilters.abuserRelationship}
+                  activeReportingFor={harassmentFilters.reportingFor}
+                  onSelectAgeGroup={(value) =>
+                    setHarassmentFilters((current) => ({
+                      ...current,
+                      ageGroup: current.ageGroup === value ? 'all' : value,
+                    }))
+                  }
+                  onSelectAbuserRelationship={(value) =>
+                    setHarassmentFilters((current) => ({
+                      ...current,
+                      abuserRelationship:
+                        current.abuserRelationship === value ? 'all' : value,
+                    }))
+                  }
+                  onSelectReportingFor={(value) =>
+                    setHarassmentFilters((current) => ({
+                      ...current,
+                      reportingFor: current.reportingFor === value ? 'all' : value,
+                    }))
+                  }
+                />
               )}
 
               {/* 2. Detailed analysis (Directly visible by default) */}
@@ -922,14 +1081,20 @@ export const ExplorePage: React.FC = () => {
                 <div className="space-y-4">
                   {/* 1. Subcategory breakdown */}
                   <ReportSubcategoryBreakdown
-                    reports={filteredReports}
+                    reports={subcategoryChartReports}
                     language={language}
+                    activeSubcategory={selectedSubcategory}
+                    onSelectSubcategory={handleSelectSubcategoryInsight}
                   />
 
                   {/* 2. Geographic breakdown */}
                   <ReportGeographicBreakdown
                     reports={filteredReports}
                     language={language}
+                    activeDivision={selectedDivision}
+                    activeDistrict={selectedDistrict}
+                    onSelectDivision={handleSelectDivisionInsight}
+                    onSelectDistrict={handleSelectDistrict}
                   />
 
                   {/* 3. Activity Timeline or Small Dataset Trend Safety Message */}
@@ -948,8 +1113,10 @@ export const ExplorePage: React.FC = () => {
                     </div>
                   ) : (
                     <ReportActivityTimeline
-                      reports={filteredReports}
+                      reports={timelineChartReports}
                       language={language}
+                      activeMonthKey={selectedMonth}
+                      onSelectMonth={handleSelectMonthInsight}
                     />
                   )}
                 </div>
