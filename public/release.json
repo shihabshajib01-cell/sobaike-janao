@@ -1,0 +1,11 @@
+{
+  "application": "sobaike-janao-public",
+  "version": "0.2.0",
+  "release": "source-verification-v2",
+  "releasedAt": "2026-09-18",
+  "features": [
+    "verified canonical source links on report details",
+    "source-verification-v2 database contract",
+    "sourced-report publication gate"
+  ]
+}
