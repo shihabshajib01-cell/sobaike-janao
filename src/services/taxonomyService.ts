@@ -118,6 +118,8 @@ let cachedSubcategories: Record<string, SubcategoryOption[]> = Object.fromEntrie
 
 let isFetched = false;
 let isFetching = false;
+let lastFetchedAt = 0;
+const TAXONOMY_REFRESH_INTERVAL_MS = 60_000;
 const listeners = new Set<() => void>();
 
 function notifyListeners() {
@@ -276,6 +278,7 @@ export const TaxonomyService = {
         PublicReportingConfigService.fetch(true),
       ]);
       isFetched = true;
+      lastFetchedAt = Date.now();
       notifyListeners();
     } finally {
       isFetching = false;
@@ -321,8 +324,24 @@ export const TaxonomyService = {
   },
 };
 
-if (typeof window !== 'undefined' && !isFetched) {
-  TaxonomyService.fetchTaxonomy().catch(() => {});
+if (typeof window !== 'undefined') {
+  if (!isFetched) {
+    TaxonomyService.fetchTaxonomy().catch(() => {});
+  }
+
+  const refreshIfStale = () => {
+    if (
+      !isFetching &&
+      Date.now() - lastFetchedAt >= TAXONOMY_REFRESH_INTERVAL_MS
+    ) {
+      TaxonomyService.fetchTaxonomy().catch(() => {});
+    }
+  };
+
+  window.addEventListener('focus', refreshIfStale);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') refreshIfStale();
+  });
 }
 
 export function useTaxonomy() {
