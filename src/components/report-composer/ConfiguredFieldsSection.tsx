@@ -19,6 +19,16 @@ import {
   getUpazilaByStoredName,
   getUpazilasByDistrict,
 } from '../../data/upazilas';
+import { Select } from '../ui/Select';
+import { Checkbox } from '../ui/Checkbox';
+import { TextField } from '../ui/TextField';
+import { TextAreaField } from '../ui/TextAreaField';
+import { DateField } from '../ui/DateField';
+import { TimeField } from '../ui/TimeField';
+import { MonthField } from '../ui/MonthField';
+import { RadioGroup } from '../ui/RadioGroup';
+import { isValidEmail, isValidHttpUrl, isValidPhone } from '../ui/formValidation';
+import { NumberField } from '../ui/NumberField';
 
 export interface ConfiguredFieldsHandle {
   validateAndProceed: () => boolean;
@@ -42,24 +52,6 @@ const isEmpty = (value: unknown): boolean => {
 
 const getLabel = (field: PublicReportingField, language: 'bn' | 'en') =>
   language === 'bn' ? field.labelBn : field.labelEn;
-
-const EMAIL_PATTERN = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-const PHONE_PATTERN = /^\+?[0-9 ()-]{7,25}$/;
-
-const isValidHttpUrl = (value: string): boolean => {
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
-
-const isValidPhone = (value: string): boolean => {
-  if (!PHONE_PATTERN.test(value)) return false;
-  const digits = value.replace(/\D/g, '');
-  return digits.length >= 7 && digits.length <= 15;
-};
 
 export const ConfiguredFieldsSection = forwardRef<
   ConfiguredFieldsHandle,
@@ -139,7 +131,25 @@ export const ConfiguredFieldsSection = forwardRef<
           continue;
         }
 
-        if (field.fieldType === 'evidence' || field.fieldType === 'privacy') {
+        if (field.fieldType === 'evidence') {
+          if (
+            field.required &&
+            pendingImages.length === 0 &&
+            !formData.evidenceDescription?.trim()
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'কমপক্ষে একটি ছবি বা সহায়ক তথ্যের বিবরণ দিন।'
+                : 'Attach at least one image or add supporting information notes.';
+          }
+          continue;
+        }
+
+        if (field.fieldType === 'privacy') {
+          if (field.required && !formData.privacyChoice) {
+            next[field.fieldKey] =
+              language === 'bn' ? 'গোপনীয়তার একটি অপশন নির্বাচন করুন।' : 'Select a privacy option.';
+          }
           continue;
         }
 
@@ -207,7 +217,7 @@ export const ConfiguredFieldsSection = forwardRef<
         if (
           field.fieldType === 'email' &&
           typeof value === 'string' &&
-          !EMAIL_PATTERN.test(value.trim())
+          !isValidEmail(value)
         ) {
           next[field.fieldKey] =
             language === 'bn'
@@ -218,7 +228,7 @@ export const ConfiguredFieldsSection = forwardRef<
         if (
           field.fieldType === 'url' &&
           typeof value === 'string' &&
-          !isValidHttpUrl(value.trim())
+          !isValidHttpUrl(value)
         ) {
           next[field.fieldKey] =
             language === 'bn'
@@ -229,7 +239,7 @@ export const ConfiguredFieldsSection = forwardRef<
         if (
           field.fieldType === 'phone' &&
           typeof value === 'string' &&
-          !isValidPhone(value.trim())
+          !isValidPhone(value)
         ) {
           next[field.fieldKey] =
             language === 'bn'
@@ -263,6 +273,30 @@ export const ConfiguredFieldsSection = forwardRef<
               language === 'bn'
                 ? `সর্বোচ্চ মান ${field.validation.max}।`
                 : `Maximum value is ${field.validation.max}.`;
+          }
+        }
+
+        if (
+          (field.fieldType === 'date' ||
+            field.fieldType === 'time' ||
+            field.fieldType === 'month') &&
+          typeof value === 'string'
+        ) {
+          const minValue =
+            field.validation?.min !== undefined ? String(field.validation.min) : '';
+          const maxValue =
+            field.validation?.max !== undefined ? String(field.validation.max) : '';
+          if (minValue && value < minValue) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? `সর্বনিম্ন অনুমোদিত মান ${minValue}।`
+                : `Earliest allowed value is ${minValue}.`;
+          }
+          if (maxValue && value > maxValue) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? `সর্বোচ্চ অনুমোদিত মান ${maxValue}।`
+                : `Latest allowed value is ${maxValue}.`;
           }
         }
       }
@@ -301,9 +335,6 @@ export const ConfiguredFieldsSection = forwardRef<
       districtId
     );
 
-    const commonInputClass =
-      'w-full min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-body text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus';
-
     return (
       <section
         id="composer-section-configured-fields"
@@ -332,189 +363,127 @@ export const ConfiguredFieldsSection = forwardRef<
                 aria-labelledby={fieldLabelId}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <div className="space-y-1">
-                  <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
                     {label}
                     {field.required ? ' *' : ''}
                   </h3>
-                  {helper && (
-                    <p id={fieldHelperId} className="type-compact text-ui-content-secondary">
+                  {helper ? (
+                    <p id={fieldHelperId} className="type-helper text-role-on-surface-muted">
                       {helper}
                     </p>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-division"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'বিভাগ' : 'Division'} *
-                    </label>
-                    <select
-                      id="configured-location-division"
-                      aria-required="true"
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                      value={divisionId}
-                      onChange={(event) => {
-                        const division = DIVISIONS.find(
-                          (item) => item.id === event.target.value
-                        );
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            division: division?.nameEn || '',
-                            district: '',
-                            upazilaOrThana: '',
-                          },
-                        });
-                      }}
-                      className={commonInputClass}
-                    >
-                      <option value="">
-                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                      </option>
-                      {DIVISIONS.map((division) => (
-                        <option key={division.id} value={division.id}>
-                          {language === 'bn'
-                            ? division.nameBn
-                            : division.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="configured-location-division"
+                    label={language === 'bn' ? 'বিভাগ' : 'Division'}
+                    required={field.required}
+                    value={divisionId}
+                    onChange={(event) => {
+                      const division = DIVISIONS.find((item) => item.id === event.target.value);
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          division: division?.nameEn || '',
+                          district: '',
+                          upazilaOrThana: '',
+                        },
+                      });
+                      if (error) setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                    }}
+                    placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                    options={DIVISIONS.map((division) => ({
+                      value: division.id,
+                      label: language === 'bn' ? division.nameBn : division.nameEn,
+                    }))}
+                  />
 
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-district"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'জেলা' : 'District'} *
-                    </label>
-                    <select
-                      id="configured-location-district"
-                      aria-required="true"
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                      value={districtId}
-                      disabled={!divisionId}
-                      onChange={(event) => {
-                        const district = BANGLADESH_DISTRICTS.find(
-                          (item) => item.id === event.target.value
-                        );
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            district: district?.nameEn || '',
-                            upazilaOrThana: '',
-                          },
-                        });
-                      }}
-                      className={commonInputClass}
-                    >
-                      <option value="">
-                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                      </option>
-                      {districtOptions.map((district) => (
-                        <option key={district.id} value={district.id}>
-                          {language === 'bn'
-                            ? district.nameBn
-                            : district.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="configured-location-district"
+                    label={language === 'bn' ? 'জেলা' : 'District'}
+                    required={field.required}
+                    value={districtId}
+                    disabled={!divisionId}
+                    onChange={(event) => {
+                      const district = BANGLADESH_DISTRICTS.find((item) => item.id === event.target.value);
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          district: district?.nameEn || '',
+                          upazilaOrThana: '',
+                        },
+                      });
+                      if (error) setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                    }}
+                    placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                    options={districtOptions.map((district) => ({
+                      value: district.id,
+                      label: language === 'bn' ? district.nameBn : district.nameEn,
+                    }))}
+                  />
 
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-upazila"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn'
-                        ? 'থানা / উপজেলা'
-                        : 'Thana / Upazila'}
-                    </label>
-                    <select
-                      id="configured-location-upazila"
-                      value={selectedUpazila?.id || ''}
-                      disabled={!districtId}
-                      onChange={(event) => {
-                        const item = upazilaOptions.find(
-                          (option) => option.id === event.target.value
-                        );
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            upazilaOrThana: item?.nameEn || '',
-                          },
-                        });
-                      }}
-                      className={commonInputClass}
-                    >
-                      <option value="">
-                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                      </option>
-                      {upazilaOptions.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {language === 'bn' ? item.nameBn : item.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="configured-location-upazila"
+                    label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
+                    value={selectedUpazila?.id || ''}
+                    disabled={!districtId}
+                    onChange={(event) => {
+                      const item = upazilaOptions.find((option) => option.id === event.target.value);
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          upazilaOrThana: item?.nameEn || '',
+                        },
+                      });
+                    }}
+                    placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                    options={upazilaOptions.map((item) => ({
+                      value: item.id,
+                      label: language === 'bn' ? item.nameBn : item.nameEn,
+                    }))}
+                  />
 
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-location-area"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'এলাকা' : 'Area'}
-                    </label>
-                    <input
-                      id="configured-location-area"
-                      value={formData.location?.area || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            area: event.target.value,
-                          },
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
+                  <TextField
+                    id="configured-location-area"
+                    type="text"
+                    label={language === 'bn' ? 'এলাকা' : 'Area'}
+                    value={formData.location?.area || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          area: event.target.value,
+                        },
+                      })
+                    }
+                  />
 
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label
-                      htmlFor="configured-location-address"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
-                    </label>
-                    <input
-                      id="configured-location-address"
-                      value={formData.location?.formattedAddress || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          location: {
-                            ...formData.location,
-                            formattedAddress: event.target.value,
-                          },
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
+                  <TextField
+                    id="configured-location-address"
+                    type="text"
+                    fieldClassName="sm:col-span-2"
+                    label={language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
+                    value={formData.location?.formattedAddress || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          formattedAddress: event.target.value,
+                        },
+                      })
+                    }
+                  />
                 </div>
-                {error && (
-                  <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
+
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
                     {error}
                   </p>
-                )}
+                ) : null}
               </div>
             );
           }
@@ -524,18 +493,18 @@ export const ConfiguredFieldsSection = forwardRef<
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <div className="space-y-1">
-                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
                     {label}
+                    {field.required ? ' *' : ''}
                   </h3>
-                  {helper && (
-                    <p className="type-compact text-ui-content-secondary">
-                      {helper}
-                    </p>
-                  )}
+                  {helper ? (
+                    <p className="type-helper text-role-on-surface-muted">{helper}</p>
+                  ) : null}
                 </div>
+
                 <ImageAttachmentPicker
                   images={pendingImages}
                   onChange={(images) => {
@@ -545,127 +514,112 @@ export const ConfiguredFieldsSection = forwardRef<
                         images.length > 0 ||
                         Boolean(formData.evidenceDescription?.trim()),
                     });
+                    if (error && (images.length > 0 || formData.evidenceDescription?.trim())) {
+                      setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                    }
                   }}
                   language={language}
                 />
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="configured-evidence-description"
-                    className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                  >
-                    {language === 'bn'
+
+                <TextAreaField
+                  id="configured-evidence-description"
+                  rows={3}
+                  label={
+                    language === 'bn'
                       ? 'সহায়ক তথ্যের বিবরণ'
-                      : 'Supporting information notes'}
-                  </label>
-                  <textarea
-                    id="configured-evidence-description"
-                    rows={3}
-                    value={formData.evidenceDescription || ''}
-                    onChange={(event) =>
-                      onUpdateFormData({
-                        evidenceDescription: event.target.value,
-                        hasSupportingInfo:
-                          pendingImages.length > 0 ||
-                          Boolean(event.target.value.trim()),
-                      })
+                      : 'Supporting information notes'
+                  }
+                  value={formData.evidenceDescription || ''}
+                  onChange={(event) => {
+                    onUpdateFormData({
+                      evidenceDescription: event.target.value,
+                      hasSupportingInfo:
+                        pendingImages.length > 0 ||
+                        Boolean(event.target.value.trim()),
+                    });
+                    if (error && (pendingImages.length > 0 || event.target.value.trim())) {
+                      setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
                     }
-                    className={`${commonInputClass} resize-y`}
-                  />
-                </div>
+                  }}
+                />
+
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                    {error}
+                  </p>
+                ) : null}
               </div>
             );
           }
 
           if (field.fieldType === 'privacy') {
+            const privacyValue = formData.privacyChoice || 'anonymous';
             return (
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
-                <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
-                  {label}
-                </h3>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {[
+                <RadioGroup
+                  id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={privacyValue}
+                  onChange={(next) => {
+                    onUpdateFormData({
+                      privacyChoice: next as
+                        | 'anonymous'
+                        | 'admin_only'
+                        | 'public_identity',
+                    });
+                    if (error) setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+                  }}
+                  options={[
                     {
                       value: 'anonymous',
-                      en: 'Anonymous',
-                      bn: 'নাম প্রকাশ নয়',
+                      label: language === 'bn' ? 'নাম প্রকাশ নয়' : 'Anonymous',
                     },
                     {
                       value: 'admin_only',
-                      en: 'Admin only',
-                      bn: 'শুধু অ্যাডমিন',
+                      label: language === 'bn' ? 'শুধু অ্যাডমিন' : 'Admin only',
                     },
                     {
                       value: 'public_identity',
-                      en: 'Public identity',
-                      bn: 'পাবলিক পরিচয়',
+                      label: language === 'bn' ? 'পাবলিক পরিচয়' : 'Public identity',
                     },
-                  ].map((option) => (
-                    <label
-                      key={option.value}
-                      className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
-                    >
-                      <input
-                        type="radio"
-                        name="configured-privacy-choice"
-                        value={option.value}
-                        checked={
-                          (formData.privacyChoice || 'anonymous') === option.value
-                        }
-                        onChange={() =>
-                          onUpdateFormData({
-                            privacyChoice: option.value as
-                              | 'anonymous'
-                              | 'admin_only'
-                              | 'public_identity',
-                          })
-                        }
-                      />
-                      {language === 'bn' ? option.bn : option.en}
-                    </label>
-                  ))}
-                </div>
+                  ]}
+                />
 
-                {(formData.privacyChoice === 'admin_only' ||
-                  formData.privacyChoice === 'public_identity') && (
+                {(privacyValue === 'admin_only' || privacyValue === 'public_identity') ? (
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="configured-admin-name"
-                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                      >
-                        {language === 'bn' ? 'নাম' : 'Name'}
-                      </label>
-                      <input
-                        id="configured-admin-name"
-                        value={formData.adminName || ''}
-                        onChange={(event) =>
-                          onUpdateFormData({ adminName: event.target.value })
-                        }
-                        className={commonInputClass}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="configured-admin-contact"
-                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                      >
-                        {language === 'bn' ? 'যোগাযোগ' : 'Contact'}
-                      </label>
-                      <input
-                        id="configured-admin-contact"
-                        value={formData.adminContact || ''}
-                        onChange={(event) =>
-                          onUpdateFormData({ adminContact: event.target.value })
-                        }
-                        className={commonInputClass}
-                      />
-                    </div>
+                    <TextField
+                      id="configured-admin-name"
+                      type="text"
+                      label={language === 'bn' ? 'নাম' : 'Name'}
+                      value={formData.adminName || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ adminName: event.target.value })
+                      }
+                      autoComplete="name"
+                    />
+                    <TextField
+                      id="configured-admin-contact"
+                      type="text"
+                      label={language === 'bn' ? 'যোগাযোগ' : 'Contact'}
+                      value={formData.adminContact || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({ adminContact: event.target.value })
+                      }
+                      placeholder={
+                        language === 'bn'
+                          ? 'ইমেইল বা ফোন নম্বর'
+                          : 'Email address or phone number'
+                      }
+                    />
                   </div>
-                )}
+                ) : null}
               </div>
             );
           }
@@ -679,214 +633,195 @@ export const ConfiguredFieldsSection = forwardRef<
                 aria-labelledby={fieldLabelId}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? fieldErrorId : undefined}
-                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
-                <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
                   {label}
                   {field.required ? ' *' : ''}
                 </h3>
+
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-type"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'ধরন' : 'Type'}
-                    </label>
-                    <select
-                      id="configured-party-type"
-                      value={formData.subjectType || 'unknown'}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          subjectType: event.target.value as ReportFormData['subjectType'],
-                        })
+                  <Select
+                    id="configured-party-type"
+                    label={language === 'bn' ? 'ধরন' : 'Type'}
+                    value={formData.subjectType || 'unknown'}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        subjectType: event.target.value as ReportFormData['subjectType'],
+                      })
+                    }
+                    options={[
+                      { value: 'unknown', label: language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified' },
+                      { value: 'individual', label: language === 'bn' ? 'ব্যক্তি' : 'Individual' },
+                      { value: 'business', label: language === 'bn' ? 'ব্যবসা' : 'Business' },
+                      { value: 'group', label: language === 'bn' ? 'গোষ্ঠী' : 'Group' },
+                      { value: 'organization', label: language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization' },
+                    ]}
+                  />
+                  <TextField
+                    id="configured-party-name"
+                    type="text"
+                    label={language === 'bn' ? 'নাম' : 'Name'}
+                    value={formData.reportedSubject || ''}
+                    onChange={(event) => {
+                      onUpdateFormData({ reportedSubject: event.target.value });
+                      if (error && (event.target.value.trim() || formData.organization?.trim())) {
+                        setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
                       }
-                      className={commonInputClass}
-                    >
-                      <option value="unknown">
-                        {language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified'}
-                      </option>
-                      <option value="individual">
-                        {language === 'bn' ? 'ব্যক্তি' : 'Individual'}
-                      </option>
-                      <option value="business">
-                        {language === 'bn' ? 'ব্যবসা' : 'Business'}
-                      </option>
-                      <option value="group">
-                        {language === 'bn' ? 'গোষ্ঠী' : 'Group'}
-                      </option>
-                      <option value="organization">
-                        {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
-                      </option>
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-name"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'নাম' : 'Name'}
-                    </label>
-                    <input
-                      id="configured-party-name"
-                      aria-required={field.required || undefined}
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : undefined}
-                      value={formData.reportedSubject || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({ reportedSubject: event.target.value })
+                    }}
+                  />
+                  <TextField
+                    id="configured-party-role"
+                    type="text"
+                    label={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
+                    value={formData.roleOrDesignation || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({ roleOrDesignation: event.target.value })
+                    }
+                  />
+                  <TextField
+                    id="configured-party-org"
+                    type="text"
+                    label={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
+                    value={formData.organization || ''}
+                    onChange={(event) => {
+                      onUpdateFormData({ organization: event.target.value });
+                      if (error && (event.target.value.trim() || formData.reportedSubject?.trim())) {
+                        setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
                       }
-                      className={commonInputClass}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-role"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
-                    </label>
-                    <input
-                      id="configured-party-role"
-                      value={formData.roleOrDesignation || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({
-                          roleOrDesignation: event.target.value,
-                        })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="configured-party-org"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                    >
-                      {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
-                    </label>
-                    <input
-                      id="configured-party-org"
-                      aria-required={field.required || undefined}
-                      aria-invalid={Boolean(error)}
-                      aria-describedby={error ? fieldErrorId : undefined}
-                      value={formData.organization || ''}
-                      onChange={(event) =>
-                        onUpdateFormData({ organization: event.target.value })
-                      }
-                      className={commonInputClass}
-                    />
-                  </div>
+                    }}
+                  />
                 </div>
-                {error && (
-                  <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
+
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
                     {error}
                   </p>
-                )}
+                ) : null}
               </div>
             );
           }
 
-          const fullWidth =
-            field.fieldType === 'textarea' || field.fieldType === 'multiselect';
+          const cardClass =
+            'rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5';
 
-          return (
-            <div
-              key={field.fieldKey}
-              id={`configured-field-${field.fieldKey}`}
-              className={`space-y-1.5 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5 ${
-                fullWidth ? '' : ''
-              }`}
-            >
-              {field.fieldType === 'radio' || field.fieldType === 'multiselect' ? (
-                <p
-                  id={fieldLabelId}
-                  className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                >
-                  {label}
-                  {field.required ? ' *' : ''}
-                </p>
-              ) : field.fieldType === 'checkbox' ? null : (
-                <label
-                  id={fieldLabelId}
-                  htmlFor={fieldControlId}
-                  className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
-                >
-                  {label}
-                  {field.required ? ' *' : ''}
-                </label>
-              )}
-
-              {field.fieldType === 'textarea' ? (
-                <textarea
+          if (field.fieldType === 'textarea') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <TextAreaField
                   id={fieldControlId}
                   rows={5}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
                   value={String(value ?? '')}
-                  aria-required={field.required || undefined}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   placeholder={placeholder}
+                  minLength={
+                    field.validation?.minLength !== undefined
+                      ? Number(field.validation.minLength)
+                      : undefined
+                  }
+                  maxLength={
+                    field.validation?.maxLength !== undefined
+                      ? Number(field.validation.maxLength)
+                      : undefined
+                  }
                   onChange={(event) => setValue(field, event.target.value)}
-                  className={`${commonInputClass} resize-y`}
                 />
-              ) : field.fieldType === 'select' ? (
-                <select
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'select') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <Select
                   id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
                   value={String(value ?? '')}
-                  aria-required={field.required || undefined}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   onChange={(event) => setValue(field, event.target.value)}
-                  className={commonInputClass}
-                >
-                  <option value="">
-                    {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                  </option>
-                  {field.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {language === 'bn' ? option.labelBn : option.labelEn}
-                    </option>
-                  ))}
-                </select>
-              ) : field.fieldType === 'radio' ? (
-                <div
-                  role="radiogroup"
-                  aria-labelledby={fieldLabelId}
+                  placeholder={placeholder || (language === 'bn' ? 'নির্বাচন করুন' : 'Select')}
+                  options={field.options.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'radio') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <RadioGroup
+                  id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  onChange={(next) => setValue(field, next)}
+                  options={field.options.map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'checkbox') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className={`${cardClass} space-y-1.5`}
+              >
+                <Checkbox
+                  id={fieldControlId}
+                  checked={Boolean(value)}
+                  required={field.required}
                   aria-required={field.required || undefined}
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                  className="flex flex-wrap gap-2"
-                >
-                  {field.options.map((option) => (
-                    <label
-                      key={option.value}
-                      className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
-                    >
-                      <input
-                        type="radio"
-                        name={`configured-${field.fieldKey}`}
-                        value={option.value}
-                        checked={value === option.value}
-                        onChange={() => setValue(field, option.value)}
-                      />
-                      {language === 'bn' ? option.labelBn : option.labelEn}
-                    </label>
-                  ))}
-                </div>
-              ) : field.fieldType === 'checkbox' ? (
-                <label className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary">
-                  <input
-                    id={fieldControlId}
-                    type="checkbox"
-                    checked={Boolean(value)}
-                    aria-required={field.required || undefined}
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? fieldErrorId : undefined}
-                    onChange={(event) => setValue(field, event.target.checked)}
-                  />
-                  {helper || label}
-                  {field.required ? ' *' : ''}
-                </label>
-              ) : field.fieldType === 'multiselect' ? (
+                  onChange={(event) => setValue(field, event.target.checked)}
+                  label={
+                    <>
+                      {label}
+                      {field.required ? (
+                        <span className="text-role-validation ml-1" aria-hidden="true">*</span>
+                      ) : null}
+                    </>
+                  }
+                  description={!error ? helper : undefined}
+                  descriptionId={!error && helper ? fieldHelperId : undefined}
+                />
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                    {error}
+                  </p>
+                ) : null}
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'multiselect') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className={`${cardClass} space-y-2`}
+              >
+                <p id={fieldLabelId} className="type-label text-role-on-surface">
+                  {label}
+                  {field.required ? (
+                    <span className="text-role-validation ml-1" aria-hidden="true">*</span>
+                  ) : null}
+                </p>
                 <div
                   role="group"
                   aria-labelledby={fieldLabelId}
@@ -896,80 +831,153 @@ export const ConfiguredFieldsSection = forwardRef<
                   className="grid gap-2 sm:grid-cols-2"
                 >
                   {field.options.map((option) => {
-                    const selected = Array.isArray(value)
-                      ? value.includes(option.value)
-                      : false;
+                    const selected = Array.isArray(value) ? value.includes(option.value) : false;
                     return (
-                      <label
+                      <Checkbox
                         key={option.value}
-                        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selected}
-                          onChange={(event) => {
-                            const current = Array.isArray(value)
-                              ? [...value]
-                              : [];
-                            const next = event.target.checked
-                              ? [...current, option.value]
-                              : current.filter((item) => item !== option.value);
-                            setValue(field, next);
-                          }}
-                        />
-                        {language === 'bn' ? option.labelBn : option.labelEn}
-                      </label>
+                        id={`${fieldControlId}-${option.value}`}
+                        checked={selected}
+                        onChange={(event) => {
+                          const current = Array.isArray(value) ? [...value] : [];
+                          const next = event.target.checked
+                            ? [...current, option.value]
+                            : current.filter((item) => item !== option.value);
+                          setValue(field, next);
+                        }}
+                        label={language === 'bn' ? option.labelBn : option.labelEn}
+                        labelClassName="type-body text-role-on-surface"
+                      />
                     );
                   })}
                 </div>
-              ) : (
-                <input
+                {error ? (
+                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                    {error}
+                  </p>
+                ) : helper ? (
+                  <p id={fieldHelperId} className="type-helper text-role-on-surface-muted">{helper}</p>
+                ) : null}
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'date') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <DateField
                   id={fieldControlId}
-                  aria-required={field.required || undefined}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                  type={
-                    field.fieldType === 'currency' ||
-                    field.fieldType === 'number'
-                      ? 'number'
-                      : field.fieldType === 'phone'
-                        ? 'tel'
-                        : field.fieldType === 'url'
-                          ? 'url'
-                          : field.fieldType === 'email'
-                            ? 'email'
-                            : field.fieldType
-                  }
+                  language={language}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  min={field.validation?.min !== undefined ? String(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? String(field.validation.max) : undefined}
+                  onChange={(event) => setValue(field, event.target.value)}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'time') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <TimeField
+                  id={fieldControlId}
+                  language={language}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  min={field.validation?.min !== undefined ? String(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? String(field.validation.max) : undefined}
+                  onChange={(event) => setValue(field, event.target.value)}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'month') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <MonthField
+                  id={fieldControlId}
+                  language={language}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
+                  value={String(value ?? '')}
+                  min={field.validation?.min !== undefined ? String(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? String(field.validation.max) : undefined}
+                  onChange={(event) => setValue(field, event.target.value)}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'number' || field.fieldType === 'currency') {
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+                <NumberField
+                  id={fieldControlId}
+                  label={label}
+                  required={field.required}
+                  helperText={helper}
+                  error={error}
                   value={String(value ?? '')}
                   placeholder={placeholder}
-                  min={
-                    field.validation?.min !== undefined
-                      ? Number(field.validation.min)
-                      : undefined
-                  }
-                  max={
-                    field.validation?.max !== undefined
-                      ? Number(field.validation.max)
-                      : undefined
-                  }
-                  maxLength={
-                    field.validation?.maxLength !== undefined
-                      ? Number(field.validation.maxLength)
-                      : undefined
-                  }
+                  min={field.validation?.min !== undefined ? Number(field.validation.min) : undefined}
+                  max={field.validation?.max !== undefined ? Number(field.validation.max) : undefined}
                   onChange={(event) => setValue(field, event.target.value)}
-                  className={commonInputClass}
                 />
-              )}
+              </div>
+            );
+          }
 
-              {field.fieldType !== 'checkbox' && helper && (
-                <p id={fieldHelperId} className="type-compact text-ui-content-muted">{helper}</p>
-              )}
-              {error && (
-                <p id={fieldErrorId} role="alert" className="type-compact text-ui-error-text">
-                  {error}
-                </p>
-              )}
+          const inputType =
+            field.fieldType === 'phone'
+              ? 'tel'
+              : field.fieldType === 'url'
+                ? 'url'
+                : field.fieldType === 'email'
+                  ? 'email'
+                  : 'text';
+
+          return (
+            <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`} className={cardClass}>
+              <TextField
+                id={fieldControlId}
+                type={inputType}
+                label={label}
+                required={field.required}
+                helperText={helper}
+                error={error}
+                value={String(value ?? '')}
+                placeholder={placeholder}
+                minLength={
+                  field.validation?.minLength !== undefined
+                    ? Number(field.validation.minLength)
+                    : undefined
+                }
+                maxLength={
+                  field.validation?.maxLength !== undefined
+                    ? Number(field.validation.maxLength)
+                    : undefined
+                }
+                inputMode={
+                  field.fieldType === 'phone'
+                    ? 'tel'
+                    : field.fieldType === 'email'
+                      ? 'email'
+                      : field.fieldType === 'url'
+                        ? 'url'
+                        : undefined
+                }
+                onChange={(event) => setValue(field, event.target.value)}
+              />
             </div>
           );
         })}
