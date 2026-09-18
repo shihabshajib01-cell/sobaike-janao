@@ -24,6 +24,10 @@ export interface ModalProps {
   ariaDescribedBy?: string;
   mobilePresentation?: 'sheet' | 'fullscreen' | 'center';
   closeOnBackdrop?: boolean;
+  headerIcon?: React.ReactNode;
+  showCloseButton?: boolean;
+  headerClassName?: string;
+  footerClassName?: string;
 }
 
 // Global reference counter and stack for nested modal scroll locks & keyboard focus handling
@@ -52,6 +56,10 @@ export const Modal: React.FC<ModalProps> = ({
   contentClassName,
   mobilePresentation,
   closeOnBackdrop = true,
+  headerIcon,
+  showCloseButton = true,
+  headerClassName = '',
+  footerClassName = '',
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
@@ -226,27 +234,38 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        {/* Default Header if requested and title provided */}
-        {showHeader && (title || description) && (
-          <div className="flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 border-b border-ui-stroke-subtle bg-ui-surface shrink-0 gap-3">
-            <div className="min-w-0 flex-1">
-              {title && (
-                <h2 id={`${id}-title`} className="type-h2 font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
-                  {title}
-                </h2>
+        {/* Unified modal header */}
+        {showHeader && (title || description || headerIcon) && (
+          <div className={`flex items-start justify-between px-5 sm:px-6 py-4 sm:py-5 border-b border-ui-stroke-subtle bg-ui-surface shrink-0 gap-3 ${headerClassName}`}>
+            <div className="flex items-start gap-3.5 min-w-0 flex-1">
+              {headerIcon && (
+                <div className="w-11 h-11 ui-radius-control bg-ui-surface-subtle text-ui-content-secondary ui-border-default border-ui-stroke-subtle flex items-center justify-center shrink-0">
+                  {headerIcon}
+                </div>
               )}
-              {description && (
-                <p id={`${id}-desc`} className="type-compact text-ui-content-muted mt-0.5 leading-normal">{description}</p>
-              )}
+              <div className="min-w-0 flex-1 pt-0.5">
+                {title && (
+                  <h2 id={`${id}-title`} className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
+                    {title}
+                  </h2>
+                )}
+                {description && (
+                  <p id={`${id}-desc`} className="type-helper text-ui-content-secondary mt-1 leading-normal">
+                    {description}
+                  </p>
+                )}
+              </div>
             </div>
-            <IconButton
-              id={`${id}-close`}
-              icon={<X className="w-4 h-4" />}
-              aria-label={closeLabel}
-              size="md"
-              onClick={onClose}
-              className="text-ui-content-muted hover:text-ui-content-primary ml-2 shrink-0"
-            />
+            {showCloseButton && (
+              <IconButton
+                id={`${id}-close`}
+                icon={<X className="w-5 h-5" aria-hidden="true" />}
+                aria-label={closeLabel}
+                size="md"
+                onClick={onClose}
+                className="text-ui-content-secondary -mt-1"
+              />
+            )}
           </div>
         )}
 
@@ -259,10 +278,10 @@ export const Modal: React.FC<ModalProps> = ({
               ? 'flex flex-col overflow-hidden'
               : 'overflow-y-auto overscroll-contain'
           } text-ui-content-primary ${
-            showHeader && (title || description)
+            showHeader && (title || description || headerIcon)
               ? !footer && effectiveMobilePresentation === 'sheet'
-                ? 'px-4 md:px-6 pt-4 md:pt-5 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-5'
-                : 'px-4 md:px-6 py-4 md:py-5'
+                ? 'px-5 sm:px-6 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-6'
+                : 'p-5 sm:p-6'
               : !footer && effectiveMobilePresentation === 'sheet' && !contentClassName
               ? 'pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-0'
               : ''
@@ -274,11 +293,11 @@ export const Modal: React.FC<ModalProps> = ({
         {/* Footer */}
         {footer && (
           <div
-            className={`flex items-center justify-end gap-3 px-4 md:px-6 py-3.5 md:py-4 bg-ui-surface-subtle border-t border-ui-stroke-subtle shrink-0 ${
+            className={`flex items-center justify-end gap-2.5 px-5 sm:px-6 py-3.5 sm:py-4 bg-ui-surface border-t border-ui-stroke-subtle shrink-0 ${
               effectiveMobilePresentation === 'sheet'
                 ? 'pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] md:pb-4'
                 : ''
-            }`}
+            } ${footerClassName}`}
           >
             {footer}
           </div>
