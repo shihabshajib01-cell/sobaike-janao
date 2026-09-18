@@ -76,9 +76,21 @@ export function normalizeSeoDescription(
   return truncateSeoText(result, maxLength);
 }
 
-export function isSeoIndexableReportContent(...values: Array<string | null | undefined>): boolean {
-  const haystack = values.filter(Boolean).join(' ');
-  return !SEO_TEST_MARKER_PATTERN.test(haystack);
+export function isSeoIndexableReportContent(
+  titleBn?: string | null,
+  titleEn?: string | null,
+  descriptionBn?: string | null,
+  descriptionEn?: string | null
+): boolean {
+  const haystack = [titleBn, titleEn, descriptionBn, descriptionEn]
+    .filter(Boolean)
+    .join(' ');
+  const longestDescription = Math.max(
+    String(descriptionBn || '').trim().length,
+    String(descriptionEn || '').trim().length
+  );
+
+  return !SEO_TEST_MARKER_PATTERN.test(haystack) && longestDescription >= 50;
 }
 
 export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
