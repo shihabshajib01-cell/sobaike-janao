@@ -54,6 +54,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const [report, setReport] = useState<ReportItem | null>(null);
   const [storedResponses, setStoredResponses] = useState<PublicPublishedResponse[]>([]);
   const [responseLoadError, setResponseLoadError] = useState<boolean>(false);
+  const [showAllResponses, setShowAllResponses] = useState(false);
   const [relatedReports, setRelatedReports] = useState<ReportItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<boolean>(false);
@@ -286,6 +287,38 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     Boolean(report.response) ||
     storedResponses.length > 0 ||
     (PUBLIC_RESPONSE_DISPLAY_CONNECTED && responseLoadError);
+
+  const publishedResponseItems = [
+    ...(report.response
+      ? [{
+          id: 'report-response',
+          type: 'legacy' as const,
+          label: language === 'bn' ? report.response.respondentBn : report.response.respondentEn,
+          name: '',
+          subtitle: '',
+          incidentDate: '',
+          publishedDate: language === 'bn' ? report.response.dateBn : report.response.dateEn,
+          content: language === 'bn' ? report.response.statementBn : report.response.statementEn,
+        }]
+      : []),
+    ...storedResponses.map((response) => ({
+      id: response.id,
+      type: response.responseType,
+      label:
+        response.responseType === 'citizen_information'
+          ? language === 'bn' ? 'তথ্য বা অভিজ্ঞতা' : 'Information / experience'
+          : language === 'bn' ? 'উল্লেখিত ব্যক্তি বা পক্ষ' : 'Mentioned person / party',
+      name: response.responseType === 'citizen_information' ? '' : response.responderName || '',
+      subtitle: [response.designation, response.organizationName].filter(Boolean).join(', '),
+      incidentDate: response.incidentDate ? formatResponseDate(response.incidentDate, language) : '',
+      publishedDate: response.publishedAt ? formatResponseDate(response.publishedAt, language) : '',
+      content: response.content,
+    })),
+  ];
+  const visiblePublishedResponses = showAllResponses
+    ? publishedResponseItems
+    : publishedResponseItems.slice(0, 3);
+  const hiddenResponseCount = Math.max(0, publishedResponseItems.length - 3);
 
   const displayEngagementCount = (value: number) =>
     language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
@@ -667,7 +700,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               <Scale className="w-5 h-5 text-ui-content-secondary" aria-hidden="true" />
               <span>
                 {language === 'bn' ? 'প্রকাশিত প্রতিক্রিয়া' : 'Published responses'}
-                {' '}({language === 'bn' ? toBanglaDigits((report.response ? 1 : 0) + storedResponses.length) : (report.response ? 1 : 0) + storedResponses.length})
+                {' '}({language === 'bn' ? toBanglaDigits(publishedResponseItems.length) : publishedResponseItems.length})
               </span>
             </h2>
 
@@ -690,79 +723,64 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               </div>
             )}
 
-            {report.response && (
-              <div className="bg-ui-surface-subtle ui-radius-control p-4 space-y-2">
-                <div className="flex items-center justify-between gap-3 type-meta text-ui-content-primary font-[var(--font-weight-semibold)]">
-                  <span>
-                    {language === 'bn'
-                      ? report.response.respondentBn
-                      : report.response.respondentEn}
-                  </span>
-                  <span className="text-ui-content-muted shrink-0">
-                    {language === 'bn' ? report.response.dateBn : report.response.dateEn}
-                  </span>
-                </div>
-                <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words">
-                  “{language === 'bn' ? report.response.statementBn : report.response.statementEn}”
-                </blockquote>
-              </div>
-            )}
-
-            {storedResponses.map((response) => {
-              const subtitleParts = [response.designation, response.organizationName].filter(Boolean);
-              const isCitizenInformation = response.responseType === 'citizen_information';
-
-              return (
-                <div
-                  key={response.id}
-                  className="bg-ui-surface-subtle ui-radius-control p-4 space-y-2.5"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-2 type-meta">
-                    <div className="space-y-0.5">
-                      <p className="font-[var(--font-weight-semibold)] text-ui-content-primary">
-                        {isCitizenInformation
-                          ? language === 'bn'
-                            ? 'তথ্য বা অভিজ্ঞতা'
-                            : 'Information / experience'
-                          : language === 'bn'
-                          ? 'উল্লেখিত ব্যক্তি বা পক্ষ'
-                          : 'Mentioned person / party'}
+            {visiblePublishedResponses.map((response, index) => (
+              <article
+                key={response.id}
+                className={`py-3.5 first:pt-1 last:pb-1 space-y-2.5 ${index > 0 ? 'border-t border-ui-stroke-subtle' : ''}`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-4">
+                  <div className="min-w-0 space-y-0.5">
+                    <p className="type-meta font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {response.label}
+                    </p>
+                    {response.name && (
+                      <p className="type-meta font-[var(--font-weight-medium)] text-ui-content-secondary break-words">
+                        {response.name}
+                        {response.subtitle && (
+                          <span className="text-ui-content-muted font-[var(--font-weight-regular)]">
+                            {' '}({response.subtitle})
+                          </span>
+                        )}
                       </p>
-
-                      {!isCitizenInformation && response.responderName && (
-                        <p className="type-meta font-[var(--font-weight-medium)] text-ui-content-secondary break-words">
-                          {response.responderName}
-                          {subtitleParts.length > 0 && (
-                            <span className="text-ui-content-muted font-[var(--font-weight-regular)]">
-                              {' '}({subtitleParts.join(', ')})
-                            </span>
-                          )}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-3 text-ui-content-muted type-meta">
-                      {response.incidentDate && (
-                        <span>
-                          {language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}
-                          {formatResponseDate(response.incidentDate, language)}
-                        </span>
-                      )}
-                      {response.publishedAt && (
-                        <span>
-                          {language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}
-                          {formatResponseDate(response.publishedAt, language)}
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
 
-                  <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words whitespace-pre-line">
-                    “{response.content}”
-                  </blockquote>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-meta text-ui-content-muted sm:justify-end shrink-0">
+                    {response.incidentDate && (
+                      <span>
+                        {language === 'bn' ? 'ঘটনার তারিখ: ' : 'Incident date: '}
+                        {response.incidentDate}
+                      </span>
+                    )}
+                    {response.publishedDate && (
+                      <span>
+                        {language === 'bn' ? 'প্রকাশিত: ' : 'Published: '}
+                        {response.publishedDate}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              );
-            })}
+
+                <blockquote className="type-body text-ui-content-secondary italic border-l-2 border-ui-stroke-default pl-3 break-words whitespace-pre-line">
+                  “{response.content}”
+                </blockquote>
+              </article>
+            ))}
+
+            {hiddenResponseCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowAllResponses((current) => !current)}
+                className="w-full min-h-[44px] type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary border-t border-ui-stroke-subtle pt-3 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+                aria-expanded={showAllResponses}
+              >
+                {showAllResponses
+                  ? language === 'bn' ? 'কম দেখুন ↑' : 'Show less ↑'
+                  : language === 'bn'
+                  ? `আরও ${toBanglaDigits(hiddenResponseCount)}টি প্রতিক্রিয়া দেখুন ↓`
+                  : `Show ${hiddenResponseCount} more response${hiddenResponseCount === 1 ? '' : 's'} ↓`}
+              </button>
+            )}
           </section>
         )}
 
