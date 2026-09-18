@@ -144,7 +144,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         ogType: 'article',
         ogSiteName: BRAND_NAME[language],
         canonicalPath: `/report-detail/${encodeURIComponent(report.id)}`,
-        image: report.images?.[0],
+        image: report.images?.[0]?.url,
         imageAlt: publicTitle,
         pageType: 'article',
         publishedTime: report.publishedAt || undefined,
