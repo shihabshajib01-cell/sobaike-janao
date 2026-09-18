@@ -173,6 +173,22 @@ requireNotContains(
   'SearchInput must not expose unused language-specific placeholder props'
 );
 
+requireContains(
+  'src/components/branding/EvStationIcon.tsx',
+  '<svg',
+  'charging category icon must render as a self-contained SVG'
+);
+requireNotContains(
+  'src/components/branding/EvStationIcon.tsx',
+  'material-symbols-outlined',
+  'charging category icon must not depend on the Material Symbols webfont'
+);
+requireNotContains(
+  'src/components/branding/EvStationIcon.tsx',
+  '>ev_station<',
+  'charging category icon must never expose the Material Symbols ligature text'
+);
+
 requireNotContains(
   'src/pages/IssuesPage.tsx',
   'className="md:hidden"',
