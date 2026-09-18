@@ -1,9 +1,10 @@
 import { chromium } from 'playwright';
 
-const SITE_URL = (process.env.SITE_URL || 'https://shihabshajib01-cell.github.io/sobaike-janao/').replace(/\/?$/, '/');
+const SITE_URL = (process.env.SITE_URL || 'https://shobaikejanao.com/').replace(/\/?$/, '/');
 
 function routeUrl(path) {
-  return `${SITE_URL}#${path.startsWith('/') ? path : `/${path}`}`;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return new URL(normalized.replace(/^\//, ''), SITE_URL).toString();
 }
 
 async function seedReturningVisitor(context) {
