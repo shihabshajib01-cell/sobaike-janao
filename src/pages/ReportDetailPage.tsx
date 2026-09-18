@@ -199,7 +199,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         id="report-detail-loading-container"
         className="w-full max-w-[900px] mx-auto"
       >
-        <ReportDetailSkeleton id="report-detail-loading-skeleton" />
+        <ReportDetailSkeleton id="report-detail-loading-skeleton" language={language} />
       </PublicPageContainer>
     );
   }
