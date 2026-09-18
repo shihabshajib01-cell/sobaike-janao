@@ -7,7 +7,10 @@ import {
   getHeroSliderCssVars,
 } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
-import { useTaxonomy } from '../../services/taxonomyService';
+import {
+  isManagedThemePreset,
+  useTaxonomy,
+} from '../../services/taxonomyService';
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 import { getPublishedBannerSettings, getRuntimeBannerContent, usePublishedBannerRuntime } from '../../services/bannerRuntime';
 import { IconButton } from '../ui/IconButton';
@@ -235,10 +238,11 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const currentSlide = slides[safeIndex];
   const activeKey = currentSlide.key;
   const activeSegment = segments[activeKey];
-  const activeHeroBg =
-    HERO_TOKENS.sections[activeKey]?.background ??
-    activeSegment?.bgColor ??
-    'var(--ui-surface-subtle)';
+  const activeHeroBg = isManagedThemePreset(activeSegment?.themeKey)
+    ? activeSegment?.bgColor || 'var(--ui-surface-subtle)'
+    : HERO_TOKENS.sections[activeKey]?.background ??
+      activeSegment?.bgColor ??
+      'var(--ui-surface-subtle)';
 
   const containerStyle: React.CSSProperties = {
     ...getHeroSliderCssVars(),
@@ -304,10 +308,11 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 aria-hidden={!isActive}
                 className="w-full shrink-0 min-w-full p-0 flex flex-col"
                 style={{
-                  backgroundColor:
-                    HERO_TOKENS.sections[slide.key]?.background ??
-                    slideSegment?.bgColor ??
-                    'var(--ui-surface-subtle)',
+                  backgroundColor: isManagedThemePreset(slideSegment?.themeKey)
+                    ? slideSegment?.bgColor || 'var(--ui-surface-subtle)'
+                    : HERO_TOKENS.sections[slide.key]?.background ??
+                      slideSegment?.bgColor ??
+                      'var(--ui-surface-subtle)',
                 }}
               >
                 <CategoryHeroBanner

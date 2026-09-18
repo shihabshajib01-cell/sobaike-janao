@@ -7,7 +7,10 @@ import {
   getHeroSliderCssVars,
 } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
-import { useTaxonomy } from '../../services/taxonomyService';
+import {
+  isManagedThemePreset,
+  useTaxonomy,
+} from '../../services/taxonomyService';
 import { CategoryHeroBanner } from './CategoryHeroBanner';
 import { IconButton } from '../ui/IconButton';
 
@@ -64,10 +67,12 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
   const sectionKey = section;
   const sectionMeta = segments[sectionKey];
   const isSectionActive = Boolean(sectionMeta);
-  const heroBackground =
-    HERO_TOKENS.sections[sectionKey]?.background ??
-    sectionMeta?.bgColor ??
-    'var(--ui-surface-subtle)';
+  const usesManagedTheme = isManagedThemePreset(sectionMeta?.themeKey);
+  const heroBackground = usesManagedTheme
+    ? sectionMeta?.bgColor || 'var(--ui-surface-subtle)'
+    : HERO_TOKENS.sections[sectionKey]?.background ??
+      sectionMeta?.bgColor ??
+      'var(--ui-surface-subtle)';
 
   const totalSlides = slides.length;
   const isMultiSlide = totalSlides > 1;

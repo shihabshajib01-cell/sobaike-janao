@@ -43,6 +43,24 @@ const isEmpty = (value: unknown): boolean => {
 const getLabel = (field: PublicReportingField, language: 'bn' | 'en') =>
   language === 'bn' ? field.labelBn : field.labelEn;
 
+const EMAIL_PATTERN = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const PHONE_PATTERN = /^\+?[0-9 ()-]{7,25}$/;
+
+const isValidHttpUrl = (value: string): boolean => {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+const isValidPhone = (value: string): boolean => {
+  if (!PHONE_PATTERN.test(value)) return false;
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= 7 && digits.length <= 15;
+};
+
 export const ConfiguredFieldsSection = forwardRef<
   ConfiguredFieldsHandle,
   ConfiguredFieldsSectionProps
@@ -141,6 +159,18 @@ export const ConfiguredFieldsSection = forwardRef<
 
         const value = readValue(field);
 
+        if (
+          field.required &&
+          field.fieldType === 'checkbox' &&
+          value !== true
+        ) {
+          next[field.fieldKey] =
+            language === 'bn'
+              ? 'চালিয়ে যেতে এই অপশনটি নির্বাচন করুন।'
+              : 'Select this option to continue.';
+          continue;
+        }
+
         if (field.required && isEmpty(value)) {
           next[field.fieldKey] =
             language === 'bn' ? 'এই তথ্যটি আবশ্যক।' : 'This field is required.';
@@ -149,7 +179,20 @@ export const ConfiguredFieldsSection = forwardRef<
 
         if (isEmpty(value)) continue;
 
+        const minLength = Number(field.validation?.minLength || 0);
         const maxLength = Number(field.validation?.maxLength || 0);
+
+        if (
+          minLength > 0 &&
+          typeof value === 'string' &&
+          value.trim().length < minLength
+        ) {
+          next[field.fieldKey] =
+            language === 'bn'
+              ? `কমপক্ষে ${minLength} অক্ষর লিখুন।`
+              : `Use at least ${minLength} characters.`;
+        }
+
         if (
           maxLength > 0 &&
           typeof value === 'string' &&
@@ -159,6 +202,39 @@ export const ConfiguredFieldsSection = forwardRef<
             language === 'bn'
               ? `সর্বোচ্চ ${maxLength} অক্ষর লিখুন।`
               : `Use at most ${maxLength} characters.`;
+        }
+
+        if (
+          field.fieldType === 'email' &&
+          typeof value === 'string' &&
+          !EMAIL_PATTERN.test(value.trim())
+        ) {
+          next[field.fieldKey] =
+            language === 'bn'
+              ? 'সঠিক ইমেইল ঠিকানা লিখুন।'
+              : 'Enter a valid email address.';
+        }
+
+        if (
+          field.fieldType === 'url' &&
+          typeof value === 'string' &&
+          !isValidHttpUrl(value.trim())
+        ) {
+          next[field.fieldKey] =
+            language === 'bn'
+              ? 'http:// অথবা https:// সহ সঠিক URL লিখুন।'
+              : 'Enter a valid URL beginning with http:// or https://.';
+        }
+
+        if (
+          field.fieldType === 'phone' &&
+          typeof value === 'string' &&
+          !isValidPhone(value.trim())
+        ) {
+          next[field.fieldKey] =
+            language === 'bn'
+              ? '৭–১৫ সংখ্যার সঠিক ফোন নম্বর লিখুন।'
+              : 'Enter a valid phone number containing 7–15 digits.';
         }
 
         if (field.fieldType === 'number' || field.fieldType === 'currency') {

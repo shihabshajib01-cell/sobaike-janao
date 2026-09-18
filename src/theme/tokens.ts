@@ -471,7 +471,18 @@ export const getHeroSliderCssVars = (): React.CSSProperties =>
 
 export const getHeroCtaStyle = (section: SectionKey): React.CSSProperties => {
   const t = HERO_TOKENS.sections[section];
-  if (!t) return {};
+
+  if (!t) {
+    const key = String(section).replace(/[^a-z0-9_-]/gi, '');
+    return {
+      '--hero-cta-text': `var(--sec-${key}-text, var(--ui-content-primary))`,
+      '--hero-cta-border': `var(--sec-${key}-primary, var(--ui-action-bg))`,
+      '--hero-cta-hover-bg': `var(--sec-${key}-primary, var(--ui-action-bg))`,
+      '--hero-cta-hover-border': `var(--sec-${key}-primary, var(--ui-action-bg))`,
+      '--hero-cta-hover-text': 'var(--ui-action-text)',
+    } as React.CSSProperties;
+  }
+
   return {
     '--hero-cta-text': t.ctaText,
     '--hero-cta-border': t.ctaBorder,
