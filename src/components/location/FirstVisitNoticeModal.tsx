@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Checkbox } from '../ui/Checkbox';
+import { Button } from '../ui/Button';
 
 interface FirstVisitNoticeModalProps {
   isOpen: boolean;
@@ -15,7 +15,6 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
   onAcknowledge,
 }) => {
   const [isChecked, setIsChecked] = useState(false);
-  const acknowledgeBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -26,11 +25,26 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
   if (!isOpen) return null;
 
   const isBn = language === 'bn';
+  const brandBase = import.meta.env.BASE_URL || '/';
+  const normalizedBrandBase = brandBase.endsWith('/') ? brandBase : `${brandBase}/`;
+  const brandMarkSrc = `${normalizedBrandBase}brand/sobaike-janao-mark-128.png`;
 
   const handleContinue = () => {
     if (!isChecked) return;
     onAcknowledge();
   };
+
+  const instructions = isBn
+    ? [
+        'সঠিক, সত্য ও প্রাসঙ্গিক তথ্য দিয়ে প্রতিবেদন প্রকাশ করুন।',
+        'কারও সুনাম নষ্ট করার অসৎ উদ্দেশ্যে ভিত্তিহীন অভিযোগ দেওয়া থেকে বিরত থাকুন।',
+        'জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট হটলাইনে সরাসরি যোগাযোগ করুন।',
+      ]
+    : [
+        'Submit accurate, factual, and relevant information.',
+        'Avoid submitting false, malicious, or defamatory complaints.',
+        'For emergencies, contact 999 or the relevant hotline directly.',
+      ];
 
   return (
     <Modal
@@ -44,89 +58,68 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
       ariaLabelledBy="first-visit-notice-title"
       ariaDescribedBy="first-visit-notice-desc"
     >
-      <div className="p-5 sm:p-6 flex flex-col gap-5 text-ui-content-primary">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-[var(--radius-control)] bg-ui-brand-bg text-ui-brand-text border border-ui-brand-border flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-6 h-6" aria-hidden="true" />
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <p className="type-label font-[var(--font-weight-bold)] text-ui-brand-text mb-1">
-              {isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
-            </p>
-            <h2
-              id="first-visit-notice-title"
-              className="type-h2 font-[var(--font-weight-bold)] tracking-tight text-ui-content-primary"
-            >
-              {isBn
-                ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
-                : 'Independence & Responsible Use Notice'}
-            </h2>
-          </div>
+      <div className="p-5 sm:p-6 flex flex-col gap-4 text-ui-content-primary">
+        <div className="flex items-center gap-3.5">
+          <img
+            src={brandMarkSrc}
+            alt=""
+            aria-hidden="true"
+            width={44}
+            height={44}
+            className="w-11 h-11 object-contain shrink-0 select-none"
+          />
+          <h1
+            id="first-visit-notice-title"
+            className="type-h1 tracking-tight text-ui-content-primary"
+          >
+            {isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
+          </h1>
         </div>
 
-        <div
-          id="first-visit-notice-desc"
-          className="type-body text-ui-content-primary space-y-4 leading-relaxed"
-        >
-          <p>
+        <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
+
+        <div className="flex flex-col gap-2.5">
+          <h2 className="type-h2 text-ui-content-primary">
             {isBn
-              ? 'এটি একটি স্বাধীন নাগরিক তথ্য ও জনস্বার্থ প্ল্যাটফর্ম। নির্ভুল ও তথ্যভিত্তিক নাগরিক পর্যবেক্ষণ বজায় রাখতে নিচের বিষয়গুলো মনে রাখুন:'
-              : 'This is an independent citizen reporting and public interest platform. To ensure truthful and constructive records, please note:'}
+              ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
+              : 'Independence & Responsible Use Notice'}
+          </h2>
+
+          <p
+            id="first-visit-notice-desc"
+            className="type-body text-ui-content-secondary"
+          >
+            {isBn
+              ? 'এই প্ল্যাটফর্মটি নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ শেয়ার করার একটি স্বাধীন মাধ্যম। সবার জন্য নির্ভরযোগ্য ও নিরাপদ পরিবেশ বজায় রাখতে নিচের নির্দেশনাগুলো অনুসরণ করুন।'
+              : 'This is an independent platform for citizens to share public-interest information, experiences, and observations. Please follow the guidance below to help keep the platform reliable and safe for everyone.'}
           </p>
+        </div>
 
+        <div className="rounded-[var(--radius-control)] border border-ui-stroke-default p-4 bg-ui-surface">
           <ol className="space-y-3 list-none">
-            <li className="flex items-start gap-3">
-              <p
-                className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0"
-                aria-hidden="true"
-              >
-                {isBn ? '১.' : '1.'}
-              </p>
-              <p className="text-ui-content-primary">
-                {isBn
-                  ? 'সঠিক, সত্য ও প্রাসঙ্গিক তথ্য দিয়ে প্রতিবেদন প্রকাশ করুন।'
-                  : 'Submit accurate, factual, and relevant information.'}
-              </p>
-            </li>
-
-            <li className="flex items-start gap-3">
-              <p
-                className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0"
-                aria-hidden="true"
-              >
-                {isBn ? '২.' : '2.'}
-              </p>
-              <p className="text-ui-content-primary">
-                {isBn
-                  ? 'কারও সুনাম নষ্ট করার অসৎ উদ্দেশ্যে ভিত্তিহীন অভিযোগ দেওয়া থেকে বিরত থাকুন।'
-                  : 'Avoid submitting false, malicious, or defamatory complaints.'}
-              </p>
-            </li>
-
-            <li className="flex items-start gap-3">
-              <p
-                className="font-[var(--font-weight-bold)] text-ui-brand-text shrink-0"
-                aria-hidden="true"
-              >
-                {isBn ? '৩.' : '3.'}
-              </p>
-              <p className="text-ui-content-primary">
-                {isBn
-                  ? 'জরুরি সহায়তার জন্য ৯৯৯ অথবা সংশ্লিষ্ট হটলাইনে সরাসরি যোগাযোগ করুন।'
-                  : 'For life-threatening emergencies, call national hotlines (999) directly.'}
-              </p>
-            </li>
+            {instructions.map((instruction, index) => (
+              <li key={instruction} className="flex items-start gap-3">
+                <p
+                  className="type-action text-ui-content-primary shrink-0"
+                  aria-hidden="true"
+                >
+                  {isBn ? `${['১', '২', '৩'][index]}.` : `${index + 1}.`}
+                </p>
+                <p className="type-action text-ui-content-primary">
+                  {instruction}
+                </p>
+              </li>
+            ))}
           </ol>
         </div>
 
-        <div className="pt-2 border-t border-ui-stroke-subtle">
+        <div className="pt-1 border-t border-ui-stroke-subtle">
           <Checkbox
             id="first-visit-ack-checkbox"
             checked={isChecked}
             onChange={(e) => setIsChecked(e.target.checked)}
             label={
-              <span className="type-body font-[var(--font-weight-medium)] text-ui-content-primary">
+              <span className="type-label text-ui-content-primary">
                 {isBn
                   ? 'আমি নিয়মগুলো পড়েছি এবং দায়িত্বশীলভাবে ব্যবহার করতে সম্মত।'
                   : 'I have read and agree to use this platform responsibly.'}
@@ -135,18 +128,18 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
           />
         </div>
 
-        <div className="pt-1">
-          <button
-            ref={acknowledgeBtnRef}
-            id="first-visit-acknowledge-btn"
-            type="button"
-            onClick={handleContinue}
-            disabled={!isChecked}
-            className="w-full h-12 px-5 rounded-[var(--radius-control)] font-[var(--font-weight-semibold)] type-body bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus shadow-[var(--elevation-xs)]"
-          >
-            <span>{isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}</span>
-          </button>
-        </div>
+        <Button
+          id="first-visit-acknowledge-btn"
+          type="button"
+          variant="primary"
+          size="lg"
+          fullWidth
+          onClick={handleContinue}
+          disabled={!isChecked}
+          className="disabled:opacity-100 disabled:bg-ui-disabled-bg disabled:text-ui-disabled-text disabled:hover:bg-ui-disabled-bg"
+        >
+          {isBn ? 'সম্মতি দিয়ে এগিয়ে যান' : 'Acknowledge & Continue'}
+        </Button>
       </div>
     </Modal>
   );
