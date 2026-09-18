@@ -809,13 +809,13 @@ async function main() {
   const districts = await loadDistricts();
   const [reports, segments] = await Promise.all([loadPublishedReports(), loadActiveSegments()]);
 
-  const pages = [...STATIC_PAGES];
-  const seenPaths = new Set(pages.map((page) => page.path));
+  const basePages = [...STATIC_PAGES];
+  const seenPaths = new Set(basePages.map((page) => page.path));
 
   for (const segment of segments) {
     const page = dynamicCategoryPage(segment);
     if (page && !seenPaths.has(page.path)) {
-      pages.push(page);
+      basePages.push(page);
       seenPaths.add(page.path);
     }
   }
@@ -825,7 +825,7 @@ async function main() {
   for (const report of reports) {
     const page = reportPage(report);
     if (page && !seenPaths.has(page.path)) {
-      pages.push(page);
+      basePages.push(page);
       seenPaths.add(page.path);
     }
 
@@ -836,7 +836,7 @@ async function main() {
     if (subject) {
       const subjectRoute = subjectPage(subject);
       if (!seenPaths.has(subjectRoute.path)) {
-        pages.push(subjectRoute);
+        basePages.push(subjectRoute);
         seenPaths.add(subjectRoute.path);
       }
     }
@@ -847,10 +847,18 @@ async function main() {
     const path = `/location/${encodeURIComponent(district.id)}`;
     if (seenPaths.has(path)) continue;
 
-    pages.push({
+    basePages.push({
       path,
-      title: `${district.nameBn} এলাকার প্রতিবেদন | সবাইকে জানাও`,
-      description: `${district.nameBn} এলাকার প্রকাশিত নাগরিক প্রতিবেদন ও জনস্বার্থ রেকর্ড।`,
+      title: buildBrandedSeoTitle(`${district.nameBn} এলাকার প্রতিবেদন`),
+      titleEn: buildBrandedSeoTitle(`Reports from ${district.nameEn}`, 'Sobaike Janao'),
+      description: normalizeSeoDescription(
+        `${district.nameBn} এলাকার প্রকাশিত নাগরিক প্রতিবেদন, জনস্বার্থের ঘটনা, সংশ্লিষ্ট বিষয় ও সর্বশেষ আপডেট দেখুন।`,
+        'bn'
+      ),
+      descriptionEn: normalizeSeoDescription(
+        `Browse published citizen reports, public-interest incidents, related topics, and the latest updates from ${district.nameEn}, Bangladesh.`,
+        'en'
+      ),
       robots: 'index, follow, max-image-preview:large',
       sitemap: true,
       collection: true,
@@ -858,7 +866,14 @@ async function main() {
     seenPaths.add(path);
   }
 
-  const rootPage = pages.find((page) => page.path === '/');
+  const pages = basePages.flatMap((page) => [
+    localizePage(page, 'bn'),
+    localizePage(page, 'en'),
+  ]);
+
+  const rootPage = pages.find(
+    (page) => page.language === 'bn' && page.logicalPath === '/'
+  );
   if (rootPage) {
     await writeFile(join(DIST_DIR, 'index.html'), injectMeta(template, rootPage), 'utf8');
   }
@@ -870,13 +885,14 @@ async function main() {
     .map((page) => {
       const lines = [
         '  <url>',
-        `    <loc>${xmlEscape(canonicalUrl(page.path))}</loc>`,
-        `    <xhtml:link rel="alternate" hreflang="bn-BD" href="${xmlEscape(localizedUrl(page.path, 'bn'))}" />`,
-        `    <xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(localizedUrl(page.path, 'en'))}" />`,
-        `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(localizedUrl(page.path, 'bn'))}" />`,
+        `    <loc>${xmlEscape(localizedUrl(page.logicalPath, page.language))}</loc>`,
+        `    <xhtml:link rel="alternate" hreflang="bn-BD" href="${xmlEscape(localizedUrl(page.logicalPath, 'bn'))}" />`,
+        `    <xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(localizedUrl(page.logicalPath, 'en'))}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(localizedUrl(page.logicalPath, 'bn'))}" />`,
       ];
-      if (page.publishedAt) {
-        lines.push(`    <lastmod>${new Date(page.publishedAt).toISOString().slice(0, 10)}</lastmod>`);
+      const freshness = page.modifiedAt || page.publishedAt;
+      if (freshness) {
+        lines.push(`    <lastmod>${new Date(freshness).toISOString().slice(0, 10)}</lastmod>`);
       }
       lines.push('  </url>');
       return lines.join('\n');
