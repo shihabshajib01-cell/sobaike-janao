@@ -177,8 +177,8 @@
     --font-weight-bold: 700;
 
     /* Central Typography Tokens - Body, Label, Action, Meta */
-    --type-body-size: 14px;
-    --type-body-line: 22px;
+    --type-body-size: 16px;
+    --type-body-line: 26px;
     --type-body-weight: var(--font-weight-regular);
 
     --type-label-size: 16px;
@@ -300,27 +300,27 @@
     --font-ui: 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
     /* Optical normalization for English headings and text */
-    --type-h1-size-mobile: 26px;
-    --type-h1-line-mobile: 35px;
+    --type-h1-size-mobile: 28px;
+    --type-h1-line-mobile: 38px;
     --type-h1-size-tablet: 28px;
     --type-h1-line-tablet: 38px;
     --type-h1-size-desktop: 30px;
     --type-h1-line-desktop: 40px;
     --type-h1-weight: var(--font-weight-semibold);
 
-    --type-h2-size-mobile: 20px;
-    --type-h2-line-mobile: 28px;
+    --type-h2-size-mobile: 22px;
+    --type-h2-line-mobile: 32px;
     --type-h2-size-tablet: 22px;
     --type-h2-line-tablet: 32px;
     --type-h2-weight: var(--font-weight-semibold);
 
-    --type-h3-size-mobile: 17px;
-    --type-h3-line-mobile: 26px;
+    --type-h3-size-mobile: 18px;
+    --type-h3-line-mobile: 28px;
     --type-h3-size-tablet: 19px;
     --type-h3-line-tablet: 28px;
 
-    --type-h4-size-mobile: 15px;
-    --type-h4-line-mobile: 24px;
+    --type-h4-size-mobile: 16px;
+    --type-h4-line-mobile: 26px;
     --type-h4-size-tablet: 17px;
     --type-h4-line-tablet: 26px;
   }
