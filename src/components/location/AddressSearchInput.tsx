@@ -216,13 +216,33 @@ export const AddressSearchInput: React.FC<AddressSearchInputProps> = ({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 p-1 text-ui-content-secondary hover:text-ui-content-primary rounded-[var(--radius-pill)] hover:bg-ui-surface-subtle cursor-pointer transition-colors"
+            className="absolute right-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-ui-content-secondary hover:text-ui-content-primary rounded-[var(--radius-pill)] hover:bg-ui-surface-subtle cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             title={language === 'bn' ? 'মুছুন' : 'Clear'}
             aria-label={language === 'bn' ? 'ঠিকানা মুছুন' : 'Clear address'}
           >
             <X className="w-4 h-4" />
           </button>
         )}
+      </div>
+
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {isLoading
+          ? language === 'bn'
+            ? 'ঠিকানা খোঁজা হচ্ছে'
+            : 'Searching addresses'
+          : hasError
+            ? language === 'bn'
+              ? 'ঠিকানা অনুসন্ধান করা যায়নি'
+              : 'Address search failed'
+            : hasNoResults
+              ? language === 'bn'
+                ? 'কোনো ঠিকানা পাওয়া যায়নি'
+                : 'No addresses found'
+              : suggestions.length > 0
+                ? language === 'bn'
+                  ? `${suggestions.length}টি ঠিকানা পাওয়া গেছে`
+                  : `${suggestions.length} address suggestions available`
+                : ''}
       </div>
 
       {/* Suggestions Dropdown */}
