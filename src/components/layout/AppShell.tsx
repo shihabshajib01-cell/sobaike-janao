@@ -24,6 +24,7 @@ import { SearchPage } from '../../pages/SearchPage';
 import { MorePage } from '../../pages/MorePage';
 import { LocationPage } from '../../pages/LocationPage';
 import { SubjectPage } from '../../pages/SubjectPage';
+import { DynamicCategoryPage } from '../../pages/DynamicCategoryPage';
 import { SeoManager } from '../seo/SeoManager';
 import { MapExploreSkeleton } from '../ui/LoadingSkeleton';
 
@@ -167,6 +168,7 @@ export const AppShell: React.FC = () => {
                   <Route path="/load-shedding" element={<UtilityPage />} />
                   <Route path="/illegal-occupation" element={<StandardCategoryPage section="illegal_occupation" />} />
                   <Route path="/rickshaw" element={<RickshawPage />} />
+                  <Route path="/category/:slug" element={<DynamicCategoryPage />} />
                   <Route path="/report" element={<ReportPage />} />
                   <Route
                     path="/explore"
