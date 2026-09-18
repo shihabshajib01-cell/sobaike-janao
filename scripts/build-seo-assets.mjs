@@ -730,13 +730,19 @@ function reportPage(report) {
       report.descriptionEn ||
       'সবাইকে জানাও প্ল্যাটফর্মে প্রকাশিত নাগরিক প্রতিবেদন।'
   );
-  const rawDescriptionEn = cleanText(
+  const englishCandidate = cleanText(
     report.summaryEn ||
       report.descriptionEn ||
-      report.summaryBn ||
-      report.descriptionBn ||
-      'Published citizen report on Sobaike Janao.'
+      ''
   );
+  const rawDescriptionEn =
+    englishCandidate &&
+    englishCandidate !== rawDescriptionBn &&
+    englishCandidate.length >= 50
+      ? englishCandidate
+      : cleanText(
+          `Published citizen report about ${rawTitleEn}. Review the report details, location, available sources, public-interest context, and the latest updates on Sobaike Janao.`
+        );
   const indexable = isSeoIndexableReport(report);
 
   return {
