@@ -26,6 +26,12 @@ export const SeoManager: React.FC<SeoManagerProps> = ({ children }) => {
   const { language } = useApp();
   const location = useLocation();
   const [dynamicSeo, setDynamicSeo] = useState<SeoMetadata | null>(null);
+  const logicalPathname =
+    location.pathname === '/en'
+      ? '/'
+      : location.pathname.startsWith('/en/')
+        ? location.pathname.slice(3) || '/'
+        : location.pathname;
 
   // Clear dynamic override whenever pathname changes to prevent stale metadata
   useEffect(() => {
@@ -43,15 +49,15 @@ export const SeoManager: React.FC<SeoManagerProps> = ({ children }) => {
     }
 
     const isServerBackedDynamicRoute =
-      location.pathname.startsWith('/report-detail/') ||
-      location.pathname.startsWith('/location/') ||
-      location.pathname.startsWith('/category/');
+      logicalPathname.startsWith('/report-detail/') ||
+      logicalPathname.startsWith('/location/') ||
+      logicalPathname.startsWith('/category/');
 
     if (isServerBackedDynamicRoute) return;
 
-    const staticMeta = getStaticSeo(location.pathname, language);
+    const staticMeta = getStaticSeo(logicalPathname, language);
     applySeoMetadata(staticMeta, language);
-  }, [location.pathname, language, dynamicSeo]);
+  }, [logicalPathname, language, dynamicSeo]);
 
   const value = useMemo(
     () => ({
