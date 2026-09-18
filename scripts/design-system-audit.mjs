@@ -119,7 +119,7 @@ const APPROVED_MATERIAL_CORE = {
     '--md-surface-hover': '#E4E6EB',
     '--md-on-surface': '#050505',
     '--md-on-surface-secondary': '#65676B',
-    '--md-on-surface-muted': '#65676B',
+    '--md-on-surface-muted': '#6B6E72',
     '--md-outline-subtle': '#CED0D4',
     '--md-outline': '#85888C',
     '--md-outline-strong': '#65676B',
@@ -143,7 +143,7 @@ const APPROVED_MATERIAL_CORE = {
     '--md-surface-hover': '#303234',
     '--md-on-surface': '#E4E6EB',
     '--md-on-surface-secondary': '#B0B3B8',
-    '--md-on-surface-muted': '#B0B3B8',
+    '--md-on-surface-muted': '#9CA0A6',
     '--md-outline-subtle': '#4E4F50',
     '--md-outline': '#7C8086',
     '--md-outline-strong': '#B0B3B8',
@@ -321,6 +321,17 @@ if (!fs.existsSync(colorSystemFile)) {
         token: theme,
         message: 'Outline subtle/default/strong roles must remain visually distinct',
         source: `${values['--md-outline-subtle']} / ${values['--md-outline']} / ${values['--md-outline-strong']}`,
+      });
+    }
+
+    if (values['--md-on-surface-secondary'] === values['--md-on-surface-muted']) {
+      findings.push({
+        file: colorSystemFile,
+        line: 1,
+        rule: 'content-role-collapse',
+        token: theme,
+        message: 'Secondary and muted content roles must remain visually distinct',
+        source: values['--md-on-surface-secondary'],
       });
     }
 
