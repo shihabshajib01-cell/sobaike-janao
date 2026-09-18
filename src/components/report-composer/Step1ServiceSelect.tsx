@@ -30,96 +30,19 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
   const selectedComingSoon =
     controlledComingSoon !== undefined ? controlledComingSoon : internalComingSoon;
 
-  const allServices: Array<{
-    key: SectionKey;
-    titleBn: string;
-    titleEn: string;
-    descBn: string;
-    descEn: string;
-    bgVar: string;
-    textVar: string;
-    borderVar: string;
-    primaryVar: string;
-  }> = [
-    {
-      key: 'harassment',
-      titleBn: segments.harassment?.nameBn || SECTIONS.harassment.nameBn,
-      titleEn: segments.harassment?.nameEn || SECTIONS.harassment.nameEn,
-      descBn: 'হয়রানি, নির্যাতন বা অনলাইন হয়রানি জানান।',
-      descEn: 'Report harassment, abuse, or online harassment.',
-      bgVar: 'var(--sec-harassment-bg)',
-      textVar: 'var(--sec-harassment-text)',
-      borderVar: 'var(--sec-harassment-border)',
-      primaryVar: 'var(--sec-harassment-primary)',
-    },
-    {
-      key: 'load_shedding',
-      titleBn: segments.load_shedding?.nameBn || SECTIONS.load_shedding.nameBn,
-      titleEn: segments.load_shedding?.nameEn || SECTIONS.load_shedding.nameEn,
-      descBn: 'বিদ্যুৎ, গ্যাস বা ইউটিলিটি সমস্যা জানান।',
-      descEn: 'Report electricity, gas, or utility issues.',
-      bgVar: 'var(--sec-load_shedding-bg)',
-      textVar: 'var(--sec-load_shedding-text)',
-      borderVar: 'var(--sec-load_shedding-border)',
-      primaryVar: 'var(--sec-load_shedding-primary)',
-    },
-    {
-      key: 'extortion',
-      titleBn: segments.extortion?.nameBn || SECTIONS.extortion.nameBn,
-      titleEn: segments.extortion?.nameEn || SECTIONS.extortion.nameEn,
-      descBn: 'ঘুষ, চাঁদাবাজি বা জোরপূর্বক অর্থ আদায় জানান।',
-      descEn: 'Report bribery, extortion, or forced payments.',
-      bgVar: 'var(--sec-extortion-bg)',
-      textVar: 'var(--sec-extortion-text)',
-      borderVar: 'var(--sec-extortion-border)',
-      primaryVar: 'var(--sec-extortion-primary)',
-    },
-    {
-      key: 'public_safety',
-      titleBn: segments.public_safety?.nameBn || SECTIONS.public_safety.nameBn,
-      titleEn: segments.public_safety?.nameEn || SECTIONS.public_safety.nameEn,
-      descBn: 'চুরি, ডাকাতি, ছিনতাই বা মব সহিংসতা জানান।',
-      descEn: 'Report theft, robbery, snatching, or mob violence.',
-      bgVar: 'var(--sec-public_safety-bg)',
-      textVar: 'var(--sec-public_safety-text)',
-      borderVar: 'var(--sec-public_safety-border)',
-      primaryVar: 'var(--sec-public_safety-primary)',
-    },
-    {
-      key: 'road_transport',
-      titleBn: segments.road_transport?.nameBn || SECTIONS.road_transport.nameBn,
-      titleEn: segments.road_transport?.nameEn || SECTIONS.road_transport.nameEn,
-      descBn: 'সড়ক মেরামত, দুর্ঘটনা বা অবরোধ জানান।',
-      descEn: 'Report road repairs, accidents, or road blocks.',
-      bgVar: 'var(--sec-road_transport-bg)',
-      textVar: 'var(--sec-road_transport-text)',
-      borderVar: 'var(--sec-road_transport-border)',
-      primaryVar: 'var(--sec-road_transport-primary)',
-    },
-    {
-      key: 'illegal_occupation',
-      titleBn: segments.illegal_occupation?.nameBn || SECTIONS.illegal_occupation.nameBn,
-      titleEn: segments.illegal_occupation?.nameEn || SECTIONS.illegal_occupation.nameEn,
-      descBn: 'রাস্তা, ফুটপাত বা জমির অবৈধ দখল জানান।',
-      descEn: 'Report illegal occupation of roads, paths, or land.',
-      bgVar: 'var(--sec-illegal_occupation-bg)',
-      textVar: 'var(--sec-illegal_occupation-text)',
-      borderVar: 'var(--sec-illegal_occupation-border)',
-      primaryVar: 'var(--sec-illegal_occupation-primary)',
-    },
-    {
-      key: 'rickshaw',
-      titleBn: segments.rickshaw?.nameBn || SECTIONS.rickshaw.nameBn,
-      titleEn: segments.rickshaw?.nameEn || SECTIONS.rickshaw.nameEn,
-      descBn: 'অবৈধ বা ঝুঁকিপূর্ণ অটো-রিকশা চার্জিং স্টেশন জানান।',
-      descEn: 'Report illegal or unsafe auto-rickshaw charging stations.',
-      bgVar: 'var(--sec-rickshaw-bg)',
-      textVar: 'var(--sec-rickshaw-text)',
-      borderVar: 'var(--sec-rickshaw-border)',
-      primaryVar: 'var(--sec-rickshaw-primary)',
-    },
-  ];
-  const activeServices = allServices.filter((service) => Boolean(segments[service.key]));
+  const activeServices = Object.values(segments)
+    .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
+    .map((service) => ({
+      key: service.id as SectionKey,
+      titleBn: service.nameBn,
+      titleEn: service.nameEn,
+      descBn: service.descriptionBn || service.shortNameBn,
+      descEn: service.descriptionEn || service.shortNameEn,
+      bgColor: service.bgColor || '#F0F3F9',
+      textColor: service.textColor || '#1B4D6B',
+      borderColor: service.borderColor || '#CCD5E8',
+      primaryColor: service.primaryColor || '#3A7CA5',
+    }));
 
   const comingSoonList = Object.values(COMING_SOON_SERVICES).filter(
     (cs) => cs.key !== 'illegal_occupation'
@@ -170,9 +93,9 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               <div
                 className="w-11 h-11 md:w-12 md:h-12 shrink-0 rounded-[var(--radius-control)] flex items-center justify-center transition-colors border shadow-[var(--elevation-2xs)]"
                 style={{
-                  backgroundColor: `var(--sec-${srv.key}-bg)`,
-                  color: `var(--sec-${srv.key}-text)`,
-                  borderColor: `var(--sec-${srv.key}-border)`,
+                  backgroundColor: srv.bgColor,
+                  color: srv.textColor,
+                  borderColor: srv.borderColor,
                 }}
               >
                 <CategoryIcon section={srv.key} size="md" />
