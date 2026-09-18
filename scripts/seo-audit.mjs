@@ -369,7 +369,7 @@ for (const file of htmlFiles) {
       failures.push(`Article dateModified missing: ${rel}`);
       routeFailures += 1;
     }
-    if (indexable && rel !== 'index.html') {
+    if (indexable && rel !== 'index.html' && rel !== 'en/index.html') {
       const breadcrumb = graph.find((item) => item?.['@type'] === 'BreadcrumbList');
       if (!breadcrumb || !Array.isArray(breadcrumb.itemListElement) || breadcrumb.itemListElement.length < 2) {
         failures.push(`Breadcrumb structured data missing: ${rel}`);
