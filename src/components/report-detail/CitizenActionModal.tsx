@@ -3,6 +3,7 @@ import { CheckCircle2, Send } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
+import { ModalActions } from '../ui/ModalActions';
 import { Checkbox } from '../ui/Checkbox';
 
 interface CitizenActionModalProps {
@@ -121,43 +122,42 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
       isOpen={isOpen}
       onClose={handleResetAndClose}
       closeOnBackdrop={false}
+      closeOnEscape={false}
       maxWidth="md"
       language={language}
       title={language === 'bn' ? 'প্রতিবেদনে তথ্য দিন' : 'Share information about this report'}
       description={language === 'bn' ? `প্রতিবেদন: ${reportTitle}` : `Report: ${reportTitle}`}
       footer={
         isSubmitted ? (
-          <Button type="button" variant="primary" size="md" onClick={handleResetAndClose}>
-            {language === 'bn' ? 'সম্পন্ন' : 'Done'}
-          </Button>
+          <ModalActions
+            align="center"
+            primary={{
+              type: 'button',
+              size: 'md',
+              onClick: handleResetAndClose,
+              label: language === 'bn' ? 'সম্পন্ন' : 'Done',
+            }}
+          />
         ) : (
-          <div className="flex items-center justify-end gap-2.5 w-full">
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              onClick={handleResetAndClose}
-              disabled={isSubmitting}
-            >
-              {language === 'bn' ? 'বাতিল' : 'Cancel'}
-            </Button>
-            <Button
-              form="citizen-action-form"
-              type="submit"
-              variant="primary"
-              size="md"
-              isLoading={isSubmitting}
-              leftIcon={<Send className="w-4 h-4" aria-hidden="true" />}
-            >
-              {isSubmitting
-                ? language === 'bn'
-                  ? 'জমা দেওয়া হচ্ছে...'
-                  : 'Submitting...'
-                : language === 'bn'
-                  ? 'তথ্য জমা দিন'
-                  : 'Submit information'}
-            </Button>
-          </div>
+          <ModalActions
+            primary={{
+              form: 'citizen-action-form',
+              type: 'submit',
+              size: 'md',
+              isLoading: isSubmitting,
+              leftIcon: <Send className="w-4 h-4" aria-hidden="true" />,
+              label: isSubmitting
+                ? (language === 'bn' ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...')
+                : (language === 'bn' ? 'তথ্য জমা দিন' : 'Submit information'),
+            }}
+            secondary={{
+              type: 'button',
+              size: 'md',
+              onClick: handleResetAndClose,
+              disabled: isSubmitting,
+              label: language === 'bn' ? 'বাতিল' : 'Cancel',
+            }}
+          />
         )
       }
     >
