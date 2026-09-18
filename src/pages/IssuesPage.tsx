@@ -128,9 +128,9 @@ export const IssuesPage: React.FC = () => {
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
 
-                <h4 className="min-w-0 flex-1 type-h4 text-ui-content-primary">
+                <h2 className="min-w-0 flex-1 type-h4 text-ui-content-primary">
                   {language === 'bn' ? config.nameBn : config.nameEn}
-                </h4>
+                </h2>
 
                 <p className="shrink-0 text-right type-meta font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {isLoading
