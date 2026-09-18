@@ -75,16 +75,13 @@ export const CategoryFilterSheet: React.FC<CategoryFilterSheetProps> = ({
           primary={{
             id: `${section}-filter-apply-btn`,
             type: 'button',
-            onClick: () => {
-              onApply({ ...draft });
-              onClose();
-            },
+            onClick: () => onApply({ ...draft }),
             label: isBn ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters',
           }}
           secondary={{
             id: `${section}-filter-reset-btn`,
             type: 'button',
-            onClick: resetDraft,
+            onClick: () => setDraft({ ...EMPTY_CATEGORY_FEED_FILTERS }),
             label: isBn ? 'ফিল্টার মুছুন' : 'Clear filters',
           }}
         />
