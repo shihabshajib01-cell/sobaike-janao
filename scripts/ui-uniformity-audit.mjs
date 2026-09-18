@@ -249,6 +249,40 @@ for (const file of standardModalSurfaces) {
   requireNotContains(file, 'showHeader={false}', 'standard dialogs must use the unified Modal header anatomy');
 }
 
+const modalActionSurfaces = [
+  'src/components/location/FirstVisitNoticeModal.tsx',
+  'src/components/location/LocationConsentModal.tsx',
+  'src/components/report-detail/CitizenActionModal.tsx',
+  'src/components/report-detail/SubjectResponseModal.tsx',
+  'src/components/report/CategoryFilterSheet.tsx',
+  'src/components/report/HarassmentFilterSheet.tsx',
+];
+
+for (const file of modalActionSurfaces) {
+  requireContains(file, '<ModalActions', 'modal footers must use the shared ModalActions layout');
+}
+
+requireContains(
+  'src/components/report-composer/ReportComposerModal.tsx',
+  '<ModalActions',
+  'nested report-composer dialogs must use shared ModalActions'
+);
+requireContains(
+  'src/components/layout/SearchModal.tsx',
+  '<Button',
+  'search-modal quick actions must use the shared Button primitive'
+);
+requireNotContains(
+  'src/components/report-detail/SubjectResponseModal.tsx',
+  '<button',
+  'subject-response modal must not retain raw legacy button controls'
+);
+requireNotContains(
+  'src/components/report-detail/SubjectResponseModal.tsx',
+  'type="checkbox"',
+  'subject-response modal must use the shared Checkbox primitive'
+);
+
 const approvedSpecializedDialogSurfaces = new Set([
   'src/components/media/ImageViewer.tsx',
   'src/components/media/AttachmentLightboxModal.tsx',
@@ -275,6 +309,42 @@ requireContains(
   'src/components/ui/Modal.tsx',
   'showCloseButton?: boolean;',
   'Modal must centrally control close-button presence'
+);
+
+requireContains(
+  'src/components/ui/Modal.tsx',
+  'closeOnEscape?: boolean;',
+  'Modal must expose an explicit Escape-dismiss policy'
+);
+requireContains(
+  'src/components/ui/Modal.tsx',
+  'useDialogLifecycle',
+  'Modal must use the shared dialog lifecycle behavior'
+);
+requireContains(
+  'src/components/ui/useDialogLifecycle.ts',
+  'button:not([disabled])',
+  'dialog focus trapping must exclude disabled buttons'
+);
+requireContains(
+  'src/components/ui/useDialogLifecycle.ts',
+  'getClientRects().length > 0',
+  'dialog focus trapping must exclude hidden controls'
+);
+requireContains(
+  'src/components/media/ImageViewer.tsx',
+  'useDialogLifecycle',
+  'published image viewer must reuse shared dialog lifecycle behavior'
+);
+requireContains(
+  'src/components/media/AttachmentLightboxModal.tsx',
+  'useDialogLifecycle',
+  'attachment viewer must reuse shared dialog lifecycle behavior'
+);
+requireContains(
+  'src/components/ui/ModalActions.tsx',
+  "mobileOrder?: 'secondary-first' | 'primary-first';",
+  'ModalActions must centrally control responsive action ordering'
 );
 requireContains(
   'src/components/ui/Modal.tsx',
