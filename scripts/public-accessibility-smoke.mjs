@@ -17,6 +17,8 @@ async function seedReturningVisitor(context) {
 }
 
 async function scan(page, name) {
+  // Let short visual state transitions settle so axe measures the stable UI state.
+  await page.waitForTimeout(250);
   const result = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
     .exclude('.leaflet-container')
@@ -51,11 +53,12 @@ for (const path of ['/', '/issues', '/harassment', '/search', '/more', '/en/', '
   await scan(desktopPage, `desktop ${path}`);
 }
 
-await goto(desktopPage, '/');
 await desktopPage.evaluate(() => {
-  document.documentElement.classList.add('dark');
-  document.documentElement.setAttribute('data-theme', 'dark');
+  localStorage.setItem('sobaike-janao-theme', 'dark');
+  localStorage.setItem('theme', 'dark');
 });
+await goto(desktopPage, '/');
+await desktopPage.waitForFunction(() => document.documentElement.getAttribute('data-theme') === 'dark');
 await scan(desktopPage, 'desktop home dark');
 
 await goto(desktopPage, '/');
