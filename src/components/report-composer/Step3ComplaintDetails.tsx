@@ -67,6 +67,11 @@ import {
   ResolvedPlaceResult,
 } from '../../services/googlePlacesService';
 import { ReportTitleField, REPORT_TITLE_MAX_LENGTH } from './ReportTitleField';
+import { TextField } from '../ui/TextField';
+import { TextAreaField } from '../ui/TextAreaField';
+import { DateField } from '../ui/DateField';
+import { TimeField } from '../ui/TimeField';
+import { MonthField } from '../ui/MonthField';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -2087,26 +2092,36 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               {/* Optional address/place search; no report-input map */}
               <div className="pt-2 space-y-3">
                 {isGooglePlacesConfigured() && (
-                  <div>
-                    <label className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1">
-                      {language === 'bn' ? 'ঠিকানা দিয়ে অনুসন্ধান (ঐচ্ছিক)' : 'Search address or place (optional)'}
-                    </label>
-                    <AddressSearchInput
-                      language={language}
-                      onPlaceSelected={handleAddressSearchPlaceSelected}
-                      biasCoords={
-                        formData.location?.lat && formData.location?.lng
-                          ? { lat: formData.location.lat, lng: formData.location.lng }
-                          : resolvedDistrict
-                          ? { lat: resolvedDistrict.lat, lng: resolvedDistrict.lng }
-                          : resolvedDivision
-                          ? { lat: resolvedDivision.lat, lng: resolvedDivision.lng }
-                          : undefined
-                      }
-                      initialValue=""
-                      disabled={isLocationLocked}
-                    />
-                  </div>
+                  <AddressSearchInput
+                    language={language}
+                    label={language === 'bn' ? 'ঠিকানা দিয়ে অনুসন্ধান (ঐচ্ছিক)' : 'Search address or place (optional)'}
+                    onPlaceSelected={handleAddressSearchPlaceSelected}
+                    onClear={() =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          formattedAddress: '',
+                          road: '',
+                          area: '',
+                          landmark: '',
+                          placeId: undefined,
+                          lat: undefined,
+                          lng: undefined,
+                        },
+                      })
+                    }
+                    biasCoords={
+                      formData.location?.lat && formData.location?.lng
+                        ? { lat: formData.location.lat, lng: formData.location.lng }
+                        : resolvedDistrict
+                        ? { lat: resolvedDistrict.lat, lng: resolvedDistrict.lng }
+                        : resolvedDivision
+                        ? { lat: resolvedDivision.lat, lng: resolvedDivision.lng }
+                        : undefined
+                    }
+                    initialValue=""
+                    disabled={isLocationLocked}
+                  />
                 )}
               </div>
             </div>
@@ -2561,7 +2576,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                               value={party.name || ''}
                               onChange={(e) => handleUpdateAdditionalParty(party.id, { name: e.target.value })}
                               placeholder={language === 'bn' ? 'নাম বা পরিচিত নাম' : 'Name or known identity'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
                             />
                           </div>
                           <div>
@@ -2578,7 +2593,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                                 })
                               }
                               placeholder={language === 'bn' ? 'ফোন নম্বর বা যোগাযোগের তথ্য' : 'Phone number or contact info'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
                             />
                           </div>
                         </div>
@@ -2598,7 +2613,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                                 handleUpdateAdditionalParty(party.id, { roleOrDesignation: e.target.value })
                               }
                               placeholder={language === 'bn' ? 'ভূমিকা বা পদবি' : 'Role or designation'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
                             />
                           </div>
                           <div>
@@ -2614,7 +2629,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                                 handleUpdateAdditionalParty(party.id, { organization: e.target.value })
                               }
                               placeholder={language === 'bn' ? 'দল, সমিতি বা প্রতিষ্ঠানের নাম' : 'Group, association, or organization'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
+                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px]"
                             />
                           </div>
                         </div>
@@ -2631,7 +2646,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                               handleUpdateAdditionalParty(party.id, { identifyingDescription: e.target.value })
                             }
                             placeholder={language === 'bn' ? 'চেহারা, যানবাহন বা অন্য শনাক্তকারী তথ্য' : 'Appearance, vehicle, or identifying details'}
-                            className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px] leading-relaxed"
+                            className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[44px] leading-relaxed"
                           />
                         </div>
                       </div>
