@@ -304,6 +304,71 @@ await check('Public report detail route renders when a published report is avail
   await page.waitForTimeout(1200);
   const text = (await page.locator('#main-content').innerText()).trim();
   if (!text) throw new Error('report detail rendered empty content');
+
+  const citizenButton = page.locator('#btn-respond-citizen-info');
+  if (await citizenButton.count()) {
+    await citizenButton.click();
+    const citizenModal = page.locator('#citizen-action-modal');
+    await expectVisible(citizenModal, 'citizen information modal did not open');
+
+    const citizenDescription = page.locator('#citizen-description-input');
+    const citizenDraft = 'Smoke test unsaved citizen information';
+    await citizenDescription.fill(citizenDraft);
+    await page.locator('#citizen-action-modal-close').click();
+
+    const citizenDiscard = page.locator('#citizen-action-discard-confirm-modal');
+    await expectVisible(citizenDiscard, 'citizen dirty-close confirmation did not open');
+
+    const citizenParentIsInert = await citizenModal.evaluate((element) => Boolean(element.inert));
+    if (!citizenParentIsInert) {
+      throw new Error('citizen modal was not isolated while nested discard confirmation was open');
+    }
+
+    await page.locator('#citizen-action-discard-confirm-modal-keep-editing-btn').click();
+    await citizenDiscard.waitFor({ state: 'hidden', timeout: 10000 });
+
+    if ((await citizenDescription.inputValue()) !== citizenDraft) {
+      throw new Error('citizen draft was lost after choosing to keep editing');
+    }
+
+    await page.locator('#citizen-action-modal-close').click();
+    await expectVisible(citizenDiscard, 'citizen discard confirmation did not reopen');
+    await page.locator('#citizen-action-discard-confirm-modal-discard-btn').click();
+    await citizenModal.waitFor({ state: 'hidden', timeout: 10000 });
+  }
+
+  const subjectButton = page.locator('#btn-respond-subject-party');
+  if (await subjectButton.count()) {
+    await subjectButton.click();
+    const subjectModal = page.locator('#subject-response-modal');
+    await expectVisible(subjectModal, 'subject response modal did not open');
+
+    const subjectNameInput = page.locator('#subject-responder-name-input');
+    const subjectDraft = 'Smoke Test Responder';
+    await subjectNameInput.fill(subjectDraft);
+    await page.locator('#subject-response-modal-close').click();
+
+    const subjectDiscard = page.locator('#subject-response-discard-confirm-modal');
+    await expectVisible(subjectDiscard, 'subject dirty-close confirmation did not open');
+
+    const subjectParentIsInert = await subjectModal.evaluate((element) => Boolean(element.inert));
+    if (!subjectParentIsInert) {
+      throw new Error('subject response modal was not isolated while nested discard confirmation was open');
+    }
+
+    await page.locator('#subject-response-discard-confirm-modal-keep-editing-btn').click();
+    await subjectDiscard.waitFor({ state: 'hidden', timeout: 10000 });
+
+    if ((await subjectNameInput.inputValue()) !== subjectDraft) {
+      throw new Error('subject response draft was lost after choosing to keep editing');
+    }
+
+    await page.locator('#subject-response-modal-close').click();
+    await expectVisible(subjectDiscard, 'subject discard confirmation did not reopen');
+    await page.locator('#subject-response-discard-confirm-modal-discard-btn').click();
+    await subjectModal.waitFor({ state: 'hidden', timeout: 10000 });
+  }
+
   await context.close();
 });
 
