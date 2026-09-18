@@ -36,6 +36,9 @@ function attachRuntimeGuards(page, label) {
     if (status >= 500 && (url.startsWith(SITE_URL) || url.includes('supabase.co'))) {
       failures.push(`${label} HTTP ${status}: ${url}`);
     }
+    if (status === 404 && url.startsWith(SITE_URL)) {
+      failures.push(`${label} same-origin HTTP 404: ${url}`);
+    }
   });
 }
 async function seedReturningVisitor(context) {
@@ -256,6 +259,32 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   await context.close();
 });
 
+await check('English SEO variant is URL-addressable and self-canonical', async () => {
+  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'english-seo');
+  await page.goto(routeUrl('/?lang=en'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(500);
+
+  if ((await page.locator('html').getAttribute('lang')) !== 'en') {
+    throw new Error('English URL did not render with html lang=en');
+  }
+
+  const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+  if (!canonical || !canonical.includes('lang=en')) {
+    throw new Error(`English URL is not self-canonical: ${canonical}`);
+  }
+
+  const bnAlternate = await page.locator('link[rel="alternate"][hreflang="bn-BD"]').getAttribute('href');
+  const enAlternate = await page.locator('link[rel="alternate"][hreflang="en"]').getAttribute('href');
+  if (!bnAlternate?.startsWith(SITE_URL) || !enAlternate?.includes('lang=en')) {
+    throw new Error(`language alternates invalid: bn=${bnAlternate}, en=${enAlternate}`);
+  }
+
+  await context.close();
+});
+
 await check('Search page accepts a query without crashing', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
@@ -304,6 +333,27 @@ await check('Public report detail route renders when a published report is avail
   await page.waitForTimeout(1200);
   const text = (await page.locator('#main-content').innerText()).trim();
   if (!text) throw new Error('report detail rendered empty content');
+
+  const robots = await page.locator('meta[name="robots"]').getAttribute('content');
+  if (!robots || !/index/i.test(robots) || /noindex/i.test(robots)) {
+    throw new Error(`published report became non-indexable after hydration: ${robots}`);
+  }
+
+  const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+  if (!canonical || !canonical.includes(`/report-detail/${encodeURIComponent(reportId)}`)) {
+    throw new Error(`published report canonical is incorrect: ${canonical}`);
+  }
+
+  const title = await page.title();
+  if ([...title].length > 60) {
+    throw new Error(`published report SEO title is too long: ${[...title].length}`);
+  }
+
+  const description = await page.locator('meta[name="description"]').getAttribute('content');
+  const descriptionLength = [...(description || '')].length;
+  if (descriptionLength < 90 || descriptionLength > 160) {
+    throw new Error(`published report meta description length is ${descriptionLength}`);
+  }
 
   const citizenButton = page.locator('#btn-respond-citizen-info');
   if (await citizenButton.count()) {
