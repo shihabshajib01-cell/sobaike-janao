@@ -3,7 +3,8 @@ import { Search, Menu, PlusCircle, Home, Compass, PhoneCall, Globe } from 'lucid
 import { useApp, RoutePath } from '../../context/AppContext';
 import { CATEGORY_ORDER } from '../../data/categoryOrder';
 import { CategoryPopularityService } from '../../services/categoryPopularityService';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { Button } from '../ui/Button';
 import { IconButton } from '../ui/IconButton';
 import { Drawer } from '../ui/Drawer';
@@ -21,17 +22,19 @@ export const Header: React.FC = () => {
     setIsTabletMenuOpen,
     openReportComposer,
   } = useApp();
+  const { segments, getSegment } = useTaxonomy();
   const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
 
   useEffect(() => {
     let active = true;
+    CategoryPopularityService.clearCache();
     CategoryPopularityService.getOrderedCategoryKeys().then((keys) => {
       if (active) setCategoryOrder(keys);
     });
     return () => {
       active = false;
     };
-  }, []);
+  }, [segments]);
 
   const navItems: Array<{
     path: RoutePath;
@@ -46,13 +49,16 @@ export const Header: React.FC = () => {
       nameEn: 'Home',
       icon: <Home className="w-4 h-4" aria-hidden="true" />,
     },
-    ...categoryOrder.map((sectionKey) => ({
-      path: SECTIONS[sectionKey].slug,
-      nameBn: SECTIONS[sectionKey].shortNameBn,
-      nameEn: SECTIONS[sectionKey].shortNameEn,
-      sectionKey,
-      icon: <CategoryIcon section={sectionKey} size="md" />,
-    })),
+    ...categoryOrder
+      .map((sectionKey) => getSegment(sectionKey))
+      .filter(Boolean)
+      .map((segment) => ({
+        path: segment.slug as RoutePath,
+        nameBn: segment.shortNameBn,
+        nameEn: segment.shortNameEn,
+        sectionKey: segment.id as SectionKey,
+        icon: <CategoryIcon section={segment.id as SectionKey} size="md" />,
+      })),
     {
       path: '/explore',
       nameBn: 'এক্সপ্লোর',
@@ -124,7 +130,7 @@ export const Header: React.FC = () => {
             </p>
             {navItems.map((item) => {
               const isActive = currentRoute === item.path;
-              const secConfig = item.sectionKey ? SECTIONS[item.sectionKey] : null;
+              const secConfig = item.sectionKey ? getSegment(item.sectionKey) : null;
 
               return (
                 <button
@@ -141,9 +147,9 @@ export const Header: React.FC = () => {
                   style={
                     isActive && item.sectionKey
                       ? {
-                          backgroundColor: `var(--sec-${item.sectionKey}-bg)`,
-                          color: `var(--sec-${item.sectionKey}-text)`,
-                          borderColor: `var(--sec-${item.sectionKey}-border)`,
+                          backgroundColor: secConfig?.bgColor,
+                          color: secConfig?.textColor,
+                          borderColor: secConfig?.borderColor,
                         }
                       : undefined
                   }
@@ -157,7 +163,7 @@ export const Header: React.FC = () => {
                   {item.sectionKey && (
                     <span
                       className="w-2.5 h-2.5 ui-radius-pill shrink-0"
-                      style={{ backgroundColor: `var(--sec-${item.sectionKey}-primary)` }}
+                      style={{ backgroundColor: secConfig?.primaryColor || 'var(--ui-action-bg)' }}
                       aria-hidden="true"
                     />
                   )}

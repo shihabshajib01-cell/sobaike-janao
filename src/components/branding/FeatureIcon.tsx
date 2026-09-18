@@ -6,10 +6,13 @@ import {
   TrafficCone,
   Building2,
   ZapOff,
+  MapPin,
+  Heart,
   LucideIcon,
 } from 'lucide-react';
 import { EvStationIcon } from './EvStationIcon';
 import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 
 export type FeatureIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FeatureIconVariant = 'standard' | 'container' | 'marker' | 'badge';
@@ -23,7 +26,7 @@ export interface FeatureIconProps {
   ariaLabel?: string;
 }
 
-const ICON_MAP: Record<SectionKey, LucideIcon | React.ComponentType<any>> = {
+const ICON_MAP: Record<string, LucideIcon | React.ComponentType<any>> = {
   harassment: HeartHandshake,
   extortion: ShieldAlert,
   public_safety: ShieldCheck,
@@ -31,6 +34,13 @@ const ICON_MAP: Record<SectionKey, LucideIcon | React.ComponentType<any>> = {
   load_shedding: ZapOff,
   illegal_occupation: Building2,
   rickshaw: EvStationIcon,
+  shield: ShieldCheck,
+  alert: ShieldAlert,
+  heart: Heart,
+  road: TrafficCone,
+  building: Building2,
+  bolt: ZapOff,
+  map: MapPin,
 };
 
 const SIZE_CLASSES: Record<FeatureIconSize, string> = {
@@ -62,15 +72,22 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   strokeWidth = 2,
   ariaLabel,
 }) => {
-  const IconComponent = ICON_MAP[section] || ShieldAlert;
+  const { getSegment } = useTaxonomy();
+  const config = getSegment(section);
+  const iconKey = config?.iconKey || section;
+  const IconComponent = ICON_MAP[iconKey] || ICON_MAP[section] || ShieldAlert;
   const isAccessible = Boolean(ariaLabel);
+  const primary = config?.primaryColor || 'var(--ui-action-bg)';
+  const background = config?.bgColor || 'var(--ui-surface-subtle)';
+  const text = config?.textColor || 'var(--ui-content-primary)';
+  const border = config?.borderColor || 'var(--ui-stroke-default)';
 
   if (variant === 'marker') {
     return (
       <div
         className={`w-8 h-8 min-w-[32px] min-h-[32px] rounded-[var(--radius-pill)] flex items-center justify-center text-ui-content-inverse border-2 border-ui-surface shadow-[var(--elevation-md)] transition-all shrink-0 ${className}`}
         style={{
-          backgroundColor: `var(--sec-${section}-primary)`,
+          backgroundColor: primary,
         }}
         role={isAccessible ? 'img' : undefined}
         aria-label={ariaLabel}
@@ -86,9 +103,9 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
       <div
         className={`inline-flex items-center justify-center shrink-0 border shadow-[var(--elevation-2xs)] transition-colors ${CONTAINER_SIZE_CLASSES[size]} ${className}`}
         style={{
-          backgroundColor: `var(--sec-${section}-bg)`,
-          color: `var(--sec-${section}-text)`,
-          borderColor: `var(--sec-${section}-border)`,
+          backgroundColor: background,
+          color: text,
+          borderColor: border,
         }}
         role={isAccessible ? 'img' : undefined}
         aria-label={ariaLabel}

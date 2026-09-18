@@ -25,7 +25,7 @@ import { PublicReportService } from '../services/publicReportService';
 import { PublicEngagementService } from '../services/publicEngagementService';
 import { PUBLIC_RESPONSE_DISPLAY_CONNECTED } from '../services/publicResponseService';
 import { ReportMediaGrid } from '../components/media/ReportMediaGrid';
-import { ReportItem, PublicPublishedResponse } from '../types/report';
+import { ReportItem, PublicPublishedResponse, PublicConfiguredReportField } from '../types/report';
 import { ReportDetailSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { useSeo } from '../components/seo/SeoManager';
@@ -53,6 +53,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
   const [report, setReport] = useState<ReportItem | null>(null);
   const [storedResponses, setStoredResponses] = useState<PublicPublishedResponse[]>([]);
+  const [configuredFields, setConfiguredFields] = useState<PublicConfiguredReportField[]>([]);
   const [responseLoadError, setResponseLoadError] = useState<boolean>(false);
   const [showAllResponses, setShowAllResponses] = useState(false);
   const [relatedReports, setRelatedReports] = useState<ReportItem[]>([]);
@@ -65,6 +66,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
     setIsLoading(true);
     setFetchError(false);
     setStoredResponses([]);
+    setConfiguredFields([]);
     setResponseLoadError(false);
 
     PublicReportService.getById(reportId)
@@ -73,6 +75,8 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           setReport(res.report);
           setStoredResponses(res.responses || []);
           setResponseLoadError(Boolean(res.responseLoadError));
+          const fields = await PublicReportService.getConfiguredFields(res.report.id);
+          setConfiguredFields(fields);
 
           if (
             res.report.relatedReportIds &&
@@ -322,6 +326,35 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
   const displayEngagementCount = (value: number) =>
     language === 'bn' ? toBanglaDigits(value) : value.toLocaleString();
+
+  const formatConfiguredValue = (
+    value: unknown,
+    options: Array<{ value: string; labelEn: string; labelBn: string }> = []
+  ): string => {
+    const formatOption = (item: unknown) => {
+      const raw = String(item ?? '');
+      const option = options.find((entry) => entry.value === raw);
+      return option ? (language === 'bn' ? option.labelBn : option.labelEn) : raw;
+    };
+
+    if (Array.isArray(value)) return value.map(formatOption).join(', ');
+    if (typeof value === 'boolean') {
+      return value
+        ? language === 'bn'
+          ? 'হ্যাঁ'
+          : 'Yes'
+        : language === 'bn'
+          ? 'না'
+          : 'No';
+    }
+    if (value && typeof value === 'object') {
+      return Object.values(value as Record<string, unknown>)
+        .filter((item) => item !== null && item !== undefined && String(item).trim() !== '')
+        .map((item) => String(item))
+        .join(', ');
+    }
+    return formatOption(value);
+  };
 
   const relativePublishedTime = (() => {
     if (!report.publishedAt) return language === 'bn' ? report.publishedDateBn : report.publishedDateEn;
@@ -629,6 +662,36 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
                 )}
               </div>
             )}
+
+          {configuredFields.length > 0 && (
+            <section
+              id="configured-report-fields"
+              className="pt-4 border-t border-ui-stroke-subtle space-y-3"
+              aria-labelledby="configured-report-fields-title"
+            >
+              <h3
+                id="configured-report-fields-title"
+                className="type-h4 text-ui-content-primary"
+              >
+                {language === 'bn' ? 'অতিরিক্ত তথ্য' : 'Additional information'}
+              </h3>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {configuredFields.map((field) => (
+                  <div
+                    key={field.fieldKey}
+                    className="p-3 bg-ui-surface-subtle ui-radius-badge-md ui-border-default border-ui-stroke-subtle"
+                  >
+                    <dt className="type-meta text-ui-content-muted">
+                      {language === 'bn' ? field.labelBn : field.labelEn}
+                    </dt>
+                    <dd className="mt-1 type-body font-[var(--font-weight-semibold)] text-ui-content-primary break-words whitespace-pre-wrap">
+                      {formatConfiguredValue(field.value, field.options)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
 
           {((report.media?.images && report.media.images.length > 0) ||
             (report.images && report.images.length > 0)) && (

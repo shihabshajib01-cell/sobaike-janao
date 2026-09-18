@@ -2,19 +2,9 @@ import React, { useState } from 'react';
 import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PublicEngagementService } from '../../services/publicEngagementService';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { BrandLogo } from '../branding/BrandLogo';
 import { IconButton } from '../ui/IconButton';
-
-const CATEGORY_BY_ROUTE: Record<string, SectionKey> = {
-  '/harassment': 'harassment',
-  '/extortion': 'extortion',
-  '/public-safety': 'public_safety',
-  '/road-transport': 'road_transport',
-  '/load-shedding': 'load_shedding',
-  '/illegal-occupation': 'illegal_occupation',
-  '/rickshaw': 'rickshaw',
-};
 
 const REPORT_DETAIL_PREFIX = '/report-detail/';
 
@@ -36,9 +26,12 @@ export const MobileHeader: React.FC = () => {
     setIsHarassmentFilterOpen,
   } = useApp();
   const [isShareConfirmed, setIsShareConfirmed] = useState(false);
+  const { segments } = useTaxonomy();
 
-  const activeCategoryKey = CATEGORY_BY_ROUTE[currentRoute];
-  const activeCategory = activeCategoryKey ? SECTIONS[activeCategoryKey] : null;
+  const activeCategory = Object.values(segments).find(
+    (segment) => segment.slug === currentRoute
+  ) || null;
+  const activeCategoryKey = activeCategory?.id;
   const isHarassmentCategory = activeCategoryKey === 'harassment';
   const isReportDetailRoute = currentRoute.startsWith(REPORT_DETAIL_PREFIX);
   const reportDetailId = isReportDetailRoute

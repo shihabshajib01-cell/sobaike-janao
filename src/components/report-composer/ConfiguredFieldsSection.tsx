@@ -1,0 +1,999 @@
+import React, { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
+import {
+  PublicReportingField,
+  PublicReportingForm,
+} from '../../services/reportingFormConfig';
+import {
+  MobJusticeDetails,
+  MobJusticeValidationErrors,
+} from '../../data/mobJusticeOptions';
+import { MobJusticeDetailsFields } from './MobJusticeDetailsFields';
+import { MentionedParty, ReportFormData } from '../../services/types';
+import {
+  AttachedImagePreview,
+  ImageAttachmentPicker,
+} from '../media/ImageAttachmentPicker';
+import {
+  BANGLADESH_DISTRICTS,
+  DIVISIONS,
+  getDistrictByStoredName,
+  getDistrictsByDivision,
+  getDivisionByStoredName,
+} from '../../data/districts';
+import {
+  getUpazilaByStoredName,
+  getUpazilasByDistrict,
+} from '../../data/upazilas';
+
+export interface ConfiguredFieldsHandle {
+  validateAndProceed: () => boolean;
+}
+
+interface ConfiguredFieldsSectionProps {
+  form: PublicReportingForm | null;
+  language: 'bn' | 'en';
+  formData: ReportFormData;
+  pendingImages: AttachedImagePreview[];
+  onPendingImagesChange: (images: AttachedImagePreview[]) => void;
+  onUpdateFormData: (updates: Partial<ReportFormData>) => void;
+  mobJusticeDetails?: MobJusticeDetails;
+  mobJusticeErrors?: MobJusticeValidationErrors;
+  onMobJusticeDetailsChange?: (details: MobJusticeDetails) => void;
+}
+
+const isEmpty = (value: unknown): boolean => {
+  if (value === null || value === undefined) return true;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === 'boolean') return false;
+  return String(value).trim() === '';
+};
+
+const getLabel = (field: PublicReportingField, language: 'bn' | 'en') =>
+  language === 'bn' ? field.labelBn : field.labelEn;
+
+export const ConfiguredFieldsSection = forwardRef<
+  ConfiguredFieldsHandle,
+  ConfiguredFieldsSectionProps
+>(
+  (
+    {
+      form,
+      language,
+      formData,
+      pendingImages,
+      onPendingImagesChange,
+      onUpdateFormData,
+      mobJusticeDetails,
+      mobJusticeErrors,
+      onMobJusticeDetailsChange,
+    },
+    ref
+  ) => {
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const fields = useMemo(
+      () =>
+        form?.engineMode === 'schema'
+          ? [...form.fields]
+              .filter((field) => field.active)
+              .sort((a, b) => a.sortOrder - b.sortOrder)
+          : [],
+      [form]
+    );
+
+    const customAnswers = formData.customFieldAnswers || {};
+
+    const readValue = (field: PublicReportingField): unknown => {
+      if (field.storageMode === 'custom_json') {
+        return customAnswers[field.storageKey];
+      }
+      if (field.storageMode === 'core_column') {
+        return (formData as unknown as Record<string, unknown>)[field.storageKey];
+      }
+      return undefined;
+    };
+
+    const setValue = (field: PublicReportingField, value: unknown) => {
+      if (field.storageMode === 'custom_json') {
+        onUpdateFormData({
+          customFieldAnswers: {
+            ...customAnswers,
+            [field.storageKey]: value,
+          },
+        });
+      } else if (field.storageMode === 'core_column') {
+        onUpdateFormData({
+          [field.storageKey]: value,
+        } as Partial<ReportFormData>);
+      }
+
+      if (errors[field.fieldKey]) {
+        setErrors((current) => ({ ...current, [field.fieldKey]: '' }));
+      }
+    };
+
+    const validate = (): boolean => {
+      const next: Record<string, string> = {};
+
+      for (const field of fields) {
+        if (field.fieldType === 'mob_justice_details') {
+          if (field.required && mobJusticeDetails) {
+            if (!mobJusticeDetails.trigger || !mobJusticeDetails.outcome || !mobJusticeDetails.ongoingStatus) {
+              next[field.fieldKey] =
+                language === 'bn'
+                  ? 'মব সহিংসতার প্রয়োজনীয় তথ্য পূরণ করুন।'
+                  : 'Complete the required Mob Justice details.';
+            }
+          }
+          continue;
+        }
+
+        if (field.fieldType === 'location') {
+          if (
+            field.required &&
+            (!formData.location?.division?.trim() ||
+              !formData.location?.district?.trim())
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'বিভাগ ও জেলা নির্বাচন করুন।'
+                : 'Select division and district.';
+          }
+          continue;
+        }
+
+        if (field.fieldType === 'evidence') {
+          continue;
+        }
+
+        if (field.fieldType === 'privacy') {
+          if (
+            formData.privacyChoice === 'public_identity' &&
+            !formData.confirmPublicIdentity
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'পাবলিক পরিচয় প্রকাশের সম্মতি নিশ্চিত করুন।'
+                : 'Confirm consent before publishing your identity.';
+          }
+          continue;
+        }
+
+        if (field.fieldType === 'subject_party') {
+          if (
+            field.required &&
+            !formData.reportedSubject?.trim() &&
+            !formData.organization?.trim()
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'একজন ব্যক্তি বা প্রতিষ্ঠানের তথ্য দিন।'
+                : 'Provide a person or organization.';
+          }
+          continue;
+        }
+
+        const value = readValue(field);
+
+        if (field.required && isEmpty(value)) {
+          next[field.fieldKey] =
+            language === 'bn' ? 'এই তথ্যটি আবশ্যক।' : 'This field is required.';
+          continue;
+        }
+
+        if (isEmpty(value)) continue;
+
+        const maxLength = Number(field.validation?.maxLength || 0);
+        if (
+          maxLength > 0 &&
+          typeof value === 'string' &&
+          value.length > maxLength
+        ) {
+          next[field.fieldKey] =
+            language === 'bn'
+              ? `সর্বোচ্চ ${maxLength} অক্ষর লিখুন।`
+              : `Use at most ${maxLength} characters.`;
+        }
+
+        if (field.fieldType === 'number' || field.fieldType === 'currency') {
+          const numberValue = Number(value);
+          if (!Number.isFinite(numberValue)) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? 'সঠিক সংখ্যা লিখুন।'
+                : 'Enter a valid number.';
+            continue;
+          }
+          if (
+            field.validation?.min !== undefined &&
+            numberValue < Number(field.validation.min)
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? `সর্বনিম্ন মান ${field.validation.min}।`
+                : `Minimum value is ${field.validation.min}.`;
+          }
+          if (
+            field.validation?.max !== undefined &&
+            numberValue > Number(field.validation.max)
+          ) {
+            next[field.fieldKey] =
+              language === 'bn'
+                ? `সর্বোচ্চ মান ${field.validation.max}।`
+                : `Maximum value is ${field.validation.max}.`;
+          }
+        }
+      }
+
+      setErrors(next);
+      const firstKey = Object.keys(next)[0];
+      if (firstKey) {
+        window.requestAnimationFrame(() => {
+          document
+            .getElementById(`configured-field-${firstKey}`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+      return Object.keys(next).length === 0;
+    };
+
+    useImperativeHandle(ref, () => ({ validateAndProceed: validate }));
+
+    if (fields.length === 0) return null;
+
+    const selectedDivision = getDivisionByStoredName(formData.location?.division);
+    const divisionId = selectedDivision?.id || '';
+    const districtOptions = divisionId
+      ? getDistrictsByDivision(divisionId)
+      : BANGLADESH_DISTRICTS;
+    const selectedDistrict = getDistrictByStoredName(formData.location?.district);
+    const districtId = selectedDistrict?.id || '';
+    const upazilaOptions = districtId ? getUpazilasByDistrict(districtId) : [];
+    const selectedUpazila = getUpazilaByStoredName(
+      formData.location?.upazilaOrThana,
+      districtId
+    );
+
+    const commonInputClass =
+      'w-full min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-body text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus';
+
+    const updateMentionedParty = (index: number, patch: Partial<MentionedParty>) => {
+      const next = [...(formData.mentionedParties || [])];
+      next[index] = { ...next[index], ...patch };
+      onUpdateFormData({ mentionedParties: next });
+    };
+
+    const addMentionedParty = () => {
+      const id =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `party-${Date.now()}`;
+      onUpdateFormData({
+        mentionedParties: [
+          ...(formData.mentionedParties || []),
+          {
+            id,
+            type: 'unknown',
+            name: '',
+            roleOrDesignation: '',
+            organization: '',
+            phoneOrContact: '',
+            publicProfileHandle: '',
+            address: '',
+            identifyingDescription: '',
+          },
+        ],
+      });
+    };
+
+    const removeMentionedParty = (index: number) => {
+      onUpdateFormData({
+        mentionedParties: (formData.mentionedParties || []).filter(
+          (_, itemIndex) => itemIndex !== index
+        ),
+      });
+    };
+
+    return (
+      <section
+        id="composer-section-configured-fields"
+        className="space-y-4 text-left"
+      >
+        {fields.map((field) => {
+          const value = readValue(field);
+          const label = getLabel(field, language);
+          const helper = language === 'bn' ? field.helperBn : field.helperEn;
+          const placeholder =
+            language === 'bn' ? field.placeholderBn : field.placeholderEn;
+          const error = errors[field.fieldKey];
+
+          if (field.fieldType === 'mob_justice_details') {
+            if (!mobJusticeDetails || !onMobJusticeDetailsChange) return null;
+            return (
+              <div key={field.fieldKey} id={`configured-field-${field.fieldKey}`}>
+                <MobJusticeDetailsFields
+                  value={mobJusticeDetails}
+                  errors={mobJusticeErrors}
+                  onChange={onMobJusticeDetailsChange}
+                  language={language}
+                />
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'location') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+              >
+                <div className="space-y-1">
+                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                    {label}
+                    {field.required ? ' *' : ''}
+                  </h3>
+                  {helper && (
+                    <p className="type-compact text-ui-content-secondary">
+                      {helper}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-division"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'বিভাগ' : 'Division'} *
+                    </label>
+                    <select
+                      id="configured-location-division"
+                      value={divisionId}
+                      onChange={(event) => {
+                        const division = DIVISIONS.find(
+                          (item) => item.id === event.target.value
+                        );
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            division: division?.nameEn || '',
+                            district: '',
+                            upazilaOrThana: '',
+                          },
+                        });
+                      }}
+                      className={commonInputClass}
+                    >
+                      <option value="">
+                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                      </option>
+                      {DIVISIONS.map((division) => (
+                        <option key={division.id} value={division.id}>
+                          {language === 'bn'
+                            ? division.nameBn
+                            : division.nameEn}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-district"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'জেলা' : 'District'} *
+                    </label>
+                    <select
+                      id="configured-location-district"
+                      value={districtId}
+                      disabled={!divisionId}
+                      onChange={(event) => {
+                        const district = BANGLADESH_DISTRICTS.find(
+                          (item) => item.id === event.target.value
+                        );
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            district: district?.nameEn || '',
+                            upazilaOrThana: '',
+                          },
+                        });
+                      }}
+                      className={commonInputClass}
+                    >
+                      <option value="">
+                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                      </option>
+                      {districtOptions.map((district) => (
+                        <option key={district.id} value={district.id}>
+                          {language === 'bn'
+                            ? district.nameBn
+                            : district.nameEn}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-upazila"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn'
+                        ? 'থানা / উপজেলা'
+                        : 'Thana / Upazila'}
+                    </label>
+                    <select
+                      id="configured-location-upazila"
+                      value={selectedUpazila?.id || ''}
+                      disabled={!districtId}
+                      onChange={(event) => {
+                        const item = upazilaOptions.find(
+                          (option) => option.id === event.target.value
+                        );
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            upazilaOrThana: item?.nameEn || '',
+                          },
+                        });
+                      }}
+                      className={commonInputClass}
+                    >
+                      <option value="">
+                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                      </option>
+                      {upazilaOptions.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {language === 'bn' ? item.nameBn : item.nameEn}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-area"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'এলাকা' : 'Area'}
+                    </label>
+                    <input
+                      id="configured-location-area"
+                      value={formData.location?.area || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            area: event.target.value,
+                          },
+                        })
+                      }
+                      className={commonInputClass}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-road"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'রাস্তা / সড়ক' : 'Road / street'}
+                    </label>
+                    <input
+                      id="configured-location-road"
+                      value={formData.location?.road || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            road: event.target.value,
+                          },
+                        })
+                      }
+                      className={commonInputClass}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="configured-location-landmark"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'ল্যান্ডমার্ক' : 'Landmark'}
+                    </label>
+                    <input
+                      id="configured-location-landmark"
+                      value={formData.location?.landmark || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            landmark: event.target.value,
+                          },
+                        })
+                      }
+                      className={commonInputClass}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label
+                      htmlFor="configured-location-address"
+                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    >
+                      {language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
+                    </label>
+                    <input
+                      id="configured-location-address"
+                      value={formData.location?.formattedAddress || ''}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          location: {
+                            ...formData.location,
+                            formattedAddress: event.target.value,
+                          },
+                        })
+                      }
+                      className={commonInputClass}
+                    />
+                  </div>
+                </div>
+                {error && (
+                  <p role="alert" className="type-compact text-ui-error-text">
+                    {error}
+                  </p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'evidence') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+              >
+                <div className="space-y-1">
+                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                    {label}
+                  </h3>
+                  {helper && (
+                    <p className="type-compact text-ui-content-secondary">
+                      {helper}
+                    </p>
+                  )}
+                </div>
+                <ImageAttachmentPicker
+                  images={pendingImages}
+                  onChange={(images) => {
+                    onPendingImagesChange(images);
+                    onUpdateFormData({
+                      hasSupportingInfo:
+                        images.length > 0 ||
+                        Boolean(formData.evidenceDescription?.trim()),
+                    });
+                  }}
+                  language={language}
+                />
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="configured-evidence-description"
+                    className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                  >
+                    {language === 'bn'
+                      ? 'সহায়ক তথ্যের বিবরণ'
+                      : 'Supporting information notes'}
+                  </label>
+                  <textarea
+                    id="configured-evidence-description"
+                    rows={3}
+                    value={formData.evidenceDescription || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        evidenceDescription: event.target.value,
+                        hasSupportingInfo:
+                          pendingImages.length > 0 ||
+                          Boolean(event.target.value.trim()),
+                      })
+                    }
+                    className={`${commonInputClass} resize-y`}
+                  />
+                </div>
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'privacy') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+              >
+                <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                  {label}
+                </h3>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {[
+                    {
+                      value: 'anonymous',
+                      en: 'Anonymous',
+                      bn: 'নাম প্রকাশ নয়',
+                    },
+                    {
+                      value: 'admin_only',
+                      en: 'Admin only',
+                      bn: 'শুধু অ্যাডমিন',
+                    },
+                    {
+                      value: 'public_identity',
+                      en: 'Public identity',
+                      bn: 'পাবলিক পরিচয়',
+                    },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
+                    >
+                      <input
+                        type="radio"
+                        name="configured-privacy-choice"
+                        value={option.value}
+                        checked={
+                          (formData.privacyChoice || 'anonymous') === option.value
+                        }
+                        onChange={() =>
+                          onUpdateFormData({
+                            privacyChoice: option.value as
+                              | 'anonymous'
+                              | 'admin_only'
+                              | 'public_identity',
+                            confirmPublicIdentity:
+                              option.value === 'public_identity'
+                                ? formData.confirmPublicIdentity
+                                : false,
+                          })
+                        }
+                      />
+                      {language === 'bn' ? option.bn : option.en}
+                    </label>
+                  ))}
+                </div>
+
+                {(formData.privacyChoice === 'admin_only' ||
+                  formData.privacyChoice === 'public_identity') && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label
+                        htmlFor="configured-admin-name"
+                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      >
+                        {language === 'bn' ? 'নাম' : 'Name'}
+                      </label>
+                      <input
+                        id="configured-admin-name"
+                        value={formData.adminName || ''}
+                        onChange={(event) =>
+                          onUpdateFormData({ adminName: event.target.value })
+                        }
+                        className={commonInputClass}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label
+                        htmlFor="configured-admin-contact"
+                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      >
+                        {language === 'bn' ? 'যোগাযোগ' : 'Contact'}
+                      </label>
+                      <input
+                        id="configured-admin-contact"
+                        value={formData.adminContact || ''}
+                        onChange={(event) =>
+                          onUpdateFormData({ adminContact: event.target.value })
+                        }
+                        className={commonInputClass}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {formData.privacyChoice === 'public_identity' && (
+                  <label className="flex min-h-[44px] cursor-pointer items-start gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(formData.confirmPublicIdentity)}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          confirmPublicIdentity: event.target.checked,
+                        })
+                      }
+                      className="mt-1"
+                    />
+                    <span className="type-compact text-ui-content-primary">
+                      {language === 'bn'
+                        ? 'আমি আমার পরিচয় প্রকাশ্যে দেখানোর জন্য সম্মতি দিচ্ছি।'
+                        : 'I consent to displaying my identity publicly.'}
+                    </span>
+                  </label>
+                )}
+
+                {error && (
+                  <p role="alert" className="type-compact text-ui-error-text">
+                    {error}
+                  </p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.fieldType === 'subject_party') {
+            return (
+              <div
+                key={field.fieldKey}
+                id={`configured-field-${field.fieldKey}`}
+                className="space-y-4 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5"
+              >
+                <div className="space-y-1">
+                  <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
+                    {label}
+                    {field.required ? ' *' : ''}
+                  </h3>
+                  {helper && <p className="type-compact text-ui-content-secondary">{helper}</p>}
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label htmlFor="configured-party-type" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {language === 'bn' ? 'ধরন' : 'Type'}
+                    </label>
+                    <select
+                      id="configured-party-type"
+                      value={formData.subjectType || 'unknown'}
+                      onChange={(event) =>
+                        onUpdateFormData({
+                          subjectType: event.target.value as ReportFormData['subjectType'],
+                        })
+                      }
+                      className={commonInputClass}
+                    >
+                      <option value="unknown">{language === 'bn' ? 'অনির্দিষ্ট' : 'Not specified'}</option>
+                      <option value="individual">{language === 'bn' ? 'ব্যক্তি' : 'Individual'}</option>
+                      <option value="business">{language === 'bn' ? 'ব্যবসা' : 'Business'}</option>
+                      <option value="group">{language === 'bn' ? 'গোষ্ঠী' : 'Group'}</option>
+                      <option value="organization">{language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor="configured-party-name" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {language === 'bn' ? 'নাম' : 'Name'}
+                    </label>
+                    <input id="configured-party-name" value={formData.reportedSubject || ''} onChange={(event) => onUpdateFormData({ reportedSubject: event.target.value })} className={commonInputClass} />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor="configured-party-role" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
+                    </label>
+                    <input id="configured-party-role" value={formData.roleOrDesignation || ''} onChange={(event) => onUpdateFormData({ roleOrDesignation: event.target.value })} className={commonInputClass} />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor="configured-party-org" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
+                    </label>
+                    <input id="configured-party-org" value={formData.organization || ''} onChange={(event) => onUpdateFormData({ organization: event.target.value })} className={commonInputClass} />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor="configured-party-profile" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {language === 'bn' ? 'পাবলিক প্রোফাইল / হ্যান্ডেল' : 'Public profile / handle'}
+                    </label>
+                    <input id="configured-party-profile" value={formData.publicProfileHandle || ''} onChange={(event) => onUpdateFormData({ publicProfileHandle: event.target.value })} className={commonInputClass} />
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label htmlFor="configured-party-description" className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      {language === 'bn' ? 'চেনার জন্য অতিরিক্ত বিবরণ' : 'Additional identifying description'}
+                    </label>
+                    <textarea id="configured-party-description" rows={3} value={formData.identifyingDescription || ''} onChange={(event) => onUpdateFormData({ identifyingDescription: event.target.value })} className={`${commonInputClass} resize-y`} />
+                  </div>
+                </div>
+
+                {(formData.mentionedParties || []).length > 0 && (
+                  <div className="space-y-3 border-t border-ui-stroke-subtle pt-4">
+                    <h4 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                      {language === 'bn' ? 'অতিরিক্ত উল্লেখিত ব্যক্তি / প্রতিষ্ঠান' : 'Additional mentioned people / organizations'}
+                    </h4>
+                    {(formData.mentionedParties || []).map((party, index) => (
+                      <div key={party.id} className="space-y-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <input aria-label={language === 'bn' ? 'নাম' : 'Name'} placeholder={language === 'bn' ? 'নাম' : 'Name'} value={party.name || ''} onChange={(event) => updateMentionedParty(index, { name: event.target.value })} className={commonInputClass} />
+                          <input aria-label={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'} placeholder={language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'} value={party.organization || ''} onChange={(event) => updateMentionedParty(index, { organization: event.target.value })} className={commonInputClass} />
+                          <input aria-label={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'} placeholder={language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'} value={party.roleOrDesignation || ''} onChange={(event) => updateMentionedParty(index, { roleOrDesignation: event.target.value })} className={commonInputClass} />
+                          <input aria-label={language === 'bn' ? 'পাবলিক প্রোফাইল' : 'Public profile'} placeholder={language === 'bn' ? 'পাবলিক প্রোফাইল' : 'Public profile'} value={party.publicProfileHandle || ''} onChange={(event) => updateMentionedParty(index, { publicProfileHandle: event.target.value })} className={commonInputClass} />
+                        </div>
+                        <button type="button" onClick={() => removeMentionedParty(index)} className="min-h-[40px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+                          {language === 'bn' ? 'সরান' : 'Remove'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button type="button" onClick={addMentionedParty} className="min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+                  {language === 'bn' ? 'আরও ব্যক্তি / প্রতিষ্ঠান যোগ করুন' : 'Add another person / organization'}
+                </button>
+
+                {error && <p role="alert" className="type-compact text-ui-error-text">{error}</p>}
+              </div>
+            );
+          }
+
+          const fullWidth =
+            field.fieldType === 'textarea' || field.fieldType === 'multiselect';
+
+          return (
+            <div
+              key={field.fieldKey}
+              id={`configured-field-${field.fieldKey}`}
+              className={`space-y-1.5 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5 ${
+                fullWidth ? '' : ''
+              }`}
+            >
+              <label
+                htmlFor={`configured-input-${field.fieldKey}`}
+                className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+              >
+                {label}
+                {field.required ? ' *' : ''}
+              </label>
+
+              {field.fieldType === 'textarea' ? (
+                <textarea
+                  id={`configured-input-${field.fieldKey}`}
+                  rows={5}
+                  value={String(value ?? '')}
+                  placeholder={placeholder}
+                  onChange={(event) => setValue(field, event.target.value)}
+                  className={`${commonInputClass} resize-y`}
+                />
+              ) : field.fieldType === 'select' ? (
+                <select
+                  id={`configured-input-${field.fieldKey}`}
+                  value={String(value ?? '')}
+                  onChange={(event) => setValue(field, event.target.value)}
+                  className={commonInputClass}
+                >
+                  <option value="">
+                    {language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                  </option>
+                  {field.options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {language === 'bn' ? option.labelBn : option.labelEn}
+                    </option>
+                  ))}
+                </select>
+              ) : field.fieldType === 'radio' ? (
+                <div
+                  role="radiogroup"
+                  aria-label={label}
+                  className="flex flex-wrap gap-2"
+                >
+                  {field.options.map((option) => (
+                    <label
+                      key={option.value}
+                      className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
+                    >
+                      <input
+                        type="radio"
+                        name={`configured-${field.fieldKey}`}
+                        value={option.value}
+                        checked={value === option.value}
+                        onChange={() => setValue(field, option.value)}
+                      />
+                      {language === 'bn' ? option.labelBn : option.labelEn}
+                    </label>
+                  ))}
+                </div>
+              ) : field.fieldType === 'checkbox' ? (
+                <label className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary">
+                  <input
+                    id={`configured-input-${field.fieldKey}`}
+                    type="checkbox"
+                    checked={Boolean(value)}
+                    onChange={(event) => setValue(field, event.target.checked)}
+                  />
+                  {helper || label}
+                </label>
+              ) : field.fieldType === 'multiselect' ? (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {field.options.map((option) => {
+                    const selected = Array.isArray(value)
+                      ? value.includes(option.value)
+                      : false;
+                    return (
+                      <label
+                        key={option.value}
+                        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact text-ui-content-primary"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={(event) => {
+                            const current = Array.isArray(value)
+                              ? [...value]
+                              : [];
+                            const next = event.target.checked
+                              ? [...current, option.value]
+                              : current.filter((item) => item !== option.value);
+                            setValue(field, next);
+                          }}
+                        />
+                        {language === 'bn' ? option.labelBn : option.labelEn}
+                      </label>
+                    );
+                  })}
+                </div>
+              ) : (
+                <input
+                  id={`configured-input-${field.fieldKey}`}
+                  type={
+                    field.fieldType === 'currency' ||
+                    field.fieldType === 'number'
+                      ? 'number'
+                      : field.fieldType === 'phone'
+                        ? 'tel'
+                        : field.fieldType === 'url'
+                          ? 'url'
+                          : field.fieldType === 'email'
+                            ? 'email'
+                            : field.fieldType
+                  }
+                  value={String(value ?? '')}
+                  placeholder={placeholder}
+                  min={
+                    field.validation?.min !== undefined
+                      ? Number(field.validation.min)
+                      : undefined
+                  }
+                  max={
+                    field.validation?.max !== undefined
+                      ? Number(field.validation.max)
+                      : undefined
+                  }
+                  maxLength={
+                    field.validation?.maxLength !== undefined
+                      ? Number(field.validation.maxLength)
+                      : undefined
+                  }
+                  onChange={(event) => setValue(field, event.target.value)}
+                  className={commonInputClass}
+                />
+              )}
+
+              {field.fieldType !== 'checkbox' && helper && (
+                <p className="type-compact text-ui-content-muted">{helper}</p>
+              )}
+              {error && (
+                <p role="alert" className="type-compact text-ui-error-text">
+                  {error}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </section>
+    );
+  }
+);
+
+ConfiguredFieldsSection.displayName = 'ConfiguredFieldsSection';
+
+export default ConfiguredFieldsSection;

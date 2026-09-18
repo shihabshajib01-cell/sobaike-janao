@@ -1,5 +1,6 @@
 import React from 'react';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 
 export interface FilterChipProps {
   id?: string;
@@ -24,7 +25,8 @@ export const FilterChip: React.FC<FilterChipProps> = ({
   disabled = false,
   className = '',
 }) => {
-  const config = section ? SECTIONS[section] : null;
+  const { getSegment } = useTaxonomy();
+  const config = section ? getSegment(section) : null;
 
   return (
     <button
@@ -36,9 +38,9 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       style={
         selected && section
           ? {
-              backgroundColor: `var(--sec-${section}-primary)`,
-              borderColor: `var(--sec-${section}-primary)`,
-              color: `var(--sec-${section}-on-primary, var(--ui-text-inverse))`,
+              backgroundColor: config?.primaryColor || 'var(--ui-action-bg)',
+              borderColor: config?.primaryColor || 'var(--ui-action-bg)',
+              color: 'var(--ui-action-text)',
             }
           : undefined
       }
