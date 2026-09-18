@@ -9,6 +9,13 @@ export interface SupabaseSegmentRow {
   name_en: string;
   active?: boolean;
   sort_order?: number;
+  slug?: string;
+  short_name_bn?: string;
+  short_name_en?: string;
+  description_bn?: string;
+  description_en?: string;
+  icon_key?: string;
+  theme_key?: string;
   [key: string]: any;
 }
 
@@ -125,9 +132,15 @@ export const TaxonomyService = {
 
           nextSegments[row.id] = {
             ...fallback,
+            key,
             id: row.id,
+            slug: row.slug ? `/category/${row.slug}` : fallback.slug,
             nameBn: row.name_bn || fallback.nameBn,
             nameEn: row.name_en || fallback.nameEn,
+            shortNameBn: row.short_name_bn || row.name_bn || fallback.shortNameBn,
+            shortNameEn: row.short_name_en || row.name_en || fallback.shortNameEn,
+            descriptionBn: row.description_bn || fallback.descriptionBn,
+            descriptionEn: row.description_en || fallback.descriptionEn,
             sortOrder: typeof row.sort_order === 'number' ? row.sort_order : undefined,
           };
         });
