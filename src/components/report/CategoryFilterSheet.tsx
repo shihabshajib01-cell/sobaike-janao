@@ -6,7 +6,7 @@ import {
   EMPTY_CATEGORY_FEED_FILTERS,
 } from '../../data/categoryFeedFilters';
 import { SectionKey } from '../../theme/tokens';
-import { Button } from '../ui/Button';
+import { ModalActions } from '../ui/ModalActions';
 import { Modal } from '../ui/Modal';
 import { SearchableSelect } from '../ui/SearchableSelect';
 import { Select } from '../ui/Select';
@@ -71,24 +71,23 @@ export const CategoryFilterSheet: React.FC<CategoryFilterSheetProps> = ({
       maxWidth="lg"
       mobilePresentation="sheet"
       footer={
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 w-full">
-          <Button
-            id={`${section}-filter-reset-btn`}
-            type="button"
-            variant="outline"
-            onClick={() => setDraft({ ...EMPTY_CATEGORY_FEED_FILTERS })}
-          >
-            {isBn ? 'ফিল্টার মুছুন' : 'Clear filters'}
-          </Button>
-          <Button
-            id={`${section}-filter-apply-btn`}
-            type="button"
-            fullWidth
-            onClick={() => onApply({ ...draft })}
-          >
-            {isBn ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters'}
-          </Button>
-        </div>
+        <ModalActions
+          primary={{
+            id: `${section}-filter-apply-btn`,
+            type: 'button',
+            onClick: () => {
+              onApply({ ...draft });
+              onClose();
+            },
+            label: isBn ? 'ফিল্টার প্রয়োগ করুন' : 'Apply filters',
+          }}
+          secondary={{
+            id: `${section}-filter-reset-btn`,
+            type: 'button',
+            onClick: resetDraft,
+            label: isBn ? 'ফিল্টার মুছুন' : 'Clear filters',
+          }}
+        />
       }
     >
       <div className="space-y-5">
