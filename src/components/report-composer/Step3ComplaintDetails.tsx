@@ -1909,6 +1909,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
                 <div className="flex justify-start pt-0.5">
                   <button
+                    id="reporter-location-allow-btn"
                     type="button"
                     onClick={handleRetryLocationClick}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-[var(--radius-control)] bg-ui-action-bg hover:bg-ui-action-hover text-ui-action-text type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer shadow-[var(--elevation-xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
@@ -1930,6 +1931,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
                 <div className="flex justify-start pt-0.5">
                   <button
+                    id="reporter-location-allow-btn"
                     type="button"
                     onClick={handleRetryLocationClick}
                     className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-[var(--radius-control)] bg-ui-warning-text hover:opacity-90 text-ui-surface type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer shadow-[var(--elevation-xs)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95"
@@ -1967,6 +1969,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </div>
                 <div className="flex justify-start pt-0.5">
                   <button
+                    id="reporter-location-allow-btn"
                     type="button"
                     onClick={handleRetryLocationClick}
                     aria-describedby={errors.reporterLocation ? 'reporter-location-error' : undefined}
