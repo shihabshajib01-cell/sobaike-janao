@@ -573,30 +573,91 @@ export const PublicReportService = {
     segment: SectionKey,
     filters?: Omit<PublicReportFilters, 'segment'>
   ): Promise<ReportItem[]> {
+    const applySegmentFilters = (items: ReportItem[]): ReportItem[] => {
+      let result = items.filter((report) => report.segment === segment);
+
+      if (filters?.subcategory && filters.subcategory !== 'all') {
+        result = result.filter((report) => report.subcategoryId === filters.subcategory);
+      }
+      if (
+        filters?.affectedPersonAgeGroup &&
+        filters.affectedPersonAgeGroup !== 'all'
+      ) {
+        result = result.filter(
+          (report) =>
+            report.affectedPersonAgeGroup === filters.affectedPersonAgeGroup
+        );
+      }
+      if (
+        filters?.allegedAbuserRelationship &&
+        filters.allegedAbuserRelationship !== 'all'
+      ) {
+        result = result.filter(
+          (report) =>
+            report.allegedAbuserRelationship ===
+            filters.allegedAbuserRelationship
+        );
+      }
+      if (filters?.reportingFor && filters.reportingFor !== 'all') {
+        result = result.filter(
+          (report) => report.reportingFor === filters.reportingFor
+        );
+      }
+      if (filters?.limit && filters.limit > 0) {
+        result = result.slice(0, filters.limit);
+      }
+      return result;
+    };
+
+    const canUseSegmentRpc =
+      isSupabaseConfigured() &&
+      supabase &&
+      (!filters?.district || filters.district === 'all');
+
+    if (canUseSegmentRpc) {
+      const dedupKey =
+        `rpc:get_public_segment_feed:${segment}:${filters?.visitorLat ?? 'null'}:${filters?.visitorLng ?? 'null'}`;
+
+      try {
+        const { data, error } = await fetchWithDeduplication(dedupKey, () =>
+          supabase!.rpc('get_public_segment_feed', {
+            p_segment: segment,
+            p_visitor_lat: filters?.visitorLat ?? null,
+            p_visitor_lng: filters?.visitorLng ?? null,
+          })
+        );
+
+        if (!error && Array.isArray(data)) {
+          return applySegmentFilters(
+            data.map((raw: SupabasePublicReportRPC) =>
+              mapSupabasePublicReportToItem(raw)
+            )
+          );
+        }
+
+        if (error) {
+          console.warn(
+            '[PublicReportService.getBySegment] Segment RPC unavailable; using compatibility fallback:',
+            error
+          );
+        }
+      } catch (error) {
+        console.warn(
+          '[PublicReportService.getBySegment] Segment RPC failed; using compatibility fallback:',
+          error
+        );
+      }
+    }
+
     if (filters?.visitorLat != null && filters?.visitorLng != null) {
       const ranked = await this.getHomeFeed({
         visitorLat: filters.visitorLat,
         visitorLng: filters.visitorLng,
         district: filters.district || 'all',
       });
-      let result = ranked.filter((r) => r.segment === segment);
-      if (filters.subcategory && filters.subcategory !== 'all') {
-        result = result.filter((r) => r.subcategoryId === filters.subcategory);
-      }
-      if (filters.affectedPersonAgeGroup && filters.affectedPersonAgeGroup !== 'all') {
-        result = result.filter((r) => r.affectedPersonAgeGroup === filters.affectedPersonAgeGroup);
-      }
-      if (filters.allegedAbuserRelationship && filters.allegedAbuserRelationship !== 'all') {
-        result = result.filter((r) => r.allegedAbuserRelationship === filters.allegedAbuserRelationship);
-      }
-      if (filters.reportingFor && filters.reportingFor !== 'all') {
-        result = result.filter((r) => r.reportingFor === filters.reportingFor);
-      }
-      if (filters.limit && filters.limit > 0) {
-        result = result.slice(0, filters.limit);
-      }
-      return result;
+      return applySegmentFilters(ranked);
     }
+
     return this.getAll({ ...filters, segment });
   },
 
