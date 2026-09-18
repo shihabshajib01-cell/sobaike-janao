@@ -111,6 +111,9 @@ export interface ReportItem {
   recentBillAmount?: number;
   previousBillMonth?: string;
   previousBillAmount?: number;
+  briberyDepartment?: string;
+  briberyService?: string;
+  briberyAmount?: number;
   utilityEndTime?: string;
   publishedDateBn: string;
   publishedDateEn: string;
