@@ -50,6 +50,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const controlId = id || `searchable-select-${generatedId.replace(/:/g, '')}`;
   const listboxId = `${controlId}-listbox`;
   const { helperId, errorId, labelId } = formFieldIds(controlId);
+  const describedBy = [helperText ? helperId : undefined, error ? errorId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined;
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -303,7 +306,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           aria-label={resolvedAccessibleLabel}
           aria-required={required || undefined}
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? errorId : helperText ? helperId : undefined}
+          aria-describedby={describedBy}
           disabled={disabled}
           onClick={() => (isOpen ? close() : open())}
           onKeyDown={(event) => {
