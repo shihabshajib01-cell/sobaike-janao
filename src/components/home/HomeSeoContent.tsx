@@ -22,11 +22,11 @@ export const HomeSeoContent: React.FC<HomeSeoContentProps> = ({ language }) => {
       aria-labelledby="home-platform-information-title"
     >
       <h2 id="home-platform-information-title" className="type-h2 text-ui-content-primary">
-        {isBn ? 'সবাইকে জানাও সম্পর্কে' : 'About Sobaike Janao'}
+        {isBn ? 'Sobaike Janao — সবাইকে জানাও সম্পর্কে' : 'About Sobaike Janao'}
       </h2>
       <p className="type-body text-ui-content-secondary">
         {isBn
-          ? 'সবাইকে জানাও বাংলাদেশের নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ দায়িত্বশীলভাবে প্রকাশ করার একটি স্বাধীন, মডারেটেড প্ল্যাটফর্ম। এটি কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী প্রতিষ্ঠানের ওয়েবসাইট নয়।'
+          ? 'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ দায়িত্বশীলভাবে প্রকাশ করার একটি স্বাধীন, মডারেটেড প্ল্যাটফর্ম। এটি কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী প্রতিষ্ঠানের ওয়েবসাইট নয়।'
           : 'Sobaike Janao is an independent, moderated platform where people in Bangladesh can responsibly publish public-interest information, experiences, and observations. It is not a government or law-enforcement website.'}
       </p>
 
