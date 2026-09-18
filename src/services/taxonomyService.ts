@@ -73,9 +73,9 @@ export const isManagedThemePreset = (themeKey?: string): boolean =>
 const buildDynamicTheme = (themeKey?: string) => {
   const preset = THEME_PRESETS[themeKey || ''] || THEME_PRESETS.sky;
   const primary = preset.primary;
-  const background = `color-mix(in srgb, ${primary} 10%, var(--ui-surface))`;
-  const border = `color-mix(in srgb, ${primary} 35%, var(--ui-surface))`;
-  const text = `color-mix(in srgb, ${primary} 72%, var(--ui-text-primary))`;
+  const background = `color-mix(in srgb, ${primary} 10%, var(--md-surface))`;
+  const border = `color-mix(in srgb, ${primary} 35%, var(--md-surface))`;
+  const text = `color-mix(in srgb, ${primary} 72%, var(--md-on-surface))`;
 
   return {
     primaryColor: primary,
@@ -106,14 +106,12 @@ const clearRuntimeSectionCssVariables = (segmentId: string) => {
   if (!safeId) return;
 
   const style = document.documentElement.style;
-  [
-    'primary',
-    'hover',
-    'bg',
-    'border',
-    'text',
-    'on-primary',
-  ].forEach((token) => style.removeProperty(`--sec-${safeId}-${token}`));
+  ['primary', 'hover', 'container', 'on-container', 'outline', 'on-primary'].forEach((token) =>
+    style.removeProperty(`--category-${safeId}-${token}`)
+  );
+  ['primary', 'hover', 'bg', 'border', 'text', 'on-primary'].forEach((token) =>
+    style.removeProperty(`--sec-${safeId}-${token}`)
+  );
 };
 
 const applyRuntimeSectionCssVariables = (segment: SegmentTaxonomyItem) => {
@@ -123,12 +121,20 @@ const applyRuntimeSectionCssVariables = (segment: SegmentTaxonomyItem) => {
   if (!safeId) return;
 
   const style = document.documentElement.style;
-  style.setProperty(`--sec-${safeId}-primary`, segment.primaryColor);
-  style.setProperty(`--sec-${safeId}-hover`, segment.hoverColor);
-  style.setProperty(`--sec-${safeId}-bg`, segment.bgColor);
-  style.setProperty(`--sec-${safeId}-border`, segment.borderColor);
-  style.setProperty(`--sec-${safeId}-text`, segment.textColor);
-  style.setProperty(`--sec-${safeId}-on-primary`, segment.colors.filledText);
+  style.setProperty(`--category-${safeId}-primary`, segment.primaryColor);
+  style.setProperty(`--category-${safeId}-hover`, segment.hoverColor);
+  style.setProperty(`--category-${safeId}-container`, segment.bgColor);
+  style.setProperty(`--category-${safeId}-on-container`, segment.textColor);
+  style.setProperty(`--category-${safeId}-outline`, segment.borderColor);
+  style.setProperty(`--category-${safeId}-on-primary`, segment.colors.filledText);
+
+  // Compatibility aliases for existing section-aware selectors.
+  style.setProperty(`--sec-${safeId}-primary`, `var(--category-${safeId}-primary)`);
+  style.setProperty(`--sec-${safeId}-hover`, `var(--category-${safeId}-hover)`);
+  style.setProperty(`--sec-${safeId}-bg`, `var(--category-${safeId}-container)`);
+  style.setProperty(`--sec-${safeId}-border`, `var(--category-${safeId}-outline)`);
+  style.setProperty(`--sec-${safeId}-text`, `var(--category-${safeId}-on-container)`);
+  style.setProperty(`--sec-${safeId}-on-primary`, `var(--category-${safeId}-on-primary)`);
 };
 
 // In-memory cache initialized from the unified local section registry. This keeps
