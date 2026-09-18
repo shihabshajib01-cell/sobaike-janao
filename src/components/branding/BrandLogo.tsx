@@ -15,7 +15,7 @@ export interface BrandLogoProps {
 const getBrandAsset = (fileName: string) => {
   const base = import.meta.env.BASE_URL;
   if (!base || base === '/') {
-    return `./brand/${fileName}`;
+    return `/brand/${fileName}`;
   }
   const normalizedBase = base.endsWith('/') ? base : `${base}/`;
   return `${normalizedBase}brand/${fileName}`;
