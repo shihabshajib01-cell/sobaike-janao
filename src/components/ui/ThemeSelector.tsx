@@ -60,7 +60,6 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
         <button
           type="button"
           id="compact-theme-selector-btn"
-          aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-label={language === 'bn' ? 'থিম নির্বাচন' : 'Select theme'}
           onClick={() => setIsOpen(!isOpen)}
@@ -78,7 +77,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
 
         {isOpen && (
           <div
-            role="listbox"
+            role="group"
             aria-label={language === 'bn' ? 'থিম তালিকা' : 'Theme list'}
             className="absolute bottom-full mb-2 left-0 right-0 z-50 bg-ui-surface-elevated border border-ui-stroke-default rounded-[var(--radius-control)] shadow-[var(--elevation-lg)] p-1.5 space-y-1"
           >
@@ -89,8 +88,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
                 <button
                   key={opt.id}
                   type="button"
-                  role="option"
-                  aria-selected={isSelected}
+                  aria-pressed={isSelected}
                   onClick={() => {
                     setThemePreference(opt.id);
                     setIsOpen(false);
@@ -119,7 +117,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
     return (
       <div
         className={`grid grid-cols-3 gap-2.5 ${className}`}
-        role="radiogroup"
+        role="group"
         aria-label={language === 'bn' ? 'থিম' : 'Theme'}
       >
         {options.map((opt) => {
@@ -129,8 +127,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
             <button
               key={opt.id}
               type="button"
-              role="radio"
-              aria-checked={isSelected}
+              aria-pressed={isSelected}
               onClick={() => setThemePreference(opt.id)}
               className={`flex flex-col items-center justify-center p-3 rounded-[var(--radius-card)] border transition-all cursor-pointer min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isSelected
