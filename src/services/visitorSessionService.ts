@@ -20,6 +20,11 @@ export type PermissionStatus =
   | 'prompt'
   | 'unavailable';
 
+export type BrowseLocationRequestMode =
+  | 'restore'
+  | 'permission_upgrade'
+  | 'user_request';
+
 export interface VisitorMetadata {
   browser_name: string;
   browser_version: string;
@@ -55,6 +60,7 @@ export interface LocationRequestResult {
 let activeWatchId: number | null = null;
 let lastRecordedLocation: StoredLocation | null = null;
 let isAcquiringPosition = false;
+let browseIntentVersion = 0;
 let permissionStatusObj: (EventTarget & { state: string }) | null = null;
 
 type LocationChangeListener = (location: StoredLocation | null) => void;
@@ -351,11 +357,19 @@ export const VisitorSessionService = {
   },
 
   /**
+   * Invalidate every in-flight browse geolocation request. Browser geolocation
+   * cannot be reliably cancelled, so late callbacks must be ignored instead.
+   */
+  invalidateBrowseLocationRequests(): void {
+    browseIntentVersion += 1;
+  },
+
+  /**
    * Handles user clicking "Share Location" on the consent modal
    */
   async requestAndRecordLocation(
     _purpose: 'browse' | 'report' = 'browse',
-    options?: { silent?: boolean }
+    options?: { mode?: BrowseLocationRequestMode }
   ): Promise<LocationRequestResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       await this.recordSession('unavailable');
@@ -363,19 +377,30 @@ export const VisitorSessionService = {
     }
 
     return new Promise((resolve) => {
+      const requestMode: BrowseLocationRequestMode =
+        options?.mode || (_purpose === 'browse' ? 'user_request' : 'restore');
+      const requestIntentVersion = browseIntentVersion;
+
+      const browseRequestStillValid = (): boolean => {
+        if (_purpose !== 'browse') return true;
+        if (requestIntentVersion !== browseIntentVersion) return false;
+
+        const currentChoice = this.getLocationChoice();
+        if (requestMode !== 'user_request' && currentChoice === 'not_now') {
+          return false;
+        }
+        if (requestMode === 'restore' && currentChoice === 'denied') {
+          return false;
+        }
+        return true;
+      };
+
       isAcquiringPosition = true;
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           isAcquiringPosition = false;
 
-          // A silent refresh must never override a newer explicit "Not now"
-          // or denied choice that happened while the browser request was in flight.
-          const currentChoice = this.getLocationChoice();
-          if (
-            _purpose === 'browse' &&
-            options?.silent === true &&
-            (currentChoice === 'not_now' || currentChoice === 'denied')
-          ) {
+          if (!browseRequestStillValid()) {
             resolve({ success: false, status: 'prompt' });
             return;
           }
@@ -394,15 +419,19 @@ export const VisitorSessionService = {
         },
         async (error) => {
           isAcquiringPosition = false;
+
+          if (!browseRequestStillValid()) {
+            resolve({ success: false, status: 'prompt' });
+            return;
+          }
+
           let status: PermissionStatus = 'unavailable';
           let errorType: 'denied' | 'timeout' | 'unavailable' = 'unavailable';
 
           if (error.code === error.PERMISSION_DENIED) {
             status = 'denied';
             errorType = 'denied';
-            if (!(options?.silent === true && this.getLocationChoice() === 'not_now')) {
-              this.setLocationChoice('denied');
-            }
+            this.setLocationChoice('denied');
             this.clearMemoryLocation();
           } else if (error.code === error.TIMEOUT) {
             status = 'unavailable';
@@ -430,6 +459,9 @@ export const VisitorSessionService = {
    * Handles user clicking "Not Now"
    */
   async handleNotNow(): Promise<void> {
+    // Explicit user intent always wins over any geolocation request that may
+    // already be in flight.
+    this.invalidateBrowseLocationRequests();
     this.setLocationChoice('not_now');
     this.clearMemoryLocation();
     await this.recordSession('prompt');
