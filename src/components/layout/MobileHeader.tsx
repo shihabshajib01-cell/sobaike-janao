@@ -320,7 +320,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               onClick={() => goBackWithFallback(() => navigateTo('/'))}
               aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
               data-mobile-floating-control={isCompact ? 'true' : undefined}
-              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={<AppIcon name="arrow-left" size="xl" strokeWidth={2} />}
             />
 
@@ -348,7 +348,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                   : 'Share report'
               }
               data-mobile-floating-control={isCompact ? 'true' : undefined}
-              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={
                 isShareConfirmed ? (
                   <AppIcon name="check" size="xl" strokeWidth={2} className="text-ui-success-text" />
@@ -389,7 +389,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               onClick={() => navigateTo('/issues')}
               aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
               data-mobile-floating-control={isCompact ? 'true' : undefined}
-              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={<AppIcon name="arrow-left" size="xl" strokeWidth={2} />}
             />
 
@@ -411,7 +411,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
                 aria-haspopup="dialog"
                 data-mobile-floating-control={isCompact ? 'true' : undefined}
-                className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+                className={`${isCompact ? 'pointer-events-auto !bg-ui-surface ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
                 icon={<AppIcon name="filter" size="xl" strokeWidth={2} />}
               />
             ) : (
@@ -508,7 +508,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
             data-mobile-floating-control="true"
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
               isCompact ? 'scale-100 delay-[60ms] motion-reduce:delay-0' : 'scale-90 delay-0 motion-reduce:delay-0'
             }`}
             icon={<AppIcon name="menu" size="xl" strokeWidth={2} />}
@@ -521,7 +521,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
             data-mobile-floating-control="true"
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-12 h-12 min-w-[48px] min-h-[48px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-12 h-12 min-w-[48px] min-h-[48px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isCompact ? 'scale-100 delay-[60ms] motion-reduce:delay-0' : 'scale-90 delay-0 motion-reduce:delay-0'
             }`}
           >
