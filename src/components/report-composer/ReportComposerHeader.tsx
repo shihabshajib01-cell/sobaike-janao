@@ -80,7 +80,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
         <div className="flex items-center gap-3 min-w-0">
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary leading-tight">
+              <h2 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary">
                 {language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
               </h2>
 
@@ -105,7 +105,7 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               tabIndex={-1}
               aria-live="polite"
               aria-atomic="true"
-              className="type-helper text-ui-content-secondary leading-tight mt-1 focus:outline-none"
+              className="type-helper text-ui-content-secondary mt-1 focus:outline-none"
             >
               <span>
                 {language === 'bn'
