@@ -132,7 +132,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const loc = VisitorSessionService.getLastRecordedLocation();
     return loc ? { ...loc, source: 'device' as const } : null;
   });
-  const [browseLocationStatus, setBrowseLocationStatus] = useState<BrowseLocationStatus>('not_asked');
+  // Start in a short resolving state so pages do not issue an unranked request
+  // before the persisted browse-location preference has been restored.
+  const [browseLocationStatus, setBrowseLocationStatus] =
+    useState<BrowseLocationStatus>('requesting');
 
   const refreshBrowseLocation = useCallback(async () => {
     const resolveApproximate = async (
