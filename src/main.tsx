@@ -2,8 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { hydratePublishedBannerContent } from './services/bannerRuntime';
 import { applyStoredTextSizePreference } from './context/TextSizeContext';
+import { scheduleIdleTask } from './utils/scheduleIdleTask';
 import './index.css';
 import './theme/color-system.css';
 import './theme/desktop-horizontal-scroll.css';
@@ -57,5 +57,10 @@ root.render(
   </StrictMode>
 );
 
-// Banner CMS content is progressive enhancement. Never block first paint on a network request.
-void hydratePublishedBannerContent();
+// Banner CMS content is progressive enhancement. Keep it out of the first-paint
+// request burst; the code-backed banners render immediately as the fallback.
+scheduleIdleTask(() => {
+  void import('./services/bannerRuntime').then(({ hydratePublishedBannerContent }) =>
+    hydratePublishedBannerContent()
+  );
+}, 1000);
