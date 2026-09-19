@@ -31,7 +31,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             {...props}
           />
           <div className={`w-5 h-5 rounded-[var(--radius-badge-md)] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-role-focus peer-focus-visible:ring-offset-1 flex items-center justify-center ${
-            checked ? 'bg-role-primary border-role-primary' : 'border-role-outline bg-role-surface'
+            checked ? 'bg-role-primary border-role-primary' : 'border-role-control-outline bg-role-surface'
           }`}>
             {checked && <Check className="w-3.5 h-3.5 text-role-on-primary stroke-[2.5]" />}
           </div>
