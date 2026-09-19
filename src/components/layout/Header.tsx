@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, PlusCircle, Home, Compass, PhoneCall, Globe } from 'lucide-react';
+import { Search, Menu, PlusCircle, Home, Compass, PhoneCall } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { CATEGORY_ORDER } from '../../data/categoryOrder';
 import { CategoryPopularityService } from '../../services/categoryPopularityService';
@@ -230,29 +230,37 @@ export const Header: React.FC = () => {
               <p className="type-meta text-ui-content-secondary font-[var(--font-weight-medium)] px-1">
                 {language === 'bn' ? 'ভাষা' : 'Language'}
               </p>
-              <button
-                id="drawer-lang-toggle"
-                type="button"
-                onClick={toggleLanguage}
-                aria-label={language === 'bn' ? 'ইংরেজিতে পরিবর্তন করুন' : 'Switch to Bangla'}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 type-meta ui-radius-control border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary hover:text-ui-content-primary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              <div
+                className="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 type-compact ui-radius-control border border-ui-stroke-subtle bg-ui-surface min-h-[44px]"
               >
-                <span className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
-                  <span className="font-[var(--font-weight-medium)]">
-                    {language === 'bn' ? 'বাংলা / English' : 'English / বাংলা'}
-                  </span>
+                <span className="font-[var(--font-weight-medium)] text-ui-content-primary">
+                  {language === 'bn' ? 'ভাষা' : 'Language'}
                 </span>
-                <span className="flex items-center font-[var(--font-weight-semibold)] type-meta">
-                  <span className={language === 'bn' ? 'text-ui-content-primary font-[var(--font-weight-bold)]' : 'text-ui-content-muted'}>
-                    বাং
-                  </span>
-                  <span className="mx-1 text-ui-content-muted" aria-hidden="true">/</span>
-                  <span className={language === 'en' ? 'text-ui-content-primary font-[var(--font-weight-bold)]' : 'text-ui-content-muted'}>
+                <div
+                  className="flex items-center p-0.5 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-pill"
+                  role="group"
+                  aria-label={language === 'bn' ? 'ভাষা নির্বাচন' : 'Select language'}
+                >
+                  <button
+                    id="drawer-lang-bn"
+                    type="button"
+                    aria-pressed={language === 'bn'}
+                    onClick={() => language !== 'bn' && toggleLanguage()}
+                    className={`min-w-[52px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'bn' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
+                  >
+                    বাংলা
+                  </button>
+                  <button
+                    id="drawer-lang-en"
+                    type="button"
+                    aria-pressed={language === 'en'}
+                    onClick={() => language !== 'en' && toggleLanguage()}
+                    className={`min-w-[52px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'en' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
+                  >
                     EN
-                  </span>
-                </span>
-              </button>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
