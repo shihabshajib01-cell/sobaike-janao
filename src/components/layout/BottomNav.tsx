@@ -114,7 +114,45 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
     },
   ];
 
-  const compactNavItem = navItems.find((item) => item.isActive) ?? navItems[0];
+  const secondaryRouteItems: Partial<Record<RoutePath, Omit<(typeof navItems)[number], 'id'>>> = {
+    '/search': {
+      path: '/search',
+      nameBn: 'অনুসন্ধান',
+      nameEn: 'Search',
+      iconName: 'search',
+      isActive: true,
+    },
+    '/more': {
+      path: '/more',
+      nameBn: 'আরও',
+      nameEn: 'More',
+      iconName: 'info',
+      isActive: true,
+    },
+    '/report': {
+      path: '/report',
+      nameBn: 'প্রতিবেদন',
+      nameEn: 'Report',
+      iconName: 'file-text',
+      isActive: true,
+    },
+  };
+
+  const compactNavItem =
+    navItems.find((item) => item.isActive) ??
+    (secondaryRouteItems[currentRoute]
+      ? {
+          id: 'bottom-nav-current-route',
+          ...secondaryRouteItems[currentRoute]!,
+        }
+      : {
+          id: 'bottom-nav-current-route',
+          path: currentRoute,
+          nameBn: 'বর্তমান পৃষ্ঠা',
+          nameEn: 'Current page',
+          iconName: 'file-text' as AppIconName,
+          isActive: true,
+        });
 
   return (
     <>
@@ -175,7 +213,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
         inert={!isCompact ? true : undefined}
         className={`md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
-            ? 'translate-y-0 opacity-100 delay-[60ms]'
+            ? 'translate-y-0 opacity-100 delay-[60ms] motion-reduce:delay-0'
             : 'translate-y-4 opacity-0 delay-0 mobile-chrome-hide-after-transition'
         }`}
       >
@@ -188,7 +226,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             aria-label={language === 'bn' ? compactNavItem.nameBn : compactNavItem.nameEn}
             aria-current={compactNavItem.isActive ? 'page' : undefined}
             data-mobile-floating-control="true"
-            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms] motion-reduce:delay-0' : 'pointer-events-none scale-95 delay-0 motion-reduce:delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               compactNavItem.isActive
                 ? 'text-ui-content-primary dark:bg-ui-accent-soft dark:ring-1 dark:ring-ui-accent-border'
                 : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
@@ -208,7 +246,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
             data-mobile-floating-control="true"
-            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
+            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms] motion-reduce:delay-0' : 'pointer-events-none scale-95 delay-0 motion-reduce:delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
           >
             <AppIcon name="plus" size="lg" strokeWidth={2.4} />
           </button>
