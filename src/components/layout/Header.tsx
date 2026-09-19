@@ -11,6 +11,7 @@ import { IconButton } from '../ui/IconButton';
 import { Drawer } from '../ui/Drawer';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { TextSizeSelector } from '../ui/TextSizeSelector';
+import { LanguageSelector } from '../ui/LanguageSelector';
 import { BrandLogo } from '../branding/BrandLogo';
 import { CategoryIcon } from '../branding/CategoryIcon';
 
@@ -18,7 +19,6 @@ export const Header: React.FC = () => {
   const {
     currentRoute,
     language,
-    toggleLanguage,
     isTabletMenuOpen,
     setIsTabletMenuOpen,
     openReportComposer,
@@ -131,8 +131,8 @@ export const Header: React.FC = () => {
         title={language === 'bn' ? 'সবাইকে জানাও' : 'Sobaike Janao'}
         description={language === 'bn' ? 'নাগরিক তথ্য ও অভিযোগ প্ল্যাটফর্ম' : 'Citizen reporting platform'}
       >
-        <div className="space-y-4">
-          <nav className="space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu navigation'}>
+        <div>
+          <nav className="hidden md:block space-y-1" aria-label={language === 'bn' ? 'মেনু নেভিগেশন' : 'Menu navigation'}>
             <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-muted uppercase tracking-wide px-3 mb-2">
               {language === 'bn' ? 'বিভাগ ও পাতা' : 'Sections & pages'}
             </p>
@@ -177,12 +177,12 @@ export const Header: React.FC = () => {
             })}
           </nav>
 
-          <div className="pt-3 border-t border-ui-stroke-subtle space-y-1">
+          <div className="space-y-1 md:mt-4 md:pt-3 md:border-t md:border-ui-stroke-subtle">
             <Link
               to={localizePath('/search')}
               onClick={() => setIsTabletMenuOpen(false)}
               aria-current={currentRoute === '/search' ? 'page' : undefined}
-              className={`w-full flex items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`hidden md:flex w-full items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/search'
                   ? 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)] border border-ui-stroke-subtle'
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
@@ -207,7 +207,7 @@ export const Header: React.FC = () => {
             </Link>
           </div>
 
-          <div className="pt-3 border-t border-ui-stroke-subtle space-y-3">
+          <div className="mt-4 pt-3 border-t border-ui-stroke-subtle space-y-3">
             <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-muted uppercase tracking-wide px-1">
               {language === 'bn' ? 'সেটিংস' : 'Settings'}
             </p>
@@ -230,37 +230,7 @@ export const Header: React.FC = () => {
               <p className="type-meta text-ui-content-secondary font-[var(--font-weight-medium)] px-1">
                 {language === 'bn' ? 'ভাষা' : 'Language'}
               </p>
-              <div
-                className="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 type-compact ui-radius-control border border-ui-stroke-subtle bg-ui-surface min-h-[44px]"
-              >
-                <span className="font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {language === 'bn' ? 'ভাষা' : 'Language'}
-                </span>
-                <div
-                  className="flex items-center p-0.5 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-pill"
-                  role="group"
-                  aria-label={language === 'bn' ? 'ভাষা নির্বাচন' : 'Select language'}
-                >
-                  <button
-                    id="drawer-lang-bn"
-                    type="button"
-                    aria-pressed={language === 'bn'}
-                    onClick={() => language !== 'bn' && toggleLanguage()}
-                    className={`min-w-[52px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'bn' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
-                  >
-                    বাংলা
-                  </button>
-                  <button
-                    id="drawer-lang-en"
-                    type="button"
-                    aria-pressed={language === 'en'}
-                    onClick={() => language !== 'en' && toggleLanguage()}
-                    className={`min-w-[52px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'en' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
-                  >
-                    EN
-                  </button>
-                </div>
-              </div>
+              <LanguageSelector variant="segmented" idPrefix="drawer-language" />
             </div>
           </div>
         </div>
