@@ -114,6 +114,18 @@ export const formatEnglishDate = (dateStr?: string | null): string => {
   return `${day} ${month} ${year}`;
 };
 
+const hasBanglaScript = (value?: string | null): boolean =>
+  Boolean(value && /[ঀ-৿]/u.test(value));
+
+const hasLatinScript = (value?: string | null): boolean =>
+  Boolean(value && /[A-Za-z]/.test(value));
+
+const safeBanglaFallback = (value?: string | null): string =>
+  value && hasBanglaScript(value) && !hasLatinScript(value) ? value : '';
+
+const safeEnglishFallback = (value?: string | null): string =>
+  value && hasLatinScript(value) && !hasBanglaScript(value) ? value : '';
+
 export const mapSupabasePublicReportToItem = (
   rpc: SupabasePublicReportRPC
 ): ReportItem => {
@@ -130,14 +142,19 @@ export const mapSupabasePublicReportToItem = (
   const fullDescBn = rpc.descriptionBn || rpc.descriptionEn || shortDescBn;
   const fullDescEn = rpc.descriptionEn || rpc.descriptionBn || shortDescEn;
 
-  const locationBn = rpc.locationBn || rpc.location || 'অবস্থান গোপন';
-  const locationEn = rpc.locationEn || rpc.location || 'Location withheld';
+  // Fail closed by language if an RPC ever omits the bilingual fields.
+  // This prevents a future backend regression from leaking English location
+  // strings into Bangla UI (or Bangla strings into English UI).
+  const locationBn =
+    rpc.locationBn || safeBanglaFallback(rpc.location) || 'অবস্থান গোপন';
+  const locationEn =
+    rpc.locationEn || safeEnglishFallback(rpc.location) || 'Location withheld';
 
-  const districtBn = rpc.districtBn || rpc.district || '';
-  const districtEn = rpc.districtEn || rpc.district || '';
+  const districtBn = rpc.districtBn || safeBanglaFallback(rpc.district);
+  const districtEn = rpc.districtEn || safeEnglishFallback(rpc.district);
 
-  const areaBn = rpc.areaBn || rpc.area || '';
-  const areaEn = rpc.areaEn || rpc.area || '';
+  const areaBn = rpc.areaBn || safeBanglaFallback(rpc.area);
+  const areaEn = rpc.areaEn || safeEnglishFallback(rpc.area);
 
   const incidentDateBn = rpc.incidentDate ? formatBanglaDate(rpc.incidentDate) : '';
   const incidentDateEn = rpc.incidentDate ? formatEnglishDate(rpc.incidentDate) : '';
