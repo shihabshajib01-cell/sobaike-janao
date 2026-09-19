@@ -154,11 +154,11 @@ export const MorePage: React.FC = () => {
         <section className="space-y-4">
           <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-5">
             <div className="space-y-2">
-              <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'সবাইকে জানাও কী?' : 'What is Sobaike Janao?'}</h2>
+              <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'Sobaike Janao — সবাইকে জানাও সম্পর্কে' : 'About Sobaike Janao'}</h2>
               <p className="type-body text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'সবাইকে জানাও একটি স্বাধীন নাগরিক তথ্য ও জনস্বার্থ প্ল্যাটফর্ম। নাগরিকরা জনস্বার্থসংশ্লিষ্ট ঘটনা, সমস্যা ও অভিজ্ঞতা কাঠামোবদ্ধভাবে জমা দিতে পারেন। জমা দেওয়া প্রতিবেদন সরাসরি প্রকাশিত হয় না; প্রকাশের আগে তা পর্যালোচনা করা হয়।'
-                  : 'Sobaike Janao is an independent citizen-information and public-interest platform where people can submit structured reports about incidents, problems and experiences. Reports are reviewed before publication.'}
+                  ? 'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ দায়িত্বশীলভাবে প্রকাশ করার একটি স্বাধীন, মডারেটেড প্ল্যাটফর্ম। এটি কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী প্রতিষ্ঠানের ওয়েবসাইট নয়।'
+                  : 'Sobaike Janao is an independent, moderated platform where people in Bangladesh can responsibly publish public-interest information, experiences, and observations. It is not a government or law-enforcement website.'}
               </p>
             </div>
 
