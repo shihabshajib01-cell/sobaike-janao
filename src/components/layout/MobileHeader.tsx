@@ -117,10 +117,10 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       lastScrollYRef.current = window.scrollY;
       directionRef.current = null;
       directionDistanceRef.current = 0;
-      transitionLockUntilRef.current = 0;
     };
 
     if (!mobileMedia.matches) {
+      transitionLockUntilRef.current = 0;
       onCompactChange(false);
     }
     resetScrollTracking();
@@ -195,6 +195,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     };
 
     const handleMediaChange = () => {
+      transitionLockUntilRef.current = 0;
       resetScrollTracking();
       if (!mobileMedia.matches) {
         onCompactChange(false);
