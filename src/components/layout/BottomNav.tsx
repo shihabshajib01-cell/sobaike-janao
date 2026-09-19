@@ -71,7 +71,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             }
             className="pointer-events-auto flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-200 ease-out hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
           >
-            <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+            <Plus className="h-6 w-6 stroke-[2]" aria-hidden="true" />
           </button>
         </div>
       </nav>
@@ -144,7 +144,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
                   : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
               }`}
             >
-              <AppIcon name={item.iconName} size="lg" strokeWidth={item.isActive ? 2.4 : 2} />
+              <AppIcon name={item.iconName} size="lg" strokeWidth={2} />
               <span
                 className={`mt-1 w-full truncate text-center type-meta leading-tight ${
                   item.isActive ? 'font-[var(--font-weight-bold)]' : 'font-[var(--font-weight-medium)]'
@@ -163,7 +163,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
             className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-all hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
           >
-            <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+            <Plus className="h-6 w-6 stroke-[2]" aria-hidden="true" />
           </button>
         </div>
       </nav>
@@ -196,7 +196,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             <AppIcon
               name={compactNavItem.iconName}
               size="lg"
-              strokeWidth={compactNavItem.isActive ? 2.4 : 2}
+              strokeWidth={2}
             />
           </Link>
 
@@ -208,7 +208,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
             className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
           >
-            <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+            <Plus className="h-6 w-6 stroke-[2]" aria-hidden="true" />
           </button>
         </div>
       </nav>
