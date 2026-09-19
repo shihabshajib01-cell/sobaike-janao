@@ -1017,7 +1017,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         id="report-composer-modal"
         isOpen={isOpen}
         onClose={handleRequestClose}
-        maxWidth="composer"
+        maxWidth={submissionResult ? 'md' : 'composer'}
+        mobilePresentation={submissionResult ? 'sheet' : 'fullscreen'}
         showHeader={false}
         keepMounted
         containerClassName="report-composer-shell p-0 border-0 md:border"
@@ -1040,7 +1041,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             {/* Scrollable Form Content */}
             <div
               ref={scrollContainerRef}
-              className="report-composer-body flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6"
+              className={
+                submissionResult
+                  ? 'report-composer-body flex-none overflow-visible px-5 sm:px-6 py-5 sm:py-6'
+                  : 'report-composer-body flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6'
+              }
             >
               {submitError && (
                 <div
