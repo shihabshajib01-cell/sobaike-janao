@@ -571,13 +571,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsHarassmentFilterOpen(false);
   }, [language, navigate]);
 
-  // Sync report composer state when visiting /report (open modal with no pre-selected segment)
+  // Sync report composer state when visiting /report (open modal with no pre-selected segment).
+  // Use the normalized route so static route entries such as /report/ behave exactly
+  // like in-app navigation to /report.
   useEffect(() => {
-    if (logicalPathname === '/report') {
+    if (currentRoute === '/report') {
       setReportComposerInitialSegment(null);
       setIsReportComposerOpen(true);
     }
-  }, [logicalPathname]);
+  }, [currentRoute]);
 
   const openReportComposer = useCallback((segment?: SectionKey | null) => {
     // Always open with no pre-selected segment unless explicitly provided as non-null
