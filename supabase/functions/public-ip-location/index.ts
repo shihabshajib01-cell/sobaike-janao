@@ -1,16 +1,43 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "apikey, authorization, x-client-info, content-type",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+const ALLOWED_ORIGINS = new Set([
+  "https://shobaikejanao.com",
+  "https://www.shobaikejanao.com",
+  "https://shihabshajib01-cell.github.io",
+  "http://localhost:5173",
+  "http://localhost:3000",
+]);
+
+const corsHeadersFor = (req: Request) => {
+  const origin = req.headers.get("Origin") || "";
+  return {
+    ...(ALLOWED_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
+    "Vary": "Origin",
+    "Access-Control-Allow-Headers": "apikey, authorization, x-client-info, content-type",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+  };
 };
 
-const json = (body: unknown, status = 200) =>
+const RATE_WINDOW_MS = 60_000;
+const RATE_LIMIT = 30;
+const rateState = new Map<string, { count: number; resetAt: number }>();
+
+const isRateLimited = (key: string): boolean => {
+  const now = Date.now();
+  const current = rateState.get(key);
+  if (!current || current.resetAt <= now) {
+    rateState.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  current.count += 1;
+  return current.count > RATE_LIMIT;
+};
+
+const json = (req: Request, body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
     headers: {
-      ...corsHeaders,
+      ...corsHeadersFor(req),
       "Content-Type": "application/json",
       "Cache-Control": status === 200 ? "private, max-age=3600" : "no-store",
     },
@@ -41,16 +68,17 @@ const validCoordinate = (latitude: unknown, longitude: unknown): boolean =>
   !(latitude === 0 && longitude === 0);
 
 Deno.serve(async (req: Request) => {
+  const corsHeaders = corsHeadersFor(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
   if (req.method !== "GET") {
-    return json({ error: "Method not allowed." }, 405);
+    return json(req,{ error: "Method not allowed." }, 405);
   }
 
   const ip = firstForwardedIp(req);
   if (!ip) {
-    return json({ error: "Approximate location unavailable." }, 503);
+    return json(req,{ error: "Approximate location unavailable." }, 503);
   }
 
   try {
@@ -64,15 +92,15 @@ Deno.serve(async (req: Request) => {
     );
 
     if (!response.ok) {
-      return json({ error: "Approximate location unavailable." }, 503);
+      return json(req,{ error: "Approximate location unavailable." }, 503);
     }
 
     const data = await response.json();
     if (data?.success === false || !validCoordinate(data?.latitude, data?.longitude)) {
-      return json({ error: "Approximate location unavailable." }, 503);
+      return json(req,{ error: "Approximate location unavailable." }, 503);
     }
 
-    return json({
+    return json(req,{
       latitude: data.latitude,
       longitude: data.longitude,
       accuracy: 25000,
@@ -81,6 +109,6 @@ Deno.serve(async (req: Request) => {
       country: typeof data.country === "string" ? data.country : undefined,
     });
   } catch {
-    return json({ error: "Approximate location unavailable." }, 503);
+    return json(req,{ error: "Approximate location unavailable." }, 503);
   }
 });
