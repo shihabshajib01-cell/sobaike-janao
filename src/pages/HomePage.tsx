@@ -29,7 +29,8 @@ interface LoadReportsOptions {
   offset?: number;
 }
 
-const HOME_FEED_PAGE_SIZE = 10;
+const HOME_FEED_FETCH_BATCH_SIZE = 20;
+const HOME_FEED_VIRTUAL_PAGE_SIZE = 10;
 const FEED_UPDATE_POLL_INTERVAL_MS = 30_000;
 const HOME_FEED_PREFETCH_MARGIN = '720px 0px';
 const HOME_FEED_REDUCED_PREFETCH_MARGIN = '160px 0px';
@@ -113,7 +114,7 @@ export const HomePage: React.FC = () => {
         filter: feedFilter,
         district: selectedDistrict,
         offset,
-        limit: HOME_FEED_PAGE_SIZE,
+        limit: HOME_FEED_FETCH_BATCH_SIZE,
       });
 
       if (requestGeneration !== feedGenerationRef.current) {
@@ -502,7 +503,7 @@ export const HomePage: React.FC = () => {
           <div className="space-y-3">
             <VirtualizedReportFeed
               reports={filteredReports}
-              pageSize={HOME_FEED_PAGE_SIZE}
+              pageSize={HOME_FEED_VIRTUAL_PAGE_SIZE}
             />
 
             {hasMoreReports && !loadMoreError && (
