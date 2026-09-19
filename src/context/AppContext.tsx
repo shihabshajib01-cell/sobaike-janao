@@ -128,7 +128,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Global Browse Location State
   const [browseLocation, setBrowseLocation] = useState<BrowseLocation | null>(() => {
     const choice = VisitorSessionService.getLocationChoice();
-    if (choice === 'not_now' || choice === 'denied') return null;
+    if (choice !== 'granted') return null;
     const loc = VisitorSessionService.getLastRecordedLocation();
     return loc ? { ...loc, source: 'device' as const } : null;
   });
@@ -160,7 +160,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const loc = VisitorSessionService.getLastRecordedLocation();
     if (
-      choice !== 'denied' &&
+      choice === 'granted' &&
       loc &&
       isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)
     ) {
@@ -332,10 +332,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // 1. Subscribe to location updates in session memory
     const unsubscribeLocation = VisitorSessionService.subscribeLocationChange((loc) => {
-      if (loc && isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) {
+      const choice = VisitorSessionService.getLocationChoice();
+      if (
+        choice === 'granted' &&
+        loc &&
+        isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)
+      ) {
         setBrowseLocation({ ...loc, source: 'device' });
         setBrowseLocationStatus('available');
       } else {
+        // Report submission may capture a device position even while browsing
+        // is explicitly approximate. Never let reporter GPS override the saved
+        // browse preference.
         refreshBrowseLocation();
       }
     });
