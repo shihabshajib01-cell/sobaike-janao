@@ -32,7 +32,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
   return (
     <div
       id={id}
-      className={`border rounded-[var(--radius-card)] bg-ui-surface transition-colors duration-150 overflow-hidden shadow-[var(--elevation-2xs)] ${
+      className={`report-composer-card border rounded-[var(--radius-card)] bg-ui-surface transition-colors duration-150 overflow-hidden shadow-[var(--elevation-2xs)] ${
         isOpen ? 'border-ui-stroke-strong' : 'border-ui-stroke-subtle'
       } ${className}`}
     >
