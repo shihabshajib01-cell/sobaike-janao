@@ -9,6 +9,35 @@ export interface ApiError {
   field?: string;
 }
 
+const invokePublicWriteGateway = async (body: Record<string, unknown>) => {
+  if (!supabase) {
+    return {
+      data: null,
+      error: { code: 'SUPABASE_NOT_CONFIGURED', message: 'Supabase client is not configured.' },
+    };
+  }
+
+  const result = await supabase.functions.invoke('public-write-gateway', { body });
+  if (result.error) {
+    return {
+      data: null,
+      error: { code: 'PUBLIC_WRITE_GATEWAY_ERROR', message: result.error.message || 'Public write gateway failed.' },
+    };
+  }
+
+  if (!result.data?.success) {
+    return {
+      data: null,
+      error: {
+        code: result.data?.code || 'PUBLIC_WRITE_REJECTED',
+        message: result.data?.error || 'Public write request was rejected.',
+      },
+    };
+  }
+
+  return { data: result.data.result, error: null };
+};
+
 class ApiClient {
   // --- Public Response APIs ---
   async submitCitizenResponse(
@@ -29,17 +58,18 @@ class ApiClient {
       throw error;
     }
 
-    const { data, error } = await supabase.rpc('submit_public_response_v2', {
-      p_report_id: reportId,
-      p_response_type: 'citizen_information',
-      p_payload: {
+    const { data, error } = await invokePublicWriteGateway({
+      action: 'response',
+      reportId,
+      responseType: 'citizen_information',
+      payload: {
         description: payload.description,
         incidentDate: payload.incidentDate,
         contactConsent: payload.contactConsent,
         contactInfo: payload.contactConsent ? payload.contactInfo : undefined,
       },
-      p_visitor_id: VisitorSessionService.getVisitorId(),
-      p_session_id: VisitorSessionService.getSessionId(),
+      visitorId: VisitorSessionService.getVisitorId(),
+      sessionId: VisitorSessionService.getSessionId(),
     });
 
     if (error) {
@@ -88,24 +118,26 @@ class ApiClient {
       throw error;
     }
 
-    let { data, error } = await supabase.rpc('submit_public_response_v2', {
-      p_report_id: reportId,
-      p_response_type: 'subject_response',
-      p_payload: payload,
-      p_visitor_id: VisitorSessionService.getVisitorId(),
-      p_session_id: VisitorSessionService.getSessionId(),
+    let { data, error } = await invokePublicWriteGateway({
+      action: 'response',
+      reportId,
+      responseType: 'subject_response',
+      payload,
+      visitorId: VisitorSessionService.getVisitorId(),
+      sessionId: VisitorSessionService.getSessionId(),
     });
 
     // Backward compatibility: if the database has not applied allow_subject_response_without_responder_type.sql yet,
     // and returns INVALID_RESPONDER_TYPE when responderType is omitted, retry once with legacy default 'mentioned_person'
     if (error && error.message?.includes('INVALID_RESPONDER_TYPE') && !payload.responderType) {
       const fallbackPayload = { ...payload, responderType: 'mentioned_person' as const };
-      const retryResult = await supabase.rpc('submit_public_response_v2', {
-        p_report_id: reportId,
-        p_response_type: 'subject_response',
-        p_payload: fallbackPayload,
-        p_visitor_id: VisitorSessionService.getVisitorId(),
-        p_session_id: VisitorSessionService.getSessionId(),
+      const retryResult = await invokePublicWriteGateway({
+        action: 'response',
+        reportId,
+        responseType: 'subject_response',
+        payload: fallbackPayload,
+        visitorId: VisitorSessionService.getVisitorId(),
+        sessionId: VisitorSessionService.getSessionId(),
       });
       if (!retryResult.error) {
         data = retryResult.data;
@@ -197,13 +229,13 @@ class ApiClient {
         ? 'submit_public_complaint_v3'
         : 'submit_public_complaint_v2';
 
-    const result = await supabase.rpc(submissionRpc, {
-      p_payload: enrichedPayload,
-      p_client_submission_id: clientSubmissionId,
-      p_reporter_context: reporterContext,
+    const { data, error } = await invokePublicWriteGateway({
+      action: 'complaint',
+      submissionRpc,
+      payload: enrichedPayload,
+      clientSubmissionId,
+      reporterContext,
     });
-
-    const { data, error } = result;
 
     if (error) {
       const isOutdatedSchema =
