@@ -63,6 +63,15 @@ const LazyReportComposerModal = React.lazy(() =>
   import('../report-composer/ReportComposerModal').then((m) => ({ default: m.ReportComposerModal }))
 );
 
+const FORM_SCHEMA_SMOKE_ENABLED = import.meta.env.VITE_FORM_SCHEMA_SMOKE === '1';
+const LazySchemaFormSmokeHarness = FORM_SCHEMA_SMOKE_ENABLED
+  ? React.lazy(() =>
+      import('../report-composer/SchemaFormSmokeHarness').then((m) => ({
+        default: m.SchemaFormSmokeHarness,
+      }))
+    )
+  : null;
+
 const RouteSuspense: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <React.Suspense
     fallback={
@@ -246,6 +255,12 @@ export const AppShell: React.FC = () => {
                   <Route path="/report-detail/:id" element={<ReportDetailRouteWrapper />} />
                   <Route path="/location/:id" element={<LocationRouteWrapper />} />
                   <Route path="/subject/:id" element={<SubjectRouteWrapper />} />
+                  {FORM_SCHEMA_SMOKE_ENABLED && LazySchemaFormSmokeHarness ? (
+                    <Route
+                      path="/__form-schema-smoke"
+                      element={<RouteSuspense><LazySchemaFormSmokeHarness /></RouteSuspense>}
+                    />
+                  ) : null}
 
                   {/* English prerendered route family. These mirror the Bangla routes so
                       /en/... URLs are first-class crawlable pages, not query-state aliases. */}
