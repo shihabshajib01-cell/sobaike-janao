@@ -105,7 +105,7 @@ export const IssuesPage: React.FC = () => {
       <section
         id="issues-category-grid"
         aria-label={language === 'bn' ? 'অভিযোগের বিষয়সমূহ' : 'Issue categories'}
-        className="grid grid-cols-1 gap-2.5"
+        className="grid grid-cols-1 gap-2 max-[390px]:gap-1.5 sm:gap-2.5"
       >
         {cards.map(({ key, config }) => {
           const metric = metricsByKey.get(key);
@@ -119,28 +119,29 @@ export const IssuesPage: React.FC = () => {
               aria-label={`${language === 'bn' ? config.nameBn : config.nameEn}, ${
                 language === 'bn' ? `জনপ্রিয়তার অবস্থান ${toBanglaDigits(rank)}` : `popularity rank ${rank}`
               }`}
-              className="group grid min-h-[68px] grid-cols-[68px_minmax(0,1fr)] gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="group grid min-h-[68px] grid-cols-[68px_minmax(0,1fr)] gap-2 max-[390px]:min-h-[60px] max-[390px]:grid-cols-[60px_minmax(0,1fr)] max-[390px]:gap-1.5 sm:gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <div
-                className="flex size-[68px] items-center justify-center ui-radius-card border"
+                className="flex size-[68px] max-[390px]:size-[60px] items-center justify-center ui-radius-card border"
                 style={{
                   backgroundColor: config.bgColor,
                   borderColor: config.borderColor,
+                  color: config.primaryColor,
                 }}
               >
                 <CategoryIcon
                   section={key}
-                  size="lg"
+                  size="xl"
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
               </div>
 
-              <div className="flex min-w-0 items-center gap-3 ui-radius-card bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
-                <h2 className="min-w-0 flex-1 type-h4 text-ui-content-primary">
+              <div className="flex min-w-0 items-center gap-2 max-[390px]:px-2.5 max-[390px]:py-2.5 sm:gap-3 ui-radius-card bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
+                <h2 className="min-w-0 flex-1 type-h4 text-ui-content-primary max-[390px]:leading-snug">
                   {language === 'bn' ? config.nameBn : config.nameEn}
                 </h2>
 
-                <p className="shrink-0 text-right type-meta font-[var(--font-weight-medium)] text-ui-content-secondary">
+                <p className="shrink-0 max-w-[42%] text-right type-meta max-[390px]:type-helper font-[var(--font-weight-medium)] text-ui-content-secondary">
                   {isLoading
                     ? language === 'bn'
                       ? 'গণনা হচ্ছে...'
