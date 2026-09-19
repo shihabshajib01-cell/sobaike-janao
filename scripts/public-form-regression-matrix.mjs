@@ -17,7 +17,26 @@ async function makeContext(browser, viewport) {
   const context = await browser.newContext({
     viewport,
     geolocation: { latitude: 23.7806, longitude: 90.4070, accuracy: 20 },
+    serviceWorkers: 'block',
   });
+
+  await context.route('**/*', async (route) => {
+    const resourceType = route.request().resourceType();
+    if (resourceType === 'image') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'image/svg+xml',
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>',
+      });
+      return;
+    }
+    if (resourceType === 'media') {
+      await route.fulfill({ status: 204, body: '' });
+      return;
+    }
+    await route.continue();
+  });
+
   await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
   await seedReturningVisitor(context);
   return context;
@@ -161,7 +180,7 @@ const representativePaths = [
   {
     segment: 'rickshaw',
     subcategory: 'charging-station-location',
-    expectedAny: ['#operator-subject-name', '#composer-section-configured-fields'],
+    expectedAny: ['#composer-section-parties'],
   },
 ];
 
@@ -181,6 +200,23 @@ await check('Representative category-specific form paths render without runtime 
         `${testCase.segment}/${testCase.subcategory}: expected active form surface missing (${testCase.expectedAny.join(', ')})`
       );
     }
+
+    if (
+      testCase.segment === 'rickshaw' &&
+      testCase.subcategory === 'charging-station-location'
+    ) {
+      const operatorSectionHeader = page.locator('#composer-section-parties-header');
+      await expectVisible(
+        operatorSectionHeader,
+        'rickshaw/charging-station-location: operator section header missing'
+      );
+      await operatorSectionHeader.click();
+      await expectVisible(
+        page.locator('#operator-subject-name'),
+        'rickshaw/charging-station-location: operator fields did not render after expansion'
+      );
+    }
+
     await assertComposerGeometry(page, `${testCase.segment}/${testCase.subcategory}`);
   }
 
