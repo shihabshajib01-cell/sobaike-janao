@@ -105,7 +105,7 @@ export const DesktopLeftRail: React.FC = () => {
           <BrandLogo
             id="rail-brand-logo"
             size="lg"
-            className="transition-colors ui-radius-control px-1 py-1 w-full"
+            className="transition-colors ui-radius-control w-full [&_img]:scale-[1.2] [&_img]:origin-left"
           />
         </Link>
 
