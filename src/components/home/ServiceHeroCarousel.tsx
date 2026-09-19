@@ -361,11 +361,15 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   desktopDescriptionBn={content.desktopDescriptionBn}
                   desktopDescriptionEn={content.desktopDescriptionEn}
                   illustrationSrc={content.illustrationSrc}
-                  action={{
-                    labelBn: content.primaryCtaBn,
-                    labelEn: content.primaryCtaEn,
-                    onClick: () => openReportComposer(slide.key),
-                  }}
+                  action={
+                    getPublishedBannerSettings(slide.key)?.showHomeCta
+                      ? {
+                          labelBn: content.primaryCtaBn,
+                          labelEn: content.primaryCtaEn,
+                          onClick: () => openReportComposer(slide.key),
+                        }
+                      : undefined
+                  }
                   headingLevel="h2"
                   active={isActive}
                   ctaId={`${id}-report-btn-${slide.key}`}
