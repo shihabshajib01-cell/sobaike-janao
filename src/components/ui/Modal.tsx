@@ -150,6 +150,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Dialog */}
       <div
         ref={modalRef}
+        data-modal-dialog="true"
         tabIndex={-1}
         className={`relative ${maxWidthClass} ${cardShapeClasses} bg-role-surface border-role-outline-subtle shadow-[var(--elevation-2xl)] flex flex-col overflow-hidden z-10 text-left outline-none ${containerClassName}`}
       >
