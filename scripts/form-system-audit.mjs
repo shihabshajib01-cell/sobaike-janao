@@ -343,6 +343,43 @@ requireContains(
   'browser smoke must validate schema-mode rendering, invalid state, and valid state'
 );
 
+requireFile('scripts/public-form-regression-matrix.mjs');
+requireContains(
+  '.github/workflows/public-functional-smoke.yml',
+  'node scripts/public-form-regression-matrix.mjs',
+  'production functional workflow must run the public form regression matrix'
+);
+requireContains(
+  'scripts/public-composer-100-regression-smoke.mjs',
+  'p_client_submission_id',
+  'composer browser smoke must protect retry idempotency'
+);
+requireContains(
+  'scripts/public-composer-100-regression-smoke.mjs',
+  'Forced non-destructive regression failure',
+  'composer browser smoke must exercise recoverable server failure without writing production data'
+);
+requireContains(
+  'src/components/report-composer/SchemaFormSmokeHarness.tsx',
+  'setPendingImages',
+  'schema runtime fixture must retain evidence state for upload regression tests'
+);
+requireContains(
+  'scripts/public-accessibility-smoke.mjs',
+  'Schema evidence total-size validation',
+  'CI runtime smoke must exercise evidence upload limits and recovery'
+);
+requireContains(
+  'src/components/media/ImageAttachmentPicker.tsx',
+  '${maxFileSizeMB}MB',
+  'evidence helper copy must derive the per-file limit from the centralized upload configuration'
+);
+requireContains(
+  'src/components/media/ImageAttachmentPicker.tsx',
+  '${maxTotalSizeMB}MB',
+  'evidence helper copy must derive the total limit from the centralized upload configuration'
+);
+
 const distRoot = path.resolve(ROOT, 'dist');
 if (fs.existsSync(distRoot)) {
   const walkBuilt = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
