@@ -23,6 +23,25 @@
   box-shadow: var(--elevation-card);
 }
 
+/*
+ * Dark-mode card hierarchy modifiers.
+ * Keep feed/composer cards surface-led instead of outlining every block with a
+ * high-contrast gray. These modifiers reuse existing semantic color roles.
+ */
+html[data-theme="dark"] .ui-card-feed,
+.dark .ui-card-feed,
+html[data-theme="dark"] .report-composer-shell,
+.dark .report-composer-shell,
+html[data-theme="dark"] .report-composer-card:not(.border-role-error-outline),
+.dark .report-composer-card:not(.border-role-error-outline) {
+  border-color: var(--md-surface-hover);
+}
+
+html[data-theme="dark"] .report-composer-body,
+.dark .report-composer-body {
+  background-color: var(--md-background);
+}
+
 .ui-control {
   min-height: var(--touch-target-min);
   border-radius: var(--radius-control);
