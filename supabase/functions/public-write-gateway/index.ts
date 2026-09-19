@@ -82,6 +82,10 @@ type PublicWriteBody =
       eventType: "view" | "share";
       visitorId: string;
       sessionId: string;
+    }
+  | {
+      action: "session";
+      payload: Record<string, unknown>;
     };
 
 Deno.serve(async (req: Request) => {
@@ -115,7 +119,7 @@ Deno.serve(async (req: Request) => {
     return json(req, { error: "Invalid JSON request.", code: "INVALID_JSON" }, 400);
   }
 
-  if (!body || !["complaint", "response", "engagement"].includes(String((body as any).action))) {
+  if (!body || !["complaint", "response", "engagement", "session"].includes(String((body as any).action))) {
     return json(req, { error: "Invalid public write action.", code: "INVALID_ACTION" }, 400);
   }
 
@@ -144,6 +148,14 @@ Deno.serve(async (req: Request) => {
       code: "RATE_LIMITED",
       retryAfterSeconds: Number(limitData?.retryAfterSeconds || 60),
     });
+  }
+
+  if (body.action === "session") {
+    const { data, error } = await service.rpc("record_public_visit_session", body.payload);
+    if (error) {
+      return json(req, { success: false, error: error.message, code: error.code || "SESSION_RECORD_FAILED" });
+    }
+    return json(req, { success: true, result: data });
   }
 
   if (body.action === "engagement") {
