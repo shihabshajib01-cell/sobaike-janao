@@ -145,8 +145,11 @@ await check('Stored Not now remains IP-only even when browser permission is alre
 await check('Escape from browse location prompt behaves exactly like Not now', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
-    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
-    localStorage.removeItem('sobaike_location_choice_v1');
+    if (!sessionStorage.getItem('__location_escape_seeded')) {
+      localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+      localStorage.removeItem('sobaike_location_choice_v1');
+      sessionStorage.setItem('__location_escape_seeded', '1');
+    }
   });
 
   const page = await context.newPage();
@@ -187,8 +190,11 @@ await check('Escape from browse location prompt behaves exactly like Not now', a
 await check('Technical GPS failure persists IP fallback and does not nag on refresh', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
-    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
-    localStorage.removeItem('sobaike_location_choice_v1');
+    if (!sessionStorage.getItem('__location_technical_seeded')) {
+      localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+      localStorage.removeItem('sobaike_location_choice_v1');
+      sessionStorage.setItem('__location_technical_seeded', '1');
+    }
 
     const geolocation = navigator.geolocation;
     if (geolocation) {
