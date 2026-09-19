@@ -73,6 +73,7 @@ jobs:
         shell: bash
         env:
           SITE_URL: http://127.0.0.1:4173/
+          CANONICAL_ORIGIN: https://shobaikejanao.com/
           SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: |
