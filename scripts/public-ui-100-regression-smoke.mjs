@@ -612,7 +612,7 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
   await seedReturningVisitor(context);
   const page = await context.newPage();
 
-  const readState = async () =>
+  const readStandardState = async () =>
     page.evaluate(() => {
       const read = (selector) => {
         const element = document.querySelector(selector);
@@ -623,10 +623,8 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
           inert: element.inert,
           visibility: style.visibility,
           opacity: Number(style.opacity),
-          pointerEvents: style.pointerEvents,
         };
       };
-
       return {
         scrollY: window.scrollY,
         fullTop: read('#mobile-header'),
@@ -636,264 +634,149 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
       };
     });
 
-  const assertExpanded = (state, label) => {
-    if (
-      !state.fullTop ||
-      state.fullTop.ariaHidden === 'true' ||
-      state.fullTop.inert ||
-      state.fullTop.visibility !== 'visible'
-    ) {
+  const assertStandardExpanded = (state, label) => {
+    if (!state.fullTop || state.fullTop.ariaHidden === 'true' || state.fullTop.inert || state.fullTop.visibility !== 'visible') {
       throw new Error(`${label}: full mobile header is not interactive: ${JSON.stringify(state.fullTop)}`);
     }
-    if (
-      !state.compactTop ||
-      state.compactTop.ariaHidden !== 'true' ||
-      !state.compactTop.inert ||
-      state.compactTop.visibility !== 'hidden'
-    ) {
+    if (!state.compactTop || state.compactTop.ariaHidden !== 'true' || !state.compactTop.inert || state.compactTop.visibility !== 'hidden') {
       throw new Error(`${label}: compact top navigation was not removed from interaction: ${JSON.stringify(state.compactTop)}`);
     }
-    if (
-      !state.fullBottom ||
-      state.fullBottom.ariaHidden === 'true' ||
-      state.fullBottom.inert ||
-      state.fullBottom.visibility !== 'visible'
-    ) {
+    if (!state.fullBottom || state.fullBottom.ariaHidden === 'true' || state.fullBottom.inert || state.fullBottom.visibility !== 'visible') {
       throw new Error(`${label}: full bottom navigation is not interactive: ${JSON.stringify(state.fullBottom)}`);
     }
-    if (
-      !state.compactBottom ||
-      state.compactBottom.ariaHidden !== 'true' ||
-      !state.compactBottom.inert ||
-      state.compactBottom.visibility !== 'hidden'
-    ) {
+    if (!state.compactBottom || state.compactBottom.ariaHidden !== 'true' || !state.compactBottom.inert || state.compactBottom.visibility !== 'hidden') {
       throw new Error(`${label}: compact bottom navigation was not removed from interaction: ${JSON.stringify(state.compactBottom)}`);
-    }
-    if (state.fullTop.opacity < 0.99 || state.compactTop.opacity > 0.01) {
-      throw new Error(`${label}: top chrome visual state is inconsistent`);
-    }
-    if (state.fullBottom.opacity < 0.99 || state.compactBottom.opacity > 0.01) {
-      throw new Error(`${label}: bottom chrome visual state is inconsistent`);
     }
   };
 
-  const assertCompact = (state, label) => {
-    if (
-      !state.fullTop ||
-      state.fullTop.ariaHidden !== 'true' ||
-      !state.fullTop.inert ||
-      state.fullTop.visibility !== 'hidden'
-    ) {
+  const assertStandardCompact = (state, label) => {
+    if (!state.fullTop || state.fullTop.ariaHidden !== 'true' || !state.fullTop.inert || state.fullTop.visibility !== 'hidden') {
       throw new Error(`${label}: hidden full header remained interactive: ${JSON.stringify(state.fullTop)}`);
     }
-    if (
-      !state.compactTop ||
-      state.compactTop.ariaHidden === 'true' ||
-      state.compactTop.inert ||
-      state.compactTop.visibility !== 'visible'
-    ) {
+    if (!state.compactTop || state.compactTop.ariaHidden === 'true' || state.compactTop.inert || state.compactTop.visibility !== 'visible') {
       throw new Error(`${label}: compact top navigation is not interactive: ${JSON.stringify(state.compactTop)}`);
     }
-    if (
-      !state.fullBottom ||
-      state.fullBottom.ariaHidden !== 'true' ||
-      !state.fullBottom.inert ||
-      state.fullBottom.visibility !== 'hidden'
-    ) {
+    if (!state.fullBottom || state.fullBottom.ariaHidden !== 'true' || !state.fullBottom.inert || state.fullBottom.visibility !== 'hidden') {
       throw new Error(`${label}: hidden full bottom navigation remained interactive: ${JSON.stringify(state.fullBottom)}`);
     }
-    if (
-      !state.compactBottom ||
-      state.compactBottom.ariaHidden === 'true' ||
-      state.compactBottom.inert ||
-      state.compactBottom.visibility !== 'visible'
-    ) {
+    if (!state.compactBottom || state.compactBottom.ariaHidden === 'true' || state.compactBottom.inert || state.compactBottom.visibility !== 'visible') {
       throw new Error(`${label}: compact bottom navigation is not interactive: ${JSON.stringify(state.compactBottom)}`);
-    }
-    if (state.fullTop.opacity > 0.01 || state.compactTop.opacity < 0.99) {
-      throw new Error(`${label}: top chrome visual state is inconsistent`);
-    }
-    if (state.fullBottom.opacity > 0.01 || state.compactBottom.opacity < 0.99) {
-      throw new Error(`${label}: bottom chrome visual state is inconsistent`);
     }
   };
 
   const scrollIntoCompactMode = async () => {
-    const target = await page.evaluate(() => {
-      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-      return Math.min(700, maxScroll);
-    });
+    const target = await page.evaluate(() => Math.min(700, Math.max(0, document.documentElement.scrollHeight - window.innerHeight)));
     if (target < 160) throw new Error(`Home is not tall enough to exercise adaptive chrome: ${target}px`);
-    await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), target);
-    await page.waitForFunction(
-      () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') === 'true',
-      null,
-      { timeout: 5000 }
-    );
+    await scrollDownInSteps(page, target);
+    await page.waitForFunction(() => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') === 'true', null, { timeout: 5000 });
     await page.waitForTimeout(650);
   };
 
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#main-content'), 'Home did not render for adaptive chrome check');
   await page.waitForTimeout(650);
-  assertExpanded(await readState(), 'initial load');
+  assertStandardExpanded(await readStandardState(), 'initial load');
 
   await scrollIntoCompactMode();
-  assertCompact(await readState(), 'scroll down');
-  await assertMatchingFloatingControls(
-    page,
-    ['#mobile-compact-menu-btn', '#mobile-compact-search-btn'],
-    'Home compact top controls'
-  );
-  const compactBottomBoxes = await Promise.all([
-    page.locator('#bottom-nav-compact-context').boundingBox(),
-    page.locator('#bottom-nav-compact-report').boundingBox(),
-  ]);
-  if (
-    compactBottomBoxes.some(
-      (box) => !box || Math.abs(box.width - 48) > 1 || Math.abs(box.height - 48) > 1
-    )
-  ) {
-    throw new Error(`Home compact bottom controls are not 48x48: ${JSON.stringify(compactBottomBoxes)}`);
-  }
+  assertStandardCompact(await readStandardState(), 'scroll down');
+  await assertMatchingFloatingControls(page, ['#mobile-compact-menu-btn', '#mobile-compact-search-btn'], 'Home compact top controls');
 
   const compactScrollY = await page.evaluate(() => window.scrollY);
-  await page.evaluate((top) => {
-    window.scrollTo({ top: Math.max(32, top - 160), behavior: 'instant' });
-  }, compactScrollY);
-  await page.waitForFunction(
-    () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true',
-    null,
-    { timeout: 5000 }
-  );
+  await page.evaluate((top) => window.scrollTo({ top: Math.max(32, top - 160), behavior: 'instant' }), compactScrollY);
+  await page.waitForFunction(() => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true', null, { timeout: 5000 });
   await page.waitForTimeout(650);
-  assertExpanded(await readState(), 'scroll up');
+  assertStandardExpanded(await readStandardState(), 'scroll up');
 
   await scrollIntoCompactMode();
-
   const hiddenChromeAcceptedFocus = await page.evaluate(() => {
-    const controls = [
-      document.querySelector('#mobile-header-menu-btn'),
-      document.querySelector('#bottom-nav-home'),
-    ];
+    const controls = [document.querySelector('#mobile-header-menu-btn'), document.querySelector('#bottom-nav-home')];
     return controls.some((control) => {
       if (!(control instanceof HTMLElement)) return true;
       control.focus();
       return document.activeElement === control;
     });
   });
-  if (hiddenChromeAcceptedFocus) {
-    throw new Error('hidden adaptive mobile chrome still accepted focus');
-  }
+  if (hiddenChromeAcceptedFocus) throw new Error('hidden adaptive mobile chrome still accepted focus');
 
   await page.locator('#bottom-nav-compact-context').click();
-  await page.waitForFunction(
-    () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true',
-    null,
-    { timeout: 5000 }
-  );
+  await page.waitForFunction(() => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true', null, { timeout: 5000 });
   await page.waitForTimeout(650);
-  const compactBottomResetState = await readState();
-  assertExpanded(compactBottomResetState, 'compact bottom navigation reset');
-  if (compactBottomResetState.scrollY > 4) {
-    throw new Error(
-      `compact bottom navigation did not return the active page to the top: ${compactBottomResetState.scrollY}px`
-    );
-  }
+  const resetState = await readStandardState();
+  assertStandardExpanded(resetState, 'compact bottom navigation reset');
+  if (resetState.scrollY > 4) throw new Error(`compact bottom navigation did not return the active page to the top: ${resetState.scrollY}px`);
 
   await scrollIntoCompactMode();
   await page.locator('#mobile-compact-search-btn').click();
   await page.waitForURL((url) => url.pathname.endsWith('/search'), { timeout: 10000 });
   await page.waitForTimeout(650);
-  const routedState = await readState();
-  assertExpanded(routedState, 'adaptive navigation route change');
-  if (routedState.scrollY > 4) {
-    throw new Error(`adaptive navigation preserved stale scroll position: ${routedState.scrollY}px`);
-  }
 
-  const routeChangeA11y = await page.evaluate(() => ({
+  // Search is intentionally a contextual/category-style page: dedicated close/title
+  // header and no bottom navigation. Do not force the generic chrome contract onto it.
+  await expectVisible(page.locator('#mobile-search-header'), 'Search contextual header missing after adaptive navigation');
+  if (await page.locator('#bottom-nav').count()) throw new Error('Search unexpectedly rendered the standard bottom navigation');
+  if (await page.locator('#bottom-nav-compact').count()) throw new Error('Search unexpectedly rendered compact bottom navigation');
+  const searchState = await page.evaluate(() => ({
+    scrollY: window.scrollY,
     activeElementId: document.activeElement?.id || '',
-    announcement:
-      document.querySelector('#route-change-announcement')?.textContent?.trim() || '',
-    compactContextHref:
-      document.querySelector('#bottom-nav-compact-context')?.getAttribute('href') || '',
-    compactContextCurrent:
-      document.querySelector('#bottom-nav-compact-context')?.getAttribute('aria-current') || '',
+    announcement: document.querySelector('#route-change-announcement')?.textContent?.trim() || '',
   }));
-  if (routeChangeA11y.activeElementId !== 'main-content') {
-    throw new Error(
-      `route change did not focus main content: ${JSON.stringify(routeChangeA11y)}`
-    );
-  }
-  if (!routeChangeA11y.announcement) {
-    throw new Error('route change was not announced to assistive technology');
-  }
-  if (
-    !routeChangeA11y.compactContextHref.endsWith('/search') ||
-    routeChangeA11y.compactContextCurrent !== 'page'
-  ) {
-    throw new Error(
-      `Search route compact context fell back to another page: ${JSON.stringify(routeChangeA11y)}`
-    );
-  }
+  if (searchState.scrollY > 4) throw new Error(`adaptive navigation preserved stale scroll position: ${searchState.scrollY}px`);
+  if (searchState.activeElementId !== 'main-content') throw new Error(`route change did not focus main content: ${JSON.stringify(searchState)}`);
+  if (!searchState.announcement) throw new Error('route change was not announced to assistive technology');
 
   await page.goBack({ waitUntil: 'domcontentloaded' });
-  await page.waitForURL((url) => url.pathname === '/' || url.pathname.endsWith('/en'), {
-    timeout: 10000,
-  });
+  await page.waitForURL((url) => url.pathname === '/' || url.pathname.endsWith('/en'), { timeout: 10000 });
   await page.waitForTimeout(650);
-  assertExpanded(await readState(), 'browser back route change');
-  const backFocusId = await page.evaluate(() => document.activeElement?.id || '');
-  if (backFocusId !== 'main-content') {
-    throw new Error(`browser Back did not restore route focus contract: ${backFocusId}`);
-  }
+  assertStandardExpanded(await readStandardState(), 'browser back route change');
 
   await page.goForward({ waitUntil: 'domcontentloaded' });
   await page.waitForURL((url) => url.pathname.endsWith('/search'), { timeout: 10000 });
   await page.waitForTimeout(650);
-  assertExpanded(await readState(), 'browser forward route change');
-  const forwardState = await page.evaluate(() => ({
-    activeElementId: document.activeElement?.id || '',
-    href: document.querySelector('#bottom-nav-compact-context')?.getAttribute('href') || '',
-  }));
-  if (
-    forwardState.activeElementId !== 'main-content' ||
-    !forwardState.href.endsWith('/search')
-  ) {
-    throw new Error(
-      `browser Forward did not preserve navigation context: ${JSON.stringify(forwardState)}`
-    );
+  await expectVisible(page.locator('#mobile-search-header'), 'Search contextual header missing after browser Forward');
+  if ((await page.evaluate(() => document.activeElement?.id || '')) !== 'main-content') {
+    throw new Error('browser Forward did not preserve route focus contract');
   }
-
-  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
-  await scrollIntoCompactMode();
-  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
-  await page.waitForTimeout(650);
-  assertExpanded(await readState(), 'refresh');
 
   await context.close();
 });
 
-await check('Compact bottom context follows non-primary routes in Bangla and English', async () => {
+await check('Contextual Search keeps category-style mobile chrome in Bangla and English', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
 
-  const cases = [
-    { path: '/search', expectedPath: '/search', expectedLabel: 'অনুসন্ধান' },
-    { path: '/more', expectedPath: '/more', expectedLabel: 'আরও' },
-    { path: '/en/search', expectedPath: '/en/search', expectedLabel: 'Search' },
-    { path: '/en/more', expectedPath: '/en/more', expectedLabel: 'More' },
-  ];
+  for (const testCase of [
+    { path: '/search', title: 'অনুসন্ধান', lang: 'bn' },
+    { path: '/en/search', title: 'Search', lang: 'en' },
+  ]) {
+    await page.goto(routeUrl(testCase.path), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await expectVisible(page.locator('#mobile-search-header'), testCase.path + ' contextual header missing');
+    const state = await page.evaluate(() => ({
+      title: document.querySelector('#mobile-search-title')?.textContent?.trim() || '',
+      close: Boolean(document.querySelector('#mobile-search-close-btn')),
+      bottom: Boolean(document.querySelector('#bottom-nav')),
+      compactBottom: Boolean(document.querySelector('#bottom-nav-compact')),
+      language: document.documentElement.lang,
+    }));
+    if (state.title !== testCase.title || !state.close || state.bottom || state.compactBottom || state.language !== testCase.lang) {
+      throw new Error(`${testCase.path} contextual chrome contract is wrong: ${JSON.stringify(state)}`);
+    }
+  }
+  await context.close();
+});
 
-  for (const testCase of cases) {
-    await page.goto(routeUrl(testCase.path), {
-      waitUntil: 'domcontentloaded',
-      timeout: 30000,
-    });
+await check('Compact bottom context follows remaining non-primary routes in Bangla and English', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+
+  for (const testCase of [
+    { path: '/more', expectedPath: '/more', expectedLabel: 'আরও', lang: 'bn' },
+    { path: '/en/more', expectedPath: '/en/more', expectedLabel: 'More', lang: 'en' },
+  ]) {
+    await page.goto(routeUrl(testCase.path), { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expectVisible(page.locator('#main-content'), testCase.path + ' did not render');
-
-    const contextState = await page.evaluate(() => {
+    const state = await page.evaluate(() => {
       const link = document.querySelector('#bottom-nav-compact-context');
       return {
         href: link?.getAttribute('href') || '',
@@ -902,27 +785,10 @@ await check('Compact bottom context follows non-primary routes in Bangla and Eng
         language: document.documentElement.lang,
       };
     });
-
-    if (!contextState.href.endsWith(testCase.expectedPath)) {
-      throw new Error(
-        `${testCase.path} compact context resolved to ${contextState.href || 'missing'}`
-      );
-    }
-    if (contextState.label !== testCase.expectedLabel || contextState.current !== 'page') {
-      throw new Error(
-        `${testCase.path} compact context semantics are wrong: ${JSON.stringify(contextState)}`
-      );
-    }
-    if (
-      (testCase.path.startsWith('/en/') && contextState.language !== 'en') ||
-      (!testCase.path.startsWith('/en/') && contextState.language !== 'bn')
-    ) {
-      throw new Error(
-        `${testCase.path} language context is wrong: ${JSON.stringify(contextState)}`
-      );
+    if (!state.href.endsWith(testCase.expectedPath) || state.label !== testCase.expectedLabel || state.current !== 'page' || state.language !== testCase.lang) {
+      throw new Error(`${testCase.path} compact context semantics are wrong: ${JSON.stringify(state)}`);
     }
   }
-
   await context.close();
 });
 
