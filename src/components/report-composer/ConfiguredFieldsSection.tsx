@@ -819,13 +819,17 @@ export const ConfiguredFieldsSection = forwardRef<
                 <p id={fieldLabelId} className="type-label text-role-on-surface">
                   {label}
                   {field.required ? (
-                    <span className="text-role-validation ml-1" aria-hidden="true">*</span>
+                    <>
+                      <span className="text-role-validation ml-1" aria-hidden="true">*</span>
+                      <span className="sr-only">
+                        {language === 'bn' ? ' আবশ্যক' : ' required'}
+                      </span>
+                    </>
                   ) : null}
                 </p>
                 <div
                   role="group"
                   aria-labelledby={fieldLabelId}
-                  aria-required={field.required || undefined}
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
                   className="grid gap-2 sm:grid-cols-2"

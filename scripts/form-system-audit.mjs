@@ -103,6 +103,26 @@ requireContains(
   'clearable searchable selects must reserve space for the clear action'
 );
 requireContains(
+  'src/components/ui/SearchableSelect.tsx',
+  'window.visualViewport',
+  'searchable selects must position against the visual viewport for mobile keyboards'
+);
+requireContains(
+  'src/components/ui/SearchableSelect.tsx',
+  "visualViewport?.addEventListener('resize'",
+  'searchable selects must reposition when the mobile visual viewport changes'
+);
+requireNotContains(
+  'src/components/ui/ContactField.tsx',
+  "inputMode ?? 'email'",
+  'hybrid email-or-phone fields must not force the email keyboard'
+);
+requireContains(
+  'src/components/ui/ContactField.tsx',
+  'inputMode={inputMode}',
+  'hybrid contact fields must allow a neutral default or an explicit caller override'
+);
+requireContains(
   'src/components/ui/RadioGroup.tsx',
   'type-input',
   'radio choices must use the shared form input typography role'
@@ -161,6 +181,14 @@ if (!composer.includes('This end time is treated as the following day.')) {
 }
 
 const configured = read('src/components/report-composer/ConfiguredFieldsSection.tsx');
+if (configured.includes(`role="group"
+                  aria-labelledby={fieldLabelId}
+                  aria-required={field.required || undefined}`)) {
+  failures.push('ConfiguredFieldsSection.tsx: role=group must not use unsupported aria-required');
+}
+if (!configured.includes("language === 'bn' ? ' আবশ্যক' : ' required'")) {
+  failures.push('ConfiguredFieldsSection.tsx: required multiselect groups must expose a screen-reader required cue');
+}
 if (configured.includes('role="alert" className="type-helper text-role-validation"')) {
   failures.push('ConfiguredFieldsSection.tsx: schema group errors must use the accessible semantic error text role');
 }
@@ -179,6 +207,43 @@ for (const token of [
 ]) {
   if (!configured.includes(token)) {
     failures.push(`ConfiguredFieldsSection.tsx: missing schema form contract ${token}`);
+  }
+}
+
+requireFile('src/components/report-composer/SchemaFormSmokeHarness.tsx');
+requireContains(
+  'src/components/layout/AppShell.tsx',
+  "import.meta.env.VITE_FORM_SCHEMA_SMOKE === '1'",
+  'schema runtime smoke route must be gated behind the CI-only Vite flag'
+);
+requireContains(
+  '.github/workflows/ci.yml',
+  "VITE_FORM_SCHEMA_SMOKE: '1'",
+  'CI must build the schema runtime smoke route'
+);
+requireContains(
+  'scripts/public-accessibility-smoke.mjs',
+  "mobile schema form valid state",
+  'browser smoke must validate schema-mode rendering, invalid state, and valid state'
+);
+
+const distRoot = path.resolve(ROOT, 'dist');
+if (fs.existsSync(distRoot)) {
+  const walkBuilt = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    return entry.isDirectory() ? walkBuilt(full) : [full];
+  });
+  const builtText = walkBuilt(distRoot)
+    .filter((file) => /\.(?:html|js)$/.test(file))
+    .map((file) => fs.readFileSync(file, 'utf8'))
+    .join('\n');
+  const routeMarker = '__form-schema-smoke';
+  if (process.env.VITE_FORM_SCHEMA_SMOKE === '1') {
+    if (!builtText.includes(routeMarker)) {
+      failures.push('CI form build: schema runtime smoke route was not included');
+    }
+  } else if (builtText.includes(routeMarker)) {
+    failures.push('Production form build: CI-only schema runtime smoke route leaked into the deploy bundle');
   }
 }
 

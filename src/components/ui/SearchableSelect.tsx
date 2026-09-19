@@ -90,25 +90,33 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     if (!trigger || typeof window === 'undefined') return;
 
     const rect = trigger.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    const visualViewport = window.visualViewport;
+    const viewportLeft = visualViewport?.offsetLeft ?? 0;
+    const viewportTop = visualViewport?.offsetTop ?? 0;
+    const viewportWidth = visualViewport?.width ?? window.innerWidth;
+    const viewportHeight = visualViewport?.height ?? window.innerHeight;
+    const viewportRight = viewportLeft + viewportWidth;
+    const viewportBottom = viewportTop + viewportHeight;
     const edge = 8;
     const gap = 6;
-    const spaceBelow = viewportHeight - rect.bottom - gap - edge;
-    const spaceAbove = rect.top - gap - edge;
+    const spaceBelow = viewportBottom - rect.bottom - gap - edge;
+    const spaceAbove = rect.top - viewportTop - gap - edge;
     const openAbove = spaceBelow < 220 && spaceAbove > spaceBelow;
     const availableHeight = Math.max(96, openAbove ? spaceAbove : spaceBelow);
     const width = Math.min(rect.width, viewportWidth - edge * 2);
-    const left = Math.min(Math.max(edge, rect.left), Math.max(edge, viewportWidth - width - edge));
+    const left = Math.min(
+      Math.max(viewportLeft + edge, rect.left),
+      Math.max(viewportLeft + edge, viewportRight - width - edge)
+    );
 
     setPanelStyle({
       position: 'fixed',
       left,
       width,
       maxHeight: Math.min(340, availableHeight),
-      ...(openAbove
-        ? { bottom: viewportHeight - rect.top + gap, top: 'auto' }
-        : { top: rect.bottom + gap, bottom: 'auto' }),
+      top: openAbove ? Math.max(viewportTop + edge, rect.top - gap) : rect.bottom + gap,
+      bottom: 'auto',
+      transform: openAbove ? 'translateY(-100%)' : 'none',
     });
   }, []);
 
@@ -151,6 +159,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     document.addEventListener('keydown', handleKeyDown);
     window.addEventListener('resize', handleViewportChange);
     window.addEventListener('scroll', handleViewportChange, true);
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    window.visualViewport?.addEventListener('scroll', handleViewportChange);
 
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
@@ -158,6 +168,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('resize', handleViewportChange);
       window.removeEventListener('scroll', handleViewportChange, true);
+      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+      window.visualViewport?.removeEventListener('scroll', handleViewportChange);
     };
   }, [close, isOpen, updatePosition]);
 

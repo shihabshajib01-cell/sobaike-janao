@@ -118,6 +118,51 @@ await scan(mobilePage, 'mobile report composer step 3');
 await mobilePage.locator('#composer-footer-step3-review-btn').click();
 await mobilePage.waitForTimeout(250);
 await scan(mobilePage, 'mobile report composer validation errors');
+
+if (process.env.FORM_SCHEMA_SMOKE === '1') {
+  await goto(mobilePage, '/__form-schema-smoke');
+  await mobilePage.locator('#schema-form-smoke').waitFor({ state: 'visible', timeout: 15000 });
+
+  for (const id of [
+    'configured-input-smoke_text',
+    'configured-input-smoke_select',
+    'configured-field-smoke_radio',
+    'configured-field-smoke_checkbox',
+    'configured-field-smoke_multiselect',
+    'configured-input-smoke_date',
+    'configured-input-smoke_time',
+    'configured-input-smoke_month',
+    'configured-input-smoke_number',
+    'configured-input-smoke_phone',
+    'configured-input-smoke_email',
+    'configured-input-smoke_url',
+    'configured-field-smoke_location',
+    'configured-field-smoke_subject',
+    'configured-field-smoke_evidence',
+    'configured-input-smoke_privacy',
+  ]) {
+    if ((await mobilePage.locator(`#${id}`).count()) !== 1) {
+      throw new Error(`Schema runtime fixture is missing #${id}`);
+    }
+  }
+
+  await scan(mobilePage, 'mobile schema form fixture');
+  await mobilePage.locator('#schema-smoke-validate').click();
+  await mobilePage.waitForFunction(
+    () => document.getElementById('schema-smoke-status')?.getAttribute('data-schema-valid') === 'false'
+  );
+  await mobilePage.waitForFunction(
+    () => document.activeElement?.id === 'configured-input-smoke_text'
+  );
+  await scan(mobilePage, 'mobile schema form validation errors');
+
+  await mobilePage.locator('#schema-smoke-load-valid').click();
+  await mobilePage.locator('#schema-smoke-validate').click();
+  await mobilePage.waitForFunction(
+    () => document.getElementById('schema-smoke-status')?.getAttribute('data-schema-valid') === 'true'
+  );
+  await scan(mobilePage, 'mobile schema form valid state');
+}
 await mobile.close();
 
 const firstVisit = await browser.newContext({ viewport: { width: 390, height: 844 } });
