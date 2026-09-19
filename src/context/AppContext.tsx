@@ -364,6 +364,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     refreshBrowseLocation,
   ]);
 
+  // If an explicit location choice exists but the approximate provider/network
+  // is temporarily unavailable, retry without nagging the visitor again.
+  // Coming back online also triggers an immediate recovery attempt.
+  useEffect(() => {
+    const handleOnline = () => {
+      void refreshBrowseLocation();
+    };
+    window.addEventListener('online', handleOnline);
+
+    const choice = VisitorSessionService.getLocationChoice();
+    const shouldRetryApproximate =
+      choice !== null &&
+      browseLocationStatus !== 'available' &&
+      browseLocationStatus !== 'requesting' &&
+      navigator.onLine;
+
+    const retryId = shouldRetryApproximate
+      ? window.setTimeout(() => {
+          void refreshBrowseLocation();
+        }, 60_000)
+      : null;
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      if (retryId !== null) {
+        window.clearTimeout(retryId);
+      }
+    };
+  }, [browseLocationStatus, refreshBrowseLocation]);
+
   const openLocationConsent = useCallback((
     purposeOrOptions?: LocationConsentPurpose | LocationConsentOptions | (() => void | Promise<void> | any),
     onSuccess?: () => void | Promise<void> | any
