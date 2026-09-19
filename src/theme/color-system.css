@@ -187,6 +187,7 @@ html[data-theme="light"] {
   --category-harassment-container: #E9D2DA;
   --category-harassment-on-container: #7C3850;
   --category-harassment-outline: #D2A5B4;
+  --category-harassment-selected-container: color-mix(in srgb, var(--category-harassment-primary) 15%, var(--md-surface));
 
   --category-extortion-primary: #AC542F;
   --category-extortion-hover: #944828;
@@ -194,6 +195,7 @@ html[data-theme="light"] {
   --category-extortion-container: #EAD4CB;
   --category-extortion-on-container: #813F23;
   --category-extortion-outline: #D6AA97;
+  --category-extortion-selected-container: color-mix(in srgb, var(--category-extortion-primary) 15%, var(--md-surface));
 
   --category-public_safety-primary: #775A86;
   --category-public_safety-hover: #664D73;
@@ -201,6 +203,7 @@ html[data-theme="light"] {
   --category-public_safety-container: #DDD6E1;
   --category-public_safety-on-container: #594464;
   --category-public_safety-outline: #BBACC2;
+  --category-public_safety-selected-container: color-mix(in srgb, var(--category-public_safety-primary) 15%, var(--md-surface));
 
   --category-road_transport-primary: #915C42;
   --category-road_transport-hover: #7D4F39;
@@ -208,6 +211,7 @@ html[data-theme="light"] {
   --category-road_transport-container: #E4D6D0;
   --category-road_transport-on-container: #6D4532;
   --category-road_transport-outline: #C8AEA0;
+  --category-road_transport-selected-container: color-mix(in srgb, var(--category-road_transport-primary) 15%, var(--md-surface));
 
   --category-load_shedding-primary: #578C8B;
   --category-load_shedding-hover: #4B7878;
@@ -215,6 +219,7 @@ html[data-theme="light"] {
   --category-load_shedding-container: #D5E2E2;
   --category-load_shedding-on-container: #416968;
   --category-load_shedding-outline: #ABC6C5;
+  --category-load_shedding-selected-container: color-mix(in srgb, var(--category-load_shedding-primary) 15%, var(--md-surface));
 
   --category-illegal_occupation-primary: #983D3E;
   --category-illegal_occupation-hover: #833435;
@@ -222,6 +227,7 @@ html[data-theme="light"] {
   --category-illegal_occupation-container: #E5CECF;
   --category-illegal_occupation-on-container: #722E2E;
   --category-illegal_occupation-outline: #CC9E9E;
+  --category-illegal_occupation-selected-container: color-mix(in srgb, var(--category-illegal_occupation-primary) 15%, var(--md-surface));
 
   --category-rickshaw-primary: #197B56;
   --category-rickshaw-hover: #166A4A;
@@ -229,6 +235,7 @@ html[data-theme="light"] {
   --category-rickshaw-container: #C6DED5;
   --category-rickshaw-on-container: #135C40;
   --category-rickshaw-outline: #8CBDAA;
+  --category-rickshaw-selected-container: color-mix(in srgb, var(--category-rickshaw-primary) 15%, var(--md-surface));
 }
 
 html[data-theme="dark"],
@@ -373,6 +380,7 @@ html[data-theme="dark"],
   --category-harassment-container: #2B1B21;
   --category-harassment-on-container: #F0C4D2;
   --category-harassment-outline: #694052;
+  --category-harassment-selected-container: color-mix(in srgb, var(--category-harassment-primary) 22%, var(--md-surface));
 
   --category-extortion-primary: #D98967;
   --category-extortion-hover: #E5A083;
@@ -380,6 +388,7 @@ html[data-theme="dark"],
   --category-extortion-container: #2C1D17;
   --category-extortion-on-container: #F1C6B4;
   --category-extortion-outline: #704532;
+  --category-extortion-selected-container: color-mix(in srgb, var(--category-extortion-primary) 22%, var(--md-surface));
 
   --category-public_safety-primary: #B99AC7;
   --category-public_safety-hover: #C9AFD4;
@@ -387,6 +396,7 @@ html[data-theme="dark"],
   --category-public_safety-container: #241D28;
   --category-public_safety-on-container: #E1CFE8;
   --category-public_safety-outline: #5A4962;
+  --category-public_safety-selected-container: color-mix(in srgb, var(--category-public_safety-primary) 22%, var(--md-surface));
 
   --category-road_transport-primary: #C79278;
   --category-road_transport-hover: #D4A58F;
@@ -394,6 +404,7 @@ html[data-theme="dark"],
   --category-road_transport-container: #291F1B;
   --category-road_transport-on-container: #E8CABB;
   --category-road_transport-outline: #62483B;
+  --category-road_transport-selected-container: color-mix(in srgb, var(--category-road_transport-primary) 22%, var(--md-surface));
 
   --category-load_shedding-primary: #7FB6B5;
   --category-load_shedding-hover: #99C6C5;
@@ -401,6 +412,7 @@ html[data-theme="dark"],
   --category-load_shedding-container: #172625;
   --category-load_shedding-on-container: #C1E0DF;
   --category-load_shedding-outline: #3D5F5E;
+  --category-load_shedding-selected-container: color-mix(in srgb, var(--category-load_shedding-primary) 22%, var(--md-surface));
 
   --category-illegal_occupation-primary: #D47778;
   --category-illegal_occupation-hover: #DF9293;
@@ -408,6 +420,7 @@ html[data-theme="dark"],
   --category-illegal_occupation-container: #2A1A1B;
   --category-illegal_occupation-on-container: #F0BFC0;
   --category-illegal_occupation-outline: #673B3C;
+  --category-illegal_occupation-selected-container: color-mix(in srgb, var(--category-illegal_occupation-primary) 22%, var(--md-surface));
 
   --category-rickshaw-primary: #58AA87;
   --category-rickshaw-hover: #74B99B;
@@ -415,6 +428,7 @@ html[data-theme="dark"],
   --category-rickshaw-container: #14251E;
   --category-rickshaw-on-container: #B5DDCC;
   --category-rickshaw-outline: #315E4C;
+  --category-rickshaw-selected-container: color-mix(in srgb, var(--category-rickshaw-primary) 22%, var(--md-surface));
 }
 
 /* Compatibility aliases: existing UI continues working while shared primitives migrate
@@ -521,6 +535,7 @@ html[data-theme="dark"],
   --sec-harassment-primary: var(--category-harassment-primary);
   --sec-harassment-hover: var(--category-harassment-hover);
   --sec-harassment-bg: var(--category-harassment-container);
+  --sec-harassment-selected-bg: var(--category-harassment-selected-container);
   --sec-harassment-border: var(--category-harassment-outline);
   --sec-harassment-text: var(--category-harassment-on-container);
   --sec-harassment-on-primary: var(--category-harassment-on-primary);
@@ -528,6 +543,7 @@ html[data-theme="dark"],
   --sec-extortion-primary: var(--category-extortion-primary);
   --sec-extortion-hover: var(--category-extortion-hover);
   --sec-extortion-bg: var(--category-extortion-container);
+  --sec-extortion-selected-bg: var(--category-extortion-selected-container);
   --sec-extortion-border: var(--category-extortion-outline);
   --sec-extortion-text: var(--category-extortion-on-container);
   --sec-extortion-on-primary: var(--category-extortion-on-primary);
@@ -535,6 +551,7 @@ html[data-theme="dark"],
   --sec-public_safety-primary: var(--category-public_safety-primary);
   --sec-public_safety-hover: var(--category-public_safety-hover);
   --sec-public_safety-bg: var(--category-public_safety-container);
+  --sec-public_safety-selected-bg: var(--category-public_safety-selected-container);
   --sec-public_safety-border: var(--category-public_safety-outline);
   --sec-public_safety-text: var(--category-public_safety-on-container);
   --sec-public_safety-on-primary: var(--category-public_safety-on-primary);
@@ -542,6 +559,7 @@ html[data-theme="dark"],
   --sec-road_transport-primary: var(--category-road_transport-primary);
   --sec-road_transport-hover: var(--category-road_transport-hover);
   --sec-road_transport-bg: var(--category-road_transport-container);
+  --sec-road_transport-selected-bg: var(--category-road_transport-selected-container);
   --sec-road_transport-border: var(--category-road_transport-outline);
   --sec-road_transport-text: var(--category-road_transport-on-container);
   --sec-road_transport-on-primary: var(--category-road_transport-on-primary);
@@ -549,6 +567,7 @@ html[data-theme="dark"],
   --sec-load_shedding-primary: var(--category-load_shedding-primary);
   --sec-load_shedding-hover: var(--category-load_shedding-hover);
   --sec-load_shedding-bg: var(--category-load_shedding-container);
+  --sec-load_shedding-selected-bg: var(--category-load_shedding-selected-container);
   --sec-load_shedding-border: var(--category-load_shedding-outline);
   --sec-load_shedding-text: var(--category-load_shedding-on-container);
   --sec-load_shedding-on-primary: var(--category-load_shedding-on-primary);
@@ -556,6 +575,7 @@ html[data-theme="dark"],
   --sec-load-shedding-primary: var(--category-load_shedding-primary);
   --sec-load-shedding-hover: var(--category-load_shedding-hover);
   --sec-load-shedding-bg: var(--category-load_shedding-container);
+  --sec-load-shedding-selected-bg: var(--category-load_shedding-selected-container);
   --sec-load-shedding-border: var(--category-load_shedding-outline);
   --sec-load-shedding-text: var(--category-load_shedding-on-container);
   --sec-load-shedding-on-primary: var(--category-load_shedding-on-primary);
@@ -563,6 +583,7 @@ html[data-theme="dark"],
   --sec-illegal_occupation-primary: var(--category-illegal_occupation-primary);
   --sec-illegal_occupation-hover: var(--category-illegal_occupation-hover);
   --sec-illegal_occupation-bg: var(--category-illegal_occupation-container);
+  --sec-illegal_occupation-selected-bg: var(--category-illegal_occupation-selected-container);
   --sec-illegal_occupation-border: var(--category-illegal_occupation-outline);
   --sec-illegal_occupation-text: var(--category-illegal_occupation-on-container);
   --sec-illegal_occupation-on-primary: var(--category-illegal_occupation-on-primary);
@@ -570,6 +591,7 @@ html[data-theme="dark"],
   --sec-rickshaw-primary: var(--category-rickshaw-primary);
   --sec-rickshaw-hover: var(--category-rickshaw-hover);
   --sec-rickshaw-bg: var(--category-rickshaw-container);
+  --sec-rickshaw-selected-bg: var(--category-rickshaw-selected-container);
   --sec-rickshaw-border: var(--category-rickshaw-outline);
   --sec-rickshaw-text: var(--category-rickshaw-on-container);
   --sec-rickshaw-on-primary: var(--category-rickshaw-on-primary);
