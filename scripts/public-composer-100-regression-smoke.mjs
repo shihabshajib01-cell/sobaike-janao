@@ -154,6 +154,63 @@ try {
   const submitBox = await submit.boundingBox();
   if (!submitBox || submitBox.height < 44) throw new Error('Step 4 submit action is below 44px minimum target');
 
+  // Controlled submission-failure test. Intercept the Supabase submission RPC so
+  // production never receives this regression report, then verify retry safety.
+  const submissionBodies = [];
+  await page.route('**/rest/v1/rpc/submit_public_complaint_v2', async (route) => {
+    try {
+      submissionBodies.push(JSON.parse(route.request().postData() || '{}'));
+    } catch {
+      submissionBodies.push({});
+    }
+    await route.fulfill({
+      status: 500,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: 'TEST_FAILURE',
+        message: 'Forced non-destructive regression failure',
+      }),
+    });
+  });
+
+  await submit.click();
+  await expectVisible(page.locator('#composer-submit-error-banner'), 'submission failure did not expose an error banner');
+  await page.waitForFunction(
+    () => {
+      const button = document.querySelector('#composer-footer-step4-submit-btn');
+      return button instanceof HTMLButtonElement && !button.disabled;
+    },
+    null,
+    { timeout: 10000 }
+  );
+  if (submissionBodies.length !== 1) {
+    throw new Error(`expected one intercepted submission attempt, found ${submissionBodies.length}`);
+  }
+
+  await submit.click();
+  await page.waitForFunction(
+    () => {
+      const button = document.querySelector('#composer-footer-step4-submit-btn');
+      const error = document.querySelector('#composer-submit-error-banner');
+      return button instanceof HTMLButtonElement && !button.disabled && Boolean(error);
+    },
+    null,
+    { timeout: 10000 }
+  );
+  if (submissionBodies.length !== 2) {
+    throw new Error(`expected two intercepted submission attempts after retry, found ${submissionBodies.length}`);
+  }
+
+  const firstId = submissionBodies[0]?.p_client_submission_id || '';
+  const retryId = submissionBodies[1]?.p_client_submission_id || '';
+  if (!firstId || firstId !== retryId) {
+    throw new Error(`submission retry did not preserve the idempotency key: first=${firstId || 'missing'} retry=${retryId || 'missing'}`);
+  }
+  if (await submit.isDisabled()) {
+    throw new Error('submit action remained disabled after recoverable server failure');
+  }
+  await page.unroute('**/rest/v1/rpc/submit_public_complaint_v2');
+
   // Close cleanly without submitting anything.
   await page.locator('#report-composer-close-btn').click();
   await expectVisible(page.locator('#report-cancel-confirm-modal'), 'cancel confirmation missing from review step');
