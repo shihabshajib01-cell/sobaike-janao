@@ -289,6 +289,18 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   }
 
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const reloadedHomeFeed = page.locator('#home-virtualized-feed');
+  await reloadedHomeFeed.waitFor({ state: 'attached', timeout: 15000 });
+  await page.waitForFunction(
+    () =>
+      Number(
+        document.querySelector('#home-virtualized-feed')?.getAttribute('data-loaded-count') || 0
+      ) > 0,
+    null,
+    { timeout: 30000 }
+  );
+  await reloadedHomeFeed.scrollIntoViewIfNeeded();
+
   const childClickCard = page.locator('[id^="report-card-"]').first();
   await expectVisible(childClickCard, 'No report card found for title-click navigation check');
   await childClickCard.locator('a[href*="/report-detail/"] h3').click();
