@@ -121,17 +121,21 @@ export const IssuesPage: React.FC = () => {
               }`}
               className="group flex min-h-[68px] items-stretch gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-card"
             >
-              <div className="flex w-12 shrink-0 items-center justify-center ui-radius-card border border-ui-border bg-ui-surface">
+              <div
+                className="flex w-12 shrink-0 items-center justify-center ui-radius-card border"
+                style={{
+                  backgroundColor: config.bgColor,
+                  borderColor: config.borderColor,
+                }}
+              >
                 <CategoryIcon
                   section={key}
                   size="md"
-                  withContainer
-                  className="border-0 shadow-none"
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
               </div>
 
-              <div className="flex min-w-0 flex-1 items-center gap-3 ui-radius-card border border-ui-border bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
+              <div className="flex min-w-0 flex-1 items-center gap-3 ui-radius-card bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
                 <h2 className="min-w-0 flex-1 type-h4 text-ui-content-primary">
                   {language === 'bn' ? config.nameBn : config.nameEn}
                 </h2>
