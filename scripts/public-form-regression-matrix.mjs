@@ -17,7 +17,26 @@ async function makeContext(browser, viewport) {
   const context = await browser.newContext({
     viewport,
     geolocation: { latitude: 23.7806, longitude: 90.4070, accuracy: 20 },
+    serviceWorkers: 'block',
   });
+
+  await context.route('**/*', async (route) => {
+    const resourceType = route.request().resourceType();
+    if (resourceType === 'image') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'image/svg+xml',
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>',
+      });
+      return;
+    }
+    if (resourceType === 'media') {
+      await route.fulfill({ status: 204, body: '' });
+      return;
+    }
+    await route.continue();
+  });
+
   await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
   await seedReturningVisitor(context);
   return context;
