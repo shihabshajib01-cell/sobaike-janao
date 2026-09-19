@@ -302,7 +302,7 @@ export const ConfiguredFieldsSection = forwardRef<
     );
 
     const commonInputClass =
-      'w-full min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-body text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus';
+      'w-full min-h-[44px] rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-input text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus';
 
     return (
       <section
@@ -350,7 +350,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-location-division"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'বিভাগ' : 'Division'} *
                     </label>
@@ -391,7 +391,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-location-district"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'জেলা' : 'District'} *
                     </label>
@@ -432,7 +432,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-location-upazila"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn'
                         ? 'থানা / উপজেলা'
@@ -469,7 +469,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-location-area"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'এলাকা' : 'Area'}
                     </label>
@@ -491,7 +491,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5 sm:col-span-2">
                     <label
                       htmlFor="configured-location-address"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
                     </label>
@@ -551,7 +551,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 <div className="space-y-1.5">
                   <label
                     htmlFor="configured-evidence-description"
-                    className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                    className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                   >
                     {language === 'bn'
                       ? 'সহায়ক তথ্যের বিবরণ'
@@ -635,7 +635,7 @@ export const ConfiguredFieldsSection = forwardRef<
                     <div className="space-y-1.5">
                       <label
                         htmlFor="configured-admin-name"
-                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                        className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                       >
                         {language === 'bn' ? 'নাম' : 'Name'}
                       </label>
@@ -651,7 +651,7 @@ export const ConfiguredFieldsSection = forwardRef<
                     <div className="space-y-1.5">
                       <label
                         htmlFor="configured-admin-contact"
-                        className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                        className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                       >
                         {language === 'bn' ? 'যোগাযোগ' : 'Contact'}
                       </label>
@@ -689,7 +689,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-party-type"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'ধরন' : 'Type'}
                     </label>
@@ -723,7 +723,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-party-name"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'নাম' : 'Name'}
                     </label>
@@ -742,7 +742,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-party-role"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'পদ / ভূমিকা' : 'Role / designation'}
                     </label>
@@ -760,7 +760,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   <div className="space-y-1.5">
                     <label
                       htmlFor="configured-party-org"
-                      className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                      className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                     >
                       {language === 'bn' ? 'প্রতিষ্ঠান' : 'Organization'}
                     </label>
@@ -809,7 +809,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 <label
                   id={fieldLabelId}
                   htmlFor={fieldControlId}
-                  className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary"
+                  className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary"
                 >
                   {label}
                   {field.required ? ' *' : ''}
