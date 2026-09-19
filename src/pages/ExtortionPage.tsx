@@ -18,7 +18,7 @@ import {
 } from '../data/categoryFeedFilters';
 
 export const ExtortionPage: React.FC = () => {
-  const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
+  const { language, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
   usePublishedBannerRuntime();
   const bannerContent = CANONICAL_BANNER_CONTENT.extortion;
@@ -102,11 +102,6 @@ export const ExtortionPage: React.FC = () => {
             desktopDescriptionBn: bannerContent.desktopDescriptionBn,
             desktopDescriptionEn: bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
-            action: {
-              labelBn: bannerContent.primaryCtaBn,
-              labelEn: bannerContent.primaryCtaEn,
-              onClick: () => openReportComposer('extortion'),
-            },
           },
         ]}
       />

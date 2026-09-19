@@ -58,7 +58,6 @@ const matchesLocationFilters = (
 export const HarassmentPage: React.FC = () => {
   const {
     language,
-    openReportComposer,
     browseLocation,
     browseLocationStatus,
     isHarassmentFilterOpen,
@@ -171,11 +170,6 @@ export const HarassmentPage: React.FC = () => {
             desktopDescriptionBn: bannerContent.desktopDescriptionBn,
             desktopDescriptionEn: bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
-            action: {
-              labelBn: bannerContent.primaryCtaBn,
-              labelEn: bannerContent.primaryCtaEn,
-              onClick: () => openReportComposer('harassment'),
-            },
           },
         ]}
       />

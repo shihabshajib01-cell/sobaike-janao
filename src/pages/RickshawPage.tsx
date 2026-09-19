@@ -17,7 +17,7 @@ import {
 } from '../data/categoryFeedFilters';
 
 export const RickshawPage: React.FC = () => {
-  const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
+  const { language, browseLocation, browseLocationStatus } = useApp();
   usePublishedBannerRuntime();
   const bannerContent = CANONICAL_BANNER_CONTENT.rickshaw;
 
@@ -86,11 +86,6 @@ export const RickshawPage: React.FC = () => {
             desktopDescriptionBn: bannerContent.desktopDescriptionBn,
             desktopDescriptionEn: bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
-            action: {
-              labelBn: bannerContent.primaryCtaBn,
-              labelEn: bannerContent.primaryCtaEn,
-              onClick: () => openReportComposer('rickshaw'),
-            },
           },
         ]}
       />
