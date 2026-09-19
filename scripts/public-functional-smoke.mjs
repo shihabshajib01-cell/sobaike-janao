@@ -36,9 +36,18 @@ function attachRuntimeGuards(page, label) {
   page.on('console', (msg) => {
     if (msg.type() === 'error') warnings.push(`${label} console error: ${msg.text()}`);
   });
+  page.on('requestfailed', (request) => {
+    const errorText = request.failure()?.errorText || '';
+    if (/INSUFFICIENT_RESOURCES/i.test(errorText)) {
+      warnings.push(`${label} request failed ${errorText}: ${request.url()}`);
+    }
+  });
   page.on('response', (response) => {
     const status = response.status();
     const url = response.url();
+    if (status === 429) {
+      warnings.push(`${label} HTTP 429: ${url}`);
+    }
     if (status >= 500 && (url.startsWith(SITE_URL) || url.includes('supabase.co'))) {
       failures.push(`${label} HTTP ${status}: ${url}`);
     }
