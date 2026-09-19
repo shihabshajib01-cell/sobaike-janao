@@ -52,8 +52,8 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
           </div>
           <p className="type-compact font-[var(--font-weight-medium)] leading-snug text-ui-content-secondary">
             {isBn
-              ? 'আপনার কাছাকাছি কী ঘটছে জানতে লোকেশন চালু করুন। এতে আপনার এলাকার খবরগুলো আগে দেখতে পারবেন।'
-              : 'Turn on location to see what’s happening near you and get local reports first.'}
+              ? 'আপনার কাছাকাছি কী ঘটছে আর আপনার এলাকার খবর দেখাতে লোকেশন চালু করুন।'
+              : 'Turn on location to see what’s happening near you and reports from your area.'}
           </p>
         </div>
 
