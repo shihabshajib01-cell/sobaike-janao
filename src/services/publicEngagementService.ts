@@ -70,15 +70,18 @@ export const PublicEngagementService = {
     const { isSupabaseConfigured, supabase } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) return null;
     try {
-      const { data, error } = await supabase.rpc('track_public_report_engagement', {
-        p_report_id: normalizeId(reportId),
-        p_event_type: 'view',
-        p_visitor_id: VisitorSessionService.getVisitorId(),
-        p_session_id: VisitorSessionService.getSessionId(),
+      const { data, error } = await supabase.functions.invoke('public-write-gateway', {
+        body: {
+          action: 'engagement',
+          reportId: normalizeId(reportId),
+          eventType: 'view',
+          visitorId: VisitorSessionService.getVisitorId(),
+          sessionId: VisitorSessionService.getSessionId(),
+        },
       });
       if (error) throw error;
-      if (!data) return null;
-      const counts = toCounts(data);
+      if (!data?.success || !data.result) return null;
+      const counts = toCounts(data.result);
       updateCachedCounts(reportId, counts);
       return counts;
     } catch (error) {
@@ -91,15 +94,18 @@ export const PublicEngagementService = {
     const { isSupabaseConfigured, supabase } = await import('../lib/supabase');
     if (!isSupabaseConfigured() || !supabase) return null;
     try {
-      const { data, error } = await supabase.rpc('track_public_report_engagement', {
-        p_report_id: normalizeId(reportId),
-        p_event_type: 'share',
-        p_visitor_id: VisitorSessionService.getVisitorId(),
-        p_session_id: VisitorSessionService.getSessionId(),
+      const { data, error } = await supabase.functions.invoke('public-write-gateway', {
+        body: {
+          action: 'engagement',
+          reportId: normalizeId(reportId),
+          eventType: 'share',
+          visitorId: VisitorSessionService.getVisitorId(),
+          sessionId: VisitorSessionService.getSessionId(),
+        },
       });
       if (error) throw error;
-      if (!data) return null;
-      const counts = toCounts(data);
+      if (!data?.success || !data.result) return null;
+      const counts = toCounts(data.result);
       updateCachedCounts(reportId, counts);
       return counts;
     } catch (error) {
