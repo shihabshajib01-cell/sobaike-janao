@@ -1358,7 +1358,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {isBriberyReport && (
               <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
-                <h4 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h4 className="type-h4 text-ui-content-primary">
                   {language === 'bn' ? 'ঘুষ সংক্রান্ত তথ্য' : 'Bribery details'}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1610,7 +1610,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             {/* Conditional Digital Threat Questions ONLY for Digital Harassment */}
             {isDigitalHarassment && (
               <div className="pt-4 border-t border-ui-stroke-subtle space-y-3 mt-2">
-                <h4 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                <h4 className="type-h4 text-ui-content-primary">
                   {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital threat & evidence details'}
                 </h4>
 
@@ -1663,7 +1663,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           <div className="space-y-3.5 pt-1 text-left">
             {/* Single Short Sentence for Digital Harassment Location Helper */}
             {isDigitalHarassment && (
-              <p className="type-compact text-ui-content-secondary leading-normal">
+              <p className="type-compact text-ui-content-secondary">
                 {language === 'bn'
                   ? 'অনলাইন বা ডিজিটাল ঘটনার ক্ষেত্রে প্রাসঙ্গিক এলাকা বা জেলা নির্বাচন করুন।'
                   : 'For online incidents, select the most relevant area or district.'}
@@ -1680,7 +1680,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="p-3.5 rounded-[var(--radius-control)] border border-ui-error-border bg-ui-error-bg space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-ui-error-text shrink-0 mt-0.5" />
-                  <div className="flex-1 type-compact text-ui-content-primary leading-relaxed">
+                  <div className="flex-1 type-compact text-ui-content-primary">
                     {language === 'bn'
                       ? 'লোকেশন অনুমতি পাওয়া যায়নি। ব্রাউজার বা ডিভাইসে লোকেশন চালু করে আবার চেষ্টা করুন।'
                       : 'Location permission was not granted. Please enable location in your browser or device settings and try again.'}
@@ -1702,7 +1702,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="p-3.5 rounded-[var(--radius-control)] border border-ui-warning-border bg-ui-warning-bg space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 text-ui-warning-text shrink-0 mt-0.5" />
-                  <div className="flex-1 type-compact text-ui-content-primary leading-relaxed">
+                  <div className="flex-1 type-compact text-ui-content-primary">
                     {language === 'bn'
                       ? 'লোকেশন পাওয়া যাচ্ছে না। জিপিএস বা ডিভাইস লোকেশন চালু করে আবার চেষ্টা করুন।'
                       : 'Device location could not be detected. Make sure GPS or location services are enabled and try again.'}
@@ -1724,7 +1724,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="p-3.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle/70 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-4 h-4 text-ui-content-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 type-compact text-ui-content-primary leading-relaxed">
+                  <div className="flex-1 type-compact text-ui-content-primary">
                     {language === 'bn'
                       ? 'অভিযোগের স্থান নির্বাচন করতে আপনার ডিভাইসের লোকেশন চালু করুন।'
                       : 'Turn on device location before selecting the incident location.'}
@@ -1740,7 +1740,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="p-3.5 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle/70 space-y-2.5 text-left">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-4 h-4 text-ui-content-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 type-compact text-ui-content-primary leading-relaxed">
+                  <div className="flex-1 type-compact text-ui-content-primary">
                     {language === 'bn'
                       ? 'অভিযোগের স্থান নির্বাচন করতে আপনার ডিভাইসের লোকেশন চালু করুন।'
                       : 'Turn on device location before selecting the incident location.'}
@@ -2113,7 +2113,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             icon={<Users className="w-5 h-5" />}
           >
             <div className="space-y-4 pt-1 text-left">
-              <p className="type-compact text-ui-content-secondary leading-relaxed">
+              <p className="type-compact text-ui-content-secondary">
                 {language === 'bn' ? subjectConfig.questionBn : subjectConfig.questionEn}
               </p>
               <div className="space-y-3 sm:space-y-3.5">
@@ -2201,7 +2201,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               <div className="space-y-3 pt-1">
                 {formData.mentionedParties && formData.mentionedParties.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                    <h4 className="type-h4 text-ui-content-primary">
                       {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional mentioned parties'}
                     </h4>
                     {formData.mentionedParties.map((party, pIdx) => (
