@@ -154,8 +154,8 @@ export const SECTIONS = {
   rickshaw: {
     key: 'rickshaw' as const,
     slug: '/rickshaw',
-    nameBn: 'অবৈধ অটো চার্জিং',
-    nameEn: 'Illegal auto-rickshaw charging',
+    nameBn: 'অবৈধ অটো-রিকশা চার্জিং স্টেশন',
+    nameEn: 'Illegal Auto-rickshaw Charging Station',
     shortNameBn: 'চার্জিং',
     shortNameEn: 'Charging',
     descriptionBn: 'অবৈধ বা ঝুঁকিপূর্ণ চার্জিং স্টেশনের অবস্থান ও তথ্য দিন।',
