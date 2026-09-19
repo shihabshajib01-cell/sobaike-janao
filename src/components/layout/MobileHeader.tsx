@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
+import { ArrowLeft, Check, Filter, Menu, Plus, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PublicEngagementService } from '../../services/publicEngagementService';
 import { useTaxonomy } from '../../services/taxonomyService';
@@ -35,7 +35,15 @@ const goBackWithFallback = (fallback: () => void) => {
   fallback();
 };
 
-export const MobileHeader: React.FC = () => {
+interface MobileHeaderProps {
+  isCompact: boolean;
+  onCompactChange: (compact: boolean) => void;
+}
+
+export const MobileHeader: React.FC<MobileHeaderProps> = ({
+  isCompact,
+  onCompactChange,
+}) => {
   const {
     currentRoute,
     navigateTo,
@@ -47,9 +55,9 @@ export const MobileHeader: React.FC = () => {
     setIsHarassmentFilterOpen,
     isReportComposerOpen,
     isLocationModalOpen,
+    openReportComposer,
   } = useApp();
   const [isShareConfirmed, setIsShareConfirmed] = useState(false);
-  const [isCompactHeader, setIsCompactHeader] = useState(false);
   const lastScrollYRef = useRef(0);
   const directionRef = useRef<'up' | 'down' | null>(null);
   const directionDistanceRef = useRef(0);
@@ -83,16 +91,22 @@ export const MobileHeader: React.FC = () => {
 
   useEffect(() => {
     if (!shouldUseAdaptiveHeader || isHeaderInteractionBlocked) {
-      setIsCompactHeader(false);
+      onCompactChange(false);
     }
 
     lastScrollYRef.current = window.scrollY;
     directionRef.current = null;
     directionDistanceRef.current = 0;
-  }, [currentRoute, isHeaderInteractionBlocked, shouldUseAdaptiveHeader]);
+  }, [currentRoute, isHeaderInteractionBlocked, onCompactChange, shouldUseAdaptiveHeader]);
 
   useEffect(() => {
     if (!shouldUseAdaptiveHeader) return;
+
+    const mobileMedia = window.matchMedia('(max-width: 767px)');
+    if (!mobileMedia.matches) {
+      onCompactChange(false);
+      return;
+    }
 
     lastScrollYRef.current = window.scrollY;
 
@@ -110,7 +124,7 @@ export const MobileHeader: React.FC = () => {
       ) {
         directionRef.current = null;
         directionDistanceRef.current = 0;
-        setIsCompactHeader(false);
+        onCompactChange(false);
         return;
       }
 
@@ -129,13 +143,13 @@ export const MobileHeader: React.FC = () => {
         currentScrollY >= MOBILE_HEADER_HIDE_SCROLL_Y &&
         directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
       ) {
-        setIsCompactHeader(true);
+        onCompactChange(true);
         directionDistanceRef.current = 0;
       } else if (
         nextDirection === 'up' &&
         directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
       ) {
-        setIsCompactHeader(false);
+        onCompactChange(false);
         directionDistanceRef.current = 0;
       }
     };
@@ -154,7 +168,7 @@ export const MobileHeader: React.FC = () => {
         frameRef.current = null;
       }
     };
-  }, [isHeaderInteractionBlocked, shouldUseAdaptiveHeader]);
+  }, [isHeaderInteractionBlocked, onCompactChange, shouldUseAdaptiveHeader]);
 
   const registerSuccessfulShare = () => {
     if (reportDetailId) {
@@ -287,10 +301,10 @@ export const MobileHeader: React.FC = () => {
     <>
       <header
         id="mobile-header"
-        className={`md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none ${
-          isCompactHeader
-            ? '-translate-y-full opacity-0 pointer-events-none'
-            : 'translate-y-0 opacity-100'
+        className={`md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity,margin-bottom] duration-200 ease-out motion-reduce:transition-none ${
+          isCompact
+            ? '-translate-y-full opacity-0 pointer-events-none -mb-[calc(3.5rem+env(safe-area-inset-top,0px))]'
+            : 'translate-y-0 opacity-100 mb-0'
         }`}
       >
         <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
@@ -328,7 +342,7 @@ export const MobileHeader: React.FC = () => {
         </div>
       </header>
 
-      {isCompactHeader ? (
+      {isCompact ? (
         <nav
           id="mobile-compact-header"
           aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
@@ -345,14 +359,15 @@ export const MobileHeader: React.FC = () => {
               icon={<Menu className="w-5 h-5" aria-hidden="true" />}
             />
 
-            <Link
-              id="mobile-compact-search-btn"
-              to={localizePath('/search')}
-              aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-              className="pointer-events-auto inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            >
-              <Search className="w-5 h-5" aria-hidden="true" />
-            </Link>
+            <IconButton
+              id="mobile-compact-report-btn"
+              variant="primary"
+              size="lg"
+              onClick={() => openReportComposer()}
+              aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
+              className="pointer-events-auto ui-radius-pill shadow-[var(--elevation-sm)]"
+              icon={<Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />}
+            />
           </div>
         </nav>
       ) : null}

@@ -145,12 +145,14 @@ export const AppShell: React.FC = () => {
   } = useApp();
 
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
+  const [isMobileChromeCompact, setIsMobileChromeCompact] = useState(false);
   const previousRouteRef = useRef(currentRoute);
   const hideMobileMainNavigation = shouldHideBottomNav(currentRoute);
 
   useEffect(() => {
     if (previousRouteRef.current === currentRoute) return;
     previousRouteRef.current = currentRoute;
+    setIsMobileChromeCompact(false);
 
     const frame = window.requestAnimationFrame(() => {
       document.getElementById('main-content')?.focus({ preventScroll: true });
@@ -208,7 +210,10 @@ export const AppShell: React.FC = () => {
       </ErrorBoundary>
 
       <ErrorBoundary componentName="MobileHeader" fallback={null}>
-        <MobileHeader />
+        <MobileHeader
+          isCompact={isMobileChromeCompact}
+          onCompactChange={setIsMobileChromeCompact}
+        />
       </ErrorBoundary>
 
       <div
@@ -312,7 +317,7 @@ export const AppShell: React.FC = () => {
       </div>
 
       <ErrorBoundary componentName="BottomNav" fallback={null}>
-        <BottomNav />
+        <BottomNav isCompact={isMobileChromeCompact} />
       </ErrorBoundary>
 
       <ErrorBoundary componentName="SearchModal" silent>
