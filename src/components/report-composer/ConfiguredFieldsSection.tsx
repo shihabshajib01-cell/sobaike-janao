@@ -363,7 +363,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 aria-labelledby={fieldLabelId}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? fieldErrorId : helper ? fieldHelperId : undefined}
-                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
+                className="report-composer-card space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <div className="space-y-1">
                   <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
@@ -493,7 +493,7 @@ export const ConfiguredFieldsSection = forwardRef<
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
-                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
+                className="report-composer-card space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <div className="space-y-1">
                   <h3 className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
@@ -558,7 +558,7 @@ export const ConfiguredFieldsSection = forwardRef<
               <div
                 key={field.fieldKey}
                 id={`configured-field-${field.fieldKey}`}
-                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
+                className="report-composer-card space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <RadioGroup
                   id={fieldControlId}
@@ -633,7 +633,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 aria-labelledby={fieldLabelId}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? fieldErrorId : undefined}
-                className="space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
+                className="report-composer-card space-y-4 rounded-[var(--radius-card)] border border-role-outline-subtle bg-role-surface p-4 md:p-5"
               >
                 <h3 id={fieldLabelId} className="type-h3 font-[var(--font-weight-bold)] text-role-on-surface">
                   {label}
