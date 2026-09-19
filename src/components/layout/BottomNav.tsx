@@ -199,7 +199,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             onClick={() => openReportComposer()}
             tabIndex={isCompact ? -1 : undefined}
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
-            className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-all hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
+            className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-[transform,background-color,color] duration-200 ease-out hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
           >
             <AppIcon name="plus" size="xl" strokeWidth={2} />
           </button>
