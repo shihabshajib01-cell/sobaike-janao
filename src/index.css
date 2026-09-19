@@ -1309,3 +1309,11 @@
 
 
 
+
+
+/* Long-feed rendering containment: keep off-screen report cards out of layout/paint work
+   while preserving DOM order, accessibility, and scroll position. */
+.home-feed-render-window {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 20rem;
+}
