@@ -76,8 +76,18 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
   const locationModal = page.locator('#location-consent-modal');
   await expectVisible(locationModal, 'location consent did not open from the explicit location CTA');
   await expectVisible(page.locator('#location-consent-secondary-btn'), 'Not now action missing');
+  const ipFallbackResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/functions/v1/public-ip-location') &&
+      response.request().method() === 'GET',
+    { timeout: 10000 }
+  ).catch(() => null);
   await page.locator('#location-consent-secondary-btn').click();
   await locationModal.waitFor({ state: 'hidden', timeout: 10000 });
+  const ipResponse = await ipFallbackResponse;
+  if (!ipResponse || !ipResponse.ok()) {
+    throw new Error('Not now did not establish the approximate IP browse-location fallback');
+  }
   if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
     throw new Error('location reminder should disappear after Not now');
   }
