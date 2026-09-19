@@ -326,7 +326,12 @@ await check('All seven category pages preserve the shared mobile navigation cont
     }
 
     await page.locator('#report-composer-close-btn').click();
-    await page.waitForTimeout(100);
+    const cancelConfirm = page.locator('#report-cancel-confirm-modal');
+    if (await cancelConfirm.isVisible().catch(() => false)) {
+      await page.locator('#report-cancel-btn').click();
+    }
+    await page.locator('#report-composer-modal').waitFor({ state: 'hidden', timeout: 10000 });
+    await page.waitForTimeout(150);
 
     const categoryScrollTarget = await page.evaluate(() => {
       const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
