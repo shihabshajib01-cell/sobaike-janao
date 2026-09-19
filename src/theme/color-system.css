@@ -440,6 +440,7 @@ html[data-theme="dark"],
   --text-inverse: var(--md-on-primary);
 
   --ui-border-subtle: var(--md-outline-subtle);
+  --ui-divider: var(--md-outline-subtle);
   --ui-border: var(--md-outline);
   --ui-border-strong: var(--md-outline-strong);
   --border-subtle: var(--md-outline-subtle);

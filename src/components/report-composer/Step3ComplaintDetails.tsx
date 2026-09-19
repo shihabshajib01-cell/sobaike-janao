@@ -1358,7 +1358,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             />
 
             {isBriberyReport && (
-              <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
+              <div className="pt-4 border-t border-ui-divider space-y-3">
                 <h4 className="type-h4 text-ui-content-primary">
                   {language === 'bn' ? 'ঘুষ সংক্রান্ত তথ্য' : 'Bribery details'}
                 </h4>
@@ -1465,7 +1465,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             </div>
 
             {isSexualHarassment && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t border-ui-stroke-subtle">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t border-ui-divider">
                 <Select
                   id="sexual-harassment-type-select"
                   label={language === 'bn' ? 'হয়রানির ধরন' : 'Type of harassment'}
@@ -1545,7 +1545,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             )}
 
             {segment === 'harassment' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t border-ui-stroke-subtle">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t border-ui-divider">
                 <Select
                   id="harassment-age-group-select"
                   label={language === 'bn' ? 'প্রভাবিত ব্যক্তির বয়সের গ্রুপ' : "Affected person's age group"}
@@ -1610,7 +1610,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
             {/* Conditional Digital Threat Questions ONLY for Digital Harassment */}
             {isDigitalHarassment && (
-              <div className="pt-4 border-t border-ui-stroke-subtle space-y-3 mt-2">
+              <div className="pt-4 border-t border-ui-divider space-y-3 mt-2">
                 <h4 className="type-h4 text-ui-content-primary">
                   {language === 'bn' ? 'অনলাইন ও ব্ল্যাকমেইল সংক্রান্ত সুনির্দিষ্ট তথ্য' : 'Digital threat & evidence details'}
                 </h4>
@@ -1924,7 +1924,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
                 {/* When Private is OFF -> Reveal Contact Fields */}
                 {!isIdentityPrivate && (
-                  <div className="pt-3 border-t border-ui-stroke-subtle/70 space-y-3">
+                  <div className="pt-3 border-t border-ui-divider space-y-3">
                     <div className="flex items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
                       <Lock className="w-3.5 h-3.5 text-ui-content-primary" />
                       <span>

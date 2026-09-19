@@ -528,7 +528,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             </div>
           )}
 
-          <div className="border-t border-ui-stroke-subtle" aria-hidden="true" />
+          <div className="border-t border-ui-divider" aria-hidden="true" />
 
           <div className="flex items-center justify-between gap-4 type-meta text-ui-content-secondary min-w-0">
             {location && (
@@ -546,12 +546,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               )
             )}
             <div className="flex items-center gap-3 shrink-0">
-              <span className="h-5 w-px bg-ui-stroke-subtle" aria-hidden="true" />
+              <span className="h-5 border-l border-ui-divider" aria-hidden="true" />
               <span className="flex items-center gap-1.5" aria-label={`${displayEngagementCount(viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}>
                 <Eye className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                 <span>{displayEngagementCount(viewCount)}</span>
               </span>
-              <span className="h-5 w-px bg-ui-stroke-subtle" aria-hidden="true" />
+              <span className="h-5 border-l border-ui-divider" aria-hidden="true" />
               <span className="flex items-center gap-1.5" aria-label={`${displayEngagementCount(shareCount)} ${language === 'bn' ? 'শেয়ার' : 'shares'}`}>
                 <Share2 className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                 <span>{displayEngagementCount(shareCount)}</span>
@@ -649,7 +649,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
 
               {report.recentBillAmount !== undefined &&
                 report.previousBillAmount !== undefined && (
-                  <div className="flex items-center gap-2 type-meta text-ui-content-secondary pt-2 border-t border-ui-stroke-subtle">
+                  <div className="flex items-center gap-2 type-meta text-ui-content-secondary pt-2 border-t border-ui-divider">
                     <span className="text-ui-content-muted">
                       {language === 'bn' ? 'পার্থক্য বা বৃদ্ধি:' : 'Difference / increase:'}
                     </span>
@@ -685,7 +685,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             (report.incidentTime || report.frequency) && (
               <div
                 id="extortion-timeline-details"
-                className="pt-4 border-t border-ui-stroke-subtle flex flex-wrap gap-x-5 gap-y-2 type-meta text-ui-content-secondary"
+                className="pt-4 border-t border-ui-divider flex flex-wrap gap-x-5 gap-y-2 type-meta text-ui-content-secondary"
               >
                 {report.incidentTime && (
                   <span className="flex items-center gap-1.5">
@@ -717,7 +717,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               report.frequency) && (
               <div
                 id="bribery-report-details"
-                className="pt-4 border-t border-ui-stroke-subtle space-y-3"
+                className="pt-4 border-t border-ui-divider space-y-3"
               >
                 <h2 className="type-h4 text-ui-content-primary">
                   {language === 'bn' ? 'ঘুষ সংক্রান্ত তথ্য' : 'Bribery details'}
@@ -804,7 +804,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           {configuredFields.length > 0 && (
             <section
               id="configured-report-fields"
-              className="pt-4 border-t border-ui-stroke-subtle space-y-3"
+              className="pt-4 border-t border-ui-divider space-y-3"
               aria-labelledby="configured-report-fields-title"
             >
               <h3
@@ -840,7 +840,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           )}
 
           {evidenceList && evidenceList.length > 0 && (
-            <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
+            <div className="pt-4 border-t border-ui-divider space-y-3">
               <h3 className="type-h4 text-ui-content-primary flex items-center gap-2">
                 <FileCheck className="w-[18px] h-[18px] text-ui-content-secondary shrink-0" aria-hidden="true" />
                 <span>{language === 'bn' ? 'সহায়ক তথ্য' : 'Supporting information'}</span>
@@ -865,7 +865,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           )}
 
           {report.updates && report.updates.length > 0 && (
-            <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
+            <div className="pt-4 border-t border-ui-divider space-y-3">
               <h3 className="type-h4 text-ui-content-primary flex items-center gap-2">
                 <Clock className="w-4 h-4 text-ui-content-muted" aria-hidden="true" />
                 <span>{language === 'bn' ? 'আপডেট' : 'Updates'}</span>
@@ -924,7 +924,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               </div>
             )}
 
-            <div className="divide-y divide-ui-stroke-subtle">
+            <div className="divide-y divide-ui-divider">
               {visiblePublishedResponses.map((response) => (
                 <article
                   key={response.id}
@@ -962,7 +962,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
               <button
                 type="button"
                 onClick={() => setShowAllResponses((current) => !current)}
-                className="w-full min-h-[44px] mt-1 flex items-center justify-center gap-2 type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle border-t border-ui-stroke-subtle cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-control"
+                className="w-full min-h-[44px] mt-1 flex items-center justify-center gap-2 type-meta font-[var(--font-weight-semibold)] text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle border-t border-ui-divider cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-control"
                 aria-expanded={showAllResponses}
               >
                 <span>

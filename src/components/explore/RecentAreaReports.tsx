@@ -81,7 +81,7 @@ export const RecentAreaReports: React.FC<RecentAreaReportsProps> = ({
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-ui-stroke-subtle/80 flex flex-wrap sm:flex-nowrap items-center justify-between gap-x-2 gap-y-1 type-compact">
+                <div className="pt-2 border-t border-ui-divider flex flex-wrap sm:flex-nowrap items-center justify-between gap-x-2 gap-y-1 type-compact">
                   <div className="flex items-center gap-2 sm:gap-2.5 text-ui-content-secondary min-w-0 flex-wrap sm:flex-nowrap">
                     <span className="flex items-center gap-1 truncate max-w-[130px] sm:max-w-[170px]">
                       <MapIcon name="map-pin" size="sm" className="text-ui-content-secondary shrink-0" />

@@ -182,18 +182,18 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
         </p>
       )}
 
-      <div className="flex items-center pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-secondary">
+      <div data-report-divider-horizontal className="flex items-center pt-3 border-t border-ui-divider type-meta text-ui-content-secondary">
         <div className="flex items-center min-w-0 w-full">
           <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <AppIcon name="map-pin" size="sm" className="text-ui-accent shrink-0" />
             <p className="type-meta text-ui-content-secondary font-[var(--font-weight-medium)] truncate">{location}</p>
           </div>
-          <span className="h-5 w-px bg-ui-stroke-subtle mx-3 shrink-0" aria-hidden="true" />
+          <span data-report-divider-vertical className="h-5 border-l border-ui-divider mx-3 shrink-0" aria-hidden="true" />
           <div className="flex items-center gap-1.5 text-ui-content-secondary shrink-0" aria-label={`${displayCount(engagement.viewCount)} ${language === 'bn' ? 'ভিউ' : 'views'}`}>
             <Eye className="w-4 h-4" aria-hidden="true" />
             <span className="type-meta whitespace-nowrap">{displayCount(engagement.viewCount)}</span>
           </div>
-          <span className="h-5 w-px bg-ui-stroke-subtle mx-3 shrink-0" aria-hidden="true" />
+          <span data-report-divider-vertical className="h-5 border-l border-ui-divider mx-3 shrink-0" aria-hidden="true" />
           <button type="button" onClick={handleShare} aria-label={language === 'bn' ? 'প্রতিবেদন শেয়ার করুন' : 'Share report'} className="inline-flex items-center justify-center w-10 h-10 min-w-10 min-h-10 ui-radius-pill bg-ui-surface-subtle text-ui-content-secondary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus active:scale-95">
             {isCopied ? <AppIcon name="check" size="sm" className="text-ui-success-text" /> : <AppIcon name="share" size="sm" className="text-ui-content-secondary" />}
           </button>

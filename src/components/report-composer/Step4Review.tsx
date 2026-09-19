@@ -498,7 +498,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
             )}
 
             {isBlackmailCoercion && (formData.intimateWhatHappened || formData.intimatePlatform) && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-ui-stroke-subtle">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-ui-divider">
                 {formData.intimateWhatHappened && (
                   <div>
                     <span className="type-compact text-ui-content-muted block mb-0.5">
@@ -726,7 +726,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
                 {/* Other Identifying Details (ONLY when value exists) */}
                 {formData.identifyingDescription?.trim() && (
-                  <div className="pt-1 border-t border-ui-stroke-subtle/50">
+                  <div className="pt-1 border-t border-ui-divider">
                     <span className="text-ui-content-secondary font-[var(--font-weight-medium)] block mb-0.5">
                       {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য: ' : 'Other Identifying Details: '}
                     </span>
@@ -797,7 +797,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
                     {/* Other Identifying Details */}
                     {formData.identifyingDescription?.trim() && (
-                      <div className="pt-1 border-t border-ui-stroke-subtle/50">
+                      <div className="pt-1 border-t border-ui-divider">
                         <span className="text-ui-content-secondary font-[var(--font-weight-medium)] block mb-0.5">
                           {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য: ' : 'Other Identifying Details: '}
                         </span>
@@ -811,7 +811,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
                 {/* Additional Mentioned Parties */}
                 {meaningfulMentionedParties.length > 0 && (
-                  <div className={`space-y-2 type-compact ${hasExtortionPrimaryPartyData ? 'pt-2 border-t border-ui-stroke-subtle/50' : ''}`}>
+                  <div className={`space-y-2 type-compact ${hasExtortionPrimaryPartyData ? 'pt-2 border-t border-ui-divider' : ''}`}>
                     <span className="font-[var(--font-weight-bold)] text-ui-content-primary block">
                       {language === 'bn'
                         ? `অতিরিক্ত পক্ষ (${meaningfulMentionedParties.length}টি):`
@@ -891,7 +891,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 </div>
 
                 {(formData.roleOrDesignation || (formData.organization && formData.organization !== formData.reportedSubject)) && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-ui-stroke-subtle/50 type-compact text-ui-content-secondary">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-ui-divider type-compact text-ui-content-secondary">
                     {formData.roleOrDesignation && (
                       <p>
                         <strong>{language === 'bn' ? 'ভূমিকা/পদবি: ' : 'Role/Designation: '}</strong>
@@ -922,7 +922,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 )}
 
                 {formData.mentionedParties && formData.mentionedParties.length > 0 && (
-                  <div className="pt-2 border-t border-ui-stroke-subtle/50 type-compact">
+                  <div className="pt-2 border-t border-ui-divider type-compact">
                     <span className="font-[var(--font-weight-bold)] text-ui-content-primary block mb-1">
                       {language === 'bn'
                         ? `অতিরিক্ত পক্ষ (${formData.mentionedParties.length} জন):`

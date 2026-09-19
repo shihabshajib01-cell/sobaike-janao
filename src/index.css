@@ -82,6 +82,7 @@
 
   /* Border / Stroke */
   --color-ui-stroke-subtle: var(--ui-border-subtle);
+  --color-ui-divider: var(--ui-divider);
   --color-ui-stroke-default: var(--ui-border);
   --color-ui-stroke-strong: var(--ui-border-strong);
 
