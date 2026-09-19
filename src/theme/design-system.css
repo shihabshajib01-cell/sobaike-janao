@@ -24,6 +24,22 @@
 }
 
 /*
+ * Light-mode feed/composer hierarchy.
+ * Let the page canvas define the outer edge of ordinary cards instead of
+ * drawing another gray box around every item. Strong/error section borders
+ * remain available when they carry state or hierarchy.
+ */
+.ui-card-feed,
+.report-composer-shell,
+.report-composer-card:not(.border-role-error-outline):not(.border-role-outline-strong):not(.border-ui-stroke-strong) {
+  border-color: var(--md-background);
+}
+
+.report-composer-body {
+  background-color: var(--md-background);
+}
+
+/*
  * Dark-mode feed/composer hierarchy.
  * Decorative card outlines stay quiet; form-control boundaries retain their
  * stronger accessible outline roles.
