@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <script>document.documentElement.classList.add('js');</script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://ahiaymyqfmyyrjkwgvhi.supabase.co https://maps.googleapis.com https://maps.gstatic.com https://*.googleusercontent.com; connect-src 'self' https://ahiaymyqfmyyrjkwgvhi.supabase.co wss://ahiaymyqfmyyrjkwgvhi.supabase.co https://maps.googleapis.com https://*.googleapis.com; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'; media-src 'self' blob: https://ahiaymyqfmyyrjkwgvhi.supabase.co" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <script src="%BASE_URL%boot.js"></script>
     <style>.js #seo-static-fallback{display:none!important}</style>
     <title>Sobaike Janao | সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম</title>
     <meta name="description" content="Sobaike Janao (সবাইকে জানাও) — বাংলাদেশের জনস্বার্থের সাম্প্রতিক নাগরিক প্রতিবেদন দেখুন, বিষয় ও এলাকা অনুযায়ী খুঁজুন, এবং নতুন ঘটনা জানাতে প্রতিবেদন করুন।" />
@@ -55,37 +57,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <script>
-      (function() {
-        try {
-          var stored = localStorage.getItem('sobaike-janao-theme') || localStorage.getItem('theme');
-          var theme = 'light';
-          if (stored === 'dark') {
-            theme = 'dark';
-          } else if (stored === 'light') {
-            theme = 'light';
-          } else if (stored === 'system') {
-            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            theme = prefersDark ? 'dark' : 'light';
-          } else {
-            // First visit: no theme stored in localStorage -> ALWAYS default to Light Mode
-            theme = 'light';
-          }
-          document.documentElement.setAttribute('data-theme', theme);
-          document.documentElement.style.colorScheme = theme;
-          if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-        } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'light');
-          document.documentElement.style.colorScheme = 'light';
-          document.documentElement.classList.remove('dark');
-        }
-
-      })();
-    </script>
   </head>
   <body class="bg-ui-page text-ui-content-primary antialiased selection:bg-ui-accent-soft">
     <div id="root">
