@@ -1,6 +1,7 @@
 import { SectionKey, SECTIONS } from '../theme/tokens';
 import { SubcategoryOption, SEGMENT_SUBCATEGORIES } from '../data/reportOptions';
 import { useState, useEffect } from 'react';
+import { scheduleIdleTask } from '../utils/scheduleIdleTask';
 
 export interface SupabaseSegmentRow {
   id: string;
