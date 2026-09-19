@@ -122,13 +122,13 @@ html[data-theme="light"] {
      Stronger image-derived tints keep the banner distinct from the page surface. */
   --hero-text-primary: #102A43;
   --hero-text-secondary: #4F596A;
-  --hero-harassment-container: #E9D2DA;
-  --hero-extortion-container: #EAD4CB;
-  --hero-public-safety-container: #DDD6E1;
-  --hero-road-transport-container: #E4D6D0;
-  --hero-load-shedding-container: #D5E2E2;
-  --hero-illegal-occupation-container: #E5CECF;
-  --hero-rickshaw-container: #C6DED5;
+  --hero-harassment-container: var(--category-harassment-container);
+  --hero-extortion-container: var(--category-extortion-container);
+  --hero-public-safety-container: var(--category-public_safety-container);
+  --hero-road-transport-container: var(--category-road_transport-container);
+  --hero-load-shedding-container: var(--category-load_shedding-container);
+  --hero-illegal-occupation-container: var(--category-illegal_occupation-container);
+  --hero-rickshaw-container: var(--category-rickshaw-container);
 
   /* Admin-managed category theme presets - Light */
   --theme-preset-sky-primary: #0284C7;
@@ -307,13 +307,13 @@ html[data-theme="dark"],
   /* Hero roles - Dark */
   --hero-text-primary: #E4E6EB;
   --hero-text-secondary: #B0B3B8;
-  --hero-harassment-container: #211619;
-  --hero-extortion-container: #171A25;
-  --hero-public-safety-container: #101E32;
-  --hero-road-transport-container: #2A2110;
-  --hero-load-shedding-container: #112220;
-  --hero-illegal-occupation-container: #1E293B;
-  --hero-rickshaw-container: #21190F;
+  --hero-harassment-container: var(--category-harassment-container);
+  --hero-extortion-container: var(--category-extortion-container);
+  --hero-public-safety-container: var(--category-public_safety-container);
+  --hero-road-transport-container: var(--category-road_transport-container);
+  --hero-load-shedding-container: var(--category-load_shedding-container);
+  --hero-illegal-occupation-container: var(--category-illegal_occupation-container);
+  --hero-rickshaw-container: var(--category-rickshaw-container);
 
   /* Admin-managed category theme presets - Dark */
   --theme-preset-sky-primary: #38A3D8;
@@ -365,55 +365,56 @@ html[data-theme="dark"],
   --theme-preset-slate-on-container: #E2E8F0;
   --theme-preset-slate-outline: #475569;
 
-  /* Category alternative-color roles */
-  --category-harassment-primary: #B84A62;
-  --category-harassment-hover: #D05B75;
-  --category-harassment-on-primary: #FFFFFF;
-  --category-harassment-container: #211619;
-  --category-harassment-on-container: #E7AAB8;
-  --category-harassment-outline: #4A2931;
+  /* Category image-derived brand roles - Dark
+     Same category hues as light mode; only tone/luminance changes for dark surfaces. */
+  --category-harassment-primary: #D783A0;
+  --category-harassment-hover: #E2A0B7;
+  --category-harassment-on-primary: #2B1019;
+  --category-harassment-container: #2B1B21;
+  --category-harassment-on-container: #F0C4D2;
+  --category-harassment-outline: #694052;
 
-  --category-extortion-primary: #4F5D95;
-  --category-extortion-hover: #6777B8;
-  --category-extortion-on-primary: #FFFFFF;
-  --category-extortion-container: #171A25;
-  --category-extortion-on-container: #AFB9E1;
-  --category-extortion-outline: #333B5D;
+  --category-extortion-primary: #D98967;
+  --category-extortion-hover: #E5A083;
+  --category-extortion-on-primary: #2C1309;
+  --category-extortion-container: #2C1D17;
+  --category-extortion-on-container: #F1C6B4;
+  --category-extortion-outline: #704532;
 
-  --category-public_safety-primary: #60A5FA;
-  --category-public_safety-hover: #93C5FD;
-  --category-public_safety-on-primary: #050505;
-  --category-public_safety-container: #101E32;
-  --category-public_safety-on-container: #BFDBFE;
-  --category-public_safety-outline: #254B78;
+  --category-public_safety-primary: #B99AC7;
+  --category-public_safety-hover: #C9AFD4;
+  --category-public_safety-on-primary: #211527;
+  --category-public_safety-container: #241D28;
+  --category-public_safety-on-container: #E1CFE8;
+  --category-public_safety-outline: #5A4962;
 
-  --category-road_transport-primary: #FBBF24;
-  --category-road_transport-hover: #FCD34D;
-  --category-road_transport-on-primary: #050505;
-  --category-road_transport-container: #2A2110;
-  --category-road_transport-on-container: #FDE68A;
-  --category-road_transport-outline: #6B4E12;
+  --category-road_transport-primary: #C79278;
+  --category-road_transport-hover: #D4A58F;
+  --category-road_transport-on-primary: #24150F;
+  --category-road_transport-container: #291F1B;
+  --category-road_transport-on-container: #E8CABB;
+  --category-road_transport-outline: #62483B;
 
-  --category-load_shedding-primary: #14B8A6;
-  --category-load_shedding-hover: #2DD4BF;
-  --category-load_shedding-on-primary: #050505;
-  --category-load_shedding-container: #112220;
-  --category-load_shedding-on-container: #99F6E4;
-  --category-load_shedding-outline: #1D433F;
+  --category-load_shedding-primary: #7FB6B5;
+  --category-load_shedding-hover: #99C6C5;
+  --category-load_shedding-on-primary: #0D2020;
+  --category-load_shedding-container: #172625;
+  --category-load_shedding-on-container: #C1E0DF;
+  --category-load_shedding-outline: #3D5F5E;
 
-  --category-illegal_occupation-primary: #94A3B8;
-  --category-illegal_occupation-hover: #CBD5E1;
-  --category-illegal_occupation-on-primary: #050505;
-  --category-illegal_occupation-container: #1E293B;
-  --category-illegal_occupation-on-container: #E2E8F0;
-  --category-illegal_occupation-outline: #475569;
+  --category-illegal_occupation-primary: #D47778;
+  --category-illegal_occupation-hover: #DF9293;
+  --category-illegal_occupation-on-primary: #2A1011;
+  --category-illegal_occupation-container: #2A1A1B;
+  --category-illegal_occupation-on-container: #F0BFC0;
+  --category-illegal_occupation-outline: #673B3C;
 
-  --category-rickshaw-primary: #D9822B;
-  --category-rickshaw-hover: #E89540;
-  --category-rickshaw-on-primary: #050505;
-  --category-rickshaw-container: #21190F;
-  --category-rickshaw-on-container: #E9B579;
-  --category-rickshaw-outline: #54371C;
+  --category-rickshaw-primary: #58AA87;
+  --category-rickshaw-hover: #74B99B;
+  --category-rickshaw-on-primary: #092017;
+  --category-rickshaw-container: #14251E;
+  --category-rickshaw-on-container: #B5DDCC;
+  --category-rickshaw-outline: #315E4C;
 }
 
 /* Compatibility aliases: existing UI continues working while shared primitives migrate
