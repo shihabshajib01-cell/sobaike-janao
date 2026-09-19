@@ -242,7 +242,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
     return (
       <section
         id={id}
-        className={`w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors ${className}`}
+        className={`category-hero-slider w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors ${className}`}
         style={containerStyle}
       >
         <CategoryHeroBanner
@@ -290,7 +290,7 @@ export const CategoryHeroSlider: React.FC<CategoryHeroSliderProps> = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchCancel}
-      className={`group w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus ${className}`}
+      className={`category-hero-slider group w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus ${className}`}
       style={containerStyle}
     >
       {/* Slides Track */}

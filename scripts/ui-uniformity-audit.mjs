@@ -652,6 +652,17 @@ requireContains(
   'inactive hero artwork must remain lazy-loaded'
 );
 
+requireContains(
+  'src/components/category/CategoryHeroSlider.tsx',
+  'category-hero-slider',
+  'category hero must expose a scoped class so mobile sizing does not affect the Home hero'
+);
+requireContains(
+  'src/index.css',
+  '.category-hero-slider .hero-slider-media',
+  'category hero mobile image height must remain scoped to category pages'
+);
+
 if (failures.length) {
   console.error(`Public UI uniformity audit found ${failures.length} violation(s):`);
   for (const failure of failures) console.error(`  - ${failure}`);

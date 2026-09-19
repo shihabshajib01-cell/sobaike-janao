@@ -1129,6 +1129,26 @@
   }
 }
 
+/* Category pages get a slightly taller illustration on mobile only.
+   Home hero and tablet/desktop hero sizing remain unchanged. */
+@media (max-width: 767.98px) {
+  .category-hero-slider .hero-slider-media {
+    height: 160px;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767.98px) {
+  .category-hero-slider .hero-slider-media {
+    height: 180px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767.98px) {
+  .category-hero-slider .hero-slider-media {
+    height: 200px;
+  }
+}
+
 @media (min-width: 768px) {
   .hero-slider-media {
     width: 100%;
