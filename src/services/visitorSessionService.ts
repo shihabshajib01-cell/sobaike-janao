@@ -12,7 +12,7 @@ const LOCATION_CHOICE_KEY = 'sobaike_location_choice_v1';
 export const BROWSE_LOCATION_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes max age for in-memory browse location
 export const REPORTER_LOCATION_FALLBACK_MAX_AGE_MS = 5 * 60 * 1000; // report-submit fallback must remain recent
 
-export type LocationChoice = 'granted' | 'not_now' | 'denied';
+export type LocationChoice = 'granted' | 'not_now' | 'denied' | 'ip_fallback';
 
 export type PermissionStatus =
   | 'granted'
@@ -259,7 +259,7 @@ export const VisitorSessionService = {
     if (typeof window === 'undefined') return null;
     try {
       const val = localStorage.getItem(LOCATION_CHOICE_KEY);
-      if (val === 'granted' || val === 'not_now' || val === 'denied') {
+      if (val === 'granted' || val === 'not_now' || val === 'denied' || val === 'ip_fallback') {
         return val as LocationChoice;
       }
       return null;
@@ -353,7 +353,10 @@ export const VisitorSessionService = {
   /**
    * Handles user clicking "Share Location" on the consent modal
    */
-  async requestAndRecordLocation(_purpose: 'browse' | 'report' = 'browse'): Promise<LocationRequestResult> {
+  async requestAndRecordLocation(
+    _purpose: 'browse' | 'report' = 'browse',
+    options?: { silent?: boolean }
+  ): Promise<LocationRequestResult> {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       await this.recordSession('unavailable');
       return { success: false, status: 'unavailable', errorType: 'unavailable' };
@@ -364,6 +367,19 @@ export const VisitorSessionService = {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           isAcquiringPosition = false;
+
+          // A silent refresh must never override a newer explicit "Not now"
+          // or denied choice that happened while the browser request was in flight.
+          const currentChoice = this.getLocationChoice();
+          if (
+            _purpose === 'browse' &&
+            options?.silent === true &&
+            (currentChoice === 'not_now' || currentChoice === 'denied')
+          ) {
+            resolve({ success: false, status: 'prompt' });
+            return;
+          }
+
           this.setLocationChoice('granted');
           const coords = {
             latitude: position.coords.latitude,
@@ -384,7 +400,9 @@ export const VisitorSessionService = {
           if (error.code === error.PERMISSION_DENIED) {
             status = 'denied';
             errorType = 'denied';
-            this.setLocationChoice('denied');
+            if (!(options?.silent === true && this.getLocationChoice() === 'not_now')) {
+              this.setLocationChoice('denied');
+            }
             this.clearMemoryLocation();
           } else if (error.code === error.TIMEOUT) {
             status = 'unavailable';
@@ -624,7 +642,11 @@ export const VisitorSessionService = {
           if (!active) return;
           const newState = status.state as PermissionStatus;
           if (newState === 'denied') {
-            this.setLocationChoice('denied');
+            // Preserve an explicit "Not now" preference. Browser permission
+            // changes must not rewrite that user choice.
+            if (this.getLocationChoice() !== 'not_now') {
+              this.setLocationChoice('denied');
+            }
             this.clearMemoryLocation();
           }
           onChange(newState);
