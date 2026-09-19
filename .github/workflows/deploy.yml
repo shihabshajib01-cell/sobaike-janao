@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Security hardening audit
+        run: npm run audit:security-hardening
+
       - name: Integration contract audit
         run: npm run audit:integration-contract
 
