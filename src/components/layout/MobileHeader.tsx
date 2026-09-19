@@ -126,11 +126,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       const delta = currentScrollY - lastScrollYRef.current;
       lastScrollYRef.current = currentScrollY;
 
-      if (
-        isHeaderInteractionBlocked ||
-        hasTextInputFocus() ||
-        currentScrollY <= MOBILE_HEADER_TOP_RESET_Y
-      ) {
+      if (isHeaderInteractionBlocked || hasTextInputFocus()) {
         transitionLockUntilRef.current = 0;
         directionRef.current = null;
         directionDistanceRef.current = 0;
@@ -139,9 +135,26 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       }
 
       const now = performance.now();
+
+      // Collapsing/expanding the sticky header changes document height. Mobile
+      // browsers can emit compensating scroll events during that animation.
+      // Ignore those events before applying the "back at top" reset, otherwise
+      // the compact state can immediately undo itself.
       if (now < transitionLockUntilRef.current) {
         directionRef.current = null;
         directionDistanceRef.current = 0;
+        return;
+      }
+
+      if (currentScrollY <= MOBILE_HEADER_TOP_RESET_Y) {
+        directionRef.current = null;
+        directionDistanceRef.current = 0;
+
+        // Restore only when already expanded or when the user is actually
+        // moving upward. This avoids treating layout compensation as intent.
+        if (!isCompact || delta < -MOBILE_HEADER_SCROLL_EPSILON) {
+          onCompactChange(false);
+        }
         return;
       }
 
