@@ -719,18 +719,33 @@ requireContains(
 );
 requireContains(
   'src/index.css',
-  '@media (min-width: 768px) {\n  .hero-slider-cta-row {\n    display: flex;',
-  'public hero Report CTA must remain visible on tablet and desktop layouts'
+  '@media (min-width: 768px) and (max-width: 1023.98px) {\n  .hero-slider-cta-row {\n    display: flex;',
+  'tablet hero CTA must preserve the original configured-action behavior'
 );
 requireContains(
   'src/index.css',
-  '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    justify-content: flex-start;',
+  '@media (min-width: 1024px) {\n  .hero-slider-desktop-cta-row {\n    display: flex;',
+  'desktop hero Report CTA must use the desktop-only fallback row'
+);
+requireContains(
+  'src/index.css',
+  'justify-content: flex-start;',
   'desktop hero Report CTA must remain left-aligned under the banner copy'
 );
-requireNotContains(
-  'src/index.css',
-  '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    display: none;',
-  'desktop/large layouts must not hide the public hero Report CTA'
+requireContains(
+  'src/components/category/CategoryHeroBanner.tsx',
+  '{action && (\n        <div className="hero-slider-mobile-cta">',
+  'mobile hero CTA must remain controlled by the original action/config'
+);
+requireContains(
+  'src/components/category/CategoryHeroBanner.tsx',
+  '{action && (\n          <div className="hero-slider-cta-row">',
+  'tablet hero CTA must remain controlled by the original action/config'
+);
+requireContains(
+  'src/components/category/CategoryHeroBanner.tsx',
+  '{bannerAction && (\n          <div className="hero-slider-desktop-cta-row">',
+  'desktop hero CTA fallback must not leak into mobile or tablet layouts'
 );
 requireContains(
   'src/components/category/CategoryHeroBanner.tsx',
