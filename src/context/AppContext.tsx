@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { SectionKey } from '../theme/tokens';
 import { VisitorSessionService, StoredLocation, LocationRequestResult } from '../services/visitorSessionService';
 import { isValidReporterCoordinates } from '../services/types';
+import { IpLocationService, ApproximateIpLocation } from '../services/ipLocationService';
 
 export type RoutePath =
   | '/'
@@ -55,6 +56,8 @@ const normalizeRoutePath = (pathname: string): RoutePath => {
   return (normalized || '/') as RoutePath;
 };
 
+export type BrowseLocation = (StoredLocation & { source: 'device' }) | ApproximateIpLocation;
+
 export type { StoredLocation };
 
 export interface LocationConsentOptions {
@@ -91,7 +94,7 @@ export interface AppContextType {
   closeLocationConsent: () => void;
   locationSuccessCallback: (() => void | Promise<void> | any) | null;
   browseLocationStatus: BrowseLocationStatus;
-  browseLocation: StoredLocation | null;
+  browseLocation: BrowseLocation | null;
   refreshBrowseLocation: () => Promise<void>;
   retryBrowseLocation: () => Promise<LocationRequestResult>;
 }
@@ -122,33 +125,59 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [locationSuccessCallback, setLocationSuccessCallback] = useState<(() => void | Promise<void> | any) | null>(null);
 
   // Global Browse Location State
-  const [browseLocation, setBrowseLocation] = useState<StoredLocation | null>(() => {
-    return VisitorSessionService.getLastRecordedLocation();
+  const [browseLocation, setBrowseLocation] = useState<BrowseLocation | null>(() => {
+    const loc = VisitorSessionService.getLastRecordedLocation();
+    return loc ? { ...loc, source: 'device' as const } : null;
   });
   const [browseLocationStatus, setBrowseLocationStatus] = useState<BrowseLocationStatus>('not_asked');
 
   const refreshBrowseLocation = useCallback(async () => {
     const loc = VisitorSessionService.getLastRecordedLocation();
     if (loc && isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) {
-      setBrowseLocation(loc);
+      setBrowseLocation({ ...loc, source: 'device' });
+      setBrowseLocationStatus('available');
+      return;
+    }
+
+    const choice = VisitorSessionService.getLocationChoice();
+    const perm = await VisitorSessionService.queryPermissionStatus();
+
+    // If browser permission is already granted, retrieve device location silently.
+    // This never creates a permission prompt because we only enter this branch after
+    // the browser reports an existing grant.
+    if (perm === 'granted') {
+      const deviceResult = await VisitorSessionService.requestAndRecordLocation('browse');
+      if (deviceResult.success && deviceResult.coords) {
+        setBrowseLocation({
+          latitude: deviceResult.coords.latitude,
+          longitude: deviceResult.coords.longitude,
+          accuracy: deviceResult.coords.accuracy,
+          timestamp: Date.now(),
+          source: 'device',
+        });
+        setBrowseLocationStatus('available');
+        return;
+      }
+    }
+
+    // Browsing remains usable when precise/device location is unavailable.
+    // IP location is coarse and is NEVER written into VisitorSessionService,
+    // which keeps the report-submission GPS gate strictly device-only.
+    const approximate = await IpLocationService.getApproximateLocation();
+    if (approximate) {
+      setBrowseLocation(approximate);
       setBrowseLocationStatus('available');
       return;
     }
 
     setBrowseLocation(null);
-    const choice = VisitorSessionService.getLocationChoice();
     if (choice === 'not_now') {
       setBrowseLocationStatus('not_now');
-      return;
-    }
-
-    const perm = await VisitorSessionService.queryPermissionStatus();
-    if (perm === 'denied') {
+    } else if (perm === 'denied') {
       setBrowseLocationStatus('denied');
     } else if (perm === 'unavailable') {
       setBrowseLocationStatus('unavailable');
     } else if (choice === 'granted') {
-      // User consented previously, but coordinates are unavailable / waiting / GPS off
       setBrowseLocationStatus('granted_unavailable');
     } else {
       setBrowseLocationStatus('not_asked');
@@ -164,6 +193,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         longitude: result.coords.longitude,
         accuracy: result.coords.accuracy,
         timestamp: Date.now(),
+        source: 'device',
       });
       setBrowseLocationStatus('available');
       return result;
@@ -186,7 +216,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. Subscribe to location updates in session memory
     const unsubscribeLocation = VisitorSessionService.subscribeLocationChange((loc) => {
       if (loc && isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) {
-        setBrowseLocation(loc);
+        setBrowseLocation({ ...loc, source: 'device' });
         setBrowseLocationStatus('available');
       } else {
         refreshBrowseLocation();
