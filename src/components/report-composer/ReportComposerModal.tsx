@@ -126,6 +126,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const rapeConsentMissing = requiresRapeConsent && !rapePublishingConsentAccepted;
   const isMobJusticeReport =
     formData.segment === 'public_safety' && formData.subcategoryId === 'mob-justice';
+  const isChildSafetyReport =
+    formData.segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
 
   // Defensive guard: if formData ever targets Step 3/4 with rape subcategory without consent, open disclaimer and hold step
   useEffect(() => {
@@ -475,14 +477,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const handleNextFromStep3 = useCallback(() => {
     if (!validateMobJusticeSection()) return;
 
-    if (reportingForm?.engineMode === 'schema') {
+    if (reportingForm?.engineMode === 'schema' && !isChildSafetyReport) {
       if (!configuredFieldsRef.current?.validateAndProceed()) return;
     } else {
       if (!step3Ref.current?.validateAndProceed()) return;
     }
 
     handleGoToStep(4);
-  }, [handleGoToStep, reportingForm?.engineMode, validateMobJusticeSection]);
+  }, [handleGoToStep, reportingForm?.engineMode, isChildSafetyReport, validateMobJusticeSection]);
 
   // Rape Consent Modal Handlers
   const handleAgreeRapeConsent = useCallback(() => {
@@ -1151,7 +1153,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           language={language}
                         />
                       )}
-                      {reportingForm?.engineMode === 'schema' ? (
+                      {reportingForm?.engineMode === 'schema' && !isChildSafetyReport ? (
                         <ConfiguredFieldsSection
                           ref={configuredFieldsRef}
                           form={reportingForm}
