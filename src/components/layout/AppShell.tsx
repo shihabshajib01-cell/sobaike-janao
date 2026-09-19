@@ -167,11 +167,13 @@ export const AppShell: React.FC = () => {
       setIsFirstVisitNoticeOpen(true);
     } else {
       const choice = VisitorSessionService.getLocationChoice();
-      if (!choice) {
-        openLocationConsent('browse');
-      } else {
+      if (choice === 'granted') {
         VisitorSessionService.initReturningVisitor();
       }
+      // Do not trigger a browser permission prompt on page load.
+      // AppContext silently restores an existing grant and otherwise falls back
+      // to approximate IP location for browsing; the inline CTA lets the user
+      // explicitly request device location.
     }
 
     return () => {
@@ -184,9 +186,7 @@ export const AppShell: React.FC = () => {
     setIsFirstVisitNoticeOpen(false);
 
     const choice = VisitorSessionService.getLocationChoice();
-    if (!choice) {
-      openLocationConsent('browse');
-    } else {
+    if (choice === 'granted') {
       VisitorSessionService.initReturningVisitor();
     }
   };
