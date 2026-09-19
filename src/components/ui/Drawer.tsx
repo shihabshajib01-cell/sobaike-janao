@@ -59,7 +59,7 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const positionClasses = {
     bottom:
-      'absolute inset-x-0 bottom-0 max-h-[85%] rounded-t-[var(--radius-modal)] border-t border-role-outline pb-safe',
+      'absolute inset-x-0 bottom-0 max-h-[85dvh] rounded-t-[var(--radius-modal)] border-t border-role-outline pb-safe',
     right:
       'absolute inset-y-0 right-0 w-full max-w-md border-l border-role-outline',
     left:
@@ -73,7 +73,7 @@ export const Drawer: React.FC<DrawerProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? `${id}-title` : undefined}
-      className="fixed inset-0 min-h-0 z-50 overflow-hidden"
+      className="fixed inset-0 h-[100dvh] max-h-[100dvh] min-h-0 z-50 overflow-hidden overscroll-none"
     >
       {/* Backdrop */}
       <div
