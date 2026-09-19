@@ -38,9 +38,10 @@ export const SearchModal: React.FC = () => {
               ? 'প্রতিবেদন বা এলাকা খুঁজুন...'
               : 'Search reports or areas...'
           }
-          onSearch={() => {
+          onSearch={(query) => {
             setIsSearchModalOpen(false);
-            navigateTo('/search');
+            const trimmed = query.trim();
+            navigateTo((trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : '/search') as RoutePath);
           }}
         />
 

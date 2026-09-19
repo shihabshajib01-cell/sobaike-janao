@@ -6,6 +6,10 @@ import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { ModalActions } from '../ui/ModalActions';
 import { UnsavedChangesDialog } from '../ui/UnsavedChangesDialog';
+import { TextField } from '../ui/TextField';
+import { TextAreaField } from '../ui/TextAreaField';
+import { ContactField } from '../ui/ContactField';
+import { isValidEmailOrPhone } from '../ui/formValidation';
 
 /**
  * Rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -41,6 +45,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -49,6 +54,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
       setIsSubmitting(false);
       setResponseId(null);
       setError(null);
+      setFieldErrors({});
       setIsDiscardConfirmOpen(false);
     }
   }, [isOpen]);
@@ -59,32 +65,38 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     e.preventDefault();
     if (isSubmitting) return;
 
-    if (!responderName.trim() || !contactEmailOrPhone.trim() || !officialStatement.trim()) {
-      setError(
-        language === 'bn'
-          ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'আপনার পূর্ণ নাম, ইমেইল বা ফোন এবং জবাব লিখুন।'
-              : 'অনুগ্রহ করে আপনার নাম, যোগাযোগের মাধ্যম এবং আনুষ্ঠানিক বক্তব্য পূরণ করুন।')
-          : (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'Enter your full name, email or phone, and response.'
-              : 'Please provide your full name, contact information, and formal statement.')
-      );
+    const nextFieldErrors: Record<string, string> = {};
+    if (!responderName.trim()) {
+      nextFieldErrors.responderName =
+        language === 'bn' ? 'আপনার পূর্ণ নাম লিখুন।' : 'Enter your full name.';
+    }
+    if (!contactEmailOrPhone.trim()) {
+      nextFieldErrors.contact =
+        language === 'bn' ? 'ইমেইল বা ফোন নম্বর লিখুন।' : 'Enter an email address or phone number.';
+    } else if (!isValidEmailOrPhone(contactEmailOrPhone)) {
+      nextFieldErrors.contact =
+        language === 'bn' ? 'সঠিক ইমেইল বা ফোন নম্বর লিখুন।' : 'Enter a valid email address or phone number.';
+    }
+    if (!officialStatement.trim()) {
+      nextFieldErrors.statement =
+        language === 'bn' ? 'আপনার জবাব লিখুন।' : 'Enter your response.';
+    } else if (officialStatement.trim().length < 10) {
+      nextFieldErrors.statement =
+        language === 'bn' ? 'জবাবে অন্তত ১০ অক্ষর লিখুন।' : 'Enter at least 10 characters in your response.';
+    }
+
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors);
+      const firstId = nextFieldErrors.responderName
+        ? 'subject-responder-name-input'
+        : nextFieldErrors.contact
+          ? 'subject-contact-email-phone-input'
+          : 'subject-official-statement-input';
+      window.requestAnimationFrame(() => document.getElementById(firstId)?.focus());
       return;
     }
 
-    if (officialStatement.trim().length < 10) {
-      setError(
-        language === 'bn'
-          ? (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'জবাবে অন্তত ১০ অক্ষর লিখুন।'
-              : 'বক্তব্য কমপক্ষে ১০ অক্ষরের হতে হবে।')
-          : (SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-              ? 'Enter at least 10 characters in your response.'
-              : 'Statement must be at least 10 characters.')
-      );
-      return;
-    }
-
+    setFieldErrors({});
     setIsSubmitting(true);
     setError(null);
     try {
@@ -148,6 +160,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
     setIsSubmitting(false);
     setResponseId(null);
     setError(null);
+    setFieldErrors({});
     setIsDiscardConfirmOpen(false);
     onClose();
   };
@@ -270,7 +283,7 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               )}
         </div>
       ) : (
-        <form id="subject-response-form" onSubmit={handleSubmit} className="space-y-4">
+        <form id="subject-response-form" onSubmit={handleSubmit} noValidate className="space-y-4">
             {error && (
               <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] type-compact font-[var(--font-weight-medium)]">
                 {error}
@@ -317,105 +330,101 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
             {/* Name and Contact */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label htmlFor="subject-responder-name-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                    ? (language === 'bn' ? 'পূর্ণ নাম *' : 'Full name *')
-                    : (language === 'bn' ? 'আপনার পূর্ণ নাম *' : 'Full Legal Name *')}
-                </label>
-                <input
-                  id="subject-responder-name-input"
-                  name="responderName"
-                  type="text"
-                  required
-                  aria-required="true"
-                  value={responderName}
-                  onChange={(e) => setResponderName(e.target.value)}
-                  placeholder={language === 'bn' ? 'উদাঃ মোস্তাফিজুর রহমান' : 'e.g. Mostafizur Rahman'}
-                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                />
-              </div>
+              <TextField
+                id="subject-responder-name-input"
+                name="responderName"
+                required
+                label={
+                  SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn' ? 'পূর্ণ নাম' : 'Full name')
+                    : (language === 'bn' ? 'আপনার পূর্ণ নাম' : 'Full Legal Name')
+                }
+                value={responderName}
+                onChange={(e) => {
+                  setResponderName(e.target.value);
+                  if (fieldErrors.responderName) setFieldErrors((current) => ({ ...current, responderName: '' }));
+                }}
+                error={fieldErrors.responderName}
+                autoComplete="name"
+                placeholder={language === 'bn' ? 'উদাঃ মোস্তাফিজুর রহমান' : 'e.g. Mostafizur Rahman'}
+              />
 
-              <div className="space-y-1">
-                <label htmlFor="subject-contact-email-phone-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                    ? (language === 'bn' ? 'ইমেইল বা ফোন *' : 'Email or phone *')
-                    : (language === 'bn' ? 'যাচাইযোগ্য ইমেইল বা ফোন *' : 'Contact Email or Phone *')}
-                </label>
-                <input
-                  id="subject-contact-email-phone-input"
-                  name="contactEmailOrPhone"
-                  type="text"
-                  required
-                  aria-required="true"
-                  value={contactEmailOrPhone}
-                  onChange={(e) => setContactEmailOrPhone(e.target.value)}
-                  placeholder={language === 'bn' ? 'name@example.com / 01XXXXXXXXX' : 'name@example.com / 01XXXXXXXXX'}
-                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                />
-              </div>
+              <ContactField
+                id="subject-contact-email-phone-input"
+                name="contactEmailOrPhone"
+                required
+                label={
+                  SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                    ? (language === 'bn' ? 'ইমেইল বা ফোন' : 'Email or phone')
+                    : (language === 'bn' ? 'যাচাইযোগ্য ইমেইল বা ফোন' : 'Contact Email or Phone')
+                }
+                value={contactEmailOrPhone}
+                onChange={(e) => {
+                  setContactEmailOrPhone(e.target.value);
+                  if (fieldErrors.contact) setFieldErrors((current) => ({ ...current, contact: '' }));
+                }}
+                error={fieldErrors.contact}
+                autoComplete="email"
+                placeholder={language === 'bn' ? 'name@example.com / 01XXXXXXXXX' : 'name@example.com / 01XXXXXXXXX'}
+              />
             </div>
 
             {/* Role & Org */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label htmlFor="subject-designation-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              <TextField
+                id="subject-designation-input"
+                name="designation"
+                type="text"
+                label={
+                  SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'পদবী / ভূমিকা (ঐচ্ছিক)' : 'Role / designation (optional)')
-                    : (language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)')}
-                </label>
-                <input
-                  id="subject-designation-input"
-                  name="designation"
-                  type="text"
-                  value={designation}
-                  onChange={(e) => setDesignation(e.target.value)}
-                  placeholder={language === 'bn' ? 'উদাহরণ: ম্যানেজার, পরিচালক' : 'e.g. Branch Manager'}
-                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                />
-              </div>
+                    : (language === 'bn' ? 'পদবী / দায়িত্ব' : 'Designation (Optional)')
+                }
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                autoComplete="organization-title"
+                placeholder={language === 'bn' ? 'উদাহরণ: ম্যানেজার, পরিচালক' : 'e.g. Branch Manager'}
+              />
 
-              <div className="space-y-1">
-                <label htmlFor="subject-org-name-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
-                  {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+              <TextField
+                id="subject-org-name-input"
+                name="organizationName"
+                type="text"
+                label={
+                  SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
                     ? (language === 'bn' ? 'প্রতিষ্ঠান (ঐচ্ছিক)' : 'Organization (optional)')
-                    : (language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)')}
-                </label>
-                <input
-                  id="subject-org-name-input"
-                  name="organizationName"
-                  type="text"
-                  value={organizationName}
-                  onChange={(e) => setOrganizationName(e.target.value)}
-                  placeholder={language === 'bn' ? 'উদাহরণ: রহিম ট্রেডার্স' : 'e.g. Rahim Traders'}
-                  className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                />
-              </div>
+                    : (language === 'bn' ? 'প্রতিষ্ঠানের নাম' : 'Organization Name (Optional)')
+                }
+                value={organizationName}
+                onChange={(e) => setOrganizationName(e.target.value)}
+                autoComplete="organization"
+                placeholder={language === 'bn' ? 'উদাহরণ: রহিম ট্রেডার্স' : 'e.g. Rahim Traders'}
+              />
             </div>
 
             {/* Statement / Clarification */}
-            <div className="space-y-1">
-              <label htmlFor="subject-official-statement-input" className="block type-label font-[var(--font-weight-medium)] text-ui-content-primary">
-                {SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
-                  ? (language === 'bn' ? 'আপনার জবাব *' : 'Your response *')
-                  : (language === 'bn' ? 'আপনার বক্তব্য বা স্পষ্টীকরণ *' : 'Statement or Clarification *')}
-              </label>
-              <textarea
-                id="subject-official-statement-input"
-                name="officialStatement"
-                rows={4}
-                required
-                aria-required="true"
-                value={officialStatement}
-                onChange={(e) => setOfficialStatement(e.target.value)}
-                placeholder={
-                  language === 'bn'
-                    ? 'আপনার অবস্থান, ব্যাখ্যা বা প্রাসঙ্গিক তথ্য লিখুন...'
-                    : 'Write your response, clarification, or relevant context...'
-                }
-                className="w-full ui-space-textarea bg-ui-input ui-border-default border-ui-stroke-default ui-radius-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent resize-y"
-              />
-            </div>
+            <TextAreaField
+              id="subject-official-statement-input"
+              name="officialStatement"
+              rows={4}
+              required
+              label={
+                SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
+                  ? (language === 'bn' ? 'আপনার জবাব' : 'Your response')
+                  : (language === 'bn' ? 'আপনার বক্তব্য বা স্পষ্টীকরণ' : 'Statement or Clarification')
+              }
+              value={officialStatement}
+              onChange={(e) => {
+                setOfficialStatement(e.target.value);
+                if (fieldErrors.statement) setFieldErrors((current) => ({ ...current, statement: '' }));
+              }}
+              error={fieldErrors.statement}
+              placeholder={
+                language === 'bn'
+                  ? 'আপনার অবস্থান, ব্যাখ্যা বা প্রাসঙ্গিক তথ্য লিখুন...'
+                  : 'Write your response, clarification, or relevant context...'
+              }
+            />
 
             {/* Request Correction / Removal checkbox */}
             {!SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED && (
@@ -433,24 +442,19 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
                 />
 
                 {requestCorrectionOrRemoval && (
-                  <div>
-                    <label htmlFor="subject-correction-details-input" className="sr-only">
-                      {language === 'bn' ? 'সংশোধনের বিবরণ' : 'Correction details'}
-                    </label>
-                    <input
-                      id="subject-correction-details-input"
-                      name="correctionDetails"
-                      type="text"
-                      value={correctionDetails}
-                      onChange={(e) => setCorrectionDetails(e.target.value)}
-                      placeholder={
-                        language === 'bn'
-                          ? 'কোন অংশটি ভুল এবং সঠিক তথ্য কী, তা সংক্ষেপে উল্লেখ করুন'
-                          : 'Specify what fact is inaccurate and provide correct verifiable info'
-                      }
-                      className="w-full px-[var(--field-padding-x)] ui-space-field-y bg-ui-input ui-border-default border-ui-stroke-default focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent ui-radius-control ui-control type-body text-ui-content-primary placeholder:text-ui-input-placeholder"
-                    />
-                  </div>
+                  <TextField
+                    id="subject-correction-details-input"
+                    name="correctionDetails"
+                    type="text"
+                    label={language === 'bn' ? 'সংশোধনের বিবরণ' : 'Correction details'}
+                    value={correctionDetails}
+                    onChange={(e) => setCorrectionDetails(e.target.value)}
+                    placeholder={
+                      language === 'bn'
+                        ? 'কোন অংশটি ভুল এবং সঠিক তথ্য কী, তা সংক্ষেপে উল্লেখ করুন'
+                        : 'Specify what fact is inaccurate and provide correct verifiable info'
+                    }
+                  />
                 )}
               </div>
             )}

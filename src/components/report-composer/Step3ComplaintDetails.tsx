@@ -7,16 +7,12 @@ import {
   ChevronDown,
   Lock,
   Info,
-  Calendar,
-  Clock,
-  Repeat,
   Users,
   Plus,
   Trash2,
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Coins,
 } from 'lucide-react';
 import { SectionKey } from '../../theme/tokens';
 import { useApp } from '../../context/AppContext';
@@ -67,6 +63,14 @@ import {
   ResolvedPlaceResult,
 } from '../../services/googlePlacesService';
 import { ReportTitleField, REPORT_TITLE_MAX_LENGTH } from './ReportTitleField';
+import { TextField } from '../ui/TextField';
+import { TextAreaField } from '../ui/TextAreaField';
+import { DateField } from '../ui/DateField';
+import { TimeField } from '../ui/TimeField';
+import { MonthField } from '../ui/MonthField';
+import { isValidEmailOrPhone } from '../ui/formValidation';
+import { NumberField } from '../ui/NumberField';
+import { ContactField } from '../ui/ContactField';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -138,6 +142,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     ref
   ) => {
     const todayLocal = getLocalToday();
+    const currentMonthLocal = todayLocal.slice(0, 7);
 
     // Segment structure conditions
     const showsPartySection =
@@ -708,6 +713,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (!formData.recentBillMonth?.trim()) {
             newErrors.recentBillMonth =
               language === 'bn' ? 'সাম্প্রতিক বিলের মাস নির্বাচন করুন।' : 'Select the recent bill month.';
+          } else if (formData.recentBillMonth > currentMonthLocal) {
+            newErrors.recentBillMonth =
+              language === 'bn' ? 'ভবিষ্যতের বিলের মাস নির্বাচন করা যাবে না।' : 'Recent bill month cannot be in the future.';
           }
 
           // 2. Validate Recent Bill Amount (Required, numeric > 0)
@@ -725,6 +733,17 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           if (!formData.previousBillMonth?.trim()) {
             newErrors.previousBillMonth =
               language === 'bn' ? 'আগের বিলের মাস নির্বাচন করুন।' : 'Select the previous bill month.';
+          } else if (formData.previousBillMonth > currentMonthLocal) {
+            newErrors.previousBillMonth =
+              language === 'bn' ? 'ভবিষ্যতের বিলের মাস নির্বাচন করা যাবে না।' : 'Previous bill month cannot be in the future.';
+          } else if (
+            formData.recentBillMonth?.trim() &&
+            formData.previousBillMonth >= formData.recentBillMonth
+          ) {
+            newErrors.previousBillMonth =
+              language === 'bn'
+                ? 'আগের বিলের মাস সাম্প্রতিক বিলের মাসের আগে হতে হবে।'
+                : 'Previous bill month must be earlier than the recent bill month.';
           }
 
           // 4. Validate Previous Bill Amount (Required, numeric > 0)
@@ -756,14 +775,17 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               language === 'bn' ? 'শুরুর সময় নির্বাচন করুন।' : 'Select a start time.';
           }
 
-          // 3. Validate End Time (Optional, but if both provided, validate end time > start time)
-          if (formData.incidentTime?.trim() && formData.utilityEndTime?.trim()) {
-            if (formData.utilityEndTime.trim() <= formData.incidentTime.trim()) {
-              newErrors.utilityEndTime =
-                language === 'bn'
-                  ? 'শেষ সময় শুরুর সময়ের পরে হতে হবে।'
-                  : 'End time must be after start time.';
-            }
+          // 3. End time is optional. An earlier clock time is valid and represents
+          // an incident that continued past midnight into the next day.
+          if (
+            formData.incidentTime?.trim() &&
+            formData.utilityEndTime?.trim() &&
+            formData.utilityEndTime.trim() === formData.incidentTime.trim()
+          ) {
+            newErrors.utilityEndTime =
+              language === 'bn'
+                ? 'শেষ সময় শুরুর সময়ের সমান হতে পারে না।'
+                : 'End time cannot be the same as the start time.';
           }
         }
 
@@ -955,22 +977,29 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
         // Harassment Identity Validation
         if (showsIdentitySection) {
-          if (formData.privacyChoice === 'admin_only' && !formData.adminContact?.trim()) {
+          const needsContact =
+            formData.privacyChoice === 'admin_only' ||
+            formData.privacyChoice === 'public_identity';
+
+          if (needsContact && !formData.adminContact?.trim()) {
             newErrors.adminContact =
               language === 'bn'
                 ? 'যোগাযোগের জন্য ইমেইল বা ফোন নম্বর লিখুন।'
                 : 'Enter an email or phone number for follow-up.';
+          } else if (
+            needsContact &&
+            formData.adminContact?.trim() &&
+            !isValidEmailOrPhone(formData.adminContact)
+          ) {
+            newErrors.adminContact =
+              language === 'bn'
+                ? 'সঠিক ইমেইল বা ফোন নম্বর লিখুন।'
+                : 'Enter a valid email address or phone number.';
           }
 
-          if (formData.privacyChoice === 'public_identity') {
-            if (!formData.adminName?.trim()) {
-              newErrors.adminName =
-                language === 'bn' ? 'আপনার নাম লিখুন।' : 'Enter your name.';
-            }
-            if (!formData.adminContact?.trim()) {
-              newErrors.adminContact =
-                language === 'bn' ? 'আপনার যোগাযোগের তথ্য লিখুন।' : 'Enter your contact information.';
-            }
+          if (formData.privacyChoice === 'public_identity' && !formData.adminName?.trim()) {
+            newErrors.adminName =
+              language === 'bn' ? 'আপনার নাম লিখুন।' : 'Enter your name.';
           }
         }
       }
@@ -1120,309 +1149,173 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               {isExcessElectricityBill ? (
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Recent Bill Month */}
-                    <div>
-                      <label
-                        htmlFor="recent-bill-month-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের মাস *' : 'Recent bill month *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="recent-bill-month-input"
-                  aria-invalid={Boolean(errors.recentBillMonth)}
-                  aria-describedby={errors.recentBillMonth ? 'recent-bill-month-input-error' : undefined}
-                  aria-required="true"
-                        type="month"
-                        value={formData.recentBillMonth || ''}
-                        onChange={(e) => {
-                          onUpdateFormData({ recentBillMonth: e.target.value });
-                          if (errors.recentBillMonth) setErrors((prev) => ({ ...prev, recentBillMonth: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.recentBillMonth ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.recentBillMonth && (
-                        <p id="recent-bill-month-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillMonth}</p>
-                      )}
-                    </div>
-
-                    {/* Recent Bill Amount */}
-                    <div>
-                      <label
-                        htmlFor="recent-bill-amount-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Coins className="w-3.5 h-3.5 text-ui-content-primary" />
-                          <span>{language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা) *' : 'Recent bill amount (BDT) *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="recent-bill-amount-input"
-                  aria-invalid={Boolean(errors.recentBillAmount)}
-                  aria-describedby={errors.recentBillAmount ? 'recent-bill-amount-input-error' : undefined}
-                  aria-required="true"
-                        type="number"
-                        min="1"
-                        step="any"
-                        placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
-                        value={formData.recentBillAmount !== undefined && formData.recentBillAmount !== null ? formData.recentBillAmount : ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          onUpdateFormData({ recentBillAmount: val === '' ? undefined : Number(val) });
-                          if (errors.recentBillAmount) setErrors((prev) => ({ ...prev, recentBillAmount: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.recentBillAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.recentBillAmount && (
-                        <p id="recent-bill-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.recentBillAmount}</p>
-                      )}
-                    </div>
+                    <MonthField
+                      id="recent-bill-month-input"
+                      language={language}
+                      required
+                      label={language === 'bn' ? 'সাম্প্রতিক বিলের মাস' : 'Recent bill month'}
+                      max={currentMonthLocal}
+                      value={formData.recentBillMonth || ''}
+                      error={errors.recentBillMonth}
+                      onChange={(e) => {
+                        onUpdateFormData({ recentBillMonth: e.target.value });
+                        if (errors.recentBillMonth) setErrors((prev) => ({ ...prev, recentBillMonth: '' }));
+                        if (
+                          errors.previousBillMonth &&
+                          formData.previousBillMonth &&
+                          e.target.value &&
+                          formData.previousBillMonth < e.target.value
+                        ) {
+                          setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
+                        }
+                      }}
+                    />
+                    <NumberField
+                      id="recent-bill-amount-input"
+                      min="1"
+                      step="any"
+                      inputMode="decimal"
+                      required
+                      label={language === 'bn' ? 'সাম্প্রতিক বিলের পরিমাণ (টাকা)' : 'Recent bill amount (BDT)'}
+                      placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
+                      value={formData.recentBillAmount !== undefined && formData.recentBillAmount !== null ? formData.recentBillAmount : ''}
+                      error={errors.recentBillAmount}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onUpdateFormData({ recentBillAmount: val === '' ? undefined : Number(val) });
+                        if (errors.recentBillAmount) setErrors((prev) => ({ ...prev, recentBillAmount: '' }));
+                      }}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Previous Bill Month */}
-                    <div>
-                      <label
-                        htmlFor="previous-bill-month-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের মাস *' : 'Previous bill month *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="previous-bill-month-input"
-                  aria-invalid={Boolean(errors.previousBillMonth)}
-                  aria-describedby={errors.previousBillMonth ? 'previous-bill-month-input-error' : undefined}
-                  aria-required="true"
-                        type="month"
-                        value={formData.previousBillMonth || ''}
-                        onChange={(e) => {
-                          onUpdateFormData({ previousBillMonth: e.target.value });
-                          if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.previousBillMonth ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.previousBillMonth && (
-                        <p id="previous-bill-month-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillMonth}</p>
-                      )}
-                    </div>
-
-                    {/* Previous Bill Amount */}
-                    <div>
-                      <label
-                        htmlFor="previous-bill-amount-input"
-                        className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Coins className="w-3.5 h-3.5 text-ui-content-secondary" />
-                          <span>{language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা) *' : 'Previous bill amount (BDT) *'}</span>
-                        </div>
-                      </label>
-                      <input
-                        id="previous-bill-amount-input"
-                  aria-invalid={Boolean(errors.previousBillAmount)}
-                  aria-describedby={errors.previousBillAmount ? 'previous-bill-amount-input-error' : undefined}
-                  aria-required="true"
-                        type="number"
-                        min="1"
-                        step="any"
-                        placeholder={language === 'bn' ? 'যেমন: ১৫০০' : 'e.g. 1500'}
-                        value={formData.previousBillAmount !== undefined && formData.previousBillAmount !== null ? formData.previousBillAmount : ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          onUpdateFormData({ previousBillAmount: val === '' ? undefined : Number(val) });
-                          if (errors.previousBillAmount) setErrors((prev) => ({ ...prev, previousBillAmount: '' }));
-                        }}
-                        className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                          errors.previousBillAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                        }`}
-                      />
-                      {errors.previousBillAmount && (
-                        <p id="previous-bill-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.previousBillAmount}</p>
-                      )}
-                    </div>
+                    <MonthField
+                      id="previous-bill-month-input"
+                      language={language}
+                      required
+                      label={language === 'bn' ? 'আগের বিলের মাস' : 'Previous bill month'}
+                      max={formData.recentBillMonth || currentMonthLocal}
+                      value={formData.previousBillMonth || ''}
+                      error={errors.previousBillMonth}
+                      onChange={(e) => {
+                        onUpdateFormData({ previousBillMonth: e.target.value });
+                        if (errors.previousBillMonth) setErrors((prev) => ({ ...prev, previousBillMonth: '' }));
+                      }}
+                    />
+                    <NumberField
+                      id="previous-bill-amount-input"
+                      min="1"
+                      step="any"
+                      inputMode="decimal"
+                      required
+                      label={language === 'bn' ? 'আগের বিলের পরিমাণ (টাকা)' : 'Previous bill amount (BDT)'}
+                      placeholder={language === 'bn' ? 'যেমন: ১৫০০' : 'e.g. 1500'}
+                      value={formData.previousBillAmount !== undefined && formData.previousBillAmount !== null ? formData.previousBillAmount : ''}
+                      error={errors.previousBillAmount}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onUpdateFormData({ previousBillAmount: val === '' ? undefined : Number(val) });
+                        if (errors.previousBillAmount) setErrors((prev) => ({ ...prev, previousBillAmount: '' }));
+                      }}
+                    />
                   </div>
                 </div>
               ) : (
-                /* Date, Start Time & End Time in 3 columns on sm+ screens */
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Incident Date */}
-                  <div>
-                    <label
-                      htmlFor="complaint-date-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                        <span>{language === 'bn' ? 'তারিখ *' : 'Date *'}</span>
-                      </div>
-                    </label>
-                    <input
-                      id="complaint-date-input"
-                  aria-invalid={Boolean(errors.incidentDate)}
-                  aria-describedby={errors.incidentDate ? 'complaint-date-input-error' : undefined}
-                  aria-required="true"
-                      type="date"
-                      max={todayLocal}
-                      value={formData.incidentDate || ''}
-                      onChange={(e) => {
-                        const selectedDate = e.target.value;
-                        if (selectedDate && selectedDate > todayLocal) {
-                          setErrors((prev) => ({
-                            ...prev,
-                            incidentDate:
-                              language === 'bn'
-                                ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                                : 'Select today or an earlier date.',
-                          }));
-                          return;
-                        }
-                        onUpdateFormData({ incidentDate: selectedDate });
-                        if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
-                      }}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.incidentDate ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.incidentDate && (
-                      <p id="complaint-date-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
-                    )}
-                  </div>
-
-                  {/* Start Time (Required) */}
-                  <div>
-                    <label
-                      htmlFor="utility-start-time-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-ui-content-primary" />
-                        <span>{language === 'bn' ? 'শুরুর সময় *' : 'Start time *'}</span>
-                      </div>
-                    </label>
-                    <input
-                      id="utility-start-time-input"
-                  aria-invalid={Boolean(errors.incidentTime)}
-                  aria-describedby={errors.incidentTime ? 'utility-start-time-input-error' : undefined}
-                  aria-required="true"
-                      type="time"
-                      value={formData.incidentTime || ''}
-                      onChange={(e) => {
-                        onUpdateFormData({ incidentTime: e.target.value });
-                        if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
-                        if (errors.utilityEndTime && formData.utilityEndTime && e.target.value < formData.utilityEndTime) {
-                          setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
-                        }
-                      }}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.incidentTime ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.incidentTime && (
-                      <p id="utility-start-time-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentTime}</p>
-                    )}
-                  </div>
-
-                  {/* End Time (Optional) */}
-                  <div>
-                    <label
-                      htmlFor="utility-end-time-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                        <span>{language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End time (optional)'}</span>
-                      </div>
-                    </label>
-                    <input
-                      id="utility-end-time-input"
-                  aria-invalid={Boolean(errors.utilityEndTime)}
-                  aria-describedby={errors.utilityEndTime ? 'utility-end-time-input-error' : undefined}
-                      type="time"
-                      value={formData.utilityEndTime || ''}
-                      onChange={(e) => {
-                        onUpdateFormData({ utilityEndTime: e.target.value });
-                        if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
-                      }}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.utilityEndTime ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.utilityEndTime && (
-                      <p id="utility-end-time-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.utilityEndTime}</p>
-                    )}
-                  </div>
+                  <DateField
+                    id="complaint-date-input"
+                    language={language}
+                    required
+                    label={language === 'bn' ? 'তারিখ' : 'Date'}
+                    max={todayLocal}
+                    value={formData.incidentDate || ''}
+                    error={errors.incidentDate}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      if (selectedDate && selectedDate > todayLocal) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          incidentDate:
+                            language === 'bn'
+                              ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
+                              : 'Select today or an earlier date.',
+                        }));
+                        return;
+                      }
+                      onUpdateFormData({ incidentDate: selectedDate });
+                      if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
+                    }}
+                  />
+                  <TimeField
+                    id="utility-start-time-input"
+                    language={language}
+                    required
+                    label={language === 'bn' ? 'শুরুর সময়' : 'Start time'}
+                    value={formData.incidentTime || ''}
+                    error={errors.incidentTime}
+                    onChange={(e) => {
+                      onUpdateFormData({ incidentTime: e.target.value });
+                      if (errors.incidentTime) setErrors((prev) => ({ ...prev, incidentTime: '' }));
+                      if (errors.utilityEndTime && formData.utilityEndTime && e.target.value !== formData.utilityEndTime) {
+                        setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                      }
+                    }}
+                  />
+                  <TimeField
+                    id="utility-end-time-input"
+                    language={language}
+                    label={language === 'bn' ? 'শেষ সময় (ঐচ্ছিক)' : 'End time (optional)'}
+                    helperText={
+                      formData.incidentTime && formData.utilityEndTime && formData.utilityEndTime < formData.incidentTime
+                        ? language === 'bn'
+                          ? 'শেষ সময়টি পরের দিনের হিসেবে ধরা হবে।'
+                          : 'This end time is treated as the following day.'
+                        : undefined
+                    }
+                    value={formData.utilityEndTime || ''}
+                    error={errors.utilityEndTime}
+                    onChange={(e) => {
+                      onUpdateFormData({ utilityEndTime: e.target.value });
+                      if (errors.utilityEndTime) setErrors((prev) => ({ ...prev, utilityEndTime: '' }));
+                    }}
+                  />
                 </div>
               )}
 
               {/* Incident Description */}
-              <div className="space-y-1">
-                <label
-                  htmlFor="complaint-desc-input"
-                  className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
-                >
-                  {language === 'bn' ? 'বিবরণ *' : 'Description *'}
-                </label>
-                <textarea
-                  id="complaint-desc-input"
-                  aria-invalid={Boolean(errors.description)}
-                  aria-describedby={errors.description ? 'complaint-desc-input-error' : undefined}
-                  aria-required="true"
-                  rows={4}
-                  maxLength={2000}
-                  value={formData.description || ''}
-                  onChange={(e) => {
-                    onUpdateFormData({ description: e.target.value });
-                    if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
-                  }}
-                  placeholder={
-                    isExcessElectricityBill
-                      ? language === 'bn'
-                        ? 'বিদ্যুৎ বিলটি অস্বাভাবিক বেশি বা ভুল মনে হওয়ার কারণ লিখুন।'
-                        : 'Describe why you believe the electricity bill is unusually high or incorrect.'
-                      : isLoadShedding
+              <TextAreaField
+                id="complaint-desc-input"
+                rows={4}
+                maxLength={2000}
+                required
+                label={language === 'bn' ? 'বিবরণ' : 'Description'}
+                value={formData.description || ''}
+                error={errors.description}
+                onChange={(e) => {
+                  onUpdateFormData({ description: e.target.value });
+                  if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
+                }}
+                placeholder={
+                  isExcessElectricityBill
+                    ? language === 'bn'
+                      ? 'বিদ্যুৎ বিলটি অস্বাভাবিক বেশি বা ভুল মনে হওয়ার কারণ লিখুন।'
+                      : 'Describe why you believe the electricity bill is unusually high or incorrect.'
+                    : isLoadShedding
                       ? language === 'bn'
                         ? 'লোডশেডিংয়ের প্রভাব, এলাকা বা সময়কাল সম্পর্কিত বিবরণ লিখুন...'
                         : 'Describe the load shedding outage, area affected, or duration details...'
                       : language === 'bn'
-                      ? 'গ্যাস সংকট, চাপ কম বা সম্পূর্ণ সরবরাহ বন্ধ থাকার বিবরণ লিখুন...'
-                      : 'Describe the gas shortage, low pressure, or outage details...'
-                  }
-                  className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-[var(--radius-control)] type-h4 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
-                    errors.description ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                  }`}
-                />
-                <div className="flex items-center justify-between gap-2">
-                  {errors.description ? (
-                    <p id="complaint-desc-input-error" role="alert" className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
-                  ) : (
-                    <span />
-                  )}
-                  {(formData.description?.length || 0) >= 1600 && (
-                    <span
-                      className={`type-compact tabular-nums shrink-0 ml-auto ${
-                        (formData.description?.length || 0) > 2000
-                          ? 'text-ui-error-text font-[var(--font-weight-bold)]'
-                          : 'text-ui-content-muted'
-                      }`}
-                    >
+                        ? 'গ্যাস সংকট, চাপ কম বা সম্পূর্ণ সরবরাহ বন্ধ থাকার বিবরণ লিখুন...'
+                        : 'Describe the gas shortage, low pressure, or outage details...'
+                }
+                helperText={
+                  (formData.description?.length || 0) >= 1600 ? (
+                    <div className="text-right type-meta tabular-nums">
                       {formData.description?.length || 0} / 2000
-                    </span>
-                  )}
-                </div>
-              </div>
+                    </div>
+                  ) : undefined
+                }
+              />
             </div>
           ) : (
           <div className="space-y-4 pt-1 text-left">
@@ -1437,54 +1330,31 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             />
 
             {/* Incident Narrative */}
-            <div className="space-y-1">
-              <label
-                htmlFor="complaint-desc-input"
-                className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
-              >
-                <span>{language === 'bn' ? 'কী ঘটেছিল?' : 'What happened?'}</span>
-                <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
-              </label>
-              <textarea
-                id="complaint-desc-input"
-                  aria-invalid={Boolean(errors.description)}
-                  aria-describedby={errors.description ? 'complaint-desc-input-error' : undefined}
-                  aria-required="true"
-                rows={4}
-                maxLength={2000}
-                value={formData.description || ''}
-                onChange={(e) => {
-                  onUpdateFormData({ description: e.target.value });
-                  if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
-                }}
-                placeholder={
-                  language === 'bn'
-                    ? 'ঘটনাটি সংক্ষেপে ও স্পষ্টভাবে লিখুন...'
-                    : 'Describe the incident clearly...'
-                }
-                className={`w-full px-3.5 py-2.5 bg-ui-surface border rounded-[var(--radius-control)] type-h4 text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed ${
-                  errors.description ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                }`}
-              />
-              <div className="flex items-center justify-between gap-2">
-                {errors.description ? (
-                  <p id="complaint-desc-input-error" role="alert" className="type-compact text-ui-error-text font-[var(--font-weight-semibold)]">{errors.description}</p>
-                ) : (
-                  <span />
-                )}
-                {(formData.description?.length || 0) >= 1600 && (
-                  <span
-                    className={`type-compact tabular-nums shrink-0 ml-auto ${
-                      (formData.description?.length || 0) > 2000
-                        ? 'text-ui-error-text font-[var(--font-weight-bold)]'
-                        : 'text-ui-content-muted'
-                    }`}
-                  >
+            <TextAreaField
+              id="complaint-desc-input"
+              rows={4}
+              maxLength={2000}
+              required
+              label={language === 'bn' ? 'কী ঘটেছিল?' : 'What happened?'}
+              value={formData.description || ''}
+              error={errors.description}
+              onChange={(e) => {
+                onUpdateFormData({ description: e.target.value });
+                if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
+              }}
+              placeholder={
+                language === 'bn'
+                  ? 'ঘটনাটি সংক্ষেপে ও স্পষ্টভাবে লিখুন...'
+                  : 'Describe the incident clearly...'
+              }
+              helperText={
+                (formData.description?.length || 0) >= 1600 ? (
+                  <div className="text-right type-meta tabular-nums">
                     {formData.description?.length || 0} / 2000
-                  </span>
-                )}
-              </div>
-            </div>
+                  </div>
+                ) : undefined
+              }
+            />
 
             {isBriberyReport && (
               <div className="pt-4 border-t border-ui-stroke-subtle space-y-3">
@@ -1507,143 +1377,89 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                       keywords: [option.labelBn, option.labelEn],
                     }))}
                   />
-                  <div>
-                    <label htmlFor="bribery-service-input" className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1">
-                      {language === 'bn' ? 'সেবা বা প্রক্রিয়া (ঐচ্ছিক)' : 'Service or process (optional)'}
-                    </label>
-                    <input
-                      id="bribery-service-input"
-                      type="text"
-                      value={formData.briberyService || ''}
-                      onChange={(e) => onUpdateFormData({ briberyService: e.target.value })}
-                      placeholder={language === 'bn' ? 'যেমন: মিউটেশন, পাসপোর্ট নবায়ন, লাইসেন্স' : 'e.g. mutation, passport renewal, licence'}
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="bribery-amount-input" className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1">
-                      {language === 'bn' ? 'টাকার পরিমাণ (ঐচ্ছিক)' : 'Amount (BDT) (optional)'}
-                    </label>
-                    <input
-                      id="bribery-amount-input"
-                  aria-invalid={Boolean(errors.briberyAmount)}
-                  aria-describedby={errors.briberyAmount ? 'bribery-amount-input-error' : undefined}
-                      type="number"
-                      min="1"
-                      step="any"
-                      value={formData.briberyAmount !== undefined && formData.briberyAmount !== null ? formData.briberyAmount : ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        onUpdateFormData({ briberyAmount: value === '' ? undefined : Number(value) });
-                        if (errors.briberyAmount) setErrors((prev) => ({ ...prev, briberyAmount: '' }));
-                      }}
-                      placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${errors.briberyAmount ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'}`}
-                    />
-                    {errors.briberyAmount && <p id="bribery-amount-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.briberyAmount}</p>}
-                  </div>
+                  <TextField
+                    id="bribery-service-input"
+                    type="text"
+                    label={language === 'bn' ? 'সেবা বা প্রক্রিয়া (ঐচ্ছিক)' : 'Service or process (optional)'}
+                    value={formData.briberyService || ''}
+                    onChange={(e) => onUpdateFormData({ briberyService: e.target.value })}
+                    placeholder={language === 'bn' ? 'যেমন: মিউটেশন, পাসপোর্ট নবায়ন, লাইসেন্স' : 'e.g. mutation, passport renewal, licence'}
+                  />
+                  <NumberField
+                    id="bribery-amount-input"
+                    min="1"
+                    step="any"
+                    inputMode="decimal"
+                    label={language === 'bn' ? 'টাকার পরিমাণ (ঐচ্ছিক)' : 'Amount (BDT) (optional)'}
+                    value={formData.briberyAmount !== undefined && formData.briberyAmount !== null ? formData.briberyAmount : ''}
+                    error={errors.briberyAmount}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      onUpdateFormData({ briberyAmount: value === '' ? undefined : Number(value) });
+                      if (errors.briberyAmount) setErrors((prev) => ({ ...prev, briberyAmount: '' }));
+                    }}
+                    placeholder={language === 'bn' ? 'যেমন: ৫০০০' : 'e.g. 5000'}
+                  />
                 </div>
               </div>
             )}
 
             {/* Incident timeline */}
             <div className={`grid grid-cols-1 ${hideIncidentTime && hideFrequency ? 'sm:grid-cols-1' : hideFrequency ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3`}>
-              <div>
-                <label
-                  htmlFor="complaint-date-input"
-                  className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-ui-content-primary" />
-                    <span>{language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}</span>
-                    <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
-                  </div>
-                </label>
-                <input
-                  id="complaint-date-input"
-                  aria-invalid={Boolean(errors.incidentDate)}
-                  aria-describedby={errors.incidentDate ? 'complaint-date-input-error' : undefined}
-                  aria-required="true"
-                  type="date"
-                  max={todayLocal}
-                  value={formData.incidentDate || ''}
-                  onChange={(e) => {
-                    const selectedDate = e.target.value;
-                    if (selectedDate && selectedDate > todayLocal) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        incidentDate:
-                          language === 'bn'
-                            ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
-                            : 'Select today or an earlier date.',
-                      }));
-                      return;
-                    }
-                    onUpdateFormData({ incidentDate: selectedDate });
-                    if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
-                  }}
-                  className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                    errors.incidentDate ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                  }`}
-                />
-                {errors.incidentDate && (
-                  <p id="complaint-date-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.incidentDate}</p>
-                )}
-              </div>
+              <DateField
+                id="complaint-date-input"
+                language={language}
+                required
+                label={language === 'bn' ? 'ঘটনার তারিখ' : 'Incident date'}
+                max={todayLocal}
+                value={formData.incidentDate || ''}
+                error={errors.incidentDate}
+                onChange={(e) => {
+                  const selectedDate = e.target.value;
+                  if (selectedDate && selectedDate > todayLocal) {
+                    setErrors((prev) => ({
+                      ...prev,
+                      incidentDate:
+                        language === 'bn'
+                          ? 'আজ বা আগের কোনো তারিখ নির্বাচন করুন।'
+                          : 'Select today or an earlier date.',
+                    }));
+                    return;
+                  }
+                  onUpdateFormData({ incidentDate: selectedDate });
+                  if (errors.incidentDate) setErrors((prev) => ({ ...prev, incidentDate: '' }));
+                }}
+              />
 
               {!hideIncidentTime && (
-                <div>
-                  <label
-                    htmlFor="complaint-time-input"
-                    className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-ui-content-secondary" />
-                      <span>{language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}</span>
-                    </div>
-                  </label>
-                  <input
-                    id="complaint-time-input"
-                    type="time"
-                    value={formData.incidentTime || ''}
-                    onChange={(e) => onUpdateFormData({ incidentTime: e.target.value })}
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                  />
-                </div>
+                <TimeField
+                  id="complaint-time-input"
+                  language={language}
+                  label={language === 'bn' ? 'সময় (ঐচ্ছিক)' : 'Time (optional)'}
+                  value={formData.incidentTime || ''}
+                  onChange={(e) => onUpdateFormData({ incidentTime: e.target.value })}
+                />
               )}
 
               {!hideFrequency && (
-                <div>
-                  <label
-                    htmlFor="complaint-frequency-select"
-                    className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Repeat className="w-3.5 h-3.5 text-ui-content-secondary" />
-                      <span>{language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}</span>
-                    </div>
-                  </label>
-                  <select
-                    id="complaint-frequency-select"
-                    value={formData.frequency || 'one-time'}
-                    onChange={(e) =>
-                      onUpdateFormData({ frequency: e.target.value as ReportFormData['frequency'] })
-                    }
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[44px]"
-                  >
-                    {(isSexualHarassment
-                      ? SEXUAL_HARASSMENT_FREQUENCY_OPTIONS
-                      : [
-                          { value: 'one-time', labelBn: 'এককালীন (One-time)', labelEn: 'One-time' },
-                          { value: 'repeated', labelBn: 'নিয়মিত / একাধিকবার', labelEn: 'Repeated / Ongoing' },
-                        ]
-                    ).map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {language === 'bn' ? option.labelBn : option.labelEn}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  id="complaint-frequency-select"
+                  label={language === 'bn' ? 'পুনরাবৃত্তি' : 'Frequency'}
+                  value={formData.frequency || 'one-time'}
+                  onChange={(e) =>
+                    onUpdateFormData({ frequency: e.target.value as ReportFormData['frequency'] })
+                  }
+                  options={(isSexualHarassment
+                    ? SEXUAL_HARASSMENT_FREQUENCY_OPTIONS
+                    : [
+                        { value: 'one-time', labelBn: 'এককালীন (One-time)', labelEn: 'One-time' },
+                        { value: 'repeated', labelBn: 'নিয়মিত / একাধিকবার', labelEn: 'Repeated / Ongoing' },
+                      ]
+                  ).map((option) => ({
+                    value: option.value,
+                    label: language === 'bn' ? option.labelBn : option.labelEn,
+                  }))}
+                />
               )}
             </div>
 
@@ -1700,45 +1516,29 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 />
 
                 {needsSexualHarassmentInstitution(formData.sexualHarassmentContext) && (
-                  <div>
-                    <label
-                      htmlFor="sexual-harassment-institution-input"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      {language === 'bn'
+                  <TextField
+                    id="sexual-harassment-institution-input"
+                    type="text"
+                    maxLength={200}
+                    label={
+                      language === 'bn'
                         ? 'প্রতিষ্ঠান / সংস্থার নাম (ঐচ্ছিক)'
-                        : 'Institution / organization (optional)'}
-                    </label>
-                    <input
-                      id="sexual-harassment-institution-input"
-                  aria-invalid={Boolean(errors.sexualHarassmentInstitution)}
-                  aria-describedby={errors.sexualHarassmentInstitution ? 'sexual-harassment-institution-input-error' : undefined}
-                      type="text"
-                      maxLength={200}
-                      value={formData.sexualHarassmentInstitution || ''}
-                      onChange={(event) => {
-                        onUpdateFormData({ sexualHarassmentInstitution: event.target.value });
-                        if (errors.sexualHarassmentInstitution) {
-                          setErrors((prev) => ({ ...prev, sexualHarassmentInstitution: '' }));
-                        }
-                      }}
-                      placeholder={
-                        language === 'bn'
-                          ? 'উৎস বা ঘটনার তথ্য অনুযায়ী প্রতিষ্ঠানের নাম'
-                          : 'Institution name, if known'
+                        : 'Institution / organization (optional)'
+                    }
+                    value={formData.sexualHarassmentInstitution || ''}
+                    error={errors.sexualHarassmentInstitution}
+                    onChange={(event) => {
+                      onUpdateFormData({ sexualHarassmentInstitution: event.target.value });
+                      if (errors.sexualHarassmentInstitution) {
+                        setErrors((prev) => ({ ...prev, sexualHarassmentInstitution: '' }));
                       }
-                      className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary placeholder:text-ui-content-muted focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                        errors.sexualHarassmentInstitution
-                          ? 'border-ui-error-border bg-ui-error-bg'
-                          : 'border-ui-stroke-subtle'
-                      }`}
-                    />
-                    {errors.sexualHarassmentInstitution && (
-                      <p id="sexual-harassment-institution-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">
-                        {errors.sexualHarassmentInstitution}
-                      </p>
-                    )}
-                  </div>
+                    }}
+                    placeholder={
+                      language === 'bn'
+                        ? 'উৎস বা ঘটনার তথ্য অনুযায়ী প্রতিষ্ঠানের নাম'
+                        : 'Institution name, if known'
+                    }
+                  />
                 )}
               </div>
             )}
@@ -1815,49 +1615,28 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label
-                      htmlFor="intimate-action-select"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat status / action'}
-                    </label>
-                    <select
-                      id="intimate-action-select"
-                      value={formData.intimateWhatHappened || ''}
-                      onChange={(e) => onUpdateFormData({ intimateWhatHappened: e.target.value })}
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[44px]"
-                    >
-                      <option value="">{language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}</option>
-                      {INTIMATE_WHAT_HAPPENED_OPTIONS.map((opt) => (
-                        <option key={opt.id} value={opt.id}>
-                          {language === 'bn' ? opt.nameBn : opt.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="intimate-platform-select"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / channel'}
-                    </label>
-                    <select
-                      id="intimate-platform-select"
-                      value={formData.intimatePlatform || ''}
-                      onChange={(e) => onUpdateFormData({ intimatePlatform: e.target.value })}
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent cursor-pointer min-h-[44px]"
-                    >
-                      <option value="">{language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}</option>
-                      {INTIMATE_PLATFORMS.map((plat) => (
-                        <option key={plat.id} value={plat.id}>
-                          {language === 'bn' ? plat.nameBn : plat.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Select
+                    id="intimate-action-select"
+                    label={language === 'bn' ? 'কী ঘটেছে বা হুমকি দেওয়া হচ্ছে?' : 'Threat status / action'}
+                    value={formData.intimateWhatHappened || ''}
+                    onChange={(event) => onUpdateFormData({ intimateWhatHappened: event.target.value })}
+                    placeholder={language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}
+                    options={INTIMATE_WHAT_HAPPENED_OPTIONS.map((option) => ({
+                      value: option.id,
+                      label: language === 'bn' ? option.nameBn : option.nameEn,
+                    }))}
+                  />
+                  <Select
+                    id="intimate-platform-select"
+                    label={language === 'bn' ? 'কোন মাধ্যমে হুমকি বা অপপ্রচার হচ্ছে?' : 'Platform / channel'}
+                    value={formData.intimatePlatform || ''}
+                    onChange={(event) => onUpdateFormData({ intimatePlatform: event.target.value })}
+                    placeholder={language === 'bn' ? '-- নির্বাচন করুন --' : '-- Select --'}
+                    options={INTIMATE_PLATFORMS.map((platform) => ({
+                      value: platform.id,
+                      label: language === 'bn' ? platform.nameBn : platform.nameEn,
+                    }))}
+                  />
                 </div>
               </div>
             )}
@@ -2052,61 +1831,57 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
               {/* Row 3: Detailed Address (Optional for non-utility, completely omitted for utility) */}
               {!isUtilityReport && (
-                <div>
-                  <label
-                    htmlFor="complaint-address-input"
-                    className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                  >
-                    {language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed address (optional)'}
-                  </label>
-                  <textarea
-                    id="complaint-address-input"
-                  aria-invalid={Boolean(errors.formattedAddress)}
-                  aria-describedby={errors.formattedAddress ? 'complaint-address-input-error' : undefined}
-                    rows={3}
-                    disabled={isLocationLocked}
-                    value={formData.location?.formattedAddress || ''}
-                    onChange={(e) => handleManualLocationChange({ formattedAddress: e.target.value })}
-                    placeholder={
-                      language === 'bn'
-                        ? 'বাড়ি/হোল্ডিং, রাস্তা, বাজার, প্রতিষ্ঠান, পরিচিত স্থান বা প্রয়োজনীয় অন্যান্য ঠিকানা লিখুন'
-                        : 'Enter house/holding, road, market, institution, landmark, or other useful address details'
-                    }
-                    className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent resize-none leading-relaxed ${
-                      isLocationLocked ? 'cursor-not-allowed opacity-60 bg-ui-surface-subtle' : ''
-                    } ${
-                      errors.formattedAddress ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                    }`}
-                  />
-                  {errors.formattedAddress && (
-                    <p id="complaint-address-input-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.formattedAddress}</p>
-                  )}
-                </div>
+                <TextAreaField
+                  id="complaint-address-input"
+                  rows={3}
+                  disabled={isLocationLocked}
+                  label={language === 'bn' ? 'বিস্তারিত ঠিকানা (ঐচ্ছিক)' : 'Detailed address (optional)'}
+                  value={formData.location?.formattedAddress || ''}
+                  error={errors.formattedAddress}
+                  onChange={(e) => handleManualLocationChange({ formattedAddress: e.target.value })}
+                  placeholder={
+                    language === 'bn'
+                      ? 'বাড়ি/হোল্ডিং, রাস্তা, বাজার, প্রতিষ্ঠান, পরিচিত স্থান বা প্রয়োজনীয় অন্যান্য ঠিকানা লিখুন'
+                      : 'Enter house/holding, road, market, institution, landmark, or other useful address details'
+                  }
+                  maxLength={500}
+                  className="resize-none"
+                />
               )}
 
               {/* Optional address/place search; no report-input map */}
               <div className="pt-2 space-y-3">
                 {isGooglePlacesConfigured() && (
-                  <div>
-                    <label className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1">
-                      {language === 'bn' ? 'ঠিকানা দিয়ে অনুসন্ধান (ঐচ্ছিক)' : 'Search address or place (optional)'}
-                    </label>
-                    <AddressSearchInput
-                      language={language}
-                      onPlaceSelected={handleAddressSearchPlaceSelected}
-                      biasCoords={
-                        formData.location?.lat && formData.location?.lng
-                          ? { lat: formData.location.lat, lng: formData.location.lng }
-                          : resolvedDistrict
-                          ? { lat: resolvedDistrict.lat, lng: resolvedDistrict.lng }
-                          : resolvedDivision
-                          ? { lat: resolvedDivision.lat, lng: resolvedDivision.lng }
-                          : undefined
-                      }
-                      initialValue=""
-                      disabled={isLocationLocked}
-                    />
-                  </div>
+                  <AddressSearchInput
+                    language={language}
+                    label={language === 'bn' ? 'ঠিকানা দিয়ে অনুসন্ধান (ঐচ্ছিক)' : 'Search address or place (optional)'}
+                    onPlaceSelected={handleAddressSearchPlaceSelected}
+                    onClear={() =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          formattedAddress: '',
+                          road: '',
+                          area: '',
+                          landmark: '',
+                          placeId: undefined,
+                          lat: undefined,
+                          lng: undefined,
+                        },
+                      })
+                    }
+                    biasCoords={
+                      formData.location?.lat && formData.location?.lng
+                        ? { lat: formData.location.lat, lng: formData.location.lng }
+                        : resolvedDistrict
+                        ? { lat: resolvedDistrict.lat, lng: resolvedDistrict.lng }
+                        : resolvedDivision
+                        ? { lat: resolvedDivision.lat, lng: resolvedDivision.lng }
+                        : undefined
+                    }
+                    initialValue=""
+                    disabled={isLocationLocked}
+                  />
                 )}
               </div>
             </div>
@@ -2157,57 +1932,32 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label
-                          htmlFor="reporter-admin-name"
-                          className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary mb-1"
-                        >
-                          {language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)'}
-                        </label>
-                        <input
-                          id="reporter-admin-name"
-                  aria-invalid={Boolean(errors.adminName)}
-                  aria-describedby={errors.adminName ? 'reporter-admin-name-error' : undefined}
-                          type="text"
-                          value={formData.adminName || ''}
-                          onChange={(e) => onUpdateFormData({ adminName: e.target.value })}
-                          placeholder={language === 'bn' ? 'নাম' : 'Name'}
-                          className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                        />
-                        {errors.adminName && (
-                          <p id="reporter-admin-name-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminName}</p>
-                        )}
-                      </div>
+                      <TextField
+                        id="reporter-admin-name"
+                        type="text"
+                        label={language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)'}
+                        value={formData.adminName || ''}
+                        error={errors.adminName}
+                        onChange={(e) => {
+                          onUpdateFormData({ adminName: e.target.value });
+                          if (errors.adminName) setErrors((prev) => ({ ...prev, adminName: '' }));
+                        }}
+                        placeholder={language === 'bn' ? 'নাম' : 'Name'}
+                        autoComplete="name"
+                      />
 
-                      <div>
-                        <label
-                          htmlFor="reporter-admin-contact"
-                          className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary mb-1"
-                        >
-                          <span>{language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল' : 'Phone number or email'}</span>
-                          <span className="text-ui-validation-text ml-1" aria-hidden="true">*</span>
-                        </label>
-                        <input
-                          id="reporter-admin-contact"
-                  aria-invalid={Boolean(errors.adminContact)}
-                  aria-describedby={errors.adminContact ? 'reporter-admin-contact-error' : undefined}
-                  aria-required="true"
-                          type="text"
-                          value={formData.adminContact || ''}
-                          onChange={(e) => {
-                            onUpdateFormData({ adminContact: e.target.value });
-                            if (errors.adminContact)
-                              setErrors((prev) => ({ ...prev, adminContact: '' }));
-                          }}
-                          placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
-                          className={`w-full px-3 py-2 bg-ui-surface border rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px] ${
-                            errors.adminContact ? 'border-ui-error-border bg-ui-error-bg' : 'border-ui-stroke-subtle'
-                          }`}
-                        />
-                        {errors.adminContact && (
-                          <p id="reporter-admin-contact-error" role="alert" className="type-compact text-ui-error-text mt-1 font-[var(--font-weight-semibold)]">{errors.adminContact}</p>
-                        )}
-                      </div>
+                      <ContactField
+                        id="reporter-admin-contact"
+                        required
+                        label={language === 'bn' ? 'মোবাইল নম্বর বা ইমেইল' : 'Phone number or email'}
+                        value={formData.adminContact || ''}
+                        error={errors.adminContact}
+                        onChange={(e) => {
+                          onUpdateFormData({ adminContact: e.target.value });
+                          if (errors.adminContact) setErrors((prev) => ({ ...prev, adminContact: '' }));
+                        }}
+                        placeholder={language === 'bn' ? '০১৭xxxxxxxx বা user@example.com' : '017xxxxxxxx or email'}
+                      />
                     </div>
 
                     {/* Secondary Optional Toggle: Request Public Identity */}
@@ -2279,94 +2029,58 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             icon={<Users className="w-5 h-5" />}
           >
             <div className="space-y-3.5 pt-1 text-left">
-              {/* Row 1: Name / Known Identity (col 1) + Phone / Contact (col 2) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label
-                    htmlFor="operator-subject-name"
-                    className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                  >
-                    {language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
-                  </label>
-                  <input
-                    id="operator-subject-name"
-                    type="text"
-                    value={formData.reportedSubject || formData.organization || ''}
-                    onChange={(e) => handleOperatorNameChange(e.target.value)}
-                    placeholder={
-                      language === 'bn'
-                        ? 'স্টেশন, গ্যারেজ, ব্যক্তি বা প্রতিষ্ঠানের নাম জানা থাকলে লিখুন'
-                        : 'Enter the station, garage, person, or organization name if known'
-                    }
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="operator-contact"
-                    className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                  >
-                    {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
-                  </label>
-                  <input
-                    id="operator-contact"
-                    type="text"
-                    value={formData.publicProfileHandle || ''}
-                    onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
-                    placeholder={
-                      language === 'bn'
-                        ? 'ফোন নম্বর বা জানা যোগাযোগের তথ্য'
-                        : 'Phone number or known contact information'
-                    }
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                  />
-                </div>
-              </div>
-
-              {/* Row 2: Role / Responsibility */}
-              <div>
-                <label
-                  htmlFor="operator-role"
-                  className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                >
-                  {language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / responsibility'}
-                </label>
-                <input
-                  id="operator-role"
+                <TextField
+                  id="operator-subject-name"
                   type="text"
-                  value={formData.roleOrDesignation || ''}
-                  onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
+                  label={language === 'bn' ? 'নাম / পরিচিতি' : 'Name / known identity'}
+                  value={formData.reportedSubject || formData.organization || ''}
+                  onChange={(e) => handleOperatorNameChange(e.target.value)}
                   placeholder={
                     language === 'bn'
-                      ? 'যেমন: মালিক, ম্যানেজার, পরিচালনাকারী'
-                      : 'e.g. Owner, Manager, Operator'
+                      ? 'স্টেশন, গ্যারেজ, ব্যক্তি বা প্রতিষ্ঠানের নাম জানা থাকলে লিখুন'
+                      : 'Enter the station, garage, person, or organization name if known'
                   }
-                  className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
+                />
+                <TextField
+                  id="operator-contact"
+                  type="text"
+                  label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                  value={formData.publicProfileHandle || ''}
+                  onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
+                  placeholder={
+                    language === 'bn'
+                      ? 'ফোন নম্বর বা জানা যোগাযোগের তথ্য'
+                      : 'Phone number or known contact information'
+                  }
                 />
               </div>
 
-              {/* Row 3: Other Identifying Details */}
-              <div>
-                <label
-                  htmlFor="operator-identifying-desc"
-                  className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                >
-                  {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
-                </label>
-                <textarea
-                  id="operator-identifying-desc"
-                  rows={2}
-                  value={formData.identifyingDescription || ''}
-                  onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
-                  placeholder={
-                    language === 'bn'
-                      ? 'সাইনবোর্ড, চেহারা, অবস্থান সূত্র বা অন্য কোনো পরিচিত তথ্য'
-                      : 'Signage, appearance, location clues, or any other known identifying information'
-                  }
-                  className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed min-h-[44px]"
-                />
-              </div>
+              <TextField
+                id="operator-role"
+                type="text"
+                label={language === 'bn' ? 'ভূমিকা / দায়িত্ব' : 'Role / responsibility'}
+                value={formData.roleOrDesignation || ''}
+                onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
+                placeholder={
+                  language === 'bn'
+                    ? 'যেমন: মালিক, ম্যানেজার, পরিচালনাকারী'
+                    : 'e.g. Owner, Manager, Operator'
+                }
+              />
+
+              <TextAreaField
+                id="operator-identifying-desc"
+                rows={2}
+                label={language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                value={formData.identifyingDescription || ''}
+                onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
+                placeholder={
+                  language === 'bn'
+                    ? 'সাইনবোর্ড, চেহারা, অবস্থান সূত্র বা অন্য কোনো পরিচিত তথ্য'
+                    : 'Signage, appearance, location clues, or any other known identifying information'
+                }
+              />
             </div>
           </Accordion>
         )}
@@ -2403,123 +2117,84 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 {language === 'bn' ? subjectConfig.questionBn : subjectConfig.questionEn}
               </p>
               <div className="space-y-3 sm:space-y-3.5">
-                {/* Row 1: Name / Known Identity (col 1) + Phone / Contact (col 2) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label
-                      htmlFor="extortion-subject-name"
-                      className="block type-compact font-[var(--font-weight-bold)] text-ui-content-primary mb-1"
-                    >
-                      {language === 'bn'
+                  <TextField
+                    id="extortion-subject-name"
+                    type="text"
+                    label={
+                      language === 'bn'
                         ? subjectConfig.nameLabelBn || 'নাম / পরিচিতি'
-                        : subjectConfig.nameLabelEn || 'Name / known identity'}
-                    </label>
-                    <input
-                      id="extortion-subject-name"
-                      type="text"
-                      value={formData.reportedSubject || ''}
-                      onChange={(e) => onUpdateFormData({ reportedSubject: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? subjectConfig.namePlaceholderBn || 'নাম বা পরিচিতি জানা থাকলে লিখুন'
-                          : subjectConfig.namePlaceholderEn || 'Enter the name or known identity if available'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="extortion-contact"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
-                    </label>
-                    <input
-                      id="extortion-contact"
-                      type="text"
-                      value={formData.publicProfileHandle || ''}
-                      onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? 'ফোন নম্বর, অনলাইন পরিচিতি বা অন্য যোগাযোগের তথ্য'
-                          : 'Phone number, online identity, or other contact information'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-                </div>
-
-                {/* Row 2: Role / Designation (col 1) + Group / Organization / Association (col 2) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label
-                      htmlFor="extortion-role"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn'
-                        ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
-                        : subjectConfig.roleLabelEn || 'Role / designation'}
-                    </label>
-                    <input
-                      id="extortion-role"
-                      type="text"
-                      value={formData.roleOrDesignation || ''}
-                      onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? subjectConfig.rolePlaceholderBn || 'ভূমিকা বা পদবি জানা থাকলে লিখুন'
-                          : subjectConfig.rolePlaceholderEn || 'Enter the role or designation if known'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="extortion-org"
-                      className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                    >
-                      {language === 'bn'
-                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
-                        : subjectConfig.organizationLabelEn || 'Group / organization'}
-                    </label>
-                    <input
-                      id="extortion-org"
-                      type="text"
-                      value={formData.organization || ''}
-                      onChange={(e) => onUpdateFormData({ organization: e.target.value })}
-                      placeholder={
-                        language === 'bn'
-                          ? subjectConfig.organizationPlaceholderBn || 'সংশ্লিষ্ট দল, প্রতিষ্ঠান বা সংগঠনের নাম জানা থাকলে লিখুন'
-                          : subjectConfig.organizationPlaceholderEn || 'Enter the related group or organization if known'
-                      }
-                      className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent min-h-[44px]"
-                    />
-                  </div>
-                </div>
-
-                {/* Row 3: Other Identifying Details — full width (textarea) */}
-                <div>
-                  <label
-                    htmlFor="extortion-identifying-desc"
-                    className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1"
-                  >
-                    {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
-                  </label>
-                  <textarea
-                    id="extortion-identifying-desc"
-                    rows={2}
-                    value={formData.identifyingDescription || ''}
-                    onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
+                        : subjectConfig.nameLabelEn || 'Name / known identity'
+                    }
+                    value={formData.reportedSubject || ''}
+                    onChange={(e) => onUpdateFormData({ reportedSubject: e.target.value })}
                     placeholder={
                       language === 'bn'
-                        ? subjectConfig.identifyingPlaceholderBn || 'চেহারা, যানবাহন, অবস্থান সূত্র বা অন্য কোনো শনাক্তকারী তথ্য'
-                        : subjectConfig.identifyingPlaceholderEn || 'Appearance, vehicle, location clues, or other identifying details'
+                        ? subjectConfig.namePlaceholderBn || 'নাম বা পরিচিতি জানা থাকলে লিখুন'
+                        : subjectConfig.namePlaceholderEn || 'Enter the name or known identity if available'
                     }
-                    className="w-full px-3 py-2 bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus focus:border-ui-accent leading-relaxed min-h-[44px]"
+                  />
+                  <TextField
+                    id="extortion-contact"
+                    type="text"
+                    label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                    value={formData.publicProfileHandle || ''}
+                    onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? 'ফোন নম্বর, অনলাইন পরিচিতি বা অন্য যোগাযোগের তথ্য'
+                        : 'Phone number, online identity, or other contact information'
+                    }
                   />
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <TextField
+                    id="extortion-role"
+                    type="text"
+                    label={
+                      language === 'bn'
+                        ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
+                        : subjectConfig.roleLabelEn || 'Role / designation'
+                    }
+                    value={formData.roleOrDesignation || ''}
+                    onChange={(e) => onUpdateFormData({ roleOrDesignation: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? subjectConfig.rolePlaceholderBn || 'ভূমিকা বা পদবি জানা থাকলে লিখুন'
+                        : subjectConfig.rolePlaceholderEn || 'Enter the role or designation if known'
+                    }
+                  />
+                  <TextField
+                    id="extortion-org"
+                    type="text"
+                    label={
+                      language === 'bn'
+                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
+                        : subjectConfig.organizationLabelEn || 'Group / organization'
+                    }
+                    value={formData.organization || ''}
+                    onChange={(e) => onUpdateFormData({ organization: e.target.value })}
+                    placeholder={
+                      language === 'bn'
+                        ? subjectConfig.organizationPlaceholderBn || 'সংশ্লিষ্ট দল, প্রতিষ্ঠান বা সংগঠনের নাম জানা থাকলে লিখুন'
+                        : subjectConfig.organizationPlaceholderEn || 'Enter the related group or organization if known'
+                    }
+                  />
+                </div>
+
+                <TextAreaField
+                  id="extortion-identifying-desc"
+                  rows={2}
+                  label={language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                  value={formData.identifyingDescription || ''}
+                  onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
+                  placeholder={
+                    language === 'bn'
+                      ? subjectConfig.identifyingPlaceholderBn || 'চেহারা, যানবাহন, অবস্থান সূত্র বা অন্য কোনো শনাক্তকারী তথ্য'
+                      : subjectConfig.identifyingPlaceholderEn || 'Appearance, vehicle, location clues, or other identifying details'
+                  }
+                />
               </div>
 
               {/* Additional Mentioned Parties */}
@@ -2548,92 +2223,76 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           </button>
                         </div>
 
-                        {/* Row 1: Name + Phone */}
+                        {/* Unified additional-party fields */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn'
-                        ? subjectConfig.nameLabelBn || 'নাম / পরিচিতি'
-                        : subjectConfig.nameLabelEn || 'Name / known identity'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.name || ''}
-                              onChange={(e) => handleUpdateAdditionalParty(party.id, { name: e.target.value })}
-                              placeholder={language === 'bn' ? 'নাম বা পরিচিত নাম' : 'Name or known identity'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.phoneOrContact || party.publicProfileHandle || ''}
-                              onChange={(e) =>
-                                handleUpdateAdditionalParty(party.id, {
-                                  phoneOrContact: e.target.value,
-                                  publicProfileHandle: e.target.value,
-                                })
-                              }
-                              placeholder={language === 'bn' ? 'ফোন নম্বর বা যোগাযোগের তথ্য' : 'Phone number or contact info'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Row 2: Role + Group/Organization */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn'
-                        ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
-                        : subjectConfig.roleLabelEn || 'Role / designation'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.roleOrDesignation || ''}
-                              onChange={(e) =>
-                                handleUpdateAdditionalParty(party.id, { roleOrDesignation: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'ভূমিকা বা পদবি' : 'Role or designation'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                              {language === 'bn'
-                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
-                        : subjectConfig.organizationLabelEn || 'Group / organization'}
-                            </label>
-                            <input
-                              type="text"
-                              value={party.organization || ''}
-                              onChange={(e) =>
-                                handleUpdateAdditionalParty(party.id, { organization: e.target.value })
-                              }
-                              placeholder={language === 'bn' ? 'দল, সমিতি বা প্রতিষ্ঠানের নাম' : 'Group, association, or organization'}
-                              className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Row 3: Other Identifying Details */}
-                        <div>
-                          <label className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary mb-1">
-                            {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
-                          </label>
-                          <textarea
-                            rows={2}
-                            value={party.identifyingDescription || ''}
-                            onChange={(e) =>
-                              handleUpdateAdditionalParty(party.id, { identifyingDescription: e.target.value })
+                          <TextField
+                            id={`party-${party.id}-name`}
+                            type="text"
+                            label={
+                              language === 'bn'
+                                ? subjectConfig.nameLabelBn || 'নাম / পরিচিতি'
+                                : subjectConfig.nameLabelEn || 'Name / known identity'
                             }
-                            placeholder={language === 'bn' ? 'চেহারা, যানবাহন বা অন্য শনাক্তকারী তথ্য' : 'Appearance, vehicle, or identifying details'}
-                            className="w-full px-2.5 py-1.5 bg-ui-surface-subtle border border-ui-stroke-subtle rounded-[var(--radius-control)] type-compact text-ui-content-primary focus:outline-none focus:ring-2 focus:ring-ui-focus min-h-[40px] leading-relaxed"
+                            value={party.name || ''}
+                            onChange={(e) => handleUpdateAdditionalParty(party.id, { name: e.target.value })}
+                            placeholder={language === 'bn' ? 'নাম বা পরিচিত নাম' : 'Name or known identity'}
+                          />
+                          <TextField
+                            id={`party-${party.id}-contact`}
+                            type="text"
+                            label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                            value={party.phoneOrContact || party.publicProfileHandle || ''}
+                            onChange={(e) =>
+                              handleUpdateAdditionalParty(party.id, {
+                                phoneOrContact: e.target.value,
+                                publicProfileHandle: e.target.value,
+                              })
+                            }
+                            placeholder={language === 'bn' ? 'ফোন নম্বর বা যোগাযোগের তথ্য' : 'Phone number or contact info'}
                           />
                         </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <TextField
+                            id={`party-${party.id}-role`}
+                            type="text"
+                            label={
+                              language === 'bn'
+                                ? subjectConfig.roleLabelBn || 'ভূমিকা / পদবি'
+                                : subjectConfig.roleLabelEn || 'Role / designation'
+                            }
+                            value={party.roleOrDesignation || ''}
+                            onChange={(e) =>
+                              handleUpdateAdditionalParty(party.id, { roleOrDesignation: e.target.value })
+                            }
+                            placeholder={language === 'bn' ? 'ভূমিকা বা পদবি' : 'Role or designation'}
+                          />
+                          <TextField
+                            id={`party-${party.id}-organization`}
+                            type="text"
+                            label={
+                              language === 'bn'
+                                ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
+                                : subjectConfig.organizationLabelEn || 'Group / organization'
+                            }
+                            value={party.organization || ''}
+                            onChange={(e) =>
+                              handleUpdateAdditionalParty(party.id, { organization: e.target.value })
+                            }
+                            placeholder={language === 'bn' ? 'দল, সমিতি বা প্রতিষ্ঠানের নাম' : 'Group, association, or organization'}
+                          />
+                        </div>
+
+                        <TextAreaField
+                          id={`party-${party.id}-identifying`}
+                          rows={2}
+                          label={language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                          value={party.identifyingDescription || ''}
+                          onChange={(e) =>
+                            handleUpdateAdditionalParty(party.id, { identifyingDescription: e.target.value })
+                          }
+                          placeholder={language === 'bn' ? 'চেহারা, যানবাহন বা অন্য শনাক্তকারী তথ্য' : 'Appearance, vehicle, or identifying details'}
+                        />
                       </div>
                     ))}
                   </div>
