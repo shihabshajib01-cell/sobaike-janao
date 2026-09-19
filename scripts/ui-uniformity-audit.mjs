@@ -211,6 +211,37 @@ requireNotContains(reportCard, 'tabIndex={0}', 'report card container must not a
 requireNotContains(reportCard, 'onKeyDown={handleCardKeyDown}', 'report card must rely on native link keyboard activation');
 requireContains(reportCard, 'INTERACTIVE_SELECTOR', 'pointer-wide card activation must protect nested interactive actions');
 
+requireContains(
+  'src/components/layout/BottomNav.tsx',
+  'secondaryRouteItems',
+  'compact mobile context must derive from the current route instead of falling back to Home'
+);
+requireContains(
+  'src/components/layout/BottomNav.tsx',
+  "nameEn: 'Search'",
+  'Search route must expose its own compact navigation context'
+);
+requireContains(
+  'src/components/layout/MobileHeader.tsx',
+  "import { AppIcon } from '../ui/AppIcon';",
+  'mobile adaptive navigation icons must use the shared AppIcon registry'
+);
+requireNotContains(
+  'src/components/layout/MobileHeader.tsx',
+  'shadow-[var(--elevation-sm)]',
+  'mobile adaptive navigation must use the shared control elevation utility'
+);
+requireContains(
+  'src/components/layout/MobileHeader.tsx',
+  'ui-elevation-control',
+  'mobile adaptive navigation must use shared control elevation'
+);
+requireContains(
+  'src/components/feed/MobileCategoryFilterPortal.tsx',
+  '<AppIcon name="filter"',
+  'mobile category filter must use the shared icon registry'
+);
+
 const consolidatedPublicUiFiles = [
   'src/pages/ReportPage.tsx',
   'src/components/layout/Header.tsx',
