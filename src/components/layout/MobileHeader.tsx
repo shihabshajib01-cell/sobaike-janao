@@ -186,12 +186,17 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   };
 
   useEffect(() => {
-    if (fullHeaderRef.current) {
-      fullHeaderRef.current.inert = isCompact;
-    }
-    if (compactHeaderRef.current) {
-      compactHeaderRef.current.inert = !isCompact;
-    }
+    const syncInertAttribute = (element: HTMLElement | null, shouldBeInert: boolean) => {
+      if (!element) return;
+      if (shouldBeInert) {
+        element.setAttribute('inert', '');
+      } else {
+        element.removeAttribute('inert');
+      }
+    };
+
+    syncInertAttribute(fullHeaderRef.current, isCompact);
+    syncInertAttribute(compactHeaderRef.current, !isCompact);
   }, [isCompact]);
 
   const registerSuccessfulShare = () => {
@@ -334,7 +339,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           ref={fullHeaderRef}
           id="mobile-header"
           aria-hidden={isCompact || undefined}
-          inert={isCompact ? true : undefined}
           className={`absolute inset-x-0 top-0 w-full bg-ui-surface border-b border-ui-divider pt-safe transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
             isCompact
               ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none'
@@ -385,7 +389,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         id="mobile-compact-header"
         aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
         aria-hidden={!isCompact || undefined}
-        inert={!isCompact ? true : undefined}
         className={`md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4 transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
             ? 'translate-y-0 opacity-100 delay-[60ms]'
