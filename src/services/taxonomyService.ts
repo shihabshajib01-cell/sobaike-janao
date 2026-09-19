@@ -195,14 +195,11 @@ export const TaxonomyService = {
           const legacy = SECTIONS[key];
           const dynamicTheme = buildDynamicTheme(row.theme_key);
           const hasManagedTheme = isManagedThemePreset(row.theme_key);
+          // Built-in illustrated categories are brand-locked to the palette derived
+          // from their banner artwork. Admin theme presets may style truly dynamic
+          // categories, but must not silently break a canonical banner/palette pair.
           const fallback = legacy
-            ? hasManagedTheme
-              ? {
-                  ...legacy,
-                  ...dynamicTheme,
-                  colors: dynamicTheme.colors,
-                }
-              : legacy
+            ? legacy
             : {
                 ...SECTIONS.public_safety,
                 ...dynamicTheme,
@@ -233,7 +230,7 @@ export const TaxonomyService = {
 
           // Existing built-in categories must keep their CSS light/dark tokens.
           // Only truly dynamic or explicitly managed themes should write runtime overrides.
-          if (legacy && !hasManagedTheme) {
+          if (legacy) {
             clearRuntimeSectionCssVariables(segment.id);
           } else {
             applyRuntimeSectionCssVariables(segment);
