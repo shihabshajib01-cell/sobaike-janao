@@ -77,7 +77,7 @@ for (const needle of [
   requireText(ipEdge, needle, 'IP fallback edge function');
 }
 for (const needle of [
-  "choice === 'granted' || choice === 'denied'",
+  "choice === 'granted' || choice === 'denied' || choice === 'not_now'",
   "browseFallback: 'ip'",
   "if (perm === 'denied')",
   "refreshBrowseLocation();",
@@ -146,5 +146,5 @@ if (errors.length) {
 }
 
 console.log(
-  'Location contract audit passed: device-only reporting, fresh submission fallback, post-attempt IP fallback (including device denial), first-visit privacy, bilingual rendering, canonical taxonomy, and SQL hardening are protected.'
+  'Location contract audit passed: device-only reporting, fresh submission fallback, post-choice IP browsing fallback (including Not now and device denial), first-visit privacy, bilingual rendering, canonical taxonomy, and SQL hardening are protected.'
 );
