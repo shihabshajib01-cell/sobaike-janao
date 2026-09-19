@@ -80,6 +80,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
   const primary = config?.primaryColor || 'var(--md-primary)';
   const background = config?.bgColor || 'var(--md-surface-subtle)';
   const text = config?.textColor || 'var(--md-on-surface)';
+  const iconColor = config?.primaryColor || text;
   const border = config?.borderColor || 'var(--md-outline)';
 
   if (variant === 'marker') {
@@ -105,7 +106,7 @@ export const FeatureIcon: React.FC<FeatureIconProps> = ({
         className={`inline-flex items-center justify-center shrink-0 border shadow-[var(--elevation-2xs)] transition-colors ${CONTAINER_SIZE_CLASSES[size]} ${className}`}
         style={{
           backgroundColor: background,
-          color: text,
+          color: iconColor,
           borderColor: border,
         }}
         role={isAccessible ? 'img' : undefined}
