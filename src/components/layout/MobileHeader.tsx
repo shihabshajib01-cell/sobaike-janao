@@ -256,7 +256,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               size="md"
               onClick={() => goBackWithFallback(() => navigateTo('/'))}
               aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
-              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md' : ''} transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
             />
 
@@ -283,7 +283,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                   ? 'প্রতিবেদন শেয়ার করুন'
                   : 'Share report'
               }
-              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md' : ''} transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={
                 isShareConfirmed ? (
                   <Check className="h-5 w-5 text-ui-success-text" aria-hidden="true" />
@@ -323,7 +323,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               size="md"
               onClick={() => navigateTo('/issues')}
               aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
-              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md' : ''} transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
             />
 
@@ -344,13 +344,13 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 onClick={() => setIsHarassmentFilterOpen(true)}
                 aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
                 aria-haspopup="dialog"
-                className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md' : ''} transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+                className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
                 icon={<Filter className="h-5 w-5" aria-hidden="true" />}
               />
             ) : (
               <div
                 id="mobile-category-location-slot"
-                className={`shrink-0 ${isCompact ? 'pointer-events-auto drop-shadow-sm' : ''}`}
+                className={`shrink-0 ${isCompact ? 'pointer-events-auto ui-elevation-control' : ''}`}
                 aria-label={language === 'bn' ? 'ফিল্টার' : 'Filters'}
               />
             )}
@@ -440,7 +440,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             onClick={() => setIsTabletMenuOpen(true)}
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
               isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
             }`}
             icon={<Menu className="w-5 h-5" aria-hidden="true" />}
