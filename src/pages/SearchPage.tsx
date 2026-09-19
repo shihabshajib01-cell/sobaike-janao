@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Search, MapPin, UserX, ArrowRight, AlertCircle } from 'lucide-react';
+import { Search, MapPin, UserX, ArrowRight, AlertCircle, Sparkles, MapPinned, Layers3 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
@@ -195,7 +195,7 @@ export const SearchPage: React.FC = () => {
         }
       />
 
-      <section className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4 space-y-3" aria-label={language === 'bn' ? 'প্রতিবেদন ফিল্টার' : 'Report filters'}>
+      <section className="space-y-3" aria-label={language === 'bn' ? 'প্রতিবেদন ফিল্টার' : 'Report filters'}>
         <div className="max-w-sm">
           <Select
             id="search-report-category"
@@ -206,7 +206,9 @@ export const SearchPage: React.FC = () => {
           />
         </div>
         {selectedReportSegment === 'harassment' && (
-          <HarassmentClassificationFilters language={language} value={harassmentFilters} onChange={setHarassmentFilters} />
+          <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3.5 sm:p-4">
+            <HarassmentClassificationFilters language={language} value={harassmentFilters} onChange={setHarassmentFilters} />
+          </div>
         )}
       </section>
 
@@ -255,9 +257,68 @@ export const SearchPage: React.FC = () => {
       )}
 
       {!isLoading && !fetchError && !hasSearchIntent && (
-        <div className="py-14 text-center">
-          <Search className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
-        </div>
+        <section className="pt-2 space-y-4" aria-labelledby="search-discovery-title">
+          <div className="space-y-1">
+            <h2 id="search-discovery-title" className="type-h3 text-ui-content-primary">
+              {language === 'bn' ? 'কী খুঁজছেন?' : 'What are you looking for?'}
+            </h2>
+            <p className="type-meta text-ui-content-muted">
+              {language === 'bn'
+                ? 'প্রতিবেদন, এলাকা বা বিষয় দিয়ে দ্রুত খোঁজা শুরু করুন।'
+                : 'Start with reports, places, or topics.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <button
+              type="button"
+              onClick={() => document.getElementById('search-page-input')?.focus()}
+              className="min-h-[64px] flex items-center gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-4 text-left transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-ui-surface-subtle text-ui-content-secondary">
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <span className="type-body font-[var(--font-weight-semibold)] text-ui-content-primary">
+                {language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Find reports'}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => document.getElementById('search-page-input')?.focus()}
+              className="min-h-[64px] flex items-center gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-4 text-left transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-ui-surface-subtle text-ui-content-secondary">
+                <MapPinned className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <span className="type-body font-[var(--font-weight-semibold)] text-ui-content-primary">
+                {language === 'bn' ? 'এলাকা খুঁজুন' : 'Find a place'}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => document.getElementById('search-report-category')?.focus()}
+              className="min-h-[64px] flex items-center gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface px-4 text-left transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-ui-surface-subtle text-ui-content-secondary">
+                <Layers3 className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <span className="type-body font-[var(--font-weight-semibold)] text-ui-content-primary">
+                {language === 'bn' ? 'বিষয় বেছে নিন' : 'Choose a topic'}
+              </span>
+            </button>
+          </div>
+
+          <div className="flex items-start gap-2.5 rounded-[var(--radius-control)] bg-ui-surface-subtle px-4 py-3">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-ui-content-secondary" aria-hidden="true" />
+            <p className="type-meta text-ui-content-muted">
+              {language === 'bn'
+                ? 'নাম, জায়গা বা ঘটনার কয়েকটি শব্দ লিখলেও খোঁজা যাবে।'
+                : 'You can also search with a name, place, or a few words from an incident.'}
+            </p>
+          </div>
+        </section>
       )}
 
       {!isLoading && !fetchError && hasSearchIntent && (
@@ -353,12 +414,12 @@ export const SearchPage: React.FC = () => {
             <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-10 text-center space-y-3 shadow-[var(--elevation-2xs)]">
               <AlertCircle className="w-8 h-8 text-ui-content-muted mx-auto" aria-hidden="true" />
               <h3 className="type-h4 text-ui-content-primary">
-                {language === 'bn' ? 'কোনো ফল পাওয়া যায়নি।' : 'No results found.'}
+                {language === 'bn' ? 'কোনো প্রতিবেদন পাওয়া যায়নি' : 'No reports found'}
               </h3>
               <p className="type-meta text-ui-content-muted max-w-sm mx-auto">
                 {language === 'bn'
-                  ? `"${query}" এর সাথে মিলে এমন কোনো ফলাফল পাওয়া যায়নি।`
-                  : `No reports, places, or entities match "${query}".`}
+                  ? 'অন্য শব্দ লিখে বা প্রতিবেদনের ধরন বদলে আবার চেষ্টা করুন।'
+                  : 'Try another search term or change the report category.'}
               </p>
             </div>
           )}
