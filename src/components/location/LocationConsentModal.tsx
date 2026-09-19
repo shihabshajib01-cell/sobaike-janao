@@ -20,7 +20,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const { retryBrowseLocation } = useApp();
+  const { retryBrowseLocation, refreshBrowseLocation } = useApp();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -107,9 +107,13 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
     try {
       if (!isReportMode) {
         await VisitorSessionService.handleNotNow();
+        // "Not now" skips precise device/GPS location, but still establishes
+        // coarse IP-based browse location so nearby content can remain useful.
+        await refreshBrowseLocation();
       }
     } catch {
-      // Handled internally
+      // Best-effort browse fallback: the explicit choice remains persisted even
+      // if approximate IP location is temporarily unavailable.
     } finally {
       onClose();
     }
