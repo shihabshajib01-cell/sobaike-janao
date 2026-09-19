@@ -4,6 +4,7 @@ import { useApp, RoutePath } from '../../context/AppContext';
 import { CATEGORY_ORDER } from '../../data/categoryOrder';
 import { CategoryPopularityService } from '../../services/categoryPopularityService';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { TextSizeSelector } from '../ui/TextSizeSelector';
 import { LanguageSelector } from '../ui/LanguageSelector';
@@ -21,7 +22,7 @@ const SECTION_ICON_NAMES: Record<SectionKey, AppIconName> = {
 };
 
 export const DesktopLeftRail: React.FC = () => {
-  const { currentRoute, language } = useApp();
+  const { currentRoute, language, openReportComposer } = useApp();
   const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
   const localizePath = (path: RoutePath) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -107,6 +108,20 @@ export const DesktopLeftRail: React.FC = () => {
             className="transition-colors ui-radius-control w-full [&_img]:scale-[1.2] [&_img]:origin-left"
           />
         </Link>
+
+        <div>
+          <Button
+            id="rail-primary-report-cta"
+            variant="primary"
+            size="md"
+            fullWidth
+            leftIcon={<AppIcon name="plus-circle" size="lg" className="text-ui-content-inverse" />}
+            onClick={() => openReportComposer()}
+            className="global-product-action-scope font-[var(--font-weight-semibold)] py-2.5 min-h-[44px]"
+          >
+            {language === 'bn' ? 'ঘটনা জানান' : 'Report incident'}
+          </Button>
+        </div>
 
         <nav className="space-y-1" aria-label={language === 'bn' ? 'প্রধান বিভাগ' : 'Main sections'}>
           {navItems.map((item) => {
