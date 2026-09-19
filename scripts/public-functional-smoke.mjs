@@ -78,12 +78,41 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
   await expectVisible(page.locator('#location-consent-secondary-btn'), 'Not now action missing');
   await page.locator('#location-consent-secondary-btn').click();
   await locationModal.waitFor({ state: 'hidden', timeout: 10000 });
-  await expectVisible(page.locator('#location-reminder-bar'), 'location reminder did not remain available after Not now');
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('location reminder should disappear after Not now');
+  }
   const stored = await page.evaluate(() => ({
     notice: localStorage.getItem('sobaike_responsibility_notice_v1'),
     location: localStorage.getItem('sobaike_location_choice_v1'),
   }));
   if (stored.notice !== 'accepted' || stored.location !== 'not_now') throw new Error(`unexpected stored state ${JSON.stringify(stored)}`);
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(350);
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('location reminder returned after refresh despite stored Not now choice');
+  }
+  await context.close();
+});
+
+await check('Returning denied-location visitor is not nagged after refresh', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.setItem('sobaike_location_choice_v1', 'denied');
+  });
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-denied-returning');
+  await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(500);
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('location reminder should stay hidden for a returning visitor who already denied device location');
+  }
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(500);
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('location reminder reappeared after refresh for stored denied choice');
+  }
   await context.close();
 });
 
