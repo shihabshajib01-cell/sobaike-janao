@@ -176,12 +176,6 @@ export const SearchPage: React.FC = () => {
 
   return (
     <PublicPageContainer id="search-page-container">
-      <div className="space-y-1">
-        <h1 className="type-h1 text-ui-content-primary">
-          {language === 'bn' ? 'অনুসন্ধান' : 'Search'}
-        </h1>
-      </div>
-
       <SearchInput
         id="search-page-input"
         value={query}
