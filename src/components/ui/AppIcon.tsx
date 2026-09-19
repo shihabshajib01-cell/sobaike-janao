@@ -39,12 +39,14 @@ import {
   PlusCircle,
   Shield,
   CheckCircle,
+  Menu,
   LucideIcon,
 } from 'lucide-react';
 import { EvStationIcon } from '../branding/EvStationIcon';
 
 export type AppIconName =
   | 'home'
+  | 'menu'
   | 'globe'
   | 'plus-circle'
   | 'shield'
@@ -98,6 +100,7 @@ export interface AppIconProps {
 
 const ICON_REGISTRY: Record<AppIconName, LucideIcon | React.ComponentType<any>> = {
   home: Home,
+  menu: Menu,
   globe: Globe,
   'plus-circle': PlusCircle,
   shield: Shield,
