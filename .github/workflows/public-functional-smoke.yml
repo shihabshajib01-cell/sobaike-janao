@@ -9,12 +9,12 @@ on:
 permissions:
   contents: read
 
-# Multiple Deploy completions can target the same production revision. Keep only
-# one heavyweight browser suite active so duplicate Playwright runs do not
-# compete for browser/network/Supabase resources and create false regressions.
+# Only the newest deployed revision needs the heavyweight live browser suite.
+# Keep one suite active globally: a newer deployment cancels stale validation
+# instead of making multiple Playwright runs hammer the same live services.
 concurrency:
-  group: public-functional-smoke-${{ github.event.workflow_run.head_sha || github.sha }}
-  cancel-in-progress: false
+  group: public-functional-smoke
+  cancel-in-progress: true
 
 jobs:
   browser-smoke:
