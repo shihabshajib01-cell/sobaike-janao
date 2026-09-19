@@ -19,7 +19,6 @@ import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
 import { useApp } from '../context/AppContext';
-import { VisitorSessionService } from '../services/visitorSessionService';
 import { scheduleIdleTask } from '../utils/scheduleIdleTask';
 
 type FeedFilterType = 'all' | 'latest' | 'popular';
@@ -84,12 +83,13 @@ export const HomePage: React.FC = () => {
   const [pendingNewestPublishedAt, setPendingNewestPublishedAt] = useState<string | null>(null);
   const [isRefreshingNewReports, setIsRefreshingNewReports] = useState<boolean>(false);
 
+  // AppContext owns source-aware freshness for both device and IP
+  // locations. Home only consumes the currently valid global browse state.
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
     browseLocation !== null &&
     typeof browseLocation.latitude === 'number' &&
-    typeof browseLocation.longitude === 'number' &&
-    VisitorSessionService.isLocationFresh(browseLocation);
+    typeof browseLocation.longitude === 'number';
 
   const visitorLat = hasValidBrowseLocation ? browseLocation.latitude : null;
   const visitorLng = hasValidBrowseLocation ? browseLocation.longitude : null;
