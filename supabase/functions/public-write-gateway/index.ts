@@ -30,10 +30,11 @@ const json = (req: Request, body: unknown, status = 200) =>
   });
 
 const firstForwardedIp = (req: Request): string | null => {
+  // Trust only managed edge headers. Never fall back to client-controlled
+  // X-Forwarded-For for abuse/rate-limit identity.
   const candidates = [
     req.headers.get("cf-connecting-ip"),
     req.headers.get("x-real-ip"),
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
   ];
   for (const candidate of candidates) {
     const value = String(candidate || "").trim();
@@ -90,6 +91,10 @@ type PublicWriteBody =
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
+    const origin = req.headers.get("Origin") || "";
+    if (origin && !ALLOWED_ORIGINS.has(origin)) {
+      return new Response("Forbidden", { status: 403, headers: corsHeadersFor(req) });
+    }
     return new Response("ok", { headers: corsHeadersFor(req) });
   }
   if (req.method !== "POST") {
