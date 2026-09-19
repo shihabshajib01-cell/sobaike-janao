@@ -58,7 +58,7 @@ export const FormField: React.FC<FormFieldProps> = ({
         </div>
       ) : null}
       {error ? (
-        <p id={errorId} role="alert" className="type-helper text-role-validation font-[var(--font-weight-medium)]">
+        <p id={errorId} role="alert" className="type-helper text-ui-error-text font-[var(--font-weight-medium)]">
           {error}
         </p>
       ) : null}
