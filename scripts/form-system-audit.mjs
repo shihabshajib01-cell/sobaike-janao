@@ -118,6 +118,22 @@ requireContains(
   '<FormField',
   'SearchableSelect must use the shared field shell'
 );
+
+requireContains(
+  'src/components/ui/SearchableSelect.tsx',
+  'border-role-control-outline hover:border-role-control-outline-hover',
+  'SearchableSelect must use the shared form-control outline role'
+);
+requireContains(
+  'src/components/ui/RadioGroup.tsx',
+  'border-role-control-outline',
+  'RadioGroup options must use the shared form-control outline role'
+);
+requireContains(
+  'src/components/ui/Checkbox.tsx',
+  'border-role-control-outline',
+  'Checkboxes must use the shared form-control outline role'
+);
 requireContains(
   'src/components/ui/SearchableSelect.tsx',
   "'pr-16'",
