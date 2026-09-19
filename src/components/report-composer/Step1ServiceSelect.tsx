@@ -125,18 +125,26 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                 className="w-11 h-11 md:w-12 md:h-12 shrink-0 ui-radius-control flex items-center justify-center transition-colors ui-border-default ui-elevation-control"
                 style={{
                   backgroundColor: getSectionStyles(srv.key).background,
-                  color: getSectionStyles(srv.key).text,
-                  borderColor: getSectionStyles(srv.key).border,
+                  color: getSectionStyles(srv.key).primary,
+                  borderColor: isSelected
+                    ? getSectionStyles(srv.key).primary
+                    : getSectionStyles(srv.key).border,
                 }}
               >
                 <CategoryIcon section={srv.key} size="md" />
               </div>
 
               <div className="min-w-0 flex-1">
-                <h4 className="type-h4 text-ui-content-primary">
+                <h4
+                  className="type-h4 text-ui-content-primary"
+                  style={{ color: isSelected ? getSectionStyles(srv.key).text : undefined }}
+                >
                   {language === 'bn' ? srv.titleBn : srv.titleEn}
                 </h4>
-                <p className="type-helper text-ui-content-secondary mt-0.5 truncate">
+                <p
+                  className="type-helper text-ui-content-secondary mt-0.5 truncate"
+                  style={{ color: isSelected ? getSectionStyles(srv.key).text : undefined }}
+                >
                   {language === 'bn' ? srv.descBn : srv.descEn}
                 </p>
               </div>
