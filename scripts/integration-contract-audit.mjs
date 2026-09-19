@@ -140,6 +140,7 @@ const functionalSmoke = read('.github/workflows/public-functional-smoke.yml');
 for (const needle of [
   'Checkout exact deployed commit',
   "ref: ${{ github.event.workflow_run.head_sha || github.sha }}",
+  'branches: [main]',
   'group: public-functional-smoke-production',
   'cancel-in-progress: true',
 ]) {
@@ -159,6 +160,7 @@ for (const needle of [
 }
 
 for (const needle of [
+  'branches: [main]',
   'group: production-smoke-live',
   'cancel-in-progress: true',
   'get_public_home_feed_page',
