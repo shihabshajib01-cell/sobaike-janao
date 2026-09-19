@@ -43,6 +43,42 @@ async function expectVisible(locator, message) {
   if (!(await locator.isVisible())) throw new Error(message);
 }
 
+async function scrollDownInSteps(page, target) {
+  const points = [0.34, 0.68, 1]
+    .map((ratio) => Math.round(target * ratio))
+    .filter((value, index, values) => value > 0 && values.indexOf(value) === index);
+
+  for (const top of points) {
+    await page.evaluate((nextTop) => {
+      window.scrollTo({ top: nextTop, behavior: 'instant' });
+    }, top);
+    await page.waitForTimeout(120);
+  }
+}
+
+async function waitForCompactState(page, selector, compact, label) {
+  try {
+    await page.waitForFunction(
+      ({ targetSelector, expected }) =>
+        document.querySelector(targetSelector)?.getAttribute('data-compact') === expected,
+      { targetSelector: selector, expected: compact ? 'true' : 'false' },
+      { timeout: 5000 }
+    );
+  } catch {
+    const state = await page.evaluate((targetSelector) => {
+      const element = document.querySelector(targetSelector);
+      return {
+        compact: element?.getAttribute('data-compact') ?? null,
+        scrollY: window.scrollY,
+        maxScroll: Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
+      };
+    }, selector);
+    throw new Error(
+      label + '; compact=' + state.compact + ', scrollY=' + Math.round(state.scrollY) + ', maxScroll=' + Math.round(state.maxScroll)
+    );
+  }
+}
+
 async function check(name, fn) {
   try {
     await fn();
@@ -198,32 +234,31 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     return Math.min(700, maxScroll);
   });
-  if (detailScrollTarget < 160) {
-    throw new Error(`Report detail is not tall enough to exercise adaptive chrome: ${detailScrollTarget}px`);
-  }
-  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), detailScrollTarget);
-  await page.waitForFunction(
-    () => document.querySelector('#mobile-report-detail-header')?.getAttribute('data-compact') === 'true',
-    null,
-    { timeout: 5000 }
-  );
-  await page.waitForTimeout(650);
-  await expectVisible(
-    page.locator('#mobile-report-detail-back-btn'),
-    'Report detail compact back button missing'
-  );
-  await expectVisible(
-    page.locator('#mobile-report-detail-share-btn'),
-    'Report detail compact share button missing'
-  );
+  // Compact mode starts after 96px. Short content that cannot physically cross
+  // that threshold should remain expanded instead of failing an unrelated route check.
+  if (detailScrollTarget > 96) {
+    await scrollDownInSteps(page, detailScrollTarget);
+    await waitForCompactState(
+      page,
+      '#mobile-report-detail-header',
+      true,
+      'Report detail header did not enter compact mode'
+    );
+    await page.waitForTimeout(650);
+    await expectVisible(page.locator('#mobile-report-detail-back-btn'), 'Report detail compact back button missing');
+    await expectVisible(page.locator('#mobile-report-detail-share-btn'), 'Report detail compact share button missing');
 
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-  await page.waitForFunction(
-    () => document.querySelector('#mobile-report-detail-header')?.getAttribute('data-compact') === 'false',
-    null,
-    { timeout: 5000 }
-  );
-  await page.waitForTimeout(650);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await waitForCompactState(
+      page,
+      '#mobile-report-detail-header',
+      false,
+      'Report detail header did not restore at the top'
+    );
+    await page.waitForTimeout(650);
+  } else if ((await page.locator('#mobile-report-detail-header').getAttribute('data-compact')) !== 'false') {
+    throw new Error('Short report detail should remain expanded; maxScroll=' + Math.round(detailScrollTarget) + 'px');
+  }
 
   await context.close();
 });
@@ -291,42 +326,41 @@ await check('All seven category pages preserve the shared mobile navigation cont
     }
 
     await page.locator('#report-composer-close-btn').click();
-    await page.waitForTimeout(100);
+    const cancelConfirm = page.locator('#report-cancel-confirm-modal');
+    if (await cancelConfirm.isVisible().catch(() => false)) {
+      await page.locator('#report-cancel-btn').click();
+    }
+    await page.locator('#report-composer-modal').waitFor({ state: 'hidden', timeout: 10000 });
+    await page.waitForTimeout(150);
 
     const categoryScrollTarget = await page.evaluate(() => {
       const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
       return Math.min(700, maxScroll);
     });
-    if (categoryScrollTarget < 160) {
-      throw new Error(`${route} is not tall enough to exercise adaptive category chrome: ${categoryScrollTarget}px`);
-    }
-    await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), categoryScrollTarget);
-    await page.waitForFunction(
-      () => document.querySelector('#mobile-category-header')?.getAttribute('data-compact') === 'true',
-      null,
-      { timeout: 5000 }
-    );
-    await page.waitForTimeout(650);
-    await expectVisible(
-      page.locator('#mobile-category-back-btn'),
-      `${route} compact back button missing`
-    );
-    await expectVisible(
-      page.locator('#mobile-category-filter-btn'),
-      `${route} compact filter button missing`
-    );
-    await expectVisible(
-      page.locator('#mobile-category-report'),
-      `${route} compact category report action missing`
-    );
+    if (categoryScrollTarget > 96) {
+      await scrollDownInSteps(page, categoryScrollTarget);
+      await waitForCompactState(
+        page,
+        '#mobile-category-header',
+        true,
+        route + ' category header did not enter compact mode'
+      );
+      await page.waitForTimeout(650);
+      await expectVisible(page.locator('#mobile-category-back-btn'), route + ' compact back button missing');
+      await expectVisible(page.locator('#mobile-category-filter-btn'), route + ' compact filter button missing');
+      await expectVisible(page.locator('#mobile-category-report'), route + ' compact category report action missing');
 
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await page.waitForFunction(
-      () => document.querySelector('#mobile-category-header')?.getAttribute('data-compact') === 'false',
-      null,
-      { timeout: 5000 }
-    );
-    await page.waitForTimeout(650);
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+      await waitForCompactState(
+        page,
+        '#mobile-category-header',
+        false,
+        route + ' category header did not restore at the top'
+      );
+      await page.waitForTimeout(650);
+    } else if ((await page.locator('#mobile-category-header').getAttribute('data-compact')) !== 'false') {
+      throw new Error(route + ' short category page should remain expanded; maxScroll=' + Math.round(categoryScrollTarget) + 'px');
+    }
 
     const sectionId = route.replace(/^\//, '').replace(/-/g, '_');
     const sharedFeedSection = page.locator(
