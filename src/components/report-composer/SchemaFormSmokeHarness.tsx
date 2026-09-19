@@ -4,6 +4,7 @@ import { INITIAL_REPORT_FORM } from '../../services/reportFormState';
 import { ReportFormData } from '../../services/types';
 import { PublicReportingField, PublicReportingForm } from '../../services/reportingFormConfig';
 import { Button } from '../ui/Button';
+import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
 
 const field = (
   fieldKey: string,
@@ -133,6 +134,7 @@ export const SchemaFormSmokeHarness: React.FC = () => {
   const sectionRef = useRef<ConfiguredFieldsHandle>(null);
   const [formData, setFormData] = useState<ReportFormData>(() => buildInitialData());
   const [validationState, setValidationState] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  const [pendingImages, setPendingImages] = useState<AttachedImagePreview[]>([]);
 
   const updateFormData = (updates: Partial<ReportFormData>) => {
     setFormData((current) => ({ ...current, ...updates }));
@@ -157,8 +159,8 @@ export const SchemaFormSmokeHarness: React.FC = () => {
         form={SCHEMA_SMOKE_FORM}
         language="en"
         formData={formData}
-        pendingImages={[]}
-        onPendingImagesChange={() => {}}
+        pendingImages={pendingImages}
+        onPendingImagesChange={setPendingImages}
         onUpdateFormData={updateFormData}
       />
 
@@ -172,6 +174,7 @@ export const SchemaFormSmokeHarness: React.FC = () => {
           variant="outline"
           onClick={() => {
             setFormData(buildValidData());
+            setPendingImages([]);
             setValidationState('idle');
           }}
         >
