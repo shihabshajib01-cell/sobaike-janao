@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, Filter, Menu, Plus, Search, Share2 } from 'lucide-react';
+import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PublicEngagementService } from '../../services/publicEngagementService';
 import { useTaxonomy } from '../../services/taxonomyService';
@@ -55,7 +55,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     setIsHarassmentFilterOpen,
     isReportComposerOpen,
     isLocationModalOpen,
-    openReportComposer,
   } = useApp();
   const [isShareConfirmed, setIsShareConfirmed] = useState(false);
   const lastScrollYRef = useRef(0);
@@ -359,15 +358,14 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               icon={<Menu className="w-5 h-5" aria-hidden="true" />}
             />
 
-            <IconButton
-              id="mobile-compact-report-btn"
-              variant="primary"
-              size="lg"
-              onClick={() => openReportComposer()}
-              aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
-              className="pointer-events-auto ui-radius-pill shadow-[var(--elevation-sm)]"
-              icon={<Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />}
-            />
+            <Link
+              id="mobile-compact-search-btn"
+              to={localizePath('/search')}
+              aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
+              className="pointer-events-auto inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <Search className="w-5 h-5" aria-hidden="true" />
+            </Link>
           </div>
         </nav>
       ) : null}
