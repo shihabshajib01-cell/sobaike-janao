@@ -320,7 +320,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               aria-label={language === 'bn' ? 'অনুসন্ধান বন্ধ করুন' : 'Close search'}
               data-mobile-floating-control={isCompact ? 'true' : undefined}
               className={`${isCompact ? 'pointer-events-auto !bg-ui-surface ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
-              icon={<AppIcon name="x" size="xl" strokeWidth={2} />}
+              icon={<AppIcon name="close" size="xl" strokeWidth={2} />}
             />
 
             <p
