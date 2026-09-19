@@ -85,12 +85,22 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
 
   const activeComingSoonData = selectedComingSoon ? COMING_SOON_SERVICES[selectedComingSoon] : null;
 
-  const getSectionStyles = (section: SectionKey) => ({
-    background: `var(--sec-${section}-bg)`,
-    text: `var(--sec-${section}-text)`,
-    border: `var(--sec-${section}-border)`,
-    primary: `var(--sec-${section}-primary)`,
-  });
+  const getSectionStyles = (section: SectionKey) => {
+    const background = `var(--sec-${section}-bg)`;
+    const text = `var(--sec-${section}-text)`;
+    const border = `var(--sec-${section}-border)`;
+
+    return {
+      background,
+      text,
+      border,
+      accent: `color-mix(in srgb, ${text} 82%, var(--md-on-surface))`,
+      selectedDescription: `color-mix(in srgb, ${text} 88%, var(--md-on-surface-secondary))`,
+      iconBackground: `color-mix(in srgb, ${background} 76%, var(--md-surface))`,
+      selectedIconBackground: `color-mix(in srgb, ${background} 56%, var(--md-surface))`,
+      iconBorder: `color-mix(in srgb, ${border} 88%, var(--md-surface))`,
+    };
+  };
 
   return (
     <div className="space-y-5">
@@ -103,6 +113,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
         {activeServices.map((srv) => {
           const isSelected = selectedSegment === srv.key && !selectedComingSoon;
+          const palette = getSectionStyles(srv.key);
 
           return (
             <button
@@ -117,18 +128,18 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   : 'bg-ui-surface border-ui-stroke-default ui-elevation-control'
               }`}
               style={{
-                backgroundColor: isSelected ? getSectionStyles(srv.key).background : undefined,
-                borderColor: isSelected ? getSectionStyles(srv.key).primary : undefined,
+                backgroundColor: isSelected ? palette.background : undefined,
+                borderColor: isSelected ? palette.accent : undefined,
               }}
             >
               <div
                 className="w-11 h-11 md:w-12 md:h-12 shrink-0 ui-radius-control flex items-center justify-center transition-colors ui-border-default ui-elevation-control"
                 style={{
-                  backgroundColor: getSectionStyles(srv.key).background,
-                  color: getSectionStyles(srv.key).primary,
+                  backgroundColor: isSelected ? palette.selectedIconBackground : palette.iconBackground,
+                  color: palette.accent,
                   borderColor: isSelected
-                    ? getSectionStyles(srv.key).primary
-                    : getSectionStyles(srv.key).border,
+                    ? palette.accent
+                    : palette.iconBorder,
                 }}
               >
                 <CategoryIcon section={srv.key} size="md" />
@@ -137,13 +148,13 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               <div className="min-w-0 flex-1">
                 <h4
                   className="type-h4 text-ui-content-primary"
-                  style={{ color: isSelected ? getSectionStyles(srv.key).text : undefined }}
+                  style={{ color: isSelected ? palette.accent : undefined }}
                 >
                   {language === 'bn' ? srv.titleBn : srv.titleEn}
                 </h4>
                 <p
                   className="type-helper text-ui-content-secondary mt-0.5 truncate"
-                  style={{ color: isSelected ? getSectionStyles(srv.key).text : undefined }}
+                  style={{ color: isSelected ? palette.selectedDescription : undefined }}
                 >
                   {language === 'bn' ? srv.descBn : srv.descEn}
                 </p>
@@ -157,14 +168,14 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                     : 'border-ui-stroke-default bg-ui-surface'
                 }`}
                 style={{
-                  borderColor: isSelected ? getSectionStyles(srv.key).primary : undefined,
+                  borderColor: isSelected ? palette.accent : undefined,
                 }}
               >
                 <span
                   className={`w-2 h-2 rounded-[var(--radius-pill)] transition-transform ${
                     isSelected ? 'scale-100' : 'scale-0'
                   }`}
-                  style={{ backgroundColor: getSectionStyles(srv.key).primary }}
+                  style={{ backgroundColor: palette.accent }}
                 />
               </div>
             </button>

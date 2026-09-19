@@ -65,11 +65,15 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
     return () => window.cancelAnimationFrame(frame);
   }, [currentStep]);
 
-  const getSegmentStyles = (sec: SectionKey) => ({
-    bg: `var(--sec-${sec}-bg)`,
-    color: `var(--sec-${sec}-text)`,
-    border: `var(--sec-${sec}-border)`,
-  });
+  const getSegmentStyles = (sec: SectionKey) => {
+    const color = `var(--sec-${sec}-text)`;
+
+    return {
+      bg: `var(--sec-${sec}-bg)`,
+      color: `color-mix(in srgb, ${color} 82%, var(--md-on-surface))`,
+      border: `var(--sec-${sec}-border)`,
+    };
+  };
 
   const progressPercentage = Math.round((currentStep / totalSteps) * 100);
 

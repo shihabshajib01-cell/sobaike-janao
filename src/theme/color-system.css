@@ -607,6 +607,6 @@ html[data-theme="dark"],
   --ui-accent-hover: var(--category-route-hover);
   --ui-focus: var(--category-route-primary);
 
-  --hero-text-primary: color-mix(in srgb, var(--category-route-on-container) 78%, var(--md-on-background));
-  --hero-text-secondary: color-mix(in srgb, var(--category-route-on-container) 86%, var(--md-on-background));
+  --hero-text-primary: color-mix(in srgb, var(--category-route-on-container) 68%, var(--md-on-surface));
+  --hero-text-secondary: color-mix(in srgb, var(--category-route-on-container) 76%, var(--md-on-surface));
 }
