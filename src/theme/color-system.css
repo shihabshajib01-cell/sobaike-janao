@@ -121,7 +121,7 @@ html[data-theme="light"] {
   /* Hero roles - Light
      Stronger image-derived tints keep the banner distinct from the page surface. */
   --hero-text-primary: #102A43;
-  --hero-text-secondary: #596579;
+  --hero-text-secondary: #4F596A;
   --hero-harassment-container: #E9D2DA;
   --hero-extortion-container: #EAD4CB;
   --hero-public-safety-container: #DDD6E1;
