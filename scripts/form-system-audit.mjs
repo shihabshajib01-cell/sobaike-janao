@@ -181,6 +181,14 @@ if (!composer.includes('This end time is treated as the following day.')) {
 }
 
 const configured = read('src/components/report-composer/ConfiguredFieldsSection.tsx');
+if (configured.includes(`role="group"
+                  aria-labelledby={fieldLabelId}
+                  aria-required={field.required || undefined}`)) {
+  failures.push('ConfiguredFieldsSection.tsx: role=group must not use unsupported aria-required');
+}
+if (!configured.includes("language === 'bn' ? ' আবশ্যক' : ' required'")) {
+  failures.push('ConfiguredFieldsSection.tsx: required multiselect groups must expose a screen-reader required cue');
+}
 if (configured.includes('role="alert" className="type-helper text-role-validation"')) {
   failures.push('ConfiguredFieldsSection.tsx: schema group errors must use the accessible semantic error text role');
 }
