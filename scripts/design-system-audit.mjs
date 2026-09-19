@@ -823,14 +823,19 @@ const taxonomyFile = 'src/services/taxonomyService.ts';
 if (fs.existsSync(taxonomyFile)) {
   const source = fs.readFileSync(taxonomyFile, 'utf8');
 
-  if (!source.includes('if (legacy && !hasManagedTheme)')) {
+  if (
+    !source.includes('const fallback = legacy') ||
+    !source.includes('if (legacy) {') ||
+    !source.includes('clearRuntimeSectionCssVariables(segment.id)') ||
+    !source.includes('applyRuntimeSectionCssVariables(segment)')
+  ) {
     findings.push({
       file: taxonomyFile,
       line: 1,
       rule: 'legacy-theme-inline-override',
       token: 'legacy-category-runtime-theme',
-      message: 'Built-in categories must not receive inline runtime colors that override dark-mode category roles',
-      source: 'Expected legacy theme guard is missing',
+      message: 'Built-in categories must stay locked to the canonical banner-derived palette while only dynamic categories receive runtime theme overrides',
+      source: 'Expected canonical built-in/dynamic theme boundary is missing',
     });
   }
 
