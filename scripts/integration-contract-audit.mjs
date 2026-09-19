@@ -123,6 +123,8 @@ for (const needle of [
   'Verify Public-SQL-Admin sync contract',
   'get_platform_sync_contract_version',
   '2026-09-19.1',
+  'Verify first-party browse IP fallback',
+  '/functions/v1/public-ip-location',
 ]) {
   if (!productionSmoke.includes(needle)) {
     fail('production smoke is missing live sync-contract guard: ' + needle);
