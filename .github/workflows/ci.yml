@@ -71,6 +71,9 @@ jobs:
       - name: Design-system source audit
         run: npm run audit:design-system
 
+      - name: Category theme propagation audit
+        run: npm run audit:category-theme
+
       - name: UI uniformity source audit
         run: npm run audit:ui-uniformity
 
