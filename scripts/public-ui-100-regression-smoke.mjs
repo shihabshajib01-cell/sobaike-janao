@@ -324,7 +324,9 @@ await check('Dark semantic surfaces retain distinct visual hierarchy', async () 
   await page.locator('#tablet-menu-button').click();
   await expectVisible(page.locator('#tablet-drawer'), 'tablet drawer missing');
 
-  const themeOptions = page.locator('#tablet-drawer button[aria-pressed]');
+  const themeOptions = page.locator(
+    '#tablet-drawer [role="group"][aria-label="থিম"] button[aria-pressed], #tablet-drawer [role="group"][aria-label="Theme"] button[aria-pressed]'
+  );
   const themeOptionCount = await themeOptions.count();
   if (themeOptionCount !== 3) {
     throw new Error(`expected 3 theme options, found ${themeOptionCount}`);
