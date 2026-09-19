@@ -325,6 +325,12 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         >
           {slides.map((slide, index) => {
             const isActive = index === safeIndex;
+            const rawDistance = Math.abs(index - safeIndex);
+            const circularDistance =
+              totalSlides > 1
+                ? Math.min(rawDistance, totalSlides - rawDistance)
+                : 0;
+            const shouldHydrateMedia = circularDistance <= 1;
             const content = getRuntimeBannerContent(slide.key);
             if (!content) return null;
             const slideSegment = segments[slide.key];
@@ -361,6 +367,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   desktopDescriptionBn={content.desktopDescriptionBn}
                   desktopDescriptionEn={content.desktopDescriptionEn}
                   illustrationSrc={content.illustrationSrc}
+                  deferIllustration={!shouldHydrateMedia}
                   action={
                     getPublishedBannerSettings(slide.key)?.showHomeCta
                       ? {
