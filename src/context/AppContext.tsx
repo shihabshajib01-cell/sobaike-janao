@@ -161,10 +161,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // Do not perform IP geolocation on a first visit before the user has
-    // interacted with location. After a user has tried device location,
-    // browsing can fall back to coarse IP location when device GPS is denied
-    // or temporarily unavailable. "Not now" still means no location fallback.
-    if (choice === 'granted' || choice === 'denied') {
+    // interacted with location. After any explicit browse-location choice,
+    // keep at least a coarse location for feed relevance. "Not now" means
+    // skip precise GPS, not opt out of approximate IP-based browsing.
+    if (choice === 'granted' || choice === 'denied' || choice === 'not_now') {
       const approximate = await IpLocationService.getApproximateLocation();
       if (approximate) {
         setBrowseLocation(approximate);
