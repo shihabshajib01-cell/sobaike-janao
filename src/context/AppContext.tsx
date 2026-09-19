@@ -260,6 +260,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       mode: 'user_request',
     });
 
+    // The user may have selected Not now / approximate location while the
+    // browser geolocation request was still in flight. Preserve that newer
+    // intent and never rewrite it to ip_fallback.
+    const currentChoice = VisitorSessionService.getLocationChoice();
+    if (currentChoice === 'not_now') {
+      const approximate = await IpLocationService.getApproximateLocation();
+      if (approximate) {
+        setBrowseLocation(approximate);
+        setBrowseLocationStatus('available');
+      } else {
+        setBrowseLocation(null);
+        setBrowseLocationStatus('not_now');
+      }
+      return result;
+    }
+
     if (result.success && result.coords) {
       setBrowseLocation({
         latitude: result.coords.latitude,
