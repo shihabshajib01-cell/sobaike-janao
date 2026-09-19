@@ -334,6 +334,12 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             const content = getRuntimeBannerContent(slide.key);
             if (!content) return null;
             const slideSegment = segments[slide.key];
+            const slideTextColor =
+              slideSegment?.textColor ?? `var(--sec-${slide.key}-text, var(--md-on-surface))`;
+            const homeBannerTitleColor =
+              `color-mix(in srgb, ${slideTextColor} 70%, var(--md-on-surface))`;
+            const homeBannerDescriptionColor =
+              `color-mix(in srgb, ${slideTextColor} 82%, var(--md-on-surface))`;
 
             return (
               <div
@@ -381,6 +387,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   active={isActive}
                   ctaId={`${id}-report-btn-${slide.key}`}
                   ctaTabIndex={isActive ? 0 : -1}
+                  titleColor={homeBannerTitleColor}
+                  descriptionColor={homeBannerDescriptionColor}
                 />
               </div>
             );

@@ -6,6 +6,7 @@ const shell = read('src/components/layout/AppShell.tsx');
 const taxonomy = read('src/services/taxonomyService.ts');
 const composerStep1 = read('src/components/report-composer/Step1ServiceSelect.tsx');
 const composerHeader = read('src/components/report-composer/ReportComposerHeader.tsx');
+const homeCarousel = read('src/components/home/ServiceHeroCarousel.tsx');
 
 const categories = [
   'harassment',
@@ -56,6 +57,13 @@ if (!composerStep1.includes('color: palette.accent')) {
 }
 if (!composerHeader.includes('color: \`color-mix(in srgb, \${color} 82%, var(--md-on-surface))\`')) {
   failures.push('Report composer selected category badge is not using the stronger category accent');
+}
+
+if (!homeCarousel.includes('titleColor={homeBannerTitleColor}')) {
+  failures.push('Home banners are not using their own category-derived title color');
+}
+if (!homeCarousel.includes('descriptionColor={homeBannerDescriptionColor}')) {
+  failures.push('Home banners are not using their own category-derived description color');
 }
 
 if (!shell.includes('category-theme-scope')) failures.push('AppShell does not activate category theme scope');
