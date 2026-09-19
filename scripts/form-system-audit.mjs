@@ -351,8 +351,13 @@ requireContains(
 );
 requireContains(
   'scripts/public-composer-100-regression-smoke.mjs',
-  'p_client_submission_id',
-  'composer browser smoke must protect retry idempotency'
+  'public-write-gateway',
+  'composer browser smoke must intercept the current public write gateway before production'
+);
+requireContains(
+  'scripts/public-composer-100-regression-smoke.mjs',
+  'clientSubmissionId',
+  'composer browser smoke must protect retry idempotency through the gateway contract'
 );
 requireContains(
   'scripts/public-composer-100-regression-smoke.mjs',
