@@ -67,6 +67,30 @@ const heroBannerSourcePath = path.join(
   'category',
   'CategoryHeroBanner.tsx'
 );
+const mobileHeaderSourcePath = path.join(
+  root,
+  'src',
+  'components',
+  'layout',
+  'MobileHeader.tsx'
+);
+if (fs.existsSync(mobileHeaderSourcePath)) {
+  const mobileHeaderSource = fs.readFileSync(mobileHeaderSourcePath, 'utf8');
+
+  if (!mobileHeaderSource.includes("window.addEventListener('scroll', handleScroll, { passive: true })")) {
+    fail('Adaptive mobile navigation scroll listener must remain passive.');
+  }
+  if (!mobileHeaderSource.includes('window.requestAnimationFrame(evaluateScroll)')) {
+    fail('Adaptive mobile navigation must coalesce scroll work through requestAnimationFrame.');
+  }
+  if (!mobileHeaderSource.includes('const isCompactRef = useRef(isCompact);')) {
+    fail('Adaptive mobile navigation must keep compact state in a ref to avoid listener churn.');
+  }
+  if (!mobileHeaderSource.includes('}, [shouldUseAdaptiveHeader, updateCompactState]);')) {
+    fail('Adaptive mobile navigation listener must not re-subscribe on every compact/full state transition.');
+  }
+}
+
 if (fs.existsSync(homePageSourcePath)) {
   const homePageSource = fs.readFileSync(homePageSourcePath, 'utf8');
 
