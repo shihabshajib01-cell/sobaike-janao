@@ -138,11 +138,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       const delta = currentScrollY - lastScrollYRef.current;
       lastScrollYRef.current = currentScrollY;
 
-      if (
-        isHeaderInteractionBlocked ||
-        hasTextInputFocus() ||
-        currentScrollY <= MOBILE_HEADER_TOP_RESET_Y
-      ) {
+      if (isHeaderInteractionBlocked || hasTextInputFocus()) {
         transitionLockUntilRef.current = 0;
         directionRef.current = null;
         directionDistanceRef.current = 0;
@@ -151,9 +147,20 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       }
 
       const now = performance.now();
+
       if (now < transitionLockUntilRef.current) {
         directionRef.current = null;
         directionDistanceRef.current = 0;
+        return;
+      }
+
+      if (currentScrollY <= MOBILE_HEADER_TOP_RESET_Y) {
+        directionRef.current = null;
+        directionDistanceRef.current = 0;
+
+        if (!isCompact || delta < -MOBILE_HEADER_SCROLL_EPSILON) {
+          onCompactChange(false);
+        }
         return;
       }
 
