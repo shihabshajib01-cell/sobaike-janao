@@ -29,6 +29,8 @@ export const SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
     { id: 'theft', nameBn: 'চুরি', nameEn: 'Theft' },
     { id: 'robbery', nameBn: 'ডাকাতি', nameEn: 'Robbery / Dacoity' },
     { id: 'snatching', nameBn: 'ছিনতাই', nameEn: 'Snatching' },
+    { id: 'mob-justice', nameBn: 'গণপিটুনি / মব সহিংসতা', nameEn: 'Mob Justice / Mob Violence' },
+    { id: 'child_abduction_murder', nameBn: 'শিশু অপহরণ / হত্যা', nameEn: 'Child Abduction / Murder' },
   ],
   road_transport: [
     { id: 'all', nameBn: 'সকল রিপোর্ট', nameEn: 'All Reports' },
