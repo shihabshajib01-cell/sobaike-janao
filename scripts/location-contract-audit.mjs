@@ -53,6 +53,8 @@ for (const needle of [
   'Date.now() - lastRecordedLocation.timestamp <= REPORTER_LOCATION_FALLBACK_MAX_AGE_MS',
   'maximumAge: 0',
   "this.setLocationChoice('not_now')",
+  "export type LocationChoice = 'granted' | 'not_now' | 'denied';",
+  "this.setLocationChoice('denied')",
 ]) {
   requireText(visitor, needle, 'reporter location freshness');
 }
@@ -75,9 +77,10 @@ for (const needle of [
   requireText(ipEdge, needle, 'IP fallback edge function');
 }
 for (const needle of [
-  "choice === 'granted' && perm !== 'denied'",
+  "choice === 'granted' || choice === 'denied'",
   "browseFallback: 'ip'",
-  "result.status !== 'denied'",
+  "if (perm === 'denied')",
+  "refreshBrowseLocation();",
 ]) {
   requireText(appContext, needle, 'browse fallback consent boundary');
 }
@@ -135,5 +138,5 @@ if (errors.length) {
 }
 
 console.log(
-  'Location contract audit passed: device-only reporting, fresh submission fallback, consent-aware first-party IP fallback, bilingual rendering, canonical taxonomy, and SQL hardening are protected.'
+  'Location contract audit passed: device-only reporting, fresh submission fallback, post-attempt IP fallback (including device denial), first-visit privacy, bilingual rendering, canonical taxonomy, and SQL hardening are protected.'
 );
