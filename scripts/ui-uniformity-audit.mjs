@@ -260,15 +260,23 @@ requireContains(
 );
 
 const reportTitleField = 'src/components/report-composer/ReportTitleField.tsx';
-requireContains(reportTitleField, 'type-label', 'report title label must use semantic label typography');
-requireContains(reportTitleField, 'type-body', 'report title input must use semantic body typography');
-requireContains(reportTitleField, 'type-helper', 'report title helper/error text must use semantic helper typography');
-requireContains(reportTitleField, 'type-meta', 'report title counter must use semantic meta typography');
-requireContains(reportTitleField, 'ui-control', 'report title input must use the shared control recipe');
-requireContains(reportTitleField, 'aria-required="true"', 'required report title input must expose required semantics');
-requireContains(reportTitleField, 'role="alert"', 'report title validation must announce errors');
+requireContains(reportTitleField, '<TextField', 'report title must use the unified TextField primitive');
+requireContains(reportTitleField, 'required', 'report title must preserve required semantics through TextField');
+requireContains(reportTitleField, 'error={error}', 'report title must route validation through the unified field error contract');
+requireContains(reportTitleField, 'type-meta', 'report title counter must preserve semantic meta typography');
+requireNotContains(reportTitleField, '<input', 'report title must not recreate a raw input outside the form system');
 requireNotContains(reportTitleField, '--type-fixed-', 'report title field must not use legacy fixed typography aliases');
-requireNotContains(reportTitleField, 'min-h-[44px]', 'report title field must inherit minimum target size from ui-control');
+
+const textFieldPrimitive = 'src/components/ui/TextField.tsx';
+requireContains(textFieldPrimitive, 'FORM_CONTROL_BASE', 'TextField must inherit the shared control recipe');
+requireContains(textFieldPrimitive, 'aria-required={required', 'TextField must own required semantics');
+requireContains(textFieldPrimitive, 'aria-invalid={Boolean(error)}', 'TextField must own invalid semantics');
+requireContains(textFieldPrimitive, '<FormField', 'TextField must use the shared label/helper/error shell');
+
+const formFieldPrimitive = 'src/components/ui/FormField.tsx';
+requireContains(formFieldPrimitive, 'type-label', 'FormField must own semantic label typography');
+requireContains(formFieldPrimitive, 'type-helper', 'FormField must own helper/error typography');
+requireContains(formFieldPrimitive, 'role="alert"', 'FormField validation must announce errors');
 
 const closureFiles = [
   ...fs.readdirSync(path.resolve(ROOT, 'src/components/report-composer'))
