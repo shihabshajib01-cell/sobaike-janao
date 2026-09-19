@@ -113,9 +113,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   const brandContent = (
     <div className={`flex items-center ${style.gap} select-none min-w-0 ${className}`}>
-      {/* Official Sobaike Janao Teal Logo Mark */}
+      {/* Official Sobaike Janao brand mark */}
       <img
-        src={getBrandAsset('sobaike-janao-mark-512.png')}
+        src={getBrandAsset('sobaike-janao-mark.svg')}
         alt=""
         aria-hidden="true"
         width={dim.width}
