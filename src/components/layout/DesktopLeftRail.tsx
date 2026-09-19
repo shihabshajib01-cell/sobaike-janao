@@ -6,6 +6,7 @@ import { CategoryPopularityService } from '../../services/categoryPopularityServ
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
+import { TextSizeSelector } from '../ui/TextSizeSelector';
 import { BrandLogo } from '../branding/BrandLogo';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
 
@@ -176,6 +177,7 @@ export const DesktopLeftRail: React.FC = () => {
 
       <div className="pt-4 border-t border-ui-stroke-subtle space-y-2.5">
         <ThemeSelector variant="compact" />
+        <TextSizeSelector variant="compact" idPrefix="rail-text-size" />
 
         <button
           id="rail-lang-toggle"
