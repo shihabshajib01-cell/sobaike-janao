@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -23,7 +24,72 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Require successful CI for exact revision
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "Waiting for CI to finish for exact revision ${TARGET_SHA}..."
+          for attempt in {1..90}; do
+            curl --fail-with-body -sS \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=100" \
+              -o /tmp/ci-runs.json
+
+            state=$(python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path('/tmp/ci-runs.json').read_text())
+          runs = [
+              run for run in data.get('workflow_runs', [])
+              if run.get('name') == 'CI'
+          ]
+          if not runs:
+              print('missing')
+          else:
+              run = sorted(runs, key=lambda item: item.get('created_at') or '', reverse=True)[0]
+              status = run.get('status') or 'unknown'
+              conclusion = run.get('conclusion') or ''
+              if status != 'completed':
+                  print('pending')
+              elif conclusion == 'success':
+                  print('success')
+              else:
+                  print('failed:' + conclusion)
+          PY
+            )
+
+            case "${state}" in
+              success)
+                echo "Exact-revision CI passed. Deployment may continue."
+                break
+                ;;
+              failed:*)
+                echo "ERROR: exact-revision CI did not pass: ${state#failed:}"
+                exit 1
+                ;;
+              missing|pending)
+                if [ "${attempt}" -eq 90 ]; then
+                  echo "ERROR: timed out waiting for exact-revision CI"
+                  exit 1
+                fi
+                sleep 5
+                ;;
+              *)
+                echo "ERROR: unexpected CI gate state: ${state}"
+                exit 1
+                ;;
+            esac
+          done
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
 
       - uses: actions/setup-node@v4
         with:
@@ -37,6 +103,9 @@ jobs:
 
       - name: Integration contract audit
         run: npm run audit:integration-contract
+
+      - name: Category theme propagation audit
+        run: npm run audit:category-theme
 
       - name: Type check
         run: npm run lint
