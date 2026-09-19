@@ -43,6 +43,51 @@ async function expectVisible(locator, message) {
   if (!(await locator.isVisible())) throw new Error(message);
 }
 
+async function assertMatchingFloatingControls(page, selectors, label) {
+  const metrics = await page.evaluate((targetSelectors) => {
+    return targetSelectors.map((selector) => {
+      const element = document.querySelector(selector);
+      if (!(element instanceof HTMLElement)) return { selector, missing: true };
+      const box = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        selector,
+        missing: false,
+        width: box.width,
+        height: box.height,
+        borderColor: style.borderColor,
+        borderRadius: style.borderRadius,
+        backgroundColor: style.backgroundColor,
+      };
+    });
+  }, selectors);
+
+  if (metrics.some((item) => item.missing)) {
+    throw new Error(`${label}: missing floating control: ${JSON.stringify(metrics)}`);
+  }
+
+  for (const item of metrics) {
+    if (Math.abs(item.width - 48) > 1 || Math.abs(item.height - 48) > 1) {
+      throw new Error(
+        `${label}: floating control is not 48x48: ${item.selector}=${Math.round(item.width)}x${Math.round(item.height)}`
+      );
+    }
+  }
+
+  const [reference, ...rest] = metrics;
+  for (const item of rest) {
+    if (
+      item.borderColor !== reference.borderColor ||
+      item.borderRadius !== reference.borderRadius ||
+      item.backgroundColor !== reference.backgroundColor
+    ) {
+      throw new Error(
+        `${label}: floating control styling diverged: ${JSON.stringify(metrics)}`
+      );
+    }
+  }
+}
+
 async function scrollDownInSteps(page, target) {
   const points = [0.34, 0.68, 1]
     .map((ratio) => Math.round(target * ratio))
@@ -247,6 +292,11 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     await page.waitForTimeout(650);
     await expectVisible(page.locator('#mobile-report-detail-back-btn'), 'Report detail compact back button missing');
     await expectVisible(page.locator('#mobile-report-detail-share-btn'), 'Report detail compact share button missing');
+    await assertMatchingFloatingControls(
+      page,
+      ['#mobile-report-detail-back-btn', '#mobile-report-detail-share-btn'],
+      'Report detail compact controls'
+    );
 
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
     await waitForCompactState(
@@ -349,6 +399,19 @@ await check('All seven category pages preserve the shared mobile navigation cont
       await expectVisible(page.locator('#mobile-category-back-btn'), route + ' compact back button missing');
       await expectVisible(page.locator('#mobile-category-filter-btn'), route + ' compact filter button missing');
       await expectVisible(page.locator('#mobile-category-report'), route + ' compact category report action missing');
+      await assertMatchingFloatingControls(
+        page,
+        ['#mobile-category-back-btn', '#mobile-category-filter-btn'],
+        route + ' compact category controls'
+      );
+      const categoryReportBox = await page.locator('#mobile-category-report').boundingBox();
+      if (
+        !categoryReportBox ||
+        Math.abs(categoryReportBox.width - 48) > 1 ||
+        Math.abs(categoryReportBox.height - 48) > 1
+      ) {
+        throw new Error(route + ' compact category report action is not 48x48');
+      }
 
       await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
       await waitForCompactState(
@@ -626,6 +689,22 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
 
   await scrollIntoCompactMode();
   assertCompact(await readState(), 'scroll down');
+  await assertMatchingFloatingControls(
+    page,
+    ['#mobile-compact-menu-btn', '#mobile-compact-search-btn'],
+    'Home compact top controls'
+  );
+  const compactBottomBoxes = await Promise.all([
+    page.locator('#bottom-nav-compact-context').boundingBox(),
+    page.locator('#bottom-nav-compact-report').boundingBox(),
+  ]);
+  if (
+    compactBottomBoxes.some(
+      (box) => !box || Math.abs(box.width - 48) > 1 || Math.abs(box.height - 48) > 1
+    )
+  ) {
+    throw new Error(`Home compact bottom controls are not 48x48: ${JSON.stringify(compactBottomBoxes)}`);
+  }
 
   const compactScrollY = await page.evaluate(() => window.scrollY);
   await page.evaluate((top) => {
