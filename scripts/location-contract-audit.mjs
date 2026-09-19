@@ -99,6 +99,14 @@ if (reminder.includes('খবরগুলো আগে দেখতে পার
   errors.push('location reminder copy: must not claim unverified feed priority');
 }
 
+for (const needle of [
+  'VisitorSessionService.getLocationChoice()',
+  'hasAnsweredLocationPrompt',
+  'locationChoice !== null',
+]) {
+  requireText(reminder, needle, 'location reminder refresh suppression');
+}
+
 for (const needle of ['safeBanglaFallback', 'safeEnglishFallback']) {
   requireText(mapper, needle, 'bilingual location mapper');
 }
