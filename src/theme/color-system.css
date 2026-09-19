@@ -121,7 +121,7 @@ html[data-theme="light"] {
   /* Hero roles - Light
      Stronger image-derived tints keep the banner distinct from the page surface. */
   --hero-text-primary: #102A43;
-  --hero-text-secondary: #4F596A;
+  --hero-text-secondary: #334155;
   --hero-harassment-container: var(--category-harassment-container);
   --hero-extortion-container: var(--category-extortion-container);
   --hero-public-safety-container: var(--category-public_safety-container);
@@ -306,7 +306,7 @@ html[data-theme="dark"],
 
   /* Hero roles - Dark */
   --hero-text-primary: #E4E6EB;
-  --hero-text-secondary: #B0B3B8;
+  --hero-text-secondary: #CBD0D6;
   --hero-harassment-container: var(--category-harassment-container);
   --hero-extortion-container: var(--category-extortion-container);
   --hero-public-safety-container: var(--category-public_safety-container);
