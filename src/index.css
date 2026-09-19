@@ -1311,14 +1311,6 @@
 
 
 
-/* Long-feed rendering containment: keep off-screen report cards out of layout/paint work
-   while preserving DOM order, accessibility, and scroll position. */
-.home-feed-render-window {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 20rem;
-}
-
-
 /* Adaptive mobile chrome: keep the exit motion visible, then remove the
    inactive layer from focus/hit-testing at the end of the 500ms transition. */
 @keyframes mobile-chrome-hide-visibility {
@@ -1335,4 +1327,11 @@
   .mobile-chrome-hide-after-transition {
     animation-delay: 0s;
   }
+}
+
+
+/* Measured page virtualization keeps long Home feeds scroll-stable while
+   unmounting far-away report cards from React and the DOM. */
+.home-feed-virtual-page[data-mounted='false'] {
+  contain: layout paint style;
 }
