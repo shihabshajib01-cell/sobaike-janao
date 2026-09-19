@@ -177,6 +177,21 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     throw new Error(`Clicking report-card title did not open detail; got ${page.url()}`);
   }
 
+  await expectVisible(
+    page.locator('#mobile-report-detail-back-btn'),
+    'Report detail mobile back button missing'
+  );
+  await expectVisible(
+    page.locator('#mobile-report-detail-share-btn'),
+    'Report detail mobile share button missing'
+  );
+  if ((await page.locator('#bottom-nav').count()) !== 0) {
+    throw new Error('Report detail incorrectly shows the global bottom navigation');
+  }
+  if ((await page.locator('#mobile-category-report').count()) !== 0) {
+    throw new Error('Report detail incorrectly shows the category report action');
+  }
+
   await context.close();
 });
 
@@ -198,9 +213,53 @@ await check('All seven category pages preserve the shared mobile navigation cont
         }`
       );
     }
+    await expectVisible(
+      page.locator('#mobile-category-back-btn'),
+      `${route} category back button missing`
+    );
+    await expectVisible(
+      page.locator('#mobile-category-filter-btn'),
+      `${route} category filter button missing`
+    );
+    await expectVisible(
+      page.locator('#mobile-category-report'),
+      `${route} category bottom-right report action missing`
+    );
+
     if ((await page.locator('#bottom-nav').count()) !== 0) {
       throw new Error(`${route} incorrectly shows the global bottom navigation`);
     }
+
+    if ((await page.locator('.hero-slider-mobile-cta').count()) !== 0) {
+      throw new Error(`${route} still renders a report CTA inside the category hero`);
+    }
+
+    const categoryTitle = (await page.locator('#mobile-category-title').innerText()).trim();
+    await page.locator('#mobile-category-report').click();
+    await expectVisible(
+      page.locator('#report-composer-modal'),
+      `${route} category report action did not open the composer`
+    );
+
+    const stepStatus = (await page.locator('#report-composer-step-status').innerText()).trim();
+    if (!/ধাপ\s*২|Step\s*2/i.test(stepStatus)) {
+      throw new Error(
+        `${route} report composer did not start at category-selected step 2; got "${stepStatus}"`
+      );
+    }
+
+    const composerCategoryTitle = (
+      await page.locator('#report-composer-modal .report-composer-body h3').first().innerText()
+    ).trim();
+    if (composerCategoryTitle !== categoryTitle) {
+      throw new Error(
+        `${route} report composer category mismatch; header="${categoryTitle}", composer="${composerCategoryTitle}"`
+      );
+    }
+
+    await page.locator('#report-composer-close-btn').click();
+    await page.waitForTimeout(100);
+
     const sectionId = route.replace(/^\//, '').replace(/-/g, '_');
     const sharedFeedSection = page.locator(
       sectionId === 'load_shedding'
