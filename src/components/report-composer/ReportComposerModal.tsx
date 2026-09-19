@@ -426,7 +426,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         };
       });
 
-      void PublicReportingConfigService.fetch()
+      // A newly published taxonomy item can appear before a long-lived browser
+      // session refreshes its cached form bundle. Force one config refresh only when
+      // the selected published subcategory is missing from the cache.
+      void PublicReportingConfigService.fetch(!cachedForm)
         .then(() => {
           if (requestId !== subcategoryConfigRequestRef.current) return;
           const selectedForm = PublicReportingConfigService.getForm(subcategoryId);
