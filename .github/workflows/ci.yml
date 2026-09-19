@@ -48,6 +48,19 @@ jobs:
           test -f supabase/migrations/20260915163600_public_security_evidence_hardening.sql
           test -f supabase/migrations/20260915164500_public_security_surface_limits.sql
           test -f supabase/migrations/20260915165000_public_security_policy_cleanup.sql
+          test -f supabase/migrations/20260919155020_close_legacy_engagement_and_persist_ip_location_limit.sql
+          test -f supabase/migrations/20260919161859_close_legacy_engagement_and_network_surface.sql
+          # Legacy anonymous engagement RPCs must never be restored to frontend use.
+          if grep -R "rpc('track_public_report_view_v2\|rpc('track_public_report_share_v2" src; then
+            echo "ERROR: legacy engagement RPC usage detected"
+            exit 1
+          fi
+          grep -q "public-write-gateway" src/services/publicEngagementService.ts
+          grep -q "p_action: \"ip_location\"" supabase/functions/public-ip-location/index.ts
+          if grep -q "x-forwarded-for" supabase/functions/public-write-gateway/index.ts; then
+            echo "ERROR: public write gateway must not trust client X-Forwarded-For"
+            exit 1
+          fi
 
       - name: Security hardening audit
         run: npm run audit:security-hardening
