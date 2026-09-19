@@ -13,6 +13,7 @@ const MOBILE_HEADER_HIDE_SCROLL_Y = 96;
 const MOBILE_HEADER_DIRECTION_THRESHOLD = 32;
 const MOBILE_HEADER_SCROLL_EPSILON = 2;
 const MOBILE_HEADER_TOP_RESET_Y = 24;
+const MOBILE_CHROME_TRANSITION_LOCK_MS = 560;
 
 const hasTextInputFocus = () => {
   const activeElement = document.activeElement;
@@ -69,6 +70,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const directionRef = useRef<'up' | 'down' | null>(null);
   const directionDistanceRef = useRef(0);
   const frameRef = useRef<number | null>(null);
+  const transitionLockUntilRef = useRef(0);
   const { segments } = useTaxonomy();
   const localizePath = (path: string) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -129,9 +131,17 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         hasTextInputFocus() ||
         currentScrollY <= MOBILE_HEADER_TOP_RESET_Y
       ) {
+        transitionLockUntilRef.current = 0;
         directionRef.current = null;
         directionDistanceRef.current = 0;
         onCompactChange(false);
+        return;
+      }
+
+      const now = performance.now();
+      if (now < transitionLockUntilRef.current) {
+        directionRef.current = null;
+        directionDistanceRef.current = 0;
         return;
       }
 
@@ -150,13 +160,19 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         currentScrollY >= MOBILE_HEADER_HIDE_SCROLL_Y &&
         directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
       ) {
-        onCompactChange(true);
+        if (!isCompact) {
+          transitionLockUntilRef.current = now + MOBILE_CHROME_TRANSITION_LOCK_MS;
+          onCompactChange(true);
+        }
         directionDistanceRef.current = 0;
       } else if (
         nextDirection === 'up' &&
         directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
       ) {
-        onCompactChange(false);
+        if (isCompact) {
+          transitionLockUntilRef.current = now + MOBILE_CHROME_TRANSITION_LOCK_MS;
+          onCompactChange(false);
+        }
         directionDistanceRef.current = 0;
       }
     };
@@ -175,7 +191,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         frameRef.current = null;
       }
     };
-  }, [isHeaderInteractionBlocked, onCompactChange, shouldUseAdaptiveHeader]);
+  }, [isCompact, isHeaderInteractionBlocked, onCompactChange, shouldUseAdaptiveHeader]);
 
   const handleAdaptiveNavigation = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (!isPrimaryUnmodifiedNavigation(event)) return;
