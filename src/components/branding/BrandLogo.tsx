@@ -24,8 +24,6 @@ const getBrandAsset = (fileName: string) => {
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   variant = 'compact',
   size = 'md',
-  showEnglish = true,
-  englishClassName,
   className = '',
   onClick,
   id,
@@ -37,103 +35,24 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home';
   const ariaLabel = customAriaLabel || defaultAriaLabel;
 
-  if (variant === 'full') {
-    const fullSizes = {
-      sm: 'h-8 max-w-[180px]',
-      md: 'h-10 max-w-[220px]',
-      lg: 'h-12 max-w-[260px]',
-    };
-
-    const content = (
-      <div className={`relative inline-flex items-center ${fullSizes[size]} ${className}`}>
-        {/* Light Mode Wordmark */}
-        <img
-          src={getBrandAsset('sobaike-janao-logo-light.png')}
-          alt="সবাইকে জানাও (Sobaike Janao)"
-          className="block dark:hidden object-contain h-full w-auto select-none"
-        />
-        {/* Dark Mode Wordmark */}
-        <img
-          src={getBrandAsset('sobaike-janao-logo-dark.png')}
-          alt="সবাইকে জানাও (Sobaike Janao)"
-          className="hidden dark:block object-contain h-full w-auto select-none"
-        />
-      </div>
-    );
-
-    if (onClick) {
-      return (
-        <button
-          type="button"
-          id={id}
-          onClick={onClick}
-          aria-label={ariaLabel}
-          className="inline-flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-badge-md)] transition-colors cursor-pointer"
-        >
-          {content}
-        </button>
-      );
-    }
-
-    return (
-      <div id={id} className="inline-flex items-center">
-        {content}
-      </div>
-    );
-  }
-
-  // Compact Navigation Brand: Mark (Image) + Live Responsive HTML Text
-  // Mark Sizes (Explicit dimensions to prevent CLS layout shift)
-  const markDimensions = {
-    sm: { width: 32, height: 32, imgClass: 'w-8 h-8' },
-    md: { width: 36, height: 36, imgClass: 'w-9 h-9' },
-    lg: { width: 44, height: 44, imgClass: 'w-11 h-11' },
+  const logoSizes = {
+    sm: 'h-8 max-w-[124px]',
+    md: 'h-10 max-w-[156px]',
+    lg: 'h-12 max-w-[190px]',
   };
-
-  const textStyles = {
-    sm: {
-      bangla: 'type-h4 font-[var(--font-weight-bold)] leading-tight text-ui-content-primary tracking-tight whitespace-nowrap',
-      english: 'hidden min-[380px]:block type-compact leading-tight font-[var(--font-weight-medium)] text-ui-content-secondary tracking-normal whitespace-nowrap',
-      gap: 'gap-1.5 sm:gap-2.5',
-    },
-    md: {
-      bangla: 'type-h3 leading-[var(--type-line-24)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight whitespace-nowrap',
-      english: 'type-compact leading-tight font-[var(--font-weight-medium)] text-ui-content-secondary tracking-normal whitespace-nowrap',
-      gap: 'gap-3',
-    },
-    lg: {
-      bangla: 'type-h3 leading-[var(--type-line-26)] font-[var(--font-weight-bold)] text-ui-content-primary tracking-tight whitespace-nowrap',
-      english: 'type-h4 leading-tight font-[var(--font-weight-medium)] text-ui-content-secondary tracking-normal whitespace-nowrap',
-      gap: 'gap-3.5',
-    },
-  };
-
-  const dim = markDimensions[size];
-  const style = textStyles[size];
 
   const brandContent = (
-    <div className={`flex items-center ${style.gap} select-none min-w-0 ${className}`}>
-      {/* Official Sobaike Janao brand mark */}
+    <div
+      className={`relative inline-flex items-center min-w-0 ${logoSizes[size]} ${className}`}
+    >
       <img
-        src={getBrandAsset('sobaike-janao-ouroboros-512.png')}
+        src={getBrandAsset('sobaike-janao-wordmark.webp')}
         alt=""
         aria-hidden="true"
-        width={dim.width}
-        height={dim.height}
-        className={`${dim.imgClass} object-contain shrink-0 select-none`}
+        width={360}
+        height={109}
+        className="block h-full w-auto max-w-full object-contain shrink-0 select-none"
       />
-
-      {/* Semantic Accessible Live HTML Wordmark */}
-      <div className="flex flex-col text-left min-w-0">
-        <span className={style.bangla}>
-          সবাইকে জানাও
-        </span>
-        {showEnglish && (
-          <span className={englishClassName || style.english}>
-            Sobaike Janao
-          </span>
-        )}
-      </div>
     </div>
   );
 
@@ -144,7 +63,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         id={id}
         onClick={onClick}
         aria-label={ariaLabel}
-        className="flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus rounded-[var(--radius-control)] p-0.5 sm:p-1 transition-colors cursor-pointer min-w-0"
+        className={`inline-flex items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus transition-colors cursor-pointer min-w-0 ${
+          variant === 'full'
+            ? 'rounded-[var(--radius-badge-md)]'
+            : 'rounded-[var(--radius-control)] p-0.5 sm:p-1'
+        }`}
       >
         {brandContent}
       </button>
@@ -152,7 +75,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   }
 
   return (
-    <div id={id} className="flex items-center">
+    <div id={id} className="inline-flex items-center min-w-0">
       {brandContent}
     </div>
   );
