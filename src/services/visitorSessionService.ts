@@ -10,6 +10,7 @@ const VISITOR_ID_KEY = 'sobaike_visitor_id_v1';
 const SESSION_ID_KEY = 'sobaike_session_id_v1';
 const LOCATION_CHOICE_KEY = 'sobaike_location_choice_v1';
 export const BROWSE_LOCATION_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes max age for in-memory browse location
+export const REPORTER_LOCATION_FALLBACK_MAX_AGE_MS = 5 * 60 * 1000; // report-submit fallback must remain recent
 
 export type LocationChoice = 'granted' | 'not_now';
 
@@ -683,8 +684,8 @@ export const VisitorSessionService = {
    * 2. Attempts fresh capture via navigator.geolocation.getCurrentPosition with high accuracy.
    * 3. Validates coordinates (numeric, not 0,0, lat -90..90, lng -180..180, accuracy > 0).
    * 4. If fresh capture succeeds, updates `lastRecordedLocation` and returns coordinates.
-   * 5. If fresh capture times out or fails (e.g. temporary weak signal), but a previously valid
-   *    `lastRecordedLocation` is available, uses it.
+   * 5. If fresh capture times out or fails (e.g. temporary weak signal), a previously captured
+   *    device position may be used only when it is still valid and no more than 5 minutes old.
    * 6. If permission was denied or no valid position could be captured, returns clear fail result (fails closed).
    */
   async captureReporterDeviceLocation(): Promise<ReporterLocationCaptureResult> {
@@ -705,6 +706,7 @@ export const VisitorSessionService = {
         // If fresh capture timed out, check if we have a valid lastRecordedLocation to use
         if (
           lastRecordedLocation &&
+          Date.now() - lastRecordedLocation.timestamp <= REPORTER_LOCATION_FALLBACK_MAX_AGE_MS &&
           isValidReporterCoordinates(
             lastRecordedLocation.latitude,
             lastRecordedLocation.longitude,
@@ -745,6 +747,7 @@ export const VisitorSessionService = {
             // Check if valid stored location exists as fallback
             if (
               lastRecordedLocation &&
+              Date.now() - lastRecordedLocation.timestamp <= REPORTER_LOCATION_FALLBACK_MAX_AGE_MS &&
               isValidReporterCoordinates(
                 lastRecordedLocation.latitude,
                 lastRecordedLocation.longitude,
@@ -816,6 +819,7 @@ export const VisitorSessionService = {
           // For other errors (POSITION_UNAVAILABLE, TIMEOUT), fallback if valid location exists
           if (
             lastRecordedLocation &&
+            Date.now() - lastRecordedLocation.timestamp <= REPORTER_LOCATION_FALLBACK_MAX_AGE_MS &&
             isValidReporterCoordinates(
               lastRecordedLocation.latitude,
               lastRecordedLocation.longitude,
