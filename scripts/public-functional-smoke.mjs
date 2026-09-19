@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 
 const SITE_URL = (process.env.SITE_URL || 'https://shobaikejanao.com/').replace(/\/?$/, '/');
+const CANONICAL_ORIGIN = (process.env.CANONICAL_ORIGIN || new URL(SITE_URL).origin).replace(/\/?$/, '/');
 const failures = [];
 const warnings = [];
 const results = [];
@@ -20,6 +21,10 @@ async function check(name, fn) {
 function routeUrl(path) {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return new URL(normalized.replace(/^\//, ''), SITE_URL).toString();
+}
+function canonicalUrl(path) {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return new URL(normalized.replace(/^\//, ''), CANONICAL_ORIGIN).toString();
 }
 
 function currentPath(page) {
@@ -731,13 +736,13 @@ await check('English SEO variant is prerendered, URL-addressable and self-canoni
   }
 
   const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-  if (canonical !== routeUrl('/en/')) {
+  if (canonical !== canonicalUrl('/en/')) {
     throw new Error(`English URL is not self-canonical: ${canonical}`);
   }
 
   const bnAlternate = await page.locator('link[rel="alternate"][hreflang="bn-BD"]').getAttribute('href');
   const enAlternate = await page.locator('link[rel="alternate"][hreflang="en"]').getAttribute('href');
-  if (bnAlternate !== routeUrl('/') || enAlternate !== routeUrl('/en/')) {
+  if (bnAlternate !== canonicalUrl('/') || enAlternate !== canonicalUrl('/en/')) {
     throw new Error(`language alternates invalid: bn=${bnAlternate}, en=${enAlternate}`);
   }
 
@@ -747,7 +752,7 @@ await check('English SEO variant is prerendered, URL-addressable and self-canoni
     throw new Error('English category route lost html lang=en');
   }
   const categoryCanonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-  if (categoryCanonical !== routeUrl('/en/public-safety')) {
+  if (categoryCanonical !== canonicalUrl('/en/public-safety')) {
     throw new Error(`English category canonical is incorrect: ${categoryCanonical}`);
   }
 
