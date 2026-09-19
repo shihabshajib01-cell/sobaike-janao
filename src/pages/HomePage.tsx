@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   AlertCircle,
   Sparkles,
   LayoutGrid,
   TrendingUp,
+  LoaderCircle,
 } from 'lucide-react';
 import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
 import { ReportItem } from '../types/report';
@@ -30,6 +31,35 @@ interface LoadReportsOptions {
 
 const HOME_FEED_PAGE_SIZE = 10;
 const FEED_UPDATE_POLL_INTERVAL_MS = 30_000;
+const HOME_FEED_PREFETCH_MARGIN = '720px 0px';
+const HOME_FEED_REDUCED_PREFETCH_MARGIN = '160px 0px';
+
+const getHomeFeedPrefetchMargin = (): string => {
+  if (typeof navigator === 'undefined') return HOME_FEED_PREFETCH_MARGIN;
+
+  const connection = (
+    navigator as Navigator & {
+      connection?: {
+        saveData?: boolean;
+        effectiveType?: string;
+      };
+    }
+  ).connection;
+
+  if (
+    connection?.saveData ||
+    connection?.effectiveType === 'slow-2g' ||
+    connection?.effectiveType === '2g'
+  ) {
+    return HOME_FEED_REDUCED_PREFETCH_MARGIN;
+  }
+
+  if (connection?.effectiveType === '3g') {
+    return '360px 0px';
+  }
+
+  return HOME_FEED_PREFETCH_MARGIN;
+};
 
 export const HomePage: React.FC = () => {
   const { language, browseLocation, browseLocationStatus } = useApp();
@@ -44,6 +74,10 @@ export const HomePage: React.FC = () => {
   const [nextOffset, setNextOffset] = useState<number | null>(0);
   const [totalReportCount, setTotalReportCount] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
+  const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+  const loadMoreInFlightRef = useRef(false);
+  const feedGenerationRef = useRef(0);
   const [feedWatermark, setFeedWatermark] = useState<string | null>(null);
   const [newReportCount, setNewReportCount] = useState<number>(0);
   const [pendingNewestPublishedAt, setPendingNewestPublishedAt] = useState<string | null>(null);
@@ -63,6 +97,7 @@ export const HomePage: React.FC = () => {
     const background = options?.background === true;
     const append = options?.append === true;
     const offset = Math.max(0, options?.offset || 0);
+    const requestGeneration = feedGenerationRef.current;
 
     if (!background && !append) {
       setIsLoading(true);
@@ -80,6 +115,10 @@ export const HomePage: React.FC = () => {
         limit: HOME_FEED_PAGE_SIZE,
       });
 
+      if (requestGeneration !== feedGenerationRef.current) {
+        return false;
+      }
+
       setAllReports((current) => {
         if (!append) return page.reports;
         const existingIds = new Set(current.map((report) => report.id));
@@ -92,22 +131,30 @@ export const HomePage: React.FC = () => {
       return true;
     } catch (err) {
       console.warn('[HomePage data load error]', err);
-      if (!background && !append) {
+      if (
+        requestGeneration === feedGenerationRef.current &&
+        !background &&
+        !append
+      ) {
         setFetchError('LOAD_ERROR');
       }
       return false;
     } finally {
-      if (!background && !append) {
+      if (
+        requestGeneration === feedGenerationRef.current &&
+        !background &&
+        !append
+      ) {
         setIsLoading(false);
       }
     }
   }, [visitorLat, visitorLng, feedFilter, selectedDistrict]);
 
   useEffect(() => {
-    void loadReports();
-  }, [loadReports]);
-
-  useEffect(() => {
+    feedGenerationRef.current += 1;
+    loadMoreInFlightRef.current = false;
+    setIsLoadingMore(false);
+    setLoadMoreError(false);
     setHasMoreReports(false);
     setNextOffset(0);
     setTotalReportCount(0);
@@ -115,6 +162,10 @@ export const HomePage: React.FC = () => {
     setNewReportCount(0);
     setPendingNewestPublishedAt(null);
   }, [feedFilter, selectedDistrict, visitorLat, visitorLng]);
+
+  useEffect(() => {
+    void loadReports();
+  }, [loadReports]);
 
   useEffect(() => {
     if (isLoading || fetchError || feedWatermark) return;
@@ -230,19 +281,85 @@ export const HomePage: React.FC = () => {
   const filteredReports = useMemo(() => allReports, [allReports]);
 
   const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMoreReports || nextOffset === null) return;
+    if (
+      loadMoreInFlightRef.current ||
+      !hasMoreReports ||
+      nextOffset === null
+    ) {
+      return;
+    }
 
+    const requestGeneration = feedGenerationRef.current;
+    loadMoreInFlightRef.current = true;
     setIsLoadingMore(true);
+    setLoadMoreError(false);
+
     try {
-      await loadReports({
+      const loaded = await loadReports({
         background: true,
         append: true,
         offset: nextOffset,
       });
+
+      if (!loaded && requestGeneration === feedGenerationRef.current) {
+        setLoadMoreError(true);
+      }
     } finally {
-      setIsLoadingMore(false);
+      if (requestGeneration === feedGenerationRef.current) {
+        loadMoreInFlightRef.current = false;
+        setIsLoadingMore(false);
+      }
     }
-  }, [hasMoreReports, isLoadingMore, loadReports, nextOffset]);
+  }, [hasMoreReports, loadReports, nextOffset]);
+
+  useEffect(() => {
+    const sentinel = loadMoreSentinelRef.current;
+
+    if (
+      !sentinel ||
+      isLoading ||
+      fetchError ||
+      !hasMoreReports ||
+      nextOffset === null ||
+      loadMoreError ||
+      typeof IntersectionObserver === 'undefined'
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (
+          !entry?.isIntersecting ||
+          document.visibilityState !== 'visible' ||
+          !navigator.onLine
+        ) {
+          return;
+        }
+
+        void handleLoadMore();
+      },
+      {
+        root: null,
+        rootMargin: getHomeFeedPrefetchMargin(),
+        threshold: 0.01,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [
+    fetchError,
+    handleLoadMore,
+    hasMoreReports,
+    isLoading,
+    loadMoreError,
+    nextOffset,
+  ]);
 
   return (
     <PublicPageContainer id="home-page-container">
@@ -328,19 +445,57 @@ export const HomePage: React.FC = () => {
         {!isLoading && !fetchError && filteredReports.length > 0 && (
           <div className="space-y-3">
             {filteredReports.map((report) => (
-              <ReportCard key={report.id} report={report} />
+              <div key={report.id} className="home-feed-render-window">
+                <ReportCard report={report} />
+              </div>
             ))}
 
-            {hasMoreReports && (
-              <div className="pt-2 flex justify-center">
+            {hasMoreReports && !loadMoreError && (
+              <div
+                ref={loadMoreSentinelRef}
+                id="home-infinite-feed-sentinel"
+                className="min-h-6 pt-1 flex items-center justify-center"
+                aria-hidden={!isLoadingMore}
+              >
+                {isLoadingMore && (
+                  <div
+                    id="home-infinite-feed-loader"
+                    role="status"
+                    aria-live="polite"
+                    className="flex min-h-12 items-center justify-center"
+                  >
+                    <LoaderCircle
+                      className="h-5 w-5 animate-spin text-ui-content-muted"
+                      aria-hidden="true"
+                    />
+                    <span className="sr-only">
+                      {language === 'bn'
+                        ? 'আরও প্রতিবেদন লোড হচ্ছে...'
+                        : 'Loading more reports...'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {hasMoreReports && loadMoreError && (
+              <div
+                id="home-infinite-feed-error"
+                role="alert"
+                className="pt-2 flex flex-col items-center justify-center gap-2 text-center"
+              >
+                <p className="type-meta text-ui-content-muted">
+                  {language === 'bn'
+                    ? 'আরও প্রতিবেদন লোড করা যায়নি।'
+                    : 'Couldn’t load more reports.'}
+                </p>
                 <Button
-                  id="home-load-more-button"
+                  id="home-infinite-feed-retry-button"
                   variant="secondary"
-                  size="md"
+                  size="sm"
                   onClick={() => void handleLoadMore()}
-                  isLoading={isLoadingMore}
                 >
-                  {language === 'bn' ? 'আরও প্রতিবেদন দেখুন' : 'Load more reports'}
+                  {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry'}
                 </Button>
               </div>
             )}
