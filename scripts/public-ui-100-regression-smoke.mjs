@@ -811,11 +811,154 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
     throw new Error(`adaptive navigation preserved stale scroll position: ${routedState.scrollY}px`);
   }
 
+  const routeChangeA11y = await page.evaluate(() => ({
+    activeElementId: document.activeElement?.id || '',
+    announcement:
+      document.querySelector('#route-change-announcement')?.textContent?.trim() || '',
+    compactContextHref:
+      document.querySelector('#bottom-nav-compact-context')?.getAttribute('href') || '',
+    compactContextCurrent:
+      document.querySelector('#bottom-nav-compact-context')?.getAttribute('aria-current') || '',
+  }));
+  if (routeChangeA11y.activeElementId !== 'main-content') {
+    throw new Error(
+      `route change did not focus main content: ${JSON.stringify(routeChangeA11y)}`
+    );
+  }
+  if (!routeChangeA11y.announcement) {
+    throw new Error('route change was not announced to assistive technology');
+  }
+  if (
+    !routeChangeA11y.compactContextHref.endsWith('/search') ||
+    routeChangeA11y.compactContextCurrent !== 'page'
+  ) {
+    throw new Error(
+      `Search route compact context fell back to another page: ${JSON.stringify(routeChangeA11y)}`
+    );
+  }
+
+  await page.goBack({ waitUntil: 'domcontentloaded' });
+  await page.waitForURL((url) => url.pathname === '/' || url.pathname.endsWith('/en'), {
+    timeout: 10000,
+  });
+  await page.waitForTimeout(650);
+  assertExpanded(await readState(), 'browser back route change');
+  const backFocusId = await page.evaluate(() => document.activeElement?.id || '');
+  if (backFocusId !== 'main-content') {
+    throw new Error(`browser Back did not restore route focus contract: ${backFocusId}`);
+  }
+
+  await page.goForward({ waitUntil: 'domcontentloaded' });
+  await page.waitForURL((url) => url.pathname.endsWith('/search'), { timeout: 10000 });
+  await page.waitForTimeout(650);
+  assertExpanded(await readState(), 'browser forward route change');
+  const forwardState = await page.evaluate(() => ({
+    activeElementId: document.activeElement?.id || '',
+    href: document.querySelector('#bottom-nav-compact-context')?.getAttribute('href') || '',
+  }));
+  if (
+    forwardState.activeElementId !== 'main-content' ||
+    !forwardState.href.endsWith('/search')
+  ) {
+    throw new Error(
+      `browser Forward did not preserve navigation context: ${JSON.stringify(forwardState)}`
+    );
+  }
+
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await scrollIntoCompactMode();
   await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(650);
   assertExpanded(await readState(), 'refresh');
+
+  await context.close();
+});
+
+await check('Compact bottom context follows non-primary routes in Bangla and English', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+
+  const cases = [
+    { path: '/search', expectedPath: '/search', expectedLabel: 'অনুসন্ধান' },
+    { path: '/more', expectedPath: '/more', expectedLabel: 'আরও' },
+    { path: '/en/search', expectedPath: '/en/search', expectedLabel: 'Search' },
+    { path: '/en/more', expectedPath: '/en/more', expectedLabel: 'More' },
+  ];
+
+  for (const testCase of cases) {
+    await page.goto(routeUrl(testCase.path), {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000,
+    });
+    await expectVisible(page.locator('#main-content'), testCase.path + ' did not render');
+
+    const contextState = await page.evaluate(() => {
+      const link = document.querySelector('#bottom-nav-compact-context');
+      return {
+        href: link?.getAttribute('href') || '',
+        label: link?.getAttribute('aria-label') || '',
+        current: link?.getAttribute('aria-current') || '',
+        language: document.documentElement.lang,
+      };
+    });
+
+    if (!contextState.href.endsWith(testCase.expectedPath)) {
+      throw new Error(
+        `${testCase.path} compact context resolved to ${contextState.href || 'missing'}`
+      );
+    }
+    if (contextState.label !== testCase.expectedLabel || contextState.current !== 'page') {
+      throw new Error(
+        `${testCase.path} compact context semantics are wrong: ${JSON.stringify(contextState)}`
+      );
+    }
+    if (
+      (testCase.path.startsWith('/en/') && contextState.language !== 'en') ||
+      (!testCase.path.startsWith('/en/') && contextState.language !== 'bn')
+    ) {
+      throw new Error(
+        `${testCase.path} language context is wrong: ${JSON.stringify(contextState)}`
+      );
+    }
+  }
+
+  await context.close();
+});
+
+await check('Reduced-motion adaptive chrome has no hidden interaction lock', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#main-content'), 'Home did not render for reduced-motion check');
+
+  const target = await page.evaluate(() => {
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    return Math.min(700, maxScroll);
+  });
+  if (target < 160) {
+    throw new Error(`Home is not tall enough for reduced-motion adaptive chrome: ${target}px`);
+  }
+
+  await scrollDownInSteps(page, target);
+  await page.waitForFunction(
+    () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') === 'true',
+    null,
+    { timeout: 5000 }
+  );
+
+  const compactY = await page.evaluate(() => window.scrollY);
+  await page.evaluate((top) => {
+    window.scrollTo({ top: Math.max(32, top - 180), behavior: 'instant' });
+  }, compactY);
+
+  await page.waitForFunction(
+    () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true',
+    null,
+    { timeout: 450 }
+  );
 
   await context.close();
 });
