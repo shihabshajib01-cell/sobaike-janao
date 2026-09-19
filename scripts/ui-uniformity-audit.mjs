@@ -722,6 +722,11 @@ requireContains(
   '@media (min-width: 768px) {\n  .hero-slider-cta-row {\n    display: flex;',
   'public hero Report CTA must remain visible on tablet and desktop layouts'
 );
+requireContains(
+  'src/index.css',
+  '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    justify-content: flex-start;',
+  'desktop hero Report CTA must remain left-aligned under the banner copy'
+);
 requireNotContains(
   'src/index.css',
   '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    display: none;',
