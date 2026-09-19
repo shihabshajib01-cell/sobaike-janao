@@ -52,6 +52,7 @@ for (const needle of [
   'REPORTER_LOCATION_FALLBACK_MAX_AGE_MS = 5 * 60 * 1000',
   'Date.now() - lastRecordedLocation.timestamp <= REPORTER_LOCATION_FALLBACK_MAX_AGE_MS',
   'maximumAge: 0',
+  "this.setLocationChoice('not_now')",
 ]) {
   requireText(visitor, needle, 'reporter location freshness');
 }
@@ -79,6 +80,11 @@ for (const needle of [
   "result.status !== 'denied'",
 ]) {
   requireText(appContext, needle, 'browse fallback consent boundary');
+}
+
+const consentModal = read('src/components/location/LocationConsentModal.tsx');
+if (consentModal.includes("VisitorSessionService.setLocationChoice('granted');")) {
+  errors.push('browse fallback consent boundary: modal must not persist a grant before browser approval');
 }
 
 requireText(
