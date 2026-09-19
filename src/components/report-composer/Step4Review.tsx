@@ -341,7 +341,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
             <div className="p-3 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle">
               <span className="text-ui-content-muted block mb-1 type-compact">{language === 'bn' ? 'বিবরণ:' : 'Description:'}</span>
-              <p className="text-ui-content-secondary leading-relaxed whitespace-pre-wrap type-compact">
+              <p className="text-ui-content-secondary whitespace-pre-wrap type-compact">
                 {formData.description || '-'}
               </p>
             </div>
