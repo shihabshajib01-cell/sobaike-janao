@@ -79,6 +79,33 @@ if (!deployWorkflow.includes("if: github.event_name == 'push' && github.ref == '
   fail('Production deploy is no longer restricted to pushes on main');
 }
 
+
+const syncMigrationFile = 'supabase/migrations/20260919142507_end_to_end_sync_contract_and_rls_hardening.sql';
+if (!fs.existsSync(syncMigrationFile)) {
+  fail('missing canonical Public-SQL-Admin sync migration');
+}
+const syncMigration = read(syncMigrationFile);
+for (const needle of [
+  'get_platform_sync_contract_version',
+  '2026-09-19.1',
+  'RPC-only table: deny direct reads',
+]) {
+  if (!syncMigration.includes(needle)) {
+    fail('sync migration is missing contract hardening marker: ' + needle);
+  }
+}
+
+const productionSmoke = read('.github/workflows/production-smoke.yml');
+for (const needle of [
+  'Verify Public-SQL-Admin sync contract',
+  'get_platform_sync_contract_version',
+  '2026-09-19.1',
+]) {
+  if (!productionSmoke.includes(needle)) {
+    fail('production smoke is missing live sync-contract guard: ' + needle);
+  }
+}
+
 console.log(
   'Integration contract audit passed using ' + latestContractFile +
   '; harassment schema options and deploy concurrency are aligned.'
