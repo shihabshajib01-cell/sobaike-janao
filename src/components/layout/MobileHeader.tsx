@@ -89,6 +89,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const activeCategoryKey = activeCategory?.id;
   const isHarassmentCategory = activeCategoryKey === 'harassment';
   const isReportDetailRoute = currentRoute.startsWith(REPORT_DETAIL_PREFIX);
+  const isSearchRoute = currentRoute === '/search';
   const reportDetailId = isReportDetailRoute
     ? decodeURIComponent(currentRoute.slice(REPORT_DETAIL_PREFIX.length))
     : '';
@@ -293,6 +294,48 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       }
     }
   };
+
+  if (isSearchRoute) {
+    return (
+      <div
+        className={`md:hidden sticky top-0 z-40 w-full overflow-visible transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+          isCompact ? 'h-0' : 'h-[calc(3.5rem+env(safe-area-inset-top,0px))]'
+        }`}
+      >
+        <header
+          id="mobile-search-header"
+          data-compact={isCompact ? 'true' : 'false'}
+          className={`absolute inset-x-0 top-0 w-full pt-safe transition-[background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+            isCompact
+              ? 'pointer-events-none bg-transparent border-b border-transparent'
+              : 'bg-ui-surface border-b border-ui-divider'
+          }`}
+        >
+          <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
+            <IconButton
+              id="mobile-search-close-btn"
+              variant="outline"
+              size="lg"
+              onClick={() => goBackWithFallback(() => navigateTo('/'))}
+              aria-label={language === 'bn' ? 'অনুসন্ধান বন্ধ করুন' : 'Close search'}
+              data-mobile-floating-control={isCompact ? 'true' : undefined}
+              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              icon={<AppIcon name="close" size="xl" strokeWidth={2} />}
+            />
+
+            <p
+              id="mobile-search-title"
+              className={`min-w-0 flex-1 truncate type-h3 text-ui-content-primary transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                isCompact ? '-translate-y-2 opacity-0' : 'translate-y-0 opacity-100'
+              }`}
+            >
+              {language === 'bn' ? 'অনুসন্ধান' : 'Search'}
+            </p>
+          </div>
+        </header>
+      </div>
+    );
+  }
 
   if (isReportDetailRoute) {
     return (
