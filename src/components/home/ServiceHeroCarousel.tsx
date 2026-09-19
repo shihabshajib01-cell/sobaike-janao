@@ -30,7 +30,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   id = 'home-service-carousel',
   className = '',
 }) => {
-  const { language, openReportComposer } = useApp();
+  const { language, navigateTo, openReportComposer } = useApp();
   const { segments } = useTaxonomy();
   usePublishedBannerRuntime();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,6 +42,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
 
   const timerRef = useRef<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const lastSwipeAtRef = useRef(0);
   const sliderRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -215,6 +216,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       Math.abs(diffX) > HERO_SLIDER_BEHAVIOR.swipeThresholdPx &&
       Math.abs(diffX) > Math.abs(diffY) * HERO_SLIDER_BEHAVIOR.swipeDominanceRatio
     ) {
+      lastSwipeAtRef.current = Date.now();
       if (diffX < 0) {
         handleNext();
       } else {
@@ -229,6 +231,27 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     setIsHovered(false);
     touchStartRef.current = null;
     setIsSwiping(false);
+  };
+
+  const handleSlideClick = (
+    e: React.MouseEvent<HTMLDivElement>,
+    slideKey: SectionKey
+  ) => {
+    if (Date.now() - lastSwipeAtRef.current < 500) return;
+
+    const target = e.target as HTMLElement | null;
+    if (
+      target?.closest(
+        'button, a, input, textarea, select, [role="button"], [role="link"], [role="textbox"]'
+      )
+    ) {
+      return;
+    }
+
+    const targetRoute = segments[slideKey]?.slug;
+    if (targetRoute) {
+      navigateTo(targetRoute);
+    }
   };
 
   if (totalSlides === 0) {
@@ -306,7 +329,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                     : `Slide ${index + 1} of ${totalSlides}`
                 }
                 aria-hidden={!isActive}
-                className="w-full shrink-0 min-w-full p-0 flex flex-col"
+                onClick={(e) => handleSlideClick(e, slide.key)}
+                className={`w-full shrink-0 min-w-full p-0 flex flex-col ${isActive ? 'cursor-pointer' : ''}`}
                 style={{
                   backgroundColor: isManagedThemePreset(slideSegment?.themeKey)
                     ? slideSegment?.bgColor || 'var(--md-surface-subtle)'
