@@ -48,6 +48,37 @@ jobs:
           print('Public site smoke check passed')
           PY
 
+      - name: Verify first-party browse IP fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+
+          curl --fail-with-body -sS \
+            "$SUPABASE_URL/functions/v1/public-ip-location" \
+            -H "Accept: application/json" \
+            -o /tmp/public-ip-location.json
+
+          python - <<'PY'
+          import json
+          import math
+          from pathlib import Path
+
+          data = json.loads(Path('/tmp/public-ip-location.json').read_text())
+          lat = data.get('latitude')
+          lng = data.get('longitude')
+          accuracy = data.get('accuracy')
+
+          if not isinstance(lat, (int, float)) or not math.isfinite(lat) or not (-90 <= lat <= 90):
+              raise SystemExit('ERROR: first-party IP fallback returned invalid latitude')
+          if not isinstance(lng, (int, float)) or not math.isfinite(lng) or not (-180 <= lng <= 180):
+              raise SystemExit('ERROR: first-party IP fallback returned invalid longitude')
+          if not isinstance(accuracy, (int, float)) or accuracy <= 0:
+              raise SystemExit('ERROR: first-party IP fallback returned invalid accuracy')
+
+          print('First-party browse IP fallback smoke check passed')
+          PY
+
       - name: Verify live SEO surface
         shell: bash
         run: |
