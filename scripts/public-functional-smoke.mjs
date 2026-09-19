@@ -54,10 +54,40 @@ async function expectVisible(locator, message) {
   if (!(await locator.isVisible())) throw new Error(message);
 }
 
+async function createSmokeContext(options = {}) {
+  const context = await browser.newContext({
+    serviceWorkers: 'block',
+    ...options,
+  });
+
+  // This suite validates behavior, state, routing and data contracts rather than
+  // image decoding. Avoid downloading every hero/feed media asset in each of
+  // the many isolated contexts, which previously exhausted Chromium/network
+  // resources and triggered upstream 429s unrelated to product behavior.
+  await context.route('**/*', async (route) => {
+    const resourceType = route.request().resourceType();
+    if (resourceType === 'image') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'image/svg+xml',
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>',
+      });
+      return;
+    }
+    if (resourceType === 'media') {
+      await route.fulfill({ status: 204, body: '' });
+      return;
+    }
+    await route.continue();
+  });
+
+  return context;
+}
+
 const browser = await chromium.launch({ headless: true });
 
 await check('First-visit responsibility -> location -> Not now flow', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   attachRuntimeGuards(page, 'first-visit');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -106,7 +136,7 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
 });
 
 await check('Stored Not now remains IP-only even when browser permission is already granted', async () => {
-  const context = await browser.newContext({
+  const context = await createSmokeContext({
     viewport: { width: 390, height: 844 },
     geolocation: { latitude: 23.7806, longitude: 90.4070 },
   });
@@ -143,7 +173,7 @@ await check('Stored Not now remains IP-only even when browser permission is alre
 });
 
 await check('Escape from browse location prompt behaves exactly like Not now', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
     if (!sessionStorage.getItem('__location_escape_seeded')) {
       localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
@@ -188,7 +218,7 @@ await check('Escape from browse location prompt behaves exactly like Not now', a
 });
 
 await check('Technical GPS failure persists IP fallback and does not nag on refresh', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
     if (!sessionStorage.getItem('__location_technical_seeded')) {
       localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
@@ -248,7 +278,7 @@ await check('Technical GPS failure persists IP fallback and does not nag on refr
 });
 
 await check('Pending GPS cannot override a later Not now choice', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
     localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
     localStorage.removeItem('sobaike_location_choice_v1');
@@ -311,7 +341,7 @@ await check('Pending GPS cannot override a later Not now choice', async () => {
 });
 
 await check('Denied browse choice upgrades after browser permission is later granted', async () => {
-  const context = await browser.newContext({
+  const context = await createSmokeContext({
     viewport: { width: 390, height: 844 },
     geolocation: { latitude: 23.7806, longitude: 90.4070 },
   });
@@ -342,7 +372,7 @@ await check('Denied browse choice upgrades after browser permission is later gra
 });
 
 await check('Privacy settings can switch approximate -> precise -> approximate', async () => {
-  const context = await browser.newContext({
+  const context = await createSmokeContext({
     viewport: { width: 390, height: 844 },
     geolocation: { latitude: 23.7806, longitude: 90.4070 },
   });
@@ -397,7 +427,7 @@ await check('Privacy settings can switch approximate -> precise -> approximate',
 });
 
 await check('Returning denied-location visitor is not nagged after refresh', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
     localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
     localStorage.setItem('sobaike_location_choice_v1', 'denied');
@@ -418,7 +448,7 @@ await check('Returning denied-location visitor is not nagged after refresh', asy
 });
 
 await check('Browse location grant flow works with simulated coordinates', async () => {
-  const context = await browser.newContext({
+  const context = await createSmokeContext({
     viewport: { width: 390, height: 844 },
     geolocation: { latitude: 23.7806, longitude: 90.4070 },
   });
@@ -445,7 +475,7 @@ await check('Browse location grant flow works with simulated coordinates', async
 
 const desktopRoutes = ['/', '/harassment', '/rickshaw', '/extortion', '/load-shedding', '/illegal-occupation', '/explore', '/search', '/more'];
 await check('Desktop routes render without runtime crashes', async () => {
-  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  const context = await createSmokeContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'desktop-routes');
@@ -460,7 +490,7 @@ await check('Desktop routes render without runtime crashes', async () => {
 });
 
 await check('Home infinite feed autoloads with bounded mounted cards', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'home-infinite-performance');
@@ -546,7 +576,7 @@ await check('Home infinite feed autoloads with bounded mounted cards', async () 
 
 
 await check('Mobile navigation, issue rows and category controls follow the approved contract', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'mobile-nav');
@@ -601,7 +631,7 @@ await check('Mobile navigation, issue rows and category controls follow the appr
 });
 
 await check('Legacy hash links migrate to clean URLs', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'legacy-hash');
@@ -617,7 +647,7 @@ await check('Legacy hash links migrate to clean URLs', async () => {
 });
 
 await check('Report composer has no draft persistence and uses the approved two-action cancel flow', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   await context.addInitScript(() => {
     localStorage.setItem('sobaike_janao_draft_report', JSON.stringify({ segment: 'harassment', currentStep: 4, title: 'legacy draft' }));
@@ -659,7 +689,7 @@ await check('Report composer has no draft persistence and uses the approved two-
 });
 
 await check('Tablet menu, language toggle and theme controls are interactive', async () => {
-  const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+  const context = await createSmokeContext({ viewport: { width: 1024, height: 768 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'settings');
@@ -698,7 +728,7 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
 });
 
 await check('English SEO variant is prerendered, URL-addressable and self-canonical', async () => {
-  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  const context = await createSmokeContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'english-seo');
@@ -734,7 +764,7 @@ await check('English SEO variant is prerendered, URL-addressable and self-canoni
 });
 
 await check('Legacy ?lang=en links migrate to /en paths', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'legacy-english-url');
@@ -747,7 +777,7 @@ await check('Legacy ?lang=en links migrate to /en paths', async () => {
 });
 
 await check('Search page accepts a query without crashing', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createSmokeContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'search');
@@ -856,7 +886,7 @@ await check('Public report detail route renders when a published report is avail
     warnings.push('No published report available; report-detail browser check skipped');
     return;
   }
-  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  const context = await createSmokeContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   attachRuntimeGuards(page, 'report-detail');
