@@ -282,11 +282,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             <IconButton
               id="mobile-report-detail-back-btn"
               variant={isCompact ? 'outline' : 'ghost'}
-              size="md"
+              size="lg"
               onClick={() => goBackWithFallback(() => navigateTo('/'))}
               aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
-              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
-              icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 !border-ui-stroke-subtle ui-elevation-control backdrop-blur-md' : ''} !border-ui-stroke-subtle transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              icon={<ArrowLeft className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
             />
 
             <p
@@ -301,7 +301,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             <IconButton
               id="mobile-report-detail-share-btn"
               variant="outline"
-              size="md"
+              size="lg"
               onClick={handleReportShare}
               aria-label={
                 isShareConfirmed
@@ -312,12 +312,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                   ? 'প্রতিবেদন শেয়ার করুন'
                   : 'Share report'
               }
-              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 !border-ui-stroke-subtle ui-elevation-control backdrop-blur-md' : ''} !border-ui-stroke-subtle transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={
                 isShareConfirmed ? (
-                  <Check className="h-5 w-5 text-ui-success-text" aria-hidden="true" />
+                  <Check className="h-6 w-6 stroke-[2] text-ui-success-text" aria-hidden="true" />
                 ) : (
-                  <Share2 className="h-5 w-5" aria-hidden="true" />
+                  <Share2 className="h-6 w-6 stroke-[2]" aria-hidden="true" />
                 )
               }
             />
@@ -349,11 +349,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             <IconButton
               id="mobile-category-back-btn"
               variant={isCompact ? 'outline' : 'ghost'}
-              size="md"
+              size="lg"
               onClick={() => navigateTo('/issues')}
               aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
-              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
-              icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 !border-ui-stroke-subtle ui-elevation-control backdrop-blur-md' : ''} !border-ui-stroke-subtle transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              icon={<ArrowLeft className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
             />
 
             <p
@@ -369,12 +369,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               <IconButton
                 id="mobile-category-filter-btn"
                 variant="outline"
-                size="md"
+                size="lg"
                 onClick={() => setIsHarassmentFilterOpen(true)}
                 aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
                 aria-haspopup="dialog"
-                className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
-                icon={<Filter className="h-5 w-5" aria-hidden="true" />}
+                className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 !border-ui-stroke-subtle ui-elevation-control backdrop-blur-md' : ''} !border-ui-stroke-subtle transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+                icon={<Filter className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
               />
             ) : (
               <div
@@ -413,12 +413,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               <IconButton
                 id="mobile-header-menu-btn"
                 variant="outline"
-                size="md"
+                size="lg"
                 onClick={() => setIsTabletMenuOpen(true)}
                 tabIndex={isCompact ? -1 : undefined}
                 aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
                 className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
-                icon={<Menu className="w-5 h-5" aria-hidden="true" />}
+                icon={<Menu className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
               />
 
               <Link
@@ -442,9 +442,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               onClick={handleAdaptiveNavigation}
               tabIndex={isCompact ? -1 : undefined}
               aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-              className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="inline-flex w-12 h-12 min-w-[48px] min-h-[48px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
-              <Search className="w-5 h-5" aria-hidden="true" />
+              <Search className="h-6 w-6 stroke-[2]" aria-hidden="true" />
             </Link>
           </div>
         </header>
@@ -465,14 +465,14 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           <IconButton
             id="mobile-compact-menu-btn"
             variant="outline"
-            size="md"
+            size="lg"
             onClick={() => setIsTabletMenuOpen(true)}
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
             className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
               isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
             }`}
-            icon={<Menu className="w-5 h-5" aria-hidden="true" />}
+            icon={<Menu className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
           />
 
           <Link
@@ -481,11 +481,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             onClick={handleAdaptiveNavigation}
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-12 h-12 min-w-[48px] min-h-[48px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
             }`}
           >
-            <Search className="w-5 h-5" aria-hidden="true" />
+            <Search className="h-6 w-6 stroke-[2]" aria-hidden="true" />
           </Link>
         </div>
       </nav>
