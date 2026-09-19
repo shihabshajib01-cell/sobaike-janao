@@ -194,7 +194,6 @@ export const TaxonomyService = {
           const key = row.id as SectionKey;
           const legacy = SECTIONS[key];
           const dynamicTheme = buildDynamicTheme(row.theme_key);
-          const hasManagedTheme = isManagedThemePreset(row.theme_key);
           // Built-in illustrated categories are brand-locked to the palette derived
           // from their banner artwork. Admin theme presets may style truly dynamic
           // categories, but must not silently break a canonical banner/palette pair.
