@@ -23,6 +23,7 @@ export interface CategoryHeroBannerProps {
   desktopDescriptionBn?: string;
   desktopDescriptionEn?: string;
   illustrationSrc?: string;
+  deferIllustration?: boolean;
   desktopMediaPosition?: string;
   desktopMediaScale?: number;
   desktopMediaTranslateY?: string;
@@ -73,6 +74,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   desktopDescriptionBn,
   desktopDescriptionEn,
   illustrationSrc,
+  deferIllustration = false,
   desktopMediaPosition,
   desktopMediaScale,
   desktopMediaTranslateY,
@@ -179,26 +181,43 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
       {/* 3: Mobile/Desktop Illustration */}
       <div className="hero-slider-media">
         {illustrationSrc ? (
-          <img
-            src={resolvePublicAsset(illustrationSrc)}
-            alt=""
-            aria-hidden="true"
-            width={1600}
-            height={900}
-            loading={active ? 'eager' : 'lazy'}
-            fetchPriority={active ? 'high' : 'low'}
-            decoding="async"
-            style={
-              {
-                '--hero-desktop-media-position': resolvedDesktopMediaPosition,
-                '--hero-desktop-media-scale': resolvedDesktopMediaScale,
-                ...(resolvedDesktopMediaTranslateY
-                  ? { '--hero-desktop-media-translate-y': resolvedDesktopMediaTranslateY }
-                  : {}),
-              } as React.CSSProperties
-            }
-            className="hero-slider-image hero-desktop-media-framed"
-          />
+          deferIllustration ? (
+            <div
+              aria-hidden="true"
+              data-hero-media-deferred="true"
+              className="hero-slider-image hero-desktop-media-framed"
+              style={{
+                ...({
+              '--hero-desktop-media-position': resolvedDesktopMediaPosition,
+              '--hero-desktop-media-scale': resolvedDesktopMediaScale,
+              ...(resolvedDesktopMediaTranslateY
+                ? { '--hero-desktop-media-translate-y': resolvedDesktopMediaTranslateY }
+                : {}),
+            } as React.CSSProperties),
+                aspectRatio: '16 / 9',
+                opacity: 0,
+              }}
+            />
+          ) : (
+            <img
+              src={resolvePublicAsset(illustrationSrc)}
+              alt=""
+              aria-hidden="true"
+              width={1600}
+              height={900}
+              loading={active ? 'eager' : 'lazy'}
+              fetchPriority={active ? 'high' : 'low'}
+              decoding="async"
+              style={{
+              '--hero-desktop-media-position': resolvedDesktopMediaPosition,
+              '--hero-desktop-media-scale': resolvedDesktopMediaScale,
+              ...(resolvedDesktopMediaTranslateY
+                ? { '--hero-desktop-media-translate-y': resolvedDesktopMediaTranslateY }
+                : {}),
+            } as React.CSSProperties}
+              className="hero-slider-image hero-desktop-media-framed"
+            />
+          )
         ) : (
           <div
             aria-hidden="true"

@@ -168,6 +168,92 @@ await check('Desktop routes render without runtime crashes', async () => {
   await context.close();
 });
 
+await check('Home infinite feed autoloads with bounded mounted cards', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'home-infinite-performance');
+
+  let feedRequests = 0;
+  page.on('request', (request) => {
+    if (request.url().includes('/rest/v1/rpc/get_public_home_feed_page')) {
+      feedRequests += 1;
+    }
+  });
+
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const feed = page.locator('#home-virtualized-feed');
+  await feed.waitFor({ state: 'attached', timeout: 15000 });
+
+  const loadedCount = async () =>
+    Number((await feed.getAttribute('data-loaded-count')) || 0);
+
+  await page.waitForFunction(() => {
+    const node = document.querySelector('#home-virtualized-feed');
+    return Number(node?.getAttribute('data-loaded-count') || 0) >= 10;
+  });
+
+  for (const target of [20, 30, 40, 50]) {
+    if ((await loadedCount()) >= target) continue;
+
+    const sentinel = page.locator('#home-infinite-feed-sentinel');
+    await sentinel.waitFor({ state: 'attached', timeout: 15000 });
+    await sentinel.scrollIntoViewIfNeeded();
+
+    await page.waitForFunction(
+      (minimum) => {
+        const node = document.querySelector('#home-virtualized-feed');
+        return Number(node?.getAttribute('data-loaded-count') || 0) >= minimum;
+      },
+      target,
+      { timeout: 15000 }
+    );
+  }
+
+  await page.waitForTimeout(700);
+
+  const state = await page.evaluate(() => {
+    const feedNode = document.querySelector('#home-virtualized-feed');
+    const cardIds = Array.from(document.querySelectorAll('[id^="report-card-"]'))
+      .map((node) => node.id);
+
+    return {
+      loaded: Number(feedNode?.getAttribute('data-loaded-count') || 0),
+      mountedPages: document.querySelectorAll(
+        '[data-virtualized-report-page][data-mounted="true"]'
+      ).length,
+      mountedCards: cardIds.length,
+      uniqueMountedCards: new Set(cardIds).size,
+      manualLoadMore: document.querySelectorAll('#home-load-more-button').length,
+    };
+  });
+
+  if (state.loaded < 50) {
+    throw new Error(`infinite feed stopped early at ${state.loaded} loaded reports`);
+  }
+  if (state.manualLoadMore !== 0) {
+    throw new Error('manual Home load-more control returned');
+  }
+  if (state.mountedCards > 40 || state.mountedPages > 4) {
+    throw new Error(
+      `virtualization window is too large: pages=${state.mountedPages}, cards=${state.mountedCards}`
+    );
+  }
+  if (state.mountedCards !== state.uniqueMountedCards) {
+    throw new Error('duplicate mounted report IDs detected during infinite scrolling');
+  }
+
+  const expectedPages = Math.ceil(state.loaded / 10);
+  if (feedRequests > expectedPages + 1) {
+    throw new Error(
+      `too many Home page RPCs: requests=${feedRequests}, loaded=${state.loaded}`
+    );
+  }
+
+  await context.close();
+});
+
+
 await check('Mobile navigation, issue rows and category controls follow the approved contract', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);

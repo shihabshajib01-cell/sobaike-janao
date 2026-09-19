@@ -1,6 +1,7 @@
 import { SectionKey, SECTIONS } from '../theme/tokens';
 import { SubcategoryOption, SEGMENT_SUBCATEGORIES } from '../data/reportOptions';
 import { useState, useEffect } from 'react';
+import { scheduleIdleTask } from '../utils/scheduleIdleTask';
 
 export interface SupabaseSegmentRow {
   id: string;
@@ -369,9 +370,22 @@ export const TaxonomyService = {
   },
 };
 
+let cancelScheduledTaxonomyFetch: (() => void) | null = null;
+
+const scheduleTaxonomyFetch = (timeoutMs = 1200) => {
+  if (isFetching || cancelScheduledTaxonomyFetch) return;
+
+  cancelScheduledTaxonomyFetch = scheduleIdleTask(() => {
+    cancelScheduledTaxonomyFetch = null;
+    if (!isFetching) {
+      TaxonomyService.fetchTaxonomy().catch(() => {});
+    }
+  }, timeoutMs);
+};
+
 if (typeof window !== 'undefined') {
   if (!isFetched) {
-    TaxonomyService.fetchTaxonomy().catch(() => {});
+    scheduleTaxonomyFetch();
   }
 
   const refreshIfStale = () => {
@@ -379,7 +393,7 @@ if (typeof window !== 'undefined') {
       !isFetching &&
       Date.now() - lastFetchedAt >= TAXONOMY_REFRESH_INTERVAL_MS
     ) {
-      TaxonomyService.fetchTaxonomy().catch(() => {});
+      scheduleTaxonomyFetch(700);
     }
   };
 
@@ -398,7 +412,7 @@ export function useTaxonomy() {
     });
 
     if (!isFetched && !isFetching) {
-      TaxonomyService.fetchTaxonomy().catch(() => {});
+      scheduleTaxonomyFetch();
     }
 
     return () => {
