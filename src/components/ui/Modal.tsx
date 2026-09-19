@@ -83,21 +83,21 @@ export const Modal: React.FC<ModalProps> = ({
     (maxWidth === 'composer' || maxWidth === 'full' ? 'fullscreen' : 'sheet');
 
   const defaultMaxWidthClasses: Record<string, string> = {
-    sm: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-sm max-h-[calc(100%-24px)] sm:max-h-[calc(100%-32px)] md:max-h-[90vh] my-auto',
-    md: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-lg max-h-[calc(100%-24px)] sm:max-h-[calc(100%-32px)] md:max-h-[90vh] my-auto',
-    lg: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-2xl max-h-[calc(100%-24px)] sm:max-h-[calc(100%-32px)] md:max-h-[90vh] my-auto',
-    xl: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-3xl max-h-[calc(100%-24px)] sm:max-h-[calc(100%-32px)] md:max-h-[90vh] my-auto',
-    '2xl': 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-5xl max-h-[calc(100%-24px)] sm:max-h-[calc(100%-32px)] md:max-h-[90vh] my-auto',
-    composer: 'w-full max-w-full h-full max-h-full rounded-none md:w-[calc(100vw-48px)] md:max-w-[1040px] md:h-auto md:max-h-[90vh] md:rounded-[var(--radius-modal)] md:my-auto',
-    full: 'w-full max-w-full h-full',
+    sm: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-sm max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    md: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-lg max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    lg: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-2xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    xl: 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-3xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    '2xl': 'w-[calc(100%-24px)] sm:w-[calc(100%-32px)] max-w-5xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] md:max-h-[90vh] my-auto',
+    composer: 'w-full max-w-full h-[100dvh] max-h-[100dvh] rounded-none md:w-[calc(100vw-48px)] md:max-w-[1040px] md:h-auto md:max-h-[90vh] md:rounded-[var(--radius-modal)] md:my-auto',
+    full: 'w-full max-w-full h-[100dvh] max-h-[100dvh]',
   };
 
   const sheetMaxWidthClasses: Record<string, string> = {
-    sm: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-sm max-h-[92%] md:max-h-[90vh] my-0 md:my-auto',
-    md: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-lg max-h-[92%] md:max-h-[90vh] my-0 md:my-auto',
-    lg: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-2xl max-h-[92%] md:max-h-[90vh] my-0 md:my-auto',
-    xl: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-3xl max-h-[92%] md:max-h-[90vh] my-0 md:my-auto',
-    '2xl': 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-5xl max-h-[92%] md:max-h-[90vh] my-0 md:my-auto',
+    sm: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-sm max-h-[calc(100dvh-env(safe-area-inset-top,0px)-12px)] md:max-h-[90vh] my-0 md:my-auto',
+    md: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-lg max-h-[calc(100dvh-env(safe-area-inset-top,0px)-12px)] md:max-h-[90vh] my-0 md:my-auto',
+    lg: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-2xl max-h-[calc(100dvh-env(safe-area-inset-top,0px)-12px)] md:max-h-[90vh] my-0 md:my-auto',
+    xl: 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-3xl max-h-[calc(100dvh-env(safe-area-inset-top,0px)-12px)] md:max-h-[90vh] my-0 md:my-auto',
+    '2xl': 'w-full max-w-none md:w-[calc(100%-32px)] md:max-w-5xl max-h-[calc(100dvh-env(safe-area-inset-top,0px)-12px)] md:max-h-[90vh] my-0 md:my-auto',
     composer: defaultMaxWidthClasses.composer,
     full: defaultMaxWidthClasses.full,
   };
@@ -136,7 +136,7 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={effectiveLabelledBy}
       aria-describedby={effectiveDescribedBy}
       aria-label={effectiveAriaLabel}
-      className={`fixed inset-0 min-h-0 ${zIndexClass} ${rootPositionClasses} transition-opacity duration-200 ${
+      className={`fixed inset-0 h-[100dvh] max-h-[100dvh] min-h-0 overscroll-none ${zIndexClass} ${rootPositionClasses} transition-opacity duration-200 ${
         isHidden ? 'opacity-0 pointer-events-none invisible' : 'opacity-100 visible'
       }`}
     >
