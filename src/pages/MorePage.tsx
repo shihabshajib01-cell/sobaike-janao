@@ -25,6 +25,7 @@ import { useTaxonomy } from '../services/taxonomyService';
 import { SECTIONS, SectionKey } from '../theme/tokens';
 import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { Button } from '../components/ui/Button';
+import { PlatformInformationDetails } from '../components/home/HomeSeoContent';
 
 type InfoTab = 'about' | 'guide' | 'helplines' | 'principles' | 'response' | 'faq';
 
@@ -204,6 +205,8 @@ export const MorePage: React.FC = () => {
               })}
             </div>
           </div>
+
+          <PlatformInformationDetails language={language} />
         </section>
       )}
 
