@@ -8,7 +8,7 @@
   "theme_color": "#1B4D6B",
   "icons": [
     {
-      "src": "./brand/sobaike-janao-ouroboros-512.png",
+      "src": "./brand/sobaike-janao-favicon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
