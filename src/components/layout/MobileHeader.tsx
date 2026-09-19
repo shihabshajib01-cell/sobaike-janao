@@ -300,7 +300,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     <>
       <header
         id="mobile-header"
-        className={`md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity,margin-bottom] duration-200 ease-out motion-reduce:transition-none ${
+        className={`md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity,margin-bottom] duration-300 ease-out motion-reduce:transition-none will-change-transform ${
           isCompact
             ? '-translate-y-full opacity-0 pointer-events-none -mb-[calc(3.5rem+env(safe-area-inset-top,0px))]'
             : 'translate-y-0 opacity-100 mb-0'
@@ -341,34 +341,40 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         </div>
       </header>
 
-      {isCompact ? (
-        <nav
-          id="mobile-compact-header"
-          aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
-          className="md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4"
-        >
-          <div className="flex w-full items-center justify-between">
-            <IconButton
-              id="mobile-compact-menu-btn"
-              variant="outline"
-              size="md"
-              onClick={() => setIsTabletMenuOpen(true)}
-              aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-              className="pointer-events-auto bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md"
-              icon={<Menu className="w-5 h-5" aria-hidden="true" />}
-            />
+      <nav
+        id="mobile-compact-header"
+        aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
+        aria-hidden={!isCompact || undefined}
+        inert={!isCompact ? true : undefined}
+        className={`md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4 transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none will-change-transform ${
+          isCompact ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'
+        }`}
+      >
+        <div className="flex w-full items-center justify-between">
+          <IconButton
+            id="mobile-compact-menu-btn"
+            variant="outline"
+            size="md"
+            onClick={() => setIsTabletMenuOpen(true)}
+            aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-300 ease-out motion-reduce:transition-none ${
+              isCompact ? 'scale-100' : 'scale-95'
+            }`}
+            icon={<Menu className="w-5 h-5" aria-hidden="true" />}
+          />
 
-            <Link
-              id="mobile-compact-search-btn"
-              to={localizePath('/search')}
-              aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-              className="pointer-events-auto inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-            >
-              <Search className="w-5 h-5" aria-hidden="true" />
-            </Link>
-          </div>
-        </nav>
-      ) : null}
+          <Link
+            id="mobile-compact-search-btn"
+            to={localizePath('/search')}
+            aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-300 ease-out motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              isCompact ? 'scale-100' : 'scale-95'
+            }`}
+          >
+            <Search className="w-5 h-5" aria-hidden="true" />
+          </Link>
+        </div>
+      </nav>
     </>
   );
 };
