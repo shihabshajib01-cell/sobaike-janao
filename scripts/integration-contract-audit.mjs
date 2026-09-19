@@ -110,11 +110,31 @@ const functionalSmoke = read('.github/workflows/public-functional-smoke.yml');
 for (const needle of [
   'Checkout exact deployed commit',
   "ref: ${{ github.event.workflow_run.head_sha || github.sha }}",
-  "group: public-functional-smoke-${{ github.event.workflow_run.head_sha || github.sha }}",
-  'cancel-in-progress: false',
+  'group: public-functional-smoke-production',
+  'cancel-in-progress: true',
 ]) {
   if (!functionalSmoke.includes(needle)) {
-    fail('Public functional smoke exact-revision guard is missing: ' + needle);
+    fail('Public functional smoke production-safety guard is missing: ' + needle);
+  }
+}
+
+const functionalSmokeScript = read('scripts/public-functional-smoke.mjs');
+for (const needle of [
+  "**/functions/v1/public-write-gateway",
+  "JSON.stringify({ success: true, result: null })",
+]) {
+  if (!functionalSmokeScript.includes(needle)) {
+    fail('Public functional smoke must not write repeatedly to the live gateway: ' + needle);
+  }
+}
+
+for (const needle of [
+  'group: production-smoke-live',
+  'cancel-in-progress: true',
+  'get_public_home_feed_page',
+]) {
+  if (!productionSmoke.includes(needle)) {
+    fail('Production smoke load-safety guard is missing: ' + needle);
   }
 }
 
