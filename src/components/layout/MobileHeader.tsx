@@ -90,7 +90,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const reportDetailId = isReportDetailRoute
     ? decodeURIComponent(currentRoute.slice(REPORT_DETAIL_PREFIX.length))
     : '';
-  const shouldUseAdaptiveHeader = !isReportDetailRoute && !activeCategory;
+  const shouldUseAdaptiveHeader = true;
   const isHeaderInteractionBlocked =
     isSearchModalOpen ||
     isTabletMenuOpen ||
@@ -233,96 +233,130 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
   if (isReportDetailRoute) {
     return (
-      <header
-        id="mobile-report-detail-header"
-        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-divider pt-safe"
+      <div
+        className={`md:hidden sticky top-0 z-40 w-full overflow-visible transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+          isCompact
+            ? 'h-0'
+            : 'h-[calc(3.5rem+env(safe-area-inset-top,0px))]'
+        }`}
       >
-        <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-          <IconButton
-            id="mobile-report-detail-back-btn"
-            variant="ghost"
-            size="md"
-            onClick={() => goBackWithFallback(() => navigateTo('/'))}
-            aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
-            icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
-          />
+        <header
+          id="mobile-report-detail-header"
+          data-compact={isCompact ? 'true' : 'false'}
+          className={`absolute inset-x-0 top-0 w-full pt-safe transition-[background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+            isCompact
+              ? 'pointer-events-none bg-transparent border-b border-transparent'
+              : 'bg-ui-surface border-b border-ui-divider'
+          }`}
+        >
+          <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
+            <IconButton
+              id="mobile-report-detail-back-btn"
+              variant={isCompact ? 'outline' : 'ghost'}
+              size="md"
+              onClick={() => goBackWithFallback(() => navigateTo('/'))}
+              aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
+            />
 
-          <p
-            id="mobile-report-detail-title"
-            className="min-w-0 flex-1 truncate type-h3 text-ui-content-primary"
-          >
-            {language === 'bn' ? 'প্রতিবেদন' : 'Report'}
-          </p>
+            <p
+              id="mobile-report-detail-title"
+              className={`min-w-0 flex-1 truncate type-h3 text-ui-content-primary transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                isCompact ? '-translate-y-2 opacity-0' : 'translate-y-0 opacity-100'
+              }`}
+            >
+              {language === 'bn' ? 'প্রতিবেদন' : 'Report'}
+            </p>
 
-          <IconButton
-            id="mobile-report-detail-share-btn"
-            variant="outline"
-            size="md"
-            onClick={handleReportShare}
-            aria-label={
-              isShareConfirmed
-                ? language === 'bn'
-                  ? 'লিংক কপি হয়েছে'
-                  : 'Link copied'
-                : language === 'bn'
-                ? 'প্রতিবেদন শেয়ার করুন'
-                : 'Share report'
-            }
-            icon={
-              isShareConfirmed ? (
-                <Check className="h-5 w-5 text-ui-success-text" aria-hidden="true" />
-              ) : (
-                <Share2 className="h-5 w-5" aria-hidden="true" />
-              )
-            }
-          />
-        </div>
-      </header>
+            <IconButton
+              id="mobile-report-detail-share-btn"
+              variant="outline"
+              size="md"
+              onClick={handleReportShare}
+              aria-label={
+                isShareConfirmed
+                  ? language === 'bn'
+                    ? 'লিংক কপি হয়েছে'
+                    : 'Link copied'
+                  : language === 'bn'
+                  ? 'প্রতিবেদন শেয়ার করুন'
+                  : 'Share report'
+              }
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              icon={
+                isShareConfirmed ? (
+                  <Check className="h-5 w-5 text-ui-success-text" aria-hidden="true" />
+                ) : (
+                  <Share2 className="h-5 w-5" aria-hidden="true" />
+                )
+              }
+            />
+          </div>
+        </header>
+      </div>
     );
   }
 
   if (activeCategory) {
     return (
-      <header
-        id="mobile-category-header"
-        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-divider pt-safe"
+      <div
+        className={`md:hidden sticky top-0 z-40 w-full overflow-visible transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+          isCompact
+            ? 'h-0'
+            : 'h-[calc(3.5rem+env(safe-area-inset-top,0px))]'
+        }`}
       >
-        <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-          <IconButton
-            id="mobile-category-back-btn"
-            variant="ghost"
-            size="md"
-            onClick={() => navigateTo('/issues')}
-            aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
-            icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
-          />
-
-          <p
-            id="mobile-category-title"
-            className="min-w-0 flex-1 truncate type-h3 text-ui-content-primary"
-          >
-            {language === 'bn' ? activeCategory.nameBn : activeCategory.nameEn}
-          </p>
-
-          {isHarassmentCategory ? (
+        <header
+          id="mobile-category-header"
+          data-compact={isCompact ? 'true' : 'false'}
+          className={`absolute inset-x-0 top-0 w-full pt-safe transition-[background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+            isCompact
+              ? 'pointer-events-none bg-transparent border-b border-transparent'
+              : 'bg-ui-surface border-b border-ui-divider'
+          }`}
+        >
+          <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
             <IconButton
-              id="mobile-category-filter-btn"
-              variant="outline"
+              id="mobile-category-back-btn"
+              variant={isCompact ? 'outline' : 'ghost'}
               size="md"
-              onClick={() => setIsHarassmentFilterOpen(true)}
-              aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
-              aria-haspopup="dialog"
-              icon={<Filter className="h-5 w-5" aria-hidden="true" />}
+              onClick={() => navigateTo('/issues')}
+              aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
+              className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
             />
-          ) : (
-            <div
-              id="mobile-category-location-slot"
-              className="shrink-0"
-              aria-label={language === 'bn' ? 'ফিল্টার' : 'Filters'}
-            />
-          )}
-        </div>
-      </header>
+
+            <p
+              id="mobile-category-title"
+              className={`min-w-0 flex-1 truncate type-h3 text-ui-content-primary transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                isCompact ? '-translate-y-2 opacity-0' : 'translate-y-0 opacity-100'
+              }`}
+            >
+              {language === 'bn' ? activeCategory.nameBn : activeCategory.nameEn}
+            </p>
+
+            {isHarassmentCategory ? (
+              <IconButton
+                id="mobile-category-filter-btn"
+                variant="outline"
+                size="md"
+                onClick={() => setIsHarassmentFilterOpen(true)}
+                aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
+                aria-haspopup="dialog"
+                className={`${isCompact ? 'pointer-events-auto bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+                icon={<Filter className="h-5 w-5" aria-hidden="true" />}
+              />
+            ) : (
+              <div
+                id="mobile-category-location-slot"
+                className={`shrink-0 ${isCompact ? 'pointer-events-auto ui-elevation-control' : ''}`}
+                aria-label={language === 'bn' ? 'ফিল্টার' : 'Filters'}
+              />
+            )}
+          </div>
+        </header>
+      </div>
     );
   }
 
@@ -406,7 +440,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             onClick={() => setIsTabletMenuOpen(true)}
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
               isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
             }`}
             icon={<Menu className="w-5 h-5" aria-hidden="true" />}
