@@ -138,11 +138,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       const delta = currentScrollY - lastScrollYRef.current;
       lastScrollYRef.current = currentScrollY;
 
-      if (
-        isHeaderInteractionBlocked ||
-        hasTextInputFocus() ||
-        currentScrollY <= MOBILE_HEADER_TOP_RESET_Y
-      ) {
+      if (isHeaderInteractionBlocked || hasTextInputFocus()) {
         transitionLockUntilRef.current = 0;
         directionRef.current = null;
         directionDistanceRef.current = 0;
@@ -151,9 +147,23 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       }
 
       const now = performance.now();
+
+      // The animated sticky-header height change can emit compensating scroll
+      // events on mobile browsers. Ignore those before evaluating the top
+      // reset, otherwise compact mode can immediately undo itself.
       if (now < transitionLockUntilRef.current) {
         directionRef.current = null;
         directionDistanceRef.current = 0;
+        return;
+      }
+
+      if (currentScrollY <= MOBILE_HEADER_TOP_RESET_Y) {
+        directionRef.current = null;
+        directionDistanceRef.current = 0;
+
+        if (!isCompact || delta < -MOBILE_HEADER_SCROLL_EPSILON) {
+          onCompactChange(false);
+        }
         return;
       }
 
