@@ -9,6 +9,13 @@ on:
 permissions:
   contents: read
 
+# Multiple Deploy completions can target the same production revision. Keep only
+# one heavyweight browser suite active so duplicate Playwright runs do not
+# compete for browser/network/Supabase resources and create false regressions.
+concurrency:
+  group: public-functional-smoke
+  cancel-in-progress: true
+
 jobs:
   browser-smoke:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
