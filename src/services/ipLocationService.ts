@@ -9,7 +9,7 @@ export interface ApproximateIpLocation {
   country?: string;
 }
 
-const IP_LOCATION_MAX_AGE_MS = 60 * 60 * 1000;
+export const IP_LOCATION_MAX_AGE_MS = 60 * 60 * 1000;
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined)
   ?.trim()
   .replace(/\/+$/, '');
@@ -42,11 +42,14 @@ function isValidCoordinate(latitude: unknown, longitude: unknown): latitude is n
  * reporter/submission evidence. No IP address is stored in client state.
  */
 export const IpLocationService = {
+  isLocationFresh(location: ApproximateIpLocation | null): boolean {
+    if (!location) return false;
+    if (!isValidCoordinate(location.latitude, location.longitude)) return false;
+    return Date.now() - location.timestamp <= IP_LOCATION_MAX_AGE_MS;
+  },
+
   async getApproximateLocation(): Promise<ApproximateIpLocation | null> {
-    if (
-      cachedLocation &&
-      Date.now() - cachedLocation.timestamp <= IP_LOCATION_MAX_AGE_MS
-    ) {
+    if (this.isLocationFresh(cachedLocation)) {
       return cachedLocation;
     }
 
