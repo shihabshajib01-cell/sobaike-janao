@@ -17,7 +17,6 @@ import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
-import { HomeSeoContent } from '../components/home/HomeSeoContent';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 
@@ -340,7 +339,6 @@ export const HomePage: React.FC = () => {
                   size="md"
                   onClick={() => void handleLoadMore()}
                   isLoading={isLoadingMore}
-                  className="w-full sm:w-auto min-w-[200px]"
                 >
                   {language === 'bn' ? 'আরও প্রতিবেদন দেখুন' : 'Load more reports'}
                 </Button>
@@ -362,7 +360,6 @@ export const HomePage: React.FC = () => {
         )}
       </section>
 
-      <HomeSeoContent language={language} />
     </PublicPageContainer>
   );
 };
