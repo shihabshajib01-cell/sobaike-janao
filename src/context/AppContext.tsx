@@ -161,10 +161,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // Do not perform IP geolocation on a first visit before the user has
-    // interacted with location. Approximate fallback is allowed here only for
-    // a returning visitor who previously granted location and whose device
-    // position cannot currently be restored. Explicit denial is respected.
-    if (choice === 'granted' && perm !== 'denied') {
+    // interacted with location. After a user has tried device location,
+    // browsing can fall back to coarse IP location when device GPS is denied
+    // or temporarily unavailable. "Not now" still means no location fallback.
+    if (choice === 'granted' || choice === 'denied') {
       const approximate = await IpLocationService.getApproximateLocation();
       if (approximate) {
         setBrowseLocation(approximate);
@@ -176,7 +176,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setBrowseLocation(null);
     if (choice === 'not_now') {
       setBrowseLocationStatus('not_now');
-    } else if (perm === 'denied') {
+    } else if (choice === 'denied' || perm === 'denied') {
       setBrowseLocationStatus('denied');
     } else if (perm === 'unavailable') {
       setBrowseLocationStatus('unavailable');
@@ -201,16 +201,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setBrowseLocationStatus('available');
       return result;
     } else {
-      // Respect an explicit permission denial. For technical failures after
-      // the user actively requested location, use the coarse first-party IP
-      // fallback for browsing only; it can never satisfy report submission.
-      if (result.status !== 'denied' && result.errorType !== 'denied') {
-        const approximate = await IpLocationService.getApproximateLocation();
-        if (approximate) {
-          setBrowseLocation(approximate);
-          setBrowseLocationStatus('available');
-          return { ...result, browseFallback: 'ip' };
-        }
+      // The user explicitly tried to enable device location. If the browser
+      // denies it or GPS fails technically, fall back to coarse IP location for
+      // browsing only. This can never satisfy report submission.
+      const approximate = await IpLocationService.getApproximateLocation();
+      if (approximate) {
+        setBrowseLocation(approximate);
+        setBrowseLocationStatus('available');
+        return { ...result, browseFallback: 'ip' };
       }
 
       setBrowseLocation(null);
@@ -241,8 +239,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 2. Observe external browser permission changes (e.g. user changes setting in browser toolbar)
     const unsubscribePermission = VisitorSessionService.setupPermissionObserver((perm) => {
       if (perm === 'denied') {
-        setBrowseLocation(null);
-        setBrowseLocationStatus('denied');
+        // Device permission denial removes GPS from memory, then re-resolves
+        // browsing through the coarse IP fallback if the user had already
+        // attempted location.
+        refreshBrowseLocation();
       } else if (perm === 'granted') {
         const choice = VisitorSessionService.getLocationChoice();
         if (choice === 'granted') {
