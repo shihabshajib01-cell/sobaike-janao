@@ -106,6 +106,18 @@ for (const needle of [
   }
 }
 
+const functionalSmoke = read('.github/workflows/public-functional-smoke.yml');
+for (const needle of [
+  'Checkout exact deployed commit',
+  "ref: ${{ github.event.workflow_run.head_sha || github.sha }}",
+  "group: public-functional-smoke-${{ github.event.workflow_run.head_sha || github.sha }}",
+  'cancel-in-progress: false',
+]) {
+  if (!functionalSmoke.includes(needle)) {
+    fail('Public functional smoke exact-revision guard is missing: ' + needle);
+  }
+}
+
 console.log(
   'Integration contract audit passed using ' + latestContractFile +
   '; harassment schema options and deploy concurrency are aligned.'
