@@ -102,6 +102,11 @@ requireContains(
   "'pr-16'",
   'clearable searchable selects must reserve space for the clear action'
 );
+requireContains(
+  'src/components/ui/RadioGroup.tsx',
+  'type-input',
+  'radio choices must use the shared form input typography role'
+);
 
 requireContains(
   'src/components/report-detail/SubjectResponseModal.tsx',
