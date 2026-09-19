@@ -23,14 +23,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm audit --audit-level=moderate
 
       - name: Integration contract audit
         run: npm run audit:integration-contract
@@ -63,6 +65,42 @@ jobs:
             echo "ERROR: source index deployed"
             exit 1
           fi
+
+      - name: Install pre-deploy browser runtime
+        run: |
+          npm install --no-save playwright@1.63.0 @axe-core/playwright@4.13.0
+          npm audit --audit-level=moderate
+          npx playwright install --with-deps chromium
+
+      - name: Run full pre-deploy Public regression gate
+        shell: bash
+        env:
+          SITE_URL: http://127.0.0.1:4173/
+          CANONICAL_ORIGIN: https://shobaikejanao.com/
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          set -euo pipefail
+
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/sobaike-predeploy-preview.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill $PREVIEW_PID || true' EXIT
+
+          ready=0
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = "1"
+
+          node scripts/public-functional-smoke.mjs
+          node scripts/public-ui-100-regression-smoke.mjs
+          node scripts/public-form-regression-matrix.mjs
+          node scripts/public-composer-100-regression-smoke.mjs
+          node scripts/public-accessibility-smoke.mjs
 
       - uses: actions/upload-pages-artifact@v3
         with:
