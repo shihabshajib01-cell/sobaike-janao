@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -9,6 +9,22 @@ import { IconButton } from '../ui/IconButton';
 import { SECTIONS } from '../../theme/tokens';
 
 const REPORT_DETAIL_PREFIX = '/report-detail/';
+const MOBILE_HEADER_HIDE_SCROLL_Y = 96;
+const MOBILE_HEADER_DIRECTION_THRESHOLD = 32;
+const MOBILE_HEADER_SCROLL_EPSILON = 2;
+const MOBILE_HEADER_TOP_RESET_Y = 24;
+
+const hasTextInputFocus = () => {
+  const activeElement = document.activeElement;
+  if (!(activeElement instanceof HTMLElement)) return false;
+
+  return (
+    activeElement.tagName === 'INPUT' ||
+    activeElement.tagName === 'TEXTAREA' ||
+    activeElement.tagName === 'SELECT' ||
+    activeElement.isContentEditable
+  );
+};
 
 const goBackWithFallback = (fallback: () => void) => {
   if (window.history.length > 1) {
@@ -24,10 +40,20 @@ export const MobileHeader: React.FC = () => {
     currentRoute,
     navigateTo,
     language,
+    isSearchModalOpen,
+    isTabletMenuOpen,
     setIsTabletMenuOpen,
+    isHarassmentFilterOpen,
     setIsHarassmentFilterOpen,
+    isReportComposerOpen,
+    isLocationModalOpen,
   } = useApp();
   const [isShareConfirmed, setIsShareConfirmed] = useState(false);
+  const [isCompactHeader, setIsCompactHeader] = useState(false);
+  const lastScrollYRef = useRef(0);
+  const directionRef = useRef<'up' | 'down' | null>(null);
+  const directionDistanceRef = useRef(0);
+  const frameRef = useRef<number | null>(null);
   const { segments } = useTaxonomy();
   const localizePath = (path: string) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -47,6 +73,88 @@ export const MobileHeader: React.FC = () => {
   const reportDetailId = isReportDetailRoute
     ? decodeURIComponent(currentRoute.slice(REPORT_DETAIL_PREFIX.length))
     : '';
+  const shouldUseAdaptiveHeader = !isReportDetailRoute && !activeCategory;
+  const isHeaderInteractionBlocked =
+    isSearchModalOpen ||
+    isTabletMenuOpen ||
+    isHarassmentFilterOpen ||
+    isReportComposerOpen ||
+    isLocationModalOpen;
+
+  useEffect(() => {
+    if (!shouldUseAdaptiveHeader || isHeaderInteractionBlocked) {
+      setIsCompactHeader(false);
+    }
+
+    lastScrollYRef.current = window.scrollY;
+    directionRef.current = null;
+    directionDistanceRef.current = 0;
+  }, [currentRoute, isHeaderInteractionBlocked, shouldUseAdaptiveHeader]);
+
+  useEffect(() => {
+    if (!shouldUseAdaptiveHeader) return;
+
+    lastScrollYRef.current = window.scrollY;
+
+    const evaluateScroll = () => {
+      frameRef.current = null;
+
+      const currentScrollY = Math.max(0, window.scrollY);
+      const delta = currentScrollY - lastScrollYRef.current;
+      lastScrollYRef.current = currentScrollY;
+
+      if (
+        isHeaderInteractionBlocked ||
+        hasTextInputFocus() ||
+        currentScrollY <= MOBILE_HEADER_TOP_RESET_Y
+      ) {
+        directionRef.current = null;
+        directionDistanceRef.current = 0;
+        setIsCompactHeader(false);
+        return;
+      }
+
+      if (Math.abs(delta) < MOBILE_HEADER_SCROLL_EPSILON) return;
+
+      const nextDirection: 'up' | 'down' = delta > 0 ? 'down' : 'up';
+      if (directionRef.current !== nextDirection) {
+        directionRef.current = nextDirection;
+        directionDistanceRef.current = 0;
+      }
+
+      directionDistanceRef.current += Math.abs(delta);
+
+      if (
+        nextDirection === 'down' &&
+        currentScrollY >= MOBILE_HEADER_HIDE_SCROLL_Y &&
+        directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
+      ) {
+        setIsCompactHeader(true);
+        directionDistanceRef.current = 0;
+      } else if (
+        nextDirection === 'up' &&
+        directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
+      ) {
+        setIsCompactHeader(false);
+        directionDistanceRef.current = 0;
+      }
+    };
+
+    const handleScroll = () => {
+      if (frameRef.current !== null) return;
+      frameRef.current = window.requestAnimationFrame(evaluateScroll);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+  }, [isHeaderInteractionBlocked, shouldUseAdaptiveHeader]);
 
   const registerSuccessfulShare = () => {
     if (reportDetailId) {
@@ -176,43 +284,78 @@ export const MobileHeader: React.FC = () => {
   }
 
   return (
-    <header
-      id="mobile-header"
-      className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
-    >
-      <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <IconButton
-            id="mobile-header-menu-btn"
-            variant="outline"
-            size="md"
-            onClick={() => setIsTabletMenuOpen(true)}
-            aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-            icon={<Menu className="w-5 h-5" aria-hidden="true" />}
-          />
+    <>
+      <header
+        id="mobile-header"
+        className={`md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none ${
+          isCompactHeader
+            ? '-translate-y-full opacity-0 pointer-events-none'
+            : 'translate-y-0 opacity-100'
+        }`}
+      >
+        <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <IconButton
+              id="mobile-header-menu-btn"
+              variant="outline"
+              size="md"
+              onClick={() => setIsTabletMenuOpen(true)}
+              aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
+              icon={<Menu className="w-5 h-5" aria-hidden="true" />}
+            />
+
+            <Link
+              to={localizePath('/')}
+              aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
+              className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <BrandLogo
+                id="mobile-header-brand-logo"
+                size="sm"
+                showEnglish={false}
+              />
+            </Link>
+          </div>
 
           <Link
-            to={localizePath('/')}
-            aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
-            className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            id="mobile-header-search-btn"
+            to={localizePath('/search')}
+            aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
+            className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
           >
-            <BrandLogo
-              id="mobile-header-brand-logo"
-              size="sm"
-              showEnglish={false}
-            />
+            <Search className="w-5 h-5" aria-hidden="true" />
           </Link>
         </div>
+      </header>
 
-        <Link
-          id="mobile-header-search-btn"
-          to={localizePath('/search')}
-          aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-          className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+      {isCompactHeader ? (
+        <nav
+          id="mobile-compact-header"
+          aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
+          className="md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4"
         >
-          <Search className="w-5 h-5" aria-hidden="true" />
-        </Link>
-      </div>
-    </header>
+          <div className="flex w-full items-center justify-between">
+            <IconButton
+              id="mobile-compact-menu-btn"
+              variant="outline"
+              size="md"
+              onClick={() => setIsTabletMenuOpen(true)}
+              aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
+              className="pointer-events-auto bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md"
+              icon={<Menu className="w-5 h-5" aria-hidden="true" />}
+            />
+
+            <Link
+              id="mobile-compact-search-btn"
+              to={localizePath('/search')}
+              aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
+              className="pointer-events-auto inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <Search className="w-5 h-5" aria-hidden="true" />
+            </Link>
+          </div>
+        </nav>
+      ) : null}
+    </>
   );
 };
