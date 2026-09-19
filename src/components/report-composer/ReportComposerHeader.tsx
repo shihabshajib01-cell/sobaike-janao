@@ -149,12 +149,12 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
               }`}
             >
               <span
-                className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 rounded-[var(--radius-pill)] flex items-center justify-center type-compact font-[var(--font-weight-bold)] ${
-                  isCurrent
-                    ? 'bg-ui-content-inverse/25 text-ui-content-inverse'
-                    : isCompleted
-                    ? 'bg-ui-accent text-ui-content-inverse'
-                    : 'bg-ui-surface text-ui-content-muted ui-border-default border-ui-stroke-default'
+                className={`w-4 sm:w-5 shrink-0 flex items-center justify-center type-compact font-[var(--font-weight-bold)] ${
+                  isCompleted
+                    ? 'h-4 sm:h-5 rounded-[var(--radius-pill)] bg-ui-accent text-ui-content-inverse'
+                    : isCurrent
+                    ? 'text-ui-content-inverse'
+                    : 'text-ui-content-muted'
                 }`}
               >
                 {isCompleted ? <Check className="w-3 h-3 text-ui-content-inverse" aria-hidden="true" /> : st.step}
