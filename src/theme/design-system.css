@@ -31,8 +31,12 @@
  */
 .ui-card-feed,
 .report-composer-shell,
-.report-composer-card:not(.border-role-error-outline):not(.border-role-outline-strong):not(.border-ui-stroke-strong) {
+.report-composer-card:not(.border-role-error-outline) {
   border-color: var(--md-background);
+}
+
+.report-composer-card:not(.border-role-error-outline) {
+  box-shadow: var(--elevation-card);
 }
 
 .report-composer-body {
@@ -51,6 +55,11 @@ html[data-theme="dark"] .report-composer-shell,
 html[data-theme="dark"] .report-composer-card:not(.border-role-error-outline),
 .dark .report-composer-card:not(.border-role-error-outline) {
   border-color: var(--md-surface-hover);
+}
+
+html[data-theme="dark"] .report-composer-card:not(.border-role-error-outline),
+.dark .report-composer-card:not(.border-role-error-outline) {
+  box-shadow: var(--elevation-card);
 }
 
 html[data-theme="dark"] .report-composer-body,
