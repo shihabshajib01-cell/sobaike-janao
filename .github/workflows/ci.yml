@@ -26,6 +26,9 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Inspect dependency tree
+        run: npm ls --all || true
+
       - name: Dependency audit
         # Audit the committed lockfile directly. This preserves the vulnerability
         # gate while avoiding registry Quick Audit failures caused by validating
