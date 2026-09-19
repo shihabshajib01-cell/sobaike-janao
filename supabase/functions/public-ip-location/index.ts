@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.112.4";
 
 const ALLOWED_ORIGINS = new Set([
   "https://shobaikejanao.com",
@@ -33,27 +34,53 @@ const isRateLimited = (key: string): boolean => {
   return current.count > RATE_LIMIT;
 };
 
-const json = (req: Request, body: unknown, status = 200) =>
+const json = (
+  req: Request,
+  body: unknown,
+  status = 200,
+  extraHeaders: Record<string, string> = {}
+) =>
   new Response(JSON.stringify(body), {
     status,
     headers: {
       ...corsHeadersFor(req),
       "Content-Type": "application/json",
       "Cache-Control": status === 200 ? "private, max-age=3600" : "no-store",
+      ...extraHeaders,
     },
   });
 
 const firstForwardedIp = (req: Request): string | null => {
+  // Supabase's gateway exposes the requester through managed edge headers.
+  // Do not fall back to client-supplied X-Forwarded-For.
   const candidates = [
     req.headers.get("cf-connecting-ip"),
     req.headers.get("x-real-ip"),
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
   ];
   for (const candidate of candidates) {
     const value = String(candidate || "").trim();
     if (value) return value;
   }
   return null;
+};
+
+
+const hmacHex = async (keyValue: string, value: string): Promise<string> => {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(keyValue),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode("sobaike-ip-location-v1:" + value)
+  );
+  return Array.from(new Uint8Array(signature))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 };
 
 const validCoordinate = (latitude: unknown, longitude: unknown): boolean =>
@@ -70,6 +97,10 @@ const validCoordinate = (latitude: unknown, longitude: unknown): boolean =>
 Deno.serve(async (req: Request) => {
   const corsHeaders = corsHeadersFor(req);
   if (req.method === "OPTIONS") {
+    const origin = req.headers.get("Origin") || "";
+    if (origin && !ALLOWED_ORIGINS.has(origin)) {
+      return new Response("Forbidden", { status: 403, headers: corsHeaders });
+    }
     return new Response("ok", { headers: corsHeaders });
   }
   if (req.method !== "GET") {
@@ -82,7 +113,38 @@ Deno.serve(async (req: Request) => {
   }
 
   if (isRateLimited(ip)) {
-    return json(req,{ error: "Too many requests." }, 429);
+    return json(req,{ error: "Too many requests." }, 429, { "Retry-After": "60" });
+  }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  if (!supabaseUrl || !serviceRoleKey) {
+    return json(req,{ error: "Approximate location unavailable." }, 503);
+  }
+
+  const sourceFingerprint = await hmacHex(serviceRoleKey, ip);
+  const service = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data: limitData, error: limitError } = await service.rpc(
+    "service_assert_public_write_rate",
+    {
+      p_source_fingerprint: sourceFingerprint,
+      p_action: "ip_location",
+    }
+  );
+  if (limitError) {
+    console.error("IP location limiter failed.", limitError);
+    return json(req,{ error: "Approximate location unavailable." }, 503);
+  }
+  if (limitData?.allowed !== true) {
+    const retryAfter = Math.max(60, Number(limitData?.retryAfterSeconds || 60));
+    return json(
+      req,
+      { error: "Too many requests." },
+      429,
+      { "Retry-After": String(retryAfter) }
+    );
   }
 
   try {
