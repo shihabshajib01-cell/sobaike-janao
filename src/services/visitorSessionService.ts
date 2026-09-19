@@ -454,6 +454,7 @@ export const VisitorSessionService = {
             const status: PermissionStatus =
               err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
             if (status === 'denied') {
+              this.setLocationChoice('denied');
               this.clearMemoryLocation();
             }
             await this.recordSession(status);
