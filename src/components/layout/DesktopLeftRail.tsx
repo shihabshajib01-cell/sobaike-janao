@@ -134,7 +134,7 @@ export const DesktopLeftRail: React.FC = () => {
                 to={localizePath(item.path)}
                 aria-current={isActive ? 'page' : undefined}
                 className={`w-full flex items-center justify-between px-3 py-2.5 ui-radius-control type-action transition-all duration-150 text-left cursor-pointer group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                  isActive ? getSectionActiveStyles(item.sectionKey) : 'text-ui-content-secondary'
+                  isActive ? getSectionActiveStyles(item.sectionKey) : 'text-ui-content-primary/85 hover:text-ui-content-primary hover:bg-ui-surface-subtle'
                 }`}
                 style={
                   isActive && item.sectionKey
@@ -154,7 +154,7 @@ export const DesktopLeftRail: React.FC = () => {
                       isActive && !secConfig
                         ? 'text-ui-content-primary'
                         : !isActive
-                        ? 'text-ui-content-muted'
+                        ? 'text-ui-content-secondary group-hover:text-ui-content-primary'
                         : ''
                     }`}
                   />
@@ -179,23 +179,39 @@ export const DesktopLeftRail: React.FC = () => {
         <ThemeSelector variant="compact" />
         <TextSizeSelector variant="compact" idPrefix="rail-text-size" />
 
-        <button
-          id="rail-lang-toggle"
-          onClick={toggleLanguage}
-          aria-label={language === 'bn' ? 'ইংরেজিতে পরিবর্তন করুন' : 'Switch to Bangla'}
-          className="w-full flex items-center justify-between px-3.5 py-2.5 type-compact ui-radius-control border border-ui-stroke-subtle transition-colors cursor-pointer text-ui-content-secondary min-h-[44px] bg-ui-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-        >
-          <span className="font-[var(--font-weight-medium)]">{language === 'bn' ? 'ভাষা' : 'Language'}</span>
-          <span className="font-[var(--font-weight-semibold)] text-ui-content-primary px-2.5 py-1 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-badge-md type-helper">
-            {language === 'bn' ? 'English' : 'বাংলা'}
+        <div className="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 type-compact ui-radius-control border border-ui-stroke-subtle bg-ui-surface min-h-[44px]">
+          <span className="font-[var(--font-weight-medium)] text-ui-content-primary">
+            {language === 'bn' ? 'ভাষা' : 'Language'}
           </span>
-        </button>
+          <div
+            className="flex items-center p-0.5 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-pill"
+            role="group"
+            aria-label={language === 'bn' ? 'ভাষা নির্বাচন' : 'Select language'}
+          >
+            <button
+              type="button"
+              aria-pressed={language === 'bn'}
+              onClick={() => language !== 'bn' && toggleLanguage()}
+              className={`min-w-[42px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'bn' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
+            >
+              বাংলা
+            </button>
+            <button
+              type="button"
+              aria-pressed={language === 'en'}
+              onClick={() => language !== 'en' && toggleLanguage()}
+              className={`min-w-[42px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'en' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
 
-        <div className="px-2 pt-1 type-meta text-ui-content-muted leading-tight">
+        <div className="px-2 pt-1 type-meta text-ui-content-secondary leading-tight">
           <p className="font-[var(--font-weight-medium)] text-ui-content-secondary">
             {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
           </p>
-          <small className="text-ui-content-muted">
+          <small className="text-ui-content-secondary">
             {language === 'bn' ? 'বাংলাদেশ ২০২৬' : 'Bangladesh 2026'}
           </small>
         </div>
