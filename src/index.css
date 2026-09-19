@@ -1317,3 +1317,22 @@
   content-visibility: auto;
   contain-intrinsic-size: auto 20rem;
 }
+
+
+/* Adaptive mobile chrome: keep the exit motion visible, then remove the
+   inactive layer from focus/hit-testing at the end of the 500ms transition. */
+@keyframes mobile-chrome-hide-visibility {
+  to {
+    visibility: hidden;
+  }
+}
+
+.mobile-chrome-hide-after-transition {
+  animation: mobile-chrome-hide-visibility 0s linear 500ms forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-chrome-hide-after-transition {
+    animation-delay: 0s;
+  }
+}

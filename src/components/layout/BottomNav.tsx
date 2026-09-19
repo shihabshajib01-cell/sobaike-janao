@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
@@ -23,8 +23,6 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange }) => {
   const { currentRoute, language, openReportComposer } = useApp();
-  const fullNavRef = useRef<HTMLElement | null>(null);
-  const compactNavRef = useRef<HTMLElement | null>(null);
   const { segments } = useTaxonomy();
   const categoryRoutes = Object.values(segments).map((segment) => segment.slug);
   const runtimeCategory =
@@ -53,20 +51,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
     onCompactChange(false);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   };
-
-  useEffect(() => {
-    const syncInertAttribute = (element: HTMLElement | null, shouldBeInert: boolean) => {
-      if (!element) return;
-      if (shouldBeInert) {
-        element.setAttribute('inert', '');
-      } else {
-        element.removeAttribute('inert');
-      }
-    };
-
-    syncInertAttribute(fullNavRef.current, isCompact);
-    syncInertAttribute(compactNavRef.current, !isCompact);
-  }, [isCompact]);
 
   if (activeCategoryId) {
     return (
@@ -135,13 +119,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
   return (
     <>
       <nav
-        ref={fullNavRef}
         id="bottom-nav"
         aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
         aria-hidden={isCompact || undefined}
         className={`md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
-            ? 'translate-y-[calc(100%+env(safe-area-inset-bottom,0px)+24px)] opacity-0'
+            ? 'translate-y-[calc(100%+env(safe-area-inset-bottom,0px)+24px)] opacity-0 mobile-chrome-hide-after-transition'
             : 'translate-y-0 opacity-100'
         }`}
       >
@@ -152,6 +135,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
               id={item.id}
               to={localizePath(item.path)}
               onClick={handleNavigation}
+              tabIndex={isCompact ? -1 : undefined}
               aria-current={item.isActive ? 'page' : undefined}
               className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center ui-radius-control px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 item.isActive
@@ -174,6 +158,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             id="mobile-nav-report"
             type="button"
             onClick={() => openReportComposer()}
+            tabIndex={isCompact ? -1 : undefined}
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
             className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-all hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
           >
@@ -183,14 +168,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
       </nav>
 
       <nav
-        ref={compactNavRef}
         id="bottom-nav-compact"
         aria-label={language === 'bn' ? 'দ্রুত মোবাইল নেভিগেশন' : 'Quick mobile navigation'}
         aria-hidden={!isCompact || undefined}
         className={`md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
             ? 'translate-y-0 opacity-100 delay-[60ms]'
-            : 'translate-y-4 opacity-0 delay-0'
+            : 'translate-y-4 opacity-0 delay-0 mobile-chrome-hide-after-transition'
         }`}
       >
         <div className="flex w-full items-end justify-between">
@@ -198,6 +182,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             id="bottom-nav-compact-context"
             to={localizePath(compactNavItem.path)}
             onClick={handleNavigation}
+            tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? compactNavItem.nameBn : compactNavItem.nameEn}
             aria-current={compactNavItem.isActive ? 'page' : undefined}
             className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
@@ -217,6 +202,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             id="bottom-nav-compact-report"
             type="button"
             onClick={() => openReportComposer()}
+            tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
             className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
           >

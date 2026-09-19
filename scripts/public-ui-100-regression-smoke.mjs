@@ -177,6 +177,8 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     throw new Error(`Clicking report-card title did not open detail; got ${page.url()}`);
   }
 
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(150);
   await expectVisible(
     page.locator('#mobile-report-detail-back-btn'),
     'Report detail mobile back button missing'
@@ -242,7 +244,7 @@ await check('All seven category pages preserve the shared mobile navigation cont
     );
 
     const stepStatus = (await page.locator('#report-composer-step-status').innerText()).trim();
-    if (!/ধাপ\s*২|Step\s*2/i.test(stepStatus)) {
+    if (!/ধাপ\s*[২2]|Step\s*2/i.test(stepStatus)) {
       throw new Error(
         `${route} report composer did not start at category-selected step 2; got "${stepStatus}"`
       );
@@ -404,8 +406,7 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
         const style = getComputedStyle(element);
         return {
           ariaHidden: element.getAttribute('aria-hidden'),
-          inertAttribute: element.hasAttribute('inert'),
-          inertProperty: 'inert' in element ? element.inert : null,
+          visibility: style.visibility,
           opacity: Number(style.opacity),
           pointerEvents: style.pointerEvents,
         };
@@ -421,17 +422,17 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
     });
 
   const assertExpanded = (state, label) => {
-    if (!state.fullTop || state.fullTop.ariaHidden === 'true' || state.fullTop.inertAttribute) {
-      throw new Error(`${label}: full mobile header is not interactive`);
+    if (!state.fullTop || state.fullTop.ariaHidden === 'true' || state.fullTop.visibility !== 'visible') {
+      throw new Error(`${label}: full mobile header is not interactive: ${JSON.stringify(state.fullTop)}`);
     }
-    if (!state.compactTop || state.compactTop.ariaHidden !== 'true' || !state.compactTop.inertAttribute) {
-      throw new Error(`${label}: compact top navigation was not removed from interaction`);
+    if (!state.compactTop || state.compactTop.ariaHidden !== 'true' || state.compactTop.visibility !== 'hidden') {
+      throw new Error(`${label}: compact top navigation was not removed from interaction: ${JSON.stringify(state.compactTop)}`);
     }
-    if (!state.fullBottom || state.fullBottom.ariaHidden === 'true' || state.fullBottom.inertAttribute) {
-      throw new Error(`${label}: full bottom navigation is not interactive`);
+    if (!state.fullBottom || state.fullBottom.ariaHidden === 'true' || state.fullBottom.visibility !== 'visible') {
+      throw new Error(`${label}: full bottom navigation is not interactive: ${JSON.stringify(state.fullBottom)}`);
     }
-    if (!state.compactBottom || state.compactBottom.ariaHidden !== 'true' || !state.compactBottom.inertAttribute) {
-      throw new Error(`${label}: compact bottom navigation was not removed from interaction`);
+    if (!state.compactBottom || state.compactBottom.ariaHidden !== 'true' || state.compactBottom.visibility !== 'hidden') {
+      throw new Error(`${label}: compact bottom navigation was not removed from interaction: ${JSON.stringify(state.compactBottom)}`);
     }
     if (state.fullTop.opacity < 0.99 || state.compactTop.opacity > 0.01) {
       throw new Error(`${label}: top chrome visual state is inconsistent`);
@@ -442,17 +443,17 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
   };
 
   const assertCompact = (state, label) => {
-    if (!state.fullTop || state.fullTop.ariaHidden !== 'true' || !state.fullTop.inertAttribute) {
-      throw new Error(`${label}: hidden full header remained interactive`);
+    if (!state.fullTop || state.fullTop.ariaHidden !== 'true' || state.fullTop.visibility !== 'hidden') {
+      throw new Error(`${label}: hidden full header remained interactive: ${JSON.stringify(state.fullTop)}`);
     }
-    if (!state.compactTop || state.compactTop.ariaHidden === 'true' || state.compactTop.inertAttribute) {
-      throw new Error(`${label}: compact top navigation is not interactive`);
+    if (!state.compactTop || state.compactTop.ariaHidden === 'true' || state.compactTop.visibility !== 'visible') {
+      throw new Error(`${label}: compact top navigation is not interactive: ${JSON.stringify(state.compactTop)}`);
     }
-    if (!state.fullBottom || state.fullBottom.ariaHidden !== 'true' || !state.fullBottom.inertAttribute) {
-      throw new Error(`${label}: hidden full bottom navigation remained interactive`);
+    if (!state.fullBottom || state.fullBottom.ariaHidden !== 'true' || state.fullBottom.visibility !== 'hidden') {
+      throw new Error(`${label}: hidden full bottom navigation remained interactive: ${JSON.stringify(state.fullBottom)}`);
     }
-    if (!state.compactBottom || state.compactBottom.ariaHidden === 'true' || state.compactBottom.inertAttribute) {
-      throw new Error(`${label}: compact bottom navigation is not interactive`);
+    if (!state.compactBottom || state.compactBottom.ariaHidden === 'true' || state.compactBottom.visibility !== 'visible') {
+      throw new Error(`${label}: compact bottom navigation is not interactive: ${JSON.stringify(state.compactBottom)}`);
     }
     if (state.fullTop.opacity > 0.01 || state.compactTop.opacity < 0.99) {
       throw new Error(`${label}: top chrome visual state is inconsistent`);
@@ -479,19 +480,25 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
 
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#main-content'), 'Home did not render for adaptive chrome check');
+  await page.waitForTimeout(650);
   assertExpanded(await readState(), 'initial load');
 
   await scrollIntoCompactMode();
   assertCompact(await readState(), 'scroll down');
 
-  const hiddenHeaderAcceptedFocus = await page.evaluate(() => {
-    const control = document.querySelector('#mobile-header-menu-btn');
-    if (!(control instanceof HTMLElement)) return true;
-    control.focus();
-    return document.activeElement === control;
+  const hiddenChromeAcceptedFocus = await page.evaluate(() => {
+    const controls = [
+      document.querySelector('#mobile-header-menu-btn'),
+      document.querySelector('#bottom-nav-home'),
+    ];
+    return controls.some((control) => {
+      if (!(control instanceof HTMLElement)) return true;
+      control.focus();
+      return document.activeElement === control;
+    });
   });
-  if (hiddenHeaderAcceptedFocus) {
-    throw new Error('inert hidden mobile header still accepted keyboard focus');
+  if (hiddenChromeAcceptedFocus) {
+    throw new Error('hidden adaptive mobile chrome still accepted focus');
   }
 
   await page.locator('#bottom-nav-compact-context').click();

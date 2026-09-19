@@ -69,8 +69,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const directionRef = useRef<'up' | 'down' | null>(null);
   const directionDistanceRef = useRef(0);
   const frameRef = useRef<number | null>(null);
-  const fullHeaderRef = useRef<HTMLElement | null>(null);
-  const compactHeaderRef = useRef<HTMLElement | null>(null);
   const { segments } = useTaxonomy();
   const localizePath = (path: string) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -184,20 +182,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     onCompactChange(false);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   };
-
-  useEffect(() => {
-    const syncInertAttribute = (element: HTMLElement | null, shouldBeInert: boolean) => {
-      if (!element) return;
-      if (shouldBeInert) {
-        element.setAttribute('inert', '');
-      } else {
-        element.removeAttribute('inert');
-      }
-    };
-
-    syncInertAttribute(fullHeaderRef.current, isCompact);
-    syncInertAttribute(compactHeaderRef.current, !isCompact);
-  }, [isCompact]);
 
   const registerSuccessfulShare = () => {
     if (reportDetailId) {
@@ -336,12 +320,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         }`}
       >
         <header
-          ref={fullHeaderRef}
           id="mobile-header"
           aria-hidden={isCompact || undefined}
           className={`absolute inset-x-0 top-0 w-full bg-ui-surface border-b border-ui-divider pt-safe transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
             isCompact
-              ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none'
+              ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none mobile-chrome-hide-after-transition'
               : 'translate-y-0 opacity-100'
           }`}
         >
@@ -352,6 +335,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 variant="outline"
                 size="md"
                 onClick={() => setIsTabletMenuOpen(true)}
+                tabIndex={isCompact ? -1 : undefined}
                 aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
                 className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
                 icon={<Menu className="w-5 h-5" aria-hidden="true" />}
@@ -360,6 +344,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               <Link
                 to={localizePath('/')}
                 onClick={handleAdaptiveNavigation}
+                tabIndex={isCompact ? -1 : undefined}
                 aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
                 className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
@@ -375,6 +360,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               id="mobile-header-search-btn"
               to={localizePath('/search')}
               onClick={handleAdaptiveNavigation}
+              tabIndex={isCompact ? -1 : undefined}
               aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
               className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
@@ -385,14 +371,13 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       </div>
 
       <nav
-        ref={compactHeaderRef}
         id="mobile-compact-header"
         aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
         aria-hidden={!isCompact || undefined}
         className={`md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4 transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
             ? 'translate-y-0 opacity-100 delay-[60ms]'
-            : '-translate-y-6 opacity-0 delay-0'
+            : '-translate-y-6 opacity-0 delay-0 mobile-chrome-hide-after-transition'
         }`}
       >
         <div className="flex w-full items-center justify-between">
@@ -401,6 +386,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             variant="outline"
             size="md"
             onClick={() => setIsTabletMenuOpen(true)}
+            tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
             className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
               isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
@@ -412,6 +398,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             id="mobile-compact-search-btn"
             to={localizePath('/search')}
             onClick={handleAdaptiveNavigation}
+            tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
             className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
