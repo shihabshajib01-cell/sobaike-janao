@@ -73,6 +73,10 @@ html[data-theme="light"] {
   --md-outline-subtle: #E4E6EB;
   --md-outline: #85888C;
   --md-outline-strong: #65676B;
+  /* Form controls use a slightly quieter boundary derived from the default outline.
+     90% outline + 10% surface keeps the light control edge near the 3:1 boundary threshold. */
+  --md-control-outline: color-mix(in srgb, var(--md-outline) 90%, var(--md-surface));
+  --md-control-outline-hover: var(--md-outline);
 
   --md-focus: #3A7CA5;
   --md-overlay: rgba(5, 5, 5, 0.55);
@@ -255,6 +259,9 @@ html[data-theme="dark"],
   --md-outline-subtle: #4E4F50;
   --md-outline: #7C8086;
   --md-outline-strong: #B0B3B8;
+  /* Dark mode already needs the full default outline for sufficient boundary contrast. */
+  --md-control-outline: var(--md-outline);
+  --md-control-outline-hover: var(--md-outline-strong);
 
   --md-focus: #3A7CA5;
   --md-overlay: rgba(0, 0, 0, 0.72);
