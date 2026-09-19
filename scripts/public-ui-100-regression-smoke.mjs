@@ -249,6 +249,18 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   const firstCardLink = firstCard.locator('a[href*="/report-detail/"]').first();
   await expectVisible(firstCardLink, 'Report card does not expose a native keyboard-addressable detail link');
 
+  // Wait for semantic theme variables and the generated border utilities to settle.
+  // This keeps the check strict while avoiding a false negative during stylesheet hydration.
+  await page.waitForFunction(() => {
+    const card = document.querySelector('[id^="report-card-"]');
+    const horizontal = card?.querySelector('[data-report-divider-horizontal]');
+    const verticals = card ? [...card.querySelectorAll('[data-report-divider-vertical]')] : [];
+    if (!(horizontal instanceof HTMLElement) || verticals.length !== 2) return false;
+    const horizontalColor = getComputedStyle(horizontal).borderTopColor;
+    const verticalColors = verticals.map((element) => getComputedStyle(element).borderLeftColor);
+    return Boolean(horizontalColor) && verticalColors.every((color) => Boolean(color));
+  }, null, { timeout: 5000 });
+
   const lightDividerColors = await firstCard.evaluate((card) => {
     const horizontal = card.querySelector('[data-report-divider-horizontal]');
     const verticals = [...card.querySelectorAll('[data-report-divider-vertical]')];

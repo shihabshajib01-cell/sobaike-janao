@@ -297,8 +297,8 @@ export const ImageAttachmentPicker: React.FC<ImageAttachmentPickerProps> = ({
             </p>
             <p className="type-compact text-secondary">
               {language === 'bn'
-                ? `ঐচ্ছিক · সর্বোচ্চ ${maxImages}টি JPG বা PNG ছবি (প্রতি ছবি ৫MB, মোট ২৫MB)`
-                : `Optional · Up to ${maxImages} JPG or PNG images (5MB each, 25MB total)`}
+                ? `ঐচ্ছিক · সর্বোচ্চ ${maxImages}টি JPG বা PNG ছবি (প্রতি ছবি ${maxFileSizeMB}MB, মোট ${maxTotalSizeMB}MB)`
+                : `Optional · Up to ${maxImages} JPG or PNG images (${maxFileSizeMB}MB each, ${maxTotalSizeMB}MB total)`}
             </p>
           </div>
         </div>
