@@ -48,7 +48,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           <div className="flex items-center gap-2.5 min-w-0 pr-2">
             {icon && <div className="text-ui-content-primary shrink-0">{icon}</div>}
             <div className="min-w-0">
-              <span className="type-h4 font-[var(--font-weight-bold)] text-ui-content-primary leading-tight block truncate">
+              <span className="type-h4 font-[var(--font-weight-bold)] text-ui-content-primary block truncate">
                 {title}
               </span>
               {!isOpen && summary && (
