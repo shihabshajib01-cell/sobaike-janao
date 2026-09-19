@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
 import { ReportItem } from '../types/report';
-import { ReportCard } from '../components/report/ReportCard';
+import { VirtualizedReportFeed } from '../components/report/VirtualizedReportFeed';
 import { LocationSelector } from '../components/feed/LocationSelector';
 import { NewReportsNotice } from '../components/feed/NewReportsNotice';
 import { FilterChip } from '../components/ui/FilterChip';
@@ -20,6 +20,7 @@ import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
+import { scheduleIdleTask } from '../utils/scheduleIdleTask';
 
 type FeedFilterType = 'all' | 'latest' | 'popular';
 
@@ -127,7 +128,9 @@ export const HomePage: React.FC = () => {
       });
       setHasMoreReports(page.hasMore);
       setNextOffset(page.nextOffset);
-      setTotalReportCount(page.totalCount);
+      if (page.totalCount !== null) {
+        setTotalReportCount(page.totalCount);
+      }
       return true;
     } catch (err) {
       console.warn('[HomePage data load error]', err);
@@ -191,10 +194,13 @@ export const HomePage: React.FC = () => {
       }
     };
 
-    void establishFeedWatermark();
+    const cancelScheduledWatermark = scheduleIdleTask(() => {
+      void establishFeedWatermark();
+    }, 1400);
 
     return () => {
       cancelled = true;
+      cancelScheduledWatermark();
     };
   }, [isLoading, fetchError, feedWatermark, selectedDistrict]);
 
@@ -494,11 +500,10 @@ export const HomePage: React.FC = () => {
 
         {!isLoading && !fetchError && filteredReports.length > 0 && (
           <div className="space-y-3">
-            {filteredReports.map((report) => (
-              <div key={report.id} className="home-feed-render-window">
-                <ReportCard report={report} />
-              </div>
-            ))}
+            <VirtualizedReportFeed
+              reports={filteredReports}
+              pageSize={HOME_FEED_PAGE_SIZE}
+            />
 
             {hasMoreReports && !loadMoreError && (
               <div
