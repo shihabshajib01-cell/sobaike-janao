@@ -488,6 +488,39 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       }
     }, [isUtilityReport]);
 
+    // Child-safety reports intentionally collect only Division + District.
+    // Clear hidden location detail left from another subtype before validation/submission.
+    useEffect(() => {
+      if (!isChildSafetyReport || !formData.location) return;
+
+      const hasHiddenLocationData = Boolean(
+        formData.location.upazilaOrThana ||
+        formData.location.area ||
+        formData.location.road ||
+        formData.location.landmark ||
+        formData.location.formattedAddress ||
+        formData.location.placeId ||
+        formData.location.lat ||
+        formData.location.lng
+      );
+
+      if (hasHiddenLocationData) {
+        onUpdateFormData({
+          location: {
+            ...formData.location,
+            upazilaOrThana: '',
+            area: '',
+            road: '',
+            landmark: '',
+            formattedAddress: '',
+            placeId: undefined,
+            lat: undefined,
+            lng: undefined,
+          },
+        });
+      }
+    }, [isChildSafetyReport, formData.location, onUpdateFormData]);
+
     // Clear stale address-specific location data for utility complaints
     useEffect(() => {
       if (isUtilityReport && formData.location) {
@@ -979,7 +1012,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         }
 
         const detailedAddr = formData.location?.formattedAddress?.trim() || '';
-        if (detailedAddr) {
+        if (!isChildSafetyReport && detailedAddr) {
           if (detailedAddr.length < 5) {
             newErrors.formattedAddress =
               language === 'bn'
@@ -1038,6 +1071,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           newErrors.affectedPersonAgeGroup ||
           newErrors.allegedAbuserRelationship ||
           newErrors.reportingFor ||
+          newErrors.childIncidentType ||
           newErrors.sexualHarassmentType ||
           newErrors.sexualHarassmentContext ||
           newErrors.sexualHarassmentInstitution
