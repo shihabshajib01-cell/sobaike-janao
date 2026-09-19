@@ -12,7 +12,7 @@ const LOCATION_CHOICE_KEY = 'sobaike_location_choice_v1';
 export const BROWSE_LOCATION_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes max age for in-memory browse location
 export const REPORTER_LOCATION_FALLBACK_MAX_AGE_MS = 5 * 60 * 1000; // report-submit fallback must remain recent
 
-export type LocationChoice = 'granted' | 'not_now';
+export type LocationChoice = 'granted' | 'not_now' | 'denied';
 
 export type PermissionStatus =
   | 'granted'
@@ -253,13 +253,13 @@ export const VisitorSessionService = {
   },
 
   /**
-   * Get saved location choice ('granted' | 'not_now' | null)
+   * Get saved location choice ('granted' | 'not_now' | 'denied' | null)
    */
   getLocationChoice(): LocationChoice | null {
     if (typeof window === 'undefined') return null;
     try {
       const val = localStorage.getItem(LOCATION_CHOICE_KEY);
-      if (val === 'granted' || val === 'not_now') {
+      if (val === 'granted' || val === 'not_now' || val === 'denied') {
         return val as LocationChoice;
       }
       return null;
@@ -384,7 +384,7 @@ export const VisitorSessionService = {
           if (error.code === error.PERMISSION_DENIED) {
             status = 'denied';
             errorType = 'denied';
-            this.setLocationChoice('not_now');
+            this.setLocationChoice('denied');
             this.clearMemoryLocation();
           } else if (error.code === error.TIMEOUT) {
             status = 'unavailable';
@@ -428,7 +428,7 @@ export const VisitorSessionService = {
 
     const perm = await this.queryPermissionStatus();
     if (perm === 'denied') {
-      this.setLocationChoice('not_now');
+      this.setLocationChoice('denied');
       this.clearMemoryLocation();
       await this.recordSession('denied');
       return;
@@ -623,7 +623,7 @@ export const VisitorSessionService = {
           if (!active) return;
           const newState = status.state as PermissionStatus;
           if (newState === 'denied') {
-            this.setLocationChoice('not_now');
+            this.setLocationChoice('denied');
             this.clearMemoryLocation();
           }
           onChange(newState);
