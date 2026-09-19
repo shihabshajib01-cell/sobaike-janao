@@ -112,15 +112,27 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     if (!shouldUseAdaptiveHeader) return;
 
     const mobileMedia = window.matchMedia('(max-width: 767px)');
+
+    const resetScrollTracking = () => {
+      lastScrollYRef.current = window.scrollY;
+      directionRef.current = null;
+      directionDistanceRef.current = 0;
+      transitionLockUntilRef.current = 0;
+    };
+
     if (!mobileMedia.matches) {
       onCompactChange(false);
-      return;
     }
-
-    lastScrollYRef.current = window.scrollY;
+    resetScrollTracking();
 
     const evaluateScroll = () => {
       frameRef.current = null;
+
+      if (!mobileMedia.matches) {
+        resetScrollTracking();
+        onCompactChange(false);
+        return;
+      }
 
       const currentScrollY = Math.max(0, window.scrollY);
       const delta = currentScrollY - lastScrollYRef.current;
@@ -182,10 +194,19 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       frameRef.current = window.requestAnimationFrame(evaluateScroll);
     };
 
+    const handleMediaChange = () => {
+      resetScrollTracking();
+      if (!mobileMedia.matches) {
+        onCompactChange(false);
+      }
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
+    mobileMedia.addEventListener('change', handleMediaChange);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      mobileMedia.removeEventListener('change', handleMediaChange);
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);
         frameRef.current = null;
