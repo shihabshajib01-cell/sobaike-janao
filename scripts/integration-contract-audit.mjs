@@ -79,6 +79,29 @@ if (!deployWorkflow.includes("if: github.event_name == 'push' && github.ref == '
   fail('Production deploy is no longer restricted to pushes on main');
 }
 
+for (const needle of [
+  'Run full pre-deploy Public regression gate',
+  'node scripts/public-functional-smoke.mjs',
+  'node scripts/public-ui-100-regression-smoke.mjs',
+  'node scripts/public-form-regression-matrix.mjs',
+  'node scripts/public-composer-100-regression-smoke.mjs',
+  'node scripts/public-accessibility-smoke.mjs',
+]) {
+  if (!deployWorkflow.includes(needle)) {
+    fail('Deploy workflow is missing pre-deploy regression guard: ' + needle);
+  }
+}
+
+const regressionGateIndex = deployWorkflow.indexOf('Run full pre-deploy Public regression gate');
+const artifactUploadIndex = deployWorkflow.indexOf('actions/upload-pages-artifact');
+if (
+  regressionGateIndex < 0 ||
+  artifactUploadIndex < 0 ||
+  regressionGateIndex > artifactUploadIndex
+) {
+  fail('Production artifact can be uploaded before the full Public regression gate completes');
+}
+
 
 const syncMigrationFile = 'supabase/migrations/20260919142507_end_to_end_sync_contract_and_rls_hardening.sql';
 if (!fs.existsSync(syncMigrationFile)) {
@@ -110,8 +133,8 @@ const functionalSmoke = read('.github/workflows/public-functional-smoke.yml');
 for (const needle of [
   'Checkout exact deployed commit',
   "ref: ${{ github.event.workflow_run.head_sha || github.sha }}",
-  "group: public-functional-smoke-${{ github.event.workflow_run.head_sha || github.sha }}",
-  'cancel-in-progress: false',
+  'group: public-functional-smoke',
+  'cancel-in-progress: true',
 ]) {
   if (!functionalSmoke.includes(needle)) {
     fail('Public functional smoke exact-revision guard is missing: ' + needle);
@@ -120,5 +143,5 @@ for (const needle of [
 
 console.log(
   'Integration contract audit passed using ' + latestContractFile +
-  '; harassment schema options and deploy concurrency are aligned.'
+  '; harassment schema options, deploy concurrency and pre-deploy regression gating are aligned.'
 );
