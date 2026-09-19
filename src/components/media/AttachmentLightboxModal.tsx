@@ -120,7 +120,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
       role="dialog"
       aria-modal="true"
       aria-label={language === 'bn' ? 'সংযুক্ত ছবির বিশদ রূপ' : 'Attachment image viewer'}
-      className="fixed inset-0 z-[70] flex items-center justify-center p-0 md:p-6 overflow-hidden select-none animate-in fade-in duration-200"
+      className="fixed inset-0 h-[100dvh] max-h-[100dvh] z-[70] flex items-center justify-center p-0 md:p-6 overflow-hidden overscroll-none select-none animate-in fade-in duration-200"
     >
       {/* Backdrop */}
       <div
@@ -133,7 +133,7 @@ export const AttachmentLightboxModal: React.FC<AttachmentLightboxModalProps> = (
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="relative w-full max-w-4xl h-full md:h-auto max-h-none md:max-h-[92vh] flex flex-col rounded-none md:rounded-[var(--radius-card)] md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-ui-media-viewer-border bg-ui-media-viewer-bg text-ui-media-viewer-text shadow-[var(--elevation-2xl)] overflow-hidden z-10"
+        className="relative w-full max-w-4xl h-[100dvh] max-h-[100dvh] md:h-auto md:max-h-[92vh] flex flex-col rounded-none md:rounded-[var(--radius-card)] md:rounded-[var(--radius-modal)] ui-radius-modal border-0 md:border border-ui-media-viewer-border bg-ui-media-viewer-bg text-ui-media-viewer-text shadow-[var(--elevation-2xl)] overflow-hidden z-10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
