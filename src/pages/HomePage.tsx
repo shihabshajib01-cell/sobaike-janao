@@ -260,7 +260,12 @@ export const HomePage: React.FC = () => {
   const handleRefreshNewReports = useCallback(async () => {
     if (isRefreshingNewReports) return;
 
+    feedGenerationRef.current += 1;
+    loadMoreInFlightRef.current = false;
+    setIsLoadingMore(false);
+    setLoadMoreError(false);
     setIsRefreshingNewReports(true);
+
     try {
       const refreshed = await loadReports({ background: true });
       if (!refreshed) return;
@@ -321,36 +326,81 @@ export const HomePage: React.FC = () => {
       fetchError ||
       !hasMoreReports ||
       nextOffset === null ||
-      loadMoreError ||
-      typeof IntersectionObserver === 'undefined'
+      loadMoreError
     ) {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (
-          !entry?.isIntersecting ||
-          document.visibilityState !== 'visible' ||
-          !navigator.onLine
-        ) {
-          return;
-        }
+    const rootMargin = getHomeFeedPrefetchMargin();
+    const prefetchDistance = Number.parseInt(rootMargin, 10) || 0;
 
+    const canLoadNow = () =>
+      document.visibilityState === 'visible' &&
+      navigator.onLine;
+
+    const loadIfNearViewport = () => {
+      if (!canLoadNow()) return;
+      const bounds = sentinel.getBoundingClientRect();
+      if (bounds.top <= window.innerHeight + prefetchDistance) {
         void handleLoadMore();
-      },
-      {
-        root: null,
-        rootMargin: getHomeFeedPrefetchMargin(),
-        threshold: 0.01,
       }
-    );
+    };
 
-    observer.observe(sentinel);
+    const handleResume = () => {
+      if (document.visibilityState === 'visible') {
+        loadIfNearViewport();
+      }
+    };
+
+    const handleOnline = () => {
+      loadIfNearViewport();
+    };
+
+    document.addEventListener('visibilitychange', handleResume);
+    window.addEventListener('online', handleOnline);
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting && canLoadNow()) {
+            void handleLoadMore();
+          }
+        },
+        {
+          root: null,
+          rootMargin,
+          threshold: 0.01,
+        }
+      );
+
+      observer.observe(sentinel);
+
+      return () => {
+        observer.disconnect();
+        document.removeEventListener('visibilitychange', handleResume);
+        window.removeEventListener('online', handleOnline);
+      };
+    }
+
+    let frameId = 0;
+    const handleFallbackViewportChange = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        loadIfNearViewport();
+      });
+    };
+
+    window.addEventListener('scroll', handleFallbackViewportChange, { passive: true });
+    window.addEventListener('resize', handleFallbackViewportChange);
+    loadIfNearViewport();
 
     return () => {
-      observer.disconnect();
+      if (frameId) window.cancelAnimationFrame(frameId);
+      window.removeEventListener('scroll', handleFallbackViewportChange);
+      window.removeEventListener('resize', handleFallbackViewportChange);
+      document.removeEventListener('visibilitychange', handleResume);
+      window.removeEventListener('online', handleOnline);
     };
   }, [
     fetchError,
