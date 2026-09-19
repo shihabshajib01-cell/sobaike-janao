@@ -237,6 +237,41 @@ requireContains(
   'mobile adaptive navigation must use shared control elevation'
 );
 requireContains(
+  'src/components/layout/Header.tsx',
+  '<nav className="hidden md:block space-y-1"',
+  'mobile drawer must hide the service/category navigation while preserving it for tablet'
+);
+requireContains(
+  'src/components/layout/Header.tsx',
+  'className={\`hidden md:flex w-full items-center gap-3',
+  'mobile drawer must hide the redundant Search row while preserving it for tablet'
+);
+requireContains(
+  'src/components/layout/Header.tsx',
+  '<LanguageSelector variant="segmented" idPrefix="drawer-language" />',
+  'drawer settings must use the shared language selector'
+);
+requireContains(
+  'src/components/layout/DesktopLeftRail.tsx',
+  '<LanguageSelector variant="compact" idPrefix="rail-language" />',
+  'desktop settings must use the shared language selector'
+);
+requireNotContains(
+  'src/components/ui/LanguageSelector.tsx',
+  'ui-radius-pill',
+  'language selector must use the same control radii as the other settings controls'
+);
+requireContains(
+  'src/components/ui/LanguageSelector.tsx',
+  'rounded-[var(--radius-card)]',
+  'segmented language selector must share the settings card radius'
+);
+requireContains(
+  'src/components/ui/LanguageSelector.tsx',
+  'rounded-[var(--radius-control)]',
+  'language options must share the standard settings control radius'
+);
+requireContains(
   'src/components/feed/MobileCategoryFilterPortal.tsx',
   '<AppIcon name="filter"',
   'mobile category filter must use the shared icon registry'

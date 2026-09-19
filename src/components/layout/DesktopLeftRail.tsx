@@ -7,6 +7,7 @@ import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { TextSizeSelector } from '../ui/TextSizeSelector';
+import { LanguageSelector } from '../ui/LanguageSelector';
 import { BrandLogo } from '../branding/BrandLogo';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
 
@@ -21,7 +22,7 @@ const SECTION_ICON_NAMES: Record<SectionKey, AppIconName> = {
 };
 
 export const DesktopLeftRail: React.FC = () => {
-  const { currentRoute, language, toggleLanguage, openReportComposer } = useApp();
+  const { currentRoute, language, openReportComposer } = useApp();
   const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
   const localizePath = (path: RoutePath) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -179,33 +180,7 @@ export const DesktopLeftRail: React.FC = () => {
         <ThemeSelector variant="compact" />
         <TextSizeSelector variant="compact" idPrefix="rail-text-size" />
 
-        <div className="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 type-compact ui-radius-control border border-ui-stroke-subtle bg-ui-surface min-h-[44px]">
-          <span className="font-[var(--font-weight-medium)] text-ui-content-primary">
-            {language === 'bn' ? 'ভাষা' : 'Language'}
-          </span>
-          <div
-            className="flex items-center p-0.5 bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-pill"
-            role="group"
-            aria-label={language === 'bn' ? 'ভাষা নির্বাচন' : 'Select language'}
-          >
-            <button
-              type="button"
-              aria-pressed={language === 'bn'}
-              onClick={() => language !== 'bn' && toggleLanguage()}
-              className={`min-w-[42px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'bn' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
-            >
-              বাংলা
-            </button>
-            <button
-              type="button"
-              aria-pressed={language === 'en'}
-              onClick={() => language !== 'en' && toggleLanguage()}
-              className={`min-w-[42px] min-h-[34px] px-2.5 ui-radius-pill type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${language === 'en' ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]' : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary'}`}
-            >
-              EN
-            </button>
-          </div>
-        </div>
+        <LanguageSelector variant="compact" idPrefix="rail-language" />
 
         <div className="px-2 pt-1 type-meta text-ui-content-secondary leading-tight">
           <p className="font-[var(--font-weight-medium)] text-ui-content-secondary">
