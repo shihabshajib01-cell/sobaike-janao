@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
@@ -69,9 +68,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
                 ? 'এই ক্যাটাগরিতে প্রতিবেদন জমা দিন'
                 : 'Submit a report in this category'
             }
-            className="pointer-events-auto flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-200 ease-out hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
+            data-mobile-floating-control="true"
+            className="pointer-events-auto flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-[transform,background-color,color] duration-200 ease-out hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
           >
-            <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+            <AppIcon name="plus" size="lg" strokeWidth={2.4} />
           </button>
         </div>
       </nav>
@@ -161,9 +161,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             onClick={() => openReportComposer()}
             tabIndex={isCompact ? -1 : undefined}
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
-            className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-all hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
+            className="ml-1 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-all hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
           >
-            <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+            <AppIcon name="plus" size="lg" strokeWidth={2.4} />
           </button>
         </div>
       </nav>
@@ -187,7 +187,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? compactNavItem.nameBn : compactNavItem.nameEn}
             aria-current={compactNavItem.isActive ? 'page' : undefined}
-            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            data-mobile-floating-control="true"
+            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               compactNavItem.isActive
                 ? 'text-ui-content-primary dark:bg-ui-accent-soft dark:ring-1 dark:ring-ui-accent-border'
                 : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
@@ -206,9 +207,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             onClick={() => openReportComposer()}
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
-            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
+            data-mobile-floating-control="true"
+            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text ui-elevation-control transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
           >
-            <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+            <AppIcon name="plus" size="lg" strokeWidth={2.4} />
           </button>
         </div>
       </nav>
