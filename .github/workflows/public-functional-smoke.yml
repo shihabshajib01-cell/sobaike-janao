@@ -14,7 +14,7 @@ permissions:
 # compete for browser/network/Supabase resources and create false regressions.
 concurrency:
   group: public-functional-smoke
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
 jobs:
   browser-smoke:
@@ -27,8 +27,10 @@ jobs:
       SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
     steps:
-      - name: Checkout
+      - name: Checkout exact deployed commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
