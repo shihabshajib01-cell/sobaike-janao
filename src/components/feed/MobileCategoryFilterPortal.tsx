@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Filter } from 'lucide-react';
+import { AppIcon } from '../ui/AppIcon';
 
 export interface MobileCategoryFilterPortalProps {
   onOpen: () => void;
@@ -27,7 +27,7 @@ const CategoryFilterButton: React.FC<{
         : 'h-11 w-11 min-h-[44px] min-w-[44px]'
     }`}
   >
-    <Filter className={mobile ? 'h-6 w-6 stroke-[2]' : 'h-5 w-5 stroke-[2]'} aria-hidden="true" />
+    <AppIcon name="filter" size={mobile ? 'xl' : 'lg'} strokeWidth={2} />
   </button>
 );
 
