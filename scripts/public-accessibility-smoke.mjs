@@ -192,6 +192,81 @@ if (process.env.FORM_SCHEMA_SMOKE === '1') {
   }
 
   await scan(mobilePage, 'mobile schema form fixture');
+
+  // Evidence runtime matrix: invalid type, per-file limit, total limit, count limit,
+  // valid compression, duplicate prevention, and removal all run inside the CI-only schema fixture.
+  const evidenceField = mobilePage.locator('#configured-field-smoke_evidence');
+  const evidenceInput = evidenceField.locator('input[type="file"]');
+  const tinyPng = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlN2wAAAABJRU5ErkJggg==',
+    'base64'
+  );
+
+  await evidenceInput.setInputFiles({
+    name: 'invalid.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('not-an-image'),
+  });
+  await evidenceField.getByRole('alert').waitFor({ state: 'visible', timeout: 5000 });
+  if (!/not supported|গ্রহণযোগ্য নয়/i.test(await evidenceField.getByRole('alert').innerText())) {
+    throw new Error('Schema evidence invalid-type validation did not surface the expected message');
+  }
+
+  await evidenceInput.setInputFiles({
+    name: 'too-large.png',
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(5 * 1024 * 1024 + 1),
+  });
+  if (!/5MB|৫/i.test(await evidenceField.getByRole('alert').innerText())) {
+    throw new Error('Schema evidence individual-size validation did not surface the configured limit');
+  }
+
+  const oversizedBatch = Array.from({ length: 6 }, (_, index) => ({
+    name: `total-${index + 1}.png`,
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(Math.floor(4.5 * 1024 * 1024)),
+  }));
+  await evidenceInput.setInputFiles(oversizedBatch);
+  if (!/25MB|২৫/i.test(await evidenceField.getByRole('alert').innerText())) {
+    throw new Error('Schema evidence total-size validation did not surface the configured limit');
+  }
+
+  const tooMany = Array.from({ length: 7 }, (_, index) => ({
+    name: `count-${index + 1}.png`,
+    mimeType: 'image/png',
+    buffer: tinyPng,
+  }));
+  await evidenceInput.setInputFiles(tooMany);
+  if (!/maximum of 6|সর্বোচ্চ 6|সর্বোচ্চ ৬/i.test(await evidenceField.getByRole('alert').innerText())) {
+    throw new Error('Schema evidence count validation did not surface the configured maximum');
+  }
+
+  const validEvidenceFile = {
+    name: 'schema-evidence.png',
+    mimeType: 'image/png',
+    buffer: tinyPng,
+  };
+  await evidenceInput.setInputFiles(validEvidenceFile);
+  await evidenceField.getByText(/Attached Evidence \(1\/6\)/).waitFor({ state: 'visible', timeout: 5000 });
+  await evidenceField.getByText(/Preparing|Preparing image/).first().waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+  if ((await evidenceField.getByLabel('Remove image 1').count()) !== 1) {
+    throw new Error('Schema evidence valid image did not expose a removable preview');
+  }
+
+  await evidenceInput.setInputFiles(validEvidenceFile);
+  await evidenceField.getByRole('alert').waitFor({ state: 'visible', timeout: 5000 });
+  if (!/already attached/i.test(await evidenceField.getByRole('alert').innerText())) {
+    throw new Error('Schema evidence duplicate prevention did not surface the expected message');
+  }
+
+  await evidenceField.getByLabel('Remove image 1').click();
+  await evidenceField.getByText(/Attached Evidence \(1\/6\)/).waitFor({ state: 'detached', timeout: 5000 }).catch(async () => {
+    if ((await evidenceField.getByLabel('Remove image 1').count()) !== 0) {
+      throw new Error('Schema evidence removal did not clear the preview');
+    }
+  });
+  await scan(mobilePage, 'mobile schema evidence validation and recovery');
+
   await mobilePage.locator('#schema-smoke-validate').click();
   await mobilePage.waitForFunction(
     () => document.getElementById('schema-smoke-status')?.getAttribute('data-schema-valid') === 'false'
