@@ -226,11 +226,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
             aria-label={language === 'bn' ? compactNavItem.nameBn : compactNavItem.nameEn}
             aria-current={compactNavItem.isActive ? 'page' : undefined}
             data-mobile-floating-control="true"
-            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms] motion-reduce:delay-0' : 'pointer-events-none scale-95 delay-0 motion-reduce:delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              compactNavItem.isActive
-                ? 'text-ui-content-primary dark:bg-ui-accent-soft dark:ring-1 dark:ring-ui-accent-border'
-                : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
-            }`}
+            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms] motion-reduce:delay-0' : 'pointer-events-none scale-95 delay-0 motion-reduce:delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-control border border-ui-stroke-subtle bg-ui-surface/95 text-ui-content-primary ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus`}
           >
             <AppIcon
               name={compactNavItem.iconName}

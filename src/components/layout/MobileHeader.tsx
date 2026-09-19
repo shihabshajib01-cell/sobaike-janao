@@ -315,12 +315,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
             <IconButton
               id="mobile-report-detail-back-btn"
-              variant={isCompact ? 'outline' : 'ghost'}
+              variant="outline"
               size="lg"
               onClick={() => goBackWithFallback(() => navigateTo('/'))}
               aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
               data-mobile-floating-control={isCompact ? 'true' : undefined}
-              className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={<AppIcon name="arrow-left" size="xl" strokeWidth={2} />}
             />
 
@@ -348,7 +348,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                   : 'Share report'
               }
               data-mobile-floating-control={isCompact ? 'true' : undefined}
-              className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={
                 isShareConfirmed ? (
                   <AppIcon name="check" size="xl" strokeWidth={2} className="text-ui-success-text" />
@@ -384,12 +384,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
             <IconButton
               id="mobile-category-back-btn"
-              variant={isCompact ? 'outline' : 'ghost'}
+              variant="outline"
               size="lg"
               onClick={() => navigateTo('/issues')}
               aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
               data-mobile-floating-control={isCompact ? 'true' : undefined}
-              className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+              className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={<AppIcon name="arrow-left" size="xl" strokeWidth={2} />}
             />
 
@@ -411,7 +411,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
                 aria-haspopup="dialog"
                 data-mobile-floating-control={isCompact ? 'true' : undefined}
-                className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
+                className={`${isCompact ? 'pointer-events-auto !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : '!bg-ui-surface !shadow-none'} !border-ui-stroke-subtle !text-ui-content-primary transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
                 icon={<AppIcon name="filter" size="xl" strokeWidth={2} />}
               />
             ) : (
