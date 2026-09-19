@@ -357,6 +357,159 @@
     }
   }
 
+  /* Accessibility text sizing: Default preserves the approved typography system.
+     Smaller targets ~15% reduction with readable floors for primary/supporting text.
+     Larger applies ~15% growth while preserving the same semantic hierarchy. */
+  html[data-text-size="smaller"] {
+    --type-body-size: 14px;
+    --type-body-line: 22px;
+    --type-label-size: 14px;
+    --type-label-line: 21px;
+    --type-input-size: 14px;
+    --type-input-line: 21px;
+    --type-meta-size: 12px;
+    --type-meta-line: 19px;
+    --type-helper-size: 12px;
+    --type-helper-line: 18px;
+    --type-compact-size: 12px;
+    --type-compact-line: 18px;
+    --type-h5-size: 14px;
+    --type-h5-line: 21px;
+
+    --type-h1-size-mobile: 24px;
+    --type-h1-line-mobile: 32px;
+    --type-h1-size-tablet: 25.5px;
+    --type-h1-line-tablet: 34px;
+    --type-h1-size-desktop: 27px;
+    --type-h1-line-desktop: 36px;
+
+    --type-h2-size-mobile: 19px;
+    --type-h2-line-mobile: 27px;
+    --type-h2-size-tablet: 20.5px;
+    --type-h2-line-tablet: 29px;
+    --type-h2-size-desktop: 20.5px;
+    --type-h2-line-desktop: 29px;
+
+    --type-h3-size-mobile: 15.5px;
+    --type-h3-line-mobile: 24px;
+    --type-h3-size-tablet: 17px;
+    --type-h3-line-tablet: 25.5px;
+    --type-h3-size-desktop: 17px;
+    --type-h3-line-desktop: 25.5px;
+
+    --type-h4-size-mobile: 14px;
+    --type-h4-line-mobile: 22px;
+    --type-h4-size-tablet: 15.5px;
+    --type-h4-line-tablet: 24px;
+    --type-h4-size-desktop: 15.5px;
+    --type-h4-line-desktop: 24px;
+  }
+
+  html[lang="en"][data-text-size="smaller"] {
+    --type-h1-size-mobile: 24px;
+    --type-h1-line-mobile: 32px;
+    --type-h1-size-tablet: 24px;
+    --type-h1-line-tablet: 32px;
+    --type-h1-size-desktop: 27px;
+    --type-h1-line-desktop: 36px;
+
+    --type-h2-size-mobile: 19px;
+    --type-h2-line-mobile: 27px;
+    --type-h2-size-tablet: 19px;
+    --type-h2-line-tablet: 27px;
+    --type-h2-size-desktop: 20.5px;
+    --type-h2-line-desktop: 29px;
+
+    --type-h3-size-mobile: 15.5px;
+    --type-h3-line-mobile: 24px;
+    --type-h3-size-tablet: 16px;
+    --type-h3-line-tablet: 24px;
+    --type-h3-size-desktop: 17px;
+    --type-h3-line-desktop: 25.5px;
+
+    --type-h4-size-mobile: 14px;
+    --type-h4-line-mobile: 22px;
+    --type-h4-size-tablet: 14.5px;
+    --type-h4-line-tablet: 22px;
+    --type-h4-size-desktop: 15.5px;
+    --type-h4-line-desktop: 24px;
+  }
+
+  html[data-text-size="larger"] {
+    --type-body-size: 18.5px;
+    --type-body-line: 30px;
+    --type-label-size: 18.5px;
+    --type-label-line: 28px;
+    --type-input-size: 18.5px;
+    --type-input-line: 28px;
+    --type-meta-size: 16px;
+    --type-meta-line: 25.5px;
+    --type-helper-size: 16px;
+    --type-helper-line: 23px;
+    --type-compact-size: 16px;
+    --type-compact-line: 23px;
+    --type-h5-size: 18.5px;
+    --type-h5-line: 28px;
+
+    --type-h1-size-mobile: 32px;
+    --type-h1-line-mobile: 44px;
+    --type-h1-size-tablet: 34.5px;
+    --type-h1-line-tablet: 46px;
+    --type-h1-size-desktop: 37px;
+    --type-h1-line-desktop: 48.5px;
+
+    --type-h2-size-mobile: 25.5px;
+    --type-h2-line-mobile: 37px;
+    --type-h2-size-tablet: 27.5px;
+    --type-h2-line-tablet: 39px;
+    --type-h2-size-desktop: 27.5px;
+    --type-h2-line-desktop: 39px;
+
+    --type-h3-size-mobile: 20.5px;
+    --type-h3-line-mobile: 32px;
+    --type-h3-size-tablet: 23px;
+    --type-h3-line-tablet: 34.5px;
+    --type-h3-size-desktop: 23px;
+    --type-h3-line-desktop: 34.5px;
+
+    --type-h4-size-mobile: 18.5px;
+    --type-h4-line-mobile: 30px;
+    --type-h4-size-tablet: 20.5px;
+    --type-h4-line-tablet: 32px;
+    --type-h4-size-desktop: 20.5px;
+    --type-h4-line-desktop: 32px;
+  }
+
+  html[lang="en"][data-text-size="larger"] {
+    --type-h1-size-mobile: 32px;
+    --type-h1-line-mobile: 44px;
+    --type-h1-size-tablet: 32px;
+    --type-h1-line-tablet: 44px;
+    --type-h1-size-desktop: 37px;
+    --type-h1-line-desktop: 48.5px;
+
+    --type-h2-size-mobile: 25.5px;
+    --type-h2-line-mobile: 37px;
+    --type-h2-size-tablet: 25.5px;
+    --type-h2-line-tablet: 37px;
+    --type-h2-size-desktop: 27.5px;
+    --type-h2-line-desktop: 39px;
+
+    --type-h3-size-mobile: 20.5px;
+    --type-h3-line-mobile: 32px;
+    --type-h3-size-tablet: 22px;
+    --type-h3-line-tablet: 32px;
+    --type-h3-size-desktop: 23px;
+    --type-h3-line-desktop: 34.5px;
+
+    --type-h4-size-mobile: 18.5px;
+    --type-h4-line-mobile: 30px;
+    --type-h4-size-tablet: 19.5px;
+    --type-h4-line-tablet: 30px;
+    --type-h4-size-desktop: 20.5px;
+    --type-h4-line-desktop: 32px;
+  }
+
   /* Public color values and light/dark roles are defined only in theme/color-system.css. */
 
   html,
