@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
+import { VisitorSessionService } from './visitorSessionService';
 
 export interface ApiError {
   code: string;
@@ -28,7 +29,7 @@ class ApiClient {
       throw error;
     }
 
-    const { data, error } = await supabase.rpc('submit_public_response', {
+    const { data, error } = await supabase.rpc('submit_public_response_v2', {
       p_report_id: reportId,
       p_response_type: 'citizen_information',
       p_payload: {
@@ -37,6 +38,8 @@ class ApiClient {
         contactConsent: payload.contactConsent,
         contactInfo: payload.contactConsent ? payload.contactInfo : undefined,
       },
+      p_visitor_id: VisitorSessionService.getVisitorId(),
+      p_session_id: VisitorSessionService.getSessionId(),
     });
 
     if (error) {
@@ -85,20 +88,24 @@ class ApiClient {
       throw error;
     }
 
-    let { data, error } = await supabase.rpc('submit_public_response', {
+    let { data, error } = await supabase.rpc('submit_public_response_v2', {
       p_report_id: reportId,
       p_response_type: 'subject_response',
       p_payload: payload,
+      p_visitor_id: VisitorSessionService.getVisitorId(),
+      p_session_id: VisitorSessionService.getSessionId(),
     });
 
     // Backward compatibility: if the database has not applied allow_subject_response_without_responder_type.sql yet,
     // and returns INVALID_RESPONDER_TYPE when responderType is omitted, retry once with legacy default 'mentioned_person'
     if (error && error.message?.includes('INVALID_RESPONDER_TYPE') && !payload.responderType) {
       const fallbackPayload = { ...payload, responderType: 'mentioned_person' as const };
-      const retryResult = await supabase.rpc('submit_public_response', {
+      const retryResult = await supabase.rpc('submit_public_response_v2', {
         p_report_id: reportId,
         p_response_type: 'subject_response',
         p_payload: fallbackPayload,
+        p_visitor_id: VisitorSessionService.getVisitorId(),
+        p_session_id: VisitorSessionService.getSessionId(),
       });
       if (!retryResult.error) {
         data = retryResult.data;
