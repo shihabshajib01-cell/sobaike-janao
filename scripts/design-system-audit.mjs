@@ -687,6 +687,76 @@ for (const file of pageFiles) {
   }
 }
 
+const reportComposerFiles = files.filter((file) =>
+  file.replaceAll('\\', '/').includes('/src/components/report-composer/')
+);
+
+for (const file of reportComposerFiles) {
+  const source = fs.readFileSync(file, 'utf8');
+  const relative = path.relative(process.cwd(), file).replaceAll('\\', '/');
+
+  const microHeadingPattern =
+    /<h[1-6]\b[^>]*className=["'`][^"'`]*\btype-(body|label|meta|helper|compact)\b[^"'`]*["'`][^>]*>/g;
+  for (const match of source.matchAll(microHeadingPattern)) {
+    const line = source.slice(0, match.index).split(/\r?\n/).length;
+    findings.push({
+      file: relative,
+      line,
+      rule: 'composer-heading-micro-role',
+      token: match[1],
+      message: 'Report Composer headings must use heading typography roles',
+      source: match[0].replace(/\s+/g, ' ').trim(),
+    });
+  }
+
+  const controlRolePattern =
+    /<(input|select|textarea)\b[^>]*className=(?:\{)?["'`][^"'`]*\btype-(h1|h2|h3|h4|body|label|action|meta|helper|compact)\b[^"'`]*["'`][^>]*>/g;
+  for (const match of source.matchAll(controlRolePattern)) {
+    const line = source.slice(0, match.index).split(/\r?\n/).length;
+    findings.push({
+      file: relative,
+      line,
+      rule: 'composer-control-typography-role',
+      token: match[2],
+      message: 'Report Composer text controls must use the shared type-input role',
+      source: match[0].replace(/\s+/g, ' ').trim(),
+    });
+  }
+
+  const labelPattern = /<label\b[\s\S]*?<\/label>/g;
+  for (const match of source.matchAll(labelPattern)) {
+    const labelSource = match[0];
+    const hasMicroRole = /\btype-(compact|meta|helper|body)\b/.exec(labelSource);
+    if (!hasMicroRole) continue;
+    const wrapsChoice = /<input\b[\s\S]*?\btype=["'](?:radio|checkbox)["']/.test(labelSource);
+    if (wrapsChoice) continue;
+
+    const line = source.slice(0, match.index).split(/\r?\n/).length;
+    findings.push({
+      file: relative,
+      line,
+      rule: 'composer-primary-label-role',
+      token: hasMicroRole[1],
+      message: 'Primary Report Composer field labels must use the shared 16px type-label role',
+      source: labelSource.replace(/\s+/g, ' ').trim().slice(0, 240),
+    });
+  }
+
+  const localLeadingPattern =
+    /className=(?:\{)?["'`][^"'`]*\btype-(?:h1|h2|h3|h4|body|label|input|action|meta|helper|compact)\b[^"'`]*\bleading-(?:tight|snug|normal|relaxed)\b[^"'`]*["'`]/g;
+  for (const match of source.matchAll(localLeadingPattern)) {
+    const line = source.slice(0, match.index).split(/\r?\n/).length;
+    findings.push({
+      file: relative,
+      line,
+      rule: 'composer-local-line-height',
+      token: 'leading-*',
+      message: 'Report Composer semantic typography roles must own their line-height',
+      source: match[0].replace(/\s+/g, ' ').trim(),
+    });
+  }
+}
+
 const searchableSelectFile = 'src/components/ui/SearchableSelect.tsx';
 if (fs.existsSync(searchableSelectFile)) {
   const source = fs.readFileSync(searchableSelectFile, 'utf8');
