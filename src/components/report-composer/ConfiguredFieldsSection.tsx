@@ -426,61 +426,57 @@ export const ConfiguredFieldsSection = forwardRef<
                     }))}
                   />
 
-                  {field.config?.minimalLocation !== true ? (
-                    <>
-                        <Select
-                          id="configured-location-upazila"
-                          label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
-                          value={selectedUpazila?.id || ''}
-                          disabled={!districtId}
-                          onChange={(event) => {
-                            const item = upazilaOptions.find((option) => option.id === event.target.value);
-                            onUpdateFormData({
-                              location: {
-                                ...formData.location,
-                                upazilaOrThana: item?.nameEn || '',
-                              },
-                            });
-                          }}
-                          placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                          options={upazilaOptions.map((item) => ({
-                            value: item.id,
-                            label: language === 'bn' ? item.nameBn : item.nameEn,
-                          }))}
-                        />
-      
-                        <TextField
-                          id="configured-location-area"
-                          type="text"
-                          label={language === 'bn' ? 'এলাকা' : 'Area'}
-                          value={formData.location?.area || ''}
-                          onChange={(event) =>
-                            onUpdateFormData({
-                              location: {
-                                ...formData.location,
-                                area: event.target.value,
-                              },
-                            })
-                          }
-                        />
-      
-                        <TextField
-                          id="configured-location-address"
-                          type="text"
-                          fieldClassName="sm:col-span-2"
-                          label={language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
-                          value={formData.location?.formattedAddress || ''}
-                          onChange={(event) =>
-                            onUpdateFormData({
-                              location: {
-                                ...formData.location,
-                                formattedAddress: event.target.value,
-                              },
-                            })
-                          }
-                        />
-                    </>
-                  ) : null}
+                  <Select
+                    id="configured-location-upazila"
+                    label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / Upazila'}
+                    value={selectedUpazila?.id || ''}
+                    disabled={!districtId}
+                    onChange={(event) => {
+                      const item = upazilaOptions.find((option) => option.id === event.target.value);
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          upazilaOrThana: item?.nameEn || '',
+                        },
+                      });
+                    }}
+                    placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                    options={upazilaOptions.map((item) => ({
+                      value: item.id,
+                      label: language === 'bn' ? item.nameBn : item.nameEn,
+                    }))}
+                  />
+
+                  <TextField
+                    id="configured-location-area"
+                    type="text"
+                    label={language === 'bn' ? 'এলাকা' : 'Area'}
+                    value={formData.location?.area || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          area: event.target.value,
+                        },
+                      })
+                    }
+                  />
+
+                  <TextField
+                    id="configured-location-address"
+                    type="text"
+                    fieldClassName="sm:col-span-2"
+                    label={language === 'bn' ? 'ঠিকানা / ল্যান্ডমার্ক' : 'Address / Landmark'}
+                    value={formData.location?.formattedAddress || ''}
+                    onChange={(event) =>
+                      onUpdateFormData({
+                        location: {
+                          ...formData.location,
+                          formattedAddress: event.target.value,
+                        },
+                      })
+                    }
+                  />
                 </div>
 
                 {error ? (
