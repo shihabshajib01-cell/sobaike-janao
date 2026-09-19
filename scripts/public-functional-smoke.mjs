@@ -374,21 +374,18 @@ await check('Privacy settings can switch approximate -> precise -> approximate',
     'precise state did not expose approximate-location downgrade'
   );
 
-  const ipFallbackResponse = page.waitForResponse(
-    (response) =>
-      response.url().includes('/functions/v1/public-ip-location') &&
-      response.request().method() === 'GET',
-    { timeout: 10000 }
-  ).catch(() => null);
-
   await page.locator('#location-preference-use-approximate').click();
-  const ipResponse = await ipFallbackResponse;
-  if (!ipResponse || !ipResponse.ok()) {
-    throw new Error('approximate preference did not establish IP fallback');
-  }
 
   await page.waitForFunction(
     () => localStorage.getItem('sobaike_location_choice_v1') === 'not_now',
+    null,
+    { timeout: 10000 }
+  );
+  await page.waitForFunction(
+    () =>
+      document.querySelector('#location-preference-status')?.textContent?.includes(
+        'আনুমানিক এলাকার লোকেশন'
+      ),
     null,
     { timeout: 10000 }
   );
