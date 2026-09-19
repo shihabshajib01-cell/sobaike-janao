@@ -25,7 +25,28 @@ function routeUrl(path) {
 function currentPath(page) {
   return new URL(page.url()).pathname;
 }
-function attachRuntimeGuards(page, label) {
+async function attachRuntimeGuards(page, label) {
+  await page.route('**/functions/v1/public-write-gateway', async (route) => {
+    const request = route.request();
+    const headers = {
+      'Access-Control-Allow-Origin': new URL(SITE_URL).origin,
+      'Access-Control-Allow-Headers': 'apikey, authorization, x-client-info, content-type',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Content-Type': 'application/json',
+    };
+
+    if (request.method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers, body: '' });
+      return;
+    }
+
+    await route.fulfill({
+      status: 200,
+      headers,
+      body: JSON.stringify({ success: true, result: null }),
+    });
+  });
+
   page.on('pageerror', (error) => failures.push(`${label} pageerror: ${error.message}`));
   page.on('console', (msg) => {
     if (msg.type() === 'error') warnings.push(`${label} console error: ${msg.text()}`);
@@ -59,7 +80,7 @@ const browser = await chromium.launch({ headless: true });
 await check('First-visit responsibility -> location -> Not now flow', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'first-visit');
+  await attachRuntimeGuards(page, 'first-visit');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   const notice = page.locator('#first-visit-notice-modal');
   await expectVisible(notice, 'responsibility notice did not open');
@@ -117,7 +138,7 @@ await check('Stored Not now remains IP-only even when browser permission is alre
   });
 
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-not-now-pregranted');
+  await attachRuntimeGuards(page, 'location-not-now-pregranted');
   const ipFallbackResponse = page.waitForResponse(
     (response) =>
       response.url().includes('/functions/v1/public-ip-location') &&
@@ -153,7 +174,7 @@ await check('Escape from browse location prompt behaves exactly like Not now', a
   });
 
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-escape');
+  await attachRuntimeGuards(page, 'location-escape');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#location-reminder-bar'), 'location reminder missing before Escape test');
   await page.locator('#location-reminder-turn-on-btn').click();
@@ -213,7 +234,7 @@ await check('Technical GPS failure persists IP fallback and does not nag on refr
   });
 
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-technical-fallback');
+  await attachRuntimeGuards(page, 'location-technical-fallback');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#location-reminder-bar'), 'location reminder missing before fallback test');
   await page.locator('#location-reminder-turn-on-btn').click();
@@ -275,7 +296,7 @@ await check('Pending GPS cannot override a later Not now choice', async () => {
   });
 
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-pending-not-now');
+  await attachRuntimeGuards(page, 'location-pending-not-now');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#location-reminder-bar'), 'location reminder missing before pending GPS race test');
   await page.locator('#location-reminder-turn-on-btn').click();
@@ -322,7 +343,7 @@ await check('Denied browse choice upgrades after browser permission is later gra
   });
 
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-denied-upgrade');
+  await attachRuntimeGuards(page, 'location-denied-upgrade');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(400);
 
@@ -352,7 +373,7 @@ await check('Privacy settings can switch approximate -> precise -> approximate',
   });
 
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-preference-settings');
+  await attachRuntimeGuards(page, 'location-preference-settings');
   await page.goto(routeUrl('/more'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.getByRole('button', { name: 'সুরক্ষা ও গোপনীয়তা' }).click();
   await expectVisible(page.locator('#location-preference-card'), 'location preference card missing');
@@ -403,7 +424,7 @@ await check('Returning denied-location visitor is not nagged after refresh', asy
     localStorage.setItem('sobaike_location_choice_v1', 'denied');
   });
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-denied-returning');
+  await attachRuntimeGuards(page, 'location-denied-returning');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(500);
   if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
@@ -427,7 +448,7 @@ await check('Browse location grant flow works with simulated coordinates', async
     localStorage.removeItem('sobaike_location_choice_v1');
   });
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'location-granted');
+  await attachRuntimeGuards(page, 'location-granted');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#location-reminder-bar'), 'location reminder did not render for undecided visitor');
   await page.locator('#location-reminder-turn-on-btn').click();
@@ -448,7 +469,7 @@ await check('Desktop routes render without runtime crashes', async () => {
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'desktop-routes');
+  await attachRuntimeGuards(page, 'desktop-routes');
   for (const route of desktopRoutes) {
     await page.goto(routeUrl(route), { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expectVisible(page.locator('#main-content'), `${route} main content missing`);
@@ -463,7 +484,7 @@ await check('Home infinite feed autoloads with bounded mounted cards', async () 
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'home-infinite-performance');
+  await attachRuntimeGuards(page, 'home-infinite-performance');
 
   let feedRequests = 0;
   page.on('request', (request) => {
@@ -549,7 +570,7 @@ await check('Mobile navigation, issue rows and category controls follow the appr
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'mobile-nav');
+  await attachRuntimeGuards(page, 'mobile-nav');
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#bottom-nav'), 'mobile bottom navigation missing');
 
@@ -604,7 +625,7 @@ await check('Legacy hash links migrate to clean URLs', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'legacy-hash');
+  await attachRuntimeGuards(page, 'legacy-hash');
   await page.goto(`${SITE_URL}#/harassment`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(350);
   if (currentPath(page) !== '/harassment') {
@@ -623,7 +644,7 @@ await check('Report composer has no draft persistence and uses the approved two-
     localStorage.setItem('sobaike_janao_draft_report', JSON.stringify({ segment: 'harassment', currentStep: 4, title: 'legacy draft' }));
   });
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'report-composer');
+  await attachRuntimeGuards(page, 'report-composer');
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#mobile-nav-report').click();
   await expectVisible(page.locator('#report-composer-modal'), 'report composer did not open');
@@ -662,7 +683,7 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'settings');
+  await attachRuntimeGuards(page, 'settings');
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#tablet-menu-button').click();
   await expectVisible(page.locator('#tablet-drawer'), 'tablet drawer did not open');
@@ -701,7 +722,7 @@ await check('English SEO variant is prerendered, URL-addressable and self-canoni
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'english-seo');
+  await attachRuntimeGuards(page, 'english-seo');
   await page.goto(routeUrl('/en/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(500);
 
@@ -737,7 +758,7 @@ await check('Legacy ?lang=en links migrate to /en paths', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'legacy-english-url');
+  await attachRuntimeGuards(page, 'legacy-english-url');
   await page.goto(routeUrl('/public-safety?lang=en'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(500);
   if (!page.url().includes('/en/public-safety') || page.url().includes('lang=en')) {
@@ -750,7 +771,7 @@ await check('Search page accepts a query without crashing', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'search');
+  await attachRuntimeGuards(page, 'search');
   await page.goto(routeUrl('/search'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   const input = page.locator('input[type="search"], input[placeholder]').first();
   await expectVisible(input, 'search input not found');
@@ -859,7 +880,7 @@ await check('Public report detail route renders when a published report is avail
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
-  attachRuntimeGuards(page, 'report-detail');
+  await attachRuntimeGuards(page, 'report-detail');
   await page.goto(routeUrl(`/report-detail/${encodeURIComponent(reportId)}`), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#main-content'), 'report detail main content missing');
   await page.waitForTimeout(1200);

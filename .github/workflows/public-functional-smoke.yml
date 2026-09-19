@@ -13,8 +13,8 @@ permissions:
 # one heavyweight browser suite active so duplicate Playwright runs do not
 # compete for browser/network/Supabase resources and create false regressions.
 concurrency:
-  group: public-functional-smoke-${{ github.event.workflow_run.head_sha || github.sha }}
-  cancel-in-progress: false
+  group: public-functional-smoke-production
+  cancel-in-progress: true
 
 jobs:
   browser-smoke:
