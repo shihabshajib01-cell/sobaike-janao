@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: production-smoke-live
+  cancel-in-progress: true
+
 jobs:
   smoke:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
@@ -321,11 +325,11 @@ jobs:
             -d '{}' > /tmp/published-reports.json
 
           curl --fail-with-body -sS \
-            -X POST "$SUPABASE_URL/rest/v1/rpc/get_public_home_feed" \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/get_public_home_feed_page" \
             -H "apikey: $SUPABASE_KEY" \
             -H "Authorization: Bearer $SUPABASE_KEY" \
             -H "Content-Type: application/json" \
-            -d '{"p_visitor_lat":null,"p_visitor_lng":null,"p_filter":"all","p_district":null}' > /tmp/home-feed.json
+            -d '{"p_visitor_lat":null,"p_visitor_lng":null,"p_filter":"all","p_district":"all","p_offset":0,"p_limit":10}' > /tmp/home-feed.json
 
           python - <<'PY'
           import json
