@@ -139,6 +139,25 @@ for (const needle of [
 }
 
 
+const seoBuilder = read('scripts/build-seo-assets.mjs');
+for (const needle of [
+  "rpc/get_public_home_feed_page",
+  "p_offset",
+  "p_limit",
+  "Paginated public feed returned an invalid nextOffset.",
+]) {
+  if (!seoBuilder.includes(needle)) {
+    fail('SEO sitemap builder is missing paginated report-source guard: ' + needle);
+  }
+}
+if (seoBuilder.includes("rpc/get_public_published_reports")) {
+  fail('SEO sitemap builder must not use the unbounded published-reports RPC');
+}
+if (!seoBuilder.includes("throw error;")) {
+  fail('SEO sitemap builder must fail closed when a credentialed report fetch fails');
+}
+
+
 const formPrepublicationRestoreFile = 'supabase/migrations/20260919154219_restore_reporting_form_prepublication_contract.sql';
 if (!fs.existsSync(formPrepublicationRestoreFile)) {
   fail('missing reporting-form prepublication contract correction');
