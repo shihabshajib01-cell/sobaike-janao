@@ -1215,7 +1215,7 @@
 
 @media (min-width: 1024px) {
   .hero-slider-cta-row {
-    justify-content: flex-start;
+    display: none;
   }
 }
 

@@ -697,6 +697,11 @@ requireContains(
   '.category-hero-slider .hero-slider-media',
   'category hero mobile image height must remain scoped to category pages'
 );
+requireContains(
+  'src/index.css',
+  '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    display: none;',
+  'public hero report CTA must remain hidden on desktop/large screens'
+);
 
 if (failures.length) {
   console.error(`Public UI uniformity audit found ${failures.length} violation(s):`);
