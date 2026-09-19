@@ -29,8 +29,7 @@ interface LoadReportsOptions {
   offset?: number;
 }
 
-const HOME_FEED_FETCH_BATCH_SIZE = 20;
-const HOME_FEED_VIRTUAL_PAGE_SIZE = 10;
+const HOME_FEED_PAGE_SIZE = 10;
 const FEED_UPDATE_POLL_INTERVAL_MS = 30_000;
 const HOME_FEED_PREFETCH_MARGIN = '720px 0px';
 const HOME_FEED_REDUCED_PREFETCH_MARGIN = '160px 0px';
@@ -78,6 +77,7 @@ export const HomePage: React.FC = () => {
   const [loadMoreError, setLoadMoreError] = useState(false);
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
   const loadMoreInFlightRef = useRef(false);
+  const lastLoadMoreOffsetRef = useRef<number | null>(null);
   const feedGenerationRef = useRef(0);
   const [feedWatermark, setFeedWatermark] = useState<string | null>(null);
   const [newReportCount, setNewReportCount] = useState<number>(0);
@@ -114,7 +114,7 @@ export const HomePage: React.FC = () => {
         filter: feedFilter,
         district: selectedDistrict,
         offset,
-        limit: HOME_FEED_FETCH_BATCH_SIZE,
+        limit: HOME_FEED_PAGE_SIZE,
       });
 
       if (requestGeneration !== feedGenerationRef.current) {
@@ -157,6 +157,7 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     feedGenerationRef.current += 1;
     loadMoreInFlightRef.current = false;
+    lastLoadMoreOffsetRef.current = null;
     setIsLoadingMore(false);
     setLoadMoreError(false);
     setHasMoreReports(false);
@@ -296,13 +297,16 @@ export const HomePage: React.FC = () => {
     if (
       loadMoreInFlightRef.current ||
       !hasMoreReports ||
-      nextOffset === null
+      nextOffset === null ||
+      lastLoadMoreOffsetRef.current === nextOffset
     ) {
       return;
     }
 
     const requestGeneration = feedGenerationRef.current;
+    const requestedOffset = nextOffset;
     loadMoreInFlightRef.current = true;
+    lastLoadMoreOffsetRef.current = requestedOffset;
     setIsLoadingMore(true);
     setLoadMoreError(false);
 
@@ -314,6 +318,9 @@ export const HomePage: React.FC = () => {
       });
 
       if (!loaded && requestGeneration === feedGenerationRef.current) {
+        if (lastLoadMoreOffsetRef.current === requestedOffset) {
+          lastLoadMoreOffsetRef.current = null;
+        }
         setLoadMoreError(true);
       }
     } finally {
@@ -503,7 +510,7 @@ export const HomePage: React.FC = () => {
           <div className="space-y-3">
             <VirtualizedReportFeed
               reports={filteredReports}
-              pageSize={HOME_FEED_VIRTUAL_PAGE_SIZE}
+              pageSize={HOME_FEED_PAGE_SIZE}
             />
 
             {hasMoreReports && !loadMoreError && (
