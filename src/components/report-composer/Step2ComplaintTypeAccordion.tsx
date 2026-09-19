@@ -50,7 +50,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
     <div className="space-y-4 sm:space-y-5">
       {/* 1. Minimal Header: Title + Short Helper Text */}
       <div className="space-y-1 text-left">
-        <h3 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary leading-tight">
+        <h3 className="type-h3 font-[var(--font-weight-semibold)] text-ui-content-primary">
           {headerTitle}
         </h3>
         <p className="type-body text-ui-content-secondary">
@@ -106,7 +106,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
               }}
             >
               <div className="flex items-start justify-between gap-2.5">
-                <h4 className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary leading-snug">
+                <h4 className="type-h4 text-ui-content-primary">
                   {itemName}
                 </h4>
 
