@@ -160,14 +160,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
-    // Browsing remains usable when precise/device location is unavailable.
-    // IP location is coarse and is NEVER written into VisitorSessionService,
-    // which keeps the report-submission GPS gate strictly device-only.
-    const approximate = await IpLocationService.getApproximateLocation();
-    if (approximate) {
-      setBrowseLocation(approximate);
-      setBrowseLocationStatus('available');
-      return;
+    // Do not perform IP geolocation on a first visit before the user has
+    // interacted with location. Approximate fallback is allowed here only for
+    // a returning visitor who previously granted location and whose device
+    // position cannot currently be restored. Explicit denial is respected.
+    if (choice === 'granted' && perm !== 'denied') {
+      const approximate = await IpLocationService.getApproximateLocation();
+      if (approximate) {
+        setBrowseLocation(approximate);
+        setBrowseLocationStatus('available');
+        return;
+      }
     }
 
     setBrowseLocation(null);
@@ -198,6 +201,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setBrowseLocationStatus('available');
       return result;
     } else {
+      // Respect an explicit permission denial. For technical failures after
+      // the user actively requested location, use the coarse first-party IP
+      // fallback for browsing only; it can never satisfy report submission.
+      if (result.status !== 'denied' && result.errorType !== 'denied') {
+        const approximate = await IpLocationService.getApproximateLocation();
+        if (approximate) {
+          setBrowseLocation(approximate);
+          setBrowseLocationStatus('available');
+          return { ...result, browseFallback: 'ip' };
+        }
+      }
+
       setBrowseLocation(null);
       if (result.status === 'denied') {
         setBrowseLocationStatus('denied');
