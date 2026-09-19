@@ -77,8 +77,12 @@ Deno.serve(async (req: Request) => {
   }
 
   const ip = firstForwardedIp(req);
-  if (!ip) {
+  if (!ip || ip.length > 64 || /[\r\n]/.test(ip)) {
     return json(req,{ error: "Approximate location unavailable." }, 503);
+  }
+
+  if (isRateLimited(ip)) {
+    return json(req,{ error: "Too many requests." }, 429);
   }
 
   try {
