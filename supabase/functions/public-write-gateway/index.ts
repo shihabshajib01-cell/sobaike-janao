@@ -138,15 +138,12 @@ Deno.serve(async (req: Request) => {
   }
 
   if (limitData?.allowed !== true) {
-    return json(
-      req,
-      {
-        error: "Too many requests. Please try again later.",
-        code: "RATE_LIMITED",
-        retryAfterSeconds: Number(limitData?.retryAfterSeconds || 60),
-      },
-      429
-    );
+    return json(req, {
+      success: false,
+      error: "Too many requests. Please try again later.",
+      code: "RATE_LIMITED",
+      retryAfterSeconds: Number(limitData?.retryAfterSeconds || 60),
+    });
   }
 
   if (body.action === "engagement") {
@@ -157,7 +154,7 @@ Deno.serve(async (req: Request) => {
       p_session_id: body.sessionId,
     });
     if (error) {
-      return json(req, { error: error.message, code: error.code || "ENGAGEMENT_FAILED" }, 400);
+      return json(req, { success: false, error: error.message, code: error.code || "ENGAGEMENT_FAILED" });
     }
     return json(req, { success: true, result: data });
   }
@@ -171,7 +168,7 @@ Deno.serve(async (req: Request) => {
       p_session_id: body.sessionId,
     });
     if (error) {
-      return json(req, { error: error.message, code: error.code || "RESPONSE_FAILED" }, 400);
+      return json(req, { success: false, error: error.message, code: error.code || "RESPONSE_FAILED" });
     }
     return json(req, { success: true, result: data });
   }
@@ -182,7 +179,7 @@ Deno.serve(async (req: Request) => {
     "submit_public_configured_complaint",
   ]);
   if (!allowedSubmissionRpcs.has(body.submissionRpc)) {
-    return json(req, { error: "Invalid submission route.", code: "INVALID_SUBMISSION_ROUTE" }, 400);
+    return json(req, { success: false, error: "Invalid submission route.", code: "INVALID_SUBMISSION_ROUTE" });
   }
 
   const { data, error } = await service.rpc(body.submissionRpc, {
@@ -191,7 +188,7 @@ Deno.serve(async (req: Request) => {
     p_reporter_context: body.reporterContext,
   });
   if (error) {
-    return json(req, { error: error.message, code: error.code || "SUBMISSION_FAILED" }, 400);
+    return json(req, { success: false, error: error.message, code: error.code || "SUBMISSION_FAILED" });
   }
 
   return json(req, { success: true, result: data });
