@@ -160,7 +160,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             : desktopDescriptionEn || descriptionEn}
         </p>
 
-        {/* Tablet CTA only (shown 768px–1023px; hidden on mobile and desktop) */}
+        {/* Reserved non-mobile CTA slot; kept hidden across tablet/desktop. Mobile CTA is separate below. */}
         {action && (
           <div className="hero-slider-cta-row">
             <Button

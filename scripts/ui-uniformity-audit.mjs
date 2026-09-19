@@ -699,8 +699,13 @@ requireContains(
 );
 requireContains(
   'src/index.css',
-  '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    display: none;',
-  'public hero report CTA must remain hidden on desktop/large screens'
+  '.hero-slider-cta-row {\n  display: none !important;',
+  'public hero report CTA must remain hidden across all non-mobile banner layouts'
+);
+requireNotContains(
+  'src/index.css',
+  '@media (min-width: 768px) {\n  .hero-slider-cta-row {\n    display: flex;',
+  'tablet/large layouts must not re-enable the public hero report CTA'
 );
 
 if (failures.length) {
