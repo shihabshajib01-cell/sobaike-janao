@@ -167,7 +167,6 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
             type: 'button',
             size: 'lg',
             onClick: handleNotNow,
-            disabled: isLoading,
             label: isBn ? 'এখন নয়' : 'Not now',
           }}
         />
