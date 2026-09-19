@@ -26,8 +26,33 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Validate dependency tree
+        run: npm ls --all --omit=optional
+
       - name: Dependency audit
-        run: npm audit --audit-level=moderate
+        shell: bash
+        run: |
+          set +e
+          AUDIT_OUTPUT=$(npm audit --omit=optional --audit-level=moderate 2>&1)
+          AUDIT_STATUS=$?
+          set -e
+
+          printf '%s\n' "$AUDIT_OUTPUT"
+
+          if [ "$AUDIT_STATUS" -eq 0 ]; then
+            exit 0
+          fi
+
+          # npm's retiring Quick Audit endpoint can currently return HTTP 400
+          # for an otherwise valid lockfile/tree. We only tolerate that exact
+          # external-service failure after npm ls has validated the tree above.
+          if printf '%s' "$AUDIT_OUTPUT" | grep -q "audit endpoint returned an error" \
+            && printf '%s' "$AUDIT_OUTPUT" | grep -q "Invalid package tree"; then
+            echo "::warning::npm registry audit endpoint rejected the request after dependency-tree validation; continuing with the remaining security audits."
+            exit 0
+          fi
+
+          exit "$AUDIT_STATUS"
 
       - name: Security source invariants
         shell: bash
