@@ -257,6 +257,16 @@ requireContains(
   'desktop settings must use the shared language selector'
 );
 requireNotContains(
+  'src/components/layout/DesktopLeftRail.tsx',
+  'rail-primary-report-cta',
+  'large desktop rail must not show the Report incident CTA'
+);
+requireNotContains(
+  'src/components/layout/DesktopLeftRail.tsx',
+  'openReportComposer',
+  'large desktop rail must not keep a hidden report action path'
+);
+requireNotContains(
   'src/components/ui/LanguageSelector.tsx',
   'ui-radius-pill',
   'language selector must use the same control radii as the other settings controls'
