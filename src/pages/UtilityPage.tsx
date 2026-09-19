@@ -110,11 +110,6 @@ export const UtilityPage: React.FC = () => {
             desktopDescriptionBn: bannerContent.desktopDescriptionBn,
             desktopDescriptionEn: bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
-            action: {
-              labelBn: bannerContent.primaryCtaBn,
-              labelEn: bannerContent.primaryCtaEn,
-              onClick: () => openReportComposer('load_shedding'),
-            },
           },
         ]}
       />
