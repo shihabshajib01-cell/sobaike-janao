@@ -17,7 +17,7 @@ export const PlatformInformationDetails: React.FC<PlatformInformationDetailsProp
 
   return (
     <section
-      id="platform-information-details"
+      id="home-platform-information"
       className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-5"
       aria-labelledby="platform-information-details-title"
     >
