@@ -37,6 +37,8 @@ export interface CategoryHeroBannerProps {
   ctaId?: string;
   ctaTabIndex?: number;
   className?: string;
+  titleColor?: string;
+  descriptionColor?: string;
 }
 
 export const resolvePublicAsset = (src?: string) => {
@@ -84,6 +86,8 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   ctaId,
   ctaTabIndex,
   className,
+  titleColor,
+  descriptionColor,
 }) => {
   const { language } = useApp();
   const { getSegment } = useTaxonomy();
@@ -127,7 +131,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
       <div className="hero-slider-content">
         <HeadingTag
           className={`hero-banner-title type-h1 tracking-tight text-center md:text-left ${language === 'bn' ? 'hero-banner-title-bn' : 'hero-banner-title-en'}`}
-          style={{ color: HERO_TOKENS.text.primary }}
+          style={{ color: titleColor ?? HERO_TOKENS.text.primary }}
         >
           {language === 'bn' ? titleBn : titleEn}
         </HeadingTag>
@@ -136,7 +140,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         {mobileDescription && (
           <p
             className="hero-banner-description block md:hidden type-body text-center max-w-md mx-auto leading-relaxed"
-            style={{ color: HERO_TOKENS.text.secondary }}
+            style={{ color: descriptionColor ?? HERO_TOKENS.text.secondary }}
           >
             {mobileDescription}
           </p>
@@ -145,7 +149,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         {/* Tablet Short Description (768px - 1023px) */}
         <p
           className="hidden md:block lg:hidden type-body max-w-xl text-left"
-          style={{ color: HERO_TOKENS.text.secondary }}
+          style={{ color: descriptionColor ?? HERO_TOKENS.text.secondary }}
         >
           {language === 'bn' ? descriptionBn : descriptionEn}
         </p>
@@ -153,7 +157,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         {/* Desktop Long Description (>= 1024px) */}
         <p
           className="hidden lg:block type-body max-w-xl text-left"
-          style={{ color: HERO_TOKENS.text.secondary }}
+          style={{ color: descriptionColor ?? HERO_TOKENS.text.secondary }}
         >
           {language === 'bn'
             ? desktopDescriptionBn || descriptionBn
