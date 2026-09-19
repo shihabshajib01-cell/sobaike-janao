@@ -160,6 +160,22 @@ const parseVariables = (source) =>
     ])
   );
 
+const resolveVariableValue = (value, variables) => {
+  let current = value;
+  const seen = new Set();
+
+  while (typeof current === 'string') {
+    const match = current.match(/^var\((--[a-z0-9-_]+)\)$/i);
+    if (!match) return current;
+    const token = match[1];
+    if (seen.has(token) || !variables[token]) return current;
+    seen.add(token);
+    current = variables[token];
+  }
+
+  return current;
+};
+
 const extractThemeBlock = (source, theme) => {
   const startMarker =
     theme === 'light'
@@ -407,17 +423,19 @@ if (!fs.existsSync(colorSystemFile)) {
     'rickshaw',
   ]) {
     const heroToken = `--hero-${category}-container`;
-    const lightHero = lightValues[heroToken];
-    const darkHero = darkValues[heroToken];
+    const lightHeroRaw = lightValues[heroToken];
+    const darkHeroRaw = darkValues[heroToken];
+    const lightHero = resolveVariableValue(lightHeroRaw, lightValues);
+    const darkHero = resolveVariableValue(darkHeroRaw, darkValues);
 
-    if (!lightHero || !darkHero || lightHero === darkHero) {
+    if (!lightHeroRaw || !darkHeroRaw || !lightHero || !darkHero || lightHero === darkHero) {
       findings.push({
         file: colorSystemFile,
         line: 1,
         rule: 'hero-theme-parity',
         token: heroToken,
-        message: 'Built-in hero backgrounds must define distinct light and dark values',
-        source: `light=${lightHero || 'missing'}, dark=${darkHero || 'missing'}`,
+        message: 'Built-in hero backgrounds must resolve to distinct light and dark values',
+        source: `light=${lightHeroRaw || 'missing'} => ${lightHero || 'missing'}, dark=${darkHeroRaw || 'missing'} => ${darkHero || 'missing'}`,
       });
     }
 

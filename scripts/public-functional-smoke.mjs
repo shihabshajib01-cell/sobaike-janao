@@ -68,12 +68,17 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
   await page.locator('label[for="first-visit-ack-checkbox"]').click();
   if (await continueBtn.isDisabled()) throw new Error('continue button did not enable after acknowledgement');
   await continueBtn.click();
+  await expectVisible(
+    page.locator('#location-reminder-bar'),
+    'location reminder did not appear after responsibility acknowledgement'
+  );
+  await page.locator('#location-reminder-turn-on-btn').click();
   const locationModal = page.locator('#location-consent-modal');
-  await expectVisible(locationModal, 'location consent did not open after acknowledgement');
+  await expectVisible(locationModal, 'location consent did not open from the explicit location CTA');
   await expectVisible(page.locator('#location-consent-secondary-btn'), 'Not now action missing');
   await page.locator('#location-consent-secondary-btn').click();
   await locationModal.waitFor({ state: 'hidden', timeout: 10000 });
-  await expectVisible(page.locator('#location-reminder-bar'), 'location reminder did not appear after Not now');
+  await expectVisible(page.locator('#location-reminder-bar'), 'location reminder did not remain available after Not now');
   const stored = await page.evaluate(() => ({
     notice: localStorage.getItem('sobaike_responsibility_notice_v1'),
     location: localStorage.getItem('sobaike_location_choice_v1'),
@@ -87,7 +92,6 @@ await check('Browse location grant flow works with simulated coordinates', async
     viewport: { width: 390, height: 844 },
     geolocation: { latitude: 23.7806, longitude: 90.4070 },
   });
-  await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
   await context.addInitScript(() => {
     localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
     localStorage.removeItem('sobaike_location_choice_v1');
@@ -95,8 +99,11 @@ await check('Browse location grant flow works with simulated coordinates', async
   const page = await context.newPage();
   attachRuntimeGuards(page, 'location-granted');
   await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#location-reminder-bar'), 'location reminder did not render for undecided visitor');
+  await page.locator('#location-reminder-turn-on-btn').click();
   const locationModal = page.locator('#location-consent-modal');
-  await expectVisible(locationModal, 'location consent did not open for undecided visitor');
+  await expectVisible(locationModal, 'location consent did not open from the explicit location CTA');
+  await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
   await expectVisible(page.locator('#location-consent-primary-btn'), 'Turn on location action missing');
   await page.locator('#location-consent-primary-btn').click();
   await locationModal.waitFor({ state: 'hidden', timeout: 15000 });
@@ -243,10 +250,19 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#tablet-menu-button').click();
   await expectVisible(page.locator('#tablet-drawer'), 'tablet drawer did not open');
-  const lang = page.locator('#drawer-lang-toggle');
-  await lang.click();
+  const banglaLanguage = page.locator('#drawer-lang-bn');
+  const englishLanguage = page.locator('#drawer-lang-en');
+  await expectVisible(banglaLanguage, 'Bangla language option missing');
+  await expectVisible(englishLanguage, 'English language option missing');
+  if ((await banglaLanguage.getAttribute('aria-pressed')) !== 'true') {
+    throw new Error('Bangla should be selected initially');
+  }
+  await englishLanguage.click();
   await page.waitForTimeout(150);
   if ((await page.locator('html').getAttribute('lang')) !== 'en') throw new Error('language did not switch to English');
+  if ((await page.locator('#drawer-lang-en').getAttribute('aria-pressed')) !== 'true') {
+    throw new Error('English language option did not expose the selected state');
+  }
   const themeDark = page
     .locator('#tablet-drawer button[aria-pressed]')
     .filter({ hasText: 'Dark' })

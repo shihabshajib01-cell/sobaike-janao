@@ -141,6 +141,22 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   const firstCardLink = firstCard.locator('a[href*="/report-detail/"]').first();
   await expectVisible(firstCardLink, 'Report card does not expose a native keyboard-addressable detail link');
 
+  const lightDividerColors = await firstCard.evaluate((card) => {
+    const horizontal = card.querySelector('[data-report-divider-horizontal]');
+    const verticals = [...card.querySelectorAll('[data-report-divider-vertical]')];
+    return {
+      horizontal: horizontal ? getComputedStyle(horizontal).borderTopColor : '',
+      verticals: verticals.map((element) => getComputedStyle(element).borderLeftColor),
+    };
+  });
+  if (
+    !lightDividerColors.horizontal ||
+    lightDividerColors.verticals.length !== 2 ||
+    lightDividerColors.verticals.some((color) => color !== lightDividerColors.horizontal)
+  ) {
+    throw new Error(`report-card divider colors diverged in light mode: ${JSON.stringify(lightDividerColors)}`);
+  }
+
   const cardId = await firstCard.getAttribute('id');
   await firstCardLink.focus();
   if (!(await firstCardLink.evaluate((element) => element === document.activeElement))) {
@@ -356,6 +372,24 @@ await check('Dark semantic surfaces retain distinct visual hierarchy', async () 
   if (surfaceValues.size !== 4) throw new Error(`dark surface hierarchy collapsed: ${JSON.stringify(tokens)}`);
   const borderValues = new Set([tokens.borderSubtle, tokens.border, tokens.borderStrong]);
   if (borderValues.size !== 3) throw new Error(`dark border hierarchy collapsed: ${JSON.stringify(tokens)}`);
+
+  const firstCard = page.locator('[id^="report-card-"]').first();
+  await expectVisible(firstCard, 'No report card found for dark divider parity check');
+  const darkDividerColors = await firstCard.evaluate((card) => {
+    const horizontal = card.querySelector('[data-report-divider-horizontal]');
+    const verticals = [...card.querySelectorAll('[data-report-divider-vertical]')];
+    return {
+      horizontal: horizontal ? getComputedStyle(horizontal).borderTopColor : '',
+      verticals: verticals.map((element) => getComputedStyle(element).borderLeftColor),
+    };
+  });
+  if (
+    !darkDividerColors.horizontal ||
+    darkDividerColors.verticals.length !== 2 ||
+    darkDividerColors.verticals.some((color) => color !== darkDividerColors.horizontal)
+  ) {
+    throw new Error(`report-card divider colors diverged in dark mode: ${JSON.stringify(darkDividerColors)}`);
+  }
 
   await context.close();
 });
