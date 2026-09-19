@@ -720,12 +720,22 @@ requireContains(
 requireContains(
   'src/index.css',
   '@media (min-width: 768px) {\n  .hero-slider-cta-row {\n    display: flex;',
-  'public hero Report CTA may remain available on tablet layouts'
+  'public hero Report CTA must remain visible on tablet and desktop layouts'
 );
-requireContains(
+requireNotContains(
   'src/index.css',
   '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    display: none;',
-  'public hero Report CTA must remain hidden on desktop and large screens'
+  'desktop/large layouts must not hide the public hero Report CTA'
+);
+requireContains(
+  'src/components/category/CategoryHeroBanner.tsx',
+  "labelBn: 'রিপোর্ট করুন'",
+  'every public banner must have a Report CTA fallback'
+);
+requireContains(
+  'src/components/category/CategoryHeroBanner.tsx',
+  'onClick: () => openReportComposer(sectionKey)',
+  'every public banner Report CTA must open the report composer for its category'
 );
 
 if (failures.length) {

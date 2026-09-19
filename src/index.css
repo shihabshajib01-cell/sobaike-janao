@@ -1213,12 +1213,6 @@
   }
 }
 
-@media (min-width: 1024px) {
-  .hero-slider-cta-row {
-    display: none;
-  }
-}
-
 .hero-slider-mobile-cta {
   width: 100%;
   display: flex;

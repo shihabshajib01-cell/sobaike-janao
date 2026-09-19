@@ -85,7 +85,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   ctaTabIndex,
   className,
 }) => {
-  const { language } = useApp();
+  const { language, openReportComposer } = useApp();
   const { getSegment } = useTaxonomy();
   const sectionKey = section;
   const segmentMeta = getSegment(sectionKey);
@@ -115,6 +115,12 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
     HERO_TOKENS.sections[sectionKey]?.desktopMediaTranslateY;
 
   const HeadingTag = headingLevel;
+
+  const bannerAction = action ?? {
+    labelBn: 'রিপোর্ট করুন',
+    labelEn: 'Report Now',
+    onClick: () => openReportComposer(sectionKey),
+  };
 
   const mobileDescription =
     language === 'bn'
@@ -160,19 +166,19 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             : desktopDescriptionEn || descriptionEn}
         </p>
 
-        {/* Tablet CTA only (768px–1023px). Hidden on mobile and desktop/large screens. */}
-        {action && (
+        {/* Shared non-mobile CTA (shown on tablet and desktop; mobile uses the separate full-width CTA below). */}
+        {bannerAction && (
           <div className="hero-slider-cta-row">
             <Button
               id={ctaId}
               variant="outline"
               size="md"
               tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
-              onClick={action.onClick}
+              onClick={bannerAction.onClick}
               className="shadow-none btn-hero-cta"
               style={ctaStyle}
             >
-              {language === 'bn' ? action.labelBn : action.labelEn}
+              {language === 'bn' ? bannerAction.labelBn : bannerAction.labelEn}
             </Button>
           </div>
         )}
@@ -227,7 +233,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
       </div>
 
       {/* 4: Mobile CTA (shown on mobile <768px below illustration, hidden on >=768px) */}
-      {action && (
+      {bannerAction && (
         <div className="hero-slider-mobile-cta">
           <Button
             id={ctaId ? `${ctaId}-mobile` : undefined}
@@ -235,11 +241,11 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             variant="outline"
             size="md"
             tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
-            onClick={action.onClick}
+            onClick={bannerAction.onClick}
             className="shadow-none btn-hero-cta"
             style={ctaStyle}
           >
-            {language === 'bn' ? action.labelBn : action.labelEn}
+            {language === 'bn' ? bannerAction.labelBn : bannerAction.labelEn}
           </Button>
         </div>
       )}
