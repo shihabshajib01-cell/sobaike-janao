@@ -15,7 +15,8 @@
     "audit:integration-contract": "node scripts/integration-contract-audit.mjs",
     "audit:performance": "node scripts/performance-budget-audit.mjs",
     "audit:form-system": "node scripts/form-system-audit.mjs",
-    "audit:location-contract": "node scripts/location-contract-audit.mjs"
+    "audit:location-contract": "node scripts/location-contract-audit.mjs",
+    "audit:security-hardening": "node scripts/security-hardening-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
