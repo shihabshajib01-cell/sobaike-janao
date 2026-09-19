@@ -486,10 +486,21 @@ export const VisitorSessionService = {
 
     if (perm === 'granted') {
       if (typeof navigator !== 'undefined' && navigator.geolocation && !isAcquiringPosition) {
+        const requestIntentVersion = browseIntentVersion;
         isAcquiringPosition = true;
         navigator.geolocation.getCurrentPosition(
           async (pos) => {
             isAcquiringPosition = false;
+
+            // Returning-visitor restoration is still subordinate to any newer
+            // explicit browse choice made while this request was in flight.
+            if (
+              requestIntentVersion !== browseIntentVersion ||
+              this.getLocationChoice() !== 'granted'
+            ) {
+              return;
+            }
+
             const coords = {
               latitude: pos.coords.latitude,
               longitude: pos.coords.longitude,
@@ -501,6 +512,14 @@ export const VisitorSessionService = {
           },
           async (err) => {
             isAcquiringPosition = false;
+
+            if (
+              requestIntentVersion !== browseIntentVersion ||
+              this.getLocationChoice() !== 'granted'
+            ) {
+              return;
+            }
+
             const status: PermissionStatus =
               err.code === err.PERMISSION_DENIED ? 'denied' : 'unavailable';
             if (status === 'denied') {
@@ -529,6 +548,10 @@ export const VisitorSessionService = {
     try {
       activeWatchId = navigator.geolocation.watchPosition(
         async (position) => {
+          if (this.getLocationChoice() !== 'granted') {
+            return;
+          }
+
           const newLat = position.coords.latitude;
           const newLon = position.coords.longitude;
           const newAcc = position.coords.accuracy;
