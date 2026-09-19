@@ -209,9 +209,9 @@ html[data-theme="light"] {
   --category-road_transport-on-container: #6D4532;
   --category-road_transport-outline: #C8AEA0;
 
-  --category-load_shedding-primary: #578C8B;
-  --category-load_shedding-hover: #4B7878;
-  --category-load_shedding-on-primary: #050505;
+  --category-load_shedding-primary: #416968;
+  --category-load_shedding-hover: #365857;
+  --category-load_shedding-on-primary: #FFFFFF;
   --category-load_shedding-container: #D5E2E2;
   --category-load_shedding-on-container: #416968;
   --category-load_shedding-outline: #ABC6C5;
