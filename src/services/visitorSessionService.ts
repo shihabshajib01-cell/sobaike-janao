@@ -477,6 +477,13 @@ export const VisitorSessionService = {
     }
 
     const perm = await this.queryPermissionStatus();
+
+    // Permission lookup is asynchronous. If the user changed their browse
+    // preference while it was resolving, the newer preference wins.
+    if (this.getLocationChoice() !== 'granted') {
+      return;
+    }
+
     if (perm === 'denied') {
       this.setLocationChoice('denied');
       this.clearMemoryLocation();
