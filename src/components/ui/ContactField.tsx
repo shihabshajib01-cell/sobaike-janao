@@ -9,7 +9,7 @@ export const ContactField = React.forwardRef<HTMLInputElement, ContactFieldProps
       ref={ref}
       {...props}
       type="text"
-      inputMode={inputMode ?? 'email'}
+      inputMode={inputMode}
     />
   )
 );
