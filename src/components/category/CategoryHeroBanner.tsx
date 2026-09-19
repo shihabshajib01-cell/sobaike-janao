@@ -166,9 +166,26 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             : desktopDescriptionEn || descriptionEn}
         </p>
 
-        {/* Shared non-mobile CTA (shown on tablet and desktop; mobile uses the separate full-width CTA below). */}
-        {bannerAction && (
+        {/* Tablet CTA keeps the original action/config behavior. */}
+        {action && (
           <div className="hero-slider-cta-row">
+            <Button
+              id={ctaId ? `${ctaId}-tablet` : undefined}
+              variant="outline"
+              size="md"
+              tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
+              onClick={action.onClick}
+              className="shadow-none btn-hero-cta"
+              style={ctaStyle}
+            >
+              {language === 'bn' ? action.labelBn : action.labelEn}
+            </Button>
+          </div>
+        )}
+
+        {/* Desktop-only fallback: guarantees Report CTA without changing mobile/tablet behavior. */}
+        {bannerAction && (
+          <div className="hero-slider-desktop-cta-row">
             <Button
               id={ctaId}
               variant="outline"
@@ -232,8 +249,8 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
         )}
       </div>
 
-      {/* 4: Mobile CTA (shown on mobile <768px below illustration, hidden on >=768px) */}
-      {bannerAction && (
+      {/* 4: Mobile CTA preserves the original action/config behavior. */}
+      {action && (
         <div className="hero-slider-mobile-cta">
           <Button
             id={ctaId ? `${ctaId}-mobile` : undefined}
@@ -241,11 +258,11 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
             variant="outline"
             size="md"
             tabIndex={ctaTabIndex !== undefined ? ctaTabIndex : active ? 0 : -1}
-            onClick={bannerAction.onClick}
+            onClick={action.onClick}
             className="shadow-none btn-hero-cta"
             style={ctaStyle}
           >
-            {language === 'bn' ? bannerAction.labelBn : bannerAction.labelEn}
+            {language === 'bn' ? action.labelBn : action.labelEn}
           </Button>
         </div>
       )}
