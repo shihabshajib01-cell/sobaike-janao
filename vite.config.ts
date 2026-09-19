@@ -28,6 +28,20 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
+        manualChunks(id) {
+          const normalized = id.replace(/\\/g, '/');
+          if (!normalized.includes('/node_modules/')) return undefined;
+          if (normalized.includes('/node_modules/lucide-react/')) return 'icons-vendor';
+          if (
+            normalized.includes('/node_modules/react/') ||
+            normalized.includes('/node_modules/react-dom/') ||
+            normalized.includes('/node_modules/react-router/') ||
+            normalized.includes('/node_modules/react-router-dom/')
+          ) {
+            return 'react-vendor';
+          }
+          return undefined;
+        },
       },
     },
   },
