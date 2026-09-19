@@ -214,6 +214,9 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   }
 
   await page.setViewportSize({ width: 390, height: 844 });
+  // Reload after switching from the desktop viewport so matchMedia-based
+  // adaptive-header setup mounts in the same mobile conditions as a real phone load.
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(150);
   await expectVisible(
     page.locator('#mobile-report-detail-back-btn'),
@@ -303,31 +306,8 @@ await check('All seven category pages preserve the shared mobile navigation cont
     }
 
     const categoryTitle = (await page.locator('#mobile-category-title').innerText()).trim();
-    await page.locator('#mobile-category-report').click();
-    await expectVisible(
-      page.locator('#report-composer-modal'),
-      `${route} category report action did not open the composer`
-    );
 
-    const stepStatus = (await page.locator('#report-composer-step-status').innerText()).trim();
-    if (!/ধাপ\s*[২2]|Step\s*2/i.test(stepStatus)) {
-      throw new Error(
-        `${route} report composer did not start at category-selected step 2; got "${stepStatus}"`
-      );
-    }
-
-    const composerCategoryTitle = (
-      await page.locator('#report-composer-modal .report-composer-body h3').first().innerText()
-    ).trim();
-    if (composerCategoryTitle !== categoryTitle) {
-      throw new Error(
-        `${route} report composer category mismatch; header="${categoryTitle}", composer="${composerCategoryTitle}"`
-      );
-    }
-
-    await page.locator('#report-composer-close-btn').click();
-    await page.waitForTimeout(100);
-
+    // Verify the page's normal reading interaction before opening any modal.
     const categoryScrollTarget = await page.evaluate(() => {
       const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
       return Math.min(700, maxScroll);
@@ -356,6 +336,32 @@ await check('All seven category pages preserve the shared mobile navigation cont
     } else if ((await page.locator('#mobile-category-header').getAttribute('data-compact')) !== 'false') {
       throw new Error(route + ' short category page should remain expanded; maxScroll=' + Math.round(categoryScrollTarget) + 'px');
     }
+
+    // Separately verify the category-aware + flow after the header has restored.
+    await page.locator('#mobile-category-report').click();
+    await expectVisible(
+      page.locator('#report-composer-modal'),
+      `${route} category report action did not open the composer`
+    );
+
+    const stepStatus = (await page.locator('#report-composer-step-status').innerText()).trim();
+    if (!/ধাপ\s*[২2]|Step\s*2/i.test(stepStatus)) {
+      throw new Error(
+        `${route} report composer did not start at category-selected step 2; got "${stepStatus}"`
+      );
+    }
+
+    const composerCategoryTitle = (
+      await page.locator('#report-composer-modal .report-composer-body h3').first().innerText()
+    ).trim();
+    if (composerCategoryTitle !== categoryTitle) {
+      throw new Error(
+        `${route} report composer category mismatch; header="${categoryTitle}", composer="${composerCategoryTitle}"`
+      );
+    }
+
+    await page.locator('#report-composer-close-btn').click();
+    await page.waitForTimeout(100);
 
     const sectionId = route.replace(/^\//, '').replace(/-/g, '_');
     const sharedFeedSection = page.locator(
