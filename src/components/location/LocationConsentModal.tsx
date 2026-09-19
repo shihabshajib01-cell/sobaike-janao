@@ -180,8 +180,8 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
                 ? 'প্রতিবেদন জমা দিতে আপনার ডিভাইসের লোকেশন প্রয়োজন। লোকেশন চালু করে আবার চেষ্টা করুন।'
                 : 'Your device location is required to submit a report. Turn on location and try again.')
             : (isBn
-                ? 'আপনার ব্রাউজিং অভিজ্ঞতা ব্যক্তিগতকরণ করতে লোকেশন ব্যবহারের অনুমতি দিন। আপনার লোকেশন জনসমক্ষে দেখানো হবে না।'
-                : 'Allow location access to personalize your browsing experience. Your location will not be displayed publicly.')}
+                ? 'লোকেশন চালু করলে কাছাকাছি এলাকার খবর আরও ভালোভাবে দেখানো যাবে। এখন নয় চাপলে কাছাকাছি এলাকা ধরে খবর দেখানো হবে। আপনার লোকেশন জনসমক্ষে দেখানো হবে না।'
+                : 'Turn on location for better nearby reports. If you choose Not now, we’ll still use a rough area for local reports. Your location will not be displayed publicly.')}
         </p>
 
         {errorMessage && (
