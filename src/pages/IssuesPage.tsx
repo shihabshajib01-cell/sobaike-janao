@@ -127,13 +127,11 @@ export const IssuesPage: React.FC = () => {
                   backgroundColor: config.bgColor,
                   borderColor: config.borderColor,
                   color: config.primaryColor,
-                  ['--category-icon-color' as string]: config.primaryColor,
                 }}
               >
                 <CategoryIcon
                   section={key}
                   size="xl"
-                  className="!text-[var(--category-icon-color)]"
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
               </div>
