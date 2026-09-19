@@ -45,10 +45,15 @@ class ApiClient {
     if (error) {
       const isNotPublished = error.message?.includes('INVALID_REPORT_STATUS');
       const isNotFound = error.message?.includes('REPORT_NOT_FOUND');
+      const isRateLimited = error.message?.includes('RATE_LIMITED') || error.code === 'RATE_LIMITED';
       const apiError: ApiError = {
-        code: error.code || 'RPC_ERROR',
-        message: error.message || 'Response submission failed.',
-        messageBn: isNotPublished
+        code: isRateLimited ? 'RATE_LIMITED' : (error.code || 'RPC_ERROR'),
+        message: isRateLimited
+          ? 'Too many submissions from this connection. Please wait and try again.'
+          : (error.message || 'Response submission failed.'),
+        messageBn: isRateLimited
+          ? 'খুব অল্প সময়ে অনেকবার জমা দেওয়ার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।'
+          : isNotPublished
           ? 'শুধুমাত্র প্রকাশিত প্রতিবেদনের বিপরীতে তথ্য বা প্রতিক্রিয়া জমা দেওয়া যায়।'
           : isNotFound
           ? 'রেফারেন্স করা প্রতিবেদনটি খুঁজে পাওয়া যায়নি।'
@@ -101,7 +106,12 @@ class ApiClient {
     // Backward compatibility: if the database has not applied allow_subject_response_without_responder_type.sql yet,
     // and returns INVALID_RESPONDER_TYPE when responderType is omitted, retry once with legacy default 'mentioned_person'
     if (error && error.message?.includes('INVALID_RESPONDER_TYPE') && !payload.responderType) {
-      const fallbackPayload = { ...payload, responderType: 'mentioned_person' as const };
+      const fallbackPayload = {
+        ...payload,
+        responderType: 'mentioned_person' as const,
+        visitorId: VisitorSessionService.getVisitorId(),
+        sessionId: VisitorSessionService.getSessionId(),
+      };
       const retryResult = await supabase.rpc('submit_public_response', {
         p_report_id: reportId,
         p_response_type: 'subject_response',
@@ -116,10 +126,15 @@ class ApiClient {
     if (error) {
       const isNotPublished = error.message?.includes('INVALID_REPORT_STATUS');
       const isNotFound = error.message?.includes('REPORT_NOT_FOUND');
+      const isRateLimited = error.message?.includes('RATE_LIMITED') || error.code === 'RATE_LIMITED';
       const apiError: ApiError = {
-        code: error.code || 'RPC_ERROR',
-        message: error.message || 'Subject response submission failed.',
-        messageBn: isNotPublished
+        code: isRateLimited ? 'RATE_LIMITED' : (error.code || 'RPC_ERROR'),
+        message: isRateLimited
+          ? 'Too many submissions from this connection. Please wait and try again.'
+          : (error.message || 'Subject response submission failed.'),
+        messageBn: isRateLimited
+          ? 'খুব অল্প সময়ে অনেকবার জমা দেওয়ার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।'
+          : isNotPublished
           ? 'শুধুমাত্র প্রকাশিত প্রতিবেদনের বিপরীতে প্রতিউত্তর জমা দেওয়া যায়।'
           : isNotFound
           ? 'রেফারেন্স করা প্রতিবেদনটি খুঁজে পাওয়া যায়নি।'
