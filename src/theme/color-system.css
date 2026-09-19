@@ -42,6 +42,12 @@
   --md-on-destructive: #FFFFFF;
   --md-destructive-outline: var(--md-destructive);
 
+  /* Current Sobaike Janao brand palette. Keep literal brand values above the
+     compatibility-alias section so downstream scopes only reference roles/tokens. */
+  --sobaike-janao-brand-primary: #009966;
+  --sobaike-janao-brand-soft: #C1DCC8;
+  --sobaike-janao-brand-dark: #064E3B;
+
 }
 
 :root,
@@ -57,7 +63,7 @@ html[data-theme="light"] {
   --md-primary: #1B4D6B;
   --md-primary-variant: #163B52;
   --md-primary-active: #245F82;
-  --md-on-primary: #FFFFFF;
+  --md-on-primary: var(--product-on-primary);
 
   --md-secondary: #3A7CA5;
   --md-secondary-variant: #163B52;
@@ -598,9 +604,9 @@ html[data-theme="dark"],
  * remain unchanged.
  */
 .information-support-brand-scope {
-  --information-support-brand-primary: #009966;
-  --information-support-brand-soft: #C1DCC8;
-  --information-support-brand-dark: #064E3B;
+  --information-support-brand-primary: var(--sobaike-janao-brand-primary);
+  --information-support-brand-soft: var(--sobaike-janao-brand-soft);
+  --information-support-brand-dark: var(--sobaike-janao-brand-dark);
 
   --md-primary: var(--information-support-brand-dark);
   --md-primary-variant: color-mix(in srgb, var(--information-support-brand-dark) 88%, black);
