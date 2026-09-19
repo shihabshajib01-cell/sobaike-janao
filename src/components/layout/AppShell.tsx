@@ -140,7 +140,6 @@ export const AppShell: React.FC = () => {
     closeReportComposer,
     isLocationModalOpen,
     locationModalPurpose,
-    openLocationConsent,
     closeLocationConsent,
     locationSuccessCallback,
   } = useApp();
@@ -179,7 +178,7 @@ export const AppShell: React.FC = () => {
     return () => {
       VisitorSessionService.stopLocationWatch();
     };
-  }, [openLocationConsent]);
+  }, []);
 
   const handleAcknowledgeNotice = () => {
     setAcceptedResponsibilityNotice();
