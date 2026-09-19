@@ -71,7 +71,32 @@ async function createSmokeContext(options = {}) {
   // the many isolated contexts, which previously exhausted Chromium/network
   // resources and triggered upstream 429s unrelated to product behavior.
   await context.route('**/*', async (route) => {
-    const resourceType = route.request().resourceType();
+    const request = route.request();
+    const requestUrl = request.url();
+
+    // Browser regression validates frontend fallback/state behavior with a
+    // deterministic coarse location. The separate Production Smoke calls the
+    // real first-party Edge endpoint once per deployment, so this suite does
+    // not rate-limit the shared endpoint by repeating the same integration
+    // request across many isolated browser contexts.
+    if (requestUrl.includes('/functions/v1/public-ip-location')) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          latitude: 23.7806,
+          longitude: 90.4070,
+          accuracy: 25000,
+          city: 'Dhaka',
+          region: 'Dhaka',
+          country: 'Bangladesh',
+        }),
+      });
+      return;
+    }
+
+    const resourceType = request.resourceType();
     if (resourceType === 'image') {
       await route.fulfill({
         status: 200,
