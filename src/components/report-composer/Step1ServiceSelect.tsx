@@ -87,6 +87,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
 
   const getSectionStyles = (section: SectionKey) => ({
     background: `var(--sec-${section}-bg)`,
+    selectedBackground: `var(--sec-${section}-selected-bg)`,
     text: `var(--sec-${section}-text)`,
     border: `var(--sec-${section}-border)`,
     primary: `var(--sec-${section}-primary)`,
@@ -117,7 +118,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   : 'bg-ui-surface border-ui-stroke-default ui-elevation-control'
               }`}
               style={{
-                backgroundColor: isSelected ? getSectionStyles(srv.key).background : undefined,
+                backgroundColor: isSelected ? getSectionStyles(srv.key).selectedBackground : undefined,
                 borderColor: isSelected ? getSectionStyles(srv.key).primary : undefined,
               }}
             >
