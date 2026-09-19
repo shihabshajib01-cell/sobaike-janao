@@ -14,6 +14,8 @@ import { VisitorSessionService } from '../../services/visitorSessionService';
 import { HomePage } from '../../pages/HomePage';
 import { SeoManager } from '../seo/SeoManager';
 import { MapExploreSkeleton, ReportFeedSkeleton } from '../ui/LoadingSkeleton';
+import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 
 const LazyIssuesPage = React.lazy(() =>
   import('../../pages/IssuesPage').then((m) => ({ default: m.IssuesPage }))
@@ -144,11 +146,42 @@ export const AppShell: React.FC = () => {
     locationSuccessCallback,
   } = useApp();
 
+  const { segments } = useTaxonomy();
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
   const [isMobileChromeCompact, setIsMobileChromeCompact] = useState(false);
   const [routeAnnouncement, setRouteAnnouncement] = useState('');
   const previousNavigationKeyRef = useRef(`${language}:${currentRoute}`);
   const hideMobileMainNavigation = shouldHideBottomNav(currentRoute);
+
+  const activeCategoryTheme = React.useMemo(() => {
+    const route = currentRoute.replace(/^\/en(?=\/|$)/, '') || '/';
+    const staticEntry = (Object.entries(SECTIONS) as Array<[SectionKey, (typeof SECTIONS)[SectionKey]]>)
+      .find(([, section]) => section.slug === route);
+    const dynamicSlug = route.startsWith('/category/')
+      ? route.slice('/category/'.length)
+      : null;
+    const dynamicEntry = dynamicSlug
+      ? Object.values(segments).find((segment) => {
+          const normalizedSlug = segment.slug?.replace(/^\/category\//, '').replace(/^\//, '');
+          return normalizedSlug === dynamicSlug || segment.id === dynamicSlug;
+        })
+      : null;
+    const segment = dynamicEntry || (staticEntry ? segments[staticEntry[0]] || { ...staticEntry[1], id: staticEntry[0] } : null);
+
+    if (!segment) return null;
+
+    return {
+      id: segment.id,
+      style: {
+        '--category-route-primary': segment.primaryColor,
+        '--category-route-hover': segment.hoverColor,
+        '--category-route-on-primary': segment.colors.filledText,
+        '--category-route-container': segment.bgColor,
+        '--category-route-on-container': segment.textColor,
+        '--category-route-outline': segment.borderColor,
+      } as React.CSSProperties,
+    };
+  }, [currentRoute, segments]);
 
   useEffect(() => {
     const navigationKey = `${language}:${currentRoute}`;
@@ -200,7 +233,11 @@ export const AppShell: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-ui-page text-ui-content-primary flex flex-col">
+    <div
+      className={`min-h-screen bg-ui-page text-ui-content-primary flex flex-col${activeCategoryTheme ? ' category-theme-scope' : ''}`}
+      data-category-theme={activeCategoryTheme?.id}
+      style={activeCategoryTheme?.style}
+    >
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-ui-action-bg focus:text-ui-action-text focus:ui-radius-control focus:ui-elevation-control focus:font-[var(--font-weight-semibold)] focus:outline-none focus:ring-2 focus:ring-ui-focus type-action"
