@@ -133,6 +133,14 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       descriptionEn: 'Report crowd attacks, restraint, threats, or violence arising from accusations, suspicion, rumors, or disputes',
       isSensitive: true,
     },
+    {
+      id: 'child_abduction_murder',
+      nameBn: 'শিশু অপহরণ / হত্যা',
+      nameEn: 'Child Abduction / Murder',
+      descriptionBn: 'শিশু অপহরণ, নিখোঁজ হওয়ার সঙ্গে অপহরণের সন্দেহ, বা শিশুকে হত্যার ঘটনা জানান',
+      descriptionEn: 'Report child abduction, suspected abduction linked to a missing child, or murder of a child',
+      isSensitive: true,
+    },
   ],
   road_transport: [
     {
