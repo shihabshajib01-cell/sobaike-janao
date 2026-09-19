@@ -27,7 +27,7 @@ const CategoryFilterButton: React.FC<{
         : 'h-11 w-11 min-h-[44px] min-w-[44px]'
     }`}
   >
-    <Filter className={mobile ? 'h-6 w-6 stroke-[2]' : 'h-5 w-5 stroke-[2]'} aria-hidden="true" />
+    <Filter className={mobile ? 'h-6 w-6 shrink-0 stroke-[2]' : 'h-5 w-5 shrink-0 stroke-[2]'} aria-hidden="true" />
   </button>
 );
 
