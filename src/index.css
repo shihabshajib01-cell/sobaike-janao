@@ -26,6 +26,8 @@
   --color-role-outline-subtle: var(--md-outline-subtle);
   --color-role-outline: var(--md-outline);
   --color-role-outline-strong: var(--md-outline-strong);
+  --color-role-control-outline: var(--md-control-outline);
+  --color-role-control-outline-hover: var(--md-control-outline-hover);
   --color-role-focus: var(--md-focus);
   --color-role-overlay: var(--md-overlay);
   --color-role-disabled-container: var(--md-disabled-container);

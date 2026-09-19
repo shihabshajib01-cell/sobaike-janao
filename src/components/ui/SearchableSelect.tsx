@@ -250,7 +250,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   aria-activedescendant={
                     activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
                   }
-                  className="w-full min-h-[44px] rounded-[var(--radius-badge-md)] border border-role-outline bg-role-surface pl-9 pr-3 type-input text-role-on-surface placeholder:text-role-on-surface-muted focus:outline-none focus:ring-2 focus:ring-role-focus"
+                  className="w-full min-w-0 max-w-full min-h-[44px] rounded-[var(--radius-badge-md)] border border-role-control-outline bg-role-surface pl-9 pr-3 type-input text-role-on-surface placeholder:text-role-on-surface-muted focus:outline-none focus:ring-2 focus:ring-role-focus focus:border-role-focus"
                 />
               </div>
             </div>
@@ -329,10 +329,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               }
             }
           }}
-          className={`w-full min-h-[44px] bg-role-surface text-left type-input ui-border-default ui-radius-control px-3.5 ${clearable && value && !disabled ? 'pr-16' : 'pr-10'} transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
+          className={`w-full min-w-0 max-w-full min-h-[44px] bg-role-surface text-left type-input ui-border-default ui-radius-control px-3.5 ${clearable && value && !disabled ? 'pr-16' : 'pr-10'} transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
             error
               ? 'border-role-validation-outline focus:ring-role-validation-focus focus:border-role-validation-focus'
-              : 'border-role-outline hover:border-role-outline-strong focus:ring-role-focus'
+              : 'border-role-control-outline hover:border-role-control-outline-hover focus:ring-role-focus'
           }`}
         >
           <span className={selected ? 'text-role-on-surface' : 'text-role-on-surface-muted'}>

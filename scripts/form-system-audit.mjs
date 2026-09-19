@@ -62,6 +62,27 @@ requireContains(
   'id={labelId}',
   'shared field labels must expose a stable accessible id'
 );
+
+requireContains(
+  'src/components/ui/formSystem.ts',
+  'border-role-control-outline hover:border-role-control-outline-hover',
+  'shared controls must use the semantic form-control outline role'
+);
+requireContains(
+  'src/components/ui/formSystem.ts',
+  'min-w-0 max-w-full',
+  'shared controls must be allowed to shrink inside mobile form grids'
+);
+requireContains(
+  'src/components/ui/FormField.tsx',
+  'w-full min-w-0',
+  'shared field shells must not force intrinsic-width overflow'
+);
+requireContains(
+  'src/theme/design-system.css',
+  'input[type="date"], input[type="time"], input[type="month"]',
+  'native date/time/month controls must have an explicit mobile containment recipe'
+);
 requireContains(
   'src/components/ui/FormField.tsx',
   'text-ui-error-text',
@@ -96,6 +117,22 @@ requireContains(
   'src/components/ui/SearchableSelect.tsx',
   '<FormField',
   'SearchableSelect must use the shared field shell'
+);
+
+requireContains(
+  'src/components/ui/SearchableSelect.tsx',
+  'border-role-control-outline hover:border-role-control-outline-hover',
+  'SearchableSelect must use the shared form-control outline role'
+);
+requireContains(
+  'src/components/ui/RadioGroup.tsx',
+  'border-role-control-outline',
+  'RadioGroup options must use the shared form-control outline role'
+);
+requireContains(
+  'src/components/ui/Checkbox.tsx',
+  'border-role-control-outline',
+  'Checkboxes must use the shared form-control outline role'
 );
 requireContains(
   'src/components/ui/SearchableSelect.tsx',

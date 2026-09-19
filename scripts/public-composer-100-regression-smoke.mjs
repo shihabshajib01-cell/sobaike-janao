@@ -99,6 +99,22 @@ try {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   });
+  const composerBody = page.locator('.report-composer-body');
+  const composerBodyBox = await composerBody.boundingBox();
+  if (!composerBodyBox) throw new Error('Report composer body is not measurable');
+  for (const selector of ['#complaint-date-input', '#complaint-time-input']) {
+    const control = page.locator(selector);
+    await expectVisible(control, `${selector} missing in Step 3`);
+    const box = await control.boundingBox();
+    if (!box) throw new Error(`${selector} is not measurable`);
+    const rightEdge = box.x + box.width;
+    const bodyRightEdge = composerBodyBox.x + composerBodyBox.width;
+    if (box.x < composerBodyBox.x - 1 || rightEdge > bodyRightEdge + 1) {
+      throw new Error(
+        `${selector} overflows the mobile composer: control ${Math.round(box.x)}..${Math.round(rightEdge)}, body ${Math.round(composerBodyBox.x)}..${Math.round(bodyRightEdge)}`
+      );
+    }
+  }
   await page.locator('#complaint-date-input').fill(today);
 
   // The granted geolocation should unlock the dependent incident-location controls.
