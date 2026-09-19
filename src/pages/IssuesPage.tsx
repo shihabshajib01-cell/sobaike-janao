@@ -122,7 +122,7 @@ export const IssuesPage: React.FC = () => {
               className="group flex min-h-[68px] items-stretch gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-card"
             >
               <div
-                className="flex w-12 shrink-0 items-center justify-center ui-radius-card border"
+                className="flex w-14 shrink-0 items-center justify-center rounded-[12px] border"
                 style={{
                   backgroundColor: config.bgColor,
                   borderColor: config.borderColor,
@@ -130,7 +130,7 @@ export const IssuesPage: React.FC = () => {
               >
                 <CategoryIcon
                   section={key}
-                  size="md"
+                  size="lg"
                   ariaLabel={language === 'bn' ? config.nameBn : config.nameEn}
                 />
               </div>
