@@ -144,6 +144,11 @@ const representativePaths = [
     expectedAny: ['#composer-section-mob-justice'],
   },
   {
+    segment: 'public_safety',
+    subcategory: 'child_abduction_murder',
+    expectedAny: ['#composer-section-narrative', '#child-incident-type-select'],
+  },
+  {
     segment: 'road_transport',
     subcategory: 'road-accident',
     expectedAny: ['#complaint-date-input', '#composer-section-configured-fields'],
@@ -200,6 +205,49 @@ await check('Representative category-specific form paths render without runtime 
   if (runtimeErrors.length) {
     throw new Error(`runtime errors: ${runtimeErrors.join(' | ')}`);
   }
+  await context.close();
+});
+
+await check('Child safety keeps the established report format with only the approved minimum fields', async () => {
+  const context = await makeContext(browser, { width: 390, height: 844 });
+  const page = await context.newPage();
+  await openStep3(page, {
+    segment: 'public_safety',
+    subcategory: 'child_abduction_murder',
+  });
+
+  for (const selector of [
+    '#composer-section-narrative',
+    '#complaint-title-input',
+    '#complaint-desc-input',
+    '#child-incident-type-select',
+    '#complaint-date-input',
+    '#complaint-time-input',
+    '#composer-section-location',
+    '#complaint-division-select',
+    '#complaint-district-select',
+  ]) {
+    await expectVisible(page.locator(selector), `child safety: expected standard control missing: ${selector}`);
+  }
+
+  for (const selector of [
+    '#composer-section-configured-fields',
+    '#complaint-frequency-select',
+    '#complaint-thana-select',
+    '#complaint-address-input',
+    '#composer-section-parties',
+    '#composer-section-attachments',
+    '#composer-section-identity',
+    '#toggle-keep-identity-private',
+    '#configured-input-police_report_filed',
+    '#configured-input-police_case_reference',
+  ]) {
+    if ((await page.locator(selector).count()) > 0) {
+      throw new Error(`child safety: unapproved control/parallel form surface is present: ${selector}`);
+    }
+  }
+
+  await assertComposerGeometry(page, 'public_safety/child_abduction_murder standard format');
   await context.close();
 });
 
