@@ -345,7 +345,8 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
         const style = getComputedStyle(element);
         return {
           ariaHidden: element.getAttribute('aria-hidden'),
-          inert: element.inert,
+          inertAttribute: element.hasAttribute('inert'),
+          inertProperty: 'inert' in element ? element.inert : null,
           opacity: Number(style.opacity),
           pointerEvents: style.pointerEvents,
         };
@@ -361,16 +362,16 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
     });
 
   const assertExpanded = (state, label) => {
-    if (!state.fullTop || state.fullTop.ariaHidden === 'true' || state.fullTop.inert) {
+    if (!state.fullTop || state.fullTop.ariaHidden === 'true' || state.fullTop.inertAttribute) {
       throw new Error(`${label}: full mobile header is not interactive`);
     }
-    if (!state.compactTop || state.compactTop.ariaHidden !== 'true' || !state.compactTop.inert) {
+    if (!state.compactTop || state.compactTop.ariaHidden !== 'true' || !state.compactTop.inertAttribute) {
       throw new Error(`${label}: compact top navigation was not removed from interaction`);
     }
-    if (!state.fullBottom || state.fullBottom.ariaHidden === 'true' || state.fullBottom.inert) {
+    if (!state.fullBottom || state.fullBottom.ariaHidden === 'true' || state.fullBottom.inertAttribute) {
       throw new Error(`${label}: full bottom navigation is not interactive`);
     }
-    if (!state.compactBottom || state.compactBottom.ariaHidden !== 'true' || !state.compactBottom.inert) {
+    if (!state.compactBottom || state.compactBottom.ariaHidden !== 'true' || !state.compactBottom.inertAttribute) {
       throw new Error(`${label}: compact bottom navigation was not removed from interaction`);
     }
     if (state.fullTop.opacity < 0.99 || state.compactTop.opacity > 0.01) {
@@ -382,16 +383,16 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
   };
 
   const assertCompact = (state, label) => {
-    if (!state.fullTop || state.fullTop.ariaHidden !== 'true' || !state.fullTop.inert) {
+    if (!state.fullTop || state.fullTop.ariaHidden !== 'true' || !state.fullTop.inertAttribute) {
       throw new Error(`${label}: hidden full header remained interactive`);
     }
-    if (!state.compactTop || state.compactTop.ariaHidden === 'true' || state.compactTop.inert) {
+    if (!state.compactTop || state.compactTop.ariaHidden === 'true' || state.compactTop.inertAttribute) {
       throw new Error(`${label}: compact top navigation is not interactive`);
     }
-    if (!state.fullBottom || state.fullBottom.ariaHidden !== 'true' || !state.fullBottom.inert) {
+    if (!state.fullBottom || state.fullBottom.ariaHidden !== 'true' || !state.fullBottom.inertAttribute) {
       throw new Error(`${label}: hidden full bottom navigation remained interactive`);
     }
-    if (!state.compactBottom || state.compactBottom.ariaHidden === 'true' || state.compactBottom.inert) {
+    if (!state.compactBottom || state.compactBottom.ariaHidden === 'true' || state.compactBottom.inertAttribute) {
       throw new Error(`${label}: compact bottom navigation is not interactive`);
     }
     if (state.fullTop.opacity > 0.01 || state.compactTop.opacity < 0.99) {
