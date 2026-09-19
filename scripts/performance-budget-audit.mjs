@@ -128,7 +128,126 @@ if (fs.existsSync(migrationsDir)) {
     const functionStart = latestHomeFeedSource.search(
       /create\s+or\s+replace\s+function\s+public\.get_public_home_feed_page\s*\(/i
     );
-    const bodyOpen = latestHomeFeedSource.indexOf('$function, functionStart);
+    const bodyOpen = latestHomeFeedSource.indexOf('$function
+    const bodyClose = latestHomeFeedSource.indexOf('$function$;', bodyOpen + '$function
+    const functionSource =
+      functionStart >= 0 && bodyOpen >= 0 && bodyClose >= 0
+        ? latestHomeFeedSource.slice(functionStart, bodyClose + '$function$;'.length)
+        : latestHomeFeedSource.slice(functionStart);
+
+    if (/public\.get_public_home_feed\s*\(/i.test(functionSource)) {
+      fail(
+        `Home page RPC regressed to full-feed materialization in ${latestHomeFeedMigration}. Rank/page IDs before JSON construction instead.`
+      );
+    }
+
+    if (!/unnest\s*\(\s*v_page_ids\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must build public JSON from the bounded page ID set only.`
+      );
+    }
+
+    if (!/operator\s*\(\s*extensions\.<->\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must keep spatial-index KNN ordering for the location-first feed.`
+      );
+    }
+
+    if (!/idx_complaints_public_feed_geo/i.test(allMigrationSource)) {
+      fail('The public Home feed spatial index migration is missing.');
+    }
+
+    if (!process.exitCode) {
+      console.log(
+        `[performance-budget] scalable Home feed contract: ${latestHomeFeedMigration}`
+      );
+    }
+  }
+}
+
+if (!process.exitCode) {
+  console.log('[performance-budget] PASS');
+}
+, functionStart);
+    const bodyClose = latestHomeFeedSource.indexOf('$function$;', bodyOpen + '$function.length);
+    const functionSource =
+      functionStart >= 0 && bodyOpen >= 0 && bodyClose >= 0
+        ? latestHomeFeedSource.slice(functionStart, bodyClose + '$function$;'.length)
+        : latestHomeFeedSource.slice(functionStart);
+
+    if (/public\.get_public_home_feed\s*\(/i.test(functionSource)) {
+      fail(
+        `Home page RPC regressed to full-feed materialization in ${latestHomeFeedMigration}. Rank/page IDs before JSON construction instead.`
+      );
+    }
+
+    if (!/unnest\s*\(\s*v_page_ids\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must build public JSON from the bounded page ID set only.`
+      );
+    }
+
+    if (!/operator\s*\(\s*extensions\.<->\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must keep spatial-index KNN ordering for the location-first feed.`
+      );
+    }
+
+    if (!/idx_complaints_public_feed_geo/i.test(allMigrationSource)) {
+      fail('The public Home feed spatial index migration is missing.');
+    }
+
+    if (!process.exitCode) {
+      console.log(
+        `[performance-budget] scalable Home feed contract: ${latestHomeFeedMigration}`
+      );
+    }
+  }
+}
+
+if (!process.exitCode) {
+  console.log('[performance-budget] PASS');
+}
+.length);
+    const functionSource =
+      functionStart >= 0 && bodyOpen >= 0 && bodyClose >= 0
+        ? latestHomeFeedSource.slice(functionStart, bodyClose + '$function$;'.length)
+        : latestHomeFeedSource.slice(functionStart);
+
+    if (/public\.get_public_home_feed\s*\(/i.test(functionSource)) {
+      fail(
+        `Home page RPC regressed to full-feed materialization in ${latestHomeFeedMigration}. Rank/page IDs before JSON construction instead.`
+      );
+    }
+
+    if (!/unnest\s*\(\s*v_page_ids\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must build public JSON from the bounded page ID set only.`
+      );
+    }
+
+    if (!/operator\s*\(\s*extensions\.<->\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must keep spatial-index KNN ordering for the location-first feed.`
+      );
+    }
+
+    if (!/idx_complaints_public_feed_geo/i.test(allMigrationSource)) {
+      fail('The public Home feed spatial index migration is missing.');
+    }
+
+    if (!process.exitCode) {
+      console.log(
+        `[performance-budget] scalable Home feed contract: ${latestHomeFeedMigration}`
+      );
+    }
+  }
+}
+
+if (!process.exitCode) {
+  console.log('[performance-budget] PASS');
+}
+, functionStart);
     const bodyClose = latestHomeFeedSource.indexOf('$function$;', bodyOpen + '$function.length);
     const functionSource =
       functionStart >= 0 && bodyOpen >= 0 && bodyClose >= 0
