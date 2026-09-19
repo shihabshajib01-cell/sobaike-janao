@@ -574,3 +574,39 @@ html[data-theme="dark"],
   --sec-rickshaw-text: var(--category-rickshaw-on-container);
   --sec-rickshaw-on-primary: var(--category-rickshaw-on-primary);
 }
+
+
+/*
+ * Category route theme scope.
+ * The banner-derived category palette becomes the semantic brand palette while a
+ * category page is active. Neutral surfaces/content and status/destructive roles
+ * deliberately stay global so category color never destroys hierarchy or meaning.
+ */
+.category-theme-scope {
+  --md-primary: var(--category-route-primary);
+  --md-primary-variant: var(--category-route-hover);
+  --md-primary-active: var(--category-route-hover);
+  --md-on-primary: var(--category-route-on-primary);
+
+  --md-secondary: var(--category-route-primary);
+  --md-secondary-variant: var(--category-route-hover);
+  --md-secondary-container: var(--category-route-container);
+  --md-on-secondary-container: var(--category-route-on-container);
+  --md-secondary-outline: var(--category-route-outline);
+
+  --md-focus: var(--category-route-primary);
+
+  --ui-primary-action-bg: var(--category-route-primary);
+  --ui-primary-action-hover: var(--category-route-hover);
+  --ui-primary-action-active: var(--category-route-hover);
+  --ui-primary-action-text: var(--category-route-on-primary);
+
+  --ui-accent: var(--category-route-primary);
+  --ui-accent-soft: var(--category-route-container);
+  --ui-accent-border: var(--category-route-outline);
+  --ui-accent-hover: var(--category-route-hover);
+  --ui-focus: var(--category-route-primary);
+
+  --hero-text-primary: var(--category-route-on-container);
+  --hero-text-secondary: var(--category-route-on-container);
+}
