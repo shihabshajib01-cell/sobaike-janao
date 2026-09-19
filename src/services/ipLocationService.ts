@@ -10,6 +10,14 @@ export interface ApproximateIpLocation {
 }
 
 const IP_LOCATION_MAX_AGE_MS = 60 * 60 * 1000;
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined)
+  ?.trim()
+  .replace(/\/+$/, '');
+const SUPABASE_PUBLIC_KEY = (
+  (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined) ||
+  (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)
+)?.trim();
+
 let cachedLocation: ApproximateIpLocation | null = null;
 let inFlight: Promise<ApproximateIpLocation | null> | null = null;
 
@@ -29,8 +37,9 @@ function isValidCoordinate(latitude: unknown, longitude: unknown): latitude is n
 
 /**
  * Best-effort approximate browse location derived from the public IP.
- * This is browse-only. It must never be used as reporter/submission evidence.
- * No IP address is stored by the client.
+ * The browser calls our first-party Supabase Edge endpoint; it never calls the
+ * geolocation provider directly. This is browse-only and must never be used as
+ * reporter/submission evidence. No IP address is stored in client state.
  */
 export const IpLocationService = {
   async getApproximateLocation(): Promise<ApproximateIpLocation | null> {
@@ -45,11 +54,16 @@ export const IpLocationService = {
 
     inFlight = (async () => {
       try {
+        if (!SUPABASE_URL) return null;
+
         const controller = new AbortController();
         const timeoutId = window.setTimeout(() => controller.abort(), 4500);
-        const response = await fetch('https://ipwho.is/', {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/public-ip-location`, {
           method: 'GET',
-          headers: { Accept: 'application/json' },
+          headers: {
+            Accept: 'application/json',
+            ...(SUPABASE_PUBLIC_KEY ? { apikey: SUPABASE_PUBLIC_KEY } : {}),
+          },
           signal: controller.signal,
           cache: 'no-store',
           credentials: 'omit',
