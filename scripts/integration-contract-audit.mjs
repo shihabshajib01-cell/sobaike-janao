@@ -79,6 +79,36 @@ if (!deployWorkflow.includes("if: github.event_name == 'push' && github.ref == '
   fail('Production deploy is no longer restricted to pushes on main');
 }
 
+for (const needle of [
+  'actions: read',
+  'Require successful CI for exact revision',
+  'TARGET_SHA: ${{ github.sha }}',
+  'actions/runs?head_sha=${TARGET_SHA}&event=push',
+  "run.get('name') == 'CI'",
+  "conclusion == 'success'",
+  'ref: ${{ github.sha }}',
+  'needs: build',
+]) {
+  if (!deployWorkflow.includes(needle)) {
+    fail('Production deploy is missing exact-revision CI gate: ' + needle);
+  }
+}
+
+const ciWorkflow = read('.github/workflows/ci.yml');
+for (const [workflowName, workflowSource] of [
+  ['CI', ciWorkflow],
+  ['Deploy', deployWorkflow],
+]) {
+  for (const needle of [
+    'Category theme propagation audit',
+    'npm run audit:category-theme',
+  ]) {
+    if (!workflowSource.includes(needle)) {
+      fail(workflowName + ' workflow is missing category-theme regression gate: ' + needle);
+    }
+  }
+}
+
 
 const syncMigrationFile = 'supabase/migrations/20260919142507_end_to_end_sync_contract_and_rls_hardening.sql';
 if (!fs.existsSync(syncMigrationFile)) {
