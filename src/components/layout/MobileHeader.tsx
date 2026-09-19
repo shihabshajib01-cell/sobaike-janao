@@ -69,8 +69,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const directionRef = useRef<'up' | 'down' | null>(null);
   const directionDistanceRef = useRef(0);
   const frameRef = useRef<number | null>(null);
-  const fullHeaderRef = useRef<HTMLElement | null>(null);
-  const compactHeaderRef = useRef<HTMLElement | null>(null);
   const { segments } = useTaxonomy();
   const localizePath = (path: string) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -184,20 +182,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     onCompactChange(false);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   };
-
-  useEffect(() => {
-    const syncInertAttribute = (element: HTMLElement | null, shouldBeInert: boolean) => {
-      if (!element) return;
-      if (shouldBeInert) {
-        element.setAttribute('inert', '');
-      } else {
-        element.removeAttribute('inert');
-      }
-    };
-
-    syncInertAttribute(fullHeaderRef.current, isCompact);
-    syncInertAttribute(compactHeaderRef.current, !isCompact);
-  }, [isCompact]);
 
   const registerSuccessfulShare = () => {
     if (reportDetailId) {
@@ -336,9 +320,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         }`}
       >
         <header
-          ref={fullHeaderRef}
           id="mobile-header"
           aria-hidden={isCompact || undefined}
+          inert={isCompact ? true : undefined}
           className={`absolute inset-x-0 top-0 w-full bg-ui-surface border-b border-ui-divider pt-safe transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
             isCompact
               ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none'
@@ -385,10 +369,10 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       </div>
 
       <nav
-        ref={compactHeaderRef}
         id="mobile-compact-header"
         aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
         aria-hidden={!isCompact || undefined}
+        inert={!isCompact ? true : undefined}
         className={`md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4 transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
             ? 'translate-y-0 opacity-100 delay-[60ms]'
