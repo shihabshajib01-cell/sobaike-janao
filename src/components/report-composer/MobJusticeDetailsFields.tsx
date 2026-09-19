@@ -34,6 +34,7 @@ export const MobJusticeDetailsFields: React.FC<MobJusticeDetailsFieldsProps> = (
   return (
     <Accordion
       id="composer-section-mob-justice"
+      className="report-composer-card"
       isOpen
       collapsible={false}
       onToggle={() => {}}

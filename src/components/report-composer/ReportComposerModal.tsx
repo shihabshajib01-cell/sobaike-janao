@@ -1020,7 +1020,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         maxWidth="composer"
         showHeader={false}
         keepMounted
-        containerClassName="p-0 border-0 md:border"
+        containerClassName="report-composer-shell p-0 border-0 md:border"
         language={language}
         ariaLabel={language === 'bn' ? 'অভিযোগ জমা দেওয়ার ফর্ম' : 'Report submission form'}
       >
@@ -1040,7 +1040,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             {/* Scrollable Form Content */}
             <div
               ref={scrollContainerRef}
-              className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6"
+              className="report-composer-body flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6"
             >
               {submitError && (
                 <div

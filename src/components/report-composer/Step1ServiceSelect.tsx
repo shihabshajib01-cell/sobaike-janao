@@ -111,7 +111,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               id={`service-select-card-${srv.key}`}
               onClick={() => handleActiveSelect(srv.key)}
               aria-pressed={isSelected}
-              className={`relative ui-radius-card px-4 py-3.5 md:px-5 md:py-4 transition-colors duration-150 cursor-pointer flex items-center gap-3 text-left ui-border-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              className={`report-composer-card relative ui-radius-card px-4 py-3.5 md:px-5 md:py-4 transition-colors duration-150 cursor-pointer flex items-center gap-3 text-left ui-border-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isSelected
                   ? 'ui-elevation-selected'
                   : 'bg-ui-surface border-ui-stroke-default ui-elevation-control'
@@ -184,7 +184,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                   id={`service-select-coming-soon-${cs.key}`}
                   onClick={() => handleComingSoonSelect(cs.key)}
                   aria-pressed={isSelected}
-                  className={`relative rounded-[var(--radius-card)] p-4 sm:p-5 transition-all duration-150 cursor-pointer flex flex-col justify-between text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
+                  className={`report-composer-card relative rounded-[var(--radius-card)] p-4 sm:p-5 transition-all duration-150 cursor-pointer flex flex-col justify-between text-left border focus:outline-none focus:ring-2 focus:ring-ui-focus ${
                     isSelected
                       ? 'border-2 border-ui-stroke-strong bg-ui-surface-subtle shadow-[var(--elevation-sm)]'
                       : 'bg-ui-surface border-ui-stroke-subtle shadow-[var(--elevation-2xs)]'

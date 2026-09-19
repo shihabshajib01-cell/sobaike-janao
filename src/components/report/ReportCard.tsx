@@ -131,7 +131,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     <article
       id={`report-card-${report.id}`}
       onClick={handleCardClick}
-      className={`group relative ui-card p-4 sm:p-5 transition-all duration-150 cursor-pointer text-left space-y-2.5 sm:space-y-3 select-none hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 ${className}`}
+      className={`group relative ui-card ui-card-feed p-4 sm:p-5 transition-all duration-150 cursor-pointer text-left space-y-2.5 sm:space-y-3 select-none hover:border-ui-stroke-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-1 ${className}`}
     >
       <div className="flex items-center justify-between gap-3 type-meta">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap">
