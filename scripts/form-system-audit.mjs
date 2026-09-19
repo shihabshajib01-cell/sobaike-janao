@@ -203,6 +203,85 @@ requireContains(
   'global search submission must preserve the entered query'
 );
 
+
+const composerModal = read('src/components/report-composer/ReportComposerModal.tsx');
+for (const token of [
+  'clearLegacyReportDraftStorage();',
+  'revokePreviewUrls(pendingImages);',
+  'setPendingImages([]);',
+  "serverSubmissionState: 'not_attempted'",
+  'customFieldAnswers: {}',
+  'retryCredentialsRef.current = null',
+]) {
+  if (!composerModal.includes(token)) {
+    failures.push(`ReportComposerModal.tsx: missing report-session reset contract ${token}`);
+  }
+}
+if (!composerModal.includes("formData.serverSubmissionState === 'attempted'")) {
+  failures.push('ReportComposerModal.tsx: category/subcategory changes must be blocked after a submission attempt');
+}
+if (!composerModal.includes('generateSecureIdempotencyKey')) {
+  failures.push('ReportComposerModal.tsx: submission must keep an idempotency key contract');
+}
+
+const reportState = read('src/services/reportFormState.ts');
+for (const token of [
+  "const LEGACY_DRAFT_KEYS",
+  'localStorage.removeItem(key)',
+  'indexedDB.deleteDatabase(LEGACY_EVIDENCE_DB)',
+  'hasMeaningfulReportInput',
+  'revokePreviewUrls',
+]) {
+  if (!reportState.includes(token)) {
+    failures.push(`reportFormState.ts: missing privacy/session cleanup contract ${token}`);
+  }
+}
+
+const attachmentPicker = read('src/components/media/ImageAttachmentPicker.tsx');
+for (const token of [
+  'allowedExtensions',
+  'allowedMimeTypes',
+  'maxImages',
+  'maxFileSizeMB',
+  'maxTotalSizeMB',
+  'generateStableImageId',
+  'compressImageToWebP',
+  'URL.revokeObjectURL',
+  'aria-live="assertive"',
+  'min-w-[44px] min-h-[44px]',
+]) {
+  if (!attachmentPicker.includes(token)) {
+    failures.push(`ImageAttachmentPicker.tsx: missing evidence safety/accessibility contract ${token}`);
+  }
+}
+
+const reportOptions = read('src/data/reportOptions.ts');
+for (const category of [
+  'harassment',
+  'extortion',
+  'public_safety',
+  'road_transport',
+  'load_shedding',
+  'illegal_occupation',
+  'rickshaw',
+]) {
+  if (!reportOptions.includes(`${category}:`)) {
+    failures.push(`reportOptions.ts: missing public report category ${category}`);
+  }
+}
+for (const uniquePath of [
+  "'rape-sexual-violence'",
+  "'sexual-harassment'",
+  "'bribe-demanded-service'",
+  "'mob-justice'",
+  "'excess-electricity-bill'",
+  "'charging-station-location'",
+]) {
+  if (!reportOptions.includes(uniquePath)) {
+    failures.push(`reportOptions.ts: missing representative form path ${uniquePath}`);
+  }
+}
+
 const composer = read('src/components/report-composer/Step3ComplaintDetails.tsx');
 if (!composer.includes('const currentMonthLocal = todayLocal.slice(0, 7);')) {
   failures.push('Step3ComplaintDetails.tsx: billing month maximum must be based on the current local month');
