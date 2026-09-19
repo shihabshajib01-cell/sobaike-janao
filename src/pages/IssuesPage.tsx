@@ -119,10 +119,10 @@ export const IssuesPage: React.FC = () => {
               aria-label={`${language === 'bn' ? config.nameBn : config.nameEn}, ${
                 language === 'bn' ? `জনপ্রিয়তার অবস্থান ${toBanglaDigits(rank)}` : `popularity rank ${rank}`
               }`}
-              className="group grid min-h-[68px] grid-cols-[56px_minmax(0,1fr)] gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              className="group grid min-h-[68px] grid-cols-[68px_minmax(0,1fr)] gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <div
-                className="flex min-h-[68px] items-center justify-center rounded-[16px] border"
+                className="flex size-[68px] items-center justify-center rounded-[16px] border"
                 style={{
                   backgroundColor: config.bgColor,
                   borderColor: config.borderColor,
