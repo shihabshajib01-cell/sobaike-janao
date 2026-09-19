@@ -146,20 +146,27 @@ export const AppShell: React.FC = () => {
 
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
   const [isMobileChromeCompact, setIsMobileChromeCompact] = useState(false);
-  const previousRouteRef = useRef(currentRoute);
+  const [routeAnnouncement, setRouteAnnouncement] = useState('');
+  const previousNavigationKeyRef = useRef(`${language}:${currentRoute}`);
   const hideMobileMainNavigation = shouldHideBottomNav(currentRoute);
 
   useEffect(() => {
-    if (previousRouteRef.current === currentRoute) return;
-    previousRouteRef.current = currentRoute;
+    const navigationKey = `${language}:${currentRoute}`;
+    if (previousNavigationKeyRef.current === navigationKey) return;
+    previousNavigationKeyRef.current = navigationKey;
+
     setIsMobileChromeCompact(false);
+    setRouteAnnouncement('');
 
     const frame = window.requestAnimationFrame(() => {
       document.getElementById('main-content')?.focus({ preventScroll: true });
+      setRouteAnnouncement(
+        language === 'bn' ? 'নতুন পৃষ্ঠা খোলা হয়েছে' : 'New page loaded'
+      );
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [currentRoute]);
+  }, [currentRoute, language]);
 
   useEffect(() => {
     const hasNoticeAccepted = hasAcceptedResponsibilityNotice();
@@ -200,6 +207,16 @@ export const AppShell: React.FC = () => {
       >
         {language === 'bn' ? 'মূল বিষয়বস্তুতে যান' : 'Skip to main content'}
       </a>
+
+      <p
+        id="route-change-announcement"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {routeAnnouncement}
+      </p>
 
       <ErrorBoundary componentName="DesktopLeftRail" silent>
         <DesktopLeftRail />
