@@ -64,7 +64,7 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
       } else {
         VisitorSessionService.setLocationChoice('granted');
         const res = await retryBrowseLocation();
-        if (res.success) {
+        if (res.success || res.browseFallback === 'ip') {
           onSuccess?.();
           onClose();
         } else {
