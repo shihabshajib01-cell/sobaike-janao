@@ -4,6 +4,7 @@ on:
   workflow_run:
     workflows: ["Deploy"]
     types: [completed]
+    branches: [main]
   workflow_dispatch:
   schedule:
     # Regularly re-check the live search surface even when there is no deployment.
