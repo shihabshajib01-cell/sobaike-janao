@@ -13,16 +13,21 @@ const CategoryFilterButton: React.FC<{
   id: string;
   onOpen: () => void;
   language: 'bn' | 'en';
-}> = ({ id, onOpen, language }) => (
+  mobile?: boolean;
+}> = ({ id, onOpen, language, mobile = false }) => (
   <button
     id={id}
     type="button"
     onClick={onOpen}
     aria-label={language === 'bn' ? 'ফিল্টার খুলুন' : 'Open filters'}
     aria-haspopup="dialog"
-    className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+    className={`flex shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface text-ui-content-primary transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+      mobile
+        ? 'h-12 w-12 min-h-[48px] min-w-[48px]'
+        : 'h-11 w-11 min-h-[44px] min-w-[44px]'
+    }`}
   >
-    <Filter className="h-5 w-5" aria-hidden="true" />
+    <Filter className={mobile ? 'h-6 w-6 stroke-[2]' : 'h-5 w-5 stroke-[2]'} aria-hidden="true" />
   </button>
 );
 
@@ -48,6 +53,7 @@ export const MobileCategoryFilterPortal: React.FC<MobileCategoryFilterPortalProp
               id="mobile-category-filter-btn"
               onOpen={onOpen}
               language={language}
+              mobile
             />,
             mobileTarget
           )

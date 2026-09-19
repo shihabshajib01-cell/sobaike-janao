@@ -88,6 +88,33 @@ async function assertMatchingFloatingControls(page, selectors, label) {
   }
 }
 
+async function assertControlAndIconSize(page, selector, label) {
+  const control = page.locator(selector);
+  const icon = control.locator('svg').first();
+  const controlBox = await control.boundingBox();
+  const iconBox = await icon.boundingBox();
+
+  if (
+    !controlBox ||
+    Math.abs(controlBox.width - 48) > 1 ||
+    Math.abs(controlBox.height - 48) > 1
+  ) {
+    throw new Error(
+      `${label}: control must be 48x48; got ${controlBox ? `${Math.round(controlBox.width)}x${Math.round(controlBox.height)}` : 'not measurable'}`
+    );
+  }
+
+  if (
+    !iconBox ||
+    Math.abs(iconBox.width - 24) > 1 ||
+    Math.abs(iconBox.height - 24) > 1
+  ) {
+    throw new Error(
+      `${label}: icon must be 24x24; got ${iconBox ? `${Math.round(iconBox.width)}x${Math.round(iconBox.height)}` : 'not measurable'}`
+    );
+  }
+}
+
 async function scrollDownInSteps(page, target) {
   const points = [0.34, 0.68, 1]
     .map((ratio) => Math.round(target * ratio))
@@ -268,6 +295,9 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     page.locator('#mobile-report-detail-share-btn'),
     'Report detail mobile share button missing'
   );
+  await assertControlAndIconSize(page, '#mobile-report-detail-back-btn', 'Report detail back');
+  await assertControlAndIconSize(page, '#mobile-report-detail-share-btn', 'Report detail share');
+
   if ((await page.locator('#bottom-nav').count()) !== 0) {
     throw new Error('Report detail incorrectly shows the global bottom navigation');
   }
@@ -343,6 +373,27 @@ await check('All seven category pages preserve the shared mobile navigation cont
       page.locator('#mobile-category-report'),
       `${route} category bottom-right report action missing`
     );
+
+    await assertControlAndIconSize(page, '#mobile-category-back-btn', route + ' category back');
+    await assertControlAndIconSize(page, '#mobile-category-filter-btn', route + ' category filter');
+    await assertControlAndIconSize(page, '#mobile-category-report', route + ' category report action');
+
+    const hero = page.locator('section[id$="-header-banner"]').first();
+    const heroMedia = hero.locator('.hero-slider-media');
+    await expectVisible(hero, `${route} category hero missing`);
+    await expectVisible(heroMedia, `${route} category hero media missing`);
+    const heroBox = await hero.boundingBox();
+    const heroMediaBox = await heroMedia.boundingBox();
+    if (
+      !heroBox ||
+      !heroMediaBox ||
+      Math.abs(heroMediaBox.x - heroBox.x) > 1.5 ||
+      Math.abs(heroMediaBox.width - heroBox.width) > 2
+    ) {
+      throw new Error(
+        `${route} mobile hero media is not edge-to-edge inside the banner`
+      );
+    }
 
     if ((await page.locator('#bottom-nav').count()) !== 0) {
       throw new Error(`${route} incorrectly shows the global bottom navigation`);
