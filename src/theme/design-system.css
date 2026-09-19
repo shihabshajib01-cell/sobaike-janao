@@ -109,6 +109,21 @@ html[data-theme="dark"] .report-composer-body,
   min-height: var(--touch-target-min);
 }
 
+/* Native date/time/month controls can keep an intrinsic minimum width on mobile Safari.
+   Constrain them to the shared field shell without removing the native picker behavior. */
+:where(input[type="date"], input[type="time"], input[type="month"]) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+:where(input[type="date"], input[type="time"], input[type="month"])::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+
 /* Enforce the centralized form type scale even in older local field recipes. */
 :where(input, select, textarea) {
   font-size: var(--type-body-size) !important;
