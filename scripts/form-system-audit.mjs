@@ -63,6 +63,11 @@ requireContains(
   'shared field labels must expose a stable accessible id'
 );
 requireContains(
+  'src/components/ui/FormField.tsx',
+  'text-ui-error-text',
+  'shared field errors must use the accessible semantic error text role'
+);
+requireContains(
   'src/components/ui/TextField.tsx',
   'aria-invalid={Boolean(error)}',
   'TextField must own invalid-state semantics'
