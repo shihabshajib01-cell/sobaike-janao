@@ -299,7 +299,7 @@ export const AppShell: React.FC = () => {
             </SeoManager>
           </div>
 
-          <footer className="pt-8 pb-6 border-t border-ui-stroke-subtle mt-10 type-meta text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
+          <footer className="pt-8 pb-6 border-t border-ui-divider mt-10 type-meta text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="font-[var(--font-weight-bold)] text-ui-content-primary">সবাইকে জানাও</span>

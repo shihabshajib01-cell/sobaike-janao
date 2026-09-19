@@ -406,6 +406,7 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
         const style = getComputedStyle(element);
         return {
           ariaHidden: element.getAttribute('aria-hidden'),
+          inert: element.inert,
           visibility: style.visibility,
           opacity: Number(style.opacity),
           pointerEvents: style.pointerEvents,
@@ -422,16 +423,36 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
     });
 
   const assertExpanded = (state, label) => {
-    if (!state.fullTop || state.fullTop.ariaHidden === 'true' || state.fullTop.visibility !== 'visible') {
+    if (
+      !state.fullTop ||
+      state.fullTop.ariaHidden === 'true' ||
+      state.fullTop.inert ||
+      state.fullTop.visibility !== 'visible'
+    ) {
       throw new Error(`${label}: full mobile header is not interactive: ${JSON.stringify(state.fullTop)}`);
     }
-    if (!state.compactTop || state.compactTop.ariaHidden !== 'true' || state.compactTop.visibility !== 'hidden') {
+    if (
+      !state.compactTop ||
+      state.compactTop.ariaHidden !== 'true' ||
+      !state.compactTop.inert ||
+      state.compactTop.visibility !== 'hidden'
+    ) {
       throw new Error(`${label}: compact top navigation was not removed from interaction: ${JSON.stringify(state.compactTop)}`);
     }
-    if (!state.fullBottom || state.fullBottom.ariaHidden === 'true' || state.fullBottom.visibility !== 'visible') {
+    if (
+      !state.fullBottom ||
+      state.fullBottom.ariaHidden === 'true' ||
+      state.fullBottom.inert ||
+      state.fullBottom.visibility !== 'visible'
+    ) {
       throw new Error(`${label}: full bottom navigation is not interactive: ${JSON.stringify(state.fullBottom)}`);
     }
-    if (!state.compactBottom || state.compactBottom.ariaHidden !== 'true' || state.compactBottom.visibility !== 'hidden') {
+    if (
+      !state.compactBottom ||
+      state.compactBottom.ariaHidden !== 'true' ||
+      !state.compactBottom.inert ||
+      state.compactBottom.visibility !== 'hidden'
+    ) {
       throw new Error(`${label}: compact bottom navigation was not removed from interaction: ${JSON.stringify(state.compactBottom)}`);
     }
     if (state.fullTop.opacity < 0.99 || state.compactTop.opacity > 0.01) {
@@ -443,16 +464,36 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
   };
 
   const assertCompact = (state, label) => {
-    if (!state.fullTop || state.fullTop.ariaHidden !== 'true' || state.fullTop.visibility !== 'hidden') {
+    if (
+      !state.fullTop ||
+      state.fullTop.ariaHidden !== 'true' ||
+      !state.fullTop.inert ||
+      state.fullTop.visibility !== 'hidden'
+    ) {
       throw new Error(`${label}: hidden full header remained interactive: ${JSON.stringify(state.fullTop)}`);
     }
-    if (!state.compactTop || state.compactTop.ariaHidden === 'true' || state.compactTop.visibility !== 'visible') {
+    if (
+      !state.compactTop ||
+      state.compactTop.ariaHidden === 'true' ||
+      state.compactTop.inert ||
+      state.compactTop.visibility !== 'visible'
+    ) {
       throw new Error(`${label}: compact top navigation is not interactive: ${JSON.stringify(state.compactTop)}`);
     }
-    if (!state.fullBottom || state.fullBottom.ariaHidden !== 'true' || state.fullBottom.visibility !== 'hidden') {
+    if (
+      !state.fullBottom ||
+      state.fullBottom.ariaHidden !== 'true' ||
+      !state.fullBottom.inert ||
+      state.fullBottom.visibility !== 'hidden'
+    ) {
       throw new Error(`${label}: hidden full bottom navigation remained interactive: ${JSON.stringify(state.fullBottom)}`);
     }
-    if (!state.compactBottom || state.compactBottom.ariaHidden === 'true' || state.compactBottom.visibility !== 'visible') {
+    if (
+      !state.compactBottom ||
+      state.compactBottom.ariaHidden === 'true' ||
+      state.compactBottom.inert ||
+      state.compactBottom.visibility !== 'visible'
+    ) {
       throw new Error(`${label}: compact bottom navigation is not interactive: ${JSON.stringify(state.compactBottom)}`);
     }
     if (state.fullTop.opacity > 0.01 || state.compactTop.opacity < 0.99) {
@@ -485,6 +526,20 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
 
   await scrollIntoCompactMode();
   assertCompact(await readState(), 'scroll down');
+
+  const compactScrollY = await page.evaluate(() => window.scrollY);
+  await page.evaluate((top) => {
+    window.scrollTo({ top: Math.max(32, top - 160), behavior: 'instant' });
+  }, compactScrollY);
+  await page.waitForFunction(
+    () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true',
+    null,
+    { timeout: 5000 }
+  );
+  await page.waitForTimeout(650);
+  assertExpanded(await readState(), 'scroll up');
+
+  await scrollIntoCompactMode();
 
   const hiddenChromeAcceptedFocus = await page.evaluate(() => {
     const controls = [

@@ -122,6 +122,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
         id="bottom-nav"
         aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
         aria-hidden={isCompact || undefined}
+        inert={isCompact ? true : undefined}
         className={`md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
             ? 'translate-y-[calc(100%+env(safe-area-inset-bottom,0px)+24px)] opacity-0 mobile-chrome-hide-after-transition'
@@ -171,6 +172,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
         id="bottom-nav-compact"
         aria-label={language === 'bn' ? 'দ্রুত মোবাইল নেভিগেশন' : 'Quick mobile navigation'}
         aria-hidden={!isCompact || undefined}
+        inert={!isCompact ? true : undefined}
         className={`md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
             ? 'translate-y-0 opacity-100 delay-[60ms]'
