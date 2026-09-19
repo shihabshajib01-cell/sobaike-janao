@@ -256,15 +256,25 @@ requireContains(
   '<LanguageSelector variant="compact" idPrefix="rail-language" />',
   'desktop settings must use the shared language selector'
 );
-requireNotContains(
+requireContains(
   'src/components/layout/DesktopLeftRail.tsx',
   'rail-primary-report-cta',
-  'large desktop rail must not show the Report incident CTA'
+  'large desktop rail must keep the persistent Report incident CTA'
 );
-requireNotContains(
+requireContains(
   'src/components/layout/DesktopLeftRail.tsx',
   'openReportComposer',
-  'large desktop rail must not keep a hidden report action path'
+  'large desktop rail Report incident CTA must open the shared report composer'
+);
+requireContains(
+  'src/components/layout/DesktopLeftRail.tsx',
+  'global-product-action-scope',
+  'large desktop rail Report incident CTA must stay on the global product palette on category routes'
+);
+requireContains(
+  'src/theme/color-system.css',
+  '.global-product-action-scope',
+  'global product actions must have a dedicated category-theme escape scope'
 );
 requireNotContains(
   'src/components/ui/LanguageSelector.tsx',
@@ -709,13 +719,13 @@ requireContains(
 );
 requireContains(
   'src/index.css',
-  '.hero-slider-cta-row {\n  display: none !important;',
-  'public hero report CTA must remain hidden across all non-mobile banner layouts'
-);
-requireNotContains(
-  'src/index.css',
   '@media (min-width: 768px) {\n  .hero-slider-cta-row {\n    display: flex;',
-  'tablet/large layouts must not re-enable the public hero report CTA'
+  'public hero Report CTA may remain available on tablet layouts'
+);
+requireContains(
+  'src/index.css',
+  '@media (min-width: 1024px) {\n  .hero-slider-cta-row {\n    display: none;',
+  'public hero Report CTA must remain hidden on desktop and large screens'
 );
 
 if (failures.length) {
