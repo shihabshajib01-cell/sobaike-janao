@@ -152,7 +152,7 @@ if (process.env.FORM_SCHEMA_SMOKE === '1') {
     () => document.getElementById('schema-smoke-status')?.getAttribute('data-schema-valid') === 'false'
   );
   await mobilePage.waitForFunction(
-    () => (document.activeElement as HTMLElement | null)?.id === 'configured-input-smoke_text'
+    () => document.activeElement?.id === 'configured-input-smoke_text'
   );
   await scan(mobilePage, 'mobile schema form validation errors');
 
