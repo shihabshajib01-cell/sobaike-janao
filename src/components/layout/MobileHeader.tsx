@@ -383,7 +383,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             ) : (
               <div
                 id="mobile-category-location-slot"
-                className={`shrink-0 ${isCompact ? 'pointer-events-auto ui-elevation-control' : ''}`}
+                className={`shrink-0 ${isCompact ? 'pointer-events-auto [&_button]:!h-12 [&_button]:!w-12 [&_button]:!min-h-[48px] [&_button]:!min-w-[48px] [&_button]:!border-ui-stroke-subtle [&_button]:!bg-ui-surface/95 [&_button]:ui-elevation-control [&_button]:backdrop-blur-md' : ''}`}
                 aria-label={language === 'bn' ? 'ফিল্টার' : 'Filters'}
               />
             )}
