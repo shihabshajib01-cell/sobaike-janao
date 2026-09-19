@@ -219,7 +219,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     return (
       <header
         id="mobile-report-detail-header"
-        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
+        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-divider pt-safe"
       >
         <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
           <IconButton
@@ -269,7 +269,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     return (
       <header
         id="mobile-category-header"
-        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe"
+        className="md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-divider pt-safe"
       >
         <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
           <IconButton
@@ -323,7 +323,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           id="mobile-header"
           aria-hidden={isCompact || undefined}
           inert={isCompact ? true : undefined}
-          className={`absolute inset-x-0 top-0 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+          className={`absolute inset-x-0 top-0 w-full bg-ui-surface border-b border-ui-divider pt-safe transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
             isCompact
               ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none'
               : 'translate-y-0 opacity-100'
