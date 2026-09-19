@@ -434,14 +434,20 @@ await check('Adaptive mobile chrome preserves visual, navigation and accessibili
     throw new Error('inert hidden mobile header still accepted keyboard focus');
   }
 
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.locator('#bottom-nav-compact-context').click();
   await page.waitForFunction(
     () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true',
     null,
     { timeout: 5000 }
   );
   await page.waitForTimeout(650);
-  assertExpanded(await readState(), 'scroll up');
+  const compactBottomResetState = await readState();
+  assertExpanded(compactBottomResetState, 'compact bottom navigation reset');
+  if (compactBottomResetState.scrollY > 4) {
+    throw new Error(
+      `compact bottom navigation did not return the active page to the top: ${compactBottomResetState.scrollY}px`
+    );
+  }
 
   await scrollIntoCompactMode();
   await page.locator('#mobile-compact-search-btn').click();
