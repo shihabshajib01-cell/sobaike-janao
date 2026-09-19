@@ -26,7 +26,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   const sizeClasses: Record<IconButtonSize, string> = {
     sm: 'min-w-[44px] min-h-[44px] p-2.5',
     md: 'w-11 h-11 min-w-[44px] min-h-[44px] p-2.5',
-    lg: 'w-12 h-12 min-w-[48px] min-h-[48px] p-3',
+    lg: 'w-12 h-12 min-w-[48px] min-h-[48px] p-2.5',
   };
 
   const variantClasses: Record<IconButtonVariant, string> = {
