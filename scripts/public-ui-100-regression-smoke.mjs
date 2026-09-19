@@ -194,19 +194,34 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     throw new Error('Report detail incorrectly shows the category report action');
   }
 
-  const detailScrollTarget = await page.evaluate(() => {
-    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    return Math.min(700, maxScroll);
-  });
-  if (detailScrollTarget < 160) {
-    throw new Error(`Report detail is not tall enough to exercise adaptive chrome: ${detailScrollTarget}px`);
-  }
-  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), detailScrollTarget);
-  await page.waitForFunction(
-    () => document.querySelector('#mobile-report-detail-header')?.getAttribute('data-compact') === 'true',
-    null,
-    { timeout: 5000 }
+  const detailScrollTarget = await page.evaluate(() =>
+    Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
   );
+  if (detailScrollTarget < 96) {
+    throw new Error(`Report detail is not tall enough to cross the 96px adaptive threshold: ${detailScrollTarget}px`);
+  }
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForTimeout(100);
+  await page.mouse.move(195, 420);
+  await page.mouse.wheel(0, Math.max(240, detailScrollTarget));
+  try {
+    await page.waitForFunction(
+      () => document.querySelector('#mobile-report-detail-header')?.getAttribute('data-compact') === 'true',
+      null,
+      { timeout: 5000 }
+    );
+  } catch (error) {
+    const state = await page.evaluate(() => ({
+      scrollY: window.scrollY,
+      maxScroll: Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
+      compact: document.querySelector('#mobile-report-detail-header')?.getAttribute('data-compact'),
+    }));
+    throw new Error(
+      `Report detail did not enter compact mode: ${JSON.stringify(state)}; ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+  }
   await page.waitForTimeout(650);
   await expectVisible(
     page.locator('#mobile-report-detail-back-btn'),
@@ -293,19 +308,34 @@ await check('All seven category pages preserve the shared mobile navigation cont
     await page.locator('#report-composer-close-btn').click();
     await page.waitForTimeout(100);
 
-    const categoryScrollTarget = await page.evaluate(() => {
-      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-      return Math.min(700, maxScroll);
-    });
-    if (categoryScrollTarget < 160) {
-      throw new Error(`${route} is not tall enough to exercise adaptive category chrome: ${categoryScrollTarget}px`);
-    }
-    await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), categoryScrollTarget);
-    await page.waitForFunction(
-      () => document.querySelector('#mobile-category-header')?.getAttribute('data-compact') === 'true',
-      null,
-      { timeout: 5000 }
+    const categoryScrollTarget = await page.evaluate(() =>
+      Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
     );
+    if (categoryScrollTarget < 96) {
+      throw new Error(`${route} is not tall enough to cross the 96px adaptive threshold: ${categoryScrollTarget}px`);
+    }
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await page.waitForTimeout(150);
+    await page.mouse.move(195, 420);
+    await page.mouse.wheel(0, Math.max(320, Math.min(900, categoryScrollTarget)));
+    try {
+      await page.waitForFunction(
+        () => document.querySelector('#mobile-category-header')?.getAttribute('data-compact') === 'true',
+        null,
+        { timeout: 5000 }
+      );
+    } catch (error) {
+      const state = await page.evaluate(() => ({
+        scrollY: window.scrollY,
+        maxScroll: Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
+        compact: document.querySelector('#mobile-category-header')?.getAttribute('data-compact'),
+      }));
+      throw new Error(
+        `${route} did not enter compact category mode: ${JSON.stringify(state)}; ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    }
     await page.waitForTimeout(650);
     await expectVisible(
       page.locator('#mobile-category-back-btn'),
