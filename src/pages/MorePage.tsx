@@ -53,10 +53,21 @@ const REPORT_STEPS = [
 ];
 
 export const MorePage: React.FC = () => {
-  const { language } = useApp();
+  const {
+    language,
+    browseLocation,
+    browseLocationStatus,
+    openLocationConsent,
+    useApproximateBrowseLocation,
+  } = useApp();
   const { segments } = useTaxonomy();
   const [activeTab, setActiveTab] = useState<InfoTab>('about');
   const [openFaq, setOpenFaq] = useState<string | null>('faq-1');
+
+  const hasPreciseBrowseLocation =
+    browseLocationStatus === 'available' && browseLocation?.source === 'device';
+  const hasApproximateBrowseLocation =
+    browseLocationStatus === 'available' && browseLocation?.source === 'ip';
 
   const tabs: Array<{ key: InfoTab; labelBn: string; labelEn: string; icon: React.ComponentType<{ className?: string }> }> = [
     { key: 'about', labelBn: 'সম্পর্কে', labelEn: 'About', icon: Info },
@@ -301,6 +312,86 @@ export const MorePage: React.FC = () => {
                   </div>
                 );
               })}
+            </div>
+          </div>
+
+          <div
+            id="location-preference-card"
+            className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 shrink-0 rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-ui-accent" aria-hidden="true" />
+              </div>
+              <div className="min-w-0 space-y-1">
+                <h2 className="type-h2 text-ui-content-primary">
+                  {language === 'bn' ? 'লোকেশন পছন্দ' : 'Location preference'}
+                </h2>
+                <p
+                  id="location-preference-status"
+                  className="type-body text-ui-content-secondary"
+                >
+                  {hasPreciseBrowseLocation
+                    ? language === 'bn'
+                      ? 'এখন ডিভাইসের নির্ভুল লোকেশন ব্যবহার হচ্ছে।'
+                      : 'Precise device location is currently being used.'
+                    : hasApproximateBrowseLocation
+                    ? language === 'bn'
+                      ? 'এখন আনুমানিক এলাকার লোকেশন ব্যবহার হচ্ছে।'
+                      : 'Approximate area location is currently being used.'
+                    : language === 'bn'
+                    ? 'বর্তমানে কোনো লোকেশন পাওয়া যাচ্ছে না।'
+                    : 'Location is currently unavailable.'}
+                </p>
+                <p className="type-meta text-ui-content-muted">
+                  {language === 'bn'
+                    ? 'এটি শুধু ব্রাউজিং ও কাছাকাছি প্রতিবেদন দেখানোর জন্য। প্রতিবেদন জমা দেওয়ার সময় আলাদাভাবে ডিভাইস লোকেশন প্রয়োজন।'
+                    : 'This preference is for browsing and nearby reports only. Report submission still requires a separate device-location check.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              {!hasPreciseBrowseLocation && (
+                <Button
+                  id="location-preference-use-precise"
+                  type="button"
+                  variant="primary"
+                  size="md"
+                  onClick={() => openLocationConsent('browse')}
+                  leftIcon={<MapPin className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {language === 'bn' ? 'নির্ভুল লোকেশন ব্যবহার করুন' : 'Use precise location'}
+                </Button>
+              )}
+
+              {hasPreciseBrowseLocation && (
+                <Button
+                  id="location-preference-use-approximate"
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  onClick={() => {
+                    void useApproximateBrowseLocation();
+                  }}
+                >
+                  {language === 'bn' ? 'আনুমানিক লোকেশন ব্যবহার করুন' : 'Use approximate location'}
+                </Button>
+              )}
+
+              {!hasPreciseBrowseLocation && !hasApproximateBrowseLocation && (
+                <Button
+                  id="location-preference-retry-approximate"
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  onClick={() => {
+                    void useApproximateBrowseLocation();
+                  }}
+                >
+                  {language === 'bn' ? 'আনুমানিক লোকেশন আবার চেষ্টা করুন' : 'Retry approximate location'}
+                </Button>
+              )}
             </div>
           </div>
         </section>
