@@ -43,6 +43,19 @@ async function expectVisible(locator, message) {
   if (!(await locator.isVisible())) throw new Error(message);
 }
 
+async function expectSquareSize(locator, expected, label, tolerance = 1) {
+  const box = await locator.boundingBox();
+  if (!box) throw new Error(`${label} is not measurable`);
+  if (
+    Math.abs(box.width - expected) > tolerance ||
+    Math.abs(box.height - expected) > tolerance
+  ) {
+    throw new Error(
+      `${label} expected about ${expected}x${expected}px, got ${Math.round(box.width)}x${Math.round(box.height)}px`
+    );
+  }
+}
+
 async function scrollDownInSteps(page, target) {
   const points = [0.34, 0.68, 1]
     .map((ratio) => Math.round(target * ratio))
@@ -223,6 +236,11 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     page.locator('#mobile-report-detail-share-btn'),
     'Report detail mobile share button missing'
   );
+  await expectSquareSize(page.locator('#mobile-report-detail-back-btn'), 48, 'Report detail back control');
+  await expectSquareSize(page.locator('#mobile-report-detail-share-btn'), 48, 'Report detail share control');
+  await expectSquareSize(page.locator('#mobile-report-detail-back-btn svg').first(), 24, 'Report detail back icon');
+  await expectSquareSize(page.locator('#mobile-report-detail-share-btn svg').first(), 24, 'Report detail share icon');
+
   if ((await page.locator('#bottom-nav').count()) !== 0) {
     throw new Error('Report detail incorrectly shows the global bottom navigation');
   }
@@ -293,6 +311,31 @@ await check('All seven category pages preserve the shared mobile navigation cont
       page.locator('#mobile-category-report'),
       `${route} category bottom-right report action missing`
     );
+
+    await expectSquareSize(page.locator('#mobile-category-back-btn'), 48, `${route} category back control`);
+    await expectSquareSize(page.locator('#mobile-category-filter-btn'), 48, `${route} category filter control`);
+    await expectSquareSize(page.locator('#mobile-category-report'), 48, `${route} category report control`);
+    await expectSquareSize(page.locator('#mobile-category-back-btn svg').first(), 24, `${route} category back icon`);
+    await expectSquareSize(page.locator('#mobile-category-filter-btn svg').first(), 24, `${route} category filter icon`);
+    await expectSquareSize(page.locator('#mobile-category-report svg').first(), 24, `${route} category report icon`);
+
+    const hero = page.locator('section[id$="-header-banner"]').first();
+    const heroMedia = hero.locator('.hero-slider-media');
+    await expectVisible(hero, `${route} category hero missing`);
+    await expectVisible(heroMedia, `${route} category hero media missing`);
+    const heroBox = await hero.boundingBox();
+    const heroMediaBox = await heroMedia.boundingBox();
+    if (!heroBox || !heroMediaBox) {
+      throw new Error(`${route} category hero is not measurable`);
+    }
+    if (
+      Math.abs(heroMediaBox.x - heroBox.x) > 1.5 ||
+      Math.abs(heroMediaBox.width - heroBox.width) > 2
+    ) {
+      throw new Error(
+        `${route} mobile hero media is not edge-to-edge; hero=${Math.round(heroBox.width)}px, media=${Math.round(heroMediaBox.width)}px`
+      );
+    }
 
     if ((await page.locator('#bottom-nav').count()) !== 0) {
       throw new Error(`${route} incorrectly shows the global bottom navigation`);
@@ -480,6 +523,11 @@ await check('Key mobile controls preserve the 44px minimum interaction target', 
   const page = await context.newPage();
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#bottom-nav'), 'bottom navigation missing');
+
+  await expectSquareSize(page.locator('#mobile-header-menu-btn'), 48, 'Mobile header menu control');
+  await expectSquareSize(page.locator('#mobile-header-search-btn'), 48, 'Mobile header search control');
+  await expectSquareSize(page.locator('#mobile-header-menu-btn svg').first(), 24, 'Mobile header menu icon');
+  await expectSquareSize(page.locator('#mobile-header-search-btn svg').first(), 24, 'Mobile header search icon');
 
   const selectors = ['#bottom-nav-home', '#bottom-nav-issues', '#mobile-nav-report', '#bottom-nav-explore'];
   for (const selector of selectors) {
