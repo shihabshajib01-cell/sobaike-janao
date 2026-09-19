@@ -352,7 +352,6 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
               <ContactField
                 id="subject-contact-email-phone-input"
                 name="contactEmailOrPhone"
-                type="text"
                 required
                 label={
                   SUBJECT_RESPONSE_SIMPLE_FORM_CONNECTED
