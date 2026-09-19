@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
-import { SECTIONS } from '../../theme/tokens';
+import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
 
@@ -24,8 +24,42 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
   const { currentRoute, language, openReportComposer } = useApp();
   const { segments } = useTaxonomy();
   const categoryRoutes = Object.values(segments).map((segment) => segment.slug);
+  const runtimeCategory =
+    Object.values(segments).find((segment) => segment.slug === currentRoute) || null;
+  const staticCategoryEntry =
+    Object.entries(SECTIONS).find(([, segment]) => segment.slug === currentRoute) || null;
+  const activeCategoryId =
+    runtimeCategory?.id ||
+    (staticCategoryEntry ? staticCategoryEntry[0] : null);
+
   const localizePath = (path: RoutePath) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
+
+  if (activeCategoryId) {
+    return (
+      <nav
+        id="bottom-nav-category-action"
+        aria-label={language === 'bn' ? 'ক্যাটাগরি প্রতিবেদন অ্যাকশন' : 'Category report action'}
+        className="md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)]"
+      >
+        <div className="flex w-full items-end justify-end">
+          <button
+            id="mobile-category-report"
+            type="button"
+            onClick={() => openReportComposer(activeCategoryId as SectionKey)}
+            aria-label={
+              language === 'bn'
+                ? 'এই ক্যাটাগরিতে প্রতিবেদন জমা দিন'
+                : 'Submit a report in this category'
+            }
+            className="pointer-events-auto flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-200 ease-out hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2"
+          >
+            <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
+          </button>
+        </div>
+      </nav>
+    );
+  }
 
   if (shouldHideBottomNav(currentRoute, categoryRoutes)) return null;
 
