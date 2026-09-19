@@ -69,6 +69,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const directionRef = useRef<'up' | 'down' | null>(null);
   const directionDistanceRef = useRef(0);
   const frameRef = useRef<number | null>(null);
+  const fullHeaderRef = useRef<HTMLElement | null>(null);
+  const compactHeaderRef = useRef<HTMLElement | null>(null);
   const { segments } = useTaxonomy();
   const localizePath = (path: string) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -182,6 +184,15 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     onCompactChange(false);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   };
+
+  useEffect(() => {
+    if (fullHeaderRef.current) {
+      fullHeaderRef.current.inert = isCompact;
+    }
+    if (compactHeaderRef.current) {
+      compactHeaderRef.current.inert = !isCompact;
+    }
+  }, [isCompact]);
 
   const registerSuccessfulShare = () => {
     if (reportDetailId) {
@@ -320,6 +331,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         }`}
       >
         <header
+          ref={fullHeaderRef}
           id="mobile-header"
           aria-hidden={isCompact || undefined}
           inert={isCompact ? true : undefined}
@@ -369,6 +381,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       </div>
 
       <nav
+        ref={compactHeaderRef}
         id="mobile-compact-header"
         aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
         aria-hidden={!isCompact || undefined}

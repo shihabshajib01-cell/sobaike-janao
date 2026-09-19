@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useApp, RoutePath } from '../../context/AppContext';
@@ -23,6 +23,8 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange }) => {
   const { currentRoute, language, openReportComposer } = useApp();
+  const fullNavRef = useRef<HTMLElement | null>(null);
+  const compactNavRef = useRef<HTMLElement | null>(null);
   const { segments } = useTaxonomy();
   const categoryRoutes = Object.values(segments).map((segment) => segment.slug);
   const runtimeCategory =
@@ -51,6 +53,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
     onCompactChange(false);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   };
+
+  useEffect(() => {
+    if (fullNavRef.current) {
+      fullNavRef.current.inert = isCompact;
+    }
+    if (compactNavRef.current) {
+      compactNavRef.current.inert = !isCompact;
+    }
+  }, [isCompact]);
 
   if (activeCategoryId) {
     return (
@@ -119,6 +130,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
   return (
     <>
       <nav
+        ref={fullNavRef}
         id="bottom-nav"
         aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
         aria-hidden={isCompact || undefined}
@@ -167,6 +179,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
       </nav>
 
       <nav
+        ref={compactNavRef}
         id="bottom-nav-compact"
         aria-label={language === 'bn' ? 'দ্রুত মোবাইল নেভিগেশন' : 'Quick mobile navigation'}
         aria-hidden={!isCompact || undefined}
