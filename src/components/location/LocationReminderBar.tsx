@@ -19,6 +19,7 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
   const {
     language,
     browseLocationStatus,
+    browseLocation,
     openLocationConsent,
     isLocationModalOpen,
   } = useApp();
@@ -27,7 +28,12 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
   // 1. First-visit notice is not currently open
   // 2. First-visit location modal is not actively open
   // 3. Location is NOT available (user chose Not now, denied, or unavailable)
-  if (isFirstVisitNoticeOpen || isLocationModalOpen || browseLocationStatus === 'available') {
+  const hasDeviceLocation =
+    browseLocationStatus === 'available' && browseLocation?.source === 'device';
+  const hasApproximateLocation =
+    browseLocationStatus === 'available' && browseLocation?.source === 'ip';
+
+  if (isFirstVisitNoticeOpen || isLocationModalOpen || hasDeviceLocation) {
     return null;
   }
 
@@ -48,7 +54,11 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
             <MapPin className="w-4 h-4 sm:w-4.5 sm:h-4.5" aria-hidden="true" />
           </div>
           <p className="type-compact font-[var(--font-weight-medium)] leading-snug text-ui-content-secondary">
-            {isBn
+            {hasApproximateLocation
+              ? isBn
+                ? 'আনুমানিক এলাকা ব্যবহার করা হচ্ছে। আরও নির্ভুল ফলাফলের জন্য ডিভাইস লোকেশন চালু করুন।'
+                : 'Using your approximate area. Turn on device location for more precise results.'
+              : isBn
               ? 'আপনার ব্রাউজিং অভিজ্ঞতা ব্যক্তিগতকরণ করতে লোকেশন চালু করুন।'
               : 'Turn on location to personalize your browsing experience.'}
           </p>
