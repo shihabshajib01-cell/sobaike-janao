@@ -66,6 +66,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_FORM_SCHEMA_SMOKE: '1'
 
       - name: Install accessibility browser runtime
         run: |
@@ -86,4 +88,4 @@ jobs:
             sleep 1
           done
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
-          SITE_URL=http://127.0.0.1:4173/ node scripts/public-accessibility-smoke.mjs
+          FORM_SCHEMA_SMOKE=1 SITE_URL=http://127.0.0.1:4173/ node scripts/public-accessibility-smoke.mjs
