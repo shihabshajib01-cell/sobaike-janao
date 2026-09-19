@@ -161,7 +161,7 @@ const representativePaths = [
   {
     segment: 'rickshaw',
     subcategory: 'charging-station-location',
-    expectedAny: ['#operator-subject-name', '#composer-section-configured-fields'],
+    expectedAny: ['#composer-section-parties'],
   },
 ];
 
@@ -181,6 +181,23 @@ await check('Representative category-specific form paths render without runtime 
         `${testCase.segment}/${testCase.subcategory}: expected active form surface missing (${testCase.expectedAny.join(', ')})`
       );
     }
+
+    if (
+      testCase.segment === 'rickshaw' &&
+      testCase.subcategory === 'charging-station-location'
+    ) {
+      const operatorSectionHeader = page.locator('#composer-section-parties-header');
+      await expectVisible(
+        operatorSectionHeader,
+        'rickshaw/charging-station-location: operator section header missing'
+      );
+      await operatorSectionHeader.click();
+      await expectVisible(
+        page.locator('#operator-subject-name'),
+        'rickshaw/charging-station-location: operator fields did not render after expansion'
+      );
+    }
+
     await assertComposerGeometry(page, `${testCase.segment}/${testCase.subcategory}`);
   }
 
