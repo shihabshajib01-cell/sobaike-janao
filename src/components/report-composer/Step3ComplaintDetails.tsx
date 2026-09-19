@@ -145,10 +145,12 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const currentMonthLocal = todayLocal.slice(0, 7);
 
     // Segment structure conditions
+    const isChildSafetyReport =
+      segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
     const showsPartySection =
       segment === 'rickshaw' ||
       segment === 'extortion' ||
-      segment === 'public_safety' ||
+      (segment === 'public_safety' && !isChildSafetyReport) ||
       segment === 'road_transport' ||
       segment === 'illegal_occupation';
     const showsIdentitySection = segment === 'harassment';
@@ -177,6 +179,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     const hideIncidentTime = isIllegalOccupation;
     const hideFrequency =
       isIllegalOccupation ||
+      isChildSafetyReport ||
       (segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location');
 
     // Charging station unified operator party logic
@@ -873,6 +876,14 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               : 'Keep the description within 2,000 characters.';
         }
 
+        if (
+          isChildSafetyReport &&
+          !String(formData.customFieldAnswers?.childIncidentType || '').trim()
+        ) {
+          newErrors.childIncidentType =
+            language === 'bn' ? 'ঘটনার ধরন নির্বাচন করুন।' : 'Select the incident type.';
+        }
+
         if (!formData.incidentDate) {
           newErrors.incidentDate =
             language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন।' : 'Select the incident date.';
@@ -938,23 +949,30 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         const reportUpazilaObj = reportDistObj
           ? getUpazilaByStoredName(formData.location?.upazilaOrThana, reportDistObj.id)
           : undefined;
-        if (!reportUpazilaObj) {
+        if (!isChildSafetyReport && !reportUpazilaObj) {
           newErrors.upazilaOrThana =
             language === 'bn' ? 'উপজেলা বা থানা নির্বাচন করুন।' : 'Select an upazila or thana.';
         }
 
-        if (reportDivObj && reportDistObj && reportUpazilaObj) {
+        if (
+          reportDivObj &&
+          reportDistObj &&
+          (isChildSafetyReport || reportUpazilaObj)
+        ) {
+          const normalizedUpazila = isChildSafetyReport ? '' : reportUpazilaObj?.nameEn || '';
           if (
             formData.location?.division !== reportDivObj.nameEn ||
             formData.location?.district !== reportDistObj.nameEn ||
-            formData.location?.upazilaOrThana !== reportUpazilaObj.nameEn
+            (isChildSafetyReport
+              ? Boolean(formData.location?.upazilaOrThana)
+              : formData.location?.upazilaOrThana !== normalizedUpazila)
           ) {
             onUpdateFormData({
               location: {
                 ...formData.location,
                 division: reportDivObj.nameEn,
                 district: reportDistObj.nameEn,
-                upazilaOrThana: reportUpazilaObj.nameEn,
+                upazilaOrThana: normalizedUpazila,
               },
             });
           }
@@ -1058,6 +1076,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             ['sexualHarassmentType', 'sexual-harassment-type-select'],
             ['sexualHarassmentContext', 'sexual-harassment-context-select'],
             ['sexualHarassmentInstitution', 'sexual-harassment-institution-input'],
+            ['childIncidentType', 'child-incident-type-select'],
             ['division', 'complaint-division-select'],
             ['district', 'complaint-district-select'],
             ['upazilaOrThana', 'complaint-thana-select'],
@@ -1129,6 +1148,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             errors.previousBillMonth ||
             errors.previousBillAmount ||
             errors.briberyAmount ||
+            errors.childIncidentType ||
             errors.sexualHarassmentType ||
             errors.sexualHarassmentContext ||
             errors.sexualHarassmentInstitution
@@ -1356,6 +1376,34 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 ) : undefined
               }
             />
+
+            {isChildSafetyReport && (
+              <Select
+                id="child-incident-type-select"
+                label={language === 'bn' ? 'ঘটনার ধরন' : 'Incident type'}
+                required
+                value={String(formData.customFieldAnswers?.childIncidentType || '')}
+                error={errors.childIncidentType}
+                onChange={(event) => {
+                  onUpdateFormData({
+                    customFieldAnswers: {
+                      ...(formData.customFieldAnswers || {}),
+                      childIncidentType: event.target.value,
+                    },
+                  });
+                  if (errors.childIncidentType) {
+                    setErrors((prev) => ({ ...prev, childIncidentType: '' }));
+                  }
+                }}
+                placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
+                options={[
+                  { value: 'abduction', label: language === 'bn' ? 'শিশু অপহরণ' : 'Child abduction' },
+                  { value: 'murder', label: language === 'bn' ? 'শিশু হত্যা' : 'Murder of a child' },
+                  { value: 'abduction_and_murder', label: language === 'bn' ? 'অপহরণের পর হত্যা' : 'Abduction followed by murder' },
+                  { value: 'unknown_not_stated', label: language === 'bn' ? 'নিশ্চিত নয় / উল্লেখ নেই' : 'Not clear / not stated' },
+                ]}
+              />
+            )}
 
             {isBriberyReport && (
               <div className="pt-4 border-t border-ui-divider space-y-3">
@@ -1656,8 +1704,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           hasError={Boolean(
             errors.division ||
             errors.district ||
-            errors.upazilaOrThana ||
-            (!isUtilityReport && errors.formattedAddress) ||
+            (!isChildSafetyReport && errors.upazilaOrThana) ||
+            (!isUtilityReport && !isChildSafetyReport && errors.formattedAddress) ||
             errors.reporterLocation
           )}
           icon={<MapPin className="w-5 h-5" />}
@@ -1811,28 +1859,30 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   }))}
                 />
 
-                <SearchableSelect
-                  id="complaint-thana-select"
-                  label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / upazila'}
-                  required
-                  disabled={isLocationLocked || !resolvedDistrict}
-                  value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
-                  onChange={handleUpazilaChange}
-                  placeholder={language === 'bn' ? 'থানা / উপজেলা বেছে নিন' : 'Select thana / upazila'}
-                  searchPlaceholder={language === 'bn' ? 'থানা / উপজেলা খুঁজুন...' : 'Search thana / upazila...'}
-                  noResultsText={language === 'bn' ? 'কোনো থানা / উপজেলা পাওয়া যায়নি' : 'No matching thana / upazila'}
-                  error={errors.upazilaOrThana}
-                  className="sm:col-span-2 lg:col-span-1"
-                  options={availableUpazilas.map((upazila) => ({
-                    value: upazila.nameEn,
-                    label: language === 'bn' ? upazila.nameBn : upazila.nameEn,
-                    keywords: [upazila.nameEn, upazila.nameBn],
-                  }))}
-                />
+                {!isChildSafetyReport && (
+                  <SearchableSelect
+                    id="complaint-thana-select"
+                    label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / upazila'}
+                    required
+                    disabled={isLocationLocked || !resolvedDistrict}
+                    value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
+                    onChange={handleUpazilaChange}
+                    placeholder={language === 'bn' ? 'থানা / উপজেলা বেছে নিন' : 'Select thana / upazila'}
+                    searchPlaceholder={language === 'bn' ? 'থানা / উপজেলা খুঁজুন...' : 'Search thana / upazila...'}
+                    noResultsText={language === 'bn' ? 'কোনো থানা / উপজেলা পাওয়া যায়নি' : 'No matching thana / upazila'}
+                    error={errors.upazilaOrThana}
+                    className="sm:col-span-2 lg:col-span-1"
+                    options={availableUpazilas.map((upazila) => ({
+                      value: upazila.nameEn,
+                      label: language === 'bn' ? upazila.nameBn : upazila.nameEn,
+                      keywords: [upazila.nameEn, upazila.nameBn],
+                    }))}
+                  />
+                )}
               </div>
 
               {/* Row 3: Detailed Address (Optional for non-utility, completely omitted for utility) */}
-              {!isUtilityReport && (
+              {!isUtilityReport && !isChildSafetyReport && (
                 <TextAreaField
                   id="complaint-address-input"
                   rows={3}
@@ -1852,7 +1902,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               )}
 
               {/* Optional address/place search; no report-input map */}
-              <div className="pt-2 space-y-3">
+              {!isChildSafetyReport && (
+                <div className="pt-2 space-y-3">
                 {isGooglePlacesConfigured() && (
                   <AddressSearchInput
                     language={language}
@@ -1885,7 +1936,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     disabled={isLocationLocked}
                   />
                 )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </Accordion>
@@ -2326,7 +2378,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         )}
 
         {/* SECTION 4: Attachments (সংযুক্তি - ঐচ্ছিক) - COLLAPSIBLE - Hidden for Load Shedding & Gas Shortage, enabled for Excess Electricity Bill */}
-        {(!isUtilityReport || isExcessElectricityBill) && (
+        {(!isUtilityReport || isExcessElectricityBill) && !isChildSafetyReport && (
           <Accordion
             id="composer-section-attachments"
           className="report-composer-card"
