@@ -156,6 +156,9 @@ if (!composer.includes('This end time is treated as the following day.')) {
 }
 
 const configured = read('src/components/report-composer/ConfiguredFieldsSection.tsx');
+if (configured.includes('role="alert" className="type-helper text-role-validation"')) {
+  failures.push('ConfiguredFieldsSection.tsx: schema group errors must use the accessible semantic error text role');
+}
 for (const token of [
   "field.fieldType === 'evidence'",
   'pendingImages.length === 0',
