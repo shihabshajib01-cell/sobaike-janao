@@ -317,7 +317,10 @@ export const AppShell: React.FC = () => {
       </div>
 
       <ErrorBoundary componentName="BottomNav" fallback={null}>
-        <BottomNav isCompact={isMobileChromeCompact} />
+        <BottomNav
+          isCompact={isMobileChromeCompact}
+          onCompactChange={setIsMobileChromeCompact}
+        />
       </ErrorBoundary>
 
       <ErrorBoundary componentName="SearchModal" silent>

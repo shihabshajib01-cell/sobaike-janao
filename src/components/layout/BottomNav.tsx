@@ -18,9 +18,10 @@ export const shouldHideBottomNav = (
 
 interface BottomNavProps {
   isCompact: boolean;
+  onCompactChange: (compact: boolean) => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange }) => {
   const { currentRoute, language, openReportComposer } = useApp();
   const { segments } = useTaxonomy();
   const categoryRoutes = Object.values(segments).map((segment) => segment.slug);
@@ -34,6 +35,22 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
 
   const localizePath = (path: RoutePath) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
+
+  const handleNavigation = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    onCompactChange(false);
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  };
 
   if (activeCategoryId) {
     return (
@@ -118,6 +135,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
               key={item.id}
               id={item.id}
               to={localizePath(item.path)}
+              onClick={handleNavigation}
               aria-current={item.isActive ? 'page' : undefined}
               className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center ui-radius-control px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 item.isActive
@@ -163,6 +181,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
           <Link
             id="bottom-nav-compact-context"
             to={localizePath(compactNavItem.path)}
+            onClick={handleNavigation}
             aria-label={language === 'bn' ? compactNavItem.nameBn : compactNavItem.nameEn}
             aria-current={compactNavItem.isActive ? 'page' : undefined}
             className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${

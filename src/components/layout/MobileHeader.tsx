@@ -26,6 +26,14 @@ const hasTextInputFocus = () => {
   );
 };
 
+const isPrimaryUnmodifiedNavigation = (event: React.MouseEvent<HTMLAnchorElement>) =>
+  !event.defaultPrevented &&
+  event.button === 0 &&
+  !event.metaKey &&
+  !event.ctrlKey &&
+  !event.shiftKey &&
+  !event.altKey;
+
 const goBackWithFallback = (fallback: () => void) => {
   if (window.history.length > 1) {
     window.history.back();
@@ -168,6 +176,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       }
     };
   }, [isHeaderInteractionBlocked, onCompactChange, shouldUseAdaptiveHeader]);
+
+  const handleAdaptiveNavigation = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isPrimaryUnmodifiedNavigation(event)) return;
+    onCompactChange(false);
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  };
 
   const registerSuccessfulShare = () => {
     if (reportDetailId) {
@@ -329,6 +343,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
               <Link
                 to={localizePath('/')}
+                onClick={handleAdaptiveNavigation}
                 aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
                 className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
               >
@@ -343,6 +358,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             <Link
               id="mobile-header-search-btn"
               to={localizePath('/search')}
+              onClick={handleAdaptiveNavigation}
               aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
               className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
@@ -379,6 +395,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           <Link
             id="mobile-compact-search-btn"
             to={localizePath('/search')}
+            onClick={handleAdaptiveNavigation}
             aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
             className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
