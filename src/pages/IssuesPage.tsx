@@ -119,10 +119,10 @@ export const IssuesPage: React.FC = () => {
               aria-label={`${language === 'bn' ? config.nameBn : config.nameEn}, ${
                 language === 'bn' ? `জনপ্রিয়তার অবস্থান ${toBanglaDigits(rank)}` : `popularity rank ${rank}`
               }`}
-              className="group flex min-h-[68px] items-stretch gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-card"
+              className="group grid min-h-[68px] grid-cols-[56px_minmax(0,1fr)] gap-2.5 text-left transition-transform active:scale-[0.99] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
               <div
-                className="flex w-14 shrink-0 items-center justify-center rounded-[12px] border"
+                className="flex min-h-[68px] items-center justify-center rounded-[16px] border"
                 style={{
                   backgroundColor: config.bgColor,
                   borderColor: config.borderColor,
@@ -135,7 +135,7 @@ export const IssuesPage: React.FC = () => {
                 />
               </div>
 
-              <div className="flex min-w-0 flex-1 items-center gap-3 ui-radius-card bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
+              <div className="flex min-w-0 items-center gap-3 rounded-[16px] bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
                 <h2 className="min-w-0 flex-1 type-h4 text-ui-content-primary">
                   {language === 'bn' ? config.nameBn : config.nameEn}
                 </h2>
