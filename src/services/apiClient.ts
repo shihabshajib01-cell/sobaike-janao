@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ReporterSubmissionContext, isValidReporterCoordinates } from './types';
+import { VisitorSessionService } from './visitorSessionService';
 
 export interface ApiError {
   code: string;
@@ -36,6 +37,8 @@ class ApiClient {
         incidentDate: payload.incidentDate,
         contactConsent: payload.contactConsent,
         contactInfo: payload.contactConsent ? payload.contactInfo : undefined,
+        visitorId: VisitorSessionService.getVisitorId(),
+        sessionId: VisitorSessionService.getSessionId(),
       },
     });
 
@@ -88,7 +91,11 @@ class ApiClient {
     let { data, error } = await supabase.rpc('submit_public_response', {
       p_report_id: reportId,
       p_response_type: 'subject_response',
-      p_payload: payload,
+      p_payload: {
+        ...payload,
+        visitorId: VisitorSessionService.getVisitorId(),
+        sessionId: VisitorSessionService.getSessionId(),
+      },
     });
 
     // Backward compatibility: if the database has not applied allow_subject_response_without_responder_type.sql yet,
