@@ -67,7 +67,7 @@ export const ConfiguredFieldsReview: React.FC<ConfiguredFieldsReviewProps> = ({
   if (fields.length === 0) return null;
 
   return (
-    <section className="rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5">
+    <section className="report-composer-card rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface p-4 md:p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h3 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
           {language === 'bn' ? 'অতিরিক্ত তথ্য' : 'Additional information'}
