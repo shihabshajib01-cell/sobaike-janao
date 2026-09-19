@@ -9,7 +9,8 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
-import { getRuntimeBannerContent, usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { usePublishedBannerRuntime } from '../services/bannerRuntime';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
@@ -20,7 +21,7 @@ export const ExtortionPage: React.FC = () => {
   const { language, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
   usePublishedBannerRuntime();
-  const bannerContent = getRuntimeBannerContent('extortion');
+  const bannerContent = CANONICAL_BANNER_CONTENT.extortion;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
@@ -81,8 +82,6 @@ export const ExtortionPage: React.FC = () => {
       }).length,
     [reports, feedFilters]
   );
-
-  if (!bannerContent) return null;
 
   return (
     <PublicPageContainer id="extortion-page-container">

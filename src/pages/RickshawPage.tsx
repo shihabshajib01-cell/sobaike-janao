@@ -8,7 +8,8 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
-import { getRuntimeBannerContent, usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { usePublishedBannerRuntime } from '../services/bannerRuntime';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
@@ -18,7 +19,7 @@ import {
 export const RickshawPage: React.FC = () => {
   const { language, browseLocation, browseLocationStatus } = useApp();
   usePublishedBannerRuntime();
-  const bannerContent = getRuntimeBannerContent('rickshaw');
+  const bannerContent = CANONICAL_BANNER_CONTENT.rickshaw;
 
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
     ...EMPTY_CATEGORY_FEED_FILTERS,
@@ -65,8 +66,6 @@ export const RickshawPage: React.FC = () => {
       return matchesCategoryFeedFilters(report, 'rickshaw', feedFilters);
     });
   }, [reports, feedFilters]);
-
-  if (!bannerContent) return null;
 
   return (
     <PublicPageContainer id="rickshaw-page-container">

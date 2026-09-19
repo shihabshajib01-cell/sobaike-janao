@@ -9,7 +9,8 @@ import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { CategoryFilterSheet } from '../components/report/CategoryFilterSheet';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
-import { getRuntimeBannerContent, usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { usePublishedBannerRuntime } from '../services/bannerRuntime';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
@@ -20,7 +21,7 @@ export const UtilityPage: React.FC = () => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
   usePublishedBannerRuntime();
-  const bannerContent = getRuntimeBannerContent('load_shedding');
+  const bannerContent = CANONICAL_BANNER_CONTENT.load_shedding;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
@@ -89,8 +90,6 @@ export const UtilityPage: React.FC = () => {
     feedFilters.evidence !== 'all' ||
     feedFilters.utilityBillTrend !== 'all';
   const hasFilteredContext = hasActiveFeedFilters || selectedSubcat !== 'all';
-
-  if (!bannerContent) return null;
 
   return (
     <PublicPageContainer id="utility-page-container">

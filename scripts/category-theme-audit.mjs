@@ -32,9 +32,15 @@ for (const role of [
   '--ui-primary-action-bg: var(--category-route-primary)',
   '--ui-accent: var(--category-route-primary)',
   '--ui-focus: var(--category-route-primary)',
-  '--hero-text-primary: var(--category-route-on-container)',
 ]) {
   if (!css.includes(role)) failures.push(`Missing scoped semantic mapping: ${role}`);
+}
+
+if (!css.includes('--hero-text-primary: color-mix(in srgb, var(--category-route-on-container) 78%, var(--md-on-background))')) {
+  failures.push('Category route hero title does not use the darker category-derived text role');
+}
+if (!css.includes('--hero-text-secondary: color-mix(in srgb, var(--category-route-on-container) 86%, var(--md-on-background))')) {
+  failures.push('Category route hero description does not use the darker category-derived text role');
 }
 
 if (!shell.includes('category-theme-scope')) failures.push('AppShell does not activate category theme scope');

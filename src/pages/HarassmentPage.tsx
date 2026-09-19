@@ -8,7 +8,8 @@ import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryHeroSlider } from '../components/category/CategoryHeroSlider';
 import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
-import { getRuntimeBannerContent, usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
+import { usePublishedBannerRuntime } from '../services/bannerRuntime';
 import { BANGLADESH_DISTRICTS } from '../data/districts';
 import {
   EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
@@ -64,7 +65,7 @@ export const HarassmentPage: React.FC = () => {
   } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
   usePublishedBannerRuntime();
-  const bannerContent = getRuntimeBannerContent('harassment');
+  const bannerContent = CANONICAL_BANNER_CONTENT.harassment;
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
@@ -145,8 +146,6 @@ export const HarassmentPage: React.FC = () => {
     },
     [setIsHarassmentFilterOpen]
   );
-
-  if (!bannerContent) return null;
 
   return (
     <PublicPageContainer id="harassment-page-container">
