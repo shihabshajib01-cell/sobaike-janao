@@ -1213,6 +1213,12 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .hero-slider-cta-row {
+    justify-content: flex-start;
+  }
+}
+
 .hero-slider-mobile-cta {
   width: 100%;
   display: flex;
