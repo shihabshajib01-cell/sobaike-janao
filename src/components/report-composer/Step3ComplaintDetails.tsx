@@ -1068,6 +1068,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         {/* SECTION 1: What Happened & Timeline (ঘটনার বিবরণ ও সময়কাল) - NON-COLLAPSIBLE */}
         <Accordion
           id="composer-section-narrative"
+          className="report-composer-card"
           isOpen={true}
           collapsible={false}
           onToggle={() => {}}
@@ -1868,6 +1869,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         {/* SECTION 2: Location (লোকেশন) - NON-COLLAPSIBLE */}
         <Accordion
           id="composer-section-location"
+          className="report-composer-card"
           isOpen={true}
           collapsible={false}
           onToggle={() => {}}
@@ -2117,6 +2119,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         {showsIdentitySection && (
           <Accordion
             id="composer-section-identity"
+          className="report-composer-card"
             isOpen={true}
             collapsible={false}
             onToggle={() => {}}
@@ -2255,6 +2258,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         {showsPartySection && isChargingStationOperator && (
           <Accordion
             id="composer-section-parties"
+          className="report-composer-card"
             isOpen={Boolean(openSections.parties)}
             collapsible={true}
             onToggle={() => toggleSection('parties')}
@@ -2375,6 +2379,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         {showsPartySection && !isChargingStationOperator && subjectConfig && (
           <Accordion
             id="composer-section-parties"
+          className="report-composer-card"
             isOpen={Boolean(openSections.parties)}
             collapsible={true}
             onToggle={() => toggleSection('parties')}
@@ -2665,6 +2670,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         {(!isUtilityReport || isExcessElectricityBill) && (
           <Accordion
             id="composer-section-attachments"
+          className="report-composer-card"
             isOpen={Boolean(openSections.attachments)}
             collapsible={true}
             onToggle={() => toggleSection('attachments')}
