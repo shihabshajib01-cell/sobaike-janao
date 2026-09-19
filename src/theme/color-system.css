@@ -118,16 +118,17 @@ html[data-theme="light"] {
   --md-on-sensitive-container: #7A2338;
   --md-on-sensitive-container-muted: #9B5364;
 
-  /* Hero roles - Light */
+  /* Hero roles - Light
+     Stronger image-derived tints keep the banner distinct from the page surface. */
   --hero-text-primary: #102A43;
   --hero-text-secondary: #596579;
-  --hero-harassment-container: #FDF2F4;
-  --hero-extortion-container: #F0F3F9;
-  --hero-public-safety-container: #EFF6FF;
-  --hero-road-transport-container: #FFFBEB;
-  --hero-load-shedding-container: #F0FDFA;
-  --hero-illegal-occupation-container: #F8FAFC;
-  --hero-rickshaw-container: #FEF7EE;
+  --hero-harassment-container: #E9D2DA;
+  --hero-extortion-container: #EAD4CB;
+  --hero-public-safety-container: #DDD6E1;
+  --hero-road-transport-container: #E4D6D0;
+  --hero-load-shedding-container: #D5E2E2;
+  --hero-illegal-occupation-container: #E5CECF;
+  --hero-rickshaw-container: #C6DED5;
 
   /* Admin-managed category theme presets - Light */
   --theme-preset-sky-primary: #0284C7;
@@ -179,55 +180,55 @@ html[data-theme="light"] {
   --theme-preset-slate-on-container: #334155;
   --theme-preset-slate-outline: #CBD5E1;
 
-  /* Category alternative-color roles */
-  --category-harassment-primary: #B84A62;
-  --category-harassment-hover: #9E384E;
+  /* Category image-derived brand roles - Light */
+  --category-harassment-primary: #A64B6A;
+  --category-harassment-hover: #8F405B;
   --category-harassment-on-primary: #FFFFFF;
-  --category-harassment-container: #FDF2F4;
-  --category-harassment-on-container: #8B293E;
-  --category-harassment-outline: #F7CCD5;
+  --category-harassment-container: #E9D2DA;
+  --category-harassment-on-container: #7C3850;
+  --category-harassment-outline: #D2A5B4;
 
-  --category-extortion-primary: #4F5D95;
-  --category-extortion-hover: #3E4A7A;
+  --category-extortion-primary: #AC542F;
+  --category-extortion-hover: #944828;
   --category-extortion-on-primary: #FFFFFF;
-  --category-extortion-container: #F0F3F9;
-  --category-extortion-on-container: #333E67;
-  --category-extortion-outline: #CCD5E8;
+  --category-extortion-container: #EAD4CB;
+  --category-extortion-on-container: #813F23;
+  --category-extortion-outline: #D6AA97;
 
-  --category-public_safety-primary: #2563EB;
-  --category-public_safety-hover: #1D4ED8;
+  --category-public_safety-primary: #775A86;
+  --category-public_safety-hover: #664D73;
   --category-public_safety-on-primary: #FFFFFF;
-  --category-public_safety-container: #EFF6FF;
-  --category-public_safety-on-container: #1E40AF;
-  --category-public_safety-outline: #BFDBFE;
+  --category-public_safety-container: #DDD6E1;
+  --category-public_safety-on-container: #594464;
+  --category-public_safety-outline: #BBACC2;
 
-  --category-road_transport-primary: #A16207;
-  --category-road_transport-hover: #854D0E;
+  --category-road_transport-primary: #915C42;
+  --category-road_transport-hover: #7D4F39;
   --category-road_transport-on-primary: #FFFFFF;
-  --category-road_transport-container: #FFFBEB;
-  --category-road_transport-on-container: #854D0E;
-  --category-road_transport-outline: #FDE68A;
+  --category-road_transport-container: #E4D6D0;
+  --category-road_transport-on-container: #6D4532;
+  --category-road_transport-outline: #C8AEA0;
 
-  --category-load_shedding-primary: #0D9488;
-  --category-load_shedding-hover: #0F766E;
+  --category-load_shedding-primary: #578C8B;
+  --category-load_shedding-hover: #4B7878;
   --category-load_shedding-on-primary: #050505;
-  --category-load_shedding-container: #F0FDFA;
-  --category-load_shedding-on-container: #115E59;
-  --category-load_shedding-outline: #CCFBF1;
+  --category-load_shedding-container: #D5E2E2;
+  --category-load_shedding-on-container: #416968;
+  --category-load_shedding-outline: #ABC6C5;
 
-  --category-illegal_occupation-primary: #64748B;
-  --category-illegal_occupation-hover: #475569;
+  --category-illegal_occupation-primary: #983D3E;
+  --category-illegal_occupation-hover: #833435;
   --category-illegal_occupation-on-primary: #FFFFFF;
-  --category-illegal_occupation-container: #F8FAFC;
-  --category-illegal_occupation-on-container: #334155;
-  --category-illegal_occupation-outline: #CBD5E1;
+  --category-illegal_occupation-container: #E5CECF;
+  --category-illegal_occupation-on-container: #722E2E;
+  --category-illegal_occupation-outline: #CC9E9E;
 
-  --category-rickshaw-primary: #D9822B;
-  --category-rickshaw-hover: #B8681A;
-  --category-rickshaw-on-primary: #050505;
-  --category-rickshaw-container: #FEF7EE;
-  --category-rickshaw-on-container: #9A530C;
-  --category-rickshaw-outline: #FBDDB9;
+  --category-rickshaw-primary: #197B56;
+  --category-rickshaw-hover: #166A4A;
+  --category-rickshaw-on-primary: #FFFFFF;
+  --category-rickshaw-container: #C6DED5;
+  --category-rickshaw-on-container: #135C40;
+  --category-rickshaw-outline: #8CBDAA;
 }
 
 html[data-theme="dark"],
