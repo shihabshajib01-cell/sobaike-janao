@@ -177,12 +177,12 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
       )}
 
       {shouldShowDescription && (
-        <p className="type-body text-ui-content-secondary line-clamp-2 break-words">
+        <p className="type-body text-ui-content-primary/85 line-clamp-2 break-words">
           {shortDesc}
         </p>
       )}
 
-      <div className="flex items-center pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-muted">
+      <div className="flex items-center pt-3 border-t border-ui-stroke-subtle type-meta text-ui-content-secondary">
         <div className="flex items-center min-w-0 w-full">
           <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <AppIcon name="map-pin" size="sm" className="text-ui-accent shrink-0" />
