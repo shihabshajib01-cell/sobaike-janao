@@ -88,6 +88,32 @@ async function assertMatchingFloatingControls(page, selectors, label) {
   }
 }
 
+async function readStableReportDividerColors(page, cardSelector = '[id^="report-card-"]') {
+  await page.waitForFunction(
+    (selector) => {
+      const card = document.querySelector(selector);
+      if (!(card instanceof HTMLElement) || !card.isConnected) return false;
+      const horizontal = card.querySelector('[data-report-divider-horizontal]');
+      const verticals = [...card.querySelectorAll('[data-report-divider-vertical]')];
+      if (!(horizontal instanceof HTMLElement) || verticals.length !== 2) return false;
+      const horizontalColor = getComputedStyle(horizontal).borderTopColor;
+      const verticalColors = verticals.map((element) => getComputedStyle(element).borderLeftColor);
+      return Boolean(horizontalColor && verticalColors.every(Boolean));
+    },
+    cardSelector,
+    { timeout: 5000 }
+  );
+
+  return page.locator(cardSelector).first().evaluate((card) => {
+    const horizontal = card.querySelector('[data-report-divider-horizontal]');
+    const verticals = [...card.querySelectorAll('[data-report-divider-vertical]')];
+    return {
+      horizontal: horizontal ? getComputedStyle(horizontal).borderTopColor : '',
+      verticals: verticals.map((element) => getComputedStyle(element).borderLeftColor),
+    };
+  });
+}
+
 async function assertControlAndIconSize(page, selector, label) {
   const control = page.locator(selector);
   const icon = control.locator('svg').first();
@@ -249,14 +275,7 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   const firstCardLink = firstCard.locator('a[href*="/report-detail/"]').first();
   await expectVisible(firstCardLink, 'Report card does not expose a native keyboard-addressable detail link');
 
-  const lightDividerColors = await firstCard.evaluate((card) => {
-    const horizontal = card.querySelector('[data-report-divider-horizontal]');
-    const verticals = [...card.querySelectorAll('[data-report-divider-vertical]')];
-    return {
-      horizontal: horizontal ? getComputedStyle(horizontal).borderTopColor : '',
-      verticals: verticals.map((element) => getComputedStyle(element).borderLeftColor),
-    };
-  });
+  const lightDividerColors = await readStableReportDividerColors(page);
   if (
     !lightDividerColors.horizontal ||
     lightDividerColors.verticals.length !== 2 ||
@@ -872,14 +891,7 @@ await check('Dark semantic surfaces retain distinct visual hierarchy', async () 
 
   const firstCard = page.locator('[id^="report-card-"]').first();
   await expectVisible(firstCard, 'No report card found for dark divider parity check');
-  const darkDividerColors = await firstCard.evaluate((card) => {
-    const horizontal = card.querySelector('[data-report-divider-horizontal]');
-    const verticals = [...card.querySelectorAll('[data-report-divider-vertical]')];
-    return {
-      horizontal: horizontal ? getComputedStyle(horizontal).borderTopColor : '',
-      verticals: verticals.map((element) => getComputedStyle(element).borderLeftColor),
-    };
-  });
+  const darkDividerColors = await readStableReportDividerColors(page);
   if (
     !darkDividerColors.horizontal ||
     darkDividerColors.verticals.length !== 2 ||
