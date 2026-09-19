@@ -191,8 +191,10 @@ if (!moduleMatch) {
   } else {
     const raw = fs.statSync(entryPath).size;
     const gzip = gzipBytes(entryPath);
-    const maxRaw = 525 * 1024;
-    const maxGzip = 155 * 1024;
+    // Keep the entry comfortably below Vite's 500 kB warning line so
+    // vendor growth cannot silently turn the initial bundle monolithic again.
+    const maxRaw = 300 * 1024;
+    const maxGzip = 90 * 1024;
     console.log(`[performance-budget] entry: ${kb(raw)} KB raw / ${kb(gzip)} KB gzip`);
     if (raw > maxRaw) fail(`Entry chunk exceeds ${kb(maxRaw)} KB raw budget.`);
     if (gzip > maxGzip) fail(`Entry chunk exceeds ${kb(maxGzip)} KB gzip budget.`);
@@ -232,7 +234,13 @@ if (fs.existsSync(assetDir)) {
   }
 
   const maxLazyChunkGzip = 90 * 1024;
+  const maxJsChunkRaw = 480 * 1024;
   for (const asset of jsAssets) {
+    const raw = fs.statSync(asset.path).size;
+    if (raw > maxJsChunkRaw) {
+      fail(`JavaScript chunk ${asset.name} exceeds ${kb(maxJsChunkRaw)} KB raw budget and would reintroduce the Vite large-chunk warning.`);
+    }
+
     if (moduleMatch && asset.path === toLocalPath(moduleMatch[1])) continue;
     const gzip = gzipBytes(asset.path);
     if (gzip > maxLazyChunkGzip) {
