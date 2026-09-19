@@ -103,7 +103,7 @@ export const DesktopLeftRail: React.FC = () => {
         >
           <BrandLogo
             id="rail-brand-logo"
-            size="md"
+            size="lg"
             className="transition-colors ui-radius-control px-1 py-1 w-full"
           />
         </Link>
