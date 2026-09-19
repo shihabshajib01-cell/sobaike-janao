@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SectionKey } from '../theme/tokens';
-import { VisitorSessionService, StoredLocation, LocationRequestResult } from '../services/visitorSessionService';
+import { VisitorSessionService, StoredLocation, LocationRequestResult, BROWSE_LOCATION_MAX_AGE_MS } from '../services/visitorSessionService';
 import { isValidReporterCoordinates } from '../services/types';
-import { IpLocationService, ApproximateIpLocation } from '../services/ipLocationService';
+import { IpLocationService, ApproximateIpLocation, IP_LOCATION_MAX_AGE_MS } from '../services/ipLocationService';
 
 export type RoutePath =
   | '/'
@@ -126,27 +126,72 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Global Browse Location State
   const [browseLocation, setBrowseLocation] = useState<BrowseLocation | null>(() => {
+    const choice = VisitorSessionService.getLocationChoice();
+    if (choice === 'not_now' || choice === 'denied') return null;
     const loc = VisitorSessionService.getLastRecordedLocation();
     return loc ? { ...loc, source: 'device' as const } : null;
   });
   const [browseLocationStatus, setBrowseLocationStatus] = useState<BrowseLocationStatus>('not_asked');
 
   const refreshBrowseLocation = useCallback(async () => {
+    const resolveApproximate = async (
+      failureStatus: BrowseLocationStatus
+    ): Promise<boolean> => {
+      const approximate = await IpLocationService.getApproximateLocation();
+      if (approximate) {
+        setBrowseLocation(approximate);
+        setBrowseLocationStatus('available');
+        return true;
+      }
+      setBrowseLocation(null);
+      setBrowseLocationStatus(failureStatus);
+      return false;
+    };
+
+    let choice = VisitorSessionService.getLocationChoice();
+
+    // "Not now" is authoritative: never silently upgrade it to precise GPS,
+    // even if the browser still has a previous geolocation grant.
+    if (choice === 'not_now') {
+      await resolveApproximate('not_now');
+      return;
+    }
+
     const loc = VisitorSessionService.getLastRecordedLocation();
-    if (loc && isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)) {
+    if (
+      choice !== 'denied' &&
+      loc &&
+      isValidReporterCoordinates(loc.latitude, loc.longitude, loc.accuracy)
+    ) {
       setBrowseLocation({ ...loc, source: 'device' });
       setBrowseLocationStatus('available');
       return;
     }
 
-    const choice = VisitorSessionService.getLocationChoice();
     const perm = await VisitorSessionService.queryPermissionStatus();
 
-    // If browser permission is already granted, retrieve device location silently.
-    // This never creates a permission prompt because we only enter this branch after
-    // the browser reports an existing grant.
+    // Re-read the persisted choice after async permission lookup so an explicit
+    // "Not now" made during this refresh cannot lose a race to silent GPS.
+    choice = VisitorSessionService.getLocationChoice();
+    if (choice === 'not_now') {
+      await resolveApproximate('not_now');
+      return;
+    }
+
+    // Existing browser grants may be restored silently. The service receives
+    // silent=true so an in-flight request cannot overwrite a newer Not now/deny.
     if (perm === 'granted') {
-      const deviceResult = await VisitorSessionService.requestAndRecordLocation('browse');
+      const deviceResult = await VisitorSessionService.requestAndRecordLocation(
+        'browse',
+        { silent: true }
+      );
+
+      choice = VisitorSessionService.getLocationChoice();
+      if (choice === 'not_now') {
+        await resolveApproximate('not_now');
+        return;
+      }
+
       if (deviceResult.success && deviceResult.coords) {
         setBrowseLocation({
           latitude: deviceResult.coords.latitude,
@@ -160,28 +205,44 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
-    // Do not perform IP geolocation on a first visit before the user has
-    // interacted with location. After any explicit browse-location choice,
-    // keep at least a coarse location for feed relevance. "Not now" means
-    // skip precise GPS, not opt out of approximate IP-based browsing.
-    if (choice === 'granted' || choice === 'denied' || choice === 'not_now') {
-      const approximate = await IpLocationService.getApproximateLocation();
-      if (approximate) {
-        setBrowseLocation(approximate);
-        setBrowseLocationStatus('available');
-        return;
-      }
+    choice = VisitorSessionService.getLocationChoice();
+
+    // If a previously willing/attempted visitor now has browser permission
+    // blocked, remember that state. A manual future browser grant can still
+    // upgrade back to device location through the permission observer.
+    if (
+      perm === 'denied' &&
+      choice !== null &&
+      choice !== 'not_now' &&
+      choice !== 'denied'
+    ) {
+      VisitorSessionService.setLocationChoice('denied');
+      choice = 'denied';
+    }
+
+    // After any explicit location interaction, always keep a coarse IP
+    // location available for browsing when precise device location cannot be
+    // restored. First-time undecided visitors never enter this branch.
+    if (
+      choice === 'granted' ||
+      choice === 'denied' ||
+      choice === 'ip_fallback'
+    ) {
+      const failureStatus: BrowseLocationStatus =
+        choice === 'denied'
+          ? 'denied'
+          : choice === 'granted'
+          ? 'granted_unavailable'
+          : 'unavailable';
+      await resolveApproximate(failureStatus);
+      return;
     }
 
     setBrowseLocation(null);
-    if (choice === 'not_now') {
-      setBrowseLocationStatus('not_now');
-    } else if (choice === 'denied' || perm === 'denied') {
-      setBrowseLocationStatus('denied');
-    } else if (perm === 'unavailable') {
+    if (perm === 'unavailable') {
       setBrowseLocationStatus('unavailable');
-    } else if (choice === 'granted') {
-      setBrowseLocationStatus('granted_unavailable');
+    } else if (perm === 'denied') {
+      setBrowseLocationStatus('denied');
     } else {
       setBrowseLocationStatus('not_asked');
     }
@@ -190,6 +251,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const retryBrowseLocation = useCallback(async (): Promise<LocationRequestResult> => {
     setBrowseLocationStatus('requesting');
     const result = await VisitorSessionService.requestAndRecordLocation('browse');
+
     if (result.success && result.coords) {
       setBrowseLocation({
         latitude: result.coords.latitude,
@@ -200,27 +262,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
       setBrowseLocationStatus('available');
       return result;
-    } else {
-      // The user explicitly tried to enable device location. If the browser
-      // denies it or GPS fails technically, fall back to coarse IP location for
-      // browsing only. This can never satisfy report submission.
-      const approximate = await IpLocationService.getApproximateLocation();
-      if (approximate) {
-        setBrowseLocation(approximate);
-        setBrowseLocationStatus('available');
-        return { ...result, browseFallback: 'ip' };
-      }
-
-      setBrowseLocation(null);
-      if (result.status === 'denied') {
-        setBrowseLocationStatus('denied');
-      } else if (result.errorType === 'timeout') {
-        setBrowseLocationStatus('error');
-      } else {
-        setBrowseLocationStatus('unavailable');
-      }
-      return result;
     }
+
+    // A technical GPS failure after an explicit user attempt is remembered as
+    // an IP-fallback preference. This prevents a new location nag on refresh,
+    // while still allowing a future browser grant to upgrade to device GPS.
+    if (result.status !== 'denied' && result.errorType !== 'denied') {
+      VisitorSessionService.setLocationChoice('ip_fallback');
+    }
+
+    const approximate = await IpLocationService.getApproximateLocation();
+    if (approximate) {
+      setBrowseLocation(approximate);
+      setBrowseLocationStatus('available');
+      return { ...result, browseFallback: 'ip' };
+    }
+
+    setBrowseLocation(null);
+    if (result.status === 'denied' || result.errorType === 'denied') {
+      setBrowseLocationStatus('denied');
+    } else if (result.errorType === 'timeout') {
+      setBrowseLocationStatus('error');
+    } else {
+      setBrowseLocationStatus('unavailable');
+    }
+    return result;
   }, []);
 
   useEffect(() => {
@@ -271,6 +337,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubscribeLifecycle();
     };
   }, [refreshBrowseLocation]);
+
+  // Context owns browse-location freshness. Device positions are refreshed on
+  // the device TTL; IP positions use their longer coarse-location TTL. Pages
+  // consume this state instead of applying a second, conflicting freshness rule.
+  useEffect(() => {
+    if (browseLocationStatus !== 'available' || !browseLocation) return;
+
+    const maxAgeMs =
+      browseLocation.source === 'ip'
+        ? IP_LOCATION_MAX_AGE_MS
+        : BROWSE_LOCATION_MAX_AGE_MS;
+    const ageMs = Math.max(0, Date.now() - browseLocation.timestamp);
+    const delayMs = Math.max(1000, maxAgeMs - ageMs + 250);
+
+    const timeoutId = window.setTimeout(() => {
+      void refreshBrowseLocation();
+    }, delayMs);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    browseLocation,
+    browseLocationStatus,
+    refreshBrowseLocation,
+  ]);
 
   const openLocationConsent = useCallback((
     purposeOrOptions?: LocationConsentPurpose | LocationConsentOptions | (() => void | Promise<void> | any),
