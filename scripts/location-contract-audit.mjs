@@ -14,6 +14,7 @@ const reminder = read('src/components/location/LocationReminderBar.tsx');
 const mapper = read('src/services/supabasePublicReportMapper.ts');
 const bootstrap = read('supabase/migrations/20260919072614_canonical_bangladesh_location_taxonomy.sql');
 const finalHardening = read('supabase/migrations/20260919082400_location_contract_final_hardening.sql');
+const invokerHardening = read('supabase/migrations/20260919082649_location_admin_rpc_invoker_hardening.sql');
 
 for (const needle of [
   'REPORTER_LOCATION_FALLBACK_MAX_AGE_MS = 5 * 60 * 1000',
@@ -79,6 +80,14 @@ for (const needle of [
   'bangladesh_districts_division_id_idx',
 ]) {
   requireText(finalHardening, needle, 'final location hardening migration');
+}
+for (const needle of [
+  'alter function public.admin_get_location_taxonomy() security invoker',
+  'alter function public.admin_resolve_news_intake_location(text,text) security invoker',
+  'from public, anon',
+  'to authenticated, service_role',
+]) {
+  requireText(invokerHardening, needle, 'Admin location RPC invoker hardening');
 }
 
 if (errors.length) {
