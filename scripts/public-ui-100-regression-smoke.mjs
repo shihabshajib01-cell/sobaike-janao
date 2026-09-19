@@ -177,6 +177,20 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     throw new Error(`Clicking report-card title did not open detail; got ${page.url()}`);
   }
 
+  await context.close();
+});
+
+await check('Report detail preserves the mobile back/share navigation contract', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const firstCard = page.locator('[id^="report-card-"]').first();
+  await expectVisible(firstCard, 'No report card found for mobile detail navigation check');
+  await firstCard.locator('a[href*="/report-detail/"]').first().click();
+  await page.waitForURL((url) => url.pathname.includes('/report-detail/'), { timeout: 10000 });
+
   await expectVisible(
     page.locator('#mobile-report-detail-back-btn'),
     'Report detail mobile back button missing'
@@ -191,6 +205,17 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   if ((await page.locator('#mobile-category-report').count()) !== 0) {
     throw new Error('Report detail incorrectly shows the category report action');
   }
+
+  await page.evaluate(() => window.scrollTo({ top: 700, behavior: 'instant' }));
+  await page.waitForTimeout(150);
+  await expectVisible(
+    page.locator('#mobile-report-detail-back-btn'),
+    'Report detail back button disappeared while scrolling'
+  );
+  await expectVisible(
+    page.locator('#mobile-report-detail-share-btn'),
+    'Report detail share button disappeared while scrolling'
+  );
 
   await context.close();
 });
@@ -242,7 +267,7 @@ await check('All seven category pages preserve the shared mobile navigation cont
     );
 
     const stepStatus = (await page.locator('#report-composer-step-status').innerText()).trim();
-    if (!/ধাপ\s*২|Step\s*2/i.test(stepStatus)) {
+    if (!/ধাপ\s*[২2]|Step\s*2/i.test(stepStatus)) {
       throw new Error(
         `${route} report composer did not start at category-selected step 2; got "${stepStatus}"`
       );
