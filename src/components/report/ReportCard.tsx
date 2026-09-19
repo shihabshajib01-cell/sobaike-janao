@@ -18,7 +18,7 @@ export interface ReportCardProps {
 
 const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"], [role="link"], [role="textbox"]';
 
-export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }) => {
+const ReportCardComponent: React.FC<ReportCardProps> = ({ report, className = '' }) => {
   const { language, navigateTo } = useApp();
   const [isCopied, setIsCopied] = useState(false);
   const [engagement, setEngagement] = useState<PublicEngagementCounts>(() => ({
@@ -202,3 +202,6 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, className = '' }
     </article>
   );
 };
+
+export const ReportCard = React.memo(ReportCardComponent);
+ReportCard.displayName = 'ReportCard';
