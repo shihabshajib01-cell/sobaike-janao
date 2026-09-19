@@ -45,7 +45,28 @@ if (fs.existsSync(reportCardSourcePath)) {
 }
 
 const homePageSourcePath = path.join(root, 'src', 'pages', 'HomePage.tsx');
-const indexCssSourcePath = path.join(root, 'src', 'index.css');
+const virtualFeedSourcePath = path.join(
+  root,
+  'src',
+  'components',
+  'report',
+  'VirtualizedReportFeed.tsx'
+);
+const taxonomySourcePath = path.join(root, 'src', 'services', 'taxonomyService.ts');
+const heroCarouselSourcePath = path.join(
+  root,
+  'src',
+  'components',
+  'home',
+  'ServiceHeroCarousel.tsx'
+);
+const heroBannerSourcePath = path.join(
+  root,
+  'src',
+  'components',
+  'category',
+  'CategoryHeroBanner.tsx'
+);
 if (fs.existsSync(homePageSourcePath)) {
   const homePageSource = fs.readFileSync(homePageSourcePath, 'utf8');
 
@@ -69,13 +90,63 @@ if (fs.existsSync(homePageSourcePath)) {
   }
 }
 
-if (fs.existsSync(indexCssSourcePath)) {
-  const indexCssSource = fs.readFileSync(indexCssSourcePath, 'utf8');
+if (fs.existsSync(virtualFeedSourcePath)) {
+  const virtualFeedSource = fs.readFileSync(virtualFeedSourcePath, 'utf8');
+  if (!virtualFeedSource.includes('data-virtualized-report-page')) {
+    fail('Home long-feed virtualization page markers are missing.');
+  }
+  if (!virtualFeedSource.includes('new IntersectionObserver(')) {
+    fail('Home virtualization must mount pages using IntersectionObserver.');
+  }
+  if (!virtualFeedSource.includes('new ResizeObserver(')) {
+    fail('Home virtualization must measure variable-height report pages.');
+  }
+  if (!virtualFeedSource.includes("data-mounted={isMounted ? 'true' : 'false'}")) {
+    fail('Home virtualization must expose mounted/unmounted page state.');
+  }
+  if (!virtualFeedSource.includes('height: \`\${placeholderHeight}px\`')) {
+    fail('Home virtualization must preserve measured placeholder height.');
+  }
+} else {
+  fail('VirtualizedReportFeed source is missing.');
+}
+
+if (fs.existsSync(reportCardSourcePath)) {
+  const reportCardSource = fs.readFileSync(reportCardSourcePath, 'utf8');
+  if (!reportCardSource.includes('React.memo(ReportCardComponent)')) {
+    fail('Feed ReportCard must stay memoized for append-only Home updates.');
+  }
+}
+
+if (fs.existsSync(mainSourcePath)) {
+  const mainSource = fs.readFileSync(mainSourcePath, 'utf8');
   if (
-    !indexCssSource.includes('.home-feed-render-window') ||
-    !indexCssSource.includes('content-visibility: auto')
+    !mainSource.includes('scheduleIdleTask') ||
+    !mainSource.includes("import('./services/bannerRuntime')")
   ) {
-    fail('Long Home feeds must keep off-screen report rendering containment.');
+    fail('Banner CMS hydration must stay outside the first-paint request burst.');
+  }
+}
+
+if (fs.existsSync(taxonomySourcePath)) {
+  const taxonomySource = fs.readFileSync(taxonomySourcePath, 'utf8');
+  if (
+    !taxonomySource.includes('scheduleTaxonomyFetch') ||
+    !taxonomySource.includes('scheduleIdleTask')
+  ) {
+    fail('Taxonomy network hydration must stay idle-scheduled.');
+  }
+}
+
+if (fs.existsSync(heroCarouselSourcePath) && fs.existsSync(heroBannerSourcePath)) {
+  const heroCarouselSource = fs.readFileSync(heroCarouselSourcePath, 'utf8');
+  const heroBannerSource = fs.readFileSync(heroBannerSourcePath, 'utf8');
+  if (
+    !heroCarouselSource.includes('shouldHydrateMedia') ||
+    !heroCarouselSource.includes('deferIllustration={!shouldHydrateMedia}') ||
+    !heroBannerSource.includes('data-hero-media-deferred')
+  ) {
+    fail('Home hero must hydrate only the active/neighbor media window.');
   }
 }
 
@@ -96,8 +167,8 @@ if (!moduleMatch) {
   } else {
     const raw = fs.statSync(entryPath).size;
     const gzip = gzipBytes(entryPath);
-    const maxRaw = 550 * 1024;
-    const maxGzip = 180 * 1024;
+    const maxRaw = 525 * 1024;
+    const maxGzip = 155 * 1024;
     console.log(`[performance-budget] entry: ${kb(raw)} KB raw / ${kb(gzip)} KB gzip`);
     if (raw > maxRaw) fail(`Entry chunk exceeds ${kb(maxRaw)} KB raw budget.`);
     if (gzip > maxGzip) fail(`Entry chunk exceeds ${kb(maxGzip)} KB gzip budget.`);
@@ -110,10 +181,40 @@ for (const match of cssMatches) {
   const cssPath = toLocalPath(match[1]);
   if (fs.existsSync(cssPath)) cssGzipTotal += gzipBytes(cssPath);
 }
-const maxCssGzip = 35 * 1024;
+const maxCssGzip = 26 * 1024;
 console.log(`[performance-budget] critical CSS: ${kb(cssGzipTotal)} KB gzip`);
 if (cssGzipTotal > maxCssGzip) {
   fail(`Critical CSS exceeds ${kb(maxCssGzip)} KB gzip budget.`);
+}
+
+
+const assetDir = path.join(distDir, 'assets');
+if (fs.existsSync(assetDir)) {
+  const jsAssets = fs.readdirSync(assetDir)
+    .filter((name) => name.endsWith('.js'))
+    .map((name) => ({
+      name,
+      path: path.join(assetDir, name),
+    }));
+
+  const supabaseChunk = jsAssets.find((asset) => /^supabase-.*\.js$/i.test(asset.name));
+  if (supabaseChunk) {
+    const gzip = gzipBytes(supabaseChunk.path);
+    const maxSupabaseGzip = 70 * 1024;
+    console.log(`[performance-budget] supabase chunk: ${kb(gzip)} KB gzip`);
+    if (gzip > maxSupabaseGzip) {
+      fail(`Supabase chunk exceeds ${kb(maxSupabaseGzip)} KB gzip budget.`);
+    }
+  }
+
+  const maxLazyChunkGzip = 90 * 1024;
+  for (const asset of jsAssets) {
+    if (moduleMatch && asset.path === toLocalPath(moduleMatch[1])) continue;
+    const gzip = gzipBytes(asset.path);
+    if (gzip > maxLazyChunkGzip) {
+      fail(`Lazy chunk ${asset.name} exceeds ${kb(maxLazyChunkGzip)} KB gzip budget.`);
+    }
+  }
 }
 
 const heroDir = path.join(root, 'public', 'illustrations', 'services');
@@ -126,7 +227,7 @@ if (fs.existsSync(heroDir)) {
     }))
     .sort((a, b) => b.bytes - a.bytes);
 
-  const maxHeroBytes = 250 * 1024;
+  const maxHeroBytes = 220 * 1024;
   const largest = heroFiles[0];
   if (largest) {
     console.log(`[performance-budget] largest service hero: ${largest.name} (${kb(largest.bytes)} KB)`);
@@ -147,9 +248,11 @@ if (fs.existsSync(migrationsDir)) {
 
   let latestHomeFeedMigration = null;
   let latestHomeFeedSource = '';
+  let allMigrationSource = '';
 
   for (const name of migrationFiles) {
     const source = fs.readFileSync(path.join(migrationsDir, name), 'utf8');
+    allMigrationSource += '\n' + source;
     if (/create\s+or\s+replace\s+function\s+public\.get_public_home_feed_page\s*\(/i.test(source)) {
       latestHomeFeedMigration = name;
       latestHomeFeedSource = source;
@@ -177,8 +280,35 @@ if (fs.existsSync(migrationsDir)) {
       );
     }
 
-    if (!/idx_complaints_public_feed_geo/i.test(latestHomeFeedSource)) {
+    if (!/idx_complaints_public_feed_geo/i.test(allMigrationSource)) {
       fail('The public Home feed spatial index migration is missing.');
+    }
+
+    if (/lower\s*\(\s*coalesce\s*\(\s*c\.district/i.test(latestHomeFeedSource)) {
+      fail('Home district filters must match the lower(district) feed indexes exactly.');
+    }
+
+    if (
+      /coalesce\s*\(\s*c\.public_view_count\s*,\s*0\s*\)/i.test(latestHomeFeedSource) ||
+      /coalesce\s*\(\s*c\.public_share_count\s*,\s*0\s*\)/i.test(latestHomeFeedSource)
+    ) {
+      fail('Home popularity ordering must not hide NOT NULL engagement columns behind COALESCE.');
+    }
+
+    const indexAlignmentMigration = path.join(
+      migrationsDir,
+      '20260919101933_finish_home_feed_scale_guards.sql'
+    );
+    if (!fs.existsSync(indexAlignmentMigration)) {
+      fail('Home feed index-alignment migration is missing.');
+    } else {
+      const indexAlignmentSource = fs.readFileSync(indexAlignmentMigration, 'utf8');
+      if (
+        !indexAlignmentSource.includes('idx_complaints_public_feed_popular') ||
+        !indexAlignmentSource.includes("date_trunc('second', created_at at time zone 'UTC')")
+      ) {
+        fail('Popular Home feed index must match the production ranking order.');
+      }
     }
 
     if (!process.exitCode) {
