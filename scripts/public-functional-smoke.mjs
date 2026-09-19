@@ -105,6 +105,142 @@ await check('First-visit responsibility -> location -> Not now flow', async () =
   await context.close();
 });
 
+await check('Stored Not now remains IP-only even when browser permission is already granted', async () => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    geolocation: { latitude: 23.7806, longitude: 90.4070 },
+  });
+  await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.setItem('sobaike_location_choice_v1', 'not_now');
+  });
+
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-not-now-pregranted');
+  const ipFallbackResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/functions/v1/public-ip-location') &&
+      response.request().method() === 'GET',
+    { timeout: 10000 }
+  ).catch(() => null);
+
+  await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const ipResponse = await ipFallbackResponse;
+  if (!ipResponse || !ipResponse.ok()) {
+    throw new Error('stored Not now did not use approximate IP location');
+  }
+
+  await page.waitForTimeout(500);
+  const choice = await page.evaluate(() => localStorage.getItem('sobaike_location_choice_v1'));
+  if (choice !== 'not_now') {
+    throw new Error(`stored Not now was silently upgraded to ${choice}`);
+  }
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('stored Not now should not show the location reminder');
+  }
+  await context.close();
+});
+
+await check('Escape from browse location prompt behaves exactly like Not now', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.removeItem('sobaike_location_choice_v1');
+  });
+
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-escape');
+  await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#location-reminder-bar'), 'location reminder missing before Escape test');
+  await page.locator('#location-reminder-turn-on-btn').click();
+  const locationModal = page.locator('#location-consent-modal');
+  await expectVisible(locationModal, 'location modal missing before Escape test');
+
+  const ipFallbackResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/functions/v1/public-ip-location') &&
+      response.request().method() === 'GET',
+    { timeout: 10000 }
+  ).catch(() => null);
+
+  await page.keyboard.press('Escape');
+  await locationModal.waitFor({ state: 'hidden', timeout: 10000 });
+  const ipResponse = await ipFallbackResponse;
+  if (!ipResponse || !ipResponse.ok()) {
+    throw new Error('Escape did not establish approximate IP browse location');
+  }
+
+  const choice = await page.evaluate(() => localStorage.getItem('sobaike_location_choice_v1'));
+  if (choice !== 'not_now') {
+    throw new Error(`Escape should persist Not now; got ${choice}`);
+  }
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(350);
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('location reminder returned after Escape/Not now refresh');
+  }
+  await context.close();
+});
+
+await check('Technical GPS failure persists IP fallback and does not nag on refresh', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.removeItem('sobaike_location_choice_v1');
+
+    const geolocation = navigator.geolocation;
+    if (geolocation) {
+      geolocation.getCurrentPosition = (_success, error) => {
+        window.setTimeout(() => {
+          error?.({
+            code: 2,
+            PERMISSION_DENIED: 1,
+            POSITION_UNAVAILABLE: 2,
+            TIMEOUT: 3,
+            message: 'simulated position unavailable',
+          });
+        }, 0);
+      };
+    }
+  });
+
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-technical-fallback');
+  await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#location-reminder-bar'), 'location reminder missing before fallback test');
+  await page.locator('#location-reminder-turn-on-btn').click();
+  const locationModal = page.locator('#location-consent-modal');
+  await expectVisible(locationModal, 'location modal missing before fallback test');
+
+  const ipFallbackResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/functions/v1/public-ip-location') &&
+      response.request().method() === 'GET',
+    { timeout: 10000 }
+  ).catch(() => null);
+
+  await page.locator('#location-consent-primary-btn').click();
+  await locationModal.waitFor({ state: 'hidden', timeout: 10000 });
+  const ipResponse = await ipFallbackResponse;
+  if (!ipResponse || !ipResponse.ok()) {
+    throw new Error('technical GPS failure did not establish IP fallback');
+  }
+
+  const choice = await page.evaluate(() => localStorage.getItem('sobaike_location_choice_v1'));
+  if (choice !== 'ip_fallback') {
+    throw new Error(`technical GPS fallback should persist ip_fallback; got ${choice}`);
+  }
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(500);
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('technical GPS fallback caused the location reminder to return after refresh');
+  }
+  await context.close();
+});
+
 await check('Returning denied-location visitor is not nagged after refresh', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
