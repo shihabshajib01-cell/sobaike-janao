@@ -384,6 +384,7 @@ export const VisitorSessionService = {
           if (error.code === error.PERMISSION_DENIED) {
             status = 'denied';
             errorType = 'denied';
+            this.setLocationChoice('not_now');
             this.clearMemoryLocation();
           } else if (error.code === error.TIMEOUT) {
             status = 'unavailable';
@@ -427,6 +428,7 @@ export const VisitorSessionService = {
 
     const perm = await this.queryPermissionStatus();
     if (perm === 'denied') {
+      this.setLocationChoice('not_now');
       this.clearMemoryLocation();
       await this.recordSession('denied');
       return;
@@ -621,6 +623,7 @@ export const VisitorSessionService = {
           if (!active) return;
           const newState = status.state as PermissionStatus;
           if (newState === 'denied') {
+            this.setLocationChoice('not_now');
             this.clearMemoryLocation();
           }
           onChange(newState);
