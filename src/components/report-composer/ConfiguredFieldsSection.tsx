@@ -480,7 +480,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 </div>
 
                 {error ? (
-                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                  <p id={fieldErrorId} role="alert" className="type-helper text-ui-error-text">
                     {error}
                   </p>
                 ) : null}
@@ -544,7 +544,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 />
 
                 {error ? (
-                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                  <p id={fieldErrorId} role="alert" className="type-helper text-ui-error-text">
                     {error}
                   </p>
                 ) : null}
@@ -694,7 +694,7 @@ export const ConfiguredFieldsSection = forwardRef<
                 </div>
 
                 {error ? (
-                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                  <p id={fieldErrorId} role="alert" className="type-helper text-ui-error-text">
                     {error}
                   </p>
                 ) : null}
@@ -801,7 +801,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   descriptionId={!error && helper ? fieldHelperId : undefined}
                 />
                 {error ? (
-                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                  <p id={fieldErrorId} role="alert" className="type-helper text-ui-error-text">
                     {error}
                   </p>
                 ) : null}
@@ -851,7 +851,7 @@ export const ConfiguredFieldsSection = forwardRef<
                   })}
                 </div>
                 {error ? (
-                  <p id={fieldErrorId} role="alert" className="type-helper text-role-validation">
+                  <p id={fieldErrorId} role="alert" className="type-helper text-ui-error-text">
                     {error}
                   </p>
                 ) : helper ? (
