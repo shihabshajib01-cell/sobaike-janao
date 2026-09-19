@@ -133,7 +133,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
               </div>
 
               <div className="min-w-0 flex-1">
-                <h4 className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary">
+                <h4 className="type-h4 text-ui-content-primary">
                   {language === 'bn' ? srv.titleBn : srv.titleEn}
                 </h4>
                 <p className="type-helper text-ui-content-secondary mt-0.5 truncate">
@@ -206,10 +206,10 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                     </div>
 
                     <div>
-                      <h4 className="type-label font-[var(--font-weight-bold)] text-ui-content-primary leading-snug">
+                      <h4 className="type-h4 text-ui-content-primary">
                         {language === 'bn' ? cs.nameBn : cs.nameEn}
                       </h4>
-                      <p className="type-compact leading-relaxed text-ui-content-secondary mt-1">
+                      <p className="type-compact text-ui-content-secondary mt-1">
                         {language === 'bn' ? cs.descriptionBn : cs.descriptionEn}
                       </p>
                     </div>
@@ -235,7 +235,7 @@ export const Step1ServiceSelect: React.FC<Step1ServiceSelectProps> = ({
                     {language === 'bn' ? activeComingSoonData.badgeBn : activeComingSoonData.badgeEn}
                   </span>
                 </div>
-                <p className="type-compact text-ui-content-secondary leading-relaxed">
+                <p className="type-compact text-ui-content-secondary">
                   {language === 'bn'
                     ? 'এই রিপোর্টিং সেবাটি প্রস্তুত করা হচ্ছে এবং এখনো চালু হয়নি। অনুগ্রহ করে চালুকৃত সেবা নির্বাচন করুন অথবা বিস্তারিত দেখুন।'
                     : 'This reporting service is being prepared and is not available yet. Please select an active service or read more details.'}
