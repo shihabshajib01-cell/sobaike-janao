@@ -1201,7 +1201,22 @@
 }
 
 .hero-slider-cta-row {
-  display: none !important;
+  display: none;
+  padding-top: var(--hero-slider-cta-top-tablet);
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .hero-slider-cta-row {
+    display: flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-slider-cta-row {
+    display: none;
+  }
 }
 
 .hero-slider-mobile-cta {
