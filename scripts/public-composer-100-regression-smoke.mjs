@@ -157,6 +157,14 @@ try {
   // Close cleanly without submitting anything.
   await page.locator('#report-composer-close-btn').click();
   await expectVisible(page.locator('#report-cancel-confirm-modal'), 'cancel confirmation missing from review step');
+  await page.waitForFunction(() => {
+    const dialog = document.querySelector(
+      '#report-cancel-confirm-modal > [data-modal-dialog="true"]'
+    );
+    if (!(dialog instanceof HTMLElement)) return false;
+    const rect = dialog.getBoundingClientRect();
+    return Math.abs(rect.bottom - window.innerHeight) <= 2;
+  }, null, { timeout: 3000 });
 
   const cancelRootBox = await page.locator('#report-cancel-confirm-modal').boundingBox();
   const cancelSheetBox = await page
