@@ -43,6 +43,42 @@ if (fs.existsSync(reportCardSourcePath)) {
     fail('ReportCard must not import or mount hidden media-grid code.');
   }
 }
+
+const homePageSourcePath = path.join(root, 'src', 'pages', 'HomePage.tsx');
+const indexCssSourcePath = path.join(root, 'src', 'index.css');
+if (fs.existsSync(homePageSourcePath)) {
+  const homePageSource = fs.readFileSync(homePageSourcePath, 'utf8');
+
+  if (!homePageSource.includes('const HOME_FEED_PAGE_SIZE = 10')) {
+    fail('Home infinite feed must keep the bounded 10-report page size.');
+  }
+  if (!homePageSource.includes('new IntersectionObserver(')) {
+    fail('Home infinite feed must use IntersectionObserver instead of scroll polling.');
+  }
+  if (!homePageSource.includes('loadMoreInFlightRef.current')) {
+    fail('Home infinite feed must guard against duplicate concurrent page requests.');
+  }
+  if (!homePageSource.includes('feedGenerationRef.current')) {
+    fail('Home infinite feed must reject stale page responses after feed/filter changes.');
+  }
+  if (!homePageSource.includes('home-infinite-feed-sentinel')) {
+    fail('Home infinite feed sentinel is missing.');
+  }
+  if (homePageSource.includes('home-load-more-button')) {
+    fail('Manual Home load-more button must not return; pagination is automatic.');
+  }
+}
+
+if (fs.existsSync(indexCssSourcePath)) {
+  const indexCssSource = fs.readFileSync(indexCssSourcePath, 'utf8');
+  if (
+    !indexCssSource.includes('.home-feed-render-window') ||
+    !indexCssSource.includes('content-visibility: auto')
+  ) {
+    fail('Long Home feeds must keep off-screen report rendering containment.');
+  }
+}
+
 const toLocalPath = (url) => {
   const clean = url.split('?')[0].split('#')[0].replace(/^\.?\//, '').replace(/^\//, '');
   return path.join(distDir, clean);
