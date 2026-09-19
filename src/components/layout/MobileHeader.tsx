@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, Filter, Menu, Search, Share2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PublicEngagementService } from '../../services/publicEngagementService';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { BrandLogo } from '../branding/BrandLogo';
 import { IconButton } from '../ui/IconButton';
+import { AppIcon } from '../ui/AppIcon';
 import { SECTIONS } from '../../theme/tokens';
 
 const REPORT_DETAIL_PREFIX = '/report-detail/';
@@ -71,6 +71,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const directionDistanceRef = useRef(0);
   const frameRef = useRef<number | null>(null);
   const transitionLockUntilRef = useRef(0);
+  const isCompactRef = useRef(isCompact);
+  const interactionBlockedRef = useRef(false);
   const { segments } = useTaxonomy();
   const localizePath = (path: string) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -98,20 +100,42 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     isReportComposerOpen ||
     isLocationModalOpen;
 
+  const updateCompactState = useCallback(
+    (nextCompact: boolean) => {
+      if (isCompactRef.current === nextCompact) return;
+      isCompactRef.current = nextCompact;
+      onCompactChange(nextCompact);
+    },
+    [onCompactChange]
+  );
+
   useEffect(() => {
+    isCompactRef.current = isCompact;
+  }, [isCompact]);
+
+  useEffect(() => {
+    interactionBlockedRef.current = isHeaderInteractionBlocked;
+    transitionLockUntilRef.current = 0;
+
     if (!shouldUseAdaptiveHeader || isHeaderInteractionBlocked) {
-      onCompactChange(false);
+      updateCompactState(false);
     }
 
     lastScrollYRef.current = window.scrollY;
     directionRef.current = null;
     directionDistanceRef.current = 0;
-  }, [currentRoute, isHeaderInteractionBlocked, onCompactChange, shouldUseAdaptiveHeader]);
+  }, [
+    currentRoute,
+    isHeaderInteractionBlocked,
+    shouldUseAdaptiveHeader,
+    updateCompactState,
+  ]);
 
   useEffect(() => {
     if (!shouldUseAdaptiveHeader) return;
 
     const mobileMedia = window.matchMedia('(max-width: 767px)');
+    const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const resetScrollTracking = () => {
       lastScrollYRef.current = window.scrollY;
@@ -119,9 +143,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       directionDistanceRef.current = 0;
     };
 
+    const transitionLockMs = () =>
+      reducedMotionMedia.matches ? 0 : MOBILE_CHROME_TRANSITION_LOCK_MS;
+
     if (!mobileMedia.matches) {
       transitionLockUntilRef.current = 0;
-      onCompactChange(false);
+      updateCompactState(false);
     }
     resetScrollTracking();
 
@@ -130,7 +157,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
       if (!mobileMedia.matches) {
         resetScrollTracking();
-        onCompactChange(false);
+        updateCompactState(false);
         return;
       }
 
@@ -138,11 +165,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       const delta = currentScrollY - lastScrollYRef.current;
       lastScrollYRef.current = currentScrollY;
 
-      if (isHeaderInteractionBlocked || hasTextInputFocus()) {
+      if (interactionBlockedRef.current || hasTextInputFocus()) {
         transitionLockUntilRef.current = 0;
         directionRef.current = null;
         directionDistanceRef.current = 0;
-        onCompactChange(false);
+        updateCompactState(false);
         return;
       }
 
@@ -158,8 +185,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         directionRef.current = null;
         directionDistanceRef.current = 0;
 
-        if (!isCompact || delta < -MOBILE_HEADER_SCROLL_EPSILON) {
-          onCompactChange(false);
+        if (isCompactRef.current || delta < -MOBILE_HEADER_SCROLL_EPSILON) {
+          updateCompactState(false);
         }
         return;
       }
@@ -179,18 +206,18 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         currentScrollY >= MOBILE_HEADER_HIDE_SCROLL_Y &&
         directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
       ) {
-        if (!isCompact) {
-          transitionLockUntilRef.current = now + MOBILE_CHROME_TRANSITION_LOCK_MS;
-          onCompactChange(true);
+        if (!isCompactRef.current) {
+          transitionLockUntilRef.current = now + transitionLockMs();
+          updateCompactState(true);
         }
         directionDistanceRef.current = 0;
       } else if (
         nextDirection === 'up' &&
         directionDistanceRef.current >= MOBILE_HEADER_DIRECTION_THRESHOLD
       ) {
-        if (isCompact) {
-          transitionLockUntilRef.current = now + MOBILE_CHROME_TRANSITION_LOCK_MS;
-          onCompactChange(false);
+        if (isCompactRef.current) {
+          transitionLockUntilRef.current = now + transitionLockMs();
+          updateCompactState(false);
         }
         directionDistanceRef.current = 0;
       }
@@ -205,26 +232,33 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       transitionLockUntilRef.current = 0;
       resetScrollTracking();
       if (!mobileMedia.matches) {
-        onCompactChange(false);
+        updateCompactState(false);
       }
+    };
+
+    const handleReducedMotionChange = () => {
+      transitionLockUntilRef.current = 0;
+      resetScrollTracking();
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     mobileMedia.addEventListener('change', handleMediaChange);
+    reducedMotionMedia.addEventListener('change', handleReducedMotionChange);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       mobileMedia.removeEventListener('change', handleMediaChange);
+      reducedMotionMedia.removeEventListener('change', handleReducedMotionChange);
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);
         frameRef.current = null;
       }
     };
-  }, [isCompact, isHeaderInteractionBlocked, onCompactChange, shouldUseAdaptiveHeader]);
+  }, [shouldUseAdaptiveHeader, updateCompactState]);
 
   const handleAdaptiveNavigation = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (!isPrimaryUnmodifiedNavigation(event)) return;
-    onCompactChange(false);
+    updateCompactState(false);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   };
 
@@ -287,7 +321,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               aria-label={language === 'bn' ? 'পেছনে ফিরে যান' : 'Go back'}
               data-mobile-floating-control={isCompact ? 'true' : undefined}
               className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
-              icon={<ArrowLeft className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
+              icon={<AppIcon name="arrow-left" size="xl" strokeWidth={2} />}
             />
 
             <p
@@ -317,9 +351,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
               icon={
                 isShareConfirmed ? (
-                  <Check className="h-6 w-6 stroke-[2] text-ui-success-text" aria-hidden="true" />
+                  <AppIcon name="check" size="xl" strokeWidth={2} className="text-ui-success-text" />
                 ) : (
-                  <Share2 className="h-6 w-6 stroke-[2]" aria-hidden="true" />
+                  <AppIcon name="share" size="xl" strokeWidth={2} />
                 )
               }
             />
@@ -356,7 +390,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               aria-label={language === 'bn' ? 'বিষয়সমূহে ফিরে যান' : 'Back to issues'}
               data-mobile-floating-control={isCompact ? 'true' : undefined}
               className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
-              icon={<ArrowLeft className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
+              icon={<AppIcon name="arrow-left" size="xl" strokeWidth={2} />}
             />
 
             <p
@@ -378,7 +412,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 aria-haspopup="dialog"
                 data-mobile-floating-control={isCompact ? 'true' : undefined}
                 className={`${isCompact ? 'pointer-events-auto !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md' : ''} transition-[transform,background-color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none`}
-                icon={<Filter className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
+                icon={<AppIcon name="filter" size="xl" strokeWidth={2} />}
               />
             ) : (
               <div
@@ -422,7 +456,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 tabIndex={isCompact ? -1 : undefined}
                 aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
                 className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
-                icon={<Menu className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
+                icon={<AppIcon name="menu" size="xl" strokeWidth={2} />}
               />
 
               <Link
@@ -448,7 +482,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
               className="inline-flex w-12 h-12 min-w-[48px] min-h-[48px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
-              <Search className="h-6 w-6 stroke-[2]" aria-hidden="true" />
+              <AppIcon name="search" size="xl" strokeWidth={2} />
             </Link>
           </div>
         </header>
@@ -461,7 +495,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         inert={!isCompact ? true : undefined}
         className={`md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4 transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
-            ? 'translate-y-0 opacity-100 delay-[60ms]'
+            ? 'translate-y-0 opacity-100 delay-[60ms] motion-reduce:delay-0 motion-reduce:delay-0'
             : '-translate-y-6 opacity-0 delay-0 mobile-chrome-hide-after-transition'
         }`}
       >
@@ -475,9 +509,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
             data-mobile-floating-control="true"
             className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
-              isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
+              isCompact ? 'scale-100 delay-[60ms] motion-reduce:delay-0 motion-reduce:delay-0' : 'scale-90 delay-0 motion-reduce:delay-0'
             }`}
-            icon={<Menu className="h-6 w-6 stroke-[2]" aria-hidden="true" />}
+            icon={<AppIcon name="menu" size="xl" strokeWidth={2} />}
           />
 
           <Link
@@ -487,11 +521,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
             data-mobile-floating-control="true"
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-12 h-12 min-w-[48px] min-h-[48px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-12 h-12 min-w-[48px] min-h-[48px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              isCompact ? 'scale-100 delay-[60ms] motion-reduce:delay-0 motion-reduce:delay-0' : 'scale-90 delay-0 motion-reduce:delay-0'
             }`}
           >
-            <Search className="h-6 w-6 stroke-[2]" aria-hidden="true" />
+            <AppIcon name="search" size="xl" strokeWidth={2} />
           </Link>
         </div>
       </nav>
