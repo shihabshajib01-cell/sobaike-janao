@@ -154,21 +154,23 @@ try {
   const submitBox = await submit.boundingBox();
   if (!submitBox || submitBox.height < 44) throw new Error('Step 4 submit action is below 44px minimum target');
 
-  // Controlled submission-failure test. Intercept the Supabase submission RPC so
-  // production never receives this regression report, then verify retry safety.
+  // Controlled submission-failure test. Intercept the public-write Edge gateway
+  // before it reaches production, then verify recoverable error and retry safety.
   const submissionBodies = [];
-  await page.route('**/rest/v1/rpc/submit_public_complaint_v2', async (route) => {
+  const publicWriteRoute = '**/functions/v1/public-write-gateway';
+  await page.route(publicWriteRoute, async (route) => {
     try {
       submissionBodies.push(JSON.parse(route.request().postData() || '{}'));
     } catch {
       submissionBodies.push({});
     }
     await route.fulfill({
-      status: 500,
+      status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
+        success: false,
         code: 'TEST_FAILURE',
-        message: 'Forced non-destructive regression failure',
+        error: 'Forced non-destructive regression failure',
       }),
     });
   });
@@ -201,15 +203,22 @@ try {
     throw new Error(`expected two intercepted submission attempts after retry, found ${submissionBodies.length}`);
   }
 
-  const firstId = submissionBodies[0]?.p_client_submission_id || '';
-  const retryId = submissionBodies[1]?.p_client_submission_id || '';
+  if (
+    submissionBodies.some(
+      (body) => body?.action !== 'complaint' || body?.submissionRpc !== 'submit_public_complaint_v2'
+    )
+  ) {
+    throw new Error(`submission retry did not use the expected complaint gateway contract: ${JSON.stringify(submissionBodies)}`);
+  }
+  const firstId = submissionBodies[0]?.clientSubmissionId || '';
+  const retryId = submissionBodies[1]?.clientSubmissionId || '';
   if (!firstId || firstId !== retryId) {
     throw new Error(`submission retry did not preserve the idempotency key: first=${firstId || 'missing'} retry=${retryId || 'missing'}`);
   }
   if (await submit.isDisabled()) {
     throw new Error('submit action remained disabled after recoverable server failure');
   }
-  await page.unroute('**/rest/v1/rpc/submit_public_complaint_v2');
+  await page.unroute(publicWriteRoute);
 
   // Close cleanly without submitting anything.
   await page.locator('#report-composer-close-btn').click();
