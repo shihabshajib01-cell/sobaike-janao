@@ -161,7 +161,9 @@ const representativePaths = [
   {
     segment: 'rickshaw',
     subcategory: 'charging-station-location',
-    expectedAny: ['#operator-subject-name', '#composer-section-configured-fields'],
+    expectedAny: ['#composer-section-parties'],
+    expandSelector: '#composer-section-parties-header',
+    expectedAfterExpand: '#operator-subject-name',
   },
 ];
 
@@ -179,6 +181,17 @@ await check('Representative category-specific form paths render without runtime 
     if (!matches.some(Boolean)) {
       throw new Error(
         `${testCase.segment}/${testCase.subcategory}: expected active form surface missing (${testCase.expectedAny.join(', ')})`
+      );
+    }
+    if (testCase.expandSelector && testCase.expectedAfterExpand) {
+      const toggle = page.locator(testCase.expandSelector);
+      await expectVisible(toggle, `${testCase.segment}/${testCase.subcategory}: optional section toggle missing`);
+      if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+        await toggle.click();
+      }
+      await expectVisible(
+        page.locator(testCase.expectedAfterExpand),
+        `${testCase.segment}/${testCase.subcategory}: expanded optional form field missing`
       );
     }
     await assertComposerGeometry(page, `${testCase.segment}/${testCase.subcategory}`);
