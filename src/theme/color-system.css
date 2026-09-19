@@ -600,7 +600,7 @@ html[data-theme="dark"],
   --md-primary-variant: var(--product-primary-variant);
   --md-primary-active: var(--product-primary-active);
   --md-on-primary: var(--product-on-primary);
-  --md-focus: #3A7CA5;
+  --md-focus: var(--product-focus);
 
   --ui-primary-action-bg: var(--product-primary);
   --ui-primary-action-hover: var(--product-primary-variant);
