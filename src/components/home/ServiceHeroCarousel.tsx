@@ -142,8 +142,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isMultiSlide) return;
-
     const target = e.target as HTMLElement | null;
     if (target && target !== sliderRef.current) {
       const isInteractive =
@@ -154,6 +152,18 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         return;
       }
     }
+
+    if (e.key === 'Enter' && target === sliderRef.current) {
+      const activeSlide = slides[safeIndex];
+      const targetRoute = activeSlide ? segments[activeSlide.key]?.slug : null;
+      if (targetRoute) {
+        e.preventDefault();
+        navigateTo(targetRoute);
+      }
+      return;
+    }
+
+    if (!isMultiSlide) return;
 
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
@@ -292,6 +302,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             : 'Service highlights hero banner'
         }
         tabIndex={0}
+        aria-keyshortcuts="Enter ArrowLeft ArrowRight"
         onKeyDown={handleKeyDown}
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
