@@ -1355,19 +1355,19 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         footer={
           <ModalActions
             primary={{
-              id: 'report-cancel-btn',
-              type: 'button',
-              variant: 'destructive',
-              size: 'md',
-              onClick: handleCancelReport,
-              label: language === 'bn' ? 'প্রতিবেদন বাতিল করুন' : 'Cancel reporting',
-            }}
-            secondary={{
               id: 'report-continue-editing-btn',
               type: 'button',
               size: 'md',
               onClick: handleContinueEditing,
               label: language === 'bn' ? 'সম্পাদনা চালিয়ে যান' : 'Continue editing',
+            }}
+            secondary={{
+              id: 'report-cancel-btn',
+              type: 'button',
+              variant: 'outline',
+              size: 'md',
+              onClick: handleCancelReport,
+              label: language === 'bn' ? 'প্রতিবেদন বাতিল করুন' : 'Cancel reporting',
             }}
           />
         }
