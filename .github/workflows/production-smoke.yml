@@ -394,6 +394,28 @@ jobs:
             exit 1
           fi
 
+          legacy_view_code=$(call_rpc \
+            track_public_report_view_v2 \
+            '{"p_report_id":"__security_test__","p_visitor_id":"00000000-0000-4000-8000-000000000001"}' \
+            /tmp/legacy-view-v2.json)
+
+          if ! grep -qi "permission denied" /tmp/legacy-view-v2.json; then
+            echo "ERROR: legacy track_public_report_view_v2 is anonymously callable (HTTP $legacy_view_code)"
+            cat /tmp/legacy-view-v2.json
+            exit 1
+          fi
+
+          legacy_share_code=$(call_rpc \
+            track_public_report_share_v2 \
+            '{"p_report_id":"__security_test__","p_visitor_id":"00000000-0000-4000-8000-000000000001"}' \
+            /tmp/legacy-share-v2.json)
+
+          if ! grep -qi "permission denied" /tmp/legacy-share-v2.json; then
+            echo "ERROR: legacy track_public_report_share_v2 is anonymously callable (HTTP $legacy_share_code)"
+            cat /tmp/legacy-share-v2.json
+            exit 1
+          fi
+
           helper_code=$(call_rpc \
             can_upload_public_evidence \
             '{"p_storage_path":"public-submissions/security-test/file.webp"}' \
