@@ -489,33 +489,31 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               : 'translate-y-0 opacity-100'
           }`}
         >
-          <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <IconButton
-                id="mobile-header-menu-btn"
-                variant="outline"
-                size="lg"
-                onClick={() => setIsTabletMenuOpen(true)}
-                tabIndex={isCompact ? -1 : undefined}
-                aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-                className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
-                icon={<AppIcon name="menu" size="xl" strokeWidth={2} />}
-              />
+          <div className="grid h-14 max-w-full grid-cols-[48px_minmax(0,1fr)_48px] items-center gap-2 px-3 sm:px-4">
+            <IconButton
+              id="mobile-header-menu-btn"
+              variant="outline"
+              size="lg"
+              onClick={() => setIsTabletMenuOpen(true)}
+              tabIndex={isCompact ? -1 : undefined}
+              aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
+              className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
+              icon={<AppIcon name="menu" size="xl" strokeWidth={2} />}
+            />
 
-              <Link
-                to={localizePath('/')}
-                onClick={handleAdaptiveNavigation}
-                tabIndex={isCompact ? -1 : undefined}
-                aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
-                className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
-                <BrandLogo
-                  id="mobile-header-brand-logo"
-                  size="sm"
-                  showEnglish={false}
-                />
-              </Link>
-            </div>
+            <Link
+              to={localizePath('/')}
+              onClick={handleAdaptiveNavigation}
+              tabIndex={isCompact ? -1 : undefined}
+              aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
+              className="min-w-0 justify-self-center rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+            >
+              <BrandLogo
+                id="mobile-header-brand-logo"
+                size="md"
+                showEnglish={false}
+              />
+            </Link>
 
             <Link
               id="mobile-header-search-btn"
