@@ -44,6 +44,7 @@ export interface LocationRequestResult {
   success: boolean;
   status: PermissionStatus;
   errorType?: 'denied' | 'timeout' | 'unavailable' | 'invalid_coordinates';
+  browseFallback?: 'ip';
   coords?: {
     latitude: number;
     longitude: number;
