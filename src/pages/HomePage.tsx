@@ -169,8 +169,12 @@ export const HomePage: React.FC = () => {
   }, [feedFilter, selectedDistrict, visitorLat, visitorLng]);
 
   useEffect(() => {
+    // AppContext performs one authoritative location restoration pass on mount.
+    // Avoid fetching an unranked page that is immediately discarded/reloaded
+    // when persisted device/IP location becomes available.
+    if (browseLocationStatus === 'requesting') return;
     void loadReports();
-  }, [loadReports]);
+  }, [browseLocationStatus, loadReports]);
 
   useEffect(() => {
     if (isLoading || fetchError || feedWatermark) return;
