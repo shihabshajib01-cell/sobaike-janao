@@ -355,6 +355,17 @@ requireContains(
   'Modal must call useApp unconditionally in accordance with Hooks rules'
 );
 
+requireContains(
+  'src/components/report-composer/ReportComposerModal.tsx',
+  'el.focus({ preventScroll: true });',
+  'nested report confirmation focus must not scroll the mobile visual viewport'
+);
+requireNotContains(
+  'src/components/report-composer/ReportComposerModal.tsx',
+  'el.focus();',
+  'nested report confirmation must not use scrolling focus that can displace mobile sheets'
+);
+
 const approvedHeaderlessModalIds = new Set(['report-composer-modal']);
 
 for (const root of [path.resolve(ROOT, 'src/components'), path.resolve(ROOT, 'src/pages')]) {

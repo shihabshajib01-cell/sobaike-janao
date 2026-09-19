@@ -106,7 +106,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const timer = setTimeout(() => {
         const el = document.getElementById('report-continue-editing-btn');
         if (el) {
-          el.focus();
+          el.focus({ preventScroll: true });
         }
       }, 50);
       return () => clearTimeout(timer);
