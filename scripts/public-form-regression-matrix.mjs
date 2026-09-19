@@ -50,7 +50,11 @@ async function openStep3(page, { segment, subcategory, language = 'bn' }) {
     if (!(await agree.isDisabled())) {
       throw new Error('rape consent continue action must stay disabled before acknowledgement');
     }
-    await page.locator('#rape-consent-checkbox').check();
+    const consentCheckbox = page.locator('#rape-consent-checkbox');
+    await page.locator('label[for="rape-consent-checkbox"]').click();
+    if (!(await consentCheckbox.isChecked())) {
+      throw new Error('rape consent checkbox did not become checked after label activation');
+    }
     if (await agree.isDisabled()) {
       throw new Error('rape consent continue action did not unlock after acknowledgement');
     }
