@@ -18,6 +18,10 @@ const appShell = read('src/components/layout/AppShell.tsx');
 const dialogs = read('src/components/ui/useDialogLifecycle.ts');
 const toggle = read('src/components/ui/Toggle.tsx');
 const theme = read('src/components/ui/ThemeSelector.tsx');
+const textSizeSelector = read('src/components/ui/TextSizeSelector.tsx');
+const textSizeContext = read('src/context/TextSizeContext.tsx');
+const app = read('src/App.tsx');
+const main = read('src/main.tsx');
 const media = read('src/components/media/ReportMediaGrid.tsx');
 const card = read('src/components/report/ReportCard.tsx');
 const upload = read('src/components/media/ImageAttachmentPicker.tsx');
@@ -39,6 +43,21 @@ requireContains('Switches use aria-labelledby', toggle, 'aria-labelledby={labelI
 requireContains('Switches use aria-describedby', toggle, 'aria-describedby={descriptionId}');
 requireNotContains('Theme compact selector avoids incomplete listbox semantics', theme, 'role="listbox"');
 requireNotContains('Theme choices avoid incomplete radio composite semantics', theme, 'role="radio"');
+requireContains('Text size provider wraps the public app', app, '<TextSizeProvider>');
+requireContains('Stored text size is applied before first render', main, 'applyStoredTextSizePreference();');
+requireContains('Text size preference persists locally', textSizeContext, "sobaike-janao-text-size");
+requireContains('Text size preference is applied on the document root', textSizeContext, "setAttribute('data-text-size', preference)");
+requireContains('Text size selector exposes pressed state', textSizeSelector, 'aria-pressed={isSelected}');
+requireContains('Text size selector exposes Smaller mode', textSizeSelector, "id: 'smaller'");
+requireContains('Text size selector exposes Default mode', textSizeSelector, "id: 'default'");
+requireContains('Text size selector exposes Larger mode', textSizeSelector, "id: 'larger'");
+requireContains('Desktop rail exposes the text size selector', desktopRail, 'idPrefix="rail-text-size"');
+requireContains('Shared drawer exposes the text size selector', header, 'idPrefix="drawer-text-size"');
+requireContains('Smaller text mode is token-driven', css, 'html[data-text-size="smaller"]');
+requireContains('Larger text mode is token-driven', css, 'html[data-text-size="larger"]');
+requireContains('Smaller primary text keeps a 14px floor', css, '--type-body-size: 14px;');
+requireContains('Larger primary text follows the 15% accessibility step', css, '--type-body-size: 18.5px;');
+
 requireContains('Report media cells use native buttons', media, '<button\n        key={img.id}');
 requireNotContains(
   'Report cards avoid fake link role',
