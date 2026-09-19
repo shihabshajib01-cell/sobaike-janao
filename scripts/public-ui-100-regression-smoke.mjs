@@ -332,6 +332,136 @@ await check('Key mobile controls preserve the 44px minimum interaction target', 
   await context.close();
 });
 
+await check('Adaptive mobile chrome preserves visual, navigation and accessibility state', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+
+  const readState = async () =>
+    page.evaluate(() => {
+      const read = (selector) => {
+        const element = document.querySelector(selector);
+        if (!(element instanceof HTMLElement)) return null;
+        const style = getComputedStyle(element);
+        return {
+          ariaHidden: element.getAttribute('aria-hidden'),
+          inert: element.inert,
+          opacity: Number(style.opacity),
+          pointerEvents: style.pointerEvents,
+        };
+      };
+
+      return {
+        scrollY: window.scrollY,
+        fullTop: read('#mobile-header'),
+        compactTop: read('#mobile-compact-header'),
+        fullBottom: read('#bottom-nav'),
+        compactBottom: read('#bottom-nav-compact'),
+      };
+    });
+
+  const assertExpanded = (state, label) => {
+    if (!state.fullTop || state.fullTop.ariaHidden === 'true' || state.fullTop.inert) {
+      throw new Error(`${label}: full mobile header is not interactive`);
+    }
+    if (!state.compactTop || state.compactTop.ariaHidden !== 'true' || !state.compactTop.inert) {
+      throw new Error(`${label}: compact top navigation was not removed from interaction`);
+    }
+    if (!state.fullBottom || state.fullBottom.ariaHidden === 'true' || state.fullBottom.inert) {
+      throw new Error(`${label}: full bottom navigation is not interactive`);
+    }
+    if (!state.compactBottom || state.compactBottom.ariaHidden !== 'true' || !state.compactBottom.inert) {
+      throw new Error(`${label}: compact bottom navigation was not removed from interaction`);
+    }
+    if (state.fullTop.opacity < 0.99 || state.compactTop.opacity > 0.01) {
+      throw new Error(`${label}: top chrome visual state is inconsistent`);
+    }
+    if (state.fullBottom.opacity < 0.99 || state.compactBottom.opacity > 0.01) {
+      throw new Error(`${label}: bottom chrome visual state is inconsistent`);
+    }
+  };
+
+  const assertCompact = (state, label) => {
+    if (!state.fullTop || state.fullTop.ariaHidden !== 'true' || !state.fullTop.inert) {
+      throw new Error(`${label}: hidden full header remained interactive`);
+    }
+    if (!state.compactTop || state.compactTop.ariaHidden === 'true' || state.compactTop.inert) {
+      throw new Error(`${label}: compact top navigation is not interactive`);
+    }
+    if (!state.fullBottom || state.fullBottom.ariaHidden !== 'true' || !state.fullBottom.inert) {
+      throw new Error(`${label}: hidden full bottom navigation remained interactive`);
+    }
+    if (!state.compactBottom || state.compactBottom.ariaHidden === 'true' || state.compactBottom.inert) {
+      throw new Error(`${label}: compact bottom navigation is not interactive`);
+    }
+    if (state.fullTop.opacity > 0.01 || state.compactTop.opacity < 0.99) {
+      throw new Error(`${label}: top chrome visual state is inconsistent`);
+    }
+    if (state.fullBottom.opacity > 0.01 || state.compactBottom.opacity < 0.99) {
+      throw new Error(`${label}: bottom chrome visual state is inconsistent`);
+    }
+  };
+
+  const scrollIntoCompactMode = async () => {
+    const target = await page.evaluate(() => {
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      return Math.min(700, maxScroll);
+    });
+    if (target < 160) throw new Error(`Home is not tall enough to exercise adaptive chrome: ${target}px`);
+    await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), target);
+    await page.waitForFunction(
+      () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') === 'true',
+      null,
+      { timeout: 5000 }
+    );
+    await page.waitForTimeout(650);
+  };
+
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#main-content'), 'Home did not render for adaptive chrome check');
+  assertExpanded(await readState(), 'initial load');
+
+  await scrollIntoCompactMode();
+  assertCompact(await readState(), 'scroll down');
+
+  const hiddenHeaderAcceptedFocus = await page.evaluate(() => {
+    const control = document.querySelector('#mobile-header-menu-btn');
+    if (!(control instanceof HTMLElement)) return true;
+    control.focus();
+    return document.activeElement === control;
+  });
+  if (hiddenHeaderAcceptedFocus) {
+    throw new Error('inert hidden mobile header still accepted keyboard focus');
+  }
+
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForFunction(
+    () => document.querySelector('#mobile-header')?.getAttribute('aria-hidden') !== 'true',
+    null,
+    { timeout: 5000 }
+  );
+  await page.waitForTimeout(650);
+  assertExpanded(await readState(), 'scroll up');
+
+  await scrollIntoCompactMode();
+  await page.locator('#mobile-compact-search-btn').click();
+  await page.waitForURL((url) => url.pathname.endsWith('/search'), { timeout: 10000 });
+  await page.waitForTimeout(650);
+  const routedState = await readState();
+  assertExpanded(routedState, 'adaptive navigation route change');
+  if (routedState.scrollY > 4) {
+    throw new Error(`adaptive navigation preserved stale scroll position: ${routedState.scrollY}px`);
+  }
+
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await scrollIntoCompactMode();
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(650);
+  assertExpanded(await readState(), 'refresh');
+
+  await context.close();
+});
+
 await check('Dark semantic surfaces retain distinct visual hierarchy', async () => {
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
   await seedReturningVisitor(context);
