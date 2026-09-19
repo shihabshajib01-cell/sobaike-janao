@@ -362,7 +362,7 @@ export const HERO_TOKENS = {
 };
 
 export const HERO_SLIDER_BEHAVIOR = {
-  autoplayIntervalMs: 15_000,
+  autoplayIntervalMs: 8_000,
   swipeThresholdPx: 45,
   swipeDominanceRatio: 1.2,
   transitionDurationMs: 500,
