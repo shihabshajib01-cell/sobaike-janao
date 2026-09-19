@@ -247,6 +247,158 @@ await check('Technical GPS failure persists IP fallback and does not nag on refr
   await context.close();
 });
 
+await check('Pending GPS cannot override a later Not now choice', async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.removeItem('sobaike_location_choice_v1');
+
+    const geolocation = navigator.geolocation;
+    if (geolocation) {
+      geolocation.getCurrentPosition = (success) => {
+        window.setTimeout(() => {
+          success({
+            coords: {
+              latitude: 23.7806,
+              longitude: 90.4070,
+              accuracy: 12,
+              altitude: null,
+              altitudeAccuracy: null,
+              heading: null,
+              speed: null,
+            },
+            timestamp: Date.now(),
+          });
+        }, 700);
+      };
+    }
+  });
+
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-pending-not-now');
+  await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await expectVisible(page.locator('#location-reminder-bar'), 'location reminder missing before pending GPS race test');
+  await page.locator('#location-reminder-turn-on-btn').click();
+  const locationModal = page.locator('#location-consent-modal');
+  await expectVisible(locationModal, 'location modal missing before pending GPS race test');
+
+  const ipFallbackResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/functions/v1/public-ip-location') &&
+      response.request().method() === 'GET',
+    { timeout: 10000 }
+  ).catch(() => null);
+
+  await page.locator('#location-consent-primary-btn').click();
+  await page.waitForTimeout(80);
+  if (await page.locator('#location-consent-secondary-btn').isDisabled()) {
+    throw new Error('Not now must stay available while GPS is pending');
+  }
+  await page.locator('#location-consent-secondary-btn').click();
+  await locationModal.waitFor({ state: 'hidden', timeout: 10000 });
+
+  const ipResponse = await ipFallbackResponse;
+  if (!ipResponse || !ipResponse.ok()) {
+    throw new Error('pending-GPS Not now did not establish IP fallback');
+  }
+
+  await page.waitForTimeout(1000);
+  const choice = await page.evaluate(() => localStorage.getItem('sobaike_location_choice_v1'));
+  if (choice !== 'not_now') {
+    throw new Error(`late GPS callback overrode Not now with ${choice}`);
+  }
+  await context.close();
+});
+
+await check('Denied browse choice upgrades after browser permission is later granted', async () => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    geolocation: { latitude: 23.7806, longitude: 90.4070 },
+  });
+  await context.clearPermissions();
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.setItem('sobaike_location_choice_v1', 'denied');
+  });
+
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-denied-upgrade');
+  await page.goto(SITE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(400);
+
+  await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+
+  await page.waitForFunction(
+    () => localStorage.getItem('sobaike_location_choice_v1') === 'granted',
+    null,
+    { timeout: 10000 }
+  );
+
+  if (await page.locator('#location-reminder-bar').isVisible().catch(() => false)) {
+    throw new Error('permission upgrade reintroduced the location reminder');
+  }
+  await context.close();
+});
+
+await check('Privacy settings can switch approximate -> precise -> approximate', async () => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    geolocation: { latitude: 23.7806, longitude: 90.4070 },
+  });
+  await context.addInitScript(() => {
+    localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+    localStorage.setItem('sobaike_location_choice_v1', 'not_now');
+  });
+
+  const page = await context.newPage();
+  attachRuntimeGuards(page, 'location-preference-settings');
+  await page.goto(routeUrl('/more'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.getByRole('button', { name: 'সুরক্ষা ও গোপনীয়তা' }).click();
+  await expectVisible(page.locator('#location-preference-card'), 'location preference card missing');
+
+  await context.grantPermissions(['geolocation'], { origin: new URL(SITE_URL).origin });
+  await page.locator('#location-preference-use-precise').click();
+  const locationModal = page.locator('#location-consent-modal');
+  await expectVisible(locationModal, 'precise-location preference did not open existing consent modal');
+  await page.locator('#location-consent-primary-btn').click();
+  await locationModal.waitFor({ state: 'hidden', timeout: 15000 });
+
+  await page.waitForFunction(
+    () => localStorage.getItem('sobaike_location_choice_v1') === 'granted',
+    null,
+    { timeout: 10000 }
+  );
+  await expectVisible(
+    page.locator('#location-preference-use-approximate'),
+    'precise state did not expose approximate-location downgrade'
+  );
+
+  const ipFallbackResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/functions/v1/public-ip-location') &&
+      response.request().method() === 'GET',
+    { timeout: 10000 }
+  ).catch(() => null);
+
+  await page.locator('#location-preference-use-approximate').click();
+  const ipResponse = await ipFallbackResponse;
+  if (!ipResponse || !ipResponse.ok()) {
+    throw new Error('approximate preference did not establish IP fallback');
+  }
+
+  await page.waitForFunction(
+    () => localStorage.getItem('sobaike_location_choice_v1') === 'not_now',
+    null,
+    { timeout: 10000 }
+  );
+  await expectVisible(
+    page.locator('#location-preference-use-precise'),
+    'approximate state did not expose precise-location upgrade'
+  );
+  await context.close();
+});
+
 await check('Returning denied-location visitor is not nagged after refresh', async () => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
