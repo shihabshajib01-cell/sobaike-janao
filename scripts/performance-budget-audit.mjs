@@ -102,6 +102,69 @@ if (fs.existsSync(heroDir)) {
   }
 }
 
+
+const migrationsDir = path.join(root, 'supabase', 'migrations');
+if (fs.existsSync(migrationsDir)) {
+  const migrationFiles = fs.readdirSync(migrationsDir)
+    .filter((name) => name.endsWith('.sql'))
+    .sort();
+
+  let latestHomeFeedMigration = null;
+  let latestHomeFeedSource = '';
+  let allMigrationSource = '';
+
+  for (const name of migrationFiles) {
+    const source = fs.readFileSync(path.join(migrationsDir, name), 'utf8');
+    allMigrationSource += '\n' + source;
+    if (/create\s+or\s+replace\s+function\s+public\.get_public_home_feed_page\s*\(/i.test(source)) {
+      latestHomeFeedMigration = name;
+      latestHomeFeedSource = source;
+    }
+  }
+
+  if (!latestHomeFeedMigration) {
+    fail('No authoritative get_public_home_feed_page migration was found.');
+  } else {
+    const functionStart = latestHomeFeedSource.search(
+      /create\s+or\s+replace\s+function\s+public\.get_public_home_feed_page\s*\(/i
+    );
+    const bodyOpen = latestHomeFeedSource.indexOf('$function, functionStart);
+    const bodyClose = latestHomeFeedSource.indexOf('$function$;', bodyOpen + '$function.length);
+    const functionSource =
+      functionStart >= 0 && bodyOpen >= 0 && bodyClose >= 0
+        ? latestHomeFeedSource.slice(functionStart, bodyClose + '$function$;'.length)
+        : latestHomeFeedSource.slice(functionStart);
+
+    if (/public\.get_public_home_feed\s*\(/i.test(functionSource)) {
+      fail(
+        `Home page RPC regressed to full-feed materialization in ${latestHomeFeedMigration}. Rank/page IDs before JSON construction instead.`
+      );
+    }
+
+    if (!/unnest\s*\(\s*v_page_ids\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must build public JSON from the bounded page ID set only.`
+      );
+    }
+
+    if (!/operator\s*\(\s*extensions\.<->\s*\)/i.test(functionSource)) {
+      fail(
+        `Home page RPC in ${latestHomeFeedMigration} must keep spatial-index KNN ordering for the location-first feed.`
+      );
+    }
+
+    if (!/idx_complaints_public_feed_geo/i.test(allMigrationSource)) {
+      fail('The public Home feed spatial index migration is missing.');
+    }
+
+    if (!process.exitCode) {
+      console.log(
+        `[performance-budget] scalable Home feed contract: ${latestHomeFeedMigration}`
+      );
+    }
+  }
+}
+
 if (!process.exitCode) {
   console.log('[performance-budget] PASS');
 }
