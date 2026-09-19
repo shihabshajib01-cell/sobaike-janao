@@ -18,8 +18,14 @@ export interface SupabasePublicReportRPC {
   organization?: string | null;
   reporterName?: string | null;
   district?: string | null;
+  districtBn?: string | null;
+  districtEn?: string | null;
   area?: string | null;
+  areaBn?: string | null;
+  areaEn?: string | null;
   location?: string | null;
+  locationBn?: string | null;
+  locationEn?: string | null;
   incidentDate?: string | null;
   incidentTime?: string | null;
   incident_time?: string | null;
@@ -124,14 +130,14 @@ export const mapSupabasePublicReportToItem = (
   const fullDescBn = rpc.descriptionBn || rpc.descriptionEn || shortDescBn;
   const fullDescEn = rpc.descriptionEn || rpc.descriptionBn || shortDescEn;
 
-  const locationBn = rpc.location ? rpc.location : 'অবস্থান গোপন';
-  const locationEn = rpc.location ? rpc.location : 'Location withheld';
+  const locationBn = rpc.locationBn || rpc.location || 'অবস্থান গোপন';
+  const locationEn = rpc.locationEn || rpc.location || 'Location withheld';
 
-  const districtBn = rpc.district || '';
-  const districtEn = rpc.district || '';
+  const districtBn = rpc.districtBn || rpc.district || '';
+  const districtEn = rpc.districtEn || rpc.district || '';
 
-  const areaBn = rpc.area || '';
-  const areaEn = rpc.area || '';
+  const areaBn = rpc.areaBn || rpc.area || '';
+  const areaEn = rpc.areaEn || rpc.area || '';
 
   const incidentDateBn = rpc.incidentDate ? formatBanglaDate(rpc.incidentDate) : '';
   const incidentDateEn = rpc.incidentDate ? formatEnglishDate(rpc.incidentDate) : '';
