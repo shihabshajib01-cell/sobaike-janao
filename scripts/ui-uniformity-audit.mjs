@@ -366,6 +366,17 @@ requireNotContains(
   'nested report confirmation must not use scrolling focus that can displace mobile sheets'
 );
 
+requireContains(
+  'src/components/report-composer/ReportComposerModal.tsx',
+  "maxWidth={submissionResult ? 'md' : 'composer'}",
+  'report success must collapse from the full composer shell to a compact dialog'
+);
+requireContains(
+  'src/components/report-composer/ReportComposerModal.tsx',
+  "mobilePresentation={submissionResult ? 'sheet' : 'fullscreen'}",
+  'report success must use the compact mobile sheet presentation'
+);
+
 const approvedHeaderlessModalIds = new Set(['report-composer-modal']);
 
 for (const root of [path.resolve(ROOT, 'src/components'), path.resolve(ROOT, 'src/pages')]) {
