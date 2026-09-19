@@ -1200,21 +1200,23 @@
   }
 }
 
-.hero-slider-cta-row {
+.hero-slider-cta-row,
+.hero-slider-desktop-cta-row {
   display: none;
   padding-top: var(--hero-slider-cta-top-tablet);
   width: 100%;
-  justify-content: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1023.98px) {
   .hero-slider-cta-row {
     display: flex;
+    justify-content: center;
   }
 }
 
 @media (min-width: 1024px) {
-  .hero-slider-cta-row {
+  .hero-slider-desktop-cta-row {
+    display: flex;
     justify-content: flex-start;
   }
 }
