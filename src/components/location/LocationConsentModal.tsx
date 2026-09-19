@@ -103,25 +103,32 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
     }
   };
 
-  const handleNotNow = async () => {
-    try {
-      if (!isReportMode) {
-        await VisitorSessionService.handleNotNow();
-        // "Not now" skips precise device/GPS location, but still establishes
-        // coarse IP-based browse location so nearby content can remain useful.
-        await refreshBrowseLocation();
-      }
-    } catch {
-      // Best-effort browse fallback: the explicit choice remains persisted even
-      // if approximate IP location is temporarily unavailable.
-    } finally {
+  const chooseApproximateBrowseLocation = () => {
+    if (isReportMode) {
       onClose();
+      return;
     }
+
+    // Persist the explicit choice synchronously inside handleNotNow, close the
+    // modal immediately, then resolve the best-effort IP fallback in the
+    // background. Escape and the Not now button share exactly the same path.
+    onClose();
+    void VisitorSessionService.handleNotNow()
+      .then(() => refreshBrowseLocation())
+      .catch(() => {
+        // The choice is already persisted. A later refresh/focus can retry the
+        // approximate fallback if the first network attempt is unavailable.
+      });
+  };
+
+  const handleNotNow = () => {
+    chooseApproximateBrowseLocation();
   };
 
   const handleModalClose = () => {
     if (!isReportMode && !VisitorSessionService.getLocationChoice()) {
-      VisitorSessionService.setLocationChoice('not_now');
+      chooseApproximateBrowseLocation();
+      return;
     }
     onClose();
   };
