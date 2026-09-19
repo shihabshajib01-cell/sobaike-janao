@@ -298,58 +298,66 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
   return (
     <>
-      <header
-        id="mobile-header"
-        className={`md:hidden sticky top-0 z-40 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity,margin-bottom] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+      <div
+        className={`md:hidden sticky top-0 z-40 w-full overflow-visible transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
           isCompact
-            ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none -mb-[calc(3.5rem+env(safe-area-inset-top,0px))]'
-            : 'translate-y-0 opacity-100 mb-0'
+            ? 'h-0'
+            : 'h-[calc(3.5rem+env(safe-area-inset-top,0px))]'
         }`}
       >
-        <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <IconButton
-              id="mobile-header-menu-btn"
-              variant="outline"
-              size="md"
-              onClick={() => setIsTabletMenuOpen(true)}
-              aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-              className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
-              icon={<Menu className="w-5 h-5" aria-hidden="true" />}
-            />
+        <header
+          id="mobile-header"
+          className={`absolute inset-x-0 top-0 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+            isCompact
+              ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none'
+              : 'translate-y-0 opacity-100'
+          }`}
+        >
+          <div className="flex items-center justify-between h-14 px-3 sm:px-4 max-w-full gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <IconButton
+                id="mobile-header-menu-btn"
+                variant="outline"
+                size="md"
+                onClick={() => setIsTabletMenuOpen(true)}
+                aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
+                className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
+                icon={<Menu className="w-5 h-5" aria-hidden="true" />}
+              />
+
+              <Link
+                to={localizePath('/')}
+                aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
+                className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              >
+                <BrandLogo
+                  id="mobile-header-brand-logo"
+                  size="sm"
+                  showEnglish={false}
+                />
+              </Link>
+            </div>
 
             <Link
-              to={localizePath('/')}
-              aria-label={language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home'}
-              className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
+              id="mobile-header-search-btn"
+              to={localizePath('/search')}
+              aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
+              className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
             >
-              <BrandLogo
-                id="mobile-header-brand-logo"
-                size="sm"
-                showEnglish={false}
-              />
+              <Search className="w-5 h-5" aria-hidden="true" />
             </Link>
           </div>
-
-          <Link
-            id="mobile-header-search-btn"
-            to={localizePath('/search')}
-            aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-            className="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface text-ui-content-primary border border-ui-stroke-subtle transition-colors hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-          >
-            <Search className="w-5 h-5" aria-hidden="true" />
-          </Link>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <nav
         id="mobile-compact-header"
         aria-label={language === 'bn' ? 'দ্রুত নেভিগেশন' : 'Quick navigation'}
         aria-hidden={!isCompact || undefined}
         inert={!isCompact ? true : undefined}
-        className={`md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4 transition-[transform,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+        className={`md:hidden fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+8px)] z-50 pointer-events-none px-3 sm:px-4 transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
-            ? 'translate-y-0 opacity-100 delay-[90ms]'
+            ? 'translate-y-0 opacity-100 delay-[60ms]'
             : '-translate-y-6 opacity-0 delay-0'
         }`}
       >
@@ -360,8 +368,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             size="md"
             onClick={() => setIsTabletMenuOpen(true)}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-              isCompact ? 'scale-100 delay-[90ms]' : 'scale-90 delay-0'
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+              isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
             }`}
             icon={<Menu className="w-5 h-5" aria-hidden="true" />}
           />
@@ -370,8 +378,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             id="mobile-compact-search-btn"
             to={localizePath('/search')}
             aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              isCompact ? 'scale-100 delay-[90ms]' : 'scale-90 delay-0'
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              isCompact ? 'scale-100 delay-[60ms]' : 'scale-90 delay-0'
             }`}
           >
             <Search className="w-5 h-5" aria-hidden="true" />

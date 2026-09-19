@@ -63,6 +63,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
     },
   ];
 
+  const compactNavItem = navItems.find((item) => item.isActive) ?? navItems[0];
+
   return (
     <>
       <nav
@@ -70,7 +72,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
         aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
         aria-hidden={isCompact || undefined}
         inert={isCompact ? true : undefined}
-        className={`md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+        className={`md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
             ? 'translate-y-[calc(100%+env(safe-area-inset-bottom,0px)+24px)] opacity-0'
             : 'translate-y-0 opacity-100'
@@ -117,25 +119,29 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
         aria-label={language === 'bn' ? 'দ্রুত মোবাইল নেভিগেশন' : 'Quick mobile navigation'}
         aria-hidden={!isCompact || undefined}
         inert={!isCompact ? true : undefined}
-        className={`md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+        className={`md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
-            ? 'translate-y-0 opacity-100 delay-[90ms]'
-            : 'translate-y-8 opacity-0 delay-0'
+            ? 'translate-y-0 opacity-100 delay-[60ms]'
+            : 'translate-y-4 opacity-0 delay-0'
         }`}
       >
         <div className="flex w-full items-end justify-between">
           <Link
-            id="bottom-nav-compact-home"
-            to={localizePath('/')}
-            aria-label={language === 'bn' ? 'মূলপাতা' : 'Home'}
-            aria-current={currentRoute === '/' ? 'page' : undefined}
-            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[90ms]' : 'pointer-events-none scale-90 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-              currentRoute === '/'
+            id="bottom-nav-compact-context"
+            to={localizePath(compactNavItem.path)}
+            aria-label={language === 'bn' ? compactNavItem.nameBn : compactNavItem.nameEn}
+            aria-current={compactNavItem.isActive ? 'page' : undefined}
+            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill border border-ui-stroke-subtle bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              compactNavItem.isActive
                 ? 'text-ui-content-primary dark:bg-ui-accent-soft dark:ring-1 dark:ring-ui-accent-border'
                 : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
             }`}
           >
-            <AppIcon name="home" size="lg" strokeWidth={currentRoute === '/' ? 2.4 : 2} />
+            <AppIcon
+              name={compactNavItem.iconName}
+              size="lg"
+              strokeWidth={compactNavItem.isActive ? 2.4 : 2}
+            />
           </Link>
 
           <button
@@ -143,7 +149,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
             type="button"
             onClick={() => openReportComposer()}
             aria-label={language === 'bn' ? 'প্রতিবেদন জমা দিন' : 'Submit a report'}
-            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[90ms]' : 'pointer-events-none scale-90 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
+            className={`${isCompact ? 'pointer-events-auto scale-100 delay-[60ms]' : 'pointer-events-none scale-95 delay-0'} flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center ui-radius-pill bg-ui-action-bg text-ui-action-text shadow-[var(--elevation-sm)] transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none hover:bg-ui-action-hover active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus focus-visible:ring-offset-2`}
           >
             <Plus className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />
           </button>
