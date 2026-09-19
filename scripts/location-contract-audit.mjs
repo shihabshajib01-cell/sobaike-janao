@@ -13,6 +13,7 @@ const ipEdge = read('supabase/functions/public-ip-location/index.ts');
 const reminder = read('src/components/location/LocationReminderBar.tsx');
 const consentModal = read('src/components/location/LocationConsentModal.tsx');
 const homePage = read('src/pages/HomePage.tsx');
+const morePage = read('src/pages/MorePage.tsx');
 const mapper = read('src/services/supabasePublicReportMapper.ts');
 const bootstrap = read('supabase/migrations/20260919072614_canonical_bangladesh_location_taxonomy.sql');
 const finalHardening = read('supabase/migrations/20260919082400_location_contract_final_hardening.sql');
@@ -56,6 +57,14 @@ for (const needle of [
   'maximumAge: 0',
   "this.setLocationChoice('not_now')",
   "export type LocationChoice = 'granted' | 'not_now' | 'denied' | 'ip_fallback';",
+  "export type BrowseLocationRequestMode =",
+  "'restore'",
+  "'permission_upgrade'",
+  "'user_request'",
+  'browseIntentVersion',
+  'invalidateBrowseLocationRequests()',
+  'requestIntentVersion !== browseIntentVersion',
+  "this.getLocationChoice() !== 'granted'",
   "this.setLocationChoice('denied')",
 ]) {
   requireText(visitor, needle, 'reporter location freshness');
@@ -80,12 +89,15 @@ for (const needle of [
 }
 for (const needle of [
   "if (choice === 'not_now')",
-  "{ silent: true }",
+  "{ mode: requestMode }",
   "choice === 'ip_fallback'",
   "VisitorSessionService.setLocationChoice('ip_fallback')",
   "browseFallback: 'ip'",
   "IP_LOCATION_MAX_AGE_MS",
   "BROWSE_LOCATION_MAX_AGE_MS",
+  "useApproximateBrowseLocation",
+  "choice === 'granted'",
+  "Report submission may capture a device position",
   "void refreshBrowseLocation();",
 ]) {
   requireText(appContext, needle, 'browse fallback consent boundary');
@@ -126,6 +138,19 @@ for (const needle of [
   'If you choose Not now, we’ll still use a rough area for local reports.',
 ]) {
   requireText(consentModal, needle, 'Not now/Escape parity');
+}
+if (consentModal.includes('disabled: isLoading')) {
+  errors.push('Not now/Escape parity: Not now must remain available while GPS is pending');
+}
+
+for (const needle of [
+  'location-preference-card',
+  'location-preference-use-precise',
+  'location-preference-use-approximate',
+  "openLocationConsent('browse')",
+  'useApproximateBrowseLocation',
+]) {
+  requireText(morePage, needle, 'reversible location preference');
 }
 
 for (const needle of [
@@ -192,5 +217,5 @@ if (errors.length) {
 }
 
 console.log(
-  'Location contract audit passed: Not now is GPS-authoritative, Escape/Not now parity is protected, technical GPS failures persist IP fallback, source-aware freshness is centralized, device-only reporting remains fresh, and location privacy/SQL contracts are protected.'
+  'Location contract audit passed: browse intent versioning blocks stale GPS callbacks, explicit restore/permission-upgrade/user-request modes are enforced, Not now/Escape remains authoritative, location preference is reversible, reporter GPS cannot override approximate browsing, source-aware freshness is centralized, and report submission remains device-only.'
 );
