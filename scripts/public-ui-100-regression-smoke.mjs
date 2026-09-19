@@ -244,6 +244,18 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#home-feed-filter-rail'), 'Home shared filter rail missing');
 
+  const homeFeed = page.locator('#home-virtualized-feed');
+  await homeFeed.waitFor({ state: 'attached', timeout: 15000 });
+  await page.waitForFunction(
+    () =>
+      Number(
+        document.querySelector('#home-virtualized-feed')?.getAttribute('data-loaded-count') || 0
+      ) > 0,
+    null,
+    { timeout: 30000 }
+  );
+  await homeFeed.scrollIntoViewIfNeeded();
+
   const firstCard = page.locator('[id^="report-card-"]').first();
   await expectVisible(firstCard, 'No report card found on Home');
   const firstCardLink = firstCard.locator('a[href*="/report-detail/"]').first();
