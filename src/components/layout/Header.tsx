@@ -10,6 +10,7 @@ import { Button } from '../ui/Button';
 import { IconButton } from '../ui/IconButton';
 import { Drawer } from '../ui/Drawer';
 import { ThemeSelector } from '../ui/ThemeSelector';
+import { TextSizeSelector } from '../ui/TextSizeSelector';
 import { BrandLogo } from '../branding/BrandLogo';
 import { CategoryIcon } from '../branding/CategoryIcon';
 
@@ -216,6 +217,13 @@ export const Header: React.FC = () => {
                 {language === 'bn' ? 'প্রদর্শন' : 'Appearance'}
               </p>
               <ThemeSelector variant="segmented" />
+            </div>
+
+            <div className="space-y-1.5">
+              <p className="type-meta text-ui-content-secondary font-[var(--font-weight-medium)] px-1">
+                {language === 'bn' ? 'লেখার আকার' : 'Text size'}
+              </p>
+              <TextSizeSelector variant="segmented" idPrefix="drawer-text-size" />
             </div>
 
             <div className="space-y-1.5">

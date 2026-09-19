@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { hydratePublishedBannerContent } from './services/bannerRuntime';
+import { applyStoredTextSizePreference } from './context/TextSizeContext';
 import './index.css';
 import './theme/color-system.css';
 import './theme/desktop-horizontal-scroll.css';
@@ -37,6 +38,7 @@ const restoreInitialRoute = () => {
   }
 };
 
+applyStoredTextSizePreference();
 restoreInitialRoute();
 
 const rootElement = document.getElementById('root');
