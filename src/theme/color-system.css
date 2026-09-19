@@ -46,11 +46,18 @@
 
 :root,
 html[data-theme="light"] {
+  /* Stable product brand roles. These remain global even inside category pages. */
+  --product-primary: #1B4D6B;
+  --product-primary-variant: #163B52;
+  --product-primary-active: #245F82;
+  --product-on-primary: #FFFFFF;
+  --product-focus: #3A7CA5;
+
   /* Material product roles */
-  --md-primary: #1B4D6B;
-  --md-primary-variant: #163B52;
-  --md-primary-active: #245F82;
-  --md-on-primary: #FFFFFF;
+  --md-primary: var(--product-primary);
+  --md-primary-variant: var(--product-primary-variant);
+  --md-primary-active: var(--product-primary-active);
+  --md-on-primary: var(--product-on-primary);
 
   --md-secondary: #3A7CA5;
   --md-secondary-variant: #163B52;
@@ -78,7 +85,7 @@ html[data-theme="light"] {
   --md-control-outline: color-mix(in srgb, var(--md-outline) 90%, var(--md-surface));
   --md-control-outline-hover: var(--md-outline);
 
-  --md-focus: #3A7CA5;
+  --md-focus: var(--product-focus);
   --md-overlay: rgba(5, 5, 5, 0.55);
 
   --md-disabled-container: #E4E6EB;
@@ -233,11 +240,18 @@ html[data-theme="light"] {
 
 html[data-theme="dark"],
 .dark {
+  /* Stable product brand roles. These remain global even inside category pages. */
+  --product-primary: #327DA8;
+  --product-primary-variant: #3B7DA4;
+  --product-primary-active: #2B79A4;
+  --product-on-primary: #FFFFFF;
+  --product-focus: #3A7CA5;
+
   /* Material product roles */
-  --md-primary: #327DA8;
-  --md-primary-variant: #3B7DA4;
-  --md-primary-active: #2B79A4;
-  --md-on-primary: #FFFFFF;
+  --md-primary: var(--product-primary);
+  --md-primary-variant: var(--product-primary-variant);
+  --md-primary-active: var(--product-primary-active);
+  --md-on-primary: var(--product-on-primary);
 
   --md-secondary: #3A7CA5;
   --md-secondary-variant: #245F82;
@@ -264,7 +278,7 @@ html[data-theme="dark"],
   --md-control-outline: var(--md-outline);
   --md-control-outline-hover: var(--md-outline-strong);
 
-  --md-focus: #3A7CA5;
+  --md-focus: var(--product-focus);
   --md-overlay: rgba(0, 0, 0, 0.72);
 
   --md-disabled-container: #3A3B3C;
@@ -575,6 +589,25 @@ html[data-theme="dark"],
   --sec-rickshaw-on-primary: var(--category-rickshaw-on-primary);
 }
 
+
+/*
+ * Product-action scope.
+ * Use this only for global product actions that must not inherit category colors.
+ * Example: the persistent desktop "Report incident" CTA in the left navigation.
+ */
+.global-product-action-scope {
+  --md-primary: var(--product-primary);
+  --md-primary-variant: var(--product-primary-variant);
+  --md-primary-active: var(--product-primary-active);
+  --md-on-primary: var(--product-on-primary);
+  --md-focus: var(--product-focus);
+
+  --ui-primary-action-bg: var(--product-primary);
+  --ui-primary-action-hover: var(--product-primary-variant);
+  --ui-primary-action-active: var(--product-primary-active);
+  --ui-primary-action-text: var(--product-on-primary);
+  --ui-focus: var(--product-focus);
+}
 
 /*
  * Category route theme scope.
