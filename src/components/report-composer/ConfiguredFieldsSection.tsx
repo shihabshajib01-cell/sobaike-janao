@@ -845,7 +845,7 @@ export const ConfiguredFieldsSection = forwardRef<
                           setValue(field, next);
                         }}
                         label={language === 'bn' ? option.labelBn : option.labelEn}
-                        labelClassName="type-body text-role-on-surface"
+                        labelClassName="type-input text-role-on-surface"
                       />
                     );
                   })}
