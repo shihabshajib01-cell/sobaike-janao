@@ -93,7 +93,7 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
                 const nextIndex = (index + delta + allSubcategories.length) % allSubcategories.length;
                 selectAndFocus(nextIndex);
               }}
-              className={`p-3 sm:p-3.5 ui-radius-control ui-border-default text-left cursor-pointer transition-colors flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus select-none ${
+              className={`report-composer-card p-3 sm:p-3.5 ui-radius-control ui-border-default text-left cursor-pointer transition-colors flex flex-col justify-between gap-1.5 min-h-[68px] sm:min-h-[76px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus select-none ${
                 isSingleOption ? 'col-span-full w-full' : ''
               } ${
                 isSelected
