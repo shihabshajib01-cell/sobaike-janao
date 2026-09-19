@@ -307,6 +307,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       >
         <header
           id="mobile-header"
+          aria-hidden={isCompact || undefined}
+          inert={isCompact ? true : undefined}
           className={`absolute inset-x-0 top-0 w-full bg-ui-surface border-b border-ui-stroke-subtle pt-safe transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
             isCompact
               ? '-translate-y-[calc(100%+8px)] opacity-0 pointer-events-none'
