@@ -19,12 +19,14 @@ export interface RuntimeBannerContent {
 
 export interface ManagedBannerContent extends RuntimeBannerContent {
   showOnHome: boolean;
+  showHomeCta: boolean;
   isActive: boolean;
   sortOrder: number;
 }
 
 export interface PublishedBannerSettings {
   showOnHome: boolean;
+  showHomeCta: boolean;
   isActive: boolean;
   sortOrder: number;
 }
@@ -108,6 +110,8 @@ const parseContent = (
     primaryCtaBn: String(raw.primaryCtaBn).trim(),
     primaryCtaEn: String(raw.primaryCtaEn).trim(),
     showOnHome: raw.showOnHome,
+    // Home CTA is intentionally opt-in. Missing/legacy CMS data stays hidden.
+    showHomeCta: raw.showHomeCta === true,
     isActive: raw.isActive,
     sortOrder,
   };
@@ -217,6 +221,7 @@ export const hydratePublishedBannerContent = async (): Promise<void> => {
       runtimeContent.set(section, banner);
       publishedSettings.set(section, {
         showOnHome: remote.showOnHome,
+        showHomeCta: remote.showHomeCta,
         isActive: remote.isActive,
         sortOrder: remote.sortOrder,
       });
