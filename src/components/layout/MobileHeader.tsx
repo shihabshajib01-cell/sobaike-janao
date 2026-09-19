@@ -357,7 +357,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             size="md"
             onClick={() => setIsTabletMenuOpen(true)}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} bg-ui-surface/95 shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-300 ease-out motion-reduce:transition-none ${
               isCompact ? 'scale-100' : 'scale-95'
             }`}
             icon={<Menu className="w-5 h-5" aria-hidden="true" />}
@@ -367,7 +367,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             id="mobile-compact-search-btn"
             to={localizePath('/search')}
             aria-label={language === 'bn' ? 'প্রতিবেদন খুঁজুন' : 'Search reports'}
-            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,colors] duration-300 ease-out motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+            className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} inline-flex w-11 h-11 min-w-[44px] min-h-[44px] items-center justify-center ui-radius-control bg-ui-surface/95 text-ui-content-primary border border-ui-stroke-subtle shadow-[var(--elevation-sm)] backdrop-blur-md transition-[transform,background-color,color,border-color] duration-300 ease-out motion-reduce:transition-none hover:bg-ui-surface-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isCompact ? 'scale-100' : 'scale-95'
             }`}
           >
