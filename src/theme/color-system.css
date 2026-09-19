@@ -54,10 +54,10 @@ html[data-theme="light"] {
   --product-focus: #3A7CA5;
 
   /* Material product roles */
-  --md-primary: var(--product-primary);
-  --md-primary-variant: var(--product-primary-variant);
-  --md-primary-active: var(--product-primary-active);
-  --md-on-primary: var(--product-on-primary);
+  --md-primary: #1B4D6B;
+  --md-primary-variant: #163B52;
+  --md-primary-active: #245F82;
+  --md-on-primary: #FFFFFF;
 
   --md-secondary: #3A7CA5;
   --md-secondary-variant: #163B52;
@@ -85,7 +85,7 @@ html[data-theme="light"] {
   --md-control-outline: color-mix(in srgb, var(--md-outline) 90%, var(--md-surface));
   --md-control-outline-hover: var(--md-outline);
 
-  --md-focus: var(--product-focus);
+  --md-focus: #3A7CA5;
   --md-overlay: rgba(5, 5, 5, 0.55);
 
   --md-disabled-container: #E4E6EB;
@@ -248,10 +248,10 @@ html[data-theme="dark"],
   --product-focus: #3A7CA5;
 
   /* Material product roles */
-  --md-primary: var(--product-primary);
-  --md-primary-variant: var(--product-primary-variant);
-  --md-primary-active: var(--product-primary-active);
-  --md-on-primary: var(--product-on-primary);
+  --md-primary: #327DA8;
+  --md-primary-variant: #3B7DA4;
+  --md-primary-active: #2B79A4;
+  --md-on-primary: #FFFFFF;
 
   --md-secondary: #3A7CA5;
   --md-secondary-variant: #245F82;
@@ -278,7 +278,7 @@ html[data-theme="dark"],
   --md-control-outline: var(--md-outline);
   --md-control-outline-hover: var(--md-outline-strong);
 
-  --md-focus: var(--product-focus);
+  --md-focus: #3A7CA5;
   --md-overlay: rgba(0, 0, 0, 0.72);
 
   --md-disabled-container: #3A3B3C;
@@ -600,7 +600,7 @@ html[data-theme="dark"],
   --md-primary-variant: var(--product-primary-variant);
   --md-primary-active: var(--product-primary-active);
   --md-on-primary: var(--product-on-primary);
-  --md-focus: var(--product-focus);
+  --md-focus: #3A7CA5;
 
   --ui-primary-action-bg: var(--product-primary);
   --ui-primary-action-hover: var(--product-primary-variant);
