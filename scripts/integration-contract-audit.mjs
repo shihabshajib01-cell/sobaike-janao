@@ -99,7 +99,7 @@ const productionSmoke = read('.github/workflows/production-smoke.yml');
 for (const needle of [
   'Verify Public-SQL-Admin sync contract',
   'get_platform_sync_contract_version',
-  '2026-09-19.1',
+  '2026-09-19.3',
 ]) {
   if (!productionSmoke.includes(needle)) {
     fail('production smoke is missing live sync-contract guard: ' + needle);
@@ -157,6 +157,23 @@ if (!seoBuilder.includes("throw error;")) {
   fail('SEO sitemap builder must fail closed when a credentialed report fetch fails');
 }
 
+
+const formPrepublicationAuditCorrectionFile =
+  'supabase/migrations/20260919162702_restore_prepublication_after_lifecycle_audit.sql';
+if (!fs.existsSync(formPrepublicationAuditCorrectionFile)) {
+  fail('missing audit correction that preserves reporting-form prepublication');
+}
+const formPrepublicationAuditCorrection = read(formPrepublicationAuditCorrectionFile);
+for (const needle of [
+  'trg_guard_reporting_form_active_taxonomy',
+  'trg_archive_reporting_forms_on_subcategory_deactivate',
+  "scope_id='bribe-paid'",
+  '2026-09-19.3',
+]) {
+  if (!formPrepublicationAuditCorrection.includes(needle)) {
+    fail('reporting-form audit correction is missing: ' + needle);
+  }
+}
 
 const formPrepublicationRestoreFile = 'supabase/migrations/20260919154219_restore_reporting_form_prepublication_contract.sql';
 if (!fs.existsSync(formPrepublicationRestoreFile)) {
