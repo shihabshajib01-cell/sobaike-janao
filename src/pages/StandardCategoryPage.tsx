@@ -29,7 +29,7 @@ export interface StandardCategoryPageProps {
 }
 
 export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ section }) => {
-  const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
+  const { language, browseLocation, browseLocationStatus } = useApp();
   const { segments, getFeedSubcategories } = useTaxonomy();
   const { setDynamicSeo } = useSeo();
   usePublishedBannerRuntime();
@@ -164,11 +164,7 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
             desktopDescriptionBn: bannerContent.desktopDescriptionBn,
             desktopDescriptionEn: bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
-            action: {
-              labelBn: bannerContent.primaryCtaBn,
-              labelEn: bannerContent.primaryCtaEn,
-              onClick: () => openReportComposer(section),
-            },
+
           },
         ]}
       />
