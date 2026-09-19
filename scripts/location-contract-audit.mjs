@@ -11,6 +11,8 @@ const appContext = read('src/context/AppContext.tsx');
 const ipService = read('src/services/ipLocationService.ts');
 const ipEdge = read('supabase/functions/public-ip-location/index.ts');
 const reminder = read('src/components/location/LocationReminderBar.tsx');
+const consentModal = read('src/components/location/LocationConsentModal.tsx');
+const homePage = read('src/pages/HomePage.tsx');
 const mapper = read('src/services/supabasePublicReportMapper.ts');
 const bootstrap = read('supabase/migrations/20260919072614_canonical_bangladesh_location_taxonomy.sql');
 const finalHardening = read('supabase/migrations/20260919082400_location_contract_final_hardening.sql');
@@ -53,7 +55,7 @@ for (const needle of [
   'Date.now() - lastRecordedLocation.timestamp <= REPORTER_LOCATION_FALLBACK_MAX_AGE_MS',
   'maximumAge: 0',
   "this.setLocationChoice('not_now')",
-  "export type LocationChoice = 'granted' | 'not_now' | 'denied';",
+  "export type LocationChoice = 'granted' | 'not_now' | 'denied' | 'ip_fallback';",
   "this.setLocationChoice('denied')",
 ]) {
   requireText(visitor, needle, 'reporter location freshness');
@@ -77,15 +79,24 @@ for (const needle of [
   requireText(ipEdge, needle, 'IP fallback edge function');
 }
 for (const needle of [
-  "choice === 'granted' || choice === 'denied' || choice === 'not_now'",
+  "if (choice === 'not_now')",
+  "{ silent: true }",
+  "choice === 'ip_fallback'",
+  "VisitorSessionService.setLocationChoice('ip_fallback')",
   "browseFallback: 'ip'",
-  "if (perm === 'denied')",
-  "refreshBrowseLocation();",
+  "IP_LOCATION_MAX_AGE_MS",
+  "BROWSE_LOCATION_MAX_AGE_MS",
+  "void refreshBrowseLocation();",
 ]) {
   requireText(appContext, needle, 'browse fallback consent boundary');
 }
+if (
+  appContext.indexOf("if (choice === 'not_now')") >
+  appContext.indexOf("queryPermissionStatus()")
+) {
+  errors.push('browse fallback consent boundary: Not now must be resolved before browser permission/device lookup');
+}
 
-const consentModal = read('src/components/location/LocationConsentModal.tsx');
 if (consentModal.includes("VisitorSessionService.setLocationChoice('granted');")) {
   errors.push('browse fallback consent boundary: modal must not persist a grant before browser approval');
 }
@@ -106,6 +117,30 @@ for (const needle of [
 ]) {
   requireText(reminder, needle, 'location reminder refresh suppression');
 }
+
+for (const needle of [
+  'chooseApproximateBrowseLocation',
+  'VisitorSessionService.handleNotNow()',
+  '.then(() => refreshBrowseLocation())',
+]) {
+  requireText(consentModal, needle, 'Not now/Escape parity');
+}
+
+for (const needle of [
+  'export const IP_LOCATION_MAX_AGE_MS = 60 * 60 * 1000',
+  'isLocationFresh(location: ApproximateIpLocation | null)',
+]) {
+  requireText(ipService, needle, 'IP location freshness');
+}
+
+if (homePage.includes('VisitorSessionService.isLocationFresh(browseLocation)')) {
+  errors.push('browse location freshness: Home must not apply device TTL to IP location');
+}
+requireText(
+  homePage,
+  'AppContext owns source-aware freshness for both device and IP',
+  'browse location freshness'
+);
 
 for (const needle of ['safeBanglaFallback', 'safeEnglishFallback']) {
   requireText(mapper, needle, 'bilingual location mapper');
@@ -146,5 +181,5 @@ if (errors.length) {
 }
 
 console.log(
-  'Location contract audit passed: device-only reporting, fresh submission fallback, post-choice IP browsing fallback (including Not now and device denial), first-visit privacy, bilingual rendering, canonical taxonomy, and SQL hardening are protected.'
+  'Location contract audit passed: Not now is GPS-authoritative, Escape/Not now parity is protected, technical GPS failures persist IP fallback, source-aware freshness is centralized, device-only reporting remains fresh, and location privacy/SQL contracts are protected.'
 );
