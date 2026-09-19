@@ -122,8 +122,19 @@ for (const needle of [
   'chooseApproximateBrowseLocation',
   'VisitorSessionService.handleNotNow()',
   '.then(() => refreshBrowseLocation())',
+  'এখন নয় চাপলে কাছাকাছি এলাকা ধরে খবর দেখানো হবে।',
+  'If you choose Not now, we’ll still use a rough area for local reports.',
 ]) {
   requireText(consentModal, needle, 'Not now/Escape parity');
+}
+
+for (const needle of [
+  "window.addEventListener('online', handleOnline)",
+  'browseLocationStatus !== \'available\'',
+  'browseLocationStatus !== \'requesting\'',
+  '60_000',
+]) {
+  requireText(appContext, needle, 'approximate location recovery');
 }
 
 for (const needle of [
