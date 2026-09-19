@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Button } from '../ui/Button';
+import { VisitorSessionService } from '../../services/visitorSessionService';
 
 export interface LocationReminderBarProps {
   isFirstVisitNoticeOpen?: boolean;
@@ -9,8 +10,8 @@ export interface LocationReminderBarProps {
 
 /**
  * LocationReminderBar
- * Persistent inline reminder bar positioned below public navigation
- * displayed when browse location is off/unavailable.
+ * One-time inline reminder shown only until the visitor makes an explicit
+ * location choice. Refreshing the page must not nag returning visitors.
  * Reuses existing LocationConsentModal in 'browse' purpose.
  */
 export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
@@ -24,13 +25,20 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
     isLocationModalOpen,
   } = useApp();
 
-  // Show reminder ONLY when:
-  // 1. First-visit notice is not currently open
-  // 2. First-visit location modal is not actively open
-  // 3. Location is NOT available (user chose Not now, denied, or unavailable)
-  const hasDeviceLocation =
-    browseLocationStatus === 'available' && browseLocation?.source === 'device';
-  if (isFirstVisitNoticeOpen || isLocationModalOpen || hasDeviceLocation) {
+  // The reminder is only for visitors who have never answered the location
+  // prompt. Once they grant, deny, or choose "Not now", that decision is
+  // persisted and refreshes must not show the reminder again.
+  const locationChoice = VisitorSessionService.getLocationChoice();
+  const hasBrowseLocation =
+    browseLocationStatus === 'available' && Boolean(browseLocation);
+  const hasAnsweredLocationPrompt = locationChoice !== null;
+
+  if (
+    isFirstVisitNoticeOpen ||
+    isLocationModalOpen ||
+    hasBrowseLocation ||
+    hasAnsweredLocationPrompt
+  ) {
     return null;
   }
 
