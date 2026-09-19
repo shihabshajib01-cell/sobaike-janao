@@ -329,9 +329,17 @@ export const VisitorSessionService = {
     };
 
     try {
-      const { error } = await supabase.rpc('record_public_visit_session', payload);
-      if (error) {
-        console.warn('[VisitorSessionService] Failed to record visit session:', error.message);
+      const { data, error } = await supabase.functions.invoke('public-write-gateway', {
+        body: {
+          action: 'session',
+          payload,
+        },
+      });
+      if (error || data?.success === false) {
+        console.warn(
+          '[VisitorSessionService] Failed to record visit session:',
+          error?.message || data?.error || 'Session write rejected.'
+        );
       }
     } catch (err) {
       console.warn('[VisitorSessionService] Unexpected error recording session:', err);
