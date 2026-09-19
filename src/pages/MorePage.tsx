@@ -117,7 +117,7 @@ export const MorePage: React.FC = () => {
   ];
 
   return (
-    <PublicPageContainer id="more-page-container">
+    <PublicPageContainer id="more-page-container" className="information-support-brand-scope">
       <section className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-card)] p-5 md:p-7 shadow-[var(--elevation-2xs)] space-y-4">
         <div className="space-y-2">
           <p className="inline-flex items-center gap-2 w-fit px-3 py-1 rounded-[var(--radius-pill)] bg-ui-surface-subtle border border-ui-stroke-subtle type-meta text-ui-content-secondary">
@@ -175,8 +175,8 @@ export const MorePage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="rounded-[var(--radius-control)] border border-ui-warning-border bg-ui-warning-bg p-4 space-y-2">
-                <ShieldAlert className="w-5 h-5 text-ui-warning-text" aria-hidden="true" />
+              <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-4 space-y-2">
+                <ShieldAlert className="w-5 h-5 text-ui-accent" aria-hidden="true" />
                 <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'সরকারি ওয়েবসাইট নয়' : 'Not a government website'}</h3>
                 <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'এটি কোনো সরকারি প্রতিষ্ঠান, মন্ত্রণালয় বা দাপ্তরিক অভিযোগ পোর্টাল নয়।' : 'This is not a government agency, ministry, or official complaint portal.'}</p>
               </div>
@@ -185,8 +185,8 @@ export const MorePage: React.FC = () => {
                 <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'থানা বা আদালত নয়' : 'Not police or a court'}</h3>
                 <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'এখানে প্রতিবেদন করা জিডি, মামলা বা আনুষ্ঠানিক তদন্তের বিকল্প নয়।' : 'Reporting here does not create a GD, case, or formal investigation.'}</p>
               </div>
-              <div className="rounded-[var(--radius-control)] border border-ui-info-border bg-ui-info-bg p-4 space-y-2">
-                <AlertTriangle className="w-5 h-5 text-ui-info-text" aria-hidden="true" />
+              <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-4 space-y-2">
+                <AlertTriangle className="w-5 h-5 text-ui-accent" aria-hidden="true" />
                 <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'জরুরি সেবা নয়' : 'Not an emergency service'}</h3>
                 <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'তাৎক্ষণিক ঝুঁকি বা জরুরি অবস্থায় জাতীয় জরুরি সেবা বা সংশ্লিষ্ট কর্তৃপক্ষের সঙ্গে যোগাযোগ করুন।' : 'For immediate danger or emergencies, contact national emergency services or the appropriate authority.'}</p>
               </div>
@@ -204,7 +204,7 @@ export const MorePage: React.FC = () => {
                 if (!segment) return null;
                 return (
                   <div key={item.key} className="flex items-center gap-3 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-3.5">
-                    <div className="w-10 h-10 shrink-0 rounded-[var(--radius-control)] flex items-center justify-center border" style={{ backgroundColor: `var(--sec-${item.key}-bg)`, color: `var(--sec-${item.key}-text)`, borderColor: `var(--sec-${item.key}-border)` }}>
+                    <div className="w-10 h-10 shrink-0 rounded-[var(--radius-control)] flex items-center justify-center border border-ui-accent-border bg-ui-accent-soft text-ui-accent">
                       <CategoryIcon section={item.key} size="sm" />
                     </div>
                     <div className="min-w-0">
@@ -265,7 +265,7 @@ export const MorePage: React.FC = () => {
                 );
               })}
             </div>
-            <div className="rounded-[var(--radius-control)] border border-ui-info-border bg-ui-info-bg p-4 space-y-1">
+            <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle p-4 space-y-1">
               <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'ঘুষ প্রতিবেদনে অতিরিক্ত তথ্য' : 'Extra details for bribery reports'}</h3>
               <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রযোজ্য হলে দপ্তর, সেবা বা প্রক্রিয়া এবং টাকার পরিমাণ যোগ করুন। এগুলো মূল ঘটনার বিবরণ ও অবস্থানের বিকল্প নয়।' : 'When relevant, add the office, service/process and amount of money. These supplement the core incident description and location.'}</p>
             </div>
@@ -408,7 +408,7 @@ export const MorePage: React.FC = () => {
             <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle p-4 space-y-2"><Shield className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '২. প্রয়োজনীয় ব্যবস্থা' : '2. Moderation'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রয়োজনে সম্পাদনা, তথ্য আড়াল, প্রত্যাখ্যান বা অতিরিক্ত যাচাই করা হতে পারে।' : 'A report may be edited, redacted, rejected or checked further when needed.'}</p></div>
             <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle p-4 space-y-2"><CheckCircle2 className="w-5 h-5 text-ui-accent" aria-hidden="true" /><h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? '৩. প্রকাশ' : '3. Publication'}</h3><p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'অনুমোদিত প্রতিবেদন সংশ্লিষ্ট বিষয়, অনুসন্ধান, ফিল্টার ও মানচিত্রে দেখা যেতে পারে।' : 'Approved reports may appear in category feeds, search, filters and map views.'}</p></div>
           </div>
-          <div className="rounded-[var(--radius-control)] bg-ui-warning-bg border border-ui-warning-border p-4">
+          <div className="rounded-[var(--radius-control)] bg-ui-surface-subtle border border-ui-stroke-subtle p-4">
             <p className="type-meta text-ui-content-secondary">{language === 'bn' ? 'প্রকাশিত হওয়া মানে অভিযোগটি আদালত, পুলিশ বা সরকারি কর্তৃপক্ষ কর্তৃক সত্য প্রমাণিত হয়েছে—এমন নয়।' : 'Publication does not mean an allegation has been proven by a court, police, or government authority.'}</p>
           </div>
         </section>
