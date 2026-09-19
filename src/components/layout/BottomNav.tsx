@@ -16,7 +16,11 @@ export const shouldHideBottomNav = (
   categoryRoutes.includes(currentRoute) ||
   BACK_NAV_ROUTE_PREFIXES.some((prefix) => currentRoute.startsWith(prefix));
 
-export const BottomNav: React.FC = () => {
+interface BottomNavProps {
+  isCompact: boolean;
+}
+
+export const BottomNav: React.FC<BottomNavProps> = ({ isCompact }) => {
   const { currentRoute, language, openReportComposer } = useApp();
   const { segments } = useTaxonomy();
   const categoryRoutes = Object.values(segments).map((segment) => segment.slug);
@@ -63,7 +67,13 @@ export const BottomNav: React.FC = () => {
     <nav
       id="bottom-nav"
       aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)]"
+      aria-hidden={isCompact || undefined}
+      inert={isCompact ? true : undefined}
+      className={`md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none ${
+        isCompact
+          ? 'translate-y-[calc(100%+env(safe-area-inset-bottom,0px)+16px)] opacity-0'
+          : 'translate-y-0 opacity-100'
+      }`}
     >
       <div className="pointer-events-auto mx-auto grid max-w-[420px] grid-cols-[1fr_1fr_1fr_auto] items-center gap-1 ui-radius-card border border-ui-stroke-subtle bg-ui-surface/95 p-1.5 shadow-[var(--elevation-lg)] backdrop-blur-md">
         {navItems.map((item) => (
