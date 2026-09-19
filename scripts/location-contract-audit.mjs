@@ -80,12 +80,18 @@ if (ipService.includes('https://ipwho.is/')) {
   errors.push('first-party IP fallback: browser must not call ipwho.is directly');
 }
 for (const needle of [
-  'x-forwarded-for',
   'cf-connecting-ip',
+  'x-real-ip',
+  'Do not fall back to client-supplied X-Forwarded-For.',
+  'service_assert_public_write_rate',
+  'p_action: "ip_location"',
   'https://ipwho.is/',
   'accuracy: 25000',
 ]) {
   requireText(ipEdge, needle, 'IP fallback edge function');
+}
+if (ipEdge.includes('req.headers.get("x-forwarded-for")') || ipEdge.includes("req.headers.get('x-forwarded-for')")) {
+  errors.push('IP fallback edge function: must not trust client-supplied x-forwarded-for directly');
 }
 for (const needle of [
   "if (choice === 'not_now')",
