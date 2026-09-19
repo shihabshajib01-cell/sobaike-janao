@@ -56,6 +56,27 @@ try {
   await page.locator('#mobile-nav-report').click();
   await expectVisible(page.locator('#report-composer-modal'), 'report composer did not open');
 
+  const mobileViewport = page.viewportSize();
+  if (!mobileViewport) throw new Error('mobile viewport is unavailable');
+
+  const composerRootBox = await page.locator('#report-composer-modal').boundingBox();
+  const composerDialogBox = await page
+    .locator('#report-composer-modal > [data-modal-dialog="true"]')
+    .boundingBox();
+  if (!composerRootBox || !composerDialogBox) {
+    throw new Error('report composer viewport geometry is not measurable');
+  }
+  if (
+    Math.abs(composerRootBox.y) > 1 ||
+    Math.abs(composerRootBox.height - mobileViewport.height) > 2 ||
+    Math.abs(composerDialogBox.y) > 1 ||
+    Math.abs(composerDialogBox.height - mobileViewport.height) > 2
+  ) {
+    throw new Error(
+      `mobile composer is not anchored to the viewport: root=${JSON.stringify(composerRootBox)} dialog=${JSON.stringify(composerDialogBox)} viewport=${JSON.stringify(mobileViewport)}`
+    );
+  }
+
   // Step 1: Public Safety.
   await page.locator('#service-select-card-public_safety').click();
   const step1Next = page.locator('#composer-footer-step1-next-btn');
@@ -136,6 +157,26 @@ try {
   // Close cleanly without submitting anything.
   await page.locator('#report-composer-close-btn').click();
   await expectVisible(page.locator('#report-cancel-confirm-modal'), 'cancel confirmation missing from review step');
+
+  const cancelRootBox = await page.locator('#report-cancel-confirm-modal').boundingBox();
+  const cancelSheetBox = await page
+    .locator('#report-cancel-confirm-modal > [data-modal-dialog="true"]')
+    .boundingBox();
+  if (!cancelRootBox || !cancelSheetBox) {
+    throw new Error('cancel confirmation viewport geometry is not measurable');
+  }
+  const cancelRootBottom = cancelRootBox.y + cancelRootBox.height;
+  const cancelSheetBottom = cancelSheetBox.y + cancelSheetBox.height;
+  if (
+    Math.abs(cancelRootBox.y) > 1 ||
+    Math.abs(cancelRootBottom - mobileViewport.height) > 2 ||
+    Math.abs(cancelSheetBottom - mobileViewport.height) > 2
+  ) {
+    throw new Error(
+      `mobile cancel sheet is not bottom-anchored: root=${JSON.stringify(cancelRootBox)} sheet=${JSON.stringify(cancelSheetBox)} viewport=${JSON.stringify(mobileViewport)}`
+    );
+  }
+
   await page.locator('#report-cancel-btn').click();
   await page.locator('#report-composer-modal').waitFor({ state: 'hidden', timeout: 10000 });
 
