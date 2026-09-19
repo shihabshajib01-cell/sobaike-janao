@@ -97,6 +97,7 @@ export interface AppContextType {
   browseLocation: BrowseLocation | null;
   refreshBrowseLocation: () => Promise<void>;
   retryBrowseLocation: () => Promise<LocationRequestResult>;
+  useApproximateBrowseLocation: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -178,12 +179,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
-    // Existing browser grants may be restored silently. The service receives
-    // silent=true so an in-flight request cannot overwrite a newer Not now/deny.
+    // Existing browser grants may be restored without another prompt. A newly
+    // granted permission may upgrade denied/IP fallback, but an explicit
+    // "Not now" remains authoritative and is handled before this branch.
     if (perm === 'granted') {
+      const requestMode =
+        choice === 'denied' || choice === 'ip_fallback'
+          ? 'permission_upgrade'
+          : 'restore';
       const deviceResult = await VisitorSessionService.requestAndRecordLocation(
         'browse',
-        { silent: true }
+        { mode: requestMode }
       );
 
       choice = VisitorSessionService.getLocationChoice();
@@ -250,7 +256,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const retryBrowseLocation = useCallback(async (): Promise<LocationRequestResult> => {
     setBrowseLocationStatus('requesting');
-    const result = await VisitorSessionService.requestAndRecordLocation('browse');
+    const result = await VisitorSessionService.requestAndRecordLocation('browse', {
+      mode: 'user_request',
+    });
 
     if (result.success && result.coords) {
       setBrowseLocation({
@@ -287,6 +295,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setBrowseLocationStatus('unavailable');
     }
     return result;
+  }, []);
+
+  const useApproximateBrowseLocation = useCallback(async (): Promise<void> => {
+    await VisitorSessionService.handleNotNow();
+    const approximate = await IpLocationService.getApproximateLocation();
+
+    if (approximate) {
+      setBrowseLocation(approximate);
+      setBrowseLocationStatus('available');
+      return;
+    }
+
+    setBrowseLocation(null);
+    setBrowseLocationStatus('not_now');
   }, []);
 
   useEffect(() => {
@@ -581,6 +603,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       browseLocation,
       refreshBrowseLocation,
       retryBrowseLocation,
+      useApproximateBrowseLocation,
     }),
     [
       currentRoute,
@@ -607,6 +630,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       browseLocation,
       refreshBrowseLocation,
       retryBrowseLocation,
+      useApproximateBrowseLocation,
     ]
   );
 
