@@ -59,11 +59,17 @@ if (!composerHeader.includes('color: \`color-mix(in srgb, \${color} 82%, var(--m
   failures.push('Report composer selected category badge is not using the stronger category accent');
 }
 
-if (!homeCarousel.includes('titleColor={homeBannerTitleColor}')) {
-  failures.push('Home banners are not using their own category-derived title color');
+if (!homeCarousel.includes('className="category-hero-slider')) {
+  failures.push('Home hero does not share the category banner mobile/layout recipe');
 }
-if (!homeCarousel.includes('descriptionColor={homeBannerDescriptionColor}')) {
-  failures.push('Home banners are not using their own category-derived description color');
+if (!homeCarousel.includes('className={\`category-theme-scope')) {
+  failures.push('Home hero slides do not use the same scoped category theme as category pages');
+}
+if (!homeCarousel.includes("'--category-route-on-container': slideSegment.textColor")) {
+  failures.push('Home hero slides do not source banner text from the category palette');
+}
+if (homeCarousel.includes('titleColor={') || homeCarousel.includes('descriptionColor={')) {
+  failures.push('Home hero has one-off text overrides instead of the shared category banner style');
 }
 
 if (!shell.includes('category-theme-scope')) failures.push('AppShell does not activate category theme scope');

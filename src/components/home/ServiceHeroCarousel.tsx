@@ -311,7 +311,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
-        className="w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
+        className="category-hero-slider w-full ui-radius-card ui-elevation-card relative overflow-hidden transition-colors duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
         style={containerStyle}
       >
         <div
@@ -334,12 +334,16 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
             const content = getRuntimeBannerContent(slide.key);
             if (!content) return null;
             const slideSegment = segments[slide.key];
-            const slideTextColor =
-              slideSegment?.textColor ?? `var(--sec-${slide.key}-text, var(--md-on-surface))`;
-            const homeBannerTitleColor =
-              `color-mix(in srgb, ${slideTextColor} 70%, var(--md-on-surface))`;
-            const homeBannerDescriptionColor =
-              `color-mix(in srgb, ${slideTextColor} 82%, var(--md-on-surface))`;
+            const slideThemeStyle = slideSegment
+              ? ({
+                  '--category-route-primary': slideSegment.primaryColor,
+                  '--category-route-hover': slideSegment.hoverColor,
+                  '--category-route-on-primary': slideSegment.colors.filledText,
+                  '--category-route-container': slideSegment.bgColor,
+                  '--category-route-on-container': slideSegment.textColor,
+                  '--category-route-outline': slideSegment.borderColor,
+                } as React.CSSProperties)
+              : undefined;
 
             return (
               <div
@@ -353,8 +357,10 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                 }
                 aria-hidden={!isActive}
                 onClick={(e) => handleSlideClick(e, slide.key)}
-                className={`w-full shrink-0 min-w-full p-0 flex flex-col ${isActive ? 'cursor-pointer' : ''}`}
+                className={`category-theme-scope w-full shrink-0 min-w-full p-0 flex flex-col ${isActive ? 'cursor-pointer' : ''}`}
+                data-category-theme={slide.key}
                 style={{
+                  ...slideThemeStyle,
                   backgroundColor: isManagedThemePreset(slideSegment?.themeKey)
                     ? slideSegment?.bgColor || 'var(--md-surface-subtle)'
                     : HERO_TOKENS.sections[slide.key]?.background ??
@@ -387,8 +393,6 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
                   active={isActive}
                   ctaId={`${id}-report-btn-${slide.key}`}
                   ctaTabIndex={isActive ? 0 : -1}
-                  titleColor={homeBannerTitleColor}
-                  descriptionColor={homeBannerDescriptionColor}
                 />
               </div>
             );
