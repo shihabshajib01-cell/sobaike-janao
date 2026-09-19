@@ -27,7 +27,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   const { helperId, errorId, labelId } = formFieldIds(id);
 
   return (
-    <div className={`w-full text-left space-y-1.5 ${className}`}>
+    <div className={`w-full min-w-0 text-left space-y-1.5 ${className}`}>
       {label ? (
         groupLabel ? (
           <div id={labelId} className={`block ${labelClassName}`}>
