@@ -62,7 +62,8 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
           setErrorMessage(msg);
         }
       } else {
-        VisitorSessionService.setLocationChoice('granted');
+        // Persist "granted" only after the browser actually returns a valid
+        // device position. VisitorSessionService owns that success transition.
         const res = await retryBrowseLocation();
         if (res.success || res.browseFallback === 'ip') {
           onSuccess?.();
