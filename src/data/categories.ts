@@ -56,12 +56,12 @@ export const SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
 
 export const POPULAR_DISTRICTS = [
   { id: 'all', nameBn: 'সারা বাংলাদেশ', nameEn: 'All Bangladesh' },
-  { id: 'ঢাকা', nameBn: 'ঢাকা', nameEn: 'Dhaka' },
-  { id: 'চট্টগ্রাম', nameBn: 'চট্টগ্রাম', nameEn: 'Chittagong' },
-  { id: 'সিলেট', nameBn: 'সিলেট', nameEn: 'Sylhet' },
-  { id: 'রাজশাহী', nameBn: 'রাজশাহী', nameEn: 'Rajshahi' },
-  { id: 'খুলনা', nameBn: 'খুলনা', nameEn: 'Khulna' },
-  { id: 'বরিশাল', nameBn: 'বরিশাল', nameEn: 'Barisal' },
-  { id: 'রংপুর', nameBn: 'রংপুর', nameEn: 'Rangpur' },
-  { id: 'ময়মনসিংহ', nameBn: 'ময়মনসিংহ', nameEn: 'Mymensingh' },
+  { id: 'Dhaka', nameBn: 'ঢাকা', nameEn: 'Dhaka' },
+  { id: 'Chattogram', nameBn: 'চট্টগ্রাম', nameEn: 'Chattogram' },
+  { id: 'Sylhet', nameBn: 'সিলেট', nameEn: 'Sylhet' },
+  { id: 'Rajshahi', nameBn: 'রাজশাহী', nameEn: 'Rajshahi' },
+  { id: 'Khulna', nameBn: 'খুলনা', nameEn: 'Khulna' },
+  { id: 'Barishal', nameBn: 'বরিশাল', nameEn: 'Barishal' },
+  { id: 'Rangpur', nameBn: 'রংপুর', nameEn: 'Rangpur' },
+  { id: 'Mymensingh', nameBn: 'ময়মনসিংহ', nameEn: 'Mymensingh' },
 ];
