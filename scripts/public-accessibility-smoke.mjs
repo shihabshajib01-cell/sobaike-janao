@@ -48,6 +48,51 @@ const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 
 await seedReturningVisitor(desktop);
 const desktopPage = await desktop.newPage();
 
+await goto(desktopPage, '/');
+const defaultBodySize = await desktopPage.evaluate(() =>
+  Number.parseFloat(window.getComputedStyle(document.body).fontSize)
+);
+await desktopPage.locator('#rail-text-size-larger').click();
+await desktopPage.waitForFunction(
+  () => document.documentElement.getAttribute('data-text-size') === 'larger'
+);
+const largerBodySize = await desktopPage.evaluate(() =>
+  Number.parseFloat(window.getComputedStyle(document.body).fontSize)
+);
+if (!(largerBodySize > defaultBodySize)) {
+  throw new Error(`Larger text mode did not increase body text: ${defaultBodySize} -> ${largerBodySize}`);
+}
+await scan(desktopPage, 'desktop home larger text');
+
+await desktopPage.reload({ waitUntil: 'domcontentloaded' });
+await desktopPage.locator('#main-content').waitFor({ state: 'visible', timeout: 15000 });
+await desktopPage.waitForFunction(
+  () => document.documentElement.getAttribute('data-text-size') === 'larger'
+);
+
+await desktopPage.locator('#rail-text-size-smaller').click();
+await desktopPage.waitForFunction(
+  () => document.documentElement.getAttribute('data-text-size') === 'smaller'
+);
+const smallerBodySize = await desktopPage.evaluate(() =>
+  Number.parseFloat(window.getComputedStyle(document.body).fontSize)
+);
+if (!(smallerBodySize < defaultBodySize)) {
+  throw new Error(`Smaller text mode did not reduce body text: ${defaultBodySize} -> ${smallerBodySize}`);
+}
+await scan(desktopPage, 'desktop home smaller text');
+
+await desktopPage.locator('#rail-text-size-default').click();
+await desktopPage.waitForFunction(
+  () => document.documentElement.getAttribute('data-text-size') === 'default'
+);
+const restoredBodySize = await desktopPage.evaluate(() =>
+  Number.parseFloat(window.getComputedStyle(document.body).fontSize)
+);
+if (Math.abs(restoredBodySize - defaultBodySize) > 0.1) {
+  throw new Error(`Default text mode did not restore baseline: ${defaultBodySize} -> ${restoredBodySize}`);
+}
+
 for (const path of ['/', '/issues', '/harassment', '/search', '/more', '/en/', '/en/issues']) {
   await goto(desktopPage, path);
   await scan(desktopPage, `desktop ${path}`);
