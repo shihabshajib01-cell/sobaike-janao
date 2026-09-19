@@ -9,12 +9,12 @@ on:
 permissions:
   contents: read
 
-# Multiple Deploy completions can target the same production revision. Keep only
-# one heavyweight browser suite active so duplicate Playwright runs do not
-# compete for browser/network/Supabase resources and create false regressions.
+# Only the newest deployed revision needs the heavyweight live browser suite.
+# Keep one suite active globally: a newer deployment cancels stale validation
+# instead of making multiple Playwright runs hammer the same live services.
 concurrency:
-  group: public-functional-smoke-${{ github.event.workflow_run.head_sha || github.sha }}
-  cancel-in-progress: false
+  group: public-functional-smoke
+  cancel-in-progress: true
 
 jobs:
   browser-smoke:
@@ -28,12 +28,12 @@ jobs:
 
     steps:
       - name: Checkout exact deployed commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -43,7 +43,8 @@ jobs:
 
       - name: Install Playwright accessibility runtime
         run: |
-          npm install --no-save playwright@1.55.0 @axe-core/playwright@4.10.2
+          npm install --no-save playwright@1.63.0 @axe-core/playwright@4.13.0
+          npm audit --audit-level=moderate
           npx playwright install --with-deps chromium
 
       - name: Run comprehensive non-destructive Public browser smoke
