@@ -107,34 +107,37 @@ const APPROVED_MATERIAL_CORE = {
     '--md-primary-variant': '#163B52',
     '--md-primary-active': '#245F82',
     '--md-on-primary': '#FFFFFF',
-    '--md-secondary': '#3A7CA5',
-    '--md-secondary-variant': '#163B52',
+    '--md-secondary': '#287B65',
+    '--md-secondary-variant': '#1F6A57',
     '--md-on-secondary': '#FFFFFF',
-    '--md-on-secondary-container': '#163B52',
+    '--md-on-secondary-container': '#1F6A57',
     '--md-background': '#F0F2F5',
     '--md-on-background': '#050505',
     '--md-surface': '#FFFFFF',
-    '--md-surface-subtle': '#F0F2F5',
+    '--md-surface-subtle': '#F7F8FA',
     '--md-surface-elevated': '#FFFFFF',
-    '--md-surface-hover': '#E4E6EB',
+    '--md-surface-hover': '#ECEEF1',
     '--md-on-surface': '#050505',
     '--md-on-surface-secondary': '#4F5459',
     '--md-on-surface-muted': '#65676B',
     '--md-outline-subtle': '#E4E6EB',
     '--md-outline': '#85888C',
     '--md-outline-strong': '#65676B',
-    '--md-disabled-container': '#E4E6EB',
+    '--md-disabled-container': '#E6E8EB',
     '--md-on-disabled': '#65676B',
+    '--md-selected-container': '#EAF7F2',
+    '--md-on-selected-container': '#1F6A57',
+    '--md-selected-outline': '#B7DCCE',
   },
   dark: {
-    '--md-primary': '#327DA8',
-    '--md-primary-variant': '#3B7DA4',
-    '--md-primary-active': '#2B79A4',
+    '--md-primary': '#2D739A',
+    '--md-primary-variant': '#245F82',
+    '--md-primary-active': '#1F6286',
     '--md-on-primary': '#FFFFFF',
-    '--md-secondary': '#3A7CA5',
-    '--md-secondary-variant': '#245F82',
-    '--md-on-secondary': '#FFFFFF',
-    '--md-on-secondary-container': '#BFDBFE',
+    '--md-secondary': '#58C5A4',
+    '--md-secondary-variant': '#38AD8C',
+    '--md-on-secondary': '#050505',
+    '--md-on-secondary-container': '#9BE4CD',
     '--md-background': '#18191A',
     '--md-on-background': '#E4E6EB',
     '--md-surface': '#242526',
@@ -149,6 +152,9 @@ const APPROVED_MATERIAL_CORE = {
     '--md-outline-strong': '#B0B3B8',
     '--md-disabled-container': '#3A3B3C',
     '--md-on-disabled': '#B0B3B8',
+    '--md-selected-container': '#14352C',
+    '--md-on-selected-container': '#9BE4CD',
+    '--md-selected-outline': '#2F6E5C',
   },
 };
 
@@ -260,16 +266,13 @@ if (!fs.existsSync(colorSystemFile)) {
 
     addContrastFinding(colorSystemFile, theme, 'on-primary', values['--md-on-primary'], values['--md-primary']);
     addContrastFinding(colorSystemFile, theme, 'on-secondary', values['--md-on-secondary'], values['--md-secondary']);
-    if (values['--md-secondary-container']?.startsWith('color-mix')) {
-      const secondaryContainer = theme === 'light' ? '#E7EFF4' : '#28353D';
-      addContrastFinding(
-        colorSystemFile,
-        theme,
-        'on-secondary-container',
-        values['--md-on-secondary-container'],
-        secondaryContainer
-      );
-    }
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'on-secondary-container',
+      values['--md-on-secondary-container'],
+      values['--md-secondary-container']
+    );
     addContrastFinding(colorSystemFile, theme, 'on-background', values['--md-on-background'], values['--md-background']);
     addContrastFinding(colorSystemFile, theme, 'on-surface', values['--md-on-surface'], values['--md-surface']);
     addContrastFinding(colorSystemFile, theme, 'on-surface-secondary', values['--md-on-surface-secondary'], values['--md-surface']);
@@ -324,6 +327,31 @@ if (!fs.existsSync(colorSystemFile)) {
       values['--md-surface'],
       3
     );
+    addContrastFinding(
+      colorSystemFile,
+      theme,
+      'on-selected-container',
+      values['--md-on-selected-container'],
+      values['--md-selected-container']
+    );
+
+    const stateRoles = [
+      values['--md-surface-subtle'],
+      values['--md-surface-hover'],
+      values['--md-outline-subtle'],
+      values['--md-disabled-container'],
+      values['--md-selected-container'],
+    ];
+    if (new Set(stateRoles).size !== stateRoles.length) {
+      findings.push({
+        file: colorSystemFile,
+        line: 1,
+        rule: 'state-color-role-collapse',
+        token: theme,
+        message: 'Subtle, hover, outline, disabled and selected roles must remain visually distinct',
+        source: stateRoles.join(' / '),
+      });
+    }
 
     if (
       values['--md-outline-subtle'] === values['--md-outline'] ||
@@ -412,6 +440,42 @@ if (!fs.existsSync(colorSystemFile)) {
 
   const lightValues = parseVariables(extractThemeBlock(source, 'light'));
   const darkValues = parseVariables(extractThemeBlock(source, 'dark'));
+
+  const expectedBrandAccent = '#38AD8C';
+  if (
+    lightValues['--product-accent'] !== expectedBrandAccent ||
+    darkValues['--product-accent'] !== expectedBrandAccent
+  ) {
+    findings.push({
+      file: colorSystemFile,
+      line: 1,
+      rule: 'brand-accent-drift',
+      token: '--product-accent',
+      message: 'Approved teal brand accent must remain consistent across themes',
+      source: `light=${lightValues['--product-accent'] || 'missing'}, dark=${darkValues['--product-accent'] || 'missing'}`,
+    });
+  }
+
+  for (const asset of [
+    'public/brand/sobaike-janao-wordmark.svg',
+    'public/brand/sobaike-janao-wordmark-dark.svg',
+    'public/brand/sobaike-janao-favicon.svg',
+    'public/brand/sobaike-janao-mark.svg',
+    'public/brand/sobaike-janao-maskable.svg',
+  ]) {
+    if (!fs.existsSync(asset)) continue;
+    const assetSource = fs.readFileSync(asset, 'utf8');
+    if (!assetSource.includes(expectedBrandAccent) || assetSource.includes('#3A7CA5')) {
+      findings.push({
+        file: asset,
+        line: 1,
+        rule: 'brand-asset-color-drift',
+        token: expectedBrandAccent,
+        message: 'Brand SVG must use the approved teal accent and must not retain the legacy medium blue',
+        source: 'Expected #38AD8C and no #3A7CA5',
+      });
+    }
+  }
 
   for (const category of [
     'harassment',
@@ -513,6 +577,27 @@ if (!fs.existsSync(colorSystemFile)) {
       token: 'compatibility-alias',
       message: 'Compatibility aliases must reference Material/category roles and contain no color literals',
       source: 'Literal color found after compatibility alias marker',
+    });
+  }
+}
+
+const indexColorSource = fs.existsSync('src/index.css') ? fs.readFileSync('src/index.css', 'utf8') : '';
+for (const requiredSelectedMapping of [
+  '--color-role-selected-container: var(--md-selected-container);',
+  '--color-role-on-selected-container: var(--md-on-selected-container);',
+  '--color-role-selected-outline: var(--md-selected-outline);',
+  '--color-ui-selected-bg: var(--ui-selected-bg);',
+  '--color-ui-selected-text: var(--ui-selected-text);',
+  '--color-ui-selected-border: var(--ui-selected-border);',
+]) {
+  if (!indexColorSource.includes(requiredSelectedMapping)) {
+    findings.push({
+      file: 'src/index.css',
+      line: 1,
+      rule: 'missing-selected-color-utility',
+      token: requiredSelectedMapping,
+      message: 'Selected-state semantic color utilities must remain available',
+      source: requiredSelectedMapping,
     });
   }
 }
