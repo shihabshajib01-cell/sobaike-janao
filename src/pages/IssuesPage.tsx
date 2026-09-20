@@ -136,12 +136,12 @@ export const IssuesPage: React.FC = () => {
                 />
               </div>
 
-              <div className="flex min-w-0 items-center gap-2 max-[390px]:px-2.5 max-[390px]:py-2.5 sm:gap-3 ui-radius-card bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
-                <h2 className="min-w-0 flex-1 type-h4 text-ui-content-primary max-[390px]:leading-snug">
+              <div className="flex min-w-0 flex-col items-start justify-center gap-0.5 max-[390px]:px-2.5 max-[390px]:py-2.5 sm:flex-row sm:items-center sm:justify-start sm:gap-3 ui-radius-card bg-ui-surface px-3.5 py-3 transition-colors group-hover:bg-ui-surface-hover">
+                <h2 className="w-full min-w-0 type-h4 text-ui-content-primary max-[390px]:leading-snug sm:flex-1">
                   {language === 'bn' ? config.nameBn : config.nameEn}
                 </h2>
 
-                <p className="shrink-0 max-w-[42%] text-right type-meta max-[390px]:type-helper font-[var(--font-weight-medium)] text-ui-content-secondary">
+                <p className="w-full text-left type-meta max-[390px]:type-helper font-[var(--font-weight-medium)] text-ui-content-secondary sm:w-auto sm:shrink-0 sm:max-w-[42%] sm:text-right">
                   {isLoading
                     ? language === 'bn'
                       ? 'গণনা হচ্ছে...'
