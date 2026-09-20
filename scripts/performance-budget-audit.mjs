@@ -241,8 +241,8 @@ if (!moduleMatch) {
   } else {
     const raw = fs.statSync(entryPath).size;
     const gzip = gzipBytes(entryPath);
-    const maxRaw = 525 * 1024;
-    const maxGzip = 155 * 1024;
+    const maxRaw = 470 * 1024;
+    const maxGzip = 140 * 1024;
     console.log(`[performance-budget] entry: ${kb(raw)} KB raw / ${kb(gzip)} KB gzip`);
     if (raw > maxRaw) fail(`Entry chunk exceeds ${kb(maxRaw)} KB raw budget.`);
     if (gzip > maxGzip) fail(`Entry chunk exceeds ${kb(maxGzip)} KB gzip budget.`);
