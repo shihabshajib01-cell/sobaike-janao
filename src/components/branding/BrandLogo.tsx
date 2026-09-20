@@ -46,17 +46,22 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   const imageClass =
     'h-full w-auto max-w-full object-contain shrink-0 select-none';
 
+  const wordmarkAsset =
+    resolvedTheme === 'dark'
+      ? 'sobaike-janao-wordmark-dark.svg'
+      : 'sobaike-janao-wordmark.svg';
+
   const brandContent = (
     <div
       className={`relative inline-flex items-center min-w-0 ${logoSizes[size]} ${className}`}
     >
       <img
-        src={getBrandAsset('sobaike-janao-wordmark.webp')}
+        src={getBrandAsset(wordmarkAsset)}
         alt=""
         aria-hidden="true"
-        width={360}
-        height={109}
-        className={`block ${imageClass} ${resolvedTheme === 'dark' ? 'brightness-0 invert' : ''}`}
+        width={2014}
+        height={505}
+        className={`block ${imageClass}`}
       />
     </div>
   );
