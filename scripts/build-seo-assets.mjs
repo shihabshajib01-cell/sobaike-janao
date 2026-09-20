@@ -9,6 +9,9 @@ const FULL_INDEX_ROBOTS =
   'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 const BRAND_NAME = 'Sobaike Janao';
 const BRAND_NAME_BN = 'সবাইকে জানাও';
+const BRAND_ALTERNATE_NAMES = [BRAND_NAME_BN, 'shobaikejanao.com'];
+const ENTITY_DESCRIPTION =
+  'Independent, moderated citizen-reporting and public-interest information platform for Bangladesh.';
 
 function detectPrimaryLanguage(...values) {
   const text = values.filter(Boolean).join(' ');
@@ -23,7 +26,7 @@ const STATIC_PAGES = [
     path: '/',
     title: 'Sobaike Janao | সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
     description:
-      'Sobaike Janao (সবাইকে জানাও) — বাংলাদেশে জনস্বার্থের সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণ করার মডারেটেড প্ল্যাটফর্ম।',
+      'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম—বিষয় ও এলাকা অনুযায়ী প্রতিবেদন দেখুন ও ঘটনা জানান।',
     socialDescription:
       'Sobaike Janao (সবাইকে জানাও) — বাংলাদেশের নাগরিকদের জনস্বার্থের সমস্যা ও অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণের স্বাধীন, নিরাপদ ও মডারেটেড প্ল্যাটফর্ম।',
     robots: FULL_INDEX_ROBOTS,
@@ -130,7 +133,7 @@ const STATIC_ENGLISH = {
   '/': {
     title: 'Sobaike Janao | Citizen Reporting Platform',
     description:
-      'Sobaike Janao is a moderated citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
+      'Sobaike Janao is an independent, moderated citizen-reporting and public-interest information platform for Bangladesh, organized by topic and area.',
     socialDescription:
       'Sobaike Janao helps people in Bangladesh responsibly publish, discover, and follow moderated public-interest reports, community issues, and citizen concerns.',
   },
@@ -462,7 +465,7 @@ function injectStaticFallback(html, page) {
             reports clear and relevant, and later updates or responses from relevant parties may add important
             context to a published report.
           </p>
-          <p>
+          <p data-nosnippet>
             A published report is not, by itself, a court judgment, an official government determination, or proof
             of criminal liability. Readers should consider the report description, location, publication date,
             available sources, supporting material, responses, and subsequent updates together.
@@ -471,13 +474,13 @@ function injectStaticFallback(html, page) {
 
         <section class="mt-8 space-y-3">
           <h2>Privacy, response and safe use</h2>
-          <p>
+          <p data-nosnippet>
             Avoid publishing unnecessary phone numbers, identity-document numbers, private addresses, or other
             sensitive information that could create avoidable privacy or safety risks. If a report directly
             concerns you, review the platform guidance for response and correction options. Sobaike Janao is not
             an emergency-response service and does not replace a government investigative authority.
           </p>
-          <p>
+          <p data-nosnippet>
             If there is an immediate risk to life or safety, or an ongoing crime, contact 999 or the appropriate
             authority instead of waiting to publish a report on the website.
           </p>
@@ -549,7 +552,7 @@ function injectStaticFallback(html, page) {
 
         <section class="mt-8 space-y-3">
           <h2>${isEnglish ? 'About this page' : 'পৃষ্ঠা সম্পর্কে'}</h2>
-          <p>${htmlEscape(contextCopy)}</p>
+          <p data-nosnippet>${htmlEscape(contextCopy)}</p>
         </section>
 
         <section class="mt-8 space-y-3">
@@ -738,9 +741,8 @@ function injectMeta(template, page) {
         '@id': organizationId,
         url: `${SITE_ORIGIN}/`,
         name: 'Sobaike Janao',
-        alternateName: 'সবাইকে জানাও',
-        description:
-          'Independent, moderated citizen reporting platform for public-interest issues in Bangladesh.',
+        alternateName: BRAND_ALTERNATE_NAMES,
+        description: ENTITY_DESCRIPTION,
         areaServed: {
           '@type': 'Country',
           name: 'Bangladesh',
@@ -757,7 +759,8 @@ function injectMeta(template, page) {
         '@id': websiteId,
         url: `${SITE_ORIGIN}/`,
         name: 'Sobaike Janao',
-        alternateName: 'সবাইকে জানাও',
+        alternateName: BRAND_ALTERNATE_NAMES,
+        description: ENTITY_DESCRIPTION,
         inLanguage: ['bn-BD', 'en'],
         publisher: { '@id': organizationId },
       },
