@@ -14,10 +14,10 @@
       "purpose": "any"
     },
     {
-      "src": "./brand/sobaike-janao-maskable.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
+      "src": "./brand/sobaike-janao-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
