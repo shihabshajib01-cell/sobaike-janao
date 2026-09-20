@@ -431,6 +431,95 @@ record(
   `${htmlFiles.length} route entry files checked`
 );
 
+const seoBuildSource = await readFile('scripts/build-seo-assets.mjs', 'utf8');
+record(
+  'Taxonomy SEO uses published lifecycle only',
+  seoBuildSource.includes('active=eq.true&config_status=eq.published') &&
+    seoBuildSource.includes('loadActiveSubcategories')
+);
+
+const topicFiles = htmlFiles.filter((file) => {
+  const rel = relative(DIST, file).split(sep).join('/');
+  return rel.startsWith('topic/') || rel.startsWith('en/topic/');
+});
+const topicDataAvailable = topicFiles.length > 0;
+let topicFailures = 0;
+let indexableTopicPages = 0;
+
+for (const file of topicFiles) {
+  const html = await readFile(file, 'utf8');
+  const rel = relative(DIST, file).split(sep).join('/');
+  const canonical = getCanonical(html);
+  const robots = getRobots(html);
+  const indexable = isIndexableRobots(robots);
+  const reportLinks = count(html, /href=["'][^"']*report-detail\//gi);
+  const listedInSitemap = sitemapUrls.includes(canonical);
+
+  if (indexable) {
+    indexableTopicPages += 1;
+    if (reportLinks < 1) {
+      failures.push(`Indexable topic has no crawlable reports: ${rel}`);
+      topicFailures += 1;
+    }
+    if (!listedInSitemap) {
+      failures.push(`Indexable topic missing from sitemap: ${rel}`);
+      topicFailures += 1;
+    }
+  } else if (listedInSitemap) {
+    failures.push(`Noindex topic unexpectedly listed in sitemap: ${rel}`);
+    topicFailures += 1;
+  }
+
+  const schemaRaw = html.match(
+    /<script\s+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i
+  )?.[1];
+  try {
+    const parsed = JSON.parse(schemaRaw || '');
+    const graph = Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [parsed];
+    const pageNode = graph.find((item) => item?.['@type'] === 'CollectionPage');
+    const breadcrumb = graph.find((item) => item?.['@type'] === 'BreadcrumbList');
+    if (!pageNode || pageNode.url !== canonical) {
+      failures.push(`Topic CollectionPage schema invalid: ${rel}`);
+      topicFailures += 1;
+    }
+    if (
+      !breadcrumb ||
+      !Array.isArray(breadcrumb.itemListElement) ||
+      breadcrumb.itemListElement.length < 3
+    ) {
+      failures.push(`Topic breadcrumb hierarchy incomplete: ${rel}`);
+      topicFailures += 1;
+    }
+  } catch {
+    failures.push(`Topic structured data invalid: ${rel}`);
+    topicFailures += 1;
+  }
+}
+
+record(
+  'Subcategory topic pages pass SEO quality gate',
+  !topicDataAvailable || topicFailures === 0,
+  topicDataAvailable
+    ? `${topicFiles.length} localized topic pages; ${indexableTopicPages} indexable`
+    : 'skipped — taxonomy data unavailable in this build environment'
+);
+
+let collectionPagesWithTopicLinks = 0;
+for (const file of htmlFiles) {
+  const html = await readFile(file, 'utf8');
+  const rel = relative(DIST, file).split(sep).join('/');
+  if (!rel.includes('report-detail/') && /href=["'][^"']*\/topic\//i.test(html)) {
+    collectionPagesWithTopicLinks += 1;
+  }
+}
+record(
+  'Crawlable category-to-topic link graph exists',
+  !topicDataAvailable || collectionPagesWithTopicLinks >= 3,
+  topicDataAvailable
+    ? `${collectionPagesWithTopicLinks} collection pages link to topic routes`
+    : 'skipped — taxonomy data unavailable in this build environment'
+);
+
 let collectionPagesWithReportLinks = 0;
 for (const file of htmlFiles) {
   const html = await readFile(file, 'utf8');
