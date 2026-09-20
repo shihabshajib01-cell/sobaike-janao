@@ -124,7 +124,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
             <tr>
               <th
                 scope="col"
-                className="sticky left-0 z-20 bg-ui-surface w-[156px] min-w-[156px] max-w-[156px] sm:w-[176px] sm:min-w-[176px] sm:max-w-[176px] text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary border-r border-ui-stroke-subtle"
+                className="bg-ui-surface w-[132px] min-w-[132px] max-w-[132px] md:sticky md:left-0 md:z-20 md:w-[176px] md:min-w-[176px] md:max-w-[176px] text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary md:border-r md:border-ui-stroke-subtle"
               >
                 {language === 'bn' ? 'বিষয়' : 'Topic'}
               </th>
@@ -149,7 +149,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
                 <tr key={row.category}>
                   <th
                     scope="row"
-                    className="sticky left-0 z-20 bg-ui-surface w-[156px] min-w-[156px] max-w-[156px] sm:w-[176px] sm:min-w-[176px] sm:max-w-[176px] px-2 py-1.5 text-left border-r border-ui-stroke-subtle"
+                    className="bg-ui-surface w-[132px] min-w-[132px] max-w-[132px] md:sticky md:left-0 md:z-20 md:w-[176px] md:min-w-[176px] md:max-w-[176px] px-2 py-1.5 text-left md:border-r md:border-ui-stroke-subtle"
                   >
                     <span className="flex min-w-0 items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
                       <span className="shrink-0">
