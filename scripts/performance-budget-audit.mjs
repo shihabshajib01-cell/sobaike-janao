@@ -22,6 +22,46 @@ if (/Material\+Symbols|Material%20Symbols|Material Symbols/i.test(html)) {
   fail('Unused Material Symbols font must not be loaded by the initial document.');
 }
 
+const appShellSourcePath = path.join(root, 'src', 'components', 'layout', 'AppShell.tsx');
+if (fs.existsSync(appShellSourcePath)) {
+  const appShellSource = fs.readFileSync(appShellSourcePath, 'utf8');
+  const eagerChromeImports = [
+    "import { DesktopLeftRail } from './DesktopLeftRail'",
+    "import { Header } from './Header'",
+    "import { MobileHeader } from './MobileHeader'",
+    "import { BottomNav } from './BottomNav'",
+    "import { SearchModal } from './SearchModal'",
+    "import { LocationConsentModal } from '../location/LocationConsentModal'",
+    "import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal'",
+  ];
+
+  for (const eagerImport of eagerChromeImports) {
+    if (appShellSource.includes(eagerImport)) {
+      fail(`Public shell regressed to eager chrome/modal import: ${eagerImport}`);
+    }
+  }
+
+  if (
+    !appShellSource.includes('LazyDesktopLeftRail') ||
+    !appShellSource.includes('LazyHeader') ||
+    !appShellSource.includes('LazyMobileHeader') ||
+    !appShellSource.includes('LazyBottomNav') ||
+    !appShellSource.includes("viewportTier === 'desktop'") ||
+    !appShellSource.includes("viewportTier === 'tablet'")
+  ) {
+    fail('Public shell must load only the chrome needed for the active viewport tier.');
+  }
+
+  if (
+    !appShellSource.includes('isSearchModalOpen ?') ||
+    !appShellSource.includes('isLocationModalOpen ?') ||
+    !appShellSource.includes('isFirstVisitNoticeOpen ?') ||
+    !appShellSource.includes('LazyFirstVisitNoticeModal')
+  ) {
+    fail('Hidden or returning-user-only global modals must stay off the initial module graph.');
+  }
+}
+
 const mainSourcePath = path.join(root, 'src', 'main.tsx');
 if (fs.existsSync(mainSourcePath)) {
   const mainSource = fs.readFileSync(mainSourcePath, 'utf8');
@@ -97,6 +137,13 @@ if (fs.existsSync(homePageSourcePath)) {
   if (!homePageSource.includes('const HOME_FEED_PAGE_SIZE = 10')) {
     fail('Home infinite feed must keep the bounded 10-report page size.');
   }
+  if (
+    !homePageSource.includes('const HOME_LOCATION_BOOTSTRAP_MAX_WAIT_MS = 600') ||
+    !homePageSource.includes('allowUnrankedBootstrap') ||
+    !homePageSource.includes("browseLocationStatus === 'requesting' && !allowUnrankedBootstrap")
+  ) {
+    fail('Home must cap location bootstrap waiting before rendering an unranked feed fallback.');
+  }
   if (!homePageSource.includes('new IntersectionObserver(')) {
     fail('Home infinite feed must use IntersectionObserver instead of scroll polling.');
   }
@@ -167,10 +214,13 @@ if (fs.existsSync(heroCarouselSourcePath) && fs.existsSync(heroBannerSourcePath)
   const heroBannerSource = fs.readFileSync(heroBannerSourcePath, 'utf8');
   if (
     !heroCarouselSource.includes('shouldHydrateMedia') ||
+    !heroCarouselSource.includes('hydrateNeighborMedia') ||
+    !heroCarouselSource.includes('scheduleIdleTask') ||
+    !heroCarouselSource.includes('isActive || (hydrateNeighborMedia && circularDistance <= 1)') ||
     !heroCarouselSource.includes('deferIllustration={!shouldHydrateMedia}') ||
     !heroBannerSource.includes('data-hero-media-deferred')
   ) {
-    fail('Home hero must hydrate only the active/neighbor media window.');
+    fail('Home hero must load the active image first and defer neighbor hydration until idle.');
   }
 }
 
@@ -191,8 +241,8 @@ if (!moduleMatch) {
   } else {
     const raw = fs.statSync(entryPath).size;
     const gzip = gzipBytes(entryPath);
-    const maxRaw = 525 * 1024;
-    const maxGzip = 155 * 1024;
+    const maxRaw = 470 * 1024;
+    const maxGzip = 140 * 1024;
     console.log(`[performance-budget] entry: ${kb(raw)} KB raw / ${kb(gzip)} KB gzip`);
     if (raw > maxRaw) fail(`Entry chunk exceeds ${kb(maxRaw)} KB raw budget.`);
     if (gzip > maxGzip) fail(`Entry chunk exceeds ${kb(maxGzip)} KB gzip budget.`);

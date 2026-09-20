@@ -14,6 +14,7 @@ import {
 import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 import { getPublishedBannerSettings, getRuntimeBannerContent, usePublishedBannerRuntime } from '../../services/bannerRuntime';
 import { IconButton } from '../ui/IconButton';
+import { scheduleIdleTask } from '../../utils/scheduleIdleTask';
 
 export interface ServiceSlide {
   key: SectionKey;
@@ -39,6 +40,7 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const [isSwiping, setIsSwiping] = useState(false);
   const [isDocumentVisible, setIsDocumentVisible] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [hydrateNeighborMedia, setHydrateNeighborMedia] = useState(false);
 
   const timerRef = useRef<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -82,6 +84,14 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     mediaQuery.addEventListener('change', handler);
     return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const cancelNeighborHydration = scheduleIdleTask(() => {
+      setHydrateNeighborMedia(true);
+    }, 1600);
+
+    return cancelNeighborHydration;
   }, []);
 
   useEffect(() => {
@@ -330,7 +340,8 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
               totalSlides > 1
                 ? Math.min(rawDistance, totalSlides - rawDistance)
                 : 0;
-            const shouldHydrateMedia = circularDistance <= 1;
+            const shouldHydrateMedia =
+              isActive || (hydrateNeighborMedia && circularDistance <= 1);
             const content = getRuntimeBannerContent(slide.key);
             if (!content) return null;
             const slideSegment = segments[slide.key];
