@@ -31,6 +31,7 @@ for (const category of categories) {
 for (const role of [
   '--md-primary: var(--category-route-primary)',
   '--md-secondary: var(--category-route-primary)',
+  '--md-on-secondary: var(--category-route-on-primary)',
   '--md-focus: var(--category-route-primary)',
   '--ui-primary-action-bg: var(--category-route-primary)',
   '--ui-accent: var(--category-route-primary)',
