@@ -183,7 +183,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
                               : 'cursor-default border-transparent text-ui-content-muted'
                           } ${
                             active
-                              ? 'ring-2 ring-ui-focus bg-ui-surface-subtle text-ui-content-primary'
+                              ? 'ring-2 ring-ui-selected-border bg-ui-selected-bg text-ui-selected-text border-ui-selected-border'
                               : count > 0
                                 ? 'bg-ui-surface-subtle/80 text-ui-content-primary'
                                 : 'bg-ui-page'
