@@ -704,7 +704,7 @@ for (const file of [
 }
 requireContains(
   'src/components/ui/Toggle.tsx',
-  "disabled ? 'bg-ui-disabled-bg",
+  "disabled\n              ? 'bg-ui-disabled-bg",
   'Toggle disabled track must use the semantic disabled container'
 );
 requireContains(
