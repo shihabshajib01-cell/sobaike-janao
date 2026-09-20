@@ -13,6 +13,7 @@ type Language = 'bn' | 'en';
 
 type SubcategoryOption = {
   id: string;
+  slug?: string;
   nameBn: string;
   nameEn: string;
 };
@@ -88,7 +89,14 @@ export const CategoryFeedView: React.FC<CategoryFeedViewProps> = ({
             nextLabel={language === 'bn' ? 'পরের বিভাগগুলো দেখুন' : 'Show more categories'}
           >
             {subcategories.map((subcat) => {
-              const href = getSubcategoryHref?.(subcat.id);
+              const stableSlug = (subcat.slug || subcat.id.replace(/_/g, '-')).replace(/^\/+/, '');
+              const automaticHref =
+                subcat.id === 'all'
+                  ? undefined
+                  : language === 'en'
+                    ? `/en/topic/${encodeURIComponent(stableSlug)}`
+                    : `/topic/${encodeURIComponent(stableSlug)}`;
+              const href = getSubcategoryHref?.(subcat.id) ?? automaticHref;
               return (
                 <FilterChip
                   key={subcat.id}
