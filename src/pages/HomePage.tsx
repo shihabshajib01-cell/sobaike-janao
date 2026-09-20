@@ -44,6 +44,7 @@ interface LoadReportsOptions {
 }
 
 const HOME_FEED_PAGE_SIZE = 10;
+const HOME_LOCATION_BOOTSTRAP_MAX_WAIT_MS = 600;
 const FEED_UPDATE_POLL_INTERVAL_MS = 30_000;
 const HOME_FEED_PREFETCH_MARGIN = '720px 0px';
 const HOME_FEED_REDUCED_PREFETCH_MARGIN = '160px 0px';
@@ -100,6 +101,7 @@ export const HomePage: React.FC = () => {
   const [newReportCount, setNewReportCount] = useState<number>(0);
   const [pendingNewestPublishedAt, setPendingNewestPublishedAt] = useState<string | null>(null);
   const [isRefreshingNewReports, setIsRefreshingNewReports] = useState<boolean>(false);
+  const [allowUnrankedBootstrap, setAllowUnrankedBootstrap] = useState(false);
 
   // AppContext owns source-aware freshness for both device and IP
   // locations. Home only consumes the currently valid global browse state.
@@ -233,12 +235,24 @@ export const HomePage: React.FC = () => {
   }, [feedFilter, homeFilters, visitorLat, visitorLng]);
 
   useEffect(() => {
-    // AppContext performs one authoritative location restoration pass on mount.
-    // Avoid fetching an unranked page that is immediately discarded/reloaded
-    // when persisted device/IP location becomes available.
-    if (browseLocationStatus === 'requesting') return;
+    if (browseLocationStatus !== 'requesting' || allowUnrankedBootstrap) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setAllowUnrankedBootstrap(true);
+    }, HOME_LOCATION_BOOTSTRAP_MAX_WAIT_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [browseLocationStatus, allowUnrankedBootstrap]);
+
+  useEffect(() => {
+    // Give persisted location a short chance to restore so the common path
+    // still makes one ranked request. If the network/GPS fallback is slow,
+    // render an unranked feed after a bounded wait instead of holding content
+    // for the full location timeout. When location later resolves, the
+    // visitorLat/visitorLng generation guard safely replaces that page.
+    if (browseLocationStatus === 'requesting' && !allowUnrankedBootstrap) return;
     void loadReports();
-  }, [browseLocationStatus, loadReports]);
+  }, [browseLocationStatus, allowUnrankedBootstrap, loadReports]);
 
   useEffect(() => {
     if (usesAdvancedFilterMode || isLoading || fetchError || feedWatermark) return;
