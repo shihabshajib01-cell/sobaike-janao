@@ -5,6 +5,11 @@
 
 export type SeoPageType = 'website' | 'collection' | 'article';
 
+export interface SeoBreadcrumb {
+  name: string;
+  path: string;
+}
+
 export interface SeoMetadata {
   title: string;
   description: string;
@@ -18,6 +23,7 @@ export interface SeoMetadata {
   pageType?: SeoPageType;
   publishedTime?: string;
   modifiedTime?: string;
+  breadcrumbs?: SeoBreadcrumb[];
 }
 
 export const SITE_ORIGIN = 'https://shobaikejanao.com';
@@ -495,6 +501,20 @@ function updateJsonLd(
     page.image = absoluteUrl(metadata.image);
   }
 
+  const breadcrumbItems = (metadata.breadcrumbs || [])
+    .filter((item) => item.name && item.path)
+    .map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: localizedCanonicalUrl(item.path, language),
+    }));
+  const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+
+  if (breadcrumbItems.length >= 2) {
+    page.breadcrumb = { '@id': breadcrumbId };
+  }
+
   if (metadata.pageType === 'article') {
     page.headline = metadata.title;
     page.mainEntityOfPage = { '@id': pageId };
@@ -504,7 +524,20 @@ function updateJsonLd(
 
   scriptElement.textContent = JSON.stringify({
     '@context': 'https://schema.org',
-    '@graph': [organization, website, page],
+    '@graph': [
+      organization,
+      website,
+      page,
+      ...(breadcrumbItems.length >= 2
+        ? [
+            {
+              '@type': 'BreadcrumbList',
+              '@id': breadcrumbId,
+              itemListElement: breadcrumbItems,
+            },
+          ]
+        : []),
+    ],
   });
 }
 
