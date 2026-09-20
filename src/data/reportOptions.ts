@@ -2,6 +2,7 @@ import { SectionKey } from '../theme/tokens';
 
 export interface SubcategoryOption {
   id: string;
+  slug?: string;
   nameBn: string;
   nameEn: string;
   descriptionBn?: string;
