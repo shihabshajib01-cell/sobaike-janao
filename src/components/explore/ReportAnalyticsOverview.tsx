@@ -333,7 +333,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
                   aria-pressed={isActive}
                   onClick={() => onSelectCategory(item.key)}
                   className={`w-full min-h-[44px] text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                    isActive ? 'bg-ui-surface-subtle' : 'hover:bg-ui-surface-subtle/70'
+                    isActive ? 'bg-ui-selected-bg text-ui-selected-text' : 'hover:bg-ui-surface-hover'
                   }`}
                 >
                   {content}
