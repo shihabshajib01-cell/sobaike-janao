@@ -864,24 +864,33 @@ await check('Public report detail route renders when a published report is avail
   if (!response.ok) throw new Error(`published reports RPC returned ${response.status}`);
   const data = await response.json();
   const queue = [data];
-  let reportId = null;
-  while (queue.length && !reportId) {
+  let report = null;
+  while (queue.length && !report) {
     const item = queue.shift();
     if (Array.isArray(item)) queue.push(...item);
     else if (item && typeof item === 'object') {
-      if (typeof item.id === 'string' && item.id) reportId = item.id;
+      if (typeof item.id === 'string' && item.id) report = item;
       else queue.push(...Object.values(item));
     }
   }
-  if (!reportId) {
+  if (!report) {
     warnings.push('No published report available; report-detail browser check skipped');
     return;
   }
+
+  const reportId = report.id;
+  const hasBanglaTitle = typeof report.titleBn === 'string' && report.titleBn.trim().length > 0;
+  const hasEnglishTitle = typeof report.titleEn === 'string' && report.titleEn.trim().length > 0;
+  const canonicalReportPath =
+    hasEnglishTitle && !hasBanglaTitle
+      ? `/en/report-detail/${encodeURIComponent(reportId)}`
+      : `/report-detail/${encodeURIComponent(reportId)}`;
+
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
   const page = await context.newPage();
   await attachRuntimeGuards(page, 'report-detail');
-  await page.goto(routeUrl(`/report-detail/${encodeURIComponent(reportId)}`), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.goto(routeUrl(canonicalReportPath), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#main-content'), 'report detail main content missing');
   await page.waitForTimeout(1200);
   const text = (await page.locator('#main-content').innerText()).trim();
@@ -893,8 +902,10 @@ await check('Public report detail route renders when a published report is avail
   }
 
   const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-  if (!canonical || !canonical.includes(`/report-detail/${encodeURIComponent(reportId)}`)) {
-    throw new Error(`published report canonical is incorrect: ${canonical}`);
+  if (!canonical || !canonical.includes(canonicalReportPath)) {
+    throw new Error(
+      `published report canonical is incorrect for ${canonicalReportPath}: ${canonical}`
+    );
   }
 
   const title = await page.title();
