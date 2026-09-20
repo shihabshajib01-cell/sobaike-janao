@@ -73,8 +73,8 @@ const BreakdownColumn = <T extends string,>({
                   onClick={onSelectValue ? () => onSelectValue(row.value) : undefined}
                   aria-pressed={isActive}
                   className={`w-full min-h-[44px] text-left rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 space-y-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                    onSelectValue ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
-                  } ${isActive ? 'bg-ui-surface-subtle' : ''}`}
+                    onSelectValue ? 'cursor-pointer hover:bg-ui-surface-hover' : ''
+                  } ${isActive ? 'bg-ui-selected-bg text-ui-selected-text' : ''}`}
                 >
                   <span className="flex items-center justify-between gap-3 type-compact">
                     <span className="text-ui-content-secondary min-w-0">{row.label}</span>
