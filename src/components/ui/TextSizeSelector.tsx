@@ -52,7 +52,7 @@ export const TextSizeSelector: React.FC<TextSizeSelectorProps> = ({
                 onClick={() => setTextSize(option.id)}
                 className={`min-w-[36px] min-h-[36px] px-2 ui-radius-badge-md type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isSelected
-                    ? 'bg-ui-surface-subtle text-ui-content-primary border border-ui-stroke-default'
+                    ? 'bg-ui-selected-bg text-ui-selected-text border border-ui-selected-border'
                     : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle border border-transparent'
                 }`}
               >
@@ -82,7 +82,7 @@ export const TextSizeSelector: React.FC<TextSizeSelectorProps> = ({
             onClick={() => setTextSize(option.id)}
             className={`flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2 px-2 rounded-[var(--radius-control)] type-label font-[var(--font-weight-medium)] transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isSelected
-                ? 'bg-ui-surface text-ui-content-primary font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)] border border-ui-stroke-subtle'
+                ? 'bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)] border border-ui-selected-border'
                 : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface/50'
             }`}
           >
