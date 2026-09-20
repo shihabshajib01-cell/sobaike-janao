@@ -133,7 +133,7 @@ const APPROVED_MATERIAL_CORE = {
     '--md-selected-outline': '#B7DCCE',
   },
   dark: {
-    '--md-primary': '#2D739A',
+    '--md-primary': '#317BA5',
     '--md-primary-variant': '#245F82',
     '--md-primary-active': '#1F6286',
     '--md-on-primary': '#FFFFFF',
