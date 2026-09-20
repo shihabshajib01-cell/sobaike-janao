@@ -72,6 +72,11 @@ const rootOgImage = attr(rootHtml, /<meta\s+[^>]*property=["']og:image["'][^>]*>
 const rootOgWidth = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:width["'][^>]*>/i, 'content');
 const rootOgHeight = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:height["'][^>]*>/i, 'content');
 const rootTwitterCard = attr(rootHtml, /<meta\s+[^>]*name=["']twitter:card["'][^>]*>/i, 'content');
+const rootFavicon = attr(
+  rootHtml,
+  /<link\s+[^>]*rel=["']icon["'][^>]*>/i,
+  'href'
+);
 const rootBnAlternate = attr(
   rootHtml,
   /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']bn-BD["'][^>]*>/i,
@@ -147,6 +152,15 @@ record(
     !/href=["']\.\/site\.webmanifest/i.test(rootHtml)
 );
 record(
+  'Stable Google favicon declaration',
+  rootFavicon === '/brand/sobaike-janao-favicon-v2.png',
+  rootFavicon
+);
+record(
+  'Boilerplate safety copy excluded from snippets',
+  /data-nosnippet/i.test(rootHtml)
+);
+record(
   'Prepaint fallback guard',
   rootHtml.includes("document.documentElement.classList.add('js')") &&
     rootHtml.includes('.js #seo-static-fallback{display:none!important}')
@@ -196,17 +210,28 @@ try {
     graph.some((item) =>
       ['WebPage', 'CollectionPage', 'Article'].includes(item?.['@type'])
     );
+  const expectedAlternateNames = ['সবাইকে জানাও', 'shobaikejanao.com'];
+  const websiteAlternateNames = Array.isArray(website?.alternateName)
+    ? website.alternateName
+    : [website?.alternateName].filter(Boolean);
+  const organizationAlternateNames = Array.isArray(organization?.alternateName)
+    ? organization.alternateName
+    : [organization?.alternateName].filter(Boolean);
   siteIdentityValid =
     website?.name === 'Sobaike Janao' &&
-    website?.alternateName === 'সবাইকে জানাও' &&
     organization?.name === 'Sobaike Janao' &&
-    organization?.alternateName === 'সবাইকে জানাও';
+    expectedAlternateNames.every((name) => websiteAlternateNames.includes(name)) &&
+    expectedAlternateNames.every((name) => organizationAlternateNames.includes(name));
 } catch {
   schemaValid = false;
   siteIdentityValid = false;
 }
 record('Structured data graph valid', schemaValid);
 record('Structured site identity is consistent', siteIdentityValid);
+record(
+  'Entity description is explicit',
+  schemaRaw.includes('citizen-reporting and public-interest information platform for Bangladesh')
+);
 
 const robotsTxt = await readFile(join(DIST, 'robots.txt'), 'utf8');
 record(
