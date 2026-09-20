@@ -32,6 +32,7 @@ if (fs.existsSync(appShellSourcePath)) {
     "import { BottomNav } from './BottomNav'",
     "import { SearchModal } from './SearchModal'",
     "import { LocationConsentModal } from '../location/LocationConsentModal'",
+    "import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal'",
   ];
 
   for (const eagerImport of eagerChromeImports) {
@@ -53,9 +54,11 @@ if (fs.existsSync(appShellSourcePath)) {
 
   if (
     !appShellSource.includes('isSearchModalOpen ?') ||
-    !appShellSource.includes('isLocationModalOpen ?')
+    !appShellSource.includes('isLocationModalOpen ?') ||
+    !appShellSource.includes('isFirstVisitNoticeOpen ?') ||
+    !appShellSource.includes('LazyFirstVisitNoticeModal')
   ) {
-    fail('Hidden global modals must stay off the initial module graph.');
+    fail('Hidden or returning-user-only global modals must stay off the initial module graph.');
   }
 }
 
