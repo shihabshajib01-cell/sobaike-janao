@@ -360,7 +360,7 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
                       ? `${chip.label} ফিল্টার মুছুন`
                       : `Remove ${chip.label} filter`
                   }
-                  className="inline-flex min-h-[44px] max-w-full items-center gap-2 ui-radius-pill bg-role-surface-hover px-3 py-2 type-compact font-[var(--font-weight-medium)] text-role-on-surface-secondary transition-colors hover:text-role-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
+                  className="inline-flex min-h-[44px] max-w-full items-center gap-2 ui-radius-pill border border-ui-stroke-subtle bg-ui-surface px-3 py-2 type-compact font-[var(--font-weight-medium)] text-ui-content-primary transition-colors hover:bg-ui-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
                 >
                   <X className="h-4 w-4 shrink-0 text-role-on-surface-muted" aria-hidden="true" />
                   <span className="truncate">{chip.label}</span>
