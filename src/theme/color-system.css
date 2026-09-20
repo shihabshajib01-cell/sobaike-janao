@@ -42,12 +42,6 @@
   --md-on-destructive: #FFFFFF;
   --md-destructive-outline: var(--md-destructive);
 
-  /* Current Sobaike Janao brand palette. Keep literal brand values above the
-     compatibility-alias section so downstream scopes only reference roles/tokens. */
-  --sobaike-janao-brand-primary: #009966;
-  --sobaike-janao-brand-soft: #C1DCC8;
-  --sobaike-janao-brand-dark: #064E3B;
-
 }
 
 :root,
@@ -595,42 +589,6 @@ html[data-theme="dark"],
   --sec-rickshaw-on-primary: var(--category-rickshaw-on-primary);
 }
 
-
-/*
- * Information & Support brand scope.
- * This page intentionally uses a restrained neutral surface system while its
- * interactive/accent roles follow the current Sobaike Janao brand palette.
- * The scope is page-local so category routes and their banner-derived palettes
- * remain unchanged.
- */
-.information-support-brand-scope {
-  --information-support-brand-primary: var(--sobaike-janao-brand-primary);
-  --information-support-brand-soft: var(--sobaike-janao-brand-soft);
-  --information-support-brand-dark: var(--sobaike-janao-brand-dark);
-
-  --md-primary: var(--information-support-brand-dark);
-  --md-primary-variant: color-mix(in srgb, var(--information-support-brand-dark) 88%, black);
-  --md-primary-active: color-mix(in srgb, var(--information-support-brand-dark) 78%, black);
-  --md-on-primary: var(--product-on-primary);
-
-  --md-secondary: var(--information-support-brand-primary);
-  --md-secondary-variant: var(--information-support-brand-dark);
-  --md-secondary-container: color-mix(in srgb, var(--information-support-brand-soft) 34%, var(--md-surface));
-  --md-on-secondary-container: var(--information-support-brand-dark);
-  --md-secondary-outline: color-mix(in srgb, var(--information-support-brand-primary) 30%, var(--md-surface));
-  --md-focus: var(--information-support-brand-primary);
-
-  --ui-primary-action-bg: var(--md-primary);
-  --ui-primary-action-hover: var(--md-primary-variant);
-  --ui-primary-action-active: var(--md-primary-active);
-  --ui-primary-action-text: var(--md-on-primary);
-
-  --ui-accent: var(--md-secondary);
-  --ui-accent-soft: var(--md-secondary-container);
-  --ui-accent-border: var(--md-secondary-outline);
-  --ui-accent-hover: var(--md-secondary-variant);
-  --ui-focus: var(--md-focus);
-}
 
 /*
  * Product-action scope.
