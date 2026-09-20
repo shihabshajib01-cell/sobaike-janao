@@ -10,6 +10,7 @@ import { SeoManager } from '../seo/SeoManager';
 import { MapExploreSkeleton, ReportFeedSkeleton } from '../ui/LoadingSkeleton';
 import { SECTIONS, SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
+import { BottomNav } from './BottomNav';
 
 const LazyIssuesPage = React.lazy(() =>
   import('../../pages/IssuesPage').then((m) => ({ default: m.IssuesPage }))
@@ -67,9 +68,6 @@ const LazyHeader = React.lazy(() =>
 );
 const LazyMobileHeader = React.lazy(() =>
   import('./MobileHeader').then((m) => ({ default: m.MobileHeader }))
-);
-const LazyBottomNav = React.lazy(() =>
-  import('./BottomNav').then((m) => ({ default: m.BottomNav }))
 );
 const LazySearchModal = React.lazy(() =>
   import('./SearchModal').then((m) => ({ default: m.SearchModal }))
@@ -427,12 +425,10 @@ export const AppShell: React.FC = () => {
 
       {viewportTier === 'mobile' ? (
         <ErrorBoundary componentName="BottomNav" fallback={null}>
-          <React.Suspense fallback={null}>
-            <LazyBottomNav
-              isCompact={isMobileChromeCompact}
-              onCompactChange={setIsMobileChromeCompact}
-            />
-          </React.Suspense>
+          <BottomNav
+            isCompact={isMobileChromeCompact}
+            onCompactChange={setIsMobileChromeCompact}
+          />
         </ErrorBoundary>
       ) : null}
 

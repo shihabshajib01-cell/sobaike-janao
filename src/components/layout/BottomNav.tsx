@@ -152,10 +152,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
         aria-label={language === 'bn' ? 'মোবাইল নেভিগেশন' : 'Mobile navigation'}
         aria-hidden={isCompact || undefined}
         inert={isCompact ? true : undefined}
-        className={`md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+        className={`md:hidden fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
-            ? 'translate-y-[calc(100%+env(safe-area-inset-bottom,0px)+24px)] opacity-0 mobile-chrome-hide-after-transition'
-            : 'translate-y-0 opacity-100'
+            ? 'translate-y-[calc(100%+env(safe-area-inset-bottom,0px)+24px)] opacity-0 invisible'
+            : 'translate-y-0 opacity-100 visible'
         }`}
       >
         <div className="pointer-events-auto mx-auto grid max-w-[420px] grid-cols-[1fr_1fr_1fr_auto] items-center gap-1 ui-radius-card border border-ui-stroke-subtle bg-ui-surface/95 p-1.5 shadow-[var(--elevation-lg)] backdrop-blur-md">
@@ -202,10 +202,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
         aria-label={language === 'bn' ? 'দ্রুত মোবাইল নেভিগেশন' : 'Quick mobile navigation'}
         aria-hidden={!isCompact || undefined}
         inert={!isCompact ? true : undefined}
-        className={`md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
+        className={`md:hidden fixed bottom-0 inset-x-0 z-50 pointer-events-none px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] transition-[transform,opacity,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none will-change-[transform,opacity] ${
           isCompact
-            ? 'translate-y-0 opacity-100 delay-[60ms] motion-reduce:delay-0'
-            : 'translate-y-4 opacity-0 delay-0 mobile-chrome-hide-after-transition'
+            ? 'translate-y-0 opacity-100 visible delay-[60ms] motion-reduce:delay-0'
+            : 'translate-y-4 opacity-0 invisible delay-0'
         }`}
       >
         <div className="flex w-full items-end justify-between">
