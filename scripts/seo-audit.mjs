@@ -153,7 +153,7 @@ record(
 );
 record(
   'Stable Google favicon declaration',
-  rootFavicon === '/brand/sobaike-janao-favicon-v2.png',
+  rootFavicon === '/brand/sobaike-janao-favicon.svg',
   rootFavicon
 );
 record(
