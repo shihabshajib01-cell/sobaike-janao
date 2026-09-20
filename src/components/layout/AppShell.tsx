@@ -56,6 +56,9 @@ const LazySubjectPage = React.lazy(() =>
 const LazyDynamicCategoryPage = React.lazy(() =>
   import('../../pages/DynamicCategoryPage').then((m) => ({ default: m.DynamicCategoryPage }))
 );
+const LazyTopicPage = React.lazy(() =>
+  import('../../pages/TopicPage').then((m) => ({ default: m.TopicPage }))
+);
 
 const LazyExplorePage = React.lazy(() =>
   import('../../pages/ExplorePage').then((m) => ({ default: m.ExplorePage }))
@@ -146,7 +149,7 @@ export const AppShell: React.FC = () => {
     locationSuccessCallback,
   } = useApp();
 
-  const { segments } = useTaxonomy();
+  const { segments, subcategories } = useTaxonomy();
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
   const [isMobileChromeCompact, setIsMobileChromeCompact] = useState(false);
   const [routeAnnouncement, setRouteAnnouncement] = useState('');
@@ -166,7 +169,20 @@ export const AppShell: React.FC = () => {
           return normalizedSlug === dynamicSlug || segment.id === dynamicSlug;
         })
       : null;
-    const segment = dynamicEntry || (staticEntry ? segments[staticEntry[0]] || { ...staticEntry[1], id: staticEntry[0] } : null);
+    const topicSlug = route.startsWith('/topic/') ? route.slice('/topic/'.length) : null;
+    const topicSegmentId = topicSlug
+      ? Object.entries(subcategories).find(([, items]) =>
+          items.some((item) => {
+            const normalizedSlug = (item.slug || item.id.replace(/_/g, '-')).replace(/^\//, '');
+            return normalizedSlug === topicSlug || item.id === topicSlug;
+          })
+        )?.[0]
+      : null;
+    const topicEntry = topicSegmentId ? segments[topicSegmentId] : null;
+    const segment =
+      topicEntry ||
+      dynamicEntry ||
+      (staticEntry ? segments[staticEntry[0]] || { ...staticEntry[1], id: staticEntry[0] } : null);
 
     if (!segment) return null;
 
@@ -181,7 +197,7 @@ export const AppShell: React.FC = () => {
         '--category-route-outline': segment.borderColor,
       } as React.CSSProperties,
     };
-  }, [currentRoute, segments]);
+  }, [currentRoute, segments, subcategories]);
 
   useEffect(() => {
     const navigationKey = `${language}:${currentRoute}`;
@@ -299,6 +315,7 @@ export const AppShell: React.FC = () => {
                   <Route path="/illegal-occupation" element={<RouteSuspense><LazyStandardCategoryPage section="illegal_occupation" /></RouteSuspense>} />
                   <Route path="/rickshaw" element={<RouteSuspense><LazyRickshawPage /></RouteSuspense>} />
                   <Route path="/category/:slug" element={<RouteSuspense><LazyDynamicCategoryPage /></RouteSuspense>} />
+                  <Route path="/topic/:slug" element={<RouteSuspense><LazyTopicPage /></RouteSuspense>} />
                   <Route path="/report" element={<RouteSuspense><LazyReportPage /></RouteSuspense>} />
                   <Route
                     path="/explore"
@@ -332,6 +349,7 @@ export const AppShell: React.FC = () => {
                   <Route path="/en/illegal-occupation" element={<RouteSuspense><LazyStandardCategoryPage section="illegal_occupation" /></RouteSuspense>} />
                   <Route path="/en/rickshaw" element={<RouteSuspense><LazyRickshawPage /></RouteSuspense>} />
                   <Route path="/en/category/:slug" element={<RouteSuspense><LazyDynamicCategoryPage /></RouteSuspense>} />
+                  <Route path="/en/topic/:slug" element={<RouteSuspense><LazyTopicPage /></RouteSuspense>} />
                   <Route path="/en/report" element={<RouteSuspense><LazyReportPage /></RouteSuspense>} />
                   <Route
                     path="/en/explore"
