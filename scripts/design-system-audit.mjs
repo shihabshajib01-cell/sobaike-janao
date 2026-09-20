@@ -110,7 +110,9 @@ const APPROVED_MATERIAL_CORE = {
     '--md-secondary': '#287B65',
     '--md-secondary-variant': '#1F6A57',
     '--md-on-secondary': '#FFFFFF',
+    '--md-secondary-container': '#EAF7F2',
     '--md-on-secondary-container': '#1F6A57',
+    '--md-secondary-outline': '#B7DCCE',
     '--md-background': '#F0F2F5',
     '--md-on-background': '#050505',
     '--md-surface': '#FFFFFF',
@@ -123,6 +125,7 @@ const APPROVED_MATERIAL_CORE = {
     '--md-outline-subtle': '#E4E6EB',
     '--md-outline': '#85888C',
     '--md-outline-strong': '#65676B',
+    '--md-focus': '#287B65',
     '--md-disabled-container': '#E6E8EB',
     '--md-on-disabled': '#65676B',
     '--md-selected-container': '#EAF7F2',
@@ -137,7 +140,9 @@ const APPROVED_MATERIAL_CORE = {
     '--md-secondary': '#58C5A4',
     '--md-secondary-variant': '#38AD8C',
     '--md-on-secondary': '#050505',
+    '--md-secondary-container': '#14352C',
     '--md-on-secondary-container': '#9BE4CD',
+    '--md-secondary-outline': '#2F6E5C',
     '--md-background': '#18191A',
     '--md-on-background': '#E4E6EB',
     '--md-surface': '#242526',
@@ -150,6 +155,7 @@ const APPROVED_MATERIAL_CORE = {
     '--md-outline-subtle': '#4E4F50',
     '--md-outline': '#7C8086',
     '--md-outline-strong': '#B0B3B8',
+    '--md-focus': '#58C5A4',
     '--md-disabled-container': '#3A3B3C',
     '--md-on-disabled': '#B0B3B8',
     '--md-selected-container': '#14352C',
@@ -456,6 +462,24 @@ if (!fs.existsSync(colorSystemFile)) {
     });
   }
 
+  const expectedAccentStrong = {
+    light: '#287B65',
+    dark: '#58C5A4',
+  };
+  if (
+    lightValues['--product-accent-strong'] !== expectedAccentStrong.light ||
+    darkValues['--product-accent-strong'] !== expectedAccentStrong.dark
+  ) {
+    findings.push({
+      file: colorSystemFile,
+      line: 1,
+      rule: 'brand-accent-strong-drift',
+      token: '--product-accent-strong',
+      message: 'Accessible brand accent must remain theme-appropriate and contrast-safe',
+      source: `light=${lightValues['--product-accent-strong'] || 'missing'}, dark=${darkValues['--product-accent-strong'] || 'missing'}`,
+    });
+  }
+
   for (const asset of [
     'public/brand/sobaike-janao-wordmark.svg',
     'public/brand/sobaike-janao-wordmark-dark.svg',
@@ -599,6 +623,35 @@ for (const requiredSelectedMapping of [
       message: 'Selected-state semantic color utilities must remain available',
       source: requiredSelectedMapping,
     });
+  }
+}
+
+const heatmapFile = 'src/theme/data-viz-tokens.ts';
+if (fs.existsSync(heatmapFile)) {
+  const heatmapSource = fs.readFileSync(heatmapFile, 'utf8');
+  for (const requiredColor of ['#BDE8DB', '#7FD0B7', '#38AD8C', '#287B65', '#1B4D6B']) {
+    if (!heatmapSource.includes(requiredColor)) {
+      findings.push({
+        file: heatmapFile,
+        line: 1,
+        rule: 'density-palette-drift',
+        token: requiredColor,
+        message: 'Density visualization must keep the approved sequential brand-aligned palette',
+        source: requiredColor,
+      });
+    }
+  }
+  for (const severityColor of ['#EF4444', '#F59E0B']) {
+    if (heatmapSource.includes(severityColor)) {
+      findings.push({
+        file: heatmapFile,
+        line: 1,
+        rule: 'density-severity-color',
+        token: severityColor,
+        message: 'Density scale must not reuse warning/error colors that imply severity',
+        source: severityColor,
+      });
+    }
   }
 }
 
