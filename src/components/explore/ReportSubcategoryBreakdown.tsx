@@ -175,11 +175,11 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
                       : undefined
                   }
                   className={`w-full min-h-[44px] text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                    onSelectSubcategory ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
+                    onSelectSubcategory ? 'cursor-pointer hover:bg-ui-surface-hover' : ''
                   } ${
                     activeSubcategory?.segment === item.segment &&
                     activeSubcategory?.subId === item.subId
-                      ? 'bg-ui-surface-subtle'
+                      ? 'bg-ui-selected-bg text-ui-selected-text'
                       : ''
                   }`}
                 >
