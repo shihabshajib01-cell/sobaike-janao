@@ -85,7 +85,7 @@ export const DesktopLeftRail: React.FC = () => {
 
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
     if (!sectionKey) {
-      return 'bg-ui-surface-elevated text-ui-content-primary font-[var(--font-weight-semibold)] border border-ui-stroke-default';
+      return 'bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-semibold)] border border-ui-selected-border';
     }
     return 'font-[var(--font-weight-semibold)] border';
   };
