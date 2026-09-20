@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { PublicEngagementService } from '../../services/publicEngagementService';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { BrandLogo } from '../branding/BrandLogo';
+import { MobilePublicMenuDrawer } from './MobilePublicMenuDrawer';
 import { IconButton } from '../ui/IconButton';
 import { AppIcon } from '../ui/AppIcon';
 import { SECTIONS } from '../../theme/tokens';
@@ -497,6 +498,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               onClick={() => setIsTabletMenuOpen(true)}
               tabIndex={isCompact ? -1 : undefined}
               aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
+              aria-haspopup="dialog"
+              aria-controls="mobile-menu-drawer"
+              aria-expanded={isTabletMenuOpen}
               className="!border-ui-stroke-subtle !bg-ui-surface !shadow-none"
               icon={<AppIcon name="menu" size="xl" strokeWidth={2} />}
             />
@@ -548,6 +552,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             onClick={() => setIsTabletMenuOpen(true)}
             tabIndex={isCompact ? undefined : -1}
             aria-label={language === 'bn' ? 'মেনু খুলুন' : 'Open menu'}
+            aria-haspopup="dialog"
+            aria-controls="mobile-menu-drawer"
+            aria-expanded={isTabletMenuOpen}
             data-mobile-floating-control="true"
             className={`${isCompact ? 'pointer-events-auto' : 'pointer-events-none'} !border-ui-stroke-subtle !bg-ui-surface ui-elevation-control backdrop-blur-md transition-[transform,background-color,color,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
               isCompact ? 'scale-100 delay-[60ms] motion-reduce:delay-0' : 'scale-90 delay-0 motion-reduce:delay-0'
@@ -570,6 +577,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           </Link>
         </div>
       </nav>
+
+      <MobilePublicMenuDrawer />
     </>
   );
 };

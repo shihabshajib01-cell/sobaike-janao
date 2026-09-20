@@ -113,8 +113,8 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
         )}
       </div>
 
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-3 sm:p-4 shadow-[var(--elevation-2xs)] overflow-x-auto">
-        <table className="w-max min-w-full border-separate border-spacing-1.5">
+      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-2 sm:p-4 shadow-[var(--elevation-2xs)] overflow-x-auto overscroll-x-contain">
+        <table className="w-max min-w-full border-separate border-spacing-0">
           <caption className="sr-only">
             {language === 'bn'
               ? 'ক্যাটাগরি ও বিভাগ অনুযায়ী প্রকাশিত প্রতিবেদনের সংখ্যা'
@@ -124,7 +124,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
             <tr>
               <th
                 scope="col"
-                className="sticky left-0 z-10 bg-ui-surface min-w-[152px] text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
+                className="sticky left-0 z-20 bg-ui-surface w-[156px] min-w-[156px] max-w-[156px] sm:w-[176px] sm:min-w-[176px] sm:max-w-[176px] text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary border-r border-ui-stroke-subtle"
               >
                 {language === 'bn' ? 'বিষয়' : 'Topic'}
               </th>
@@ -132,7 +132,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
                 <th
                   key={division.id}
                   scope="col"
-                  className="min-w-[64px] max-w-[84px] px-1 py-2 text-center type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary"
+                  className="min-w-[72px] max-w-[88px] px-1 py-2 text-center type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary"
                 >
                   {language === 'bn' ? division.nameBn : division.nameEn}
                 </th>
@@ -149,11 +149,13 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
                 <tr key={row.category}>
                   <th
                     scope="row"
-                    className="sticky left-0 z-10 bg-ui-surface min-w-[152px] px-2 py-1.5 text-left"
+                    className="sticky left-0 z-20 bg-ui-surface w-[156px] min-w-[156px] max-w-[156px] sm:w-[176px] sm:min-w-[176px] sm:max-w-[176px] px-2 py-1.5 text-left border-r border-ui-stroke-subtle"
                   >
-                    <span className="flex items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
-                      <CategoryIcon section={row.category} size="xs" />
-                      <span className="truncate">{categoryLabel}</span>
+                    <span className="flex min-w-0 items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                      <span className="shrink-0">
+                        <CategoryIcon section={row.category} size="xs" />
+                      </span>
+                      <span className="min-w-0 flex-1 truncate">{categoryLabel}</span>
                     </span>
                   </th>
                   {row.cells.map(({ division, count }) => {
@@ -166,7 +168,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
                       language === 'bn' ? toBanglaDigits(count) : count;
 
                     return (
-                      <td key={division.id} className="p-0.5 text-center">
+                      <td key={division.id} className="p-1 text-center">
                         <button
                           type="button"
                           disabled={count === 0 || !onSelectCell}
