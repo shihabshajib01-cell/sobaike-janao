@@ -1,8 +1,13 @@
 # Sobaike Janao (সবাইকে জানাও)
 
-> Independent, moderated citizen reporting and public-interest information platform for Bangladesh. This is not a government or law-enforcement website.
+> Sobaike Janao is an independent, moderated citizen-reporting and public-interest information platform for Bangladesh.
 
+Preferred site name: Sobaike Janao  
+Bangla site name: সবাইকে জানাও  
+Domain fallback name: shobaikejanao.com  
 Canonical site: [https://shobaikejanao.com/](https://shobaikejanao.com/)
+
+Sobaike Janao is not a government or law-enforcement website.
 
 ## Main public pages
 
