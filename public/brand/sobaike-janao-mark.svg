@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <title>Sobaike Janao</title>
-  <path d="M132 174H330C380 174 410 204 410 252V322C410 370 380 398 330 398H198L116 448L139 392C101 382 82 351 82 313V252C82 204 106 174 132 174Z" fill="#1B4D6B"/>
-  <circle cx="166" cy="286" r="20" fill="#FFFFFF"/>
-  <circle cx="246" cy="286" r="20" fill="#FFFFFF"/>
-  <circle cx="326" cy="286" r="20" fill="#FFFFFF"/>
-  <path d="M344 150A70 70 0 0 1 414 220" stroke="#38AD8C" stroke-width="24" stroke-linecap="round"/>
-  <path d="M356 100A120 120 0 0 1 476 220" stroke="#38AD8C" stroke-width="24" stroke-linecap="round"/>
-</svg>
