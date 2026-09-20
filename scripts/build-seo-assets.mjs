@@ -1159,6 +1159,13 @@ async function main() {
       subcategory,
     ])
   );
+  const subcategoryCountBySegment = subcategories.reduce((counts, subcategory) => {
+    counts.set(
+      subcategory.segment_id,
+      (counts.get(subcategory.segment_id) || 0) + 1
+    );
+    return counts;
+  }, new Map());
   const reportPages = [];
   const topicPages = [];
 
@@ -1196,6 +1203,12 @@ async function main() {
   for (const subcategory of subcategories) {
     const segment = segmentById.get(subcategory.segment_id);
     if (!segment) continue;
+
+    // A category with only one active published subcategory already expresses the
+    // same search intent at its parent route. Avoid duplicate/cannibalizing topic URLs.
+    if ((subcategoryCountBySegment.get(subcategory.segment_id) || 0) <= 1) {
+      continue;
+    }
 
     const indexableReportCount = reportPages.filter(
       (reportPage) =>
