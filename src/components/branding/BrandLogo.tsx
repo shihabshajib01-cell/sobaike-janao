@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export interface BrandLogoProps {
   variant?: 'compact' | 'full';
@@ -30,6 +31,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   'aria-label': customAriaLabel,
 }) => {
   const { language } = useApp();
+  const { resolvedTheme } = useTheme();
 
   const defaultAriaLabel =
     language === 'bn' ? 'সবাইকে জানাও — মূলপাতা' : 'Sobaike Janao — Home';
@@ -44,25 +46,22 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   const imageClass =
     'h-full w-auto max-w-full object-contain shrink-0 select-none';
 
+  const wordmarkAsset =
+    resolvedTheme === 'dark'
+      ? 'sobaike-janao-wordmark-dark.webp'
+      : 'sobaike-janao-wordmark.webp';
+
   const brandContent = (
     <div
       className={`relative inline-flex items-center min-w-0 ${logoSizes[size]} ${className}`}
     >
       <img
-        src={getBrandAsset('sobaike-janao-wordmark.webp')}
+        src={getBrandAsset(wordmarkAsset)}
         alt=""
         aria-hidden="true"
         width={360}
         height={109}
-        className={`block dark:hidden ${imageClass}`}
-      />
-      <img
-        src={getBrandAsset('sobaike-janao-wordmark-dark.webp')}
-        alt=""
-        aria-hidden="true"
-        width={1200}
-        height={400}
-        className={`hidden dark:block ${imageClass}`}
+        className={`block ${imageClass}`}
       />
     </div>
   );

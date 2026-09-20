@@ -48,7 +48,7 @@ export const LocationReminderBar: React.FC<LocationReminderBarProps> = ({
     <aside
       id="location-reminder-bar-container"
       aria-label={isBn ? 'লোকেশন বিজ্ঞপ্তি' : 'Location notice'}
-      className="w-full mx-auto max-w-[900px] px-4 pt-3.5 sm:pt-4 md:px-6 md:pt-4 lg:px-8 min-[1440px]:px-0"
+      className="w-full px-4 pt-3.5 sm:pt-4 md:px-6 md:pt-4 lg:px-8"
     >
       <div
         id="location-reminder-bar"
