@@ -22,6 +22,7 @@ export interface SupabaseSegmentRow {
 export interface SupabaseSubcategoryRow {
   id: string;
   segment_id: string;
+  slug?: string;
   name_bn: string;
   name_en: string;
   description_bn?: string;
@@ -287,6 +288,7 @@ export const TaxonomyService = {
 
           nextSubcategories[segKey].push({
             id: row.id,
+            slug: row.slug || row.id.replace(/_/g, '-'),
             nameBn: row.name_bn || localMatch?.nameBn || row.id,
             nameEn: row.name_en || localMatch?.nameEn || row.id,
             descriptionBn: row.description_bn || localMatch?.descriptionBn,
