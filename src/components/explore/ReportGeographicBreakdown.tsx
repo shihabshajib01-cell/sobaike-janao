@@ -229,10 +229,10 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                       onClick={onSelectDistrict ? () => onSelectDistrict(item.nameEn) : undefined}
                       aria-pressed={activeDistrict.toLowerCase() === item.nameEn.toLowerCase()}
                       className={`w-full min-h-[44px] text-left space-y-1 rounded-[var(--radius-badge-md)] px-2 py-1.5 -mx-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                        onSelectDistrict ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
+                        onSelectDistrict ? 'cursor-pointer hover:bg-ui-surface-hover' : ''
                       } ${
                         activeDistrict.toLowerCase() === item.nameEn.toLowerCase()
-                          ? 'bg-ui-surface-subtle'
+                          ? 'bg-ui-selected-bg text-ui-selected-text'
                           : ''
                       }`}
                     >
@@ -337,8 +337,8 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                           : `${displayDivisionName} Division: ${displayCount} reports`
                       }
                       className={`w-14 sm:w-16 shrink-0 min-h-[44px] rounded-[var(--radius-badge-md)] px-1.5 py-2 flex flex-col items-center gap-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                        onSelectDivision ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
-                      } ${isActive ? 'bg-ui-surface-subtle' : ''}`}
+                        onSelectDivision ? 'cursor-pointer hover:bg-ui-surface-hover' : ''
+                      } ${isActive ? 'bg-ui-selected-bg text-ui-selected-text' : ''}`}
                     >
                       <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary tabular-nums">
                         {displayCount}
