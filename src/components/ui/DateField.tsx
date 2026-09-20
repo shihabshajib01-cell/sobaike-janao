@@ -68,7 +68,7 @@ export const DateField = React.forwardRef<HTMLInputElement, DateFieldProps>(
             error
               ? 'border-role-validation-outline focus-within:ring-2 focus-within:ring-role-validation-focus focus-within:border-role-validation-focus'
               : 'border-role-control-outline hover:border-role-control-outline-hover focus-within:ring-2 focus-within:ring-role-focus focus-within:border-role-focus',
-            disabled && 'bg-role-surface-subtle text-role-on-surface-muted cursor-not-allowed',
+            disabled && 'bg-role-disabled-container text-role-on-disabled cursor-not-allowed',
             className
           )}
         >
