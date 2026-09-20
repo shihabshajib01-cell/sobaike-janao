@@ -28,6 +28,18 @@ async function expectVisible(locator, message) {
   if (!(await locator.isVisible())) throw new Error(message);
 }
 
+async function chooseFirstSearchableOption(page, triggerSelector) {
+  const trigger = page.locator(triggerSelector);
+  await expectVisible(trigger, `${triggerSelector} trigger missing`);
+  if (await trigger.isDisabled()) throw new Error(`${triggerSelector} is unexpectedly disabled`);
+  await trigger.click();
+  const listboxId = await trigger.getAttribute('aria-controls');
+  if (!listboxId) throw new Error(`${triggerSelector} has no listbox relationship`);
+  const option = page.locator(`#${listboxId} [role="option"]:not([disabled])`).first();
+  await expectVisible(option, `${triggerSelector} has no selectable option`);
+  await option.click();
+}
+
 async function openStep3(page, { segment, subcategory, language = 'bn' }) {
   await page.goto(routeUrl(language === 'en' ? '/en/report' : '/report'), {
     waitUntil: 'domcontentloaded',
@@ -260,9 +272,16 @@ await check('Child safety keeps the established report format with only the appr
   await page.locator('#complaint-desc-input').fill('পরীক্ষামূলক রিপোর্ট: ঘটনার সংক্ষিপ্ত বিবরণ।');
   await page.locator('#child-incident-type-select').selectOption('abduction');
   await page.locator('#complaint-date-input').fill('2026-09-19');
-  await page.locator('#complaint-division-select').selectOption({ label: /ঢাকা|Dhaka/ });
-  await page.waitForTimeout(100);
-  await page.locator('#complaint-district-select').selectOption({ label: /ঢাকা|Dhaka/ });
+  await page.waitForFunction(
+    () => {
+      const el = document.querySelector('#complaint-division-select');
+      return el instanceof HTMLButtonElement && !el.disabled;
+    },
+    null,
+    { timeout: 15000 }
+  );
+  await chooseFirstSearchableOption(page, '#complaint-division-select');
+  await chooseFirstSearchableOption(page, '#complaint-district-select');
 
   await page.locator('#composer-footer-step3-review-btn').click();
   await expectVisible(page.locator('#review-section-incident'), 'child safety: review incident section missing');
