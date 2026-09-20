@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { X } from 'lucide-react';
 import { BANGLADESH_DISTRICTS, DIVISIONS } from '../../data/districts';
 import {
   CATEGORY_FEED_FILTER_CONFIG,
@@ -6,6 +7,10 @@ import {
 } from '../../data/categoryFeedFilters';
 import {
   EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
+  HARASSMENT_AGE_GROUP_OPTIONS,
+  HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
+  HARASSMENT_REPORTING_FOR_OPTIONS,
+  getBilingualOptionLabel,
 } from '../../data/harassmentClassification';
 import {
   createEmptyHomeFeedFilters,
@@ -33,6 +38,40 @@ const cloneFilters = (value: HomeFeedFilterState): HomeFeedFilterState => ({
   category: { ...value.category },
   harassment: { ...value.harassment },
 });
+
+interface SelectedFilterChip {
+  id: string;
+  label: string;
+  onRemove: () => void;
+}
+
+const getIncidentPeriodLabel = (
+  value: HomeFeedFilterState['category']['incidentPeriod'],
+  isBn: boolean
+): string => {
+  if (value === 'last-7-days') return isBn ? 'গত ৭ দিন' : 'Last 7 days';
+  if (value === 'last-30-days') return isBn ? 'গত ৩০ দিন' : 'Last 30 days';
+  if (value === 'older') return isBn ? '৩০ দিনের বেশি আগে' : 'More than 30 days ago';
+  return '';
+};
+
+const getEvidenceLabel = (
+  value: HomeFeedFilterState['category']['evidence'],
+  isBn: boolean
+): string => {
+  if (value === 'with-evidence') return isBn ? 'সহায়ক তথ্য আছে' : 'Has supporting information';
+  if (value === 'without-evidence') return isBn ? 'সহায়ক তথ্য নেই' : 'No supporting information';
+  return '';
+};
+
+const getUtilityBillTrendLabel = (
+  value: HomeFeedFilterState['category']['utilityBillTrend'],
+  isBn: boolean
+): string => {
+  if (value === 'increased') return isBn ? 'বিল বেড়েছে' : 'Bill increased';
+  if (value === 'not-increased') return isBn ? 'বিল বাড়েনি' : 'Bill did not increase';
+  return '';
+};
 
 export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
   isOpen,
@@ -123,6 +162,161 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
     });
   };
 
+  const selectedFilterChips: SelectedFilterChip[] = [];
+
+  if (draft.segmentId !== 'all') {
+    const selectedSegment = segments[draft.segmentId];
+    selectedFilterChips.push({
+      id: 'category',
+      label:
+        (isBn ? selectedSegment?.nameBn : selectedSegment?.nameEn) ||
+        draft.segmentId,
+      onRemove: () => handleSegmentChange('all'),
+    });
+  }
+
+  if (draft.subcategoryId !== 'all') {
+    const selectedSubcategory = subcategoryOptions.find(
+      (subcategory) => subcategory.id === draft.subcategoryId
+    );
+    selectedFilterChips.push({
+      id: 'subcategory',
+      label:
+        (isBn ? selectedSubcategory?.nameBn : selectedSubcategory?.nameEn) ||
+        draft.subcategoryId,
+      onRemove: () =>
+        setDraft((current) => ({ ...current, subcategoryId: 'all' })),
+    });
+  }
+
+  if (draft.category.divisionId !== 'all') {
+    const selectedDivision = DIVISIONS.find(
+      (division) => division.id === draft.category.divisionId
+    );
+    selectedFilterChips.push({
+      id: 'division',
+      label:
+        (isBn ? selectedDivision?.nameBn : selectedDivision?.nameEn) ||
+        draft.category.divisionId,
+      onRemove: () => handleDivisionChange('all'),
+    });
+  }
+
+  if (draft.category.districtId !== 'all') {
+    const selectedDistrict = BANGLADESH_DISTRICTS.find(
+      (district) => district.id === draft.category.districtId
+    );
+    selectedFilterChips.push({
+      id: 'district',
+      label:
+        (isBn ? selectedDistrict?.nameBn : selectedDistrict?.nameEn) ||
+        draft.category.districtId,
+      onRemove: () =>
+        setDraft((current) => ({
+          ...current,
+          category: { ...current.category, districtId: 'all' },
+        })),
+    });
+  }
+
+  if (draft.segmentId === 'harassment') {
+    if (draft.harassment.ageGroup !== 'all') {
+      selectedFilterChips.push({
+        id: 'age-group',
+        label: `${isBn ? 'বয়স' : 'Age'}: ${getBilingualOptionLabel(
+          HARASSMENT_AGE_GROUP_OPTIONS,
+          draft.harassment.ageGroup,
+          language
+        )}`,
+        onRemove: () =>
+          setDraft((current) => ({
+            ...current,
+            harassment: { ...current.harassment, ageGroup: 'all' },
+          })),
+      });
+    }
+
+    if (draft.harassment.abuserRelationship !== 'all') {
+      selectedFilterChips.push({
+        id: 'relationship',
+        label: `${isBn ? 'সম্পর্ক' : 'Relationship'}: ${getBilingualOptionLabel(
+          HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS,
+          draft.harassment.abuserRelationship,
+          language
+        )}`,
+        onRemove: () =>
+          setDraft((current) => ({
+            ...current,
+            harassment: { ...current.harassment, abuserRelationship: 'all' },
+          })),
+      });
+    }
+
+    if (draft.harassment.reportingFor !== 'all') {
+      selectedFilterChips.push({
+        id: 'reporting-for',
+        label: `${isBn ? 'প্রতিবেদন' : 'Reporting for'}: ${getBilingualOptionLabel(
+          HARASSMENT_REPORTING_FOR_OPTIONS,
+          draft.harassment.reportingFor,
+          language
+        )}`,
+        onRemove: () =>
+          setDraft((current) => ({
+            ...current,
+            harassment: { ...current.harassment, reportingFor: 'all' },
+          })),
+      });
+    }
+  } else if (draft.segmentId !== 'all') {
+    if (categoryConfig?.showIncidentPeriod && draft.category.incidentPeriod !== 'all') {
+      selectedFilterChips.push({
+        id: 'incident-period',
+        label: `${isBn ? 'সময়' : 'Time'}: ${getIncidentPeriodLabel(
+          draft.category.incidentPeriod,
+          isBn
+        )}`,
+        onRemove: () =>
+          setDraft((current) => ({
+            ...current,
+            category: { ...current.category, incidentPeriod: 'all' },
+          })),
+      });
+    }
+
+    if (categoryConfig?.showEvidence && draft.category.evidence !== 'all') {
+      selectedFilterChips.push({
+        id: 'evidence',
+        label: `${isBn ? 'প্রমাণ' : 'Evidence'}: ${getEvidenceLabel(
+          draft.category.evidence,
+          isBn
+        )}`,
+        onRemove: () =>
+          setDraft((current) => ({
+            ...current,
+            category: { ...current.category, evidence: 'all' },
+          })),
+      });
+    }
+
+    if (
+      categoryConfig?.showUtilityBillTrend &&
+      draft.category.utilityBillTrend !== 'all'
+    ) {
+      selectedFilterChips.push({
+        id: 'utility-bill-trend',
+        label: `${isBn ? 'বিল' : 'Bill'}: ${getUtilityBillTrendLabel(
+          draft.category.utilityBillTrend,
+          isBn
+        )}`,
+        onRemove: () =>
+          setDraft((current) => ({
+            ...current,
+            category: { ...current.category, utilityBillTrend: 'all' },
+          })),
+      });
+    }
+  }
+
   return (
     <Modal
       id="home-feed-filter-sheet"
@@ -149,6 +343,33 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
       }
     >
       <div className="space-y-5">
+        {selectedFilterChips.length > 0 && (
+          <section
+            aria-label={isBn ? 'নির্বাচিত ফিল্টার' : 'Selected filters'}
+            className="border-b border-ui-stroke-subtle pb-4"
+          >
+            <div className="flex flex-wrap gap-2">
+              {selectedFilterChips.map((chip) => (
+                <button
+                  key={chip.id}
+                  id={`home-filter-chip-${chip.id}`}
+                  type="button"
+                  onClick={chip.onRemove}
+                  aria-label={
+                    isBn
+                      ? `${chip.label} ফিল্টার মুছুন`
+                      : `Remove ${chip.label} filter`
+                  }
+                  className="inline-flex min-h-[44px] max-w-full items-center gap-2 ui-radius-pill bg-role-surface-hover px-3 py-2 type-compact font-[var(--font-weight-medium)] text-role-on-surface-secondary transition-colors hover:text-role-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus"
+                >
+                  <X className="h-4 w-4 shrink-0 text-role-on-surface-muted" aria-hidden="true" />
+                  <span className="truncate">{chip.label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         <Select
           id="home-feed-filter-category"
           label={isBn ? 'বিষয়' : 'Category'}
