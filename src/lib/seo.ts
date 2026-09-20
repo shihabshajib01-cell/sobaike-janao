@@ -697,6 +697,21 @@ export function getStaticSeo(pathname: string, language: 'bn' | 'en'): SeoMetada
     };
   }
 
+  if (normalizedPath.startsWith('/topic/')) {
+    return {
+      title:
+        language === 'bn'
+          ? 'উপবিষয়ের প্রতিবেদন | সবাইকে জানাও'
+          : 'Subtopic Reports | Sobaike Janao',
+      description: DEFAULT_FALLBACK_SEO[language].description,
+      robots: 'noindex, follow',
+      ogType: 'website',
+      ogSiteName: BRAND_NAME[language],
+      canonicalPath: normalizedPath,
+      pageType: 'collection',
+    };
+  }
+
   return {
     title:
       language === 'bn'
