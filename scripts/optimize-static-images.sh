@@ -2,7 +2,7 @@
 set -euo pipefail
 
 target_dir="${1:-dist/illustrations/services}"
-max_bytes="${HERO_JPEG_MAX_BYTES:-163840}"
+max_bytes="${HERO_JPEG_MAX_BYTES:-158720}"
 
 if [ ! -d "${target_dir}" ]; then
   echo "[image-opt] No hero directory at ${target_dir}; skipping."
@@ -20,7 +20,7 @@ failed=0
 while IFS= read -r -d '' file; do
   found=1
   before="$(stat -c%s "${file}")"
-  jpegoptim --strip-all --all-progressive --max=80 --quiet "${file}"
+  jpegoptim --strip-all --all-progressive --max=82 --size=70% --quiet "${file}"
   after="$(stat -c%s "${file}")"
   printf '[image-opt] %s: %.1f KB -> %.1f KB\n'     "$(basename "${file}")"     "$((before / 1024))"     "$((after / 1024))"
 
