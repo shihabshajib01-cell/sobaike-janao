@@ -68,7 +68,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
               className={joinFormClasses(
                 'inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[var(--radius-control)] border px-3 py-2 type-input transition-colors',
                 selected
-                  ? 'border-role-primary bg-role-primary-container text-role-on-primary-container'
+                  ? 'border-role-selected-outline bg-role-selected-container text-role-on-selected-container'
                   : 'border-role-control-outline bg-role-surface text-role-on-surface hover:border-role-control-outline-hover',
                 option.disabled && 'opacity-50 cursor-not-allowed',
                 optionClassName
