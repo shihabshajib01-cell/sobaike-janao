@@ -686,6 +686,32 @@ requireNotContains(
   'disabled:opacity-50',
   'Button must not use opacity as its primary disabled-state recipe'
 );
+for (const file of [
+  'src/components/ui/IconButton.tsx',
+  'src/components/ui/FilterChip.tsx',
+  'src/components/ui/SearchableSelect.tsx',
+]) {
+  requireContains(
+    file,
+    'disabled:bg-role-disabled-container',
+    'Shared interactive primitives must use the semantic disabled background'
+  );
+  requireContains(
+    file,
+    'disabled:text-role-on-disabled',
+    'Shared interactive primitives must use the semantic disabled text role'
+  );
+}
+requireContains(
+  'src/components/ui/Toggle.tsx',
+  "disabled ? 'bg-ui-disabled-bg",
+  'Toggle disabled track must use the semantic disabled container'
+);
+requireContains(
+  'src/components/ui/Checkbox.tsx',
+  "disabled\n              ? 'bg-role-disabled-container",
+  'Checkbox disabled state must use the semantic disabled container'
+);
 requireContains(
   'src/components/location/FirstVisitNoticeModal.tsx',
   'ui-radius-control ui-border-default border-ui-stroke-default',
