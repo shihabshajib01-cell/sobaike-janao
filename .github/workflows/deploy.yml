@@ -118,6 +118,13 @@ jobs:
           GOOGLE_SITE_VERIFICATION: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
         run: npm run build
 
+      - name: Optimize deployed hero JPEGs
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends jpegoptim
+          bash scripts/optimize-static-images.sh
+
       - name: Verify Vite output
         run: |
           test -f dist/index.html
