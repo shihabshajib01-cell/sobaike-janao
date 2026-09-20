@@ -37,6 +37,7 @@ export interface HomeFeedParams {
   visitorLng?: number | null;
   filter?: 'all' | 'latest' | 'popular' | 'most_shared';
   district?: string;
+  includeEvidence?: boolean;
 }
 
 export interface HomeFeedPageParams extends HomeFeedParams {
@@ -346,7 +347,7 @@ export const PublicReportService = {
     list = await enrichHarassmentClassifications(list);
 
     // Batch enrich published reports with evidence images (single RPC call for all visible items)
-    if (isSupabaseConfigured() && supabase) {
+    if (params?.includeEvidence !== false && isSupabaseConfigured() && supabase) {
       const reportIds = list.map((r) => r.id);
       if (reportIds.length > 0) {
         try {

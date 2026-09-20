@@ -9,7 +9,6 @@ import {
 import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
 import { ReportItem } from '../types/report';
 import { VirtualizedReportFeed } from '../components/report/VirtualizedReportFeed';
-import { LocationSelector } from '../components/feed/LocationSelector';
 import { NewReportsNotice } from '../components/feed/NewReportsNotice';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -18,8 +17,23 @@ import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { ReportFeedSkeleton } from '../components/ui/LoadingSkeleton';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { ServiceHeroCarousel } from '../components/home/ServiceHeroCarousel';
+import { AppIcon } from '../components/ui/AppIcon';
 import { useApp } from '../context/AppContext';
 import { scheduleIdleTask } from '../utils/scheduleIdleTask';
+import { toBanglaDigits } from '../utils/formatters';
+import {
+  HomeFeedFilterState,
+  countActiveHomeFeedFilters,
+  createEmptyHomeFeedFilters,
+  hasHomeFeedNonPaginatedFilters,
+  resolveHomeFeedServerDistrict,
+} from '../data/homeFeedFilters';
+
+const HomeFeedFilterSheet = React.lazy(() =>
+  import('../components/report/HomeFeedFilterSheet').then((module) => ({
+    default: module.HomeFeedFilterSheet,
+  }))
+);
 
 type FeedFilterType = 'all' | 'latest' | 'popular';
 
@@ -69,7 +83,10 @@ export const HomePage: React.FC = () => {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const [feedFilter, setFeedFilter] = useState<FeedFilterType>('all');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [homeFilters, setHomeFilters] = useState<HomeFeedFilterState>(() =>
+    createEmptyHomeFeedFilters()
+  );
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [hasMoreReports, setHasMoreReports] = useState(false);
   const [nextOffset, setNextOffset] = useState<number | null>(0);
   const [totalReportCount, setTotalReportCount] = useState(0);
@@ -95,6 +112,19 @@ export const HomePage: React.FC = () => {
   const visitorLat = hasValidBrowseLocation ? browseLocation.latitude : null;
   const visitorLng = hasValidBrowseLocation ? browseLocation.longitude : null;
 
+  const selectedDistrict = useMemo(
+    () => resolveHomeFeedServerDistrict(homeFilters),
+    [homeFilters]
+  );
+  const usesAdvancedFilterMode = useMemo(
+    () => hasHomeFeedNonPaginatedFilters(homeFilters),
+    [homeFilters]
+  );
+  const activeFilterCount = useMemo(
+    () => countActiveHomeFeedFilters(homeFilters),
+    [homeFilters]
+  );
+
   const loadReports = useCallback(async (options?: LoadReportsOptions): Promise<boolean> => {
     const background = options?.background === true;
     const append = options?.append === true;
@@ -108,6 +138,33 @@ export const HomePage: React.FC = () => {
 
     try {
       const { PublicReportService } = await import('../services/publicReportService');
+
+      if (usesAdvancedFilterMode) {
+        const [{ matchesHomeFeedFilters }, rankedReports] = await Promise.all([
+          import('../data/homeFeedFilterMatching'),
+          PublicReportService.getHomeFeed({
+            visitorLat,
+            visitorLng,
+            filter: feedFilter,
+            district: selectedDistrict,
+            includeEvidence: false,
+          }),
+        ]);
+        const matchingReports = rankedReports.filter((report) =>
+          matchesHomeFeedFilters(report, homeFilters)
+        );
+
+        if (requestGeneration !== feedGenerationRef.current) {
+          return false;
+        }
+
+        setAllReports(matchingReports);
+        setHasMoreReports(false);
+        setNextOffset(null);
+        setTotalReportCount(matchingReports.length);
+        return true;
+      }
+
       const page = await PublicReportService.getHomeFeedPage({
         visitorLat,
         visitorLng,
@@ -152,7 +209,14 @@ export const HomePage: React.FC = () => {
         setIsLoading(false);
       }
     }
-  }, [visitorLat, visitorLng, feedFilter, selectedDistrict]);
+  }, [
+    visitorLat,
+    visitorLng,
+    feedFilter,
+    selectedDistrict,
+    usesAdvancedFilterMode,
+    homeFilters,
+  ]);
 
   useEffect(() => {
     feedGenerationRef.current += 1;
@@ -166,7 +230,7 @@ export const HomePage: React.FC = () => {
     setFeedWatermark(null);
     setNewReportCount(0);
     setPendingNewestPublishedAt(null);
-  }, [feedFilter, selectedDistrict, visitorLat, visitorLng]);
+  }, [feedFilter, homeFilters, visitorLat, visitorLng]);
 
   useEffect(() => {
     // AppContext performs one authoritative location restoration pass on mount.
@@ -177,7 +241,7 @@ export const HomePage: React.FC = () => {
   }, [browseLocationStatus, loadReports]);
 
   useEffect(() => {
-    if (isLoading || fetchError || feedWatermark) return;
+    if (usesAdvancedFilterMode || isLoading || fetchError || feedWatermark) return;
 
     let cancelled = false;
 
@@ -208,10 +272,10 @@ export const HomePage: React.FC = () => {
       cancelled = true;
       cancelScheduledWatermark();
     };
-  }, [isLoading, fetchError, feedWatermark, selectedDistrict]);
+  }, [isLoading, fetchError, feedWatermark, selectedDistrict, usesAdvancedFilterMode]);
 
   useEffect(() => {
-    if (!feedWatermark || isLoading || fetchError) return;
+    if (usesAdvancedFilterMode || !feedWatermark || isLoading || fetchError) return;
 
     let cancelled = false;
     let checkInFlight = false;
@@ -267,7 +331,7 @@ export const HomePage: React.FC = () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('online', handleOnline);
     };
-  }, [feedWatermark, selectedDistrict, isLoading, fetchError]);
+  }, [feedWatermark, selectedDistrict, isLoading, fetchError, usesAdvancedFilterMode]);
 
   const handleRefreshNewReports = useCallback(async () => {
     if (isRefreshingNewReports) return;
@@ -447,9 +511,33 @@ export const HomePage: React.FC = () => {
             </h2>
           </div>
 
-          <div className="shrink-0">
-            <LocationSelector selectedDistrict={selectedDistrict} onSelectDistrict={setSelectedDistrict} />
-          </div>
+          <button
+            id="home-feed-filter-button"
+            type="button"
+            onClick={() => setIsFilterOpen(true)}
+            aria-label={
+              language === 'bn'
+                ? `ফিল্টার খুলুন${activeFilterCount > 0 ? ` (${toBanglaDigits(activeFilterCount)}টি সক্রিয়)` : ''}`
+                : `Open filters${activeFilterCount > 0 ? ` (${activeFilterCount} active)` : ''}`
+            }
+            aria-haspopup="dialog"
+            aria-expanded={isFilterOpen}
+            className={`relative flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-[var(--radius-control)] border bg-ui-surface transition-colors hover:bg-ui-surface-hover cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+              activeFilterCount > 0
+                ? 'border-ui-accent text-ui-accent'
+                : 'border-ui-stroke-subtle text-ui-content-primary'
+            }`}
+          >
+            <AppIcon name="filter" size="lg" strokeWidth={2} />
+            {activeFilterCount > 0 && (
+              <span
+                aria-hidden="true"
+                className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center ui-radius-pill bg-ui-accent px-1 type-meta font-[var(--font-weight-bold)] text-ui-action-text"
+              >
+                {language === 'bn' ? toBanglaDigits(activeFilterCount) : activeFilterCount}
+              </span>
+            )}
+          </button>
         </div>
 
         <HorizontalScrollRail
@@ -483,12 +571,14 @@ export const HomePage: React.FC = () => {
           />
         </HorizontalScrollRail>
 
-        <NewReportsNotice
-          count={newReportCount}
-          language={language}
-          isRefreshing={isRefreshingNewReports}
-          onRefresh={() => void handleRefreshNewReports()}
-        />
+        {!usesAdvancedFilterMode && (
+          <NewReportsNotice
+            count={newReportCount}
+            language={language}
+            isRefreshing={isRefreshingNewReports}
+            onRefresh={() => void handleRefreshNewReports()}
+          />
+        )}
 
         {isLoading && (
           <ReportFeedSkeleton
@@ -576,12 +666,26 @@ export const HomePage: React.FC = () => {
             actionLabel={language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
             onAction={() => {
               setFeedFilter('all');
-              setSelectedDistrict('all');
+              setHomeFilters(createEmptyHomeFeedFilters());
             }}
           />
         )}
       </section>
 
+      {isFilterOpen && (
+        <React.Suspense fallback={null}>
+          <HomeFeedFilterSheet
+            isOpen={isFilterOpen}
+            language={language}
+            value={homeFilters}
+            onClose={() => setIsFilterOpen(false)}
+            onApply={(next) => {
+              setHomeFilters(next);
+              setIsFilterOpen(false);
+            }}
+          />
+        </React.Suspense>
+      )}
     </PublicPageContainer>
   );
 };
