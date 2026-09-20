@@ -593,11 +593,44 @@ await check('Mobile navigation, issue rows and category controls follow the appr
 
   const mobileMatrixRowHeader = page.locator('#explore-topic-division-matrix tbody th').first();
   if ((await mobileMatrixRowHeader.count()) > 0) {
-    const matrixRowPosition = await mobileMatrixRowHeader.evaluate(
-      (element) => window.getComputedStyle(element).position
-    );
-    if (matrixRowPosition === 'sticky') {
-      throw new Error('Explore matrix topic column must not be sticky on mobile');
+    const matrixScroll = page.locator('#topic-division-matrix-scroll');
+    const beforeHeader = await mobileMatrixRowHeader.boundingBox();
+    const beforeScroll = await matrixScroll.boundingBox();
+    if (!beforeHeader || !beforeScroll) {
+      throw new Error('Explore matrix geometry is not measurable on mobile');
+    }
+
+    const matrixRowStyle = await mobileMatrixRowHeader.evaluate((element) => {
+      const style = window.getComputedStyle(element);
+      return {
+        position: style.position,
+        backgroundColor: style.backgroundColor,
+      };
+    });
+
+    if (matrixRowStyle.position !== 'sticky') {
+      throw new Error('Explore matrix topic column must stay sticky on mobile');
+    }
+    if (matrixRowStyle.backgroundColor === 'rgba(0, 0, 0, 0)' || matrixRowStyle.backgroundColor === 'transparent') {
+      throw new Error('Explore matrix sticky topic column must keep an opaque surface background');
+    }
+    if (beforeHeader.width > 156) {
+      throw new Error(`Explore matrix sticky topic column is too wide on mobile: ${beforeHeader.width}px`);
+    }
+
+    await matrixScroll.evaluate((element) => {
+      element.scrollLeft = Math.min(240, element.scrollWidth - element.clientWidth);
+    });
+    await page.waitForTimeout(80);
+
+    const afterHeader = await mobileMatrixRowHeader.boundingBox();
+    if (!afterHeader) {
+      throw new Error('Explore matrix sticky topic column disappeared after horizontal scroll');
+    }
+    if (Math.abs(afterHeader.x - beforeHeader.x) > 2) {
+      throw new Error(
+        `Explore matrix sticky topic column moved during horizontal scroll: before=${beforeHeader.x}, after=${afterHeader.x}`
+      );
     }
   }
 
