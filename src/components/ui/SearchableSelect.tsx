@@ -278,7 +278,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                       disabled={option.disabled}
                       onMouseEnter={() => !option.disabled && setActiveIndex(index)}
                       onClick={() => selectValue(option.value)}
-                      className={`w-full min-h-[44px] px-3 py-2 rounded-[var(--radius-badge-md)] flex items-center justify-between gap-3 text-left type-compact focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus disabled:opacity-50 disabled:cursor-not-allowed ${
+                      className={`w-full min-h-[44px] px-3 py-2 rounded-[var(--radius-badge-md)] flex items-center justify-between gap-3 text-left type-compact focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus disabled:opacity-100 disabled:bg-role-disabled-container disabled:text-role-on-disabled disabled:cursor-not-allowed ${
                         isSelected
                           ? 'bg-role-selected-container text-role-on-selected-container'
                           : isActive
