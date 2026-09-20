@@ -463,7 +463,7 @@ function updateJsonLd(
     },
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE_ORIGIN}/brand/icon-512x512.png`,
+      url: `${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png`,
       width: 512,
       height: 512,
     },
