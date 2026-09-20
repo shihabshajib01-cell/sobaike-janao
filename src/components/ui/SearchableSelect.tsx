@@ -278,13 +278,17 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                       disabled={option.disabled}
                       onMouseEnter={() => !option.disabled && setActiveIndex(index)}
                       onClick={() => selectValue(option.value)}
-                      className={`w-full min-h-[44px] px-3 py-2 rounded-[var(--radius-badge-md)] flex items-center justify-between gap-3 text-left type-compact text-role-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus disabled:opacity-50 disabled:cursor-not-allowed ${
-                        isActive ? 'bg-role-surface-subtle' : 'hover:bg-role-surface-subtle'
+                      className={`w-full min-h-[44px] px-3 py-2 rounded-[var(--radius-badge-md)] flex items-center justify-between gap-3 text-left type-compact focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isSelected
+                          ? 'bg-role-selected-container text-role-on-selected-container'
+                          : isActive
+                            ? 'bg-role-surface-hover text-role-on-surface'
+                            : 'text-role-on-surface hover:bg-role-surface-hover'
                       }`}
                     >
                       <span>{option.label}</span>
                       {isSelected && (
-                        <Check className="w-4 h-4 shrink-0 text-role-secondary" aria-hidden="true" />
+                        <Check className="w-4 h-4 shrink-0 text-role-on-selected-container" aria-hidden="true" />
                       )}
                     </button>
                   );
@@ -329,7 +333,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               }
             }
           }}
-          className={`w-full min-w-0 max-w-full min-h-[44px] bg-role-surface text-left type-input ui-border-default ui-radius-control px-3.5 ${clearable && value && !disabled ? 'pr-16' : 'pr-10'} transition-colors focus:outline-none focus:ring-2 disabled:bg-role-surface-subtle disabled:text-role-on-surface-muted disabled:cursor-not-allowed ${
+          className={`w-full min-w-0 max-w-full min-h-[44px] bg-role-surface text-left type-input ui-border-default ui-radius-control px-3.5 ${clearable && value && !disabled ? 'pr-16' : 'pr-10'} transition-colors focus:outline-none focus:ring-2 disabled:bg-role-disabled-container disabled:text-role-on-disabled disabled:cursor-not-allowed ${
             error
               ? 'border-role-validation-outline focus:ring-role-validation-focus focus:border-role-validation-focus'
               : 'border-role-control-outline hover:border-role-control-outline-hover focus:ring-role-focus'
