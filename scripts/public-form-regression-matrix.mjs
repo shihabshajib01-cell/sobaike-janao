@@ -289,6 +289,11 @@ await check('Child safety keeps the established report format with only the appr
   await expectVisible(page.locator('#review-section-incident'), 'child safety: review incident section missing');
   await expectVisible(page.locator('#review-child-incident-type'), 'child safety: incident type not integrated into standard review');
   await expectVisible(page.locator('#review-section-location'), 'child safety: standard review location section missing');
+  await page.locator('#review-section-location-header').click();
+  await expectVisible(
+    page.locator('#review-section-location-panel'),
+    'child safety: standard review location details did not expand'
+  );
   const locationReviewText = await page.locator('#review-section-location').innerText();
   if (!locationReviewText.includes('পরীক্ষামূলক বিস্তারিত ঠিকানা')) {
     throw new Error('child safety: detailed address did not survive into standard review');
