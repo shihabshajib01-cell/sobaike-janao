@@ -11,19 +11,30 @@ import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 import { usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { useSeo } from '../components/seo/SeoManager';
+import { SeoMetadata } from '../lib/seo';
 import {
   CategoryFeedFilterState,
   EMPTY_CATEGORY_FEED_FILTERS,
   matchesCategoryFeedFilters,
 } from '../data/categoryFeedFilters';
 
-export const UtilityPage: React.FC = () => {
+export interface UtilityPageProps {
+  initialSubcategoryId?: string;
+  seoOverride?: SeoMetadata | null;
+}
+
+export const UtilityPage: React.FC<UtilityPageProps> = ({
+  initialSubcategoryId,
+  seoOverride = null,
+}) => {
   const { language, openReportComposer, browseLocation, browseLocationStatus } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
+  const { setDynamicSeo } = useSeo();
   usePublishedBannerRuntime();
   const bannerContent = CANONICAL_BANNER_CONTENT.load_shedding;
 
-  const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
+  const [selectedSubcat, setSelectedSubcat] = useState<string>(initialSubcategoryId || 'all');
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
     ...EMPTY_CATEGORY_FEED_FILTERS,
   });
@@ -33,6 +44,29 @@ export const UtilityPage: React.FC = () => {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const subcategories = getFeedSubcategories('load_shedding');
+  const routeSubcategory = useMemo(
+    () =>
+      initialSubcategoryId
+        ? subcategories.find((subcategory) => subcategory.id === initialSubcategoryId)
+        : undefined,
+    [initialSubcategoryId, subcategories]
+  );
+
+  useEffect(() => {
+    if (!seoOverride || isLoading || fetchError) return;
+    const hasPublishedTopicReports = initialSubcategoryId
+      ? reports.some(
+          (report) =>
+            report.segment === 'load_shedding' && report.subcategoryId === initialSubcategoryId
+        )
+      : true;
+    setDynamicSeo({
+      ...seoOverride,
+      robots: hasPublishedTopicReports
+        ? 'index, follow, max-image-preview:large'
+        : 'noindex, follow',
+    });
+  }, [seoOverride, isLoading, fetchError, initialSubcategoryId, reports, setDynamicSeo]);
 
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
@@ -62,6 +96,10 @@ export const UtilityPage: React.FC = () => {
   }, [visitorLat, visitorLng]);
 
   useEffect(() => {
+    setSelectedSubcat(initialSubcategoryId || 'all');
+  }, [initialSubcategoryId]);
+
+  useEffect(() => {
     loadData();
   }, [loadData]);
 
@@ -72,6 +110,14 @@ export const UtilityPage: React.FC = () => {
       return matchesSubcat && matchesCategoryFeedFilters(report, 'load_shedding', feedFilters);
     });
   }, [reports, selectedSubcat, feedFilters]);
+
+  const getSubcategoryHref = useCallback(
+    (subcategoryId: string) => {
+      if (!initialSubcategoryId || subcategoryId !== 'all') return undefined;
+      return language === 'en' ? '/en/load-shedding' : '/load-shedding';
+    },
+    [initialSubcategoryId, language]
+  );
 
   const countForSubcategory = useCallback(
     (subcategoryId: string) =>
@@ -101,14 +147,14 @@ export const UtilityPage: React.FC = () => {
         slides={[
           {
             id: 'utility-primary',
-            titleBn: bannerContent.titleBn,
-            titleEn: bannerContent.titleEn,
-            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
-            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
-            descriptionBn: bannerContent.tabletDescriptionBn,
-            descriptionEn: bannerContent.tabletDescriptionEn,
-            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
-            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            titleBn: routeSubcategory?.nameBn || bannerContent.titleBn,
+            titleEn: routeSubcategory?.nameEn || bannerContent.titleEn,
+            mobileDescriptionBn: routeSubcategory?.descriptionBn || bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn: routeSubcategory?.descriptionEn || bannerContent.mobileDescriptionEn,
+            descriptionBn: routeSubcategory?.descriptionBn || bannerContent.tabletDescriptionBn,
+            descriptionEn: routeSubcategory?.descriptionEn || bannerContent.tabletDescriptionEn,
+            desktopDescriptionBn: routeSubcategory?.descriptionBn || bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn: routeSubcategory?.descriptionEn || bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
           },
         ]}
@@ -125,7 +171,7 @@ export const UtilityPage: React.FC = () => {
         onEmptyAction={
           hasFilteredContext
             ? () => {
-                setSelectedSubcat('all');
+                setSelectedSubcat(initialSubcategoryId || 'all');
                 setFeedFilters({ ...EMPTY_CATEGORY_FEED_FILTERS });
               }
             : () => openReportComposer('load_shedding')
@@ -147,6 +193,7 @@ export const UtilityPage: React.FC = () => {
         selectedSubcategory={selectedSubcat}
         subcategories={subcategories}
         onSelectSubcategory={setSelectedSubcat}
+        getSubcategoryHref={initialSubcategoryId ? getSubcategoryHref : undefined}
         countForSubcategory={countForSubcategory}
         idPrefix="utility"
       />
