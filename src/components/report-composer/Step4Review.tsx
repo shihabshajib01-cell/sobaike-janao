@@ -41,10 +41,12 @@ import {
   SEXUAL_HARASSMENT_TYPE_OPTIONS,
   getSexualHarassmentOptionLabel,
 } from '../../data/sexualHarassmentOptions';
+import { PublicFieldOption } from '../../services/reportingFormConfig';
 
 export interface Step4ReviewProps {
   segment: SectionKey;
   formData: ReportFormData;
+  childIncidentTypeOptions?: PublicFieldOption[];
   pendingImages: AttachedImagePreview[];
   onEditStep: (
     step: number,
@@ -59,6 +61,7 @@ export interface Step4ReviewProps {
 export const Step4Review: React.FC<Step4ReviewProps> = ({
   segment,
   formData,
+  childIncidentTypeOptions = [],
   pendingImages,
   onEditStep,
   language,
@@ -77,6 +80,8 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     segment === 'harassment' && formData.subcategoryId === 'sexual-harassment';
   const isBlackmailCoercion =
     segment === 'harassment' && formData.subcategoryId === 'blackmail-coercion';
+  const isChildSafetyReport =
+    segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -101,7 +106,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   const supportsContextualPartySection =
     segment === 'extortion' ||
-    segment === 'public_safety' ||
+    (segment === 'public_safety' && !isChildSafetyReport) ||
     segment === 'road_transport' ||
     segment === 'illegal_occupation';
 
@@ -120,6 +125,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   const hideIncidentTime = isIllegalOccupation;
   const hideFrequency =
     isIllegalOccupation ||
+    isChildSafetyReport ||
     (segment === 'rickshaw' && formData.subcategoryId === 'charging-station-location') ||
     isUtilityReport;
 
@@ -182,17 +188,25 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       }`;
 
   const locationSummary =
-    [
-      formData.location?.upazilaOrThana ||
-        (!isUtilityReport
-          ? formData.location?.area ||
-            (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : '')
-          : ''),
-      formData.location?.district,
-      formData.location?.division,
-    ]
+    (isChildSafetyReport
+      ? [formData.location?.district, formData.location?.division]
+      : [
+          formData.location?.upazilaOrThana ||
+            (!isUtilityReport
+              ? formData.location?.area ||
+                (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : '')
+              : ''),
+          formData.location?.district,
+          formData.location?.division,
+        ])
       .filter(Boolean)
       .join(', ') || (language === 'bn' ? 'অবস্থান নির্দিষ্ট নেই' : 'Unspecified location');
+
+  const childIncidentTypeValue = String(
+    formData.customFieldAnswers?.childIncidentType || ''
+  );
+  const childIncidentTypeLabel =
+    childIncidentTypeOptions.find((option) => option.value === childIncidentTypeValue);
 
   const identitySummary =
     formData.privacyChoice === 'anonymous'
@@ -345,6 +359,24 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {formData.description || '-'}
               </p>
             </div>
+
+            {isChildSafetyReport && (
+              <div
+                id="review-child-incident-type"
+                className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle"
+              >
+                <span className="type-compact text-ui-content-muted block mb-0.5">
+                  {language === 'bn' ? 'ঘটনার ধরন' : 'Incident type'}
+                </span>
+                <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                  {childIncidentTypeLabel
+                    ? language === 'bn'
+                      ? childIncidentTypeLabel.labelBn
+                      : childIncidentTypeLabel.labelEn
+                    : '-'}
+                </p>
+              </div>
+            )}
 
             {isBriberyReport && (formData.briberyDepartment || formData.briberyService || formData.briberyAmount) && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-0.5">
@@ -945,7 +977,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
         )}
 
         {/* Section 5: Attachments (Hidden for Load Shedding & Gas Shortage, enabled for Excess Electricity Bill) */}
-        {(!isUtilityReport || isExcessElectricityBill) && (
+        {(!isUtilityReport || isExcessElectricityBill) && !isChildSafetyReport && (
           <ReviewSection
             id="review-section-attachments"
             isOpen={openSections.attachments}

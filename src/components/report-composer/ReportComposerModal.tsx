@@ -78,6 +78,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const configuredFieldsRef = useRef<ConfiguredFieldsHandle>(null);
   const subcategoryConfigRequestRef = useRef(0);
   const [reportingForm, setReportingForm] = useState<PublicReportingForm | null>(null);
+  const [isReportingFormLoading, setIsReportingFormLoading] = useState(false);
 
   // Jump section tracking for Step 3
   const [step3JumpSection, setStep3JumpSection] = useState<
@@ -128,6 +129,13 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     formData.segment === 'public_safety' && formData.subcategoryId === 'mob-justice';
   const isChildSafetyReport =
     formData.segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
+  const childIncidentTypeOptions =
+    reportingForm?.fields.find(
+      (field) =>
+        field.active &&
+        field.storageMode === 'custom_json' &&
+        field.storageKey === 'childIncidentType'
+    )?.options || [];
 
   // Defensive guard: if formData ever targets Step 3/4 with rape subcategory without consent, open disclaimer and hold step
   useEffect(() => {
@@ -152,6 +160,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       setMobJusticeDetails({ ...EMPTY_MOB_JUSTICE_DETAILS });
       setMobJusticeErrors({});
       setReportingForm(null);
+      setIsReportingFormLoading(false);
       pendingTargetStepRef.current = null;
       retryCredentialsRef.current = null;
       setSubmitError(null);
@@ -260,7 +269,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [formData.subcategoryId, rapePublishingConsentAccepted]);
+  }, [
+    formData.subcategoryId,
+    rapePublishingConsentAccepted,
+    isChildSafetyReport,
+    isReportingFormLoading,
+    reportingForm,
+    language,
+  ]);
 
   const handleNextFromStep1 = useCallback(() => {
     setFormData((prev) => {
@@ -327,6 +343,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         publicProfileHandle: '',
         identifyingDescription: '',
         mentionedParties: [],
+        relationshipContext: '',
+        adminName: '',
+        adminContact: '',
+        confirmPublicIdentity: false,
+        privacyChoice: 'anonymous',
         affectedPersonAgeGroup: '',
         allegedAbuserRelationship: '',
         reportingFor: '',
@@ -351,6 +372,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       }));
       subcategoryConfigRequestRef.current += 1;
       setReportingForm(null);
+      setIsReportingFormLoading(false);
     },
     [formData.segment, formData.serverSubmissionState, formData.clientSubmissionId, language, pendingImages]
   );
@@ -381,12 +403,16 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const requestId = ++subcategoryConfigRequestRef.current;
       const cachedForm = PublicReportingConfigService.getForm(subcategoryId);
       setReportingForm(cachedForm);
+      setIsReportingFormLoading(true);
+      setSubmitError(null);
 
       setFormData((prev) => {
         const isUtilitySwitch =
           prev.segment === 'load_shedding' &&
           Boolean(prev.subcategoryId) &&
           prev.subcategoryId !== subcategoryId;
+        const selectingChildSafety =
+          prev.segment === 'public_safety' && subcategoryId === 'child_abduction_murder';
 
         return {
           ...prev,
@@ -401,13 +427,45 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           formEngineMode: cachedForm?.engineMode,
           customFieldAnswers: {},
           subjectType: 'unknown',
+          ...(selectingChildSafety
+            ? {
+                reportedSubject: '',
+                roleOrDesignation: '',
+                organization: '',
+                publicProfileHandle: '',
+                identifyingDescription: '',
+                mentionedParties: [],
+                relationshipContext: '',
+                adminName: '',
+                adminContact: '',
+                confirmPublicIdentity: false,
+                privacyChoice: 'anonymous' as const,
+                frequency: 'one-time' as const,
+                hasSupportingInfo: false,
+                evidenceTypes: [],
+                evidenceDescription: '',
+                location: {
+                  ...prev.location,
+                  upazilaOrThana: '',
+                  area: '',
+                  road: '',
+                  landmark: '',
+                  formattedAddress: '',
+                  placeId: undefined,
+                  lat: undefined,
+                  lng: undefined,
+                },
+              }
+            : {}),
           sexualHarassmentType: '',
           sexualHarassmentContext: '',
           sexualHarassmentInstitution: '',
           intimateWhatHappened: '',
           intimatePlatform: '',
           frequency:
-            prev.subcategoryId === 'sexual-harassment' || subcategoryId === 'sexual-harassment'
+            selectingChildSafety ||
+            prev.subcategoryId === 'sexual-harassment' ||
+            subcategoryId === 'sexual-harassment'
               ? 'one-time'
               : prev.frequency,
           ...(isUtilitySwitch
@@ -436,6 +494,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           if (requestId !== subcategoryConfigRequestRef.current) return;
           const selectedForm = PublicReportingConfigService.getForm(subcategoryId);
           setReportingForm(selectedForm);
+          setIsReportingFormLoading(false);
           setFormData((prev) =>
             prev.subcategoryId === subcategoryId
               ? {
@@ -449,6 +508,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         .catch(() => {
           if (requestId !== subcategoryConfigRequestRef.current) return;
           setReportingForm(null);
+          setIsReportingFormLoading(false);
         });
     },
     [formData.subcategoryId, formData.serverSubmissionState, language, pendingImages]
@@ -456,6 +516,18 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   const handleNextFromStep2 = useCallback(() => {
     if (!formData.subcategoryId) return;
+
+    if (
+      isChildSafetyReport &&
+      (isReportingFormLoading || !reportingForm || reportingForm.engineMode !== 'schema')
+    ) {
+      setSubmitError(
+        language === 'bn'
+          ? 'এই প্রতিবেদনের সর্বশেষ ফর্ম কনফিগারেশন লোড হচ্ছে। অনুগ্রহ করে কয়েক মুহূর্ত পর আবার এগিয়ে যান।'
+          : 'The latest form configuration for this report is still loading. Please try again in a moment.'
+      );
+      return;
+    }
 
     // Check Rape pre-report consent requirement
     if (
@@ -547,6 +619,19 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   // Submission handler
   const handleSubmitReport = useCallback(async () => {
     if (!formData.segment || !formData.subcategoryId) return;
+
+    if (
+      isChildSafetyReport &&
+      (!reportingForm || reportingForm.engineMode !== 'schema')
+    ) {
+      setFormData((prev) => ({ ...prev, currentStep: 2 }));
+      setSubmitError(
+        language === 'bn'
+          ? 'শিশু নিরাপত্তা প্রতিবেদনের ফর্ম কনফিগারেশন যাচাই করা যায়নি। আবার ধরন নির্বাচন করে চেষ্টা করুন।'
+          : 'The child-safety form configuration could not be verified. Re-select the report type and try again.'
+      );
+      return;
+    }
 
     // Rape pre-report consent defense guard
     if (
@@ -697,6 +782,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       }
 
       const isUtility = (formData.segment as string) === 'utility' || formData.segment === 'load_shedding';
+      const isChildSafetySubmission =
+        formData.segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
 
       const rawLoc = formData.location || {
         division: '',
@@ -712,7 +799,20 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const safeLat = hasValidIncidentCoords ? rawLoc.lat : undefined;
       const safeLng = hasValidIncidentCoords ? rawLoc.lng : undefined;
 
-      const loc = isUtility
+      const loc = isChildSafetySubmission
+        ? {
+            division: rawLoc.division || '',
+            district: rawLoc.district || '',
+            upazilaOrThana: '',
+            area: undefined,
+            road: undefined,
+            landmark: undefined,
+            placeId: undefined,
+            formattedAddress: '',
+            lat: undefined,
+            lng: undefined,
+          }
+        : isUtility
         ? {
             division: rawLoc.division || '',
             district: rawLoc.district || '',
@@ -747,11 +847,20 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             (field) => field.active && field.fieldType === 'subject_party'
           )
       );
+      const hasSchemaPrivacyBlock = Boolean(
+        reportingForm?.engineMode === 'schema' &&
+          reportingForm.fields.some(
+            (field) => field.active && field.fieldType === 'privacy'
+          )
+      );
       const isPartySegment =
-        formData.segment === 'rickshaw' ||
-        formData.segment === 'extortion' ||
-        formData.segment === 'public_safety' ||
-        hasSchemaPartyBlock;
+        !isChildSafetySubmission &&
+        (
+          formData.segment === 'rickshaw' ||
+          formData.segment === 'extortion' ||
+          formData.segment === 'public_safety' ||
+          hasSchemaPartyBlock
+        );
       const isChargingStation = isPartySegment && formData.segment === 'rickshaw' && (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
 
       const resolvedReportedSubject = isChargingStation
@@ -805,7 +914,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               ongoingStatus: mobJusticeDetails.ongoingStatus,
             }
           : undefined,
-        frequency: isIllegalOccupation ? 'one-time' : formData.frequency || 'one-time',
+        frequency: isChildSafetySubmission || isIllegalOccupation ? 'one-time' : formData.frequency || 'one-time',
         affectedPersonAgeGroup: isHarassment ? formData.affectedPersonAgeGroup || undefined : undefined,
         allegedAbuserRelationship: isHarassment ? formData.allegedAbuserRelationship || undefined : undefined,
         reportingFor: isHarassment ? formData.reportingFor || undefined : undefined,
@@ -845,10 +954,15 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             ? formData.intimatePlatform || undefined
             : undefined,
         location: loc,
-        privacyChoice: formData.privacyChoice || 'anonymous',
+        privacyChoice: isChildSafetySubmission ? 'anonymous' : formData.privacyChoice || 'anonymous',
         formSchemaVersion: reportingForm?.version || formData.formSchemaVersion,
         formEngineMode: reportingForm?.engineMode || formData.formEngineMode,
-        customFieldAnswers: formData.customFieldAnswers || {},
+        customFieldAnswers: isChildSafetySubmission
+          ? {
+              childIncidentType:
+                formData.customFieldAnswers?.childIncidentType,
+            }
+          : formData.customFieldAnswers || {},
         publicationPreferences: formData.publicationPreferences || {
           showSubjectName: false,
           showOrganization: false,
@@ -856,7 +970,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           showDescription: true,
         },
         adminContact:
-          (isHarassment || reportingForm?.engineMode === 'schema') &&
+          !isChildSafetySubmission &&
+          (isHarassment || hasSchemaPrivacyBlock) &&
           (formData.adminName || formData.adminContact)
             ? {
                 name: formData.adminName || '',
@@ -864,9 +979,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 consentPublic: Boolean(formData.confirmPublicIdentity),
               }
             : undefined,
-        hasSupportingInfo: Boolean(formData.hasSupportingInfo || pendingImages.length > 0),
-        evidenceTypes: formData.evidenceTypes || [],
-        evidenceDescription: formData.evidenceDescription || undefined,
+        hasSupportingInfo: isChildSafetySubmission
+          ? false
+          : Boolean(formData.hasSupportingInfo || pendingImages.length > 0),
+        evidenceTypes: isChildSafetySubmission ? [] : formData.evidenceTypes || [],
+        evidenceDescription: isChildSafetySubmission ? undefined : formData.evidenceDescription || undefined,
         website: (formData as any).website || '', // Honeypot anti-bot
       };
 
@@ -886,7 +1003,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         serverSubmissionState: 'attempted',
       }));
 
-      const filesToUpload = pendingImages.map((img) => img.file);
+      const filesToUpload = isChildSafetySubmission ? [] : pendingImages.map((img) => img.file);
 
       // Safely build private reporter context to link to complaint
       const reporterContext = VisitorSessionService.buildReporterSubmissionContext(
@@ -1010,7 +1127,10 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   if (!isOpen) return null;
 
   const canContinueStep1 = Boolean(formData.segment) && !selectedComingSoon;
-  const canContinueStep2 = Boolean(formData.subcategoryId);
+  const canContinueStep2 =
+    Boolean(formData.subcategoryId) &&
+    (!isChildSafetyReport ||
+      (!isReportingFormLoading && reportingForm?.engineMode === 'schema'));
 
   // Render-level defense guard: ensure Step 3/4 is NEVER rendered if rape consent is missing
   const effectiveCurrentStep =
@@ -1167,6 +1287,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                         <Step3ComplaintDetails
                           ref={step3Ref}
                           segment={formData.segment}
+                          childIncidentTypeOptions={childIncidentTypeOptions}
                           formData={formData}
                           pendingImages={pendingImages}
                           onPendingImagesChange={handlePendingImagesChange}
@@ -1188,15 +1309,18 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           onEdit={() => handleGoToStep(3)}
                         />
                       )}
-                      <ConfiguredFieldsReview
-                        form={reportingForm}
-                        language={language}
-                        answers={formData.customFieldAnswers || {}}
-                        onEdit={() => handleGoToStep(3)}
-                      />
+                      {!isChildSafetyReport && (
+                        <ConfiguredFieldsReview
+                          form={reportingForm}
+                          language={language}
+                          answers={formData.customFieldAnswers || {}}
+                          onEdit={() => handleGoToStep(3)}
+                        />
+                      )}
                       <Step4Review
                         segment={formData.segment}
                         formData={formData}
+                        childIncidentTypeOptions={childIncidentTypeOptions}
                         pendingImages={pendingImages}
                         onEditStep={(step, secKey) => handleGoToStep(step, secKey)}
                         onSubmit={handleSubmitReport}

@@ -41,8 +41,17 @@ async function openStep3(page, { segment, subcategory, language = 'bn' }) {
     `${segment}/${subcategory}: complaint type missing`
   );
   await page.locator(`#subcategory-option-${subcategory}`).click();
-  await page.waitForTimeout(250);
-  await page.locator('#composer-footer-step2-next-btn').click();
+  const step2Next = page.locator('#composer-footer-step2-next-btn');
+  await step2Next.waitFor({ state: 'visible', timeout: 15000 });
+  await page.waitForFunction(
+    () => {
+      const button = document.querySelector('#composer-footer-step2-next-btn');
+      return button instanceof HTMLButtonElement && !button.disabled;
+    },
+    null,
+    { timeout: 15000 }
+  );
+  await step2Next.click();
 
   const rapeConsent = page.locator('#rape-pre-report-consent-modal');
   if (await rapeConsent.isVisible().catch(() => false)) {
@@ -245,6 +254,33 @@ await check('Child safety keeps the established report format with only the appr
     if ((await page.locator(selector).count()) > 0) {
       throw new Error(`child safety: unapproved control/parallel form surface is present: ${selector}`);
     }
+  }
+
+  await page.locator('#complaint-title-input').fill('শিশু অপহরণের অভিযোগ');
+  await page.locator('#complaint-desc-input').fill('পরীক্ষামূলক রিপোর্ট: ঘটনার সংক্ষিপ্ত বিবরণ।');
+  await page.locator('#child-incident-type-select').selectOption('abduction');
+  await page.locator('#complaint-date-input').fill('2026-09-19');
+  await page.locator('#complaint-division-select').selectOption({ label: /ঢাকা|Dhaka/ });
+  await page.waitForTimeout(100);
+  await page.locator('#complaint-district-select').selectOption({ label: /ঢাকা|Dhaka/ });
+
+  await page.locator('#composer-footer-step3-review-btn').click();
+  await expectVisible(page.locator('#review-section-incident'), 'child safety: review incident section missing');
+  await expectVisible(page.locator('#review-child-incident-type'), 'child safety: incident type not integrated into standard review');
+
+  for (const selector of [
+    '#review-section-attachments',
+    '#review-section-parties',
+    '#review-section-identity',
+    '#composer-section-configured-fields-review',
+  ]) {
+    if ((await page.locator(selector).count()) > 0) {
+      throw new Error(`child safety: unapproved review surface is present: ${selector}`);
+    }
+  }
+  const reviewText = await page.locator('#review-section-incident').innerText();
+  if (/পুনরাবৃত্তি|Frequency/i.test(reviewText)) {
+    throw new Error('child safety: hidden frequency leaked into review');
   }
 
   await assertComposerGeometry(page, 'public_safety/child_abduction_murder standard format');

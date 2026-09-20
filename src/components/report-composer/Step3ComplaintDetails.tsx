@@ -71,6 +71,7 @@ import { MonthField } from '../ui/MonthField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
 import { NumberField } from '../ui/NumberField';
 import { ContactField } from '../ui/ContactField';
+import { PublicFieldOption } from '../../services/reportingFormConfig';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -87,6 +88,7 @@ export type ReporterLocationGateState =
 export interface Step3ComplaintDetailsProps {
   segment: SectionKey;
   formData: ReportFormData;
+  childIncidentTypeOptions?: PublicFieldOption[];
   pendingImages: AttachedImagePreview[];
   onPendingImagesChange: (images: AttachedImagePreview[]) => void;
   onUpdateFormData: (updates: Partial<ReportFormData>) => void;
@@ -133,6 +135,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     {
       segment,
       formData,
+      childIncidentTypeOptions = [],
       pendingImages,
       onPendingImagesChange,
       onUpdateFormData,
@@ -1430,12 +1433,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   }
                 }}
                 placeholder={language === 'bn' ? 'নির্বাচন করুন' : 'Select'}
-                options={[
-                  { value: 'abduction', label: language === 'bn' ? 'শিশু অপহরণ' : 'Child abduction' },
-                  { value: 'murder', label: language === 'bn' ? 'শিশু হত্যা' : 'Murder of a child' },
-                  { value: 'abduction_and_murder', label: language === 'bn' ? 'অপহরণের পর হত্যা' : 'Abduction followed by murder' },
-                  { value: 'unknown_not_stated', label: language === 'bn' ? 'নিশ্চিত নয় / উল্লেখ নেই' : 'Not clear / not stated' },
-                ]}
+                options={childIncidentTypeOptions.map((option) => ({
+                  value: option.value,
+                  label: language === 'bn' ? option.labelBn : option.labelEn,
+                }))}
               />
             )}
 

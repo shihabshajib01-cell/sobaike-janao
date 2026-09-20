@@ -687,8 +687,8 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#tablet-menu-button').click();
   await expectVisible(page.locator('#tablet-drawer'), 'tablet drawer did not open');
-  const banglaLanguage = page.locator('#drawer-lang-bn');
-  const englishLanguage = page.locator('#drawer-lang-en');
+  const banglaLanguage = page.locator('#drawer-language-bn');
+  const englishLanguage = page.locator('#drawer-language-en');
   await expectVisible(banglaLanguage, 'Bangla language option missing');
   await expectVisible(englishLanguage, 'English language option missing');
   if ((await banglaLanguage.getAttribute('aria-pressed')) !== 'true') {
@@ -697,7 +697,7 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   await englishLanguage.click();
   await page.waitForTimeout(150);
   if ((await page.locator('html').getAttribute('lang')) !== 'en') throw new Error('language did not switch to English');
-  if ((await page.locator('#drawer-lang-en').getAttribute('aria-pressed')) !== 'true') {
+  if ((await page.locator('#drawer-language-en').getAttribute('aria-pressed')) !== 'true') {
     throw new Error('English language option did not expose the selected state');
   }
   const themeDark = page
