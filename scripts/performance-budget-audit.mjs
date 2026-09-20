@@ -29,7 +29,6 @@ if (fs.existsSync(appShellSourcePath)) {
     "import { DesktopLeftRail } from './DesktopLeftRail'",
     "import { Header } from './Header'",
     "import { MobileHeader } from './MobileHeader'",
-    "import { BottomNav } from './BottomNav'",
     "import { SearchModal } from './SearchModal'",
     "import { LocationConsentModal } from '../location/LocationConsentModal'",
     "import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal'",
@@ -45,11 +44,11 @@ if (fs.existsSync(appShellSourcePath)) {
     !appShellSource.includes('LazyDesktopLeftRail') ||
     !appShellSource.includes('LazyHeader') ||
     !appShellSource.includes('LazyMobileHeader') ||
-    !appShellSource.includes('LazyBottomNav') ||
+    !appShellSource.includes("import { BottomNav } from './BottomNav'") ||
     !appShellSource.includes("viewportTier === 'desktop'") ||
     !appShellSource.includes("viewportTier === 'tablet'")
   ) {
-    fail('Public shell must load only the chrome needed for the active viewport tier.');
+    fail('Public shell must keep heavy viewport chrome lazy while preserving deterministic mobile bottom navigation.');
   }
 
   if (
