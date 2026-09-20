@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 
 const SITE_ORIGIN = 'https://shobaikejanao.com';
 const DIST_DIR = 'dist';
-const BRAND_LOGO = `${SITE_ORIGIN}/brand/icon-512x512.png`;
+const BRAND_LOGO = `${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png`;
 const DEFAULT_IMAGE = `${SITE_ORIGIN}/brand/og-social-1200x630.png`;
 const FULL_INDEX_ROBOTS =
   'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
@@ -356,6 +356,17 @@ function localizePage(page, routeLanguage) {
                 },
               ]
             : []),
+          ...(page.topicPath
+            ? [
+                {
+                  name:
+                    contentLanguage === 'en'
+                      ? page.topicNameEn || page.topicNameBn || 'Topic'
+                      : page.topicNameBn || page.topicNameEn || 'উপবিষয়',
+                  url: localizedUrl(page.topicPath, canonicalLanguage),
+                },
+              ]
+            : []),
           {
             name: currentLabel,
             url: canonical,
@@ -413,6 +424,21 @@ function injectStaticFallback(html, page) {
         <section class="mt-8 space-y-3">
           <h2>${isEnglish ? 'Published reports' : 'প্রকাশিত প্রতিবেদন'}</h2>
           <ul>${relatedReportLinks}</ul>
+        </section>`
+    : '';
+
+  const relatedTopicLinks = (page.relatedTopics || [])
+    .map((topic) => {
+      const label = isEnglish ? topic.nameEn || topic.nameBn : topic.nameBn || topic.nameEn;
+      return `<li><a href="${href(topic.path)}">${htmlEscape(label)}</a></li>`;
+    })
+    .join('\n');
+
+  const relatedTopicSection = relatedTopicLinks
+    ? `
+        <section class="mt-8 space-y-3">
+          <h2>${isEnglish ? 'Subtopics' : 'উপবিষয়সমূহ'}</h2>
+          <ul>${relatedTopicLinks}</ul>
         </section>`
     : '';
 
@@ -530,6 +556,21 @@ function injectStaticFallback(html, page) {
         </section>`
     : '';
 
+  const relatedTopicLinks = (page.relatedTopics || [])
+    .map((topic) => {
+      const label = isEnglish ? topic.nameEn || topic.nameBn : topic.nameBn || topic.nameEn;
+      return `<li><a href="${href(topic.path)}">${htmlEscape(label)}</a></li>`;
+    })
+    .join('\n');
+
+  const relatedTopicSection = relatedTopicLinks
+    ? `
+        <section class="mt-8 space-y-3">
+          <h2>${isEnglish ? 'Subtopics' : 'উপবিষয়সমূহ'}</h2>
+          <ul>${relatedTopicLinks}</ul>
+        </section>`
+    : '';
+
   const fallback = `
       <!-- SEO_FALLBACK_START -->
       <main id="seo-static-fallback" class="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 lg:px-8">
@@ -568,6 +609,7 @@ function injectStaticFallback(html, page) {
             <a href="${href('/rickshaw')}">${isEnglish ? 'auto-rickshaw charging' : 'অবৈধ অটো-রিকশা চার্জিং'}</a>.
           </p>
         </section>
+        ${relatedTopicSection}
         ${relatedReportSection}
       </main>
       <!-- SEO_FALLBACK_END -->`;
@@ -894,11 +936,23 @@ async function loadPublishedReports() {
 async function loadActiveSegments() {
   try {
     const rows = await fetchSupabaseJson(
-      'segments?select=id,slug,name_bn,name_en,description_bn,description_en,active&active=eq.true&order=sort_order.asc'
+      'segments?select=id,slug,name_bn,name_en,description_bn,description_en,active,config_status&active=eq.true&config_status=eq.published&order=sort_order.asc'
     );
     return Array.isArray(rows) ? rows : [];
   } catch (error) {
-    console.warn('[seo-build] Active segments unavailable:', error.message);
+    console.warn('[seo-build] Active published segments unavailable:', error.message);
+    return [];
+  }
+}
+
+async function loadActiveSubcategories() {
+  try {
+    const rows = await fetchSupabaseJson(
+      'subcategories?select=id,segment_id,slug,name_bn,name_en,description_bn,description_en,active,config_status&active=eq.true&config_status=eq.published&order=segment_id.asc,sort_order.asc'
+    );
+    return Array.isArray(rows) ? rows : [];
+  } catch (error) {
+    console.warn('[seo-build] Active published subcategories unavailable:', error.message);
     return [];
   }
 }
@@ -919,7 +973,7 @@ function resolveDistrictId(raw, districts) {
   return match?.id || null;
 }
 
-function reportPage(report, segmentById) {
+function reportPage(report, segmentById, subcategoryByKey) {
   const id = cleanText(report.id);
   if (!id) return null;
 
@@ -943,6 +997,13 @@ function reportPage(report, segmentById) {
       ? `/${segmentSlug}`
       : `/category/${encodeURIComponent(segmentSlug)}`
     : '/issues';
+  const subcategory = subcategoryByKey.get(`${report.segment}:${report.subcategoryId}`) || null;
+  const subcategorySlug = cleanText(subcategory?.slug || report.subcategoryId || '')
+    .replace(/^\/+/, '')
+    .replaceAll('_', '-');
+  const topicPath = subcategorySlug
+    ? `/topic/${encodeURIComponent(subcategorySlug)}`
+    : null;
 
   const indexable = isSeoIndexableReport(report);
   const title = buildReportSeoTitle(sourceTitle, brand, id);
@@ -960,6 +1021,9 @@ function reportPage(report, segmentById) {
     categoryPath,
     categoryNameBn: cleanText(segment?.name_bn || report.subcategoryBn || 'বিষয়সমূহ'),
     categoryNameEn: cleanText(segment?.name_en || report.subcategoryEn || 'Topics'),
+    topicPath,
+    topicNameBn: cleanText(subcategory?.name_bn || report.subcategoryBn || ''),
+    topicNameEn: cleanText(subcategory?.name_en || report.subcategoryEn || ''),
     articleSection:
       sourceLanguage === 'en'
         ? cleanText(report.subcategoryEn || segment?.name_en || '')
@@ -967,6 +1031,7 @@ function reportPage(report, segmentById) {
     contentLocation: cleanText(report.location || report.area || report.district || ''),
     district: cleanText(report.district || ''),
     segmentId: cleanText(report.segment || ''),
+    subcategoryId: cleanText(report.subcategoryId || ''),
     robots: indexable ? FULL_INDEX_ROBOTS : 'noindex, follow',
     sitemap: indexable,
     type: 'article',
@@ -1027,18 +1092,82 @@ function dynamicCategoryPage(segment) {
     robots: FULL_INDEX_ROBOTS,
     sitemap: true,
     collection: true,
+    segmentId: segment.id,
+  };
+}
+
+function topicPage(subcategory, segment, indexableReportCount) {
+  if (!subcategory || !segment) return null;
+
+  const slug = cleanText(subcategory.slug || subcategory.id)
+    .replace(/^\/+/, '')
+    .replaceAll('_', '-');
+  if (!slug) return null;
+
+  const segmentSlug = cleanText(segment.slug || segment.id)
+    .replace(/^\/category\//, '')
+    .replace(/^\//, '')
+    .replaceAll('_', '-');
+  const categoryPath = STATIC_PAGES.some((page) => page.path === `/${segmentSlug}`)
+    ? `/${segmentSlug}`
+    : `/category/${encodeURIComponent(segmentSlug)}`;
+
+  const nameBn = cleanText(subcategory.name_bn || subcategory.name_en || subcategory.id);
+  const nameEn = cleanText(subcategory.name_en || subcategory.name_bn || subcategory.id);
+  const categoryNameBn = cleanText(segment.name_bn || segment.name_en || segment.id);
+  const categoryNameEn = cleanText(segment.name_en || segment.name_bn || segment.id);
+  const hasIndexableReports = indexableReportCount > 0;
+
+  return {
+    path: `/topic/${encodeURIComponent(slug)}`,
+    title: buildBrandedSeoTitle(`${nameBn} সংক্রান্ত প্রতিবেদন`),
+    titleEn: buildBrandedSeoTitle(`${nameEn} Reports`, 'Sobaike Janao'),
+    description: normalizeSeoDescription(
+      `${nameBn} সংক্রান্ত প্রকাশিত নাগরিক প্রতিবেদন, এলাকা, উৎস ও সর্বশেষ আপডেট দেখুন। ${categoryNameBn} বিষয়ের প্রাসঙ্গিক প্রতিবেদন ব্রাউজ করুন।`,
+      'bn'
+    ),
+    descriptionEn: normalizeSeoDescription(
+      `Browse published citizen reports about ${nameEn}, including locations, sources, and latest updates within ${categoryNameEn} on Sobaike Janao.`,
+      'en'
+    ),
+    robots: hasIndexableReports ? FULL_INDEX_ROBOTS : 'noindex, follow',
+    sitemap: hasIndexableReports,
+    collection: true,
+    segmentId: segment.id,
+    subcategoryId: subcategory.id,
+    categoryPath,
+    categoryNameBn,
+    categoryNameEn,
   };
 }
 
 async function main() {
   const template = await readFile(join(DIST_DIR, 'index.html'), 'utf8');
   const districts = await loadDistricts();
-  const [reports, segments] = await Promise.all([loadPublishedReports(), loadActiveSegments()]);
+  const [reports, segments, subcategories] = await Promise.all([
+    loadPublishedReports(),
+    loadActiveSegments(),
+    loadActiveSubcategories(),
+  ]);
 
   const basePages = [...STATIC_PAGES];
   const seenPaths = new Set(basePages.map((page) => page.path));
   const segmentById = new Map(segments.map((segment) => [segment.id, segment]));
+  const subcategoryByKey = new Map(
+    subcategories.map((subcategory) => [
+      `${subcategory.segment_id}:${subcategory.id}`,
+      subcategory,
+    ])
+  );
+  const subcategoryCountBySegment = subcategories.reduce((counts, subcategory) => {
+    counts.set(
+      subcategory.segment_id,
+      (counts.get(subcategory.segment_id) || 0) + 1
+    );
+    return counts;
+  }, new Map());
   const reportPages = [];
+  const topicPages = [];
 
   for (const segment of segments) {
     const page = dynamicCategoryPage(segment);
@@ -1051,7 +1180,7 @@ async function main() {
   const districtIdsWithReports = new Set();
 
   for (const report of reports) {
-    const page = reportPage(report, segmentById);
+    const page = reportPage(report, segmentById, subcategoryByKey);
     if (page && !seenPaths.has(page.path)) {
       basePages.push(page);
       reportPages.push(page);
@@ -1068,6 +1197,30 @@ async function main() {
         basePages.push(subjectRoute);
         seenPaths.add(subjectRoute.path);
       }
+    }
+  }
+
+  for (const subcategory of subcategories) {
+    const segment = segmentById.get(subcategory.segment_id);
+    if (!segment) continue;
+
+    // A category with only one active published subcategory already expresses the
+    // same search intent at its parent route. Avoid duplicate/cannibalizing topic URLs.
+    if ((subcategoryCountBySegment.get(subcategory.segment_id) || 0) <= 1) {
+      continue;
+    }
+
+    const indexableReportCount = reportPages.filter(
+      (reportPage) =>
+        reportPage.sitemap &&
+        reportPage.segmentId === subcategory.segment_id &&
+        reportPage.subcategoryId === subcategory.id
+    ).length;
+    const page = topicPage(subcategory, segment, indexableReportCount);
+    if (page && !seenPaths.has(page.path)) {
+      basePages.push(page);
+      topicPages.push(page);
+      seenPaths.add(page.path);
     }
   }
 
@@ -1109,6 +1262,12 @@ async function main() {
     const segmentId = page.segmentId || staticSegmentByPath.get(page.path) || null;
     const related = reportPages
       .filter((reportPage) => {
+        if (page.subcategoryId) {
+          return (
+            reportPage.segmentId === segmentId &&
+            reportPage.subcategoryId === page.subcategoryId
+          );
+        }
         if (segmentId && reportPage.segmentId === segmentId) return true;
         if (page.districtId) {
           return resolveDistrictId(reportPage.district, districts) === page.districtId;
@@ -1123,6 +1282,20 @@ async function main() {
       }));
 
     if (related.length) page.relatedReports = related;
+
+    if (segmentId && !page.subcategoryId) {
+      const relatedTopics = topicPages
+        .filter((topic) => topic.segmentId === segmentId && topic.sitemap)
+        .map((topic) => {
+          const source = subcategories.find((item) => item.id === topic.subcategoryId);
+          return {
+            path: topic.path,
+            nameBn: cleanText(source?.name_bn || topic.subcategoryId),
+            nameEn: cleanText(source?.name_en || topic.subcategoryId),
+          };
+        });
+      if (relatedTopics.length) page.relatedTopics = relatedTopics;
+    }
   }
 
   const homePage = basePages.find((page) => page.path === '/');

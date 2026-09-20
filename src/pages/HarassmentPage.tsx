@@ -10,6 +10,8 @@ import { useApp } from '../context/AppContext';
 import { VisitorSessionService } from '../services/visitorSessionService';
 import { CANONICAL_BANNER_CONTENT } from '../data/bannerContent';
 import { usePublishedBannerRuntime } from '../services/bannerRuntime';
+import { useSeo } from '../components/seo/SeoManager';
+import { SeoMetadata } from '../lib/seo';
 import { BANGLADESH_DISTRICTS } from '../data/districts';
 import {
   EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
@@ -55,7 +57,15 @@ const matchesLocationFilters = (
   return true;
 };
 
-export const HarassmentPage: React.FC = () => {
+export interface HarassmentPageProps {
+  initialSubcategoryId?: string;
+  seoOverride?: SeoMetadata | null;
+}
+
+export const HarassmentPage: React.FC<HarassmentPageProps> = ({
+  initialSubcategoryId,
+  seoOverride = null,
+}) => {
   const {
     language,
     browseLocation,
@@ -64,10 +74,11 @@ export const HarassmentPage: React.FC = () => {
     setIsHarassmentFilterOpen,
   } = useApp();
   const { getFeedSubcategories } = useTaxonomy();
+  const { setDynamicSeo } = useSeo();
   usePublishedBannerRuntime();
   const bannerContent = CANONICAL_BANNER_CONTENT.harassment;
 
-  const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
+  const [selectedSubcat, setSelectedSubcat] = useState<string>(initialSubcategoryId || 'all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [classificationFilters, setClassificationFilters] =
@@ -80,6 +91,29 @@ export const HarassmentPage: React.FC = () => {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const subcategories = getFeedSubcategories('harassment');
+  const routeSubcategory = useMemo(
+    () =>
+      initialSubcategoryId
+        ? subcategories.find((subcategory) => subcategory.id === initialSubcategoryId)
+        : undefined,
+    [initialSubcategoryId, subcategories]
+  );
+
+  useEffect(() => {
+    if (!seoOverride || isLoading || fetchError) return;
+    const hasPublishedTopicReports = initialSubcategoryId
+      ? reports.some(
+          (report) =>
+            report.segment === 'harassment' && report.subcategoryId === initialSubcategoryId
+        )
+      : true;
+    setDynamicSeo({
+      ...seoOverride,
+      robots: hasPublishedTopicReports
+        ? 'index, follow, max-image-preview:large'
+        : 'noindex, follow',
+    });
+  }, [seoOverride, isLoading, fetchError, initialSubcategoryId, reports, setDynamicSeo]);
 
   const hasValidBrowseLocation =
     browseLocationStatus === 'available' &&
@@ -109,6 +143,10 @@ export const HarassmentPage: React.FC = () => {
   }, [visitorLat, visitorLng]);
 
   useEffect(() => {
+    setSelectedSubcat(initialSubcategoryId || 'all');
+  }, [initialSubcategoryId]);
+
+  useEffect(() => {
     loadData();
   }, [loadData]);
 
@@ -126,6 +164,14 @@ export const HarassmentPage: React.FC = () => {
       return matchesSubcat && matchesCurrentFilters(report);
     });
   }, [reports, selectedSubcat, matchesCurrentFilters]);
+
+  const getSubcategoryHref = useCallback(
+    (subcategoryId: string) => {
+      if (!initialSubcategoryId || subcategoryId !== 'all') return undefined;
+      return language === 'en' ? '/en/harassment' : '/harassment';
+    },
+    [initialSubcategoryId, language]
+  );
 
   const countForSubcategory = useCallback(
     (subcategoryId: string) =>
@@ -161,14 +207,14 @@ export const HarassmentPage: React.FC = () => {
         slides={[
           {
             id: 'harassment-primary',
-            titleBn: bannerContent.titleBn,
-            titleEn: bannerContent.titleEn,
-            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
-            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
-            descriptionBn: bannerContent.tabletDescriptionBn,
-            descriptionEn: bannerContent.tabletDescriptionEn,
-            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
-            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            titleBn: routeSubcategory?.nameBn || bannerContent.titleBn,
+            titleEn: routeSubcategory?.nameEn || bannerContent.titleEn,
+            mobileDescriptionBn: routeSubcategory?.descriptionBn || bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn: routeSubcategory?.descriptionEn || bannerContent.mobileDescriptionEn,
+            descriptionBn: routeSubcategory?.descriptionBn || bannerContent.tabletDescriptionBn,
+            descriptionEn: routeSubcategory?.descriptionEn || bannerContent.tabletDescriptionEn,
+            desktopDescriptionBn: routeSubcategory?.descriptionBn || bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn: routeSubcategory?.descriptionEn || bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
           },
         ]}
@@ -183,7 +229,7 @@ export const HarassmentPage: React.FC = () => {
         fetchError={fetchError}
         onRetry={loadData}
         onEmptyAction={() => {
-          setSelectedSubcat('all');
+          setSelectedSubcat(initialSubcategoryId || 'all');
           setSelectedDivision('all');
           setSelectedDistrict('all');
           setClassificationFilters({ ...EMPTY_HARASSMENT_CLASSIFICATION_FILTERS });
@@ -191,6 +237,7 @@ export const HarassmentPage: React.FC = () => {
         selectedSubcategory={selectedSubcat}
         subcategories={subcategories}
         onSelectSubcategory={setSelectedSubcat}
+        getSubcategoryHref={initialSubcategoryId ? getSubcategoryHref : undefined}
         countForSubcategory={countForSubcategory}
         idPrefix="harassment"
       />

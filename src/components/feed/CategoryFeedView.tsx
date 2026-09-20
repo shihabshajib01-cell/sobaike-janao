@@ -13,6 +13,7 @@ type Language = 'bn' | 'en';
 
 type SubcategoryOption = {
   id: string;
+  slug?: string;
   nameBn: string;
   nameEn: string;
 };
@@ -31,6 +32,7 @@ export interface CategoryFeedViewProps {
   selectedSubcategory?: string;
   subcategories?: SubcategoryOption[];
   onSelectSubcategory?: (id: string) => void;
+  getSubcategoryHref?: (id: string) => string | undefined;
   countForSubcategory?: (id: string) => number;
   idPrefix: string;
   showDesktopFilterSlot?: boolean;
@@ -49,6 +51,7 @@ export const CategoryFeedView: React.FC<CategoryFeedViewProps> = ({
   selectedSubcategory = 'all',
   subcategories = [],
   onSelectSubcategory,
+  getSubcategoryHref,
   countForSubcategory,
   idPrefix,
   showDesktopFilterSlot = true,
@@ -85,17 +88,28 @@ export const CategoryFeedView: React.FC<CategoryFeedViewProps> = ({
             previousLabel={language === 'bn' ? 'আগের বিভাগগুলো দেখুন' : 'Show previous categories'}
             nextLabel={language === 'bn' ? 'পরের বিভাগগুলো দেখুন' : 'Show more categories'}
           >
-            {subcategories.map((subcat) => (
-              <FilterChip
-                key={subcat.id}
-                id={`${idPrefix}-filter-subcat-${subcat.id}`}
-                label={language === 'bn' ? subcat.nameBn : subcat.nameEn}
-                section={section}
-                selected={selectedSubcategory === subcat.id}
-                count={isLoading ? undefined : countForSubcategory?.(subcat.id)}
-                onClick={() => onSelectSubcategory?.(subcat.id)}
-              />
-            ))}
+            {subcategories.map((subcat) => {
+              const stableSlug = (subcat.slug || subcat.id.replace(/_/g, '-')).replace(/^\/+/, '');
+              const automaticHref =
+                subcat.id === 'all'
+                  ? undefined
+                  : language === 'en'
+                    ? `/en/topic/${encodeURIComponent(stableSlug)}`
+                    : `/topic/${encodeURIComponent(stableSlug)}`;
+              const href = getSubcategoryHref?.(subcat.id) ?? automaticHref;
+              return (
+                <FilterChip
+                  key={subcat.id}
+                  id={`${idPrefix}-filter-subcat-${subcat.id}`}
+                  label={language === 'bn' ? subcat.nameBn : subcat.nameEn}
+                  section={section}
+                  selected={selectedSubcategory === subcat.id}
+                  count={isLoading ? undefined : countForSubcategory?.(subcat.id)}
+                  to={href}
+                  onClick={href ? undefined : () => onSelectSubcategory?.(subcat.id)}
+                />
+              );
+            })}
           </HorizontalScrollRail>
         )}
       </section>

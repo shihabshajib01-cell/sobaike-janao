@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
 
@@ -10,6 +11,7 @@ export interface FilterChipProps {
   section?: SectionKey;
   icon?: React.ReactNode;
   onClick?: () => void;
+  to?: string;
   disabled?: boolean;
   className?: string;
 }
@@ -22,36 +24,32 @@ export const FilterChip: React.FC<FilterChipProps> = ({
   section,
   icon,
   onClick,
+  to,
   disabled = false,
   className = '',
 }) => {
   const { getSegment } = useTaxonomy();
   const config = section ? getSegment(section) : null;
 
-  return (
-    <button
-      id={id}
-      type="button"
-      aria-pressed={selected}
-      disabled={disabled}
-      onClick={onClick}
-      style={
-        selected && section && !disabled
-          ? {
-              backgroundColor: config?.primaryColor || 'var(--md-primary)',
-              borderColor: config?.primaryColor || 'var(--md-primary)',
-              color: config?.colors.filledText || 'var(--md-on-primary)',
-            }
-          : undefined
-      }
-      className={`inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] type-compact font-[var(--font-weight-medium)] ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-role-disabled-container disabled:text-role-on-disabled disabled:border-role-outline-subtle disabled:hover:bg-role-disabled-container disabled:hover:text-role-on-disabled focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus focus-visible:ring-offset-1 active:scale-95 ${
-        selected && !config
-          ? 'bg-role-primary text-role-on-primary border-role-primary font-[var(--font-weight-semibold)] ui-elevation-selected'
-          : !selected
-          ? 'bg-role-surface text-role-on-surface-secondary hover:text-role-on-surface border-role-outline-subtle hover:border-role-outline hover:bg-role-surface-hover'
-          : ''
-      } ${className}`}
-    >
+  const style =
+    selected && section && !disabled
+      ? {
+          backgroundColor: config?.primaryColor || 'var(--md-primary)',
+          borderColor: config?.primaryColor || 'var(--md-primary)',
+          color: config?.colors.filledText || 'var(--md-on-primary)',
+        }
+      : undefined;
+
+  const classes = `inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] type-compact font-[var(--font-weight-medium)] ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-role-disabled-container disabled:text-role-on-disabled disabled:border-role-outline-subtle disabled:hover:bg-role-disabled-container disabled:hover:text-role-on-disabled focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus focus-visible:ring-offset-1 active:scale-95 ${
+    selected && !config && !disabled
+      ? 'bg-role-primary text-role-on-primary border-role-primary font-[var(--font-weight-semibold)] ui-elevation-selected'
+      : !selected && !disabled
+      ? 'bg-role-surface text-role-on-surface-secondary hover:text-role-on-surface border-role-outline-subtle hover:border-role-outline hover:bg-role-surface-hover'
+      : ''
+  } ${className}`;
+
+  const content = (
+    <>
       {icon && <span className="shrink-0 [&_svg]:w-3.5 [&_svg]:h-3.5">{icon}</span>}
       <span className="truncate">{label}</span>
       {count !== undefined && (
@@ -63,6 +61,35 @@ export const FilterChip: React.FC<FilterChipProps> = ({
           {count}
         </small>
       )}
+    </>
+  );
+
+  if (to && !disabled) {
+    return (
+      <Link
+        id={id}
+        to={to}
+        aria-current={selected ? 'page' : undefined}
+        onClick={onClick}
+        style={style}
+        className={classes}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      id={id}
+      type="button"
+      aria-pressed={selected}
+      disabled={disabled}
+      onClick={onClick}
+      style={style}
+      className={classes}
+    >
+      {content}
     </button>
   );
 };

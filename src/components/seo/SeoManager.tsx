@@ -51,7 +51,8 @@ export const SeoManager: React.FC<SeoManagerProps> = ({ children }) => {
     const isServerBackedDynamicRoute =
       logicalPathname.startsWith('/report-detail/') ||
       logicalPathname.startsWith('/location/') ||
-      logicalPathname.startsWith('/category/');
+      logicalPathname.startsWith('/category/') ||
+      logicalPathname.startsWith('/topic/');
 
     if (isServerBackedDynamicRoute) return;
 

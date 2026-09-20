@@ -15,6 +15,7 @@ import { useSeo } from '../components/seo/SeoManager';
 import {
   BRAND_NAME,
   STATIC_ROUTE_SEO,
+  SeoMetadata,
   buildBrandedSeoTitle,
   normalizeSeoDescription,
 } from '../lib/seo';
@@ -26,9 +27,15 @@ import {
 
 export interface StandardCategoryPageProps {
   section: SectionKey;
+  initialSubcategoryId?: string;
+  seoOverride?: SeoMetadata | null;
 }
 
-export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ section }) => {
+export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({
+  section,
+  initialSubcategoryId,
+  seoOverride = null,
+}) => {
   const { language, browseLocation, browseLocationStatus } = useApp();
   const { segments, getFeedSubcategories } = useTaxonomy();
   const { setDynamicSeo } = useSeo();
@@ -36,7 +43,7 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   const bannerContent = getRuntimeBannerContent(section);
   const segmentSeo = segments[section];
 
-  const [selectedSubcat, setSelectedSubcat] = useState<string>('all');
+  const [selectedSubcat, setSelectedSubcat] = useState<string>(initialSubcategoryId || 'all');
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
     ...EMPTY_CATEGORY_FEED_FILTERS,
   });
@@ -46,9 +53,38 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const subcategories = getFeedSubcategories(section);
+  const routeSubcategory = useMemo(
+    () =>
+      initialSubcategoryId
+        ? subcategories.find((subcategory) => subcategory.id === initialSubcategoryId)
+        : undefined,
+    [initialSubcategoryId, subcategories]
+  );
 
   useEffect(() => {
     if (!segmentSeo) return;
+
+    if (seoOverride) {
+      // Server-prerendered topic routes already ship with the correct crawlable metadata.
+      // Keep that metadata untouched during hydration/loading, then reconcile robots
+      // against the live published feed after data resolves.
+      if (isLoading || fetchError) return;
+
+      const hasPublishedTopicReports = initialSubcategoryId
+        ? reports.some(
+            (report) =>
+              report.segment === section && report.subcategoryId === initialSubcategoryId
+          )
+        : true;
+
+      setDynamicSeo({
+        ...seoOverride,
+        robots: hasPublishedTopicReports
+          ? 'index, follow, max-image-preview:large'
+          : 'noindex, follow',
+      });
+      return;
+    }
 
     const canonicalPath = segmentSeo.slug.startsWith('/')
       ? segmentSeo.slug
@@ -83,6 +119,12 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
     segmentSeo?.descriptionBn,
     segmentSeo?.descriptionEn,
     segmentSeo?.slug,
+    seoOverride,
+    isLoading,
+    fetchError,
+    initialSubcategoryId,
+    reports,
+    section,
     setDynamicSeo,
   ]);
 
@@ -114,10 +156,10 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   }, [section, visitorLat, visitorLng]);
 
   useEffect(() => {
-    setSelectedSubcat('all');
+    setSelectedSubcat(initialSubcategoryId || 'all');
     setFeedFilters({ ...EMPTY_CATEGORY_FEED_FILTERS });
     setIsFilterOpen(false);
-  }, [section]);
+  }, [section, initialSubcategoryId]);
 
   useEffect(() => {
     loadData();
@@ -126,7 +168,8 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
   const filteredReports = useMemo(() => {
     return reports.filter((report) => {
       if (report.segment !== section) return false;
-      const matchesSubcat = selectedSubcat === 'all' || report.subcategoryId === selectedSubcat;
+      const matchesSubcat =
+        selectedSubcat === 'all' || report.subcategoryId === selectedSubcat;
       return matchesSubcat && matchesCategoryFeedFilters(report, section, feedFilters);
     });
   }, [reports, section, selectedSubcat, feedFilters]);
@@ -135,15 +178,41 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
     (subcategoryId: string) =>
       reports.filter((report) => {
         if (report.segment !== section) return false;
-        const matchesSub = subcategoryId === 'all' || report.subcategoryId === subcategoryId;
+        const matchesSub =
+          subcategoryId === 'all' || report.subcategoryId === subcategoryId;
         return matchesSub && matchesCategoryFeedFilters(report, section, feedFilters);
       }).length,
     [reports, section, feedFilters]
   );
 
+  const getSubcategoryHref = useCallback(
+    (subcategoryId: string) => {
+      if (!segmentSeo) return undefined;
+
+      const localize = (path: string) =>
+        language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
+      const categoryPath = segmentSeo.slug.startsWith('/')
+        ? segmentSeo.slug
+        : `/${segmentSeo.slug}`;
+
+      if (subcategoryId === 'all') {
+        return localize(categoryPath);
+      }
+
+      const subcategory = subcategories.find((item) => item.id === subcategoryId);
+      if (!subcategory) return undefined;
+      const slug = (subcategory.slug || subcategory.id.replace(/_/g, '-')).replace(/^\/+/, '');
+      return localize(`/topic/${encodeURIComponent(slug)}`);
+    },
+    [language, segmentSeo, subcategories]
+  );
+
   if (!bannerContent) {
     return null;
   }
+
+  const topicDescriptionBn = routeSubcategory?.descriptionBn || bannerContent.tabletDescriptionBn;
+  const topicDescriptionEn = routeSubcategory?.descriptionEn || bannerContent.tabletDescriptionEn;
 
   return (
     <PublicPageContainer id={`${section}-page-container`}>
@@ -155,16 +224,19 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
         slides={[
           {
             id: `${section}-primary`,
-            titleBn: bannerContent.titleBn,
-            titleEn: bannerContent.titleEn,
-            mobileDescriptionBn: bannerContent.mobileDescriptionBn,
-            mobileDescriptionEn: bannerContent.mobileDescriptionEn,
-            descriptionBn: bannerContent.tabletDescriptionBn,
-            descriptionEn: bannerContent.tabletDescriptionEn,
-            desktopDescriptionBn: bannerContent.desktopDescriptionBn,
-            desktopDescriptionEn: bannerContent.desktopDescriptionEn,
+            titleBn: routeSubcategory?.nameBn || bannerContent.titleBn,
+            titleEn: routeSubcategory?.nameEn || bannerContent.titleEn,
+            mobileDescriptionBn:
+              routeSubcategory?.descriptionBn || bannerContent.mobileDescriptionBn,
+            mobileDescriptionEn:
+              routeSubcategory?.descriptionEn || bannerContent.mobileDescriptionEn,
+            descriptionBn: topicDescriptionBn,
+            descriptionEn: topicDescriptionEn,
+            desktopDescriptionBn:
+              routeSubcategory?.descriptionBn || bannerContent.desktopDescriptionBn,
+            desktopDescriptionEn:
+              routeSubcategory?.descriptionEn || bannerContent.desktopDescriptionEn,
             illustrationSrc: bannerContent.illustrationSrc,
-
           },
         ]}
       />
@@ -178,12 +250,13 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({ sect
         fetchError={fetchError}
         onRetry={loadData}
         onEmptyAction={() => {
-          setSelectedSubcat('all');
+          setSelectedSubcat(initialSubcategoryId || 'all');
           setFeedFilters({ ...EMPTY_CATEGORY_FEED_FILTERS });
         }}
         selectedSubcategory={selectedSubcat}
         subcategories={subcategories}
         onSelectSubcategory={setSelectedSubcat}
+        getSubcategoryHref={getSubcategoryHref}
         countForSubcategory={countForSubcategory}
         idPrefix={section}
       />
