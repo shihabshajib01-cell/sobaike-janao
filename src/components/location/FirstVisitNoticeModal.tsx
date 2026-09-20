@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Checkbox } from '../ui/Checkbox';
 import { ModalActions } from '../ui/ModalActions';
+import { BrandLogo } from '../branding/BrandLogo';
 
 interface FirstVisitNoticeModalProps {
   isOpen: boolean;
@@ -25,9 +26,6 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
   if (!isOpen) return null;
 
   const isBn = language === 'bn';
-  const brandBase = import.meta.env.BASE_URL || '/';
-  const normalizedBrandBase = brandBase.endsWith('/') ? brandBase : `${brandBase}/`;
-  const brandMarkSrc = `${normalizedBrandBase}brand/sobaike-janao-mark-128.png`;
 
   const handleContinue = () => {
     if (!isChecked) return;
@@ -55,16 +53,23 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
       closeOnEscape={false}
       maxWidth="md"
       language={language}
-      title={isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
-      headerIcon={
-        <img
-          src={brandMarkSrc}
-          alt=""
-          aria-hidden="true"
-          width={32}
-          height={32}
-          className="w-8 h-8 object-contain select-none"
-        />
+      title={
+        <span className="inline-flex items-center gap-2.5 min-w-0">
+          <span className="sr-only">
+            {isBn ? 'সবাইকে জানাও-তে স্বাগতম' : 'Welcome to Sobaike Janao'}
+          </span>
+          <span aria-hidden="true" className="inline-flex items-center gap-2.5 min-w-0">
+            <BrandLogo
+              variant="full"
+              size="sm"
+              aria-label={isBn ? 'সবাইকে জানাও' : 'Sobaike Janao'}
+              className="shrink-0"
+            />
+            <span className="whitespace-nowrap">
+              {isBn ? '-তে স্বাগতম' : '— Welcome'}
+            </span>
+          </span>
+        </span>
       }
       showCloseButton={false}
       ariaDescribedBy="first-visit-notice-desc"
