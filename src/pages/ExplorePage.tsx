@@ -673,7 +673,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Division Chip */}
           {selectedDivision !== 'all' && activeDivisionName && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate">{activeDivisionName}</span>
               <button
                 type="button"
@@ -695,7 +695,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* District Chip */}
           {selectedDistrict !== 'all' && activeDistrictName && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate">{activeDistrictName}</span>
               <button
                 type="button"
@@ -714,7 +714,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Category Chip */}
           {selectedSection !== 'all' && activeCategoryName && (
-            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <CategoryIcon section={selectedSection as SectionKey} size="xs" className="shrink-0" />
               <span className="truncate">{activeCategoryName}</span>
               <button
@@ -733,7 +733,7 @@ export const ExplorePage: React.FC = () => {
           )}
 
           {selectedSubcategory && activeSubcategoryName && (
-            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate">{activeSubcategoryName}</span>
               <button
                 type="button"
@@ -751,7 +751,7 @@ export const ExplorePage: React.FC = () => {
           )}
 
           {selectedMonth && activeMonthName && (
-            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1.5 pl-3 pr-0.5 py-0 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate">{activeMonthName}</span>
               <button
                 type="button"
@@ -770,7 +770,7 @@ export const ExplorePage: React.FC = () => {
 
           {/* Search Query Chip */}
           {searchQuery.trim() && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 py-0 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary max-w-full">
               <span className="truncate max-w-[180px] sm:max-w-[240px]">
                 {language === 'bn'
                   ? `অনুসন্ধান: “${searchQuery.trim()}”`
@@ -792,19 +792,19 @@ export const ExplorePage: React.FC = () => {
           )}
 
           {selectedSection === 'harassment' && harassmentFilters.ageGroup !== 'all' && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
               <span>{getBilingualOptionLabel(HARASSMENT_AGE_GROUP_OPTIONS, harassmentFilters.ageGroup, language)}</span>
               <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, ageGroup: 'all' }))} aria-label={language === 'bn' ? 'বয়সের ফিল্টার সরান' : 'Remove age filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
             </span>
           )}
           {selectedSection === 'harassment' && harassmentFilters.abuserRelationship !== 'all' && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
               <span>{getBilingualOptionLabel(HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS, harassmentFilters.abuserRelationship, language)}</span>
               <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, abuserRelationship: 'all' }))} aria-label={language === 'bn' ? 'সম্পর্কের ফিল্টার সরান' : 'Remove relationship filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
             </span>
           )}
           {selectedSection === 'harassment' && harassmentFilters.reportingFor !== 'all' && (
-            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-badge-md bg-ui-surface-subtle border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
+            <span className="inline-flex items-center gap-1 pl-3 pr-0.5 ui-radius-pill bg-ui-surface border border-ui-stroke-subtle type-meta font-[var(--font-weight-medium)] text-ui-content-primary">
               <span>{getBilingualOptionLabel(HARASSMENT_REPORTING_FOR_OPTIONS, harassmentFilters.reportingFor, language)}</span>
               <button type="button" onClick={() => setHarassmentFilters((prev) => ({ ...prev, reportingFor: 'all' }))} aria-label={language === 'bn' ? 'প্রতিবেদনকারীর ফিল্টার সরান' : 'Remove reporting-for filter'} className="w-11 h-11 flex items-center justify-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"><MapIcon name="close" size="xs" ariaHidden={true} /></button>
             </span>
@@ -814,7 +814,7 @@ export const ExplorePage: React.FC = () => {
           <button
             type="button"
             onClick={handleResetFilters}
-            className="min-h-[44px] px-3 py-2 inline-flex items-center type-meta font-[var(--font-weight-semibold)] text-ui-accent hover:underline cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md ml-auto sm:ml-1"
+            className="min-h-[44px] px-3 py-2 inline-flex items-center type-meta font-[var(--font-weight-semibold)] text-ui-accent hover:underline cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-pill ml-auto sm:ml-1"
           >
             {language === 'bn' ? 'সব মুছুন' : 'Clear all'}
           </button>
