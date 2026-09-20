@@ -325,6 +325,11 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
       title={isBn ? 'ফিল্টার' : 'Filter'}
       maxWidth="lg"
       mobilePresentation="sheet"
+      contentClassName={
+        selectedFilterChips.length > 0
+          ? 'overflow-y-auto overscroll-contain px-5 sm:px-6 pt-3 sm:pt-4 pb-5 sm:pb-6'
+          : undefined
+      }
       footer={
         <ModalActions
           primary={{
@@ -346,7 +351,7 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
         {selectedFilterChips.length > 0 && (
           <section
             aria-label={isBn ? 'নির্বাচিত ফিল্টার' : 'Selected filters'}
-            className="border-b border-ui-stroke-subtle pb-4"
+            className="border-b border-ui-stroke-subtle pb-2"
           >
             <div className="flex flex-wrap gap-2">
               {selectedFilterChips.map((chip) => (
