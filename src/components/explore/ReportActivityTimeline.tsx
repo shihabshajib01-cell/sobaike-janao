@@ -311,8 +311,8 @@ export const ReportActivityTimeline: React.FC<ReportActivityTimelineProps> = ({
                       onClick={onSelectMonth ? () => onSelectMonth(m.key) : undefined}
                       disabled={!onSelectMonth}
                       className={`w-full min-h-[44px] flex flex-col items-center min-w-0 rounded-[var(--radius-badge-md)] px-1 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
-                        onSelectMonth ? 'cursor-pointer hover:bg-ui-surface-subtle/70' : ''
-                      } ${activeMonthKey === m.key ? 'bg-ui-surface-subtle' : ''}`}
+                        onSelectMonth ? 'cursor-pointer hover:bg-ui-surface-hover' : ''
+                      } ${activeMonthKey === m.key ? 'bg-ui-selected-bg text-ui-selected-text' : ''}`}
                     >
                     {/* Numeric count above bar */}
                     <span
