@@ -10,7 +10,6 @@ import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
 import { ReportItem } from '../types/report';
 import { VirtualizedReportFeed } from '../components/report/VirtualizedReportFeed';
 import { NewReportsNotice } from '../components/feed/NewReportsNotice';
-import { HomeFeedFilterSheet } from '../components/report/HomeFeedFilterSheet';
 import { FilterChip } from '../components/ui/FilterChip';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Button } from '../components/ui/Button';
@@ -27,9 +26,14 @@ import {
   countActiveHomeFeedFilters,
   createEmptyHomeFeedFilters,
   hasHomeFeedNonPaginatedFilters,
-  matchesHomeFeedFilters,
   resolveHomeFeedServerDistrict,
 } from '../data/homeFeedFilters';
+
+const HomeFeedFilterSheet = React.lazy(() =>
+  import('../components/report/HomeFeedFilterSheet').then((module) => ({
+    default: module.HomeFeedFilterSheet,
+  }))
+);
 
 type FeedFilterType = 'all' | 'latest' | 'popular';
 
@@ -136,13 +140,16 @@ export const HomePage: React.FC = () => {
       const { PublicReportService } = await import('../services/publicReportService');
 
       if (usesAdvancedFilterMode) {
-        const rankedReports = await PublicReportService.getHomeFeed({
-          visitorLat,
-          visitorLng,
-          filter: feedFilter,
-          district: selectedDistrict,
-          includeEvidence: false,
-        });
+        const [{ matchesHomeFeedFilters }, rankedReports] = await Promise.all([
+          import('../data/homeFeedFilterMatching'),
+          PublicReportService.getHomeFeed({
+            visitorLat,
+            visitorLng,
+            filter: feedFilter,
+            district: selectedDistrict,
+            includeEvidence: false,
+          }),
+        ]);
         const matchingReports = rankedReports.filter((report) =>
           matchesHomeFeedFilters(report, homeFilters)
         );
@@ -525,7 +532,7 @@ export const HomePage: React.FC = () => {
             {activeFilterCount > 0 && (
               <span
                 aria-hidden="true"
-                className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-ui-accent px-1 type-meta font-[var(--font-weight-bold)] text-ui-action-text"
+                className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center ui-radius-pill bg-ui-accent px-1 type-meta font-[var(--font-weight-bold)] text-ui-action-text"
               >
                 {language === 'bn' ? toBanglaDigits(activeFilterCount) : activeFilterCount}
               </span>
@@ -665,16 +672,20 @@ export const HomePage: React.FC = () => {
         )}
       </section>
 
-      <HomeFeedFilterSheet
-        isOpen={isFilterOpen}
-        language={language}
-        value={homeFilters}
-        onClose={() => setIsFilterOpen(false)}
-        onApply={(next) => {
-          setHomeFilters(next);
-          setIsFilterOpen(false);
-        }}
-      />
+      {isFilterOpen && (
+        <React.Suspense fallback={null}>
+          <HomeFeedFilterSheet
+            isOpen={isFilterOpen}
+            language={language}
+            value={homeFilters}
+            onClose={() => setIsFilterOpen(false)}
+            onApply={(next) => {
+              setHomeFilters(next);
+              setIsFilterOpen(false);
+            }}
+          />
+        </React.Suspense>
+      )}
     </PublicPageContainer>
   );
 };
