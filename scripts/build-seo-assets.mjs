@@ -356,6 +356,17 @@ function localizePage(page, routeLanguage) {
                 },
               ]
             : []),
+          ...(page.topicPath
+            ? [
+                {
+                  name:
+                    contentLanguage === 'en'
+                      ? page.topicNameEn || page.topicNameBn || 'Topic'
+                      : page.topicNameBn || page.topicNameEn || 'উপবিষয়',
+                  url: localizedUrl(page.topicPath, canonicalLanguage),
+                },
+              ]
+            : []),
           {
             name: currentLabel,
             url: canonical,
@@ -962,7 +973,7 @@ function resolveDistrictId(raw, districts) {
   return match?.id || null;
 }
 
-function reportPage(report, segmentById) {
+function reportPage(report, segmentById, subcategoryByKey) {
   const id = cleanText(report.id);
   if (!id) return null;
 
@@ -986,6 +997,13 @@ function reportPage(report, segmentById) {
       ? `/${segmentSlug}`
       : `/category/${encodeURIComponent(segmentSlug)}`
     : '/issues';
+  const subcategory = subcategoryByKey.get(`${report.segment}:${report.subcategoryId}`) || null;
+  const subcategorySlug = cleanText(subcategory?.slug || report.subcategoryId || '')
+    .replace(/^\/+/, '')
+    .replaceAll('_', '-');
+  const topicPath = subcategorySlug
+    ? `/topic/${encodeURIComponent(subcategorySlug)}`
+    : null;
 
   const indexable = isSeoIndexableReport(report);
   const title = buildReportSeoTitle(sourceTitle, brand, id);
@@ -1003,6 +1021,9 @@ function reportPage(report, segmentById) {
     categoryPath,
     categoryNameBn: cleanText(segment?.name_bn || report.subcategoryBn || 'বিষয়সমূহ'),
     categoryNameEn: cleanText(segment?.name_en || report.subcategoryEn || 'Topics'),
+    topicPath,
+    topicNameBn: cleanText(subcategory?.name_bn || report.subcategoryBn || ''),
+    topicNameEn: cleanText(subcategory?.name_en || report.subcategoryEn || ''),
     articleSection:
       sourceLanguage === 'en'
         ? cleanText(report.subcategoryEn || segment?.name_en || '')
@@ -1132,6 +1153,12 @@ async function main() {
   const basePages = [...STATIC_PAGES];
   const seenPaths = new Set(basePages.map((page) => page.path));
   const segmentById = new Map(segments.map((segment) => [segment.id, segment]));
+  const subcategoryByKey = new Map(
+    subcategories.map((subcategory) => [
+      `${subcategory.segment_id}:${subcategory.id}`,
+      subcategory,
+    ])
+  );
   const reportPages = [];
   const topicPages = [];
 
@@ -1146,7 +1173,7 @@ async function main() {
   const districtIdsWithReports = new Set();
 
   for (const report of reports) {
-    const page = reportPage(report, segmentById);
+    const page = reportPage(report, segmentById, subcategoryByKey);
     if (page && !seenPaths.has(page.path)) {
       basePages.push(page);
       reportPages.push(page);
