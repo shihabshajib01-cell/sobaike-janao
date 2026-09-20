@@ -70,7 +70,8 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
                 selected
                   ? 'border-role-selected-outline bg-role-selected-container text-role-on-selected-container'
                   : 'border-role-control-outline bg-role-surface text-role-on-surface hover:border-role-control-outline-hover',
-                option.disabled && 'opacity-50 cursor-not-allowed',
+                option.disabled &&
+                  'bg-role-disabled-container text-role-on-disabled border-role-outline-subtle cursor-not-allowed',
                 optionClassName
               )}
             >
