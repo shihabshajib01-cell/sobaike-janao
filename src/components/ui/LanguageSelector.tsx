@@ -44,7 +44,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                 onClick={() => !isSelected && toggleLanguage()}
                 className={`min-w-[46px] min-h-[34px] px-2.5 ui-radius-badge-md type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isSelected
-                    ? 'bg-ui-surface text-ui-content-primary border border-ui-stroke-default shadow-[var(--elevation-2xs)]'
+                    ? 'bg-ui-selected-bg text-ui-selected-text border border-ui-selected-border shadow-[var(--elevation-2xs)]'
                     : 'text-ui-content-secondary border border-transparent hover:text-ui-content-primary hover:bg-ui-surface/50'
                 }`}
               >
@@ -74,7 +74,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             onClick={() => !isSelected && toggleLanguage()}
             className={`flex-1 min-w-0 min-h-[44px] px-3 rounded-[var(--radius-control)] type-label font-[var(--font-weight-medium)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isSelected
-                ? 'bg-ui-surface text-ui-content-primary font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)] border border-ui-stroke-subtle'
+                ? 'bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)] border border-ui-selected-border'
                 : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface/50 border border-transparent'
             }`}
           >
