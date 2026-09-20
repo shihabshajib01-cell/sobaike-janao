@@ -40,11 +40,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
         }
       : undefined;
 
-  const classes = `inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] type-compact font-[var(--font-weight-medium)] ui-radius-pill ui-border-default transition-all select-none whitespace-nowrap shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus focus-visible:ring-offset-1 active:scale-95 ${
-    disabled
-      ? 'cursor-not-allowed bg-role-disabled-container text-role-on-disabled border-role-outline-subtle hover:bg-role-disabled-container hover:text-role-on-disabled'
-      : 'cursor-pointer'
-  } ${
+  const classes = `inline-flex items-center justify-center ui-space-filter-chip min-h-[44px] type-compact font-[var(--font-weight-medium)] ui-radius-pill ui-border-default transition-all select-none cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-role-disabled-container disabled:text-role-on-disabled disabled:border-role-outline-subtle disabled:hover:bg-role-disabled-container disabled:hover:text-role-on-disabled focus:outline-none focus-visible:ring-2 focus-visible:ring-role-focus focus-visible:ring-offset-1 active:scale-95 ${
     selected && !config && !disabled
       ? 'bg-role-primary text-role-on-primary border-role-primary font-[var(--font-weight-semibold)] ui-elevation-selected'
       : !selected && !disabled
