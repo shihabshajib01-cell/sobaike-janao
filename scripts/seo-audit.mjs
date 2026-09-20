@@ -29,9 +29,20 @@ const attr = (html, selectorPattern, attrName) => {
   return value?.[2] || '';
 };
 
-const getTitle = (html) => html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || '';
+const decodeHtmlEntities = (value = '') =>
+  String(value)
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#(?:39|x27);/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>');
+
+const getTitle = (html) =>
+  decodeHtmlEntities(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || '');
 const getDescription = (html) =>
-  attr(html, /<meta\s+[^>]*name=["']description["'][^>]*>/i, 'content');
+  decodeHtmlEntities(
+    attr(html, /<meta\s+[^>]*name=["']description["'][^>]*>/i, 'content')
+  );
 const getCanonical = (html) =>
   attr(html, /<link\s+[^>]*rel=["']canonical["'][^>]*>/i, 'href');
 const getRobots = (html) =>
