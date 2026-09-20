@@ -2,14 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { DesktopLeftRail } from './DesktopLeftRail';
-import { Header } from './Header';
-import { MobileHeader } from './MobileHeader';
-import { BottomNav, shouldHideBottomNav } from './BottomNav';
-import { SearchModal } from './SearchModal';
 import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
-import { LocationConsentModal } from '../location/LocationConsentModal';
 import { LocationReminderBar } from '../location/LocationReminderBar';
+import { shouldHideBottomNav } from './navigationVisibility';
 import { VisitorSessionService } from '../../services/visitorSessionService';
 import { HomePage } from '../../pages/HomePage';
 import { SeoManager } from '../seo/SeoManager';
@@ -64,6 +59,34 @@ const LazyExplorePage = React.lazy(() =>
 const LazyReportComposerModal = React.lazy(() =>
   import('../report-composer/ReportComposerModal').then((m) => ({ default: m.ReportComposerModal }))
 );
+
+const LazyDesktopLeftRail = React.lazy(() =>
+  import('./DesktopLeftRail').then((m) => ({ default: m.DesktopLeftRail }))
+);
+const LazyHeader = React.lazy(() =>
+  import('./Header').then((m) => ({ default: m.Header }))
+);
+const LazyMobileHeader = React.lazy(() =>
+  import('./MobileHeader').then((m) => ({ default: m.MobileHeader }))
+);
+const LazyBottomNav = React.lazy(() =>
+  import('./BottomNav').then((m) => ({ default: m.BottomNav }))
+);
+const LazySearchModal = React.lazy(() =>
+  import('./SearchModal').then((m) => ({ default: m.SearchModal }))
+);
+const LazyLocationConsentModal = React.lazy(() =>
+  import('../location/LocationConsentModal').then((m) => ({ default: m.LocationConsentModal }))
+);
+
+type ViewportTier = 'mobile' | 'tablet' | 'desktop';
+
+const getViewportTier = (): ViewportTier => {
+  if (typeof window === 'undefined') return 'mobile';
+  if (window.matchMedia('(min-width: 1440px)').matches) return 'desktop';
+  if (window.matchMedia('(min-width: 768px)').matches) return 'tablet';
+  return 'mobile';
+};
 
 const FORM_SCHEMA_SMOKE_ENABLED = import.meta.env.VITE_FORM_SCHEMA_SMOKE === '1';
 const LazySchemaFormSmokeHarness = FORM_SCHEMA_SMOKE_ENABLED
@@ -137,6 +160,7 @@ export const AppShell: React.FC = () => {
   const {
     currentRoute,
     language,
+    isSearchModalOpen,
     isReportComposerOpen,
     reportComposerInitialSegment,
     closeReportComposer,
@@ -148,6 +172,7 @@ export const AppShell: React.FC = () => {
 
   const { segments } = useTaxonomy();
   const [isFirstVisitNoticeOpen, setIsFirstVisitNoticeOpen] = useState(false);
+  const [viewportTier, setViewportTier] = useState<ViewportTier>(getViewportTier);
   const [isMobileChromeCompact, setIsMobileChromeCompact] = useState(false);
   const [routeAnnouncement, setRouteAnnouncement] = useState('');
   const previousNavigationKeyRef = useRef(`${language}:${currentRoute}`);
@@ -182,6 +207,26 @@ export const AppShell: React.FC = () => {
       } as React.CSSProperties,
     };
   }, [currentRoute, segments]);
+
+  useEffect(() => {
+    const tabletQuery = window.matchMedia('(min-width: 768px)');
+    const desktopQuery = window.matchMedia('(min-width: 1440px)');
+
+    const syncViewportTier = () => {
+      setViewportTier(
+        desktopQuery.matches ? 'desktop' : tabletQuery.matches ? 'tablet' : 'mobile'
+      );
+    };
+
+    syncViewportTier();
+    tabletQuery.addEventListener('change', syncViewportTier);
+    desktopQuery.addEventListener('change', syncViewportTier);
+
+    return () => {
+      tabletQuery.removeEventListener('change', syncViewportTier);
+      desktopQuery.removeEventListener('change', syncViewportTier);
+    };
+  }, []);
 
   useEffect(() => {
     const navigationKey = `${language}:${currentRoute}`;
@@ -255,20 +300,28 @@ export const AppShell: React.FC = () => {
         {routeAnnouncement}
       </p>
 
-      <ErrorBoundary componentName="DesktopLeftRail" silent>
-        <DesktopLeftRail />
-      </ErrorBoundary>
-
-      <ErrorBoundary componentName="Header" silent>
-        <Header />
-      </ErrorBoundary>
-
-      <ErrorBoundary componentName="MobileHeader" fallback={null}>
-        <MobileHeader
-          isCompact={isMobileChromeCompact}
-          onCompactChange={setIsMobileChromeCompact}
-        />
-      </ErrorBoundary>
+      {viewportTier === 'desktop' ? (
+        <ErrorBoundary componentName="DesktopLeftRail" silent>
+          <React.Suspense fallback={null}>
+            <LazyDesktopLeftRail />
+          </React.Suspense>
+        </ErrorBoundary>
+      ) : viewportTier === 'tablet' ? (
+        <ErrorBoundary componentName="Header" silent>
+          <React.Suspense fallback={null}>
+            <LazyHeader />
+          </React.Suspense>
+        </ErrorBoundary>
+      ) : (
+        <ErrorBoundary componentName="MobileHeader" fallback={null}>
+          <React.Suspense fallback={null}>
+            <LazyMobileHeader
+              isCompact={isMobileChromeCompact}
+              onCompactChange={setIsMobileChromeCompact}
+            />
+          </React.Suspense>
+        </ErrorBoundary>
+      )}
 
       <div
         id="public-desktop-workspace"
@@ -370,16 +423,24 @@ export const AppShell: React.FC = () => {
         </main>
       </div>
 
-      <ErrorBoundary componentName="BottomNav" fallback={null}>
-        <BottomNav
-          isCompact={isMobileChromeCompact}
-          onCompactChange={setIsMobileChromeCompact}
-        />
-      </ErrorBoundary>
+      {viewportTier === 'mobile' ? (
+        <ErrorBoundary componentName="BottomNav" fallback={null}>
+          <React.Suspense fallback={null}>
+            <LazyBottomNav
+              isCompact={isMobileChromeCompact}
+              onCompactChange={setIsMobileChromeCompact}
+            />
+          </React.Suspense>
+        </ErrorBoundary>
+      ) : null}
 
-      <ErrorBoundary componentName="SearchModal" silent>
-        <SearchModal />
-      </ErrorBoundary>
+      {isSearchModalOpen ? (
+        <ErrorBoundary componentName="SearchModal" silent>
+          <React.Suspense fallback={null}>
+            <LazySearchModal />
+          </React.Suspense>
+        </ErrorBoundary>
+      ) : null}
 
       {isReportComposerOpen && (
         <ErrorBoundary componentName="ReportComposerModal" silent>
@@ -402,18 +463,22 @@ export const AppShell: React.FC = () => {
         />
       </ErrorBoundary>
 
-      <ErrorBoundary componentName="LocationConsentModal" silent>
-        <LocationConsentModal
-          isOpen={isLocationModalOpen}
-          language={language}
-          purpose={locationModalPurpose}
-          onClose={closeLocationConsent}
-          onSuccess={() => {
-            locationSuccessCallback?.();
-            closeLocationConsent();
-          }}
-        />
-      </ErrorBoundary>
+      {isLocationModalOpen ? (
+        <ErrorBoundary componentName="LocationConsentModal" silent>
+          <React.Suspense fallback={null}>
+            <LazyLocationConsentModal
+              isOpen={isLocationModalOpen}
+              language={language}
+              purpose={locationModalPurpose}
+              onClose={closeLocationConsent}
+              onSuccess={() => {
+                locationSuccessCallback?.();
+                closeLocationConsent();
+              }}
+            />
+          </React.Suspense>
+        </ErrorBoundary>
+      ) : null}
     </div>
   );
 };
