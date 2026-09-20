@@ -310,10 +310,61 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
               )}
             </div>
 
+            {/* Mobile: horizontal ranked bars keep long division names readable without x-axis overlap. */}
+            <div
+              role="region"
+              aria-label={language === 'bn' ? 'বিভাগ অনুযায়ী অনুভূমিক বার চার্ট' : 'Division horizontal bar chart'}
+              className="sm:hidden space-y-1"
+            >
+              {divisionStats.map((item) => {
+                const displayDivisionName =
+                  language === 'bn' ? item.nameBn : item.nameEn;
+                const displayCount =
+                  language === 'bn' ? toBanglaDigits(item.count) : item.count;
+                const width = Math.max(10, Math.round((item.count / maxDivisionCount) * 100));
+                const isActive =
+                  activeDivision.toLowerCase() === item.nameEn.toLowerCase();
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={onSelectDivision ? () => onSelectDivision(item.nameEn) : undefined}
+                    aria-pressed={isActive}
+                    aria-label={
+                      language === 'bn'
+                        ? `${displayDivisionName} বিভাগ: ${displayCount}টি প্রতিবেদন`
+                        : `${displayDivisionName} Division: ${displayCount} reports`
+                    }
+                    className={`w-full min-h-[44px] grid grid-cols-[minmax(0,7.5rem)_minmax(4rem,1fr)_2.25rem] items-center gap-2 rounded-[var(--radius-badge-md)] px-2 py-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                      onSelectDivision ? 'cursor-pointer hover:bg-ui-surface-hover' : ''
+                    } ${isActive ? 'bg-ui-selected-bg text-ui-selected-text' : ''}`}
+                  >
+                    <span className="min-w-0 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary text-left leading-tight whitespace-normal break-words">
+                      {displayDivisionName}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="w-full h-2.5 rounded-[var(--radius-pill)] bg-ui-surface-subtle border border-ui-stroke-subtle overflow-hidden"
+                    >
+                      <span
+                        className="block h-full bg-ui-accent rounded-[var(--radius-pill)] transition-all duration-300"
+                        style={{ width: `${width}%` }}
+                      />
+                    </span>
+                    <span className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary text-right tabular-nums">
+                      {displayCount}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Tablet/desktop: preserve the existing compact column chart. */}
             <div
               role="region"
               aria-label={language === 'bn' ? 'বিভাগ অনুযায়ী কলাম চার্ট' : 'Division column chart'}
-              className="overflow-x-auto pb-1"
+              className="hidden sm:block overflow-x-auto pb-1"
             >
               <div className="min-w-max flex items-end gap-2">
                 {divisionStats.map((item) => {
