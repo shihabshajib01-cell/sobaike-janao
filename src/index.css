@@ -32,6 +32,9 @@
   --color-role-overlay: var(--md-overlay);
   --color-role-disabled-container: var(--md-disabled-container);
   --color-role-on-disabled: var(--md-on-disabled);
+  --color-role-selected-container: var(--md-selected-container);
+  --color-role-on-selected-container: var(--md-on-selected-container);
+  --color-role-selected-outline: var(--md-selected-outline);
 
   --color-role-success: var(--md-success);
   --color-role-on-success: var(--md-on-success);
@@ -91,6 +94,11 @@
   --color-ui-input-placeholder: var(--ui-input-placeholder);
   --color-ui-disabled-bg: var(--ui-disabled-bg);
   --color-ui-disabled-text: var(--ui-disabled-text);
+
+  /* Selected */
+  --color-ui-selected-bg: var(--ui-selected-bg);
+  --color-ui-selected-text: var(--ui-selected-text);
+  --color-ui-selected-border: var(--ui-selected-border);
 
   /* Accent / Focus */
   --color-ui-accent: var(--ui-accent);
