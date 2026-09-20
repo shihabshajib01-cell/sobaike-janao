@@ -169,12 +169,12 @@ export const MorePage: React.FC = () => {
               <h2 className="type-h2 text-ui-content-primary">{language === 'bn' ? 'Sobaike Janao — সবাইকে জানাও সম্পর্কে' : 'About Sobaike Janao'}</h2>
               <p className="type-body text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ দায়িত্বশীলভাবে প্রকাশ করার একটি স্বাধীন, মডারেটেড প্ল্যাটফর্ম। এটি কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী প্রতিষ্ঠানের ওয়েবসাইট নয়।'
-                  : 'Sobaike Janao is an independent, moderated platform where people in Bangladesh can responsibly publish public-interest information, experiences, and observations. It is not a government or law-enforcement website.'}
+                  ? 'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের একটি স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম, যেখানে মানুষ দায়িত্বশীলভাবে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ প্রকাশ করতে পারেন।'
+                  : 'Sobaike Janao is an independent, moderated citizen-reporting and public-interest information platform for Bangladesh, where people can responsibly publish information, experiences, and observations.'}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3" data-nosnippet>
               <div className="rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface p-4 space-y-2">
                 <ShieldAlert className="w-5 h-5 text-ui-accent" aria-hidden="true" />
                 <h3 className="type-h4 text-ui-content-primary">{language === 'bn' ? 'সরকারি ওয়েবসাইট নয়' : 'Not a government website'}</h3>

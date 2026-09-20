@@ -2,13 +2,13 @@
 <html lang="bn">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-ZuBJaMmuv0yolgULJguoc6qsYB9AZnk9A+UyiEbNHQk=' 'sha256-1ZIfjgfRTxRRFtGrqC/X4vuLKXDCczKNBbC06ZRtgMg=' 'sha256-IWrS4XiYxknqBB85CwZVClri2QuTvVXaiExNemMMc14='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://ahiaymyqfmyyrjkwgvhi.supabase.co wss://ahiaymyqfmyyrjkwgvhi.supabase.co; worker-src 'self' blob:; manifest-src 'self'; frame-src 'none'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-ZuBJaMmuv0yolgULJguoc6qsYB9AZnk9A+UyiEbNHQk=' 'sha256-hHJhycXH8TAtrRzB3h4PkB6lfyaYw8DlVQU7vM2yA2s=' 'sha256-IWrS4XiYxknqBB85CwZVClri2QuTvVXaiExNemMMc14='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://ahiaymyqfmyyrjkwgvhi.supabase.co wss://ahiaymyqfmyyrjkwgvhi.supabase.co; worker-src 'self' blob:; manifest-src 'self'; frame-src 'none'; upgrade-insecure-requests" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <script>document.documentElement.classList.add('js');if(window.top!==window.self){document.documentElement.style.display='none';}</script>
     <style>.js #seo-static-fallback{display:none!important}</style>
     <title>Sobaike Janao | সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম</title>
-    <meta name="description" content="Sobaike Janao (সবাইকে জানাও) — বাংলাদেশের জনস্বার্থের সাম্প্রতিক নাগরিক প্রতিবেদন দেখুন, বিষয় ও এলাকা অনুযায়ী খুঁজুন, এবং নতুন ঘটনা জানাতে প্রতিবেদন করুন।" />
+    <meta name="description" content="Sobaike Janao (সবাইকে জানাও) বাংলাদেশের স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম—বিষয় ও এলাকা অনুযায়ী প্রতিবেদন দেখুন ও ঘটনা জানান।" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="application-name" content="Sobaike Janao" />
@@ -37,12 +37,38 @@
     <script type="application/ld+json" id="seo-jsonld">
       {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "@id": "https://shobaikejanao.com/#website",
-        "url": "https://shobaikejanao.com/",
-        "name": "Sobaike Janao",
-        "alternateName": "সবাইকে জানাও",
-        "inLanguage": ["bn-BD", "en"]
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://shobaikejanao.com/#organization",
+            "url": "https://shobaikejanao.com/",
+            "name": "Sobaike Janao",
+            "alternateName": ["সবাইকে জানাও", "shobaikejanao.com"],
+            "description": "Independent, moderated citizen-reporting and public-interest information platform for Bangladesh.",
+            "areaServed": {
+              "@type": "Country",
+              "name": "Bangladesh"
+            },
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://shobaikejanao.com/brand/icon-512x512.png",
+              "width": 512,
+              "height": 512
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://shobaikejanao.com/#website",
+            "url": "https://shobaikejanao.com/",
+            "name": "Sobaike Janao",
+            "alternateName": ["সবাইকে জানাও", "shobaikejanao.com"],
+            "description": "Independent, moderated citizen-reporting and public-interest information platform for Bangladesh.",
+            "inLanguage": ["bn-BD", "en"],
+            "publisher": {
+              "@id": "https://shobaikejanao.com/#organization"
+            }
+          }
+        ]
       }
     </script>
 
@@ -94,7 +120,7 @@
         <header class="space-y-3">
           <h1>Sobaike Janao — সবাইকে জানাও — নাগরিক প্রতিবেদন প্ল্যাটফর্ম</h1>
           <p>
-            Sobaike Janao (সবাইকে জানাও) বাংলাদেশের নাগরিকদের জনস্বার্থে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ দায়িত্বশীলভাবে প্রকাশ করার একটি স্বাধীন, মডারেটেড প্ল্যাটফর্ম। এটি কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী প্রতিষ্ঠানের ওয়েবসাইট নয়। জরুরি সহায়তা প্রয়োজন হলে ৯৯৯ অথবা সংশ্লিষ্ট সরকারি হটলাইনে সরাসরি যোগাযোগ করুন।
+            Sobaike Janao (সবাইকে জানাও) বাংলাদেশের একটি স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম, যেখানে মানুষ দায়িত্বশীলভাবে তথ্য, অভিজ্ঞতা ও পর্যবেক্ষণ প্রকাশ করতে পারেন। <span data-nosnippet>এটি কোনো সরকারি সংস্থা বা আইনশৃঙ্খলা রক্ষাকারী প্রতিষ্ঠানের ওয়েবসাইট নয়। জরুরি সহায়তা প্রয়োজন হলে ৯৯৯ অথবা সংশ্লিষ্ট সরকারি হটলাইনে সরাসরি যোগাযোগ করুন।</span>
           </p>
         </header>
 

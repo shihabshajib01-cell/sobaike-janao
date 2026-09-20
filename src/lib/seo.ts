@@ -27,6 +27,10 @@ export const BRAND_NAME = {
   en: 'Sobaike Janao',
 } as const;
 
+const BRAND_ALTERNATE_NAMES = ['সবাইকে জানাও', 'shobaikejanao.com'] as const;
+const ENTITY_DESCRIPTION =
+  'Independent, moderated citizen-reporting and public-interest information platform for Bangladesh.';
+
 const DEFAULT_SOCIAL_IMAGE = '/brand/og-social-1200x630.png';
 
 const SEO_TEST_MARKER_PATTERN =
@@ -119,7 +123,7 @@ export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
   bn: {
     title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
     description:
-      'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
+      'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম—বিষয় ও এলাকা অনুযায়ী প্রতিবেদন দেখুন ও ঘটনা জানান।',
     socialDescription:
       'সবাইকে জানাও — বাংলাদেশের নাগরিকদের জনস্বার্থের সমস্যা, অভিজ্ঞতা ও অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণ করার স্বাধীন, নিরাপদ ও মডারেটেড প্ল্যাটফর্ম।',
     robots: 'index, follow, max-image-preview:large',
@@ -131,7 +135,7 @@ export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
   en: {
     title: 'Sobaike Janao | Citizen Reporting Platform',
     description:
-      'Sobaike Janao is a moderated citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
+      'Sobaike Janao is an independent, moderated citizen-reporting and public-interest information platform for Bangladesh, organized by topic and area.',
     robots: 'index, follow, max-image-preview:large',
     ogType: 'website',
     ogSiteName: 'Sobaike Janao',
@@ -170,14 +174,14 @@ export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> 
     {
       title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
       description:
-        'সবাইকে জানাও — বাংলাদেশে জনস্বার্থ সংক্রান্ত সমস্যা ও নাগরিক অভিযোগ দায়িত্বশীলভাবে প্রকাশের মডারেটেড প্ল্যাটফর্ম।',
+        'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম—বিষয় ও এলাকা অনুযায়ী প্রতিবেদন দেখুন ও ঘটনা জানান।',
       socialDescription:
         'সবাইকে জানাও — বাংলাদেশের নাগরিকদের জনস্বার্থের সমস্যা, অভিজ্ঞতা ও অভিযোগ দায়িত্বশীলভাবে প্রকাশ, খোঁজ ও অনুসরণ করার স্বাধীন, নিরাপদ ও মডারেটেড প্ল্যাটফর্ম।',
     },
     {
       title: 'Sobaike Janao | Citizen Reporting Platform',
       description:
-        'Sobaike Janao is a moderated citizen reporting platform for responsibly documenting community issues and public-interest concerns in Bangladesh.',
+        'Sobaike Janao is an independent, moderated citizen-reporting and public-interest information platform for Bangladesh, organized by topic and area.',
     },
     '/'
   ),
@@ -445,10 +449,17 @@ function updateJsonLd(
     '@id': organizationId,
     url: `${SITE_ORIGIN}/`,
     name: 'Sobaike Janao',
-    alternateName: 'সবাইকে জানাও',
+    alternateName: [...BRAND_ALTERNATE_NAMES],
+    description: ENTITY_DESCRIPTION,
+    areaServed: {
+      '@type': 'Country',
+      name: 'Bangladesh',
+    },
     logo: {
       '@type': 'ImageObject',
       url: `${SITE_ORIGIN}/brand/icon-512x512.png`,
+      width: 512,
+      height: 512,
     },
   };
 
@@ -457,7 +468,8 @@ function updateJsonLd(
     '@id': websiteId,
     url: `${SITE_ORIGIN}/`,
     name: 'Sobaike Janao',
-    alternateName: 'সবাইকে জানাও',
+    alternateName: [...BRAND_ALTERNATE_NAMES],
+    description: ENTITY_DESCRIPTION,
     publisher: { '@id': organizationId },
   };
 
