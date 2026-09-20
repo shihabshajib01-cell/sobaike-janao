@@ -156,6 +156,24 @@ record(
   rootFavicon === '/brand/sobaike-janao-favicon.svg',
   rootFavicon
 );
+
+const allowedBrandAssets = new Set([
+  'apple-touch-icon.png',
+  'og-social-1200x630.png',
+  'sobaike-janao-favicon.svg',
+  'sobaike-janao-icon-512.png',
+  'sobaike-janao-wordmark-dark.svg',
+  'sobaike-janao-wordmark.svg',
+]);
+const brandAssets = await readdir('public/brand');
+const unexpectedBrandAssets = brandAssets.filter((name) => !allowedBrandAssets.has(name));
+const missingBrandAssets = [...allowedBrandAssets].filter((name) => !brandAssets.includes(name));
+record(
+  'Legacy logo and favicon assets removed',
+  unexpectedBrandAssets.length === 0 && missingBrandAssets.length === 0,
+  `unexpected=${unexpectedBrandAssets.join(',') || 'none'}; missing=${missingBrandAssets.join(',') || 'none'}`
+);
+
 record(
   'Boilerplate safety copy excluded from snippets',
   /data-nosnippet/i.test(rootHtml)
@@ -199,6 +217,7 @@ const schemaRaw =
   '';
 let schemaValid = false;
 let siteIdentityValid = false;
+let currentBrandLogoValid = false;
 try {
   const parsed = JSON.parse(schemaRaw);
   const graph = Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [parsed];
@@ -222,12 +241,19 @@ try {
     organization?.name === 'Sobaike Janao' &&
     expectedAlternateNames.every((name) => websiteAlternateNames.includes(name)) &&
     expectedAlternateNames.every((name) => organizationAlternateNames.includes(name));
+  currentBrandLogoValid =
+    organization?.logo?.url ===
+      `${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png` &&
+    organization?.logo?.width === 512 &&
+    organization?.logo?.height === 512;
 } catch {
   schemaValid = false;
   siteIdentityValid = false;
+  currentBrandLogoValid = false;
 }
 record('Structured data graph valid', schemaValid);
 record('Structured site identity is consistent', siteIdentityValid);
+record('Structured data uses current brand logo', currentBrandLogoValid);
 record(
   'Entity description is explicit',
   schemaRaw.includes('citizen-reporting and public-interest information platform for Bangladesh')
