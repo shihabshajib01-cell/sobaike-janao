@@ -444,17 +444,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 hasSupportingInfo: false,
                 evidenceTypes: [],
                 evidenceDescription: '',
-                location: {
-                  ...prev.location,
-                  upazilaOrThana: '',
-                  area: '',
-                  road: '',
-                  landmark: '',
-                  formattedAddress: '',
-                  placeId: undefined,
-                  lat: undefined,
-                  lng: undefined,
-                },
               }
             : {}),
           sexualHarassmentType: '',
@@ -806,20 +795,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const safeLat = hasValidIncidentCoords ? rawLoc.lat : undefined;
       const safeLng = hasValidIncidentCoords ? rawLoc.lng : undefined;
 
-      const loc = isChildSafetySubmission
-        ? {
-            division: rawLoc.division || '',
-            district: rawLoc.district || '',
-            upazilaOrThana: '',
-            area: undefined,
-            road: undefined,
-            landmark: undefined,
-            placeId: undefined,
-            formattedAddress: '',
-            lat: undefined,
-            lng: undefined,
-          }
-        : isUtility
+      const loc = isUtility
         ? {
             division: rawLoc.division || '',
             district: rawLoc.district || '',

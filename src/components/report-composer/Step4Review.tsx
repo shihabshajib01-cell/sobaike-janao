@@ -188,17 +188,15 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       }`;
 
   const locationSummary =
-    (isChildSafetyReport
-      ? [formData.location?.district, formData.location?.division]
-      : [
-          formData.location?.upazilaOrThana ||
-            (!isUtilityReport
-              ? formData.location?.area ||
-                (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : '')
-              : ''),
-          formData.location?.district,
-          formData.location?.division,
-        ])
+    [
+      formData.location?.upazilaOrThana ||
+        (!isUtilityReport
+          ? formData.location?.area ||
+            (formData.location?.formattedAddress ? formData.location.formattedAddress.split(',')[0].trim() : '')
+          : ''),
+      formData.location?.district,
+      formData.location?.division,
+    ]
       .filter(Boolean)
       .join(', ') || (language === 'bn' ? 'অবস্থান নির্দিষ্ট নেই' : 'Unspecified location');
 

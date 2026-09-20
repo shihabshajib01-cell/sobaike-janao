@@ -491,39 +491,6 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       }
     }, [isUtilityReport]);
 
-    // Child-safety reports intentionally collect only Division + District.
-    // Clear hidden location detail left from another subtype before validation/submission.
-    useEffect(() => {
-      if (!isChildSafetyReport || !formData.location) return;
-
-      const hasHiddenLocationData = Boolean(
-        formData.location.upazilaOrThana ||
-        formData.location.area ||
-        formData.location.road ||
-        formData.location.landmark ||
-        formData.location.formattedAddress ||
-        formData.location.placeId ||
-        formData.location.lat ||
-        formData.location.lng
-      );
-
-      if (hasHiddenLocationData) {
-        onUpdateFormData({
-          location: {
-            ...formData.location,
-            upazilaOrThana: '',
-            area: '',
-            road: '',
-            landmark: '',
-            formattedAddress: '',
-            placeId: undefined,
-            lat: undefined,
-            lng: undefined,
-          },
-        });
-      }
-    }, [isChildSafetyReport, formData.location, onUpdateFormData]);
-
     // Clear stale address-specific location data for utility complaints
     useEffect(() => {
       if (isUtilityReport && formData.location) {
@@ -985,23 +952,17 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         const reportUpazilaObj = reportDistObj
           ? getUpazilaByStoredName(formData.location?.upazilaOrThana, reportDistObj.id)
           : undefined;
-        if (!isChildSafetyReport && !reportUpazilaObj) {
+        if (!reportUpazilaObj) {
           newErrors.upazilaOrThana =
             language === 'bn' ? 'উপজেলা বা থানা নির্বাচন করুন।' : 'Select an upazila or thana.';
         }
 
-        if (
-          reportDivObj &&
-          reportDistObj &&
-          (isChildSafetyReport || reportUpazilaObj)
-        ) {
-          const normalizedUpazila = isChildSafetyReport ? '' : reportUpazilaObj?.nameEn || '';
+        if (reportDivObj && reportDistObj && reportUpazilaObj) {
+          const normalizedUpazila = reportUpazilaObj.nameEn;
           if (
             formData.location?.division !== reportDivObj.nameEn ||
             formData.location?.district !== reportDistObj.nameEn ||
-            (isChildSafetyReport
-              ? Boolean(formData.location?.upazilaOrThana)
-              : formData.location?.upazilaOrThana !== normalizedUpazila)
+            formData.location?.upazilaOrThana !== normalizedUpazila
           ) {
             onUpdateFormData({
               location: {
@@ -1015,7 +976,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
         }
 
         const detailedAddr = formData.location?.formattedAddress?.trim() || '';
-        if (!isChildSafetyReport && detailedAddr) {
+        if (detailedAddr) {
           if (detailedAddr.length < 5) {
             newErrors.formattedAddress =
               language === 'bn'
@@ -1739,8 +1700,8 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
           hasError={Boolean(
             errors.division ||
             errors.district ||
-            (!isChildSafetyReport && errors.upazilaOrThana) ||
-            (!isUtilityReport && !isChildSafetyReport && errors.formattedAddress) ||
+            errors.upazilaOrThana ||
+            (!isUtilityReport && errors.formattedAddress) ||
             errors.reporterLocation
           )}
           icon={<MapPin className="w-5 h-5" />}
@@ -1894,30 +1855,28 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   }))}
                 />
 
-                {!isChildSafetyReport && (
-                  <SearchableSelect
-                    id="complaint-thana-select"
-                    label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / upazila'}
-                    required
-                    disabled={isLocationLocked || !resolvedDistrict}
-                    value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
-                    onChange={handleUpazilaChange}
-                    placeholder={language === 'bn' ? 'থানা / উপজেলা বেছে নিন' : 'Select thana / upazila'}
-                    searchPlaceholder={language === 'bn' ? 'থানা / উপজেলা খুঁজুন...' : 'Search thana / upazila...'}
-                    noResultsText={language === 'bn' ? 'কোনো থানা / উপজেলা পাওয়া যায়নি' : 'No matching thana / upazila'}
-                    error={errors.upazilaOrThana}
-                    className="sm:col-span-2 lg:col-span-1"
-                    options={availableUpazilas.map((upazila) => ({
-                      value: upazila.nameEn,
-                      label: language === 'bn' ? upazila.nameBn : upazila.nameEn,
-                      keywords: [upazila.nameEn, upazila.nameBn],
-                    }))}
-                  />
-                )}
+                <SearchableSelect
+                  id="complaint-thana-select"
+                  label={language === 'bn' ? 'থানা / উপজেলা' : 'Thana / upazila'}
+                  required
+                  disabled={isLocationLocked || !resolvedDistrict}
+                  value={resolvedUpazila ? resolvedUpazila.nameEn : ''}
+                  onChange={handleUpazilaChange}
+                  placeholder={language === 'bn' ? 'থানা / উপজেলা বেছে নিন' : 'Select thana / upazila'}
+                  searchPlaceholder={language === 'bn' ? 'থানা / উপজেলা খুঁজুন...' : 'Search thana / upazila...'}
+                  noResultsText={language === 'bn' ? 'কোনো থানা / উপজেলা পাওয়া যায়নি' : 'No matching thana / upazila'}
+                  error={errors.upazilaOrThana}
+                  className="sm:col-span-2 lg:col-span-1"
+                  options={availableUpazilas.map((upazila) => ({
+                    value: upazila.nameEn,
+                    label: language === 'bn' ? upazila.nameBn : upazila.nameEn,
+                    keywords: [upazila.nameEn, upazila.nameBn],
+                  }))}
+                />
               </div>
 
               {/* Row 3: Detailed Address (Optional for non-utility, completely omitted for utility) */}
-              {!isUtilityReport && !isChildSafetyReport && (
+              {!isUtilityReport && (
                 <TextAreaField
                   id="complaint-address-input"
                   rows={3}
@@ -1937,8 +1896,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
               )}
 
               {/* Optional address/place search; no report-input map */}
-              {!isChildSafetyReport && (
-                <div className="pt-2 space-y-3">
+              <div className="pt-2 space-y-3">
                 {isGooglePlacesConfigured() && (
                   <AddressSearchInput
                     language={language}
@@ -1971,8 +1929,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                     disabled={isLocationLocked}
                   />
                 )}
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </Accordion>

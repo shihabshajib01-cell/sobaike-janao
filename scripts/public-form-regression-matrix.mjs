@@ -247,6 +247,8 @@ await check('Child safety keeps the established report format with only the appr
     '#composer-section-location',
     '#complaint-division-select',
     '#complaint-district-select',
+    '#complaint-thana-select',
+    '#complaint-address-input',
   ]) {
     await expectVisible(page.locator(selector), `child safety: expected standard control missing: ${selector}`);
   }
@@ -254,8 +256,6 @@ await check('Child safety keeps the established report format with only the appr
   for (const selector of [
     '#composer-section-configured-fields',
     '#complaint-frequency-select',
-    '#complaint-thana-select',
-    '#complaint-address-input',
     '#composer-section-parties',
     '#composer-section-attachments',
     '#composer-section-identity',
@@ -282,10 +282,17 @@ await check('Child safety keeps the established report format with only the appr
   );
   await chooseFirstSearchableOption(page, '#complaint-division-select');
   await chooseFirstSearchableOption(page, '#complaint-district-select');
+  await chooseFirstSearchableOption(page, '#complaint-thana-select');
+  await page.locator('#complaint-address-input').fill('পরীক্ষামূলক বিস্তারিত ঠিকানা');
 
   await page.locator('#composer-footer-step3-review-btn').click();
   await expectVisible(page.locator('#review-section-incident'), 'child safety: review incident section missing');
   await expectVisible(page.locator('#review-child-incident-type'), 'child safety: incident type not integrated into standard review');
+  await expectVisible(page.locator('#review-section-location'), 'child safety: standard review location section missing');
+  const locationReviewText = await page.locator('#review-section-location').innerText();
+  if (!locationReviewText.includes('পরীক্ষামূলক বিস্তারিত ঠিকানা')) {
+    throw new Error('child safety: detailed address did not survive into standard review');
+  }
 
   for (const selector of [
     '#review-section-attachments',
