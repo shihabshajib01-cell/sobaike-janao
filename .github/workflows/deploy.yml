@@ -8,6 +8,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    # Refresh dynamic report/category/location prerenders and sitemap even when
+    # Admin publishes content without a public-repo code change.
+    - cron: '17 * * * *'
 
 permissions:
   contents: read
@@ -141,7 +145,7 @@ jobs:
           path: ./dist
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
 
