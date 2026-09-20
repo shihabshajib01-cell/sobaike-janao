@@ -544,7 +544,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [formData.subcategoryId, rapePublishingConsentAccepted]);
+  }, [
+    formData.subcategoryId,
+    rapePublishingConsentAccepted,
+    isChildSafetyReport,
+    isReportingFormLoading,
+    reportingForm,
+    language,
+  ]);
 
   const handleNextFromStep3 = useCallback(() => {
     if (!validateMobJusticeSection()) return;
