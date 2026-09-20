@@ -1,9 +1,11 @@
 const HEATMAP_COLORS = {
-  low: '#2563EB',
-  lowMedium: '#06B6D4',
-  medium: '#10B981',
-  mediumHigh: '#F59E0B',
-  high: '#EF4444',
+  // Sequential density scale: lower concentration -> higher concentration.
+  // Brand-aligned and intentionally avoids red/green severity semantics.
+  low: '#BDE8DB',
+  lowMedium: '#7FD0B7',
+  medium: '#38AD8C',
+  mediumHigh: '#287B65',
+  high: '#1B4D6B',
 } as const;
 
 export const HEATMAP_TOKENS = {

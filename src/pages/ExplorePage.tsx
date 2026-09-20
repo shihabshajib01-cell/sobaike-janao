@@ -865,7 +865,7 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setViewMode('reports')}
             className={`px-3.5 sm:px-4 py-2 ui-radius-badge-md type-meta  font-[var(--font-weight-semibold)] flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
               viewMode === 'reports'
-                ? 'bg-ui-surface text-ui-content-primary shadow-[var(--elevation-2xs)] font-[var(--font-weight-bold)] border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
+                ? 'bg-ui-selected-bg text-ui-selected-text shadow-[var(--elevation-2xs)] font-[var(--font-weight-bold)] border-ui-selected-border ring-1 ring-ui-selected-border'
                 : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
             }`}
           >
@@ -880,7 +880,7 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setViewMode('heatmap')}
             className={`px-3.5 sm:px-4 py-2 ui-radius-badge-md type-meta  font-[var(--font-weight-semibold)] flex items-center gap-2 transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus border ${
               viewMode === 'heatmap'
-                ? 'bg-ui-surface text-ui-content-primary shadow-[var(--elevation-2xs)] font-[var(--font-weight-bold)] border-ui-stroke-subtle/50 dark:bg-ui-action-bg dark:text-ui-action-text dark:border-ui-action-bg dark:ring-1 dark:ring-ui-accent-border'
+                ? 'bg-ui-selected-bg text-ui-selected-text shadow-[var(--elevation-2xs)] font-[var(--font-weight-bold)] border-ui-selected-border ring-1 ring-ui-selected-border'
                 : 'border-transparent text-ui-content-secondary hover:text-ui-content-primary dark:text-ui-content-secondary dark:hover:text-ui-content-primary'
             }`}
           >

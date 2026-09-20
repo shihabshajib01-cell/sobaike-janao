@@ -72,7 +72,7 @@ export const Header: React.FC = () => {
 
   const getSectionActiveStyles = (sectionKey?: SectionKey) => {
     if (!sectionKey) {
-      return 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)] border border-ui-stroke-subtle';
+      return 'bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-bold)] border border-ui-selected-border';
     }
     return 'font-[var(--font-weight-bold)] border';
   };
@@ -184,7 +184,7 @@ export const Header: React.FC = () => {
               aria-current={currentRoute === '/search' ? 'page' : undefined}
               className={`hidden md:flex w-full items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/search'
-                  ? 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)] border border-ui-stroke-subtle'
+                  ? 'bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-bold)] border border-ui-selected-border'
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
               }`}
             >
@@ -198,7 +198,7 @@ export const Header: React.FC = () => {
               aria-current={currentRoute === '/more' ? 'page' : undefined}
               className={`w-full flex items-center gap-3 px-3.5 py-3 ui-radius-control type-action font-[var(--font-weight-medium)] text-left min-h-[44px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 currentRoute === '/more'
-                  ? 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)] border border-ui-stroke-subtle'
+                  ? 'bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-bold)] border border-ui-selected-border'
                   : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
               }`}
             >

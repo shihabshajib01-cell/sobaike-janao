@@ -30,9 +30,7 @@ export const Toggle: React.FC<ToggleProps> = ({
 
   return (
     <div
-      className={`inline-flex items-start justify-between gap-4 select-none min-h-[44px] py-1 ${
-        disabled ? 'opacity-50' : ''
-      } ${className}`}
+      className={`inline-flex items-start justify-between gap-4 select-none min-h-[44px] py-1 ${className}`}
     >
       {(label || description) && (
         <div className="text-left pr-2">
@@ -55,13 +53,17 @@ export const Toggle: React.FC<ToggleProps> = ({
         <span
           aria-hidden="true"
           className={`relative inline-flex h-6 w-11 rounded-[var(--radius-pill)] border-2 border-transparent transition-colors duration-200 ease-in-out ${
-            checked ? 'bg-ui-action-bg' : 'bg-ui-surface-subtle border border-ui-stroke-subtle'
+            disabled
+              ? 'bg-ui-disabled-bg border border-ui-stroke-subtle'
+              : checked
+                ? 'bg-ui-action-bg'
+                : 'bg-ui-surface-subtle border border-ui-stroke-subtle'
           }`}
         >
           <span
-            className={`pointer-events-none inline-block h-5 w-5 transform rounded-[var(--radius-pill)] bg-ui-action-text shadow-[var(--elevation-xs)] ring-0 transition duration-200 ease-in-out ${
-              checked ? 'translate-x-5' : 'translate-x-0'
-            }`}
+            className={`pointer-events-none inline-block h-5 w-5 transform rounded-[var(--radius-pill)] shadow-[var(--elevation-xs)] ring-0 transition duration-200 ease-in-out ${
+              disabled ? 'bg-ui-disabled-text' : 'bg-ui-action-text'
+            } ${checked ? 'translate-x-5' : 'translate-x-0'}`}
           />
         </span>
       </button>

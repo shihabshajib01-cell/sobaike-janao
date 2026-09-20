@@ -21,7 +21,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center ui-radius-control transition-colors focus:outline-none focus:ring-2 focus:ring-role-focus focus:ring-offset-1 select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0';
+    'inline-flex items-center justify-center ui-radius-control transition-colors focus:outline-none focus:ring-2 focus:ring-role-focus focus:ring-offset-1 select-none cursor-pointer shrink-0 disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-role-disabled-container disabled:text-role-on-disabled disabled:border-role-outline-subtle disabled:hover:bg-role-disabled-container disabled:hover:text-role-on-disabled';
 
   const sizeClasses: Record<IconButtonSize, string> = {
     sm: 'min-w-[44px] min-h-[44px] p-2.5',

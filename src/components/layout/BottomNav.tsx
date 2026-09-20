@@ -169,7 +169,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ isCompact, onCompactChange
               aria-current={item.isActive ? 'page' : undefined}
               className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center ui-radius-control px-1.5 py-1.5 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 item.isActive
-                  ? 'bg-ui-surface-subtle text-ui-content-primary dark:bg-ui-accent-soft dark:ring-1 dark:ring-ui-accent-border'
+                  ? 'bg-ui-selected-bg text-ui-selected-text ring-1 ring-ui-selected-border'
                   : 'text-ui-content-muted hover:bg-ui-surface-hover hover:text-ui-content-primary'
               }`}
             >

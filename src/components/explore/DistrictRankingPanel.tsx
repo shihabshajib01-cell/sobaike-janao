@@ -312,7 +312,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         aria-current={isSelected ? 'true' : undefined}
         className={`w-full flex items-center justify-between p-2.5 md:p-3 rounded-[var(--radius-control)] text-left transition-all cursor-pointer border group min-h-[58px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
           isSelected
-            ? 'bg-ui-accent-soft border-ui-accent/40 text-ui-content-primary ring-1 ring-ui-accent/30 font-[var(--font-weight-medium)] shadow-[var(--elevation-2xs)]'
+            ? 'bg-ui-selected-bg border-ui-selected-border text-ui-selected-text ring-1 ring-ui-selected-border font-[var(--font-weight-medium)] shadow-[var(--elevation-2xs)]'
             : 'bg-ui-surface dark:bg-ui-surface-elevated border-ui-stroke-subtle hover:border-ui-stroke-default hover:bg-ui-surface-hover text-ui-content-primary'
         }`}
       >
@@ -322,7 +322,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
               isSelected
                 ? 'bg-ui-accent text-ui-content-inverse border-ui-accent'
                 : index === 0
-                  ? 'bg-ui-accent-soft text-ui-accent border-ui-accent/30'
+                  ? 'bg-ui-selected-bg text-ui-selected-text border-ui-selected-border'
                   : 'bg-ui-surface text-ui-content-muted border-ui-stroke-subtle'
             }`}
           >
