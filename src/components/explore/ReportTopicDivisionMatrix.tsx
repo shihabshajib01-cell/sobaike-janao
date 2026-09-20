@@ -115,7 +115,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
         )}
       </div>
 
-      <div className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-2 sm:p-4 shadow-[var(--elevation-2xs)] overflow-x-auto overscroll-x-contain">
+      <div id="topic-division-matrix-scroll" className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-2 sm:p-4 shadow-[var(--elevation-2xs)] overflow-x-auto overscroll-x-contain">
         <table
           className="table-fixed border-separate border-spacing-0"
           style={{ width: `${TOPIC_COLUMN_WIDTH + visibleDivisions.length * DIVISION_COLUMN_WIDTH}px` }}
