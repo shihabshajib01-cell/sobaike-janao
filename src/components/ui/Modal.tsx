@@ -9,7 +9,7 @@ export interface ModalProps {
   id?: string;
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
+  title?: React.ReactNode;
   description?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
