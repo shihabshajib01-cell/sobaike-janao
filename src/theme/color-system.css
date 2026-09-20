@@ -56,7 +56,7 @@ html[data-theme="light"] {
   --product-accent-container: #EAF7F2;
   --product-on-accent-container: #1F6A57;
   --product-accent-outline: #B7DCCE;
-  --product-focus: #287B65;
+  --product-focus: #3A7CA5;
 
   /* Material product roles */
   --md-primary: #1B4D6B;
@@ -64,12 +64,12 @@ html[data-theme="light"] {
   --md-primary-active: #245F82;
   --md-on-primary: #FFFFFF;
 
-  --md-secondary: #287B65;
-  --md-secondary-variant: #1F6A57;
+  --md-secondary: #3A7CA5;
+  --md-secondary-variant: #163B52;
   --md-on-secondary: #FFFFFF;
-  --md-secondary-container: #EAF7F2;
-  --md-on-secondary-container: #1F6A57;
-  --md-secondary-outline: #B7DCCE;
+  --md-secondary-container: color-mix(in srgb, var(--md-secondary) 12%, var(--md-surface));
+  --md-on-secondary-container: #163B52;
+  --md-secondary-outline: color-mix(in srgb, var(--md-secondary) 35%, var(--md-surface));
 
   --md-background: #F0F2F5;
   --md-on-background: #050505;
@@ -90,16 +90,16 @@ html[data-theme="light"] {
   --md-control-outline: color-mix(in srgb, var(--md-outline) 90%, var(--md-surface));
   --md-control-outline-hover: var(--md-outline);
 
-  --md-focus: #287B65;
+  --md-focus: #3A7CA5;
   --md-overlay: rgba(5, 5, 5, 0.55);
 
   --md-disabled-container: #E6E8EB;
   --md-on-disabled: #65676B;
 
   /* Selected state is intentionally distinct from hover, disabled and neutral gray. */
-  --md-selected-container: #EAF7F2;
-  --md-on-selected-container: #1F6A57;
-  --md-selected-outline: #B7DCCE;
+  --md-selected-container: var(--md-secondary-container);
+  --md-on-selected-container: var(--md-on-secondary-container);
+  --md-selected-outline: var(--md-secondary-outline);
 
   /* Extended semantic roles */
   --md-success: #15803D;
@@ -260,7 +260,7 @@ html[data-theme="dark"],
   --product-accent-container: #14352C;
   --product-on-accent-container: #9BE4CD;
   --product-accent-outline: #2F6E5C;
-  --product-focus: #58C5A4;
+  --product-focus: #3A7CA5;
 
   /* Material product roles */
   --md-primary: #317BA5;
@@ -268,12 +268,12 @@ html[data-theme="dark"],
   --md-primary-active: #1F6286;
   --md-on-primary: #FFFFFF;
 
-  --md-secondary: #58C5A4;
-  --md-secondary-variant: #38AD8C;
-  --md-on-secondary: #050505;
-  --md-secondary-container: #14352C;
-  --md-on-secondary-container: #9BE4CD;
-  --md-secondary-outline: #2F6E5C;
+  --md-secondary: #3A7CA5;
+  --md-secondary-variant: #245F82;
+  --md-on-secondary: #FFFFFF;
+  --md-secondary-container: color-mix(in srgb, var(--md-secondary) 18%, var(--md-surface));
+  --md-on-secondary-container: #BFDBFE;
+  --md-secondary-outline: color-mix(in srgb, var(--md-secondary) 40%, var(--md-surface));
 
   --md-background: #18191A;
   --md-on-background: #E4E6EB;
@@ -293,15 +293,15 @@ html[data-theme="dark"],
   --md-control-outline: var(--md-outline);
   --md-control-outline-hover: var(--md-outline-strong);
 
-  --md-focus: #58C5A4;
+  --md-focus: #3A7CA5;
   --md-overlay: rgba(0, 0, 0, 0.72);
 
   --md-disabled-container: #3A3B3C;
   --md-on-disabled: #B0B3B8;
 
-  --md-selected-container: #14352C;
-  --md-on-selected-container: #9BE4CD;
-  --md-selected-outline: #2F6E5C;
+  --md-selected-container: var(--md-secondary-container);
+  --md-on-selected-container: var(--md-on-secondary-container);
+  --md-selected-outline: var(--md-secondary-outline);
 
   /* Extended semantic roles */
   --md-success: #86EFAC;
