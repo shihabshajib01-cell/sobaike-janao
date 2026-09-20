@@ -545,6 +545,21 @@ function injectStaticFallback(html, page) {
         </section>`
     : '';
 
+  const relatedTopicLinks = (page.relatedTopics || [])
+    .map((topic) => {
+      const label = isEnglish ? topic.nameEn || topic.nameBn : topic.nameBn || topic.nameEn;
+      return `<li><a href="${href(topic.path)}">${htmlEscape(label)}</a></li>`;
+    })
+    .join('\n');
+
+  const relatedTopicSection = relatedTopicLinks
+    ? `
+        <section class="mt-8 space-y-3">
+          <h2>${isEnglish ? 'Subtopics' : 'উপবিষয়সমূহ'}</h2>
+          <ul>${relatedTopicLinks}</ul>
+        </section>`
+    : '';
+
   const fallback = `
       <!-- SEO_FALLBACK_START -->
       <main id="seo-static-fallback" class="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 lg:px-8">
