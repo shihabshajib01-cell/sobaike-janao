@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { FirstVisitNoticeModal } from '../location/FirstVisitNoticeModal';
 import { LocationReminderBar } from '../location/LocationReminderBar';
 import { shouldHideBottomNav } from './navigationVisibility';
 import { VisitorSessionService } from '../../services/visitorSessionService';
@@ -77,6 +76,9 @@ const LazySearchModal = React.lazy(() =>
 );
 const LazyLocationConsentModal = React.lazy(() =>
   import('../location/LocationConsentModal').then((m) => ({ default: m.LocationConsentModal }))
+);
+const LazyFirstVisitNoticeModal = React.lazy(() =>
+  import('../location/FirstVisitNoticeModal').then((m) => ({ default: m.FirstVisitNoticeModal }))
 );
 
 type ViewportTier = 'mobile' | 'tablet' | 'desktop';
@@ -455,13 +457,24 @@ export const AppShell: React.FC = () => {
         </ErrorBoundary>
       )}
 
-      <ErrorBoundary componentName="FirstVisitNoticeModal" silent>
-        <FirstVisitNoticeModal
-          isOpen={isFirstVisitNoticeOpen}
-          language={language}
-          onAcknowledge={handleAcknowledgeNotice}
-        />
-      </ErrorBoundary>
+      {isFirstVisitNoticeOpen ? (
+        <ErrorBoundary componentName="FirstVisitNoticeModal" silent>
+          <React.Suspense
+            fallback={
+              <div
+                className="fixed inset-0 z-[100] bg-ui-overlay"
+                aria-hidden="true"
+              />
+            }
+          >
+            <LazyFirstVisitNoticeModal
+              isOpen={isFirstVisitNoticeOpen}
+              language={language}
+              onAcknowledge={handleAcknowledgeNotice}
+            />
+          </React.Suspense>
+        </ErrorBoundary>
+      ) : null}
 
       {isLocationModalOpen ? (
         <ErrorBoundary componentName="LocationConsentModal" silent>
