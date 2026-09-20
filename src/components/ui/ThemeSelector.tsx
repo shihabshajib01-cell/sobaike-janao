@@ -95,15 +95,15 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-[var(--radius-badge-md)] type-compact font-[var(--font-weight-medium)] transition-colors cursor-pointer min-h-[44px] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                     isSelected
-                      ? 'bg-ui-surface-subtle text-ui-content-primary font-[var(--font-weight-bold)]'
+                      ? 'bg-ui-selected-bg text-ui-selected-text border border-ui-selected-border font-[var(--font-weight-bold)]'
                       : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isSelected ? 'text-ui-content-primary' : 'text-ui-content-muted'}`} />
+                    <Icon className={`w-4 h-4 ${isSelected ? 'text-ui-selected-text' : 'text-ui-content-muted'}`} />
                     <span>{language === 'bn' ? opt.nameBn : opt.nameEn}</span>
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-ui-content-primary shrink-0" />}
+                  {isSelected && <Check className="w-4 h-4 text-ui-selected-text shrink-0" />}
                 </button>
               );
             })}
@@ -131,11 +131,11 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
               onClick={() => setThemePreference(opt.id)}
               className={`flex flex-col items-center justify-center p-3 rounded-[var(--radius-card)] border transition-all cursor-pointer min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                 isSelected
-                  ? 'border-ui-stroke-strong bg-ui-surface-elevated text-ui-content-primary font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
+                  ? 'border-ui-selected-border bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)]'
                   : 'border-ui-stroke-subtle bg-ui-surface-subtle text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface'
               }`}
             >
-              <Icon className={`w-5 h-5 mb-1.5 ${isSelected ? 'text-ui-content-primary' : 'text-ui-content-muted'}`} />
+              <Icon className={`w-5 h-5 mb-1.5 ${isSelected ? 'text-ui-selected-text' : 'text-ui-content-muted'}`} />
               <span className="type-label leading-tight">
                 {language === 'bn' ? opt.nameBn : opt.nameEn}
               </span>
@@ -164,11 +164,11 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'segment
             onClick={() => setThemePreference(opt.id)}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-2.5 rounded-[var(--radius-control)] type-label font-[var(--font-weight-medium)] transition-all cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
               isSelected
-                ? 'bg-ui-surface text-ui-content-primary font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)] border border-ui-stroke-subtle'
+                ? 'bg-ui-selected-bg text-ui-selected-text font-[var(--font-weight-bold)] shadow-[var(--elevation-2xs)] border border-ui-selected-border'
                 : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface/50'
             }`}
           >
-            <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-ui-content-primary' : 'text-ui-content-muted'}`} />
+            <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-ui-selected-text' : 'text-ui-content-muted'}`} />
             <span className="truncate">
               {language === 'bn' ? opt.nameBn : opt.nameEn}
             </span>
