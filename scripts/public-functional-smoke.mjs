@@ -574,6 +574,11 @@ await check('Mobile navigation, issue rows and category controls follow the appr
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#bottom-nav'), 'mobile bottom navigation missing');
 
+  await page.locator('#mobile-header-menu-btn').click();
+  await expectVisible(page.locator('#mobile-menu-drawer'), 'mobile header menu drawer did not open');
+  await page.locator('#mobile-menu-drawer-close').click();
+  await page.locator('#mobile-menu-drawer').waitFor({ state: 'hidden', timeout: 10000 });
+
   const cases = [
     ['#bottom-nav-home', '/'],
     ['#bottom-nav-issues', '/issues'],
@@ -584,6 +589,16 @@ await check('Mobile navigation, issue rows and category controls follow the appr
     await page.waitForTimeout(path === '/explore' ? 900 : 350);
     if (currentPath(page) !== path) throw new Error(`${selector} did not navigate to ${path}; got ${page.url()}`);
     await expectVisible(page.locator('#main-content'), `${selector} destination did not render`);
+  }
+
+  const mobileMatrixRowHeader = page.locator('#explore-topic-division-matrix tbody th').first();
+  if ((await mobileMatrixRowHeader.count()) > 0) {
+    const matrixRowPosition = await mobileMatrixRowHeader.evaluate(
+      (element) => window.getComputedStyle(element).position
+    );
+    if (matrixRowPosition === 'sticky') {
+      throw new Error('Explore matrix topic column must not be sticky on mobile');
+    }
   }
 
   await page.goto(routeUrl('/issues'), { waitUntil: 'domcontentloaded', timeout: 30000 });
