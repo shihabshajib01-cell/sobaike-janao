@@ -1,18 +1,5 @@
-import { BANGLADESH_DISTRICTS } from './districts';
-import {
-  CategoryFeedFilterState,
-  EMPTY_CATEGORY_FEED_FILTERS,
-  matchesCategoryFeedFilters,
-  matchesCategoryLocationFilters,
-} from './categoryFeedFilters';
-import {
-  EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
-  HarassmentClassificationFilterState,
-  hasActiveHarassmentClassificationFilters,
-  matchesHarassmentClassification,
-} from './harassmentClassification';
-import { ReportItem } from '../types/report';
-import { SectionKey } from '../theme/tokens';
+import type { CategoryFeedFilterState } from './categoryFeedFilters';
+import type { HarassmentClassificationFilterState } from './harassmentClassification';
 
 export interface HomeFeedFilterState {
   segmentId: string;
@@ -24,8 +11,18 @@ export interface HomeFeedFilterState {
 export const createEmptyHomeFeedFilters = (): HomeFeedFilterState => ({
   segmentId: 'all',
   subcategoryId: 'all',
-  category: { ...EMPTY_CATEGORY_FEED_FILTERS },
-  harassment: { ...EMPTY_HARASSMENT_CLASSIFICATION_FILTERS },
+  category: {
+    divisionId: 'all',
+    districtId: 'all',
+    incidentPeriod: 'all',
+    evidence: 'all',
+    utilityBillTrend: 'all',
+  },
+  harassment: {
+    ageGroup: 'all',
+    abuserRelationship: 'all',
+    reportingFor: 'all',
+  },
 });
 
 export const countActiveHomeFeedFilters = (filters: HomeFeedFilterState): number => {
@@ -58,6 +55,11 @@ export const hasHomeFeedNonPaginatedFilters = (filters: HomeFeedFilterState): bo
   const divisionNeedsClientFiltering =
     filters.category.divisionId !== 'all' && filters.category.districtId === 'all';
 
+  const hasHarassmentClassification =
+    filters.harassment.ageGroup !== 'all' ||
+    filters.harassment.abuserRelationship !== 'all' ||
+    filters.harassment.reportingFor !== 'all';
+
   return (
     divisionNeedsClientFiltering ||
     filters.segmentId !== 'all' ||
@@ -65,65 +67,13 @@ export const hasHomeFeedNonPaginatedFilters = (filters: HomeFeedFilterState): bo
     filters.category.incidentPeriod !== 'all' ||
     filters.category.evidence !== 'all' ||
     filters.category.utilityBillTrend !== 'all' ||
-    hasActiveHarassmentClassificationFilters(filters.harassment)
+    hasHarassmentClassification
   );
 };
 
-export const resolveHomeFeedServerDistrict = (filters: HomeFeedFilterState): string => {
-  const districtSelection = filters.category.districtId;
-  if (!districtSelection || districtSelection === 'all') return 'all';
-
-  const normalizedSelection = districtSelection.trim().toLowerCase();
-  const district = BANGLADESH_DISTRICTS.find(
-    (item) =>
-      item.id === districtSelection ||
-      item.nameBn === districtSelection ||
-      item.nameEn.toLowerCase() === normalizedSelection
-  );
-
-  return district?.nameEn || districtSelection;
-};
-
-export const matchesHomeFeedFilters = (
-  report: ReportItem,
-  filters: HomeFeedFilterState
-): boolean => {
-  if (filters.segmentId !== 'all' && report.segment !== filters.segmentId) {
-    return false;
-  }
-
-  if (
-    filters.subcategoryId !== 'all' &&
-    report.subcategoryId !== filters.subcategoryId
-  ) {
-    return false;
-  }
-
-  if (filters.segmentId === 'harassment') {
-    if (
-      !matchesCategoryLocationFilters(
-        report,
-        filters.category.divisionId,
-        filters.category.districtId
-      )
-    ) {
-      return false;
-    }
-
-    return matchesHarassmentClassification(report, filters.harassment);
-  }
-
-  if (filters.segmentId === 'all') {
-    return matchesCategoryLocationFilters(
-      report,
-      filters.category.divisionId,
-      filters.category.districtId
-    );
-  }
-
-  return matchesCategoryFeedFilters(
-    report,
-    filters.segmentId as SectionKey,
-    filters.category
-  );
-};
+/**
+ * The live canonical_district_name() RPC helper accepts district ids as well as
+ * Bangla/English names, so Home can keep the selected canonical id intact.
+ */
+export const resolveHomeFeedServerDistrict = (filters: HomeFeedFilterState): string =>
+  filters.category.districtId || 'all';
