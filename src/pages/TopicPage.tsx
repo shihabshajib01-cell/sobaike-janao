@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { StandardCategoryPage } from './StandardCategoryPage';
+import { HarassmentPage } from './HarassmentPage';
+import { ExtortionPage } from './ExtortionPage';
+import { UtilityPage } from './UtilityPage';
 import { useApp } from '../context/AppContext';
 import { useTaxonomy } from '../services/taxonomyService';
 import { SectionKey } from '../theme/tokens';
@@ -70,6 +73,12 @@ export const TopicPage: React.FC = () => {
   }
 
   const categoryPath = segment.slug.startsWith('/') ? segment.slug : `/${segment.slug}`;
+  const siblingCount = subcategories[match.segmentId]?.length || 0;
+  if (siblingCount <= 1) {
+    const parentPath = language === 'en' ? `/en${categoryPath}` : categoryPath;
+    return <Navigate to={parentPath} replace />;
+  }
+
   const topicName = language === 'bn' ? match.subcategory.nameBn : match.subcategory.nameEn;
   const categoryName = language === 'bn' ? segment.nameBn : segment.nameEn;
 
@@ -104,6 +113,33 @@ export const TopicPage: React.FC = () => {
       },
     ],
   };
+
+  if (match.segmentId === 'harassment') {
+    return (
+      <HarassmentPage
+        initialSubcategoryId={match.subcategory.id}
+        seoOverride={seoOverride}
+      />
+    );
+  }
+
+  if (match.segmentId === 'extortion') {
+    return (
+      <ExtortionPage
+        initialSubcategoryId={match.subcategory.id}
+        seoOverride={seoOverride}
+      />
+    );
+  }
+
+  if (match.segmentId === 'load_shedding') {
+    return (
+      <UtilityPage
+        initialSubcategoryId={match.subcategory.id}
+        seoOverride={seoOverride}
+      />
+    );
+  }
 
   return (
     <StandardCategoryPage
