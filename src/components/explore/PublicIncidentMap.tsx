@@ -7,7 +7,8 @@ if (typeof window !== 'undefined' && !(window as any).L) {
 import 'leaflet.heat';
 
 import { ReportItem } from '../../types/report';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { HEATMAP_TOKENS } from '../../theme/data-viz-tokens';
 import { BANGLADESH_DISTRICTS, DistrictInfo } from '../../data/districts';
 import { toBanglaDigits } from '../../utils/formatters';
@@ -29,10 +30,8 @@ type MapLayerMode = 'density' | 'districts' | 'points';
 interface DistrictAggregate {
   district: DistrictInfo;
   count: number;
-  categoryCounts: Partial<Record<SectionKey, number>>;
+  categoryCounts: Partial<Record<string, number>>;
 }
-
-const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
 
 const BANGLADESH_CENTER: [number, number] = [23.685, 90.3563];
 const BANGLADESH_BOUNDS: L.LatLngBoundsExpression = [
@@ -53,8 +52,11 @@ const isValidCoordinate = (report: ReportItem) => {
   );
 };
 
-const getTopCategory = (counts: Partial<Record<SectionKey, number>>) => {
-  return CATEGORY_KEYS.map((key) => ({
+const getTopCategory = (
+  counts: Partial<Record<string, number>>,
+  categoryKeys: SectionKey[]
+) => {
+  return categoryKeys.map((key) => ({
     key,
     count: counts[key] || 0,
   })).sort((a, b) => b.count - a.count)[0] || null;
@@ -76,6 +78,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
+  const { segments } = useTaxonomy();
+  const categoryKeys = useMemo(
+    () => Object.keys(segments) as SectionKey[],
+    [segments]
+  );
   const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('density');
 
   const isInitialMount = useRef(true);
@@ -286,7 +293,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         const lng = Number(item.district.lng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-        const topCategory = getTopCategory(item.categoryCounts);
+        const topCategory = getTopCategory(item.categoryCounts, categoryKeys);
         const color = topCategory
           ? resolveCategoryColor(topCategory.key)
           : resolveCategoryColor('public_safety');
@@ -317,11 +324,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
         if (topCategory && topCategory.count > 0) {
           const category = document.createElement('div');
-          const categoryMeta = SECTIONS[topCategory.key];
+          const categoryMeta = segments[topCategory.key];
           const label =
             language === 'bn'
-              ? categoryMeta.shortNameBn
-              : categoryMeta.shortNameEn;
+              ? categoryMeta?.shortNameBn || topCategory.key
+              : categoryMeta?.shortNameEn || topCategory.key;
           category.textContent =
             language === 'bn'
               ? `শীর্ষ বিষয়: ${label} (${toBanglaDigits(topCategory.count)})`
@@ -356,9 +363,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         tooltip.className = 'space-y-1 max-w-[240px]';
 
         const category = document.createElement('div');
-        const section = SECTIONS[report.segment];
+        const section = segments[report.segment];
         category.textContent =
-          language === 'bn' ? section.shortNameBn : section.shortNameEn;
+          language === 'bn'
+            ? section?.shortNameBn || report.segment
+            : section?.shortNameEn || report.segment;
         tooltip.appendChild(category);
 
         const title = document.createElement('strong');
@@ -523,7 +532,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       : null;
 
   const selectedSectionMeta =
-    selectedSection !== 'all' ? SECTIONS[selectedSection] : null;
+    selectedSection !== 'all' ? segments[selectedSection] : null;
 
   const scopeLabel = selectedDistrictObj
     ? language === 'bn'
