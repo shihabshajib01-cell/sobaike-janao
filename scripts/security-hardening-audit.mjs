@@ -36,11 +36,24 @@ if (/\son[a-z]+\s*=/i.test(html)) {
 }
 
 const gateway = read('src/services/apiClient.ts');
+const edgeGateway = read('supabase/functions/public-write-gateway/index.ts');
 const engagement = read('src/services/publicEngagementService.ts');
 const visit = read('src/services/visitorSessionService.ts');
 for (const [name, source] of [['apiClient', gateway], ['publicEngagementService', engagement], ['visitorSessionService', visit]]) {
   if (!source.includes("public-write-gateway")) {
     fail(name + ' no longer routes public mutation traffic through public-write-gateway');
+  }
+}
+if (gateway.includes("supabase.rpc('register_public_complaint_evidence'")) {
+  fail('apiClient must not register evidence through a direct anonymous RPC');
+}
+for (const needle of [
+  'action: "evidence"',
+  '"evidence", "response"',
+  'service.rpc("register_public_complaint_evidence"',
+]) {
+  if (!edgeGateway.includes(needle)) {
+    fail('public-write-gateway evidence routing is missing: ' + needle);
   }
 }
 
