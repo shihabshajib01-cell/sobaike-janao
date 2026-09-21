@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { IconButton } from '../ui/IconButton';
 import { CategoryIcon } from '../branding/CategoryIcon';
 
@@ -19,6 +20,9 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
   language,
   onClose,
 }) => {
+  const { getSegment } = useTaxonomy();
+  const segmentInfo = segment ? getSegment(segment) : null;
+
   const stepTitles = [
     {
       titleBn: 'সেবা',
@@ -82,8 +86,8 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
                 <CategoryIcon section={segment} size="xs" />
                 <span>
                   {language === 'bn'
-                    ? SECTIONS[segment].shortNameBn
-                    : SECTIONS[segment].shortNameEn}
+                    ? segmentInfo?.shortNameBn || segment
+                    : segmentInfo?.shortNameEn || segment}
                 </span>
               </div>
             )}
