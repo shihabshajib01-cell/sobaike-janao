@@ -199,8 +199,8 @@ const reportCard = 'src/components/report/ReportCard.tsx';
 requireContains(reportCard, '<Link', 'report card must expose a native keyboard-focusable report link');
 requireContains(
   reportCard,
-  'to={`/report-detail/${encodeURIComponent(report.id)}`}',
-  'report card native link must target the report detail route'
+  "to={`${language === 'en' ? '/en' : ''}/report-detail/${encodeURIComponent(report.id)}`}",
+  'report card native link must preserve language and target the report detail route'
 );
 requireNotContains(
   reportCard,
