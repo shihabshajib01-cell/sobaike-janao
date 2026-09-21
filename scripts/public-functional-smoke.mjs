@@ -604,15 +604,15 @@ await check('Mobile navigation, issue rows and category controls follow the appr
       const style = window.getComputedStyle(element);
       return {
         position: style.position,
-        backgroundColor: style.backgroundColor,
+        backgroundImage: style.backgroundImage,
       };
     });
 
     if (matrixRowStyle.position !== 'sticky') {
       throw new Error('Explore matrix topic column must stay sticky on mobile');
     }
-    if (matrixRowStyle.backgroundColor === 'rgba(0, 0, 0, 0)' || matrixRowStyle.backgroundColor === 'transparent') {
-      throw new Error('Explore matrix sticky topic column must keep an opaque surface background');
+    if (!matrixRowStyle.backgroundImage.includes('linear-gradient')) {
+      throw new Error('Explore matrix sticky topic column must use the integrated fade surface');
     }
     if (beforeHeader.width > 156) {
       throw new Error(`Explore matrix sticky topic column is too wide on mobile: ${beforeHeader.width}px`);
