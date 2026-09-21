@@ -1,0 +1,85 @@
+import { firefox, webkit } from 'playwright';
+
+const siteUrl = process.env.SITE_URL || 'http://127.0.0.1:4173/';
+
+const engines = [
+  ['firefox', firefox],
+  ['webkit', webkit],
+];
+
+const viewports = [
+  { label: 'mobile', width: 390, height: 844 },
+  { label: 'desktop', width: 1365, height: 900 },
+];
+
+const failures = [];
+
+const expectVisible = async (locator, label) => {
+  if (!(await locator.isVisible().catch(() => false))) {
+    throw new Error(label + ' is not visible');
+  }
+};
+
+for (const [engineName, launcher] of engines) {
+  const browser = await launcher.launch({ headless: true });
+  try {
+    for (const viewport of viewports) {
+      const context = await browser.newContext({ viewport });
+      const page = await context.newPage();
+      const label = engineName + '/' + viewport.label;
+
+      try {
+        await page.addInitScript(() => {
+          localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+          localStorage.setItem('sobaike-theme-preference', 'light');
+        });
+
+        await page.goto(siteUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await expectVisible(page.locator('#main-content'), label + ' main content');
+
+        if ((await page.locator('html').getAttribute('lang')) !== 'bn') {
+          throw new Error(label + ' Bangla route did not set html lang=bn');
+        }
+
+        const rootTheme = await page.locator('html').getAttribute('data-theme');
+        if (rootTheme !== 'light') {
+          throw new Error(label + ' stored light theme was not restored');
+        }
+
+        await page.goto(new URL('/en', siteUrl).href, {
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        });
+        await expectVisible(page.locator('#main-content'), label + ' English main content');
+
+        if ((await page.locator('html').getAttribute('lang')) !== 'en') {
+          throw new Error(label + ' English route did not set html lang=en');
+        }
+
+        if (viewport.label === 'mobile') {
+          await expectVisible(page.locator('#mobile-header'), label + ' mobile header');
+          await expectVisible(page.locator('#bottom-nav'), label + ' bottom navigation');
+          const menuButton = page.locator('#mobile-header-menu-btn');
+          await expectVisible(menuButton, label + ' mobile menu button');
+          await menuButton.click();
+          await expectVisible(page.locator('#mobile-menu-drawer'), label + ' mobile menu drawer');
+        } else {
+          await expectVisible(page.locator('#desktop-left-rail'), label + ' desktop navigation rail');
+        }
+      } catch (error) {
+        failures.push(label + ': ' + (error instanceof Error ? error.message : String(error)));
+      } finally {
+        await context.close();
+      }
+    }
+  } finally {
+    await browser.close();
+  }
+}
+
+if (failures.length) {
+  console.error('Cross-browser smoke failed:\n' + failures.join('\n'));
+  process.exit(1);
+}
+
+console.log('Cross-browser smoke passed for Firefox and WebKit on mobile and desktop.');
