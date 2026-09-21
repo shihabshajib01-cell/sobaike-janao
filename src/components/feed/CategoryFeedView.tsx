@@ -8,6 +8,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { FilterChip } from '../ui/FilterChip';
 import { HorizontalScrollRail } from '../ui/HorizontalScrollRail';
 import { ReportFeedSkeleton } from '../ui/LoadingSkeleton';
+import { toBanglaDigits } from '../../utils/formatters';
 
 type Language = 'bn' | 'en';
 
@@ -68,7 +69,7 @@ export const CategoryFeedView: React.FC<CategoryFeedViewProps> = ({
             </h2>
             <p className="type-meta text-ui-content-muted mt-0.5">
               {language === 'bn'
-                ? `${filteredReports.length}টি প্রকাশিত প্রতিবেদন`
+                ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন`
                 : `${filteredReports.length} published reports`}
             </p>
           </div>
