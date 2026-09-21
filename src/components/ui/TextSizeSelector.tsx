@@ -50,7 +50,7 @@ export const TextSizeSelector: React.FC<TextSizeSelectorProps> = ({
                 aria-pressed={isSelected}
                 aria-label={language === 'bn' ? option.labelBn : option.labelEn}
                 onClick={() => setTextSize(option.id)}
-                className={`min-w-[36px] min-h-[36px] px-2 ui-radius-badge-md type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                className={`min-w-[44px] min-h-[44px] px-2 ui-radius-badge-md type-compact font-[var(--font-weight-semibold)] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                   isSelected
                     ? 'bg-ui-selected-bg text-ui-selected-text border border-ui-selected-border'
                     : 'text-ui-content-secondary hover:text-ui-content-primary hover:bg-ui-surface-subtle border border-transparent'
@@ -87,7 +87,7 @@ export const TextSizeSelector: React.FC<TextSizeSelectorProps> = ({
             }`}
           >
             <span className="shrink-0" aria-hidden="true">{option.shortLabel}</span>
-            <span className="truncate">
+            <span className="min-w-0 text-center leading-tight">
               {language === 'bn' ? option.labelBn : option.labelEn}
             </span>
           </button>
