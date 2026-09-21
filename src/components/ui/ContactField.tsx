@@ -10,6 +10,7 @@ export const ContactField = React.forwardRef<HTMLInputElement, ContactFieldProps
       {...props}
       type="text"
       inputMode={inputMode}
+      phonetic={false}
     />
   )
 );
