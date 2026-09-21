@@ -143,7 +143,7 @@ const ReportCardComponent: React.FC<ReportCardProps> = ({ report, className = ''
       </div>
 
       <Link
-        to={`/report-detail/${encodeURIComponent(report.id)}`}
+        to={`${language === 'en' ? '/en' : ''}/report-detail/${encodeURIComponent(report.id)}`}
         onClick={registerView}
         className="relative z-10 block rounded-[var(--radius-badge-sm)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
       >
