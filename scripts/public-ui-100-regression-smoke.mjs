@@ -267,7 +267,10 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     null,
     { timeout: 30000 }
   );
-  await homeFeed.scrollIntoViewIfNeeded();
+  await page.evaluate(() => {
+    document.querySelector('#home-virtualized-feed')?.scrollIntoView({ block: 'start' });
+  });
+  await page.waitForTimeout(100);
 
   const firstCard = page.locator('[id^="report-card-"]').first();
   await expectVisible(firstCard, 'No report card found on Home');
@@ -324,7 +327,10 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
     null,
     { timeout: 30000 }
   );
-  await refreshedHomeFeed.scrollIntoViewIfNeeded();
+  await page.evaluate(() => {
+    document.querySelector('#home-virtualized-feed')?.scrollIntoView({ block: 'start' });
+  });
+  await page.waitForTimeout(100);
   const childClickCard = page.locator('[id^="report-card-"]').first();
   await expectVisible(childClickCard, 'No report card found for title-click navigation check');
   await childClickCard.locator('a[href*="/report-detail/"] h3').click();
