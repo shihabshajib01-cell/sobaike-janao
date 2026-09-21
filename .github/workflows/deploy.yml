@@ -8,6 +8,9 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    # Refresh crawlable taxonomy/topic SEO artifacts from live published data.
+    - cron: '17 */6 * * *'
 
 permissions:
   contents: read
@@ -148,7 +151,10 @@ jobs:
           path: ./dist
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule'
     needs: build
     runs-on: ubuntu-latest
 
