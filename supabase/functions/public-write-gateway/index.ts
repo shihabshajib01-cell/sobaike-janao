@@ -85,6 +85,14 @@ type PublicWriteBody =
       sessionId: string;
     }
   | {
+      action: "evidence";
+      clientSubmissionId: string;
+      storagePath: string;
+      fileName: string;
+      fileSizeBytes: number;
+      caption?: string | null;
+    }
+  | {
       action: "session";
       payload: Record<string, unknown>;
     };
@@ -124,7 +132,7 @@ Deno.serve(async (req: Request) => {
     return json(req, { error: "Invalid JSON request.", code: "INVALID_JSON" }, 400);
   }
 
-  if (!body || !["complaint", "response", "engagement", "session"].includes(String((body as any).action))) {
+  if (!body || !["complaint", "evidence", "response", "engagement", "session"].includes(String((body as any).action))) {
     return json(req, { error: "Invalid public write action.", code: "INVALID_ACTION" }, 400);
   }
 
@@ -153,6 +161,20 @@ Deno.serve(async (req: Request) => {
       code: "RATE_LIMITED",
       retryAfterSeconds: Number(limitData?.retryAfterSeconds || 60),
     });
+  }
+
+  if (body.action === "evidence") {
+    const { data, error } = await service.rpc("register_public_complaint_evidence", {
+      p_client_submission_id: body.clientSubmissionId,
+      p_storage_path: body.storagePath,
+      p_file_name: body.fileName,
+      p_file_size_bytes: body.fileSizeBytes,
+      p_caption: body.caption ?? null,
+    });
+    if (error) {
+      return json(req, { success: false, error: error.message, code: error.code || "EVIDENCE_REGISTRATION_FAILED" });
+    }
+    return json(req, { success: true, result: data });
   }
 
   if (body.action === "session") {
