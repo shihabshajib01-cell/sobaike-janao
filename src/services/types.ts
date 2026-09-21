@@ -315,6 +315,7 @@ export interface ReporterSubmissionContext {
   device_category?: 'mobile' | 'tablet' | 'desktop' | 'unknown';
   platform?: string;
   language?: string;
+  ui_language?: 'bn' | 'en';
   timezone?: string;
   screen_width?: number;
   screen_height?: number;
