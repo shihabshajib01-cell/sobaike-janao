@@ -67,16 +67,29 @@ if (deployWorkflow.includes("group: 'pages'") || deployWorkflow.includes('group:
   fail('Deploy workflow still uses one global pages concurrency group');
 }
 
-if (!deployWorkflow.includes('group: pages-${{ github.event_name }}-${{ github.ref }}')) {
-  fail('Deploy workflow does not isolate concurrency by event and ref');
+if (!deployWorkflow.includes('group: pages-${{ github.ref }}')) {
+  fail('Deploy workflow does not serialize production-capable events by ref');
+}
+if (deployWorkflow.includes('group: pages-${{ github.event_name }}-${{ github.ref }}')) {
+  fail('Deploy workflow splits production-capable events into separate concurrency lanes');
 }
 
 if (!deployWorkflow.includes('cancel-in-progress: true')) {
   fail('Deploy workflow no longer cancels stale runs within the same release lane');
 }
 
-if (!deployWorkflow.includes("if: github.event_name == 'push' && github.ref == 'refs/heads/main'")) {
-  fail('Production deploy is no longer restricted to pushes on main');
+for (const needle of [
+  "github.ref == 'refs/heads/main'",
+  "github.event_name == 'push'",
+  "github.event_name == 'workflow_dispatch'",
+  "github.event_name == 'schedule'",
+]) {
+  if (!deployWorkflow.includes(needle)) {
+    fail('Production deploy event/ref guard is missing: ' + needle);
+  }
+}
+if (!deployWorkflow.includes("if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'")) {
+  fail('Exact-revision CI gate no longer covers all main-branch production-capable events');
 }
 
 for (const needle of [
@@ -234,5 +247,5 @@ for (const needle of [
 
 console.log(
   'Integration contract audit passed using ' + latestContractFile +
-  '; harassment schema options and deploy concurrency are aligned.'
+  '; harassment schema options and production deployment safety are aligned.'
 );
