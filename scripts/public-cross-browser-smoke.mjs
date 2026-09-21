@@ -66,6 +66,17 @@ for (const [engineName, launcher] of engines) {
           diagnostics.push('console: ' + message.text());
         }
       });
+      page.on('requestfailed', (request) => {
+        const failure = request.failure();
+        diagnostics.push(
+          'requestfailed: ' +
+            request.method() +
+            ' ' +
+            request.url() +
+            ' — ' +
+            (failure?.errorText || 'unknown')
+        );
+      });
 
       try {
         // Seed persisted preferences on the real site origin, then reload.
@@ -140,13 +151,31 @@ for (const [engineName, launcher] of engines) {
           .innerText()
           .then((value) => value.replace(/\s+/g, ' ').trim().slice(0, 320))
           .catch(() => '');
-        const detail = diagnostics.length
-          ? ' | ' + diagnostics.slice(-6).join(' | ')
-          : rootText
-            ? ' | root: ' + rootText
-            : '';
+        const runtimeState = await page
+          .evaluate(() => ({
+            readyState: document.readyState,
+            htmlClass: document.documentElement.className,
+            moduleSrc: document.querySelector('script[type="module"]')?.getAttribute('src') || '',
+            rootHtml: document.getElementById('root')?.innerHTML.slice(0, 240) || '',
+            resources: performance
+              .getEntriesByType('resource')
+              .slice(-12)
+              .map((entry) => entry.name),
+          }))
+          .catch(() => null);
+        const diagnosticText = diagnostics.slice(-12).join(' | ');
+        const detail = [
+          diagnosticText ? 'diagnostics: ' + diagnosticText : '',
+          rootText ? 'root: ' + rootText : '',
+          runtimeState ? 'state: ' + JSON.stringify(runtimeState) : '',
+        ]
+          .filter(Boolean)
+          .join(' | ');
         failures.push(
-          label + ': ' + (error instanceof Error ? error.message : String(error)) + detail
+          label +
+            ': ' +
+            (error instanceof Error ? error.message : String(error)) +
+            (detail ? ' | ' + detail : '')
         );
       } finally {
         await context.close();
