@@ -63,7 +63,11 @@ async function attachRuntimeGuards(page, label) {
     }
     if (status === 400 && monitored) {
       const path = new URL(page.url()).pathname;
-      warnings.push(`${label} HTTP 400 while on ${path}: ${url}`);
+      if (url.includes('/rest/v1/rpc/get_public_published_report_evidence')) {
+        failures.push(`${label} evidence RPC HTTP 400 while on ${path}: ${url}`);
+      } else {
+        warnings.push(`${label} HTTP 400 while on ${path}: ${url}`);
+      }
     }
     if (status === 404 && url.startsWith(SITE_URL)) {
       failures.push(`${label} same-origin HTTP 404: ${url}`);
