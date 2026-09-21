@@ -7,7 +7,6 @@ import { CategoryIcon } from '../branding/CategoryIcon';
 
 export interface ReportComposerHeaderProps {
   currentStep: number;
-  totalSteps: number;
   segment: SectionKey | null;
   language: 'bn' | 'en';
   onClose: () => void;
@@ -15,7 +14,6 @@ export interface ReportComposerHeaderProps {
 
 export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
   currentStep,
-  totalSteps,
   segment,
   language,
   onClose,
@@ -44,13 +42,13 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
 
   const currentStepInfo = stepTitles[currentStep - 1] || stepTitles[0];
   const previousStepRef = useRef(currentStep);
-  const stepStatusRef = useRef<HTMLParagraphElement>(null);
+  const sectionStatusRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (previousStepRef.current === currentStep) return;
     previousStepRef.current = currentStep;
     const frame = window.requestAnimationFrame(() => {
-      stepStatusRef.current?.focus({ preventScroll: true });
+      sectionStatusRef.current?.focus({ preventScroll: true });
     });
     return () => window.cancelAnimationFrame(frame);
   }, [currentStep]);
@@ -93,16 +91,14 @@ export const ReportComposerHeader: React.FC<ReportComposerHeaderProps> = ({
             )}
 
             <p
-              ref={stepStatusRef}
-              id="report-composer-step-status"
+              ref={sectionStatusRef}
+              id="report-composer-section-status"
               tabIndex={-1}
               aria-live="polite"
               aria-atomic="true"
               className="sr-only focus:outline-none"
             >
-              {language === 'bn'
-                ? `ধাপ ${currentStep} / ${totalSteps}: ${currentStepInfo.titleBn}`
-                : `Step ${currentStep} of ${totalSteps}: ${currentStepInfo.titleEn}`}
+              {language === 'bn' ? currentStepInfo.titleBn : currentStepInfo.titleEn}
             </p>
           </div>
         </div>
