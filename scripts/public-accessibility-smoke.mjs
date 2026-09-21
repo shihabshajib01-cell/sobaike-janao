@@ -160,6 +160,33 @@ await mobilePage.locator('[id^="subcategory-option-"]').first().click();
 await mobilePage.locator('#composer-footer-step2-next-btn').click();
 await mobilePage.locator('#composer-footer-step3-review-btn').waitFor({ state: 'visible', timeout: 15000 });
 await scan(mobilePage, 'mobile report composer step 3');
+
+const phoneticToggle = mobilePage.locator('#report-form-bangla-phonetic-toggle');
+await phoneticToggle.waitFor({ state: 'visible', timeout: 5000 });
+if ((await phoneticToggle.getAttribute('aria-checked')) !== 'false') {
+  throw new Error('Bangla phonetic typing should start disabled in a fresh composer session');
+}
+await phoneticToggle.click();
+if ((await phoneticToggle.getAttribute('aria-checked')) !== 'true') {
+  throw new Error('Bangla phonetic typing toggle did not enable');
+}
+
+const titleInput = mobilePage.locator('#complaint-title-input');
+await titleInput.fill('');
+await titleInput.type('amar ');
+await mobilePage.waitForFunction(
+  () => document.getElementById('complaint-title-input')?.value === 'আমার '
+);
+if ((await titleInput.inputValue()) !== 'আমার ') {
+  throw new Error('Bangla phonetic typing did not convert "amar " to "আমার "');
+}
+
+await titleInput.press('Backspace');
+if ((await titleInput.inputValue()) !== 'amar') {
+  throw new Error('Bangla phonetic Backspace recovery did not restore the Roman word');
+}
+await titleInput.fill('');
+
 await mobilePage.locator('#composer-footer-step3-review-btn').click();
 await mobilePage.waitForTimeout(250);
 await scan(mobilePage, 'mobile report composer validation errors');
