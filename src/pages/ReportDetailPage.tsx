@@ -439,6 +439,12 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const handleShare = async () => {
     const shareUrl = window.location.href;
 
+    const markCopied = () => {
+      registerShare();
+      setIsCopied(true);
+      window.setTimeout(() => setIsCopied(false), 2000);
+    };
+
     try {
       if (navigator.share) {
         await navigator.share({ title, url: shareUrl });
@@ -446,11 +452,31 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
         return;
       }
 
-      if (navigator.clipboard) {
+      if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(shareUrl);
-        registerShare();
-        setIsCopied(true);
-        window.setTimeout(() => setIsCopied(false), 2000);
+        markCopied();
+        return;
+      }
+
+      // Compatibility fallback for older and embedded browsers where the
+      // asynchronous Clipboard API is unavailable.
+      const textarea = document.createElement('textarea');
+      textarea.value = shareUrl;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      textarea.style.pointerEvents = 'none';
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+
+      const copied = document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      if (copied) {
+        markCopied();
+      } else {
+        throw new Error('Copy command was not supported.');
       }
     } catch (error) {
       if ((error as DOMException)?.name !== 'AbortError') {
