@@ -1,7 +1,8 @@
 import { firefox, webkit } from 'playwright';
 
 const siteUrl = process.env.SITE_URL || 'http://127.0.0.1:4173/';
-const siteOrigin = new URL(siteUrl).origin;
+const siteBaseUrl = new URL(siteUrl);
+const siteOrigin = siteBaseUrl.origin;
 
 const engines = [
   ['firefox', firefox],
@@ -43,14 +44,29 @@ for (const [engineName, launcher] of engines) {
       // integration is covered by the separate production/integration smokes.
       await context.route('**/*', async (route) => {
         const requestUrl = new URL(route.request().url());
-        if (
-          requestUrl.origin === siteOrigin ||
-          requestUrl.protocol === 'data:' ||
-          requestUrl.protocol === 'blob:'
-        ) {
+
+        if (requestUrl.protocol === 'data:' || requestUrl.protocol === 'blob:') {
           await route.continue();
           return;
         }
+
+        const isLocalPreviewHost =
+          requestUrl.hostname === siteBaseUrl.hostname &&
+          requestUrl.port === siteBaseUrl.port;
+
+        if (isLocalPreviewHost && requestUrl.protocol === 'https:' && siteBaseUrl.protocol === 'http:') {
+          const localHttpUrl = new URL(requestUrl.href);
+          localHttpUrl.protocol = 'http:';
+          const response = await route.fetch({ url: localHttpUrl.href });
+          await route.fulfill({ response });
+          return;
+        }
+
+        if (requestUrl.origin === siteOrigin) {
+          await route.continue();
+          return;
+        }
+
         await route.abort('blockedbyclient');
       });
 
