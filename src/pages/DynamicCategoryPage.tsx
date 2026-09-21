@@ -3,9 +3,11 @@ import { Navigate, useParams } from 'react-router-dom';
 import { StandardCategoryPage } from './StandardCategoryPage';
 import { useTaxonomy } from '../services/taxonomyService';
 import { SectionKey } from '../theme/tokens';
+import { useApp } from '../context/AppContext';
 
 export const DynamicCategoryPage: React.FC = () => {
   const { slug = '' } = useParams<{ slug: string }>();
+  const { language } = useApp();
   const { segments, refreshTaxonomy } = useTaxonomy();
   const [resolved, setResolved] = useState(false);
 
@@ -31,13 +33,13 @@ export const DynamicCategoryPage: React.FC = () => {
   if (!segment && !resolved) {
     return (
       <div className="px-4 py-12 text-center type-body text-ui-content-secondary md:px-6">
-        Loading category…
+        {language === 'bn' ? 'বিষয় লোড হচ্ছে…' : 'Loading category…'}
       </div>
     );
   }
 
   if (!segment) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={language === 'en' ? '/en' : '/'} replace />;
   }
 
   return <StandardCategoryPage section={segment.id as SectionKey} />;
