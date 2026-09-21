@@ -584,7 +584,7 @@ await check('Explore analytics provide accessible chart drilldowns', async () =>
     'Chart drilldown did not surface active-filter context'
   );
 
-  const divisionButton = page.locator('#geographic-breakdown-divisions button').first();
+  const divisionButton = page.locator('#geographic-breakdown-divisions button:visible').first();
   if (await divisionButton.count()) {
     const divisionBox = await divisionButton.boundingBox();
     if (!divisionBox || divisionBox.width < 44 || divisionBox.height < 44) {
