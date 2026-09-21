@@ -49,13 +49,21 @@ async function attachRuntimeGuards(page, label) {
 
   page.on('pageerror', (error) => failures.push(`${label} pageerror: ${error.message}`));
   page.on('console', (msg) => {
-    if (msg.type() === 'error') warnings.push(`${label} console error: ${msg.text()}`);
+    if (msg.type() === 'error') {
+      const path = new URL(page.url()).pathname;
+      warnings.push(`${label} console error on ${path}: ${msg.text()}`);
+    }
   });
   page.on('response', (response) => {
     const status = response.status();
     const url = response.url();
-    if (status >= 500 && (url.startsWith(SITE_URL) || url.includes('supabase.co'))) {
+    const monitored = url.startsWith(SITE_URL) || url.includes('supabase.co');
+    if (status >= 500 && monitored) {
       failures.push(`${label} HTTP ${status}: ${url}`);
+    }
+    if (status === 400 && monitored) {
+      const path = new URL(page.url()).pathname;
+      warnings.push(`${label} HTTP 400 while on ${path}: ${url}`);
     }
     if (status === 404 && url.startsWith(SITE_URL)) {
       failures.push(`${label} same-origin HTTP 404: ${url}`);
