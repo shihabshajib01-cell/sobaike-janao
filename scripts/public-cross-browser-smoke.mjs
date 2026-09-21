@@ -37,6 +37,16 @@ for (const [engineName, launcher] of engines) {
       const context = await browser.newContext({ viewport });
       const page = await context.newPage();
       const label = engineName + '/' + viewport.label;
+      const diagnostics = [];
+
+      page.on('pageerror', (error) => {
+        diagnostics.push('pageerror: ' + error.message);
+      });
+      page.on('console', (message) => {
+        if (message.type() === 'error') {
+          diagnostics.push('console: ' + message.text());
+        }
+      });
 
       try {
         // Seed persisted preferences on the real site origin, then reload.
@@ -106,7 +116,19 @@ for (const [engineName, launcher] of engines) {
           );
         }
       } catch (error) {
-        failures.push(label + ': ' + (error instanceof Error ? error.message : String(error)));
+        const rootText = await page
+          .locator('#root')
+          .innerText()
+          .then((value) => value.replace(/\s+/g, ' ').trim().slice(0, 320))
+          .catch(() => '');
+        const detail = diagnostics.length
+          ? ' | ' + diagnostics.slice(-6).join(' | ')
+          : rootText
+            ? ' | root: ' + rootText
+            : '';
+        failures.push(
+          label + ': ' + (error instanceof Error ? error.message : String(error)) + detail
+        );
       } finally {
         await context.close();
       }
