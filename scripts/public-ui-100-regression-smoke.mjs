@@ -458,10 +458,12 @@ await check('All seven category pages preserve the shared mobile navigation cont
       `${route} category report action did not open the composer`
     );
 
-    const stepStatus = (await page.locator('#report-composer-step-status').innerText()).trim();
-    if (!/ধাপ\s*[২2]|Step\s*2/i.test(stepStatus)) {
+    const sectionStatus = (
+      await page.locator('#report-composer-section-status').innerText()
+    ).trim();
+    if (!/অভিযোগের ধরন|Complaint type/i.test(sectionStatus)) {
       throw new Error(
-        `${route} report composer did not start at category-selected step 2; got "${stepStatus}"`
+        `${route} report composer did not start at the category-selected complaint-type section; got "${sectionStatus}"`
       );
     }
 
@@ -824,6 +826,7 @@ await check('Compact bottom context follows remaining non-primary routes in Bang
   ]) {
     await page.goto(routeUrl(testCase.path), { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expectVisible(page.locator('#main-content'), testCase.path + ' did not render');
+    await page.locator('#bottom-nav-compact').waitFor({ state: 'attached', timeout: 10000 });
     const state = await page.evaluate(() => {
       const link = document.querySelector('#bottom-nav-compact-context');
       return {
