@@ -4,8 +4,8 @@ import { useApp } from '../context/AppContext';
 import { PublicReportService } from '../services/publicReportService';
 import { ReportItem } from '../types/report';
 import { BANGLADESH_DISTRICTS, DIVISIONS } from '../data/districts';
-import { SECTIONS, SectionKey } from '../theme/tokens';
-import { SUBCATEGORIES } from '../data/categories';
+import { SectionKey } from '../theme/tokens';
+import { useTaxonomy } from '../services/taxonomyService';
 import { ReportFeedSkeleton, MapExploreSkeleton } from '../components/ui/LoadingSkeleton';
 import type { ExploreViewMode } from '../components/explore/MapSectionHeader';
 import { PublicIncidentMap } from '../components/explore/PublicIncidentMap';
@@ -41,10 +41,13 @@ import {
   matchesHarassmentClassification,
 } from '../data/harassmentClassification';
 
-const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
-
 export const ExplorePage: React.FC = () => {
   const { language } = useApp();
+  const { segments, subcategories } = useTaxonomy();
+  const categoryItems = useMemo(
+    () => sortByLocalizedName(Object.values(segments), language),
+    [segments, language]
+  );
   // Default to 'reports' mode per Phase 8 product direction
   const [viewMode, setViewMode] = useState<ExploreViewMode>('reports');
   const [searchQuery, setSearchQuery] = useState('');
@@ -396,19 +399,19 @@ export const ExplorePage: React.FC = () => {
 
   const activeCategoryName = useMemo(() => {
     if (selectedSection === 'all') return null;
-    const sectionObj = SECTIONS[selectedSection as SectionKey];
-    if (!sectionObj) return null;
+    const sectionObj = segments[selectedSection];
+    if (!sectionObj) return selectedSection;
     return language === 'bn' ? sectionObj.shortNameBn : sectionObj.shortNameEn;
-  }, [selectedSection, language]);
+  }, [selectedSection, language, segments]);
 
   const activeSubcategoryName = useMemo(() => {
     if (!selectedSubcategory) return null;
-    const match = SUBCATEGORIES[selectedSubcategory.segment]?.find(
+    const match = subcategories[selectedSubcategory.segment]?.find(
       (item) => item.id === selectedSubcategory.subId
     );
     if (!match) return selectedSubcategory.subId;
     return language === 'bn' ? match.nameBn : match.nameEn;
-  }, [selectedSubcategory, language]);
+  }, [selectedSubcategory, language, subcategories]);
 
   const activeMonthName = useMemo(() => {
     if (!selectedMonth) return null;
@@ -426,7 +429,7 @@ export const ExplorePage: React.FC = () => {
 
   // Dynamic Answer Heading computation
   const dynamicAnswerHeading = useMemo(() => {
-    const categoryObj = selectedSection !== 'all' ? SECTIONS[selectedSection as SectionKey] : null;
+    const categoryObj = selectedSection !== 'all' ? segments[selectedSection] : null;
     const catName = categoryObj ? (language === 'bn' ? categoryObj.nameBn : categoryObj.nameEn) : null;
 
     const districtObj = selectedDistrict !== 'all'
@@ -484,7 +487,7 @@ export const ExplorePage: React.FC = () => {
       }
       return 'Published reports across Bangladesh';
     }
-  }, [selectedSection, selectedDivision, selectedDistrict, language]);
+  }, [selectedSection, selectedDivision, selectedDistrict, language, segments]);
 
   const countMessage = language === 'bn'
     ? `${toBanglaDigits(filteredReports.length)}টি প্রকাশিত প্রতিবেদন পাওয়া গেছে`
@@ -596,11 +599,11 @@ export const ExplorePage: React.FC = () => {
               {language === 'bn' ? 'সব' : 'All'}
             </Button>
 
-            {CATEGORY_KEYS.map((sectionKey) => {
-              const section = SECTIONS[sectionKey];
+            {categoryItems.map((section) => {
+              const sectionKey = section.id as SectionKey;
               return (
                 <FilterChip
-                  key={sectionKey}
+                  key={section.id}
                   label={language === 'bn' ? section.shortNameBn : section.shortNameEn}
                   section={sectionKey}
                   selected={selectedSection === sectionKey}
@@ -1241,13 +1244,13 @@ export const ExplorePage: React.FC = () => {
                 {language === 'bn' ? 'সব বিষয়' : 'All topics'}
               </button>
 
-              {CATEGORY_KEYS.map((sectionKey) => {
-                const section = SECTIONS[sectionKey];
+              {categoryItems.map((section) => {
+                const sectionKey = section.id as SectionKey;
                 const selected = draftSection === sectionKey;
                 return (
                   <button
                     type="button"
-                    key={sectionKey}
+                    key={section.id}
                     aria-pressed={selected}
                     onClick={() => setDraftSection(sectionKey)}
                     className={`px-3 py-2.5 ui-radius-control type-meta font-[var(--font-weight-semibold)] cursor-pointer border transition-all flex items-center justify-center gap-1.5 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
