@@ -2093,6 +2093,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <TextField
                   id="operator-contact"
                   type="text"
+                  phonetic={false}
                   label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
                   value={formData.publicProfileHandle || ''}
                   onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
