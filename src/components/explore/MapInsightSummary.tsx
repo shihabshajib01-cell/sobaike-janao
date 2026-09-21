@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { ReportItem } from '../../types/report';
 import { BANGLADESH_DISTRICTS } from '../../data/districts';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { toBanglaDigits } from '../../utils/formatters';
 import { CategoryIcon } from '../branding/CategoryIcon';
 import { MapIcon } from './MapIcon';
@@ -11,7 +12,6 @@ interface MapInsightSummaryProps {
   language: 'bn' | 'en';
 }
 
-const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
 
 const hasValidCoordinates = (report: ReportItem) => {
   const lat = Number(report.coordinates?.lat);
@@ -30,6 +30,12 @@ export const MapInsightSummary: React.FC<MapInsightSummaryProps> = ({
   reports,
   language,
 }) => {
+  const { segments } = useTaxonomy();
+  const categoryKeys = useMemo(
+    () => Object.keys(segments) as SectionKey[],
+    [segments]
+  );
+
   const summary = useMemo(() => {
     const preciseCount = reports.filter(hasValidCoordinates).length;
     const districtCounts = new Map<
@@ -39,7 +45,7 @@ export const MapInsightSummary: React.FC<MapInsightSummaryProps> = ({
     let districtResolvedCount = 0;
 
     const categoryCounts = new Map<SectionKey, number>(
-      CATEGORY_KEYS.map((key) => [key, 0])
+      categoryKeys.map((key) => [key, 0])
     );
 
     reports.forEach((report) => {
@@ -74,7 +80,7 @@ export const MapInsightSummary: React.FC<MapInsightSummaryProps> = ({
       null;
 
     const topCategoryEntry =
-      CATEGORY_KEYS.map((key) => ({
+      categoryKeys.map((key) => ({
         key,
         count: categoryCounts.get(key) || 0,
       })).sort((a, b) => b.count - a.count)[0] || null;
@@ -92,14 +98,14 @@ export const MapInsightSummary: React.FC<MapInsightSummaryProps> = ({
       topDistrict,
       topCategoryEntry,
     };
-  }, [reports]);
+  }, [reports, categoryKeys]);
 
   const formatNumber = (value: number) =>
     language === 'bn' ? toBanglaDigits(value) : String(value);
 
   const topCategory =
     summary.topCategoryEntry && summary.topCategoryEntry.count > 0
-      ? SECTIONS[summary.topCategoryEntry.key]
+      ? segments[summary.topCategoryEntry.key]
       : null;
 
   const topCategoryLabel = topCategory
