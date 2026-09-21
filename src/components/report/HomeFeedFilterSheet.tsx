@@ -18,6 +18,7 @@ import {
 } from '../../data/homeFeedFilters';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { SectionKey } from '../../theme/tokens';
+import { sortByLocalizedName, sortOptionsByLabel } from '../../utils/sorters';
 import { Modal } from '../ui/Modal';
 import { ModalActions } from '../ui/ModalActions';
 import { SearchableSelect } from '../ui/SearchableSelect';
@@ -90,29 +91,26 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
   }, [isOpen, value]);
 
   const segmentOptions = useMemo(
-    () =>
-      Object.values(segments).sort(
-        (a, b) =>
-          (a.sortOrder ?? Number.MAX_SAFE_INTEGER) -
-            (b.sortOrder ?? Number.MAX_SAFE_INTEGER) ||
-          a.nameEn.localeCompare(b.nameEn)
-      ),
-    [segments]
+    () => sortByLocalizedName(Object.values(segments), language),
+    [segments, language]
   );
 
   const subcategoryOptions = useMemo(() => {
     if (draft.segmentId === 'all') return [];
-    return subcategories[draft.segmentId] || [];
-  }, [draft.segmentId, subcategories]);
+    return sortByLocalizedName(subcategories[draft.segmentId] || [], language);
+  }, [draft.segmentId, subcategories, language]);
 
   const districtOptions = useMemo(
     () =>
-      BANGLADESH_DISTRICTS.filter(
-        (district) =>
-          draft.category.divisionId === 'all' ||
-          district.divisionId === draft.category.divisionId
+      sortByLocalizedName(
+        BANGLADESH_DISTRICTS.filter(
+          (district) =>
+            draft.category.divisionId === 'all' ||
+            district.divisionId === draft.category.divisionId
+        ),
+        language
       ),
-    [draft.category.divisionId]
+    [draft.category.divisionId, language]
   );
 
   const categoryConfig =
@@ -420,7 +418,7 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
           onChange={(event) => handleDivisionChange(event.target.value)}
           options={[
             { value: 'all', label: isBn ? 'সকল বিভাগ' : 'All divisions' },
-            ...DIVISIONS.map((division) => ({
+            ...sortByLocalizedName(DIVISIONS, language).map((division) => ({
               value: division.id,
               label: isBn ? division.nameBn : division.nameEn,
             })),
@@ -507,8 +505,13 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
             }
             options={[
               { value: 'all', label: isBn ? 'সকল প্রতিবেদন' : 'All reports' },
-              { value: 'with-evidence', label: isBn ? 'সহায়ক তথ্য আছে' : 'Has supporting information' },
-              { value: 'without-evidence', label: isBn ? 'সহায়ক তথ্য নেই' : 'No supporting information' },
+              ...sortOptionsByLabel(
+                [
+                  { value: 'with-evidence', label: isBn ? 'সহায়ক তথ্য আছে' : 'Has supporting information' },
+                  { value: 'without-evidence', label: isBn ? 'সহায়ক তথ্য নেই' : 'No supporting information' },
+                ],
+                language
+              ),
             ]}
           />
         )}
@@ -530,8 +533,13 @@ export const HomeFeedFilterSheet: React.FC<HomeFeedFilterSheetProps> = ({
             }
             options={[
               { value: 'all', label: isBn ? 'সকল' : 'All' },
-              { value: 'increased', label: isBn ? 'বিল বেড়েছে' : 'Bill increased' },
-              { value: 'not-increased', label: isBn ? 'বিল বাড়েনি' : 'Bill did not increase' },
+              ...sortOptionsByLabel(
+                [
+                  { value: 'increased', label: isBn ? 'বিল বেড়েছে' : 'Bill increased' },
+                  { value: 'not-increased', label: isBn ? 'বিল বাড়েনি' : 'Bill did not increase' },
+                ],
+                language
+              ),
             ]}
           />
         )}
