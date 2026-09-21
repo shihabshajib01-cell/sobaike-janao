@@ -123,7 +123,7 @@ jobs:
       - name: Install accessibility browser runtime
         run: |
           npm install --no-save playwright@1.55.0 @axe-core/playwright@4.10.2
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium firefox webkit
 
       - name: Run local WCAG accessibility smoke
         shell: bash
@@ -140,3 +140,4 @@ jobs:
           done
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
           FORM_SCHEMA_SMOKE=1 SITE_URL=http://127.0.0.1:4173/ node scripts/public-accessibility-smoke.mjs
+          SITE_URL=http://127.0.0.1:4173/ node scripts/public-cross-browser-smoke.mjs
