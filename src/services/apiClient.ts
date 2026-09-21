@@ -298,13 +298,15 @@ class ApiClient {
           }
         }
 
-        // Register evidence with Supabase RPC
-        const { error: regError } = await supabase.rpc('register_public_complaint_evidence', {
-          p_client_submission_id: clientSubmissionId,
-          p_storage_path: storagePath,
-          p_file_name: file.name,
-          p_file_size_bytes: file.size,
-          p_caption: null,
+        // Register evidence through the same source-rate-limited write gateway
+        // used by complaints, responses, engagement, and session mutations.
+        const { error: regError } = await invokePublicWriteGateway({
+          action: 'evidence',
+          clientSubmissionId,
+          storagePath,
+          fileName: file.name,
+          fileSizeBytes: file.size,
+          caption: null,
         });
 
         if (regError) {
