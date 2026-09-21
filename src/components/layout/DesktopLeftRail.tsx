@@ -3,26 +3,19 @@ import { Link } from 'react-router-dom';
 import { useApp, RoutePath } from '../../context/AppContext';
 import { CATEGORY_ORDER } from '../../data/categoryOrder';
 import { CategoryPopularityService } from '../../services/categoryPopularityService';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
 import { Button } from '../ui/Button';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { TextSizeSelector } from '../ui/TextSizeSelector';
 import { LanguageSelector } from '../ui/LanguageSelector';
 import { BrandLogo } from '../branding/BrandLogo';
+import { CategoryIcon } from '../branding/CategoryIcon';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { AppIcon, AppIconName } from '../ui/AppIcon';
-
-const SECTION_ICON_NAMES: Record<SectionKey, AppIconName> = {
-  harassment: 'harassment',
-  extortion: 'extortion',
-  public_safety: 'public-safety',
-  road_transport: 'road-transport',
-  load_shedding: 'zap-off',
-  illegal_occupation: 'illegal-occupation',
-  rickshaw: 'rickshaw',
-};
 
 export const DesktopLeftRail: React.FC = () => {
   const { currentRoute, language, openReportComposer } = useApp();
+  const { segments, getSegment } = useTaxonomy();
   const [categoryOrder, setCategoryOrder] = useState<SectionKey[]>(CATEGORY_ORDER);
   const localizePath = (path: RoutePath) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
@@ -35,7 +28,7 @@ export const DesktopLeftRail: React.FC = () => {
     return () => {
       active = false;
     };
-  }, []);
+  }, [segments]);
 
   const navItems: Array<{
     id: string;
@@ -52,14 +45,17 @@ export const DesktopLeftRail: React.FC = () => {
       nameEn: 'Home',
       iconName: 'home',
     },
-    ...categoryOrder.map((sectionKey) => ({
-      id: `rail-${sectionKey.replaceAll('_', '-')}`,
-      path: SECTIONS[sectionKey].slug,
-      nameBn: SECTIONS[sectionKey].shortNameBn,
-      nameEn: SECTIONS[sectionKey].shortNameEn,
-      iconName: SECTION_ICON_NAMES[sectionKey],
-      sectionKey,
-    })),
+    ...categoryOrder
+      .map((sectionKey) => getSegment(sectionKey))
+      .filter(Boolean)
+      .map((segment) => ({
+        id: `rail-${segment.id.replaceAll('_', '-')}`,
+        path: segment.slug as RoutePath,
+        nameBn: segment.shortNameBn,
+        nameEn: segment.shortNameEn,
+        iconName: 'shield' as AppIconName,
+        sectionKey: segment.id as SectionKey,
+      })),
     {
       id: 'rail-explore',
       path: '/explore',
@@ -148,17 +144,27 @@ export const DesktopLeftRail: React.FC = () => {
                 }
               >
                 <div className="flex items-center gap-3 truncate">
-                  <AppIcon
-                    name={item.iconName}
-                    size="lg"
-                    className={`transition-colors ${
-                      isActive && !secConfig
-                        ? 'text-ui-content-primary'
-                        : !isActive
-                        ? 'text-ui-content-secondary group-hover:text-ui-content-primary'
-                        : ''
-                    }`}
-                  />
+                  {item.sectionKey ? (
+                    <CategoryIcon
+                      section={item.sectionKey}
+                      size="lg"
+                      className={`transition-colors ${
+                        !isActive
+                          ? 'text-ui-content-secondary group-hover:text-ui-content-primary'
+                          : ''
+                      }`}
+                    />
+                  ) : (
+                    <AppIcon
+                      name={item.iconName}
+                      size="lg"
+                      className={`transition-colors ${
+                        isActive
+                          ? 'text-ui-content-primary'
+                          : 'text-ui-content-secondary group-hover:text-ui-content-primary'
+                      }`}
+                    />
+                  )}
                   <span className="truncate">{language === 'bn' ? item.nameBn : item.nameEn}</span>
                 </div>
 
