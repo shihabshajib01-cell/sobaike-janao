@@ -183,6 +183,7 @@ jobs:
 
           curl --fail-with-body -L -sS "${SITE_URL}robots.txt" -o /tmp/robots.txt
           curl --fail-with-body -L -sS "${SITE_URL}sitemap.xml" -o /tmp/sitemap.xml
+          curl --fail-with-body -L -sS "${SITE_URL}favicon.png" -o /tmp/favicon.png
 
           python - <<'PY'
           import json
@@ -194,6 +195,7 @@ jobs:
           html = Path('/tmp/public-index.html').read_text(errors='replace')
           robots = Path('/tmp/robots.txt').read_text(errors='replace')
           sitemap = Path('/tmp/sitemap.xml').read_text(errors='replace')
+          favicon = Path('/tmp/favicon.png').read_bytes()
 
           def must(pattern, label, flags=0):
               match = re.search(pattern, html, flags)
@@ -213,6 +215,33 @@ jobs:
           if canonical != f'{origin}/':
               raise SystemExit(f'ERROR: homepage canonical mismatch: {canonical}')
 
+          favicon_tag = must(
+              r'<link\s+[^>]*rel=["\']icon["\'][^>]*>',
+              'search favicon declaration',
+              re.I,
+          ).group(0)
+          favicon_href = re.search(r'href=["\']([^"\']+)["\']', favicon_tag, re.I)
+          favicon_type = re.search(r'type=["\']([^"\']+)["\']', favicon_tag, re.I)
+          favicon_sizes = re.search(r'sizes=["\']([^"\']+)["\']', favicon_tag, re.I)
+          if not favicon_href or favicon_href.group(1) != '/favicon.png':
+              raise SystemExit(f'ERROR: homepage search favicon URL mismatch: {favicon_tag}')
+          if not favicon_type or favicon_type.group(1).lower() != 'image/png':
+              raise SystemExit(f'ERROR: homepage search favicon type mismatch: {favicon_tag}')
+          if not favicon_sizes or favicon_sizes.group(1) != '512x512':
+              raise SystemExit(f'ERROR: homepage search favicon size declaration mismatch: {favicon_tag}')
+          if 'sobaike-janao-favicon.svg' in html:
+              raise SystemExit('ERROR: legacy SVG favicon is still referenced by production HTML')
+
+          png_signature = b'\x89PNG\r\n\x1a\n'
+          if len(favicon) < 24 or favicon[:8] != png_signature:
+              raise SystemExit('ERROR: live favicon is not a valid PNG')
+          favicon_width = int.from_bytes(favicon[16:20], 'big')
+          favicon_height = int.from_bytes(favicon[20:24], 'big')
+          if favicon_width != favicon_height or favicon_width < 48:
+              raise SystemExit(
+                  f'ERROR: live favicon dimensions are invalid: {favicon_width}x{favicon_height}'
+              )
+
           robots_meta = must(
               r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)["\']',
               'robots meta',
@@ -230,8 +259,15 @@ jobs:
           graph = data.get('@graph', [data]) if isinstance(data, dict) else data
           if not any(node.get('@type') == 'WebSite' and node.get('name') == 'Sobaike Janao' for node in graph):
               raise SystemExit('ERROR: WebSite brand structured data is missing')
-          if not any(node.get('@type') == 'Organization' and node.get('name') == 'Sobaike Janao' for node in graph):
+          organization = next(
+              (node for node in graph if node.get('@type') == 'Organization' and node.get('name') == 'Sobaike Janao'),
+              None,
+          )
+          if not organization:
               raise SystemExit('ERROR: Organization structured data is missing')
+          logo = organization.get('logo') or {}
+          if logo.get('url') != f'{origin}/favicon.png' or logo.get('width') != 512 or logo.get('height') != 512:
+              raise SystemExit(f'ERROR: Organization logo is not aligned with the stable favicon: {logo}')
 
           if f'Sitemap: {origin}/sitemap.xml' not in robots:
               raise SystemExit('ERROR: robots.txt does not advertise the canonical sitemap')
@@ -255,7 +291,10 @@ jobs:
               raise SystemExit('ERROR: no indexable report-detail URL found in sitemap')
 
           Path('/tmp/seo-report-url.txt').write_text(report_urls[0])
-          print(f'Live SEO homepage/sitemap checks passed ({len(locs)} sitemap URLs)')
+          print(
+              f'Live SEO homepage/sitemap/favicon checks passed '
+              f'({len(locs)} sitemap URLs; favicon {favicon_width}x{favicon_height})'
+          )
           PY
 
           report_url=$(cat /tmp/seo-report-url.txt)
@@ -307,6 +346,16 @@ jobs:
           breadcrumb = next((node for node in graph if node.get('@type') == 'BreadcrumbList'), None)
           if not breadcrumb or len(breadcrumb.get('itemListElement', [])) < 2:
               raise SystemExit('ERROR: report breadcrumb structured data is incomplete')
+
+          report_favicon = re.search(
+              r'<link\s+[^>]*rel=["\']icon["\'][^>]*href=["\']([^"\']+)["\'][^>]*>',
+              html,
+              re.I,
+          )
+          if not report_favicon or report_favicon.group(1) != '/favicon.png':
+              raise SystemExit('ERROR: generated report page does not use the stable PNG favicon')
+          if 'sobaike-janao-favicon.svg' in html:
+              raise SystemExit('ERROR: generated report page still references the legacy SVG favicon')
 
           print('Live report SEO checks passed')
           PY

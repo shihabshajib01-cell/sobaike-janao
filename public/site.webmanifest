@@ -8,13 +8,7 @@
   "theme_color": "#1B4D6B",
   "icons": [
     {
-      "src": "./brand/sobaike-janao-favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "./brand/sobaike-janao-icon-512.png",
+      "src": "./favicon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

@@ -136,9 +136,11 @@ jobs:
           test -f dist/404.html
           test -f dist/robots.txt
           test -f dist/sitemap.xml
+          test -f dist/favicon.png
           test -f dist/issues/index.html
           test -f dist/explore/index.html
           grep -q "https://shobaikejanao.com/sitemap.xml" dist/robots.txt
+          grep -q 'href="/favicon.png"' dist/index.html
           grep -q "https://shobaikejanao.com/issues" dist/issues/index.html
           echo "Checking generated index"
           cat dist/index.html
