@@ -15,6 +15,8 @@ export interface PublishedEvidenceRPCResult {
 const signedUrlCache = new Map<string, { signedUrl: string; expiresAt: number }>();
 const CACHE_TTL_MS = 240 * 1000;
 const SIGNED_URL_EXPIRY_SECONDS = 300;
+// Database contract: get_public_published_report_evidence rejects requests above 100 IDs.
+const MAX_REPORT_IDS_PER_EVIDENCE_RPC = 100;
 
 export const PublicEvidenceService = {
   /**
@@ -44,21 +46,42 @@ export const PublicEvidenceService = {
     }
 
     try {
-      // 1. Fetch published evidence metadata via sanitized RPC
-      const { data, error } = await supabase.rpc('get_public_published_report_evidence', {
-        p_report_ids: cleanIds,
-      });
+      // 1. Fetch published evidence metadata via sanitized RPC.
+      // The database intentionally caps each call at 100 report IDs, so large
+      // collection/search/explore feeds must be split instead of sending one
+      // oversized request that PostgREST returns as HTTP 400.
+      const rows: PublishedEvidenceRPCResult[] = [];
 
-      if (error) {
-        console.warn('[PublicEvidenceService] RPC error fetching published evidence:', error);
-        return result;
+      for (
+        let offset = 0;
+        offset < cleanIds.length;
+        offset += MAX_REPORT_IDS_PER_EVIDENCE_RPC
+      ) {
+        const batch = cleanIds.slice(
+          offset,
+          offset + MAX_REPORT_IDS_PER_EVIDENCE_RPC
+        );
+        const { data, error } = await supabase.rpc(
+          'get_public_published_report_evidence',
+          { p_report_ids: batch }
+        );
+
+        if (error) {
+          console.warn(
+            '[PublicEvidenceService] RPC error fetching published evidence batch:',
+            error
+          );
+          continue;
+        }
+
+        if (Array.isArray(data)) {
+          rows.push(...(data as PublishedEvidenceRPCResult[]));
+        }
       }
 
-      if (!data || !Array.isArray(data) || data.length === 0) {
+      if (rows.length === 0) {
         return result;
       }
-
-      const rows = data as PublishedEvidenceRPCResult[];
 
       // Filter valid image records
       const validRows = rows.filter((row) => {
