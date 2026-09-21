@@ -15,10 +15,10 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
   harassment: [
     {
       id: 'rape-sexual-violence',
-      nameBn: 'ধর্ষণ / যৌন সহিংসতা',
-      nameEn: 'Rape / Sexual Violence',
-      descriptionBn: 'যৌন সহিংসতা বা ধর্ষণ সংক্রান্ত অভিযোগ',
-      descriptionEn: 'Sexual violence, assault or rape allegation',
+      nameBn: 'ধর্ষণ / ধর্ষণের চেষ্টা',
+      nameEn: 'Rape / Attempt to Rape',
+      descriptionBn: 'ধর্ষণ বা ধর্ষণের চেষ্টা সংক্রান্ত অভিযোগ',
+      descriptionEn: 'Rape or attempted rape allegation',
       categoryGroup: 'violence',
       isSensitive: true,
     },
