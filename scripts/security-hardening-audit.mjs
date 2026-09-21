@@ -71,6 +71,9 @@ if (ipLocation.includes('x-forwarded-for')) {
 }
 
 const migration = read('supabase/migrations/20260919155020_close_legacy_engagement_and_persist_ip_location_limit.sql');
+const evidenceRateMigration = read('supabase/migrations/20260921164911_add_evidence_gateway_rate_limit.sql');
+const evidenceConstraintMigration = read('supabase/migrations/20260921165245_allow_evidence_write_rate_event.sql');
+const evidenceRevokeMigration = read('supabase/migrations/20260921170002_close_direct_public_evidence_registration.sql');
 for (const needle of [
   'track_public_report_view_v2',
   'track_public_report_share_v2',
@@ -80,4 +83,22 @@ for (const needle of [
   if (!migration.includes(needle)) fail('final public security migration is missing: ' + needle);
 }
 
-console.log('Security hardening audit passed: public writes are gateway-bound, legacy engagement RPCs are revoked, IP-location has persistent throttling, and CSP inline scripts are hash-locked.');
+for (const needle of ["'evidence'", "v_action='evidence'"]) {
+  if (!evidenceRateMigration.includes(needle)) {
+    fail('evidence gateway rate-limit migration is missing: ' + needle);
+  }
+}
+if (!evidenceConstraintMigration.includes("'evidence'::text")) {
+  fail('public write-rate action constraint does not include evidence');
+}
+for (const needle of [
+  'register_public_complaint_evidence(text,text,text,bigint,text)',
+  'from public, anon, authenticated',
+  'to service_role',
+]) {
+  if (!evidenceRevokeMigration.includes(needle)) {
+    fail('direct evidence registration closure is missing: ' + needle);
+  }
+}
+
+console.log('Security hardening audit passed: public writes are gateway-bound, direct evidence registration is revoked, legacy engagement RPCs are revoked, IP-location has persistent throttling, and CSP inline scripts are hash-locked.');
