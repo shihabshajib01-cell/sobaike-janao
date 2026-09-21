@@ -39,6 +39,7 @@ import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { ModalActions } from '../ui/ModalActions';
 import { CategoryBadge } from '../ui/CategoryBadge';
+import { BanglaPhoneticProvider } from '../ui/BanglaPhonetic';
 import { PublicReportingConfigService, PublicReportingForm } from '../../services/reportingFormConfig';
 
 export interface ReportComposerModalProps {
@@ -1121,8 +1122,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   return (
     <>
-      <Modal
-        id="report-composer-modal"
+      <BanglaPhoneticProvider language={language}>
+        <Modal
+          id="report-composer-modal"
         isOpen={isOpen}
         onClose={handleRequestClose}
         maxWidth={submissionResult ? 'md' : 'composer'}
@@ -1339,7 +1341,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               />
             )}
         </>
-      </Modal>
+        </Modal>
+      </BanglaPhoneticProvider>
 
       {/* Mandatory Rape Pre-Report Consent Modal */}
       <Modal
