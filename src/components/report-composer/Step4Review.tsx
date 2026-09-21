@@ -11,12 +11,12 @@ import {
   Layers,
   Coins,
 } from 'lucide-react';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { ReportFormData, isMeaningfulMentionedParty } from '../../services/types';
 import { AttachedImagePreview } from '../media/ImageAttachmentPicker';
 import { AttachmentLightboxModal } from '../media/AttachmentLightboxModal';
 import {
-  SEGMENT_SUBCATEGORIES,
   INTIMATE_WHAT_HAPPENED_OPTIONS,
   INTIMATE_PLATFORMS,
 } from '../../data/reportOptions';
@@ -66,6 +66,12 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   onEditStep,
   language,
 }) => {
+  const { getSegment, getSubcategories } = useTaxonomy();
+  const segmentInfo = getSegment(segment);
+  const currentSubcategoryOption = getSubcategories(segment).find(
+    (item) => item.id === formData.subcategoryId
+  );
+
   const isRickshawChargingStation =
     segment === 'rickshaw' &&
     (formData.subcategoryId === 'charging-station-location' || !formData.subcategoryId);
@@ -115,10 +121,6 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     (segment === 'rickshaw' && hasRickshawOperatorData);
   const showsIdentitySection = segment === 'harassment';
 
-  const currentSubcategoryOption = (SEGMENT_SUBCATEGORIES[segment] || []).find(
-    (s) => s.id === formData.subcategoryId
-  );
-
   const subjectConfig = getReportSubjectConfig(segment, formData.subcategoryId);
 
   // Conditional timeline controls: Illegal Occupation is date-only.
@@ -150,7 +152,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
   // Computed Summaries for Collapsed states
   const serviceTypeSummary = `${
-    SECTIONS[segment] ? (language === 'bn' ? SECTIONS[segment].nameBn : SECTIONS[segment].nameEn) : ''
+    language === 'bn' ? segmentInfo?.nameBn || segment : segmentInfo?.nameEn || segment
   } · ${
     currentSubcategoryOption
       ? language === 'bn'
@@ -297,7 +299,9 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 {language === 'bn' ? 'বিভাগ / সেবা' : 'Service Domain'}
               </span>
               <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
-                {language === 'bn' ? SECTIONS[segment].nameBn : SECTIONS[segment].nameEn}
+                {language === 'bn'
+                  ? segmentInfo?.nameBn || segment
+                  : segmentInfo?.nameEn || segment}
               </p>
             </div>
 
