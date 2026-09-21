@@ -404,7 +404,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
       const requestId = ++subcategoryConfigRequestRef.current;
       const cachedForm = PublicReportingConfigService.getForm(subcategoryId);
       setReportingForm(cachedForm);
-      setIsReportingFormLoading(true);
+      setIsReportingFormLoading(!cachedForm);
       setSubmitError(null);
 
       setFormData((prev) => {
@@ -475,6 +475,11 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             : {}),
         };
       });
+
+      // A cached form already belongs to the fresh configuration bundle loaded for
+      // this composer session. Avoid another network round trip when switching between
+      // subcategories in the same session.
+      if (cachedForm) return;
 
       // A newly published taxonomy item can appear before a long-lived browser
       // session refreshes its cached form bundle. Force one config refresh only when
