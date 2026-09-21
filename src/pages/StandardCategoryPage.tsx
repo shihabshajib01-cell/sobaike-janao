@@ -40,8 +40,24 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({
   const { segments, getFeedSubcategories } = useTaxonomy();
   const { setDynamicSeo } = useSeo();
   usePublishedBannerRuntime();
-  const bannerContent = getRuntimeBannerContent(section);
+  const runtimeBannerContent = getRuntimeBannerContent(section);
   const segmentSeo = segments[section];
+  const bannerContent = runtimeBannerContent || (segmentSeo
+    ? {
+        section: segmentSeo.id,
+        titleBn: segmentSeo.nameBn,
+        titleEn: segmentSeo.nameEn,
+        mobileDescriptionBn: segmentSeo.descriptionBn,
+        mobileDescriptionEn: segmentSeo.descriptionEn,
+        tabletDescriptionBn: segmentSeo.descriptionBn,
+        tabletDescriptionEn: segmentSeo.descriptionEn,
+        desktopDescriptionBn: segmentSeo.descriptionBn,
+        desktopDescriptionEn: segmentSeo.descriptionEn,
+        illustrationSrc: '',
+        primaryCtaBn: 'ঘটনা জানান',
+        primaryCtaEn: 'Report incident',
+      }
+    : null);
 
   const [selectedSubcat, setSelectedSubcat] = useState<string>(initialSubcategoryId || 'all');
   const [feedFilters, setFeedFilters] = useState<CategoryFeedFilterState>({
