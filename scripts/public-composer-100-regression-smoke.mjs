@@ -84,9 +84,15 @@ try {
   if ((await page.locator('#report-composer-modal [role="progressbar"]').count()) !== 0) {
     throw new Error('visual report composer progress track is still rendered');
   }
-  const hiddenStepStatus = page.locator('#report-composer-step-status');
-  if ((await hiddenStepStatus.count()) !== 1) {
-    throw new Error('accessible report composer step status is missing');
+  const hiddenSectionStatus = page.locator('#report-composer-section-status');
+  if ((await hiddenSectionStatus.count()) !== 1) {
+    throw new Error('accessible report composer section status is missing');
+  }
+  const initialSectionStatus = (await hiddenSectionStatus.innerText()).trim();
+  if (!/বিষয় নির্বাচন|Choose topic/i.test(initialSectionStatus)) {
+    throw new Error(
+      `accessible report composer section status is stale; got "${initialSectionStatus}"`
+    );
   }
 
   // Step 1: Public Safety.
