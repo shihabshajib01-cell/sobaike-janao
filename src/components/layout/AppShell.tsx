@@ -102,17 +102,24 @@ const LazySchemaFormSmokeHarness = FORM_SCHEMA_SMOKE_ENABLED
     )
   : null;
 
-const RouteSuspense: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <React.Suspense
-    fallback={
-      <div className="p-4 md:p-6">
-        <ReportFeedSkeleton count={3} ariaLabel="Loading page..." />
-      </div>
-    }
-  >
-    {children}
-  </React.Suspense>
-);
+const RouteSuspense: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { language } = useApp();
+
+  return (
+    <React.Suspense
+      fallback={
+        <div className="p-4 md:p-6">
+          <ReportFeedSkeleton
+            count={3}
+            ariaLabel={language === 'bn' ? 'পৃষ্ঠা লোড হচ্ছে...' : 'Loading page...'}
+          />
+        </div>
+      }
+    >
+      {children}
+    </React.Suspense>
+  );
+};
 
 const ReportDetailRouteWrapper: React.FC = () => {
   const { id } = useParams<{ id: string }>();
