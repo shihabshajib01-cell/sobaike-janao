@@ -31,7 +31,7 @@ for (const [engineName, launcher] of engines) {
       try {
         await page.addInitScript(() => {
           localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
-          localStorage.setItem('sobaike-theme-preference', 'light');
+          localStorage.setItem('sobaike-janao-theme', 'light');
         });
 
         await page.goto(siteUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -45,6 +45,29 @@ for (const [engineName, launcher] of engines) {
         if (rootTheme !== 'light') {
           throw new Error(label + ' stored light theme was not restored');
         }
+
+        await page.evaluate(() => localStorage.setItem('sobaike-janao-theme', 'dark'));
+        await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+        if ((await page.locator('html').getAttribute('data-theme')) !== 'dark') {
+          throw new Error(label + ' stored dark theme was not restored');
+        }
+        if (!(await page.locator('html').evaluate((el) => el.classList.contains('dark')))) {
+          throw new Error(label + ' dark class was not applied with stored dark theme');
+        }
+
+        await page.evaluate(() => localStorage.setItem('sobaike-janao-theme', 'system'));
+        await page.emulateMedia({ colorScheme: 'dark' });
+        await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
+        if ((await page.locator('html').getAttribute('data-theme')) !== 'dark') {
+          throw new Error(label + ' system dark preference was not resolved');
+        }
+
+        await page.emulateMedia({ colorScheme: 'light' });
+        await page.waitForFunction(
+          () => document.documentElement.getAttribute('data-theme') === 'light',
+          null,
+          { timeout: 5000 }
+        );
 
         await page.goto(new URL('/en', siteUrl).href, {
           waitUntil: 'domcontentloaded',
