@@ -66,11 +66,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  // Apply data-theme attribute and color-scheme to html element
+  // Apply data-theme, native color-scheme and browser chrome color together.
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', resolvedTheme);
     root.style.colorScheme = resolvedTheme;
+
+    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (themeColor) {
+      themeColor.content = resolvedTheme === 'dark' ? '#18191A' : '#1B4D6B';
+    }
 
     // Optional class helper for tailwind dark mode if needed
     if (resolvedTheme === 'dark') {
