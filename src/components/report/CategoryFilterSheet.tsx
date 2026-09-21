@@ -7,6 +7,7 @@ import {
   EMPTY_CATEGORY_FEED_FILTERS,
 } from '../../data/categoryFeedFilters';
 import { SectionKey } from '../../theme/tokens';
+import { sortByLocalizedName, sortOptionsByLabel } from '../../utils/sorters';
 import { ModalActions } from '../ui/ModalActions';
 import { Modal } from '../ui/Modal';
 import { SearchableSelect } from '../ui/SearchableSelect';
@@ -73,10 +74,13 @@ export const CategoryFilterSheet: React.FC<CategoryFilterSheetProps> = ({
   }, [isOpen, value]);
 
   const districtOptions = useMemo(() => {
-    return BANGLADESH_DISTRICTS.filter(
-      (district) => draft.divisionId === 'all' || district.divisionId === draft.divisionId
+    return sortByLocalizedName(
+      BANGLADESH_DISTRICTS.filter(
+        (district) => draft.divisionId === 'all' || district.divisionId === draft.divisionId
+      ),
+      language
     );
-  }, [draft.divisionId]);
+  }, [draft.divisionId, language]);
 
   const handleDivisionChange = (divisionId: string) => {
     setDraft((current) => {
@@ -208,7 +212,7 @@ export const CategoryFilterSheet: React.FC<CategoryFilterSheetProps> = ({
           onChange={(event) => handleDivisionChange(event.target.value)}
           options={[
             { value: 'all', label: isBn ? 'সকল বিভাগ' : 'All divisions' },
-            ...DIVISIONS.map((division) => ({
+            ...sortByLocalizedName(DIVISIONS, language).map((division) => ({
               value: division.id,
               label: isBn ? division.nameBn : division.nameEn,
             })),
@@ -266,8 +270,13 @@ export const CategoryFilterSheet: React.FC<CategoryFilterSheetProps> = ({
             }
             options={[
               { value: 'all', label: isBn ? 'সকল প্রতিবেদন' : 'All reports' },
-              { value: 'with-evidence', label: isBn ? 'সহায়ক তথ্য আছে' : 'Has supporting information' },
-              { value: 'without-evidence', label: isBn ? 'সহায়ক তথ্য নেই' : 'No supporting information' },
+              ...sortOptionsByLabel(
+                [
+                  { value: 'with-evidence', label: isBn ? 'সহায়ক তথ্য আছে' : 'Has supporting information' },
+                  { value: 'without-evidence', label: isBn ? 'সহায়ক তথ্য নেই' : 'No supporting information' },
+                ],
+                language
+              ),
             ]}
           />
         )}
@@ -285,8 +294,13 @@ export const CategoryFilterSheet: React.FC<CategoryFilterSheetProps> = ({
             }
             options={[
               { value: 'all', label: isBn ? 'সকল' : 'All' },
-              { value: 'increased', label: isBn ? 'বিল বেড়েছে' : 'Bill increased' },
-              { value: 'not-increased', label: isBn ? 'বিল বাড়েনি' : 'Bill did not increase' },
+              ...sortOptionsByLabel(
+                [
+                  { value: 'increased', label: isBn ? 'বিল বেড়েছে' : 'Bill increased' },
+                  { value: 'not-increased', label: isBn ? 'বিল বাড়েনি' : 'Bill did not increase' },
+                ],
+                language
+              ),
             ]}
           />
         )}
