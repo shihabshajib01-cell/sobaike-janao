@@ -417,6 +417,17 @@ jobs:
             exit 1
           fi
 
+          direct_evidence_code=$(call_rpc \
+            register_public_complaint_evidence \
+            '{"p_client_submission_id":"security-test-evidence","p_storage_path":"public-submissions/security-test-evidence/file.webp","p_file_name":"file.webp","p_file_size_bytes":1,"p_caption":null}' \
+            /tmp/direct-evidence-registration.json)
+
+          if ! grep -qi "permission denied" /tmp/direct-evidence-registration.json; then
+            echo "ERROR: register_public_complaint_evidence is directly anonymously callable (HTTP $direct_evidence_code)"
+            cat /tmp/direct-evidence-registration.json
+            exit 1
+          fi
+
           helper_code=$(call_rpc \
             can_upload_public_evidence \
             '{"p_storage_path":"public-submissions/security-test/file.webp"}' \
