@@ -9,6 +9,7 @@ import { TextAreaField } from '../ui/TextAreaField';
 import { DateField } from '../ui/DateField';
 import { ContactField } from '../ui/ContactField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
+import { BanglaPhoneticProvider, BanglaPhoneticToggle } from '../ui/BanglaPhonetic';
 
 interface CitizenActionModalProps {
   isOpen: boolean;
@@ -236,7 +237,21 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
           )}
         </div>
       ) : (
-        <form id="citizen-action-form" onSubmit={handleSubmit} noValidate className="space-y-4">
+        <BanglaPhoneticProvider language={language}>
+          <form id="citizen-action-form" onSubmit={handleSubmit} noValidate className="space-y-4">
+          <div className="flex items-center justify-between gap-4 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle px-4 py-3">
+            <div className="min-w-0">
+              <p className="type-label text-ui-content-primary">
+                {language === 'bn' ? 'বাংলা ফনেটিক টাইপিং' : 'Bangla phonetic typing'}
+              </p>
+              <p className="type-helper text-ui-content-secondary">
+                {language === 'bn'
+                  ? 'ইংরেজি অক্ষরে লিখে Space চাপলে বাংলা হবে।'
+                  : 'Type with English letters and press Space to convert words to Bangla.'}
+              </p>
+            </div>
+            <BanglaPhoneticToggle id="citizen-action-form" />
+          </div>
           {error && (
             <div
               role="alert"
@@ -310,7 +325,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
               />
             )}
           </div>
-        </form>
+          </form>
+        </BanglaPhoneticProvider>
       )}
       </Modal>
 
