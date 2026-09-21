@@ -16,6 +16,8 @@ export interface ReportTopicDivisionMatrixProps {
 const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
 const TOPIC_COLUMN_WIDTH = 152;
 const DIVISION_COLUMN_WIDTH = 76;
+const MOBILE_HEADER_HEIGHT = 44;
+const MOBILE_ROW_HEIGHT = 56;
 
 export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps> = ({
   reports,
@@ -110,15 +112,158 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
         </div>
         {onSelectCell && (
           <span className="type-compact text-ui-content-muted">
-            {language === 'bn' ? 'ঘর চাপলে দুই ফিল্টারই প্রয়োগ হবে' : 'Select a cell to apply both filters'}
+            {language === 'bn'
+              ? 'ঘর চাপলে দুই ফিল্টারই প্রয়োগ হবে'
+              : 'Select a cell to apply both filters'}
           </span>
         )}
       </div>
 
-      <div id="topic-division-matrix-scroll" className="bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-2 sm:p-4 shadow-[var(--elevation-2xs)] overflow-x-auto overscroll-x-contain">
+      {/* Mobile: fixed topic rail + independently scrollable division matrix.
+          This preserves the "sticky left categories" behavior without overlaying
+          a painted table cell on top of horizontally scrolling cells. */}
+      <div
+        id="topic-division-mobile-matrix"
+        className="md:hidden bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] shadow-[var(--elevation-2xs)] overflow-hidden"
+      >
+        <div className="flex min-w-0">
+          <div
+            id="topic-division-mobile-topics"
+            className="shrink-0 bg-ui-surface border-r border-ui-stroke-subtle"
+            style={{ width: `${TOPIC_COLUMN_WIDTH}px` }}
+          >
+            <div
+              className="flex items-center px-3 type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
+              style={{ height: `${MOBILE_HEADER_HEIGHT}px` }}
+            >
+              {language === 'bn' ? 'বিষয়' : 'Topic'}
+            </div>
+
+            {rows.map((row) => {
+              const category = SECTIONS[row.category];
+              const categoryLabel =
+                language === 'bn' ? category.shortNameBn : category.shortNameEn;
+
+              return (
+                <div
+                  key={row.category}
+                  className="flex items-center px-3"
+                  style={{ height: `${MOBILE_ROW_HEIGHT}px` }}
+                >
+                  <span className="flex min-w-0 items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    <span className="shrink-0">
+                      <CategoryIcon section={row.category} size="xs" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">{categoryLabel}</span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div
+            id="topic-division-mobile-scroll"
+            className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain"
+          >
+            <div
+              style={{ width: `${visibleDivisions.length * DIVISION_COLUMN_WIDTH}px` }}
+            >
+              <div
+                className="grid"
+                style={{
+                  gridTemplateColumns: `repeat(${visibleDivisions.length}, ${DIVISION_COLUMN_WIDTH}px)`,
+                  height: `${MOBILE_HEADER_HEIGHT}px`,
+                }}
+              >
+                {visibleDivisions.map((division) => (
+                  <div
+                    key={division.id}
+                    className="flex items-center justify-center px-1 type-compact font-[var(--font-weight-semibold)] text-ui-content-secondary truncate"
+                  >
+                    {language === 'bn' ? division.nameBn : division.nameEn}
+                  </div>
+                ))}
+              </div>
+
+              {rows.map((row) => {
+                const category = SECTIONS[row.category];
+                const categoryLabel =
+                  language === 'bn' ? category.shortNameBn : category.shortNameEn;
+
+                return (
+                  <div
+                    key={row.category}
+                    className="grid"
+                    style={{
+                      gridTemplateColumns: `repeat(${visibleDivisions.length}, ${DIVISION_COLUMN_WIDTH}px)`,
+                      height: `${MOBILE_ROW_HEIGHT}px`,
+                    }}
+                  >
+                    {row.cells.map(({ division, count }) => {
+                      const divisionLabel =
+                        language === 'bn' ? division.nameBn : division.nameEn;
+                      const active =
+                        activeCategory === row.category &&
+                        activeDivision.toLowerCase() === division.nameEn.toLowerCase();
+                      const displayCount =
+                        language === 'bn' ? toBanglaDigits(count) : count;
+
+                      return (
+                        <div key={division.id} className="flex items-center justify-center p-1">
+                          <button
+                            type="button"
+                            disabled={count === 0 || !onSelectCell}
+                            aria-pressed={active}
+                            onClick={() => onSelectCell?.(row.category, division.nameEn)}
+                            aria-label={
+                              language === 'bn'
+                                ? `${categoryLabel}, ${divisionLabel} বিভাগ: ${toBanglaDigits(count)}টি প্রতিবেদন`
+                                : `${categoryLabel}, ${divisionLabel} Division: ${count} reports`
+                            }
+                            className={`w-12 h-12 min-w-[48px] min-h-[48px] rounded-[var(--radius-badge-md)] border type-compact font-[var(--font-weight-bold)] tabular-nums transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                              count > 0
+                                ? 'cursor-pointer border-ui-stroke-subtle hover:border-ui-stroke-strong'
+                                : 'cursor-default border-transparent text-ui-content-muted'
+                            } ${
+                              active
+                                ? 'ring-2 ring-ui-selected-border bg-ui-selected-bg text-ui-selected-text border-ui-selected-border'
+                                : count > 0
+                                  ? 'bg-ui-surface-subtle/80 text-ui-content-primary'
+                                  : 'bg-ui-page'
+                            }`}
+                            style={
+                              count > 0 && !active
+                                ? {
+                                    borderColor: `var(--sec-${row.category}-border)`,
+                                    backgroundColor: `var(--sec-${row.category}-bg)`,
+                                    color: `var(--sec-${row.category}-text)`,
+                                  }
+                                : undefined
+                            }
+                          >
+                            {displayCount}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tablet / desktop: keep the existing semantic table and sticky topic column. */}
+      <div
+        id="topic-division-matrix-scroll"
+        className="hidden md:block bg-ui-surface border border-ui-stroke-subtle rounded-[var(--radius-control)] p-4 shadow-[var(--elevation-2xs)] overflow-x-auto overscroll-x-contain"
+      >
         <table
           className="table-fixed border-separate border-spacing-0"
-          style={{ width: `${TOPIC_COLUMN_WIDTH + visibleDivisions.length * DIVISION_COLUMN_WIDTH}px` }}
+          style={{
+            width: `${TOPIC_COLUMN_WIDTH + visibleDivisions.length * DIVISION_COLUMN_WIDTH}px`,
+          }}
         >
           <colgroup>
             <col style={{ width: `${TOPIC_COLUMN_WIDTH}px` }} />
@@ -135,11 +280,9 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
             <tr>
               <th
                 scope="col"
-                className="explore-sticky-topic-cell sticky left-0 z-20 text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
+                className="sticky left-0 z-20 bg-ui-surface border-r border-ui-stroke-subtle text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
               >
-                <span className="explore-sticky-topic-label explore-sticky-topic-label--header">
-                  {language === 'bn' ? 'বিষয়' : 'Topic'}
-                </span>
+                {language === 'bn' ? 'বিষয়' : 'Topic'}
               </th>
               {visibleDivisions.map((division) => (
                 <th
@@ -162,9 +305,9 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
                 <tr key={row.category}>
                   <th
                     scope="row"
-                    className="explore-sticky-topic-cell sticky left-0 z-20 px-2 py-1.5 text-left"
+                    className="sticky left-0 z-20 bg-ui-surface border-r border-ui-stroke-subtle px-2 py-1.5 text-left"
                   >
-                    <span className="explore-sticky-topic-label flex min-w-0 items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                    <span className="flex min-w-0 items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
                       <span className="shrink-0">
                         <CategoryIcon section={row.category} size="xs" />
                       </span>

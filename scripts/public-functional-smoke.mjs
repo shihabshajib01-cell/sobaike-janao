@@ -591,66 +591,69 @@ await check('Mobile navigation, issue rows and category controls follow the appr
     await expectVisible(page.locator('#main-content'), `${selector} destination did not render`);
   }
 
-  const mobileMatrixRowHeader = page.locator('#explore-topic-division-matrix tbody th').first();
-  if ((await mobileMatrixRowHeader.count()) > 0) {
-    const matrixScroll = page.locator('#topic-division-matrix-scroll');
-    const beforeHeader = await mobileMatrixRowHeader.boundingBox();
-    const beforeScroll = await matrixScroll.boundingBox();
-    if (!beforeHeader || !beforeScroll) {
-      throw new Error('Explore matrix geometry is not measurable on mobile');
+  const mobileMatrix = page.locator('#topic-division-mobile-matrix');
+  if ((await mobileMatrix.count()) > 0) {
+    const topicRail = page.locator('#topic-division-mobile-topics');
+    const divisionScroll = page.locator('#topic-division-mobile-scroll');
+
+    const beforeRail = await topicRail.boundingBox();
+    const beforeScroll = await divisionScroll.boundingBox();
+    if (!beforeRail || !beforeScroll) {
+      throw new Error('Explore mobile split matrix geometry is not measurable');
     }
 
-    const matrixRowStyle = await mobileMatrixRowHeader.evaluate((element) => {
+    if (Math.abs(beforeRail.width - 152) > 2) {
+      throw new Error(`Explore mobile topic rail width is incorrect: ${beforeRail.width}px`);
+    }
+
+    if (beforeScroll.x < beforeRail.x + beforeRail.width - 2) {
+      throw new Error('Explore mobile topic rail overlaps the division viewport');
+    }
+
+    const railStyle = await topicRail.evaluate((element) => {
       const style = window.getComputedStyle(element);
-      const label = element.querySelector('.explore-sticky-topic-label');
-      const labelStyle = label ? window.getComputedStyle(label) : null;
       return {
         position: style.position,
         backgroundColor: style.backgroundColor,
-        labelBackgroundColor: labelStyle?.backgroundColor || '',
-        labelBackdropFilter:
-          labelStyle?.backdropFilter ||
-          labelStyle?.webkitBackdropFilter ||
-          '',
       };
     });
 
-    if (matrixRowStyle.position !== 'sticky') {
-      throw new Error('Explore matrix topic column must stay sticky on mobile');
+    if (railStyle.position === 'absolute' || railStyle.position === 'fixed') {
+      throw new Error('Explore mobile topic rail must stay in normal layout flow');
     }
     if (
-      matrixRowStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' &&
-      matrixRowStyle.backgroundColor !== 'transparent'
+      !railStyle.backgroundColor ||
+      railStyle.backgroundColor === 'rgba(0, 0, 0, 0)' ||
+      railStyle.backgroundColor === 'transparent'
     ) {
-      throw new Error('Explore matrix sticky topic cell must be transparent on mobile');
-    }
-    if (
-      !matrixRowStyle.labelBackgroundColor ||
-      matrixRowStyle.labelBackgroundColor === 'rgba(0, 0, 0, 0)' ||
-      matrixRowStyle.labelBackgroundColor === 'transparent'
-    ) {
-      throw new Error('Explore matrix sticky topic label must keep its own readable surface');
-    }
-    if (!matrixRowStyle.labelBackdropFilter || matrixRowStyle.labelBackdropFilter === 'none') {
-      throw new Error('Explore matrix sticky topic label must use the compact frosted surface');
-    }
-    if (beforeHeader.width > 156) {
-      throw new Error(`Explore matrix sticky topic column is too wide on mobile: ${beforeHeader.width}px`);
+      throw new Error('Explore mobile topic rail must keep the normal table surface');
     }
 
-    await matrixScroll.evaluate((element) => {
-      element.scrollLeft = Math.min(240, element.scrollWidth - element.clientWidth);
+    const scrollResult = await divisionScroll.evaluate((element) => {
+      const target = Math.min(240, element.scrollWidth - element.clientWidth);
+      element.scrollLeft = target;
+      return { target, actual: element.scrollLeft };
     });
     await page.waitForTimeout(80);
 
-    const afterHeader = await mobileMatrixRowHeader.boundingBox();
-    if (!afterHeader) {
-      throw new Error('Explore matrix sticky topic column disappeared after horizontal scroll');
+    const afterRail = await topicRail.boundingBox();
+    const afterScroll = await divisionScroll.boundingBox();
+    if (!afterRail || !afterScroll) {
+      throw new Error('Explore mobile split matrix disappeared after horizontal scroll');
     }
-    if (Math.abs(afterHeader.x - beforeHeader.x) > 2) {
+
+    if (Math.abs(afterRail.x - beforeRail.x) > 2) {
       throw new Error(
-        `Explore matrix sticky topic column moved during horizontal scroll: before=${beforeHeader.x}, after=${afterHeader.x}`
+        `Explore mobile topic rail moved during horizontal scroll: before=${beforeRail.x}, after=${afterRail.x}`
       );
+    }
+
+    if (scrollResult.target > 0 && scrollResult.actual <= 0) {
+      throw new Error('Explore mobile division matrix did not scroll horizontally');
+    }
+
+    if (afterScroll.x < afterRail.x + afterRail.width - 2) {
+      throw new Error('Explore mobile topic rail overlaps the division viewport after scroll');
     }
   }
 
