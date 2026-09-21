@@ -15,7 +15,9 @@ const viewports = [
 const failures = [];
 
 const expectVisible = async (locator, label) => {
-  if (!(await locator.isVisible().catch(() => false))) {
+  try {
+    await locator.waitFor({ state: 'visible', timeout: 15000 });
+  } catch {
     throw new Error(label + ' is not visible');
   }
 };
@@ -31,7 +33,9 @@ for (const [engineName, launcher] of engines) {
       try {
         await page.addInitScript(() => {
           localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
-          localStorage.setItem('sobaike-janao-theme', 'light');
+          if (!localStorage.getItem('sobaike-janao-theme')) {
+            localStorage.setItem('sobaike-janao-theme', 'light');
+          }
         });
 
         await page.goto(siteUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
