@@ -60,14 +60,6 @@ export const TextAreaField = React.forwardRef<HTMLTextAreaElement, TextAreaField
       !PHONETIC_BLOCKED_INPUT_MODES.has(normalizedInputMode);
 
     const phoneticController = useBanglaPhoneticInput(id, phoneticEligible);
-    const phoneticAction = phoneticController?.labelAction;
-    const effectiveLabelAction =
-      labelAction || phoneticAction ? (
-        <div className="inline-flex items-center gap-2">
-          {labelAction}
-          {phoneticAction}
-        </div>
-      ) : undefined;
 
     return (
       <FormField
@@ -77,7 +69,7 @@ export const TextAreaField = React.forwardRef<HTMLTextAreaElement, TextAreaField
         error={error}
         required={Boolean(required)}
         className={fieldClassName}
-        labelAction={effectiveLabelAction}
+        labelAction={labelAction}
       >
         <textarea
           {...props}
