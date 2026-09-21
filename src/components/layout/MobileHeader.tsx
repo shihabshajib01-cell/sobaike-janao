@@ -7,7 +7,6 @@ import { BrandLogo } from '../branding/BrandLogo';
 import { MobilePublicMenuDrawer } from './MobilePublicMenuDrawer';
 import { IconButton } from '../ui/IconButton';
 import { AppIcon } from '../ui/AppIcon';
-import { SECTIONS } from '../../theme/tokens';
 
 const REPORT_DETAIL_PREFIX = '/report-detail/';
 const MOBILE_HEADER_HIDE_SCROLL_Y = 96;
@@ -78,15 +77,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   const localizePath = (path: string) =>
     language === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 
-  const runtimeCategory =
-    Object.values(segments).find((segment) => segment.slug === currentRoute) || null;
-  const staticCategoryEntry =
-    Object.entries(SECTIONS).find(([, segment]) => segment.slug === currentRoute) || null;
   const activeCategory =
-    runtimeCategory ||
-    (staticCategoryEntry
-      ? { ...staticCategoryEntry[1], id: staticCategoryEntry[0] }
-      : null);
+    Object.values(segments).find((segment) => segment.slug === currentRoute) || null;
   const activeCategoryKey = activeCategory?.id;
   const isHarassmentCategory = activeCategoryKey === 'harassment';
   const isReportDetailRoute = currentRoute.startsWith(REPORT_DETAIL_PREFIX);
