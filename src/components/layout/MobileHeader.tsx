@@ -275,12 +275,36 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         return;
       }
 
-      if (navigator.clipboard) {
+      if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(shareData.url);
         registerSuccessfulShare();
         setIsShareConfirmed(true);
         window.setTimeout(() => setIsShareConfirmed(false), 2000);
+        return;
       }
+
+      // Compatibility fallback for older/embedded mobile browsers where the
+      // Web Share API and asynchronous Clipboard API are both unavailable.
+      const textarea = document.createElement('textarea');
+      textarea.value = shareData.url;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      textarea.style.pointerEvents = 'none';
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+
+      const copied = document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      if (!copied) {
+        throw new Error('Copy command was not supported.');
+      }
+
+      registerSuccessfulShare();
+      setIsShareConfirmed(true);
+      window.setTimeout(() => setIsShareConfirmed(false), 2000);
     } catch (error) {
       if ((error as DOMException)?.name !== 'AbortError') {
         console.warn('[MobileHeader share error]', error);
