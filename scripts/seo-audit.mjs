@@ -83,11 +83,10 @@ const rootOgImage = attr(rootHtml, /<meta\s+[^>]*property=["']og:image["'][^>]*>
 const rootOgWidth = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:width["'][^>]*>/i, 'content');
 const rootOgHeight = attr(rootHtml, /<meta\s+[^>]*property=["']og:image:height["'][^>]*>/i, 'content');
 const rootTwitterCard = attr(rootHtml, /<meta\s+[^>]*name=["']twitter:card["'][^>]*>/i, 'content');
-const rootFavicon = attr(
-  rootHtml,
-  /<link\s+[^>]*rel=["']icon["'][^>]*>/i,
-  'href'
-);
+const rootFaviconTag = rootHtml.match(/<link\s+[^>]*rel=["']icon["'][^>]*>/i)?.[0] || '';
+const rootFavicon = attr(rootHtml, /<link\s+[^>]*rel=["']icon["'][^>]*>/i, 'href');
+const rootFaviconType = attr(rootFaviconTag, /<link\s+[^>]*>/i, 'type');
+const rootFaviconSizes = attr(rootFaviconTag, /<link\s+[^>]*>/i, 'sizes');
 const rootBnAlternate = attr(
   rootHtml,
   /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']bn-BD["'][^>]*>/i,
@@ -162,16 +161,59 @@ record(
   !/href=["']\.\/brand\//i.test(rootHtml) &&
     !/href=["']\.\/site\.webmanifest/i.test(rootHtml)
 );
+let faviconPngValid = false;
+let faviconPngWidth = 0;
+let faviconPngHeight = 0;
+try {
+  const faviconBytes = await readFile(join(DIST, 'favicon.png'));
+  const pngSignature =
+    faviconBytes.length >= 24 &&
+    faviconBytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  if (pngSignature) {
+    faviconPngWidth = faviconBytes.readUInt32BE(16);
+    faviconPngHeight = faviconBytes.readUInt32BE(20);
+    faviconPngValid =
+      faviconPngWidth === faviconPngHeight &&
+      faviconPngWidth >= 48;
+  }
+} catch {
+  faviconPngValid = false;
+}
+
 record(
-  'Stable Google favicon declaration',
-  rootFavicon === '/brand/sobaike-janao-favicon.svg',
-  rootFavicon
+  'Stable Google-compatible favicon declaration',
+  rootFavicon === '/favicon.png' &&
+    rootFaviconType === 'image/png' &&
+    rootFaviconSizes === '512x512' &&
+    faviconPngValid,
+  `href=${rootFavicon}; type=${rootFaviconType}; sizes=${rootFaviconSizes}; png=${faviconPngWidth}x${faviconPngHeight}`
 );
+record(
+  'Legacy SVG favicon declarations removed',
+  !rootHtml.includes('sobaike-janao-favicon.svg')
+);
+
+const manifestRaw = await readFile(join(DIST, 'site.webmanifest'), 'utf8');
+let manifestUsesPngFavicon = false;
+try {
+  const manifest = JSON.parse(manifestRaw);
+  manifestUsesPngFavicon =
+    Array.isArray(manifest.icons) &&
+    manifest.icons.some(
+      (icon) =>
+        icon?.src === './favicon.png' &&
+        icon?.type === 'image/png' &&
+        icon?.sizes === '512x512'
+    ) &&
+    !manifestRaw.includes('.svg');
+} catch {
+  manifestUsesPngFavicon = false;
+}
+record('Web app manifest uses the stable PNG favicon', manifestUsesPngFavicon);
 
 const allowedBrandAssets = new Set([
   'apple-touch-icon.png',
   'og-social-1200x630.png',
-  'sobaike-janao-favicon.svg',
   'sobaike-janao-icon-512.png',
   'sobaike-janao-wordmark-dark.svg',
   'sobaike-janao-wordmark.svg',
@@ -253,8 +295,7 @@ try {
     expectedAlternateNames.every((name) => websiteAlternateNames.includes(name)) &&
     expectedAlternateNames.every((name) => organizationAlternateNames.includes(name));
   currentBrandLogoValid =
-    organization?.logo?.url ===
-      `${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png` &&
+    organization?.logo?.url === `${SITE_ORIGIN}/favicon.png` &&
     organization?.logo?.width === 512 &&
     organization?.logo?.height === 512;
 } catch {
@@ -361,6 +402,16 @@ for (const file of htmlFiles) {
     /<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["']x-default["'][^>]*>/i,
     'href'
   );
+  const routeFavicon = attr(
+    html,
+    /<link\s+[^>]*rel=["']icon["'][^>]*>/i,
+    'href'
+  );
+
+  if (routeFavicon !== '/favicon.png' || html.includes('sobaike-janao-favicon.svg')) {
+    failures.push(`Route favicon contract invalid: ${rel} -> ${routeFavicon}`);
+    routeFailures += 1;
+  }
 
   if (!canonical.startsWith(SITE_ORIGIN)) {
     failures.push(`Route canonical invalid: ${rel} -> ${canonical}`);

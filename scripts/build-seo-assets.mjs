@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 
 const SITE_ORIGIN = 'https://shobaikejanao.com';
 const DIST_DIR = 'dist';
-const BRAND_LOGO = `${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png`;
+const BRAND_LOGO = `${SITE_ORIGIN}/favicon.png`;
 const DEFAULT_IMAGE = `${SITE_ORIGIN}/brand/og-social-1200x630.png`;
 const FULL_INDEX_ROBOTS =
   'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
