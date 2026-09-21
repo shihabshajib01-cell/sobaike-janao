@@ -91,8 +91,8 @@ export const FirstVisitNoticeModal: React.FC<FirstVisitNoticeModalProps> = ({
         <div className="flex flex-col gap-2.5">
           <h3 className="type-h3 text-ui-content-primary">
             {isBn
-              ? 'ব্যবহারের আগে কিছু গুরুত্বপূর্ণ কথা'
-              : 'A few important things before you continue'}
+              ? 'দায়িত্বশীল ব্যবহার ও স্বাধীনতা বিজ্ঞপ্তি'
+              : 'Responsible Use & Independence Notice'}
           </h3>
 
           <div id="first-visit-notice-desc" className="flex flex-col gap-2.5">
