@@ -336,7 +336,7 @@ export const ReportGeographicBreakdown: React.FC<ReportGeographicBreakdownProps>
                         ? `${displayDivisionName} বিভাগ: ${displayCount}টি প্রতিবেদন`
                         : `${displayDivisionName} Division: ${displayCount} reports`
                     }
-                    className={`w-full min-h-[44px] grid grid-cols-[minmax(0,7.5rem)_minmax(4rem,1fr)_2.25rem] items-center gap-2 rounded-[var(--radius-badge-md)] px-2 py-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
+                    className={`w-full min-h-[48px] grid grid-cols-[minmax(0,7.5rem)_minmax(4rem,1fr)_2.25rem] items-center gap-2 rounded-[var(--radius-badge-md)] px-2 py-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ${
                       onSelectDivision ? 'cursor-pointer hover:bg-ui-surface-hover' : ''
                     } ${isActive ? 'bg-ui-selected-bg text-ui-selected-text' : ''}`}
                   >
