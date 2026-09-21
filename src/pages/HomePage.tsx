@@ -676,12 +676,30 @@ export const HomePage: React.FC = () => {
         {!isLoading && !fetchError && filteredReports.length === 0 && (
           <EmptyState
             title={language === 'bn' ? 'কোনো প্রতিবেদন নেই' : 'No reports found'}
-            description={language === 'bn' ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই।' : 'No reports match these filters.'}
-            actionLabel={language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear filters'}
-            onAction={() => {
-              setFeedFilter('all');
-              setHomeFilters(createEmptyHomeFeedFilters());
-            }}
+            description={
+              feedFilter !== 'all' || activeFilterCount > 0
+                ? language === 'bn'
+                  ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই।'
+                  : 'No reports match these filters.'
+                : language === 'bn'
+                  ? 'এখনও কোনো প্রকাশিত প্রতিবেদন নেই।'
+                  : 'There are no published reports yet.'
+            }
+            actionLabel={
+              feedFilter !== 'all' || activeFilterCount > 0
+                ? language === 'bn'
+                  ? 'ফিল্টার মুছুন'
+                  : 'Clear filters'
+                : undefined
+            }
+            onAction={
+              feedFilter !== 'all' || activeFilterCount > 0
+                ? () => {
+                    setFeedFilter('all');
+                    setHomeFilters(createEmptyHomeFeedFilters());
+                  }
+                : undefined
+            }
           />
         )}
       </section>
