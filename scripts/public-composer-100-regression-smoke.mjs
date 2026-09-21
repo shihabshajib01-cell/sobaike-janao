@@ -89,7 +89,7 @@ try {
     throw new Error('accessible report composer section status is missing');
   }
   const initialSectionStatus = (await hiddenSectionStatus.innerText()).trim();
-  if (!/বিষয় নির্বাচন|Choose topic/i.test(initialSectionStatus)) {
+  if (!/সেবা|Service/i.test(initialSectionStatus)) {
     throw new Error(
       `accessible report composer section status is stale; got "${initialSectionStatus}"`
     );
