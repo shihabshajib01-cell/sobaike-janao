@@ -1980,4 +1980,4 @@ const avroPhonetic = {
     }
 };
 
-module.exports = avroPhonetic;
+export default avroPhonetic;
