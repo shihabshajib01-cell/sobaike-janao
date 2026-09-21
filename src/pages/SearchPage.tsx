@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, MapPin, UserX, ArrowRight, AlertCircle, Sparkles, MapPinned, Layers3 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PublicReportService } from '../services/publicReportService';
@@ -15,6 +16,7 @@ import { SearchInput } from '../components/ui/SearchInput';
 import { Button } from '../components/ui/Button';
 import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { HarassmentClassificationFilters } from '../components/report/HarassmentClassificationFilters';
+import { sortByLocalizedName } from '../utils/sorters';
 import {
   EMPTY_HARASSMENT_CLASSIFICATION_FILTERS,
   hasActiveHarassmentClassificationFilters,
@@ -25,6 +27,8 @@ type SearchTab = 'all' | 'reports' | 'locations' | 'subjects';
 
 export const SearchPage: React.FC = () => {
   const { language, navigateTo, queryParams } = useApp();
+  const location = useLocation();
+  const replaceSearchUrl = useNavigate();
   const { segments } = useTaxonomy();
   const initialQuery = queryParams.q || '';
   const [query, setQuery] = useState(initialQuery);
@@ -57,6 +61,34 @@ export const SearchPage: React.FC = () => {
       setQuery(queryParams.q);
     }
   }, [queryParams.q, query]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const params = new URLSearchParams(location.search);
+      const trimmed = query.trim();
+
+      if (trimmed) {
+        params.set('q', trimmed);
+      } else {
+        params.delete('q');
+      }
+
+      const nextSearch = params.toString();
+      const currentSearch = location.search.replace(/^\?/, '');
+      if (nextSearch === currentSearch) return;
+
+      replaceSearchUrl(
+        {
+          pathname: location.pathname,
+          search: nextSearch ? `?${nextSearch}` : '',
+          hash: location.hash,
+        },
+        { replace: true }
+      );
+    }, 250);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [location.hash, location.pathname, location.search, query, replaceSearchUrl]);
 
   const hasReportFilters =
     (selectedReportSegment === 'harassment' && hasActiveHarassmentClassificationFilters(harassmentFilters)) ||
@@ -157,12 +189,10 @@ export const SearchPage: React.FC = () => {
   const categoryOptions = useMemo(
     () => [
       { value: 'all', label: language === 'bn' ? 'সকল প্রতিবেদন' : 'All reports' },
-      ...Object.values(segments)
-        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
-        .map((section) => ({
-          value: section.id,
-          label: language === 'bn' ? section.nameBn : section.nameEn,
-        })),
+      ...sortByLocalizedName(Object.values(segments), language).map((section) => ({
+        value: section.id,
+        label: language === 'bn' ? section.nameBn : section.nameEn,
+      })),
     ],
     [language, segments]
   );
@@ -223,7 +253,7 @@ export const SearchPage: React.FC = () => {
                 onClick={() => setActiveTab(tab.key)}
                 className="shrink-0"
               >
-                {tab.label} ({tab.count})
+                {tab.label} ({language === 'bn' ? toBanglaDigits(tab.count) : tab.count})
               </Button>
             ))}
           </HorizontalScrollRail>
