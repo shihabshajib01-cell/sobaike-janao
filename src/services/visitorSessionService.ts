@@ -32,6 +32,7 @@ export interface VisitorMetadata {
   device_category: 'mobile' | 'tablet' | 'desktop' | 'unknown';
   platform: string;
   language: string;
+  ui_language: 'bn' | 'en';
   timezone: string;
   screen_width: number;
   screen_height: number;
@@ -174,6 +175,19 @@ function detectDeviceCategory(ua: string): 'mobile' | 'tablet' | 'desktop' | 'un
   return 'desktop';
 }
 
+function detectUiLanguage(): 'bn' | 'en' {
+  if (typeof window === 'undefined') return 'bn';
+
+  const pathname = window.location.pathname || '/';
+  if (pathname === '/en' || pathname.startsWith('/en/')) return 'en';
+
+  try {
+    return new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'bn';
+  } catch {
+    return 'bn';
+  }
+}
+
 /**
  * Gather safe browser/device metadata
  */
@@ -186,6 +200,7 @@ export function getVisitorMetadata(): VisitorMetadata {
       device_category: 'unknown',
       platform: '',
       language: 'en',
+      ui_language: 'bn',
       timezone: 'UTC',
       screen_width: 0,
       screen_height: 0,
@@ -216,6 +231,7 @@ export function getVisitorMetadata(): VisitorMetadata {
     device_category: deviceCategory,
     platform: platform || os,
     language: navigator.language || 'en',
+    ui_language: detectUiLanguage(),
     timezone,
     screen_width: screenWidth,
     screen_height: screenHeight,
@@ -320,6 +336,7 @@ export const VisitorSessionService = {
       p_platform: meta.platform,
 
       p_language: meta.language,
+      p_ui_language: meta.ui_language,
       p_timezone: meta.timezone,
 
       p_screen_width: meta.screen_width,
@@ -988,6 +1005,7 @@ export const VisitorSessionService = {
       device_category: meta.device_category,
       platform: meta.platform,
       language: meta.language,
+      ui_language: meta.ui_language,
       timezone: meta.timezone,
       screen_width: meta.screen_width,
       screen_height: meta.screen_height,
