@@ -15,6 +15,7 @@ import { CategoryHeroBanner } from '../category/CategoryHeroBanner';
 import { getPublishedBannerSettings, getRuntimeBannerContent, usePublishedBannerRuntime } from '../../services/bannerRuntime';
 import { IconButton } from '../ui/IconButton';
 import { scheduleIdleTask } from '../../utils/scheduleIdleTask';
+import { CategoryPopularityService } from '../../services/categoryPopularityService';
 
 export interface ServiceSlide {
   key: SectionKey;
@@ -41,12 +42,30 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
   const [isDocumentVisible, setIsDocumentVisible] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [hydrateNeighborMedia, setHydrateNeighborMedia] = useState(false);
+  const [popularityOrder, setPopularityOrder] = useState<SectionKey[] | null>(null);
 
   const timerRef = useRef<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const lastSwipeAtRef = useRef(0);
   const sliderRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    CategoryPopularityService.getOrderedCategoryKeys()
+      .then((order) => {
+        if (active) setPopularityOrder(order);
+      })
+      .catch((error) => {
+        console.warn('[ServiceHeroCarousel popularity order error]', error);
+        if (active) setPopularityOrder(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [segments]);
 
   const availableSlides: ServiceSlide[] = Object.values(segments)
     .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))
@@ -59,6 +78,16 @@ export const ServiceHeroCarousel: React.FC<ServiceHeroCarouselProps> = ({
       return settings ? settings.isActive && settings.showOnHome : true;
     })
     .sort((a, b) => {
+      if (popularityOrder) {
+        const aRank = popularityOrder.indexOf(a.key);
+        const bRank = popularityOrder.indexOf(b.key);
+        if (aRank !== -1 || bRank !== -1) {
+          if (aRank === -1) return 1;
+          if (bRank === -1) return -1;
+          if (aRank !== bRank) return aRank - bRank;
+        }
+      }
+
       const aSettings = getPublishedBannerSettings(a.key);
       const bSettings = getPublishedBannerSettings(b.key);
       const aFallback = segments[a.key]?.sortOrder ?? 999;
