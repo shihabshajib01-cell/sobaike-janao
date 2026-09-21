@@ -22,6 +22,14 @@ const expectVisible = async (locator, label) => {
   }
 };
 
+const expectAttached = async (locator, label) => {
+  try {
+    await locator.waitFor({ state: 'attached', timeout: 15000 });
+  } catch {
+    throw new Error(label + ' is not mounted');
+  }
+};
+
 for (const [engineName, launcher] of engines) {
   const browser = await launcher.launch({ headless: true });
   try {
@@ -40,7 +48,7 @@ for (const [engineName, launcher] of engines) {
           localStorage.setItem('sobaike-janao-theme', 'light');
         });
         await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
-        await expectVisible(page.locator('#main-content'), label + ' main content');
+        await expectAttached(page.locator('#main-content'), label + ' main content');
 
         if ((await page.locator('html').getAttribute('lang')) !== 'bn') {
           throw new Error(label + ' Bangla route did not set html lang=bn');
@@ -78,7 +86,7 @@ for (const [engineName, launcher] of engines) {
           waitUntil: 'domcontentloaded',
           timeout: 30000,
         });
-        await expectVisible(page.locator('#main-content'), label + ' English main content');
+        await expectAttached(page.locator('#main-content'), label + ' English main content');
 
         if ((await page.locator('html').getAttribute('lang')) !== 'en') {
           throw new Error(label + ' English route did not set html lang=en');
@@ -92,7 +100,10 @@ for (const [engineName, launcher] of engines) {
           await menuButton.click();
           await expectVisible(page.locator('#mobile-menu-drawer'), label + ' mobile menu drawer');
         } else {
-          await expectVisible(page.locator('#desktop-left-rail'), label + ' desktop navigation rail');
+          await expectVisible(
+            page.locator('#desktop-left-navigation-rail'),
+            label + ' desktop navigation rail'
+          );
         }
       } catch (error) {
         failures.push(label + ': ' + (error instanceof Error ? error.message : String(error)));
