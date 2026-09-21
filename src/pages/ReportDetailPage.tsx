@@ -299,8 +299,10 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
   const shortDesc = language === 'bn' ? report.shortDescriptionBn : report.shortDescriptionEn;
   const fullDesc = language === 'bn' ? report.fullDescriptionBn : report.fullDescriptionEn;
   const detailText = fullDesc || shortDesc;
-  const sourceName = report.sources?.[0]?.publisherName || '';
-  const sourceUrl = report.sources?.[0]?.canonicalUrl || '';
+  const verifiedSources = (report.sources || []).filter(
+    (source) => source.publisherName && source.canonicalUrl
+  );
+  const hasVerifiedSources = verifiedSources.length > 0;
   const subcategory = language === 'bn' ? report.subcategoryBn : report.subcategoryEn;
   const location = language === 'bn' ? report.locationBn : report.locationEn;
   const incidentDateRaw = language === 'bn' ? report.incidentDateBn : report.incidentDateEn;
@@ -516,15 +518,25 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             </div>
           )}
 
-          {sourceUrl && (
-            <div className="max-w-[760px] type-compact text-ui-content-primary space-y-1">
-              <p>
-                <span className="font-[var(--font-weight-semibold)]">
-                  {language === 'bn' ? 'উৎস' : 'Source'}:
-                </span>{' '}
-                {sourceName || (language === 'bn' ? 'মূল সূত্র' : 'Original source')}
-              </p>
-              <p className="break-all select-text">{sourceUrl}</p>
+          {hasVerifiedSources && (
+            <div className="max-w-[760px] type-compact text-ui-content-primary space-y-3">
+              {verifiedSources.map((source, index) => (
+                <div key={`${source.canonicalUrl}-${index}`} className="space-y-1">
+                  <p>
+                    <span className="font-[var(--font-weight-semibold)]">
+                      {verifiedSources.length > 1
+                        ? language === 'bn'
+                          ? `উৎস ${toBanglaDigits(index + 1)}`
+                          : `Source ${index + 1}`
+                        : language === 'bn'
+                          ? 'উৎস'
+                          : 'Source'}:
+                    </span>{' '}
+                    {source.publisherName || (language === 'bn' ? 'মূল সূত্র' : 'Original source')}
+                  </p>
+                  <p className="break-all select-text">{source.canonicalUrl}</p>
+                </div>
+              ))}
             </div>
           )}
 
@@ -560,7 +572,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
           </div>
 
           {/* Source-grounded reports must not display citizen-form classifications unless those answers were actually captured through the configured form. */}
-          {!sourceUrl && <HarassmentContextSummary report={report} language={language} />}
+          {!hasVerifiedSources && <HarassmentContextSummary report={report} language={language} />}
 
           {report.reportedSubject && (
             <div className="p-4 bg-ui-surface-subtle ui-radius-control ui-border-default border-ui-stroke-subtle space-y-1.5">
