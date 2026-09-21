@@ -22,6 +22,7 @@ import { BANGLADESH_HELPLINES } from '../data/reportOptions';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { useTaxonomy } from '../services/taxonomyService';
+import { VisitorSessionService } from '../services/visitorSessionService';
 import { SECTIONS, SectionKey } from '../theme/tokens';
 import { HorizontalScrollRail } from '../components/ui/HorizontalScrollRail';
 import { Button } from '../components/ui/Button';
