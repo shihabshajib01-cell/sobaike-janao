@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { ReportItem } from '../../types/report';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { BANGLADESH_DISTRICTS } from '../../data/districts';
 import { toBanglaDigits } from '../../utils/formatters';
 import { CategoryIcon } from '../branding/CategoryIcon';
@@ -12,7 +13,6 @@ export interface ReportAnalyticsOverviewProps {
   onSelectCategory?: (category: SectionKey) => void;
 }
 
-const CANONICAL_CATEGORIES = Object.keys(SECTIONS) as SectionKey[];
 
 export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = ({
   reports,
@@ -21,6 +21,11 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
   onSelectCategory,
 }) => {
   const totalReports = reports.length;
+  const { segments } = useTaxonomy();
+  const categoryKeys = useMemo(
+    () => Object.keys(segments) as SectionKey[],
+    [segments]
+  );
 
   const {
     districtCount,
@@ -46,7 +51,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
     let geoMappedCount = 0;
 
     const counts = Object.fromEntries(
-      CANONICAL_CATEGORIES.map((key) => [key, 0])
+      categoryKeys.map((key) => [key, 0])
     ) as Record<SectionKey, number>;
 
     reports.forEach((rep) => {
@@ -72,7 +77,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
       }
     });
 
-    const categoryEntries = CANONICAL_CATEGORIES.map((key) => ({
+    const categoryEntries = categoryKeys.map((key) => ({
       key,
       count: counts[key],
     }));
@@ -90,17 +95,17 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
         topCategoryKey = topKey;
         topLabel =
           language === 'bn'
-            ? SECTIONS[topKey].shortNameBn
-            : SECTIONS[topKey].shortNameEn;
+            ? segments[topKey]?.shortNameBn || topKey
+            : segments[topKey]?.shortNameEn || topKey;
       }
     }
 
-    const stats = CANONICAL_CATEGORIES.map((key) => {
+    const stats = categoryKeys.map((key) => {
       const count = counts[key];
       const percentage =
         totalReports > 0 ? Math.round((count / totalReports) * 100) : 0;
       const label =
-        language === 'bn' ? SECTIONS[key].shortNameBn : SECTIONS[key].shortNameEn;
+        language === 'bn' ? segments[key]?.shortNameBn || key : segments[key]?.shortNameEn || key;
 
       return {
         key,
@@ -119,7 +124,7 @@ export const ReportAnalyticsOverview: React.FC<ReportAnalyticsOverviewProps> = (
       mostReportedKey: topCategoryKey,
       categoryStats: stats,
     };
-  }, [reports, totalReports, language]);
+  }, [reports, totalReports, language, categoryKeys, segments]);
 
   if (totalReports === 0) {
     return null;
