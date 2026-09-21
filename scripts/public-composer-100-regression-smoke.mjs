@@ -77,6 +77,18 @@ try {
     );
   }
 
+  // Visual stepper is intentionally removed. Step navigation remains footer-only.
+  if ((await page.locator('#report-composer-modal button[aria-current="step"]').count()) !== 0) {
+    throw new Error('visual report composer stepper is still rendered');
+  }
+  if ((await page.locator('#report-composer-modal [role="progressbar"]').count()) !== 0) {
+    throw new Error('visual report composer progress track is still rendered');
+  }
+  const hiddenStepStatus = page.locator('#report-composer-step-status');
+  if ((await hiddenStepStatus.count()) !== 1) {
+    throw new Error('accessible report composer step status is missing');
+  }
+
   // Step 1: Public Safety.
   await page.locator('#service-select-card-public_safety').click();
   const step1Next = page.locator('#composer-footer-step1-next-btn');
