@@ -607,6 +607,7 @@ export const ConfiguredFieldsSection = forwardRef<
                     <TextField
                       id="configured-admin-contact"
                       type="text"
+                      phonetic={false}
                       label={language === 'bn' ? 'যোগাযোগ' : 'Contact'}
                       value={formData.adminContact || ''}
                       onChange={(event) =>
