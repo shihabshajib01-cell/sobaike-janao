@@ -1413,21 +1413,17 @@
 
 
 
-/* Adaptive mobile chrome: keep the exit motion visible, then remove the
-   inactive layer from focus/hit-testing at the end of the 500ms transition. */
-@keyframes mobile-chrome-hide-visibility {
-  to {
-    visibility: hidden;
-  }
-}
-
+/* Adaptive mobile chrome: transition visibility with transform/opacity so
+   inactive layers remain visible during the exit motion, then become truly hidden.
+   On initial render the hidden layer starts with visibility:hidden immediately. */
 .mobile-chrome-hide-after-transition {
-  animation: mobile-chrome-hide-visibility 0s linear 500ms forwards;
+  visibility: hidden;
+  transition-property: transform, opacity, visibility;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .mobile-chrome-hide-after-transition {
-    animation-delay: 0s;
+    transition: none;
   }
 }
 
