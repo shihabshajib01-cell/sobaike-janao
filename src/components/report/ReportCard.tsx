@@ -82,7 +82,7 @@ const ReportCardComponent: React.FC<ReportCardProps> = ({ report, className = ''
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const shareUrl = `${window.location.origin}/report-detail/${encodeURIComponent(report.id)}`;
+    const shareUrl = `${window.location.origin}${language === 'en' ? '/en' : ''}/report-detail/${encodeURIComponent(report.id)}`;
 
     try {
       if (navigator.share) {
@@ -96,7 +96,26 @@ const ReportCardComponent: React.FC<ReportCardProps> = ({ report, className = ''
         registerShare();
         setIsCopied(true);
         window.setTimeout(() => setIsCopied(false), 2000);
+        return;
       }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = shareUrl;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      if (!copied) {
+        throw new Error('Copy command was not supported.');
+      }
+
+      registerShare();
+      setIsCopied(true);
+      window.setTimeout(() => setIsCopied(false), 2000);
     } catch (error) {
       if ((error as DOMException)?.name !== 'AbortError') {
         console.warn('[ReportCard share error]', error);
