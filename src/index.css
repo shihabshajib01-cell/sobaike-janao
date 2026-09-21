@@ -1189,6 +1189,33 @@
   border-radius: 0;
 }
 
+/* Mobile-only soft reveal: blend the hard top edge of hero artwork into the
+   banner's own background. Tablet/desktop remain intentionally unchanged. */
+@media (max-width: 767.98px) {
+  .category-hero-slider .hero-slider-image {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgb(0 0 0 / 15%) 7%,
+      rgb(0 0 0 / 45%) 15%,
+      rgb(0 0 0 / 78%) 24%,
+      #000 34%,
+      #000 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgb(0 0 0 / 15%) 7%,
+      rgb(0 0 0 / 45%) 15%,
+      rgb(0 0 0 / 78%) 24%,
+      #000 34%,
+      #000 100%
+    );
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+}
+
 @media (min-width: 768px) {
   .hero-slider-image {
     height: auto;
