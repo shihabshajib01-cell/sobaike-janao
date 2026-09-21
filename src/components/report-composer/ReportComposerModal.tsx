@@ -1142,7 +1142,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 segment={formData.segment}
                 language={language}
                 onClose={handleRequestClose}
-                onSelectStep={(step) => handleGoToStep(step)}
               />
             )}
 
