@@ -602,17 +602,37 @@ await check('Mobile navigation, issue rows and category controls follow the appr
 
     const matrixRowStyle = await mobileMatrixRowHeader.evaluate((element) => {
       const style = window.getComputedStyle(element);
+      const label = element.querySelector('.explore-sticky-topic-label');
+      const labelStyle = label ? window.getComputedStyle(label) : null;
       return {
         position: style.position,
-        backgroundImage: style.backgroundImage,
+        backgroundColor: style.backgroundColor,
+        labelBackgroundColor: labelStyle?.backgroundColor || '',
+        labelBackdropFilter:
+          labelStyle?.backdropFilter ||
+          labelStyle?.webkitBackdropFilter ||
+          '',
       };
     });
 
     if (matrixRowStyle.position !== 'sticky') {
       throw new Error('Explore matrix topic column must stay sticky on mobile');
     }
-    if (!matrixRowStyle.backgroundImage.includes('linear-gradient')) {
-      throw new Error('Explore matrix sticky topic column must use the integrated fade surface');
+    if (
+      matrixRowStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' &&
+      matrixRowStyle.backgroundColor !== 'transparent'
+    ) {
+      throw new Error('Explore matrix sticky topic cell must be transparent on mobile');
+    }
+    if (
+      !matrixRowStyle.labelBackgroundColor ||
+      matrixRowStyle.labelBackgroundColor === 'rgba(0, 0, 0, 0)' ||
+      matrixRowStyle.labelBackgroundColor === 'transparent'
+    ) {
+      throw new Error('Explore matrix sticky topic label must keep its own readable surface');
+    }
+    if (!matrixRowStyle.labelBackdropFilter || matrixRowStyle.labelBackdropFilter === 'none') {
+      throw new Error('Explore matrix sticky topic label must use the compact frosted surface');
     }
     if (beforeHeader.width > 156) {
       throw new Error(`Explore matrix sticky topic column is too wide on mobile: ${beforeHeader.width}px`);
