@@ -135,7 +135,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
             <tr>
               <th
                 scope="col"
-                className="sticky left-0 z-20 bg-ui-surface text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary border-r border-ui-stroke-subtle"
+                className="explore-sticky-topic-cell sticky left-0 z-20 text-left px-2 py-2 type-compact font-[var(--font-weight-bold)] text-ui-content-primary"
               >
                 {language === 'bn' ? 'বিষয়' : 'Topic'}
               </th>
@@ -160,7 +160,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
                 <tr key={row.category}>
                   <th
                     scope="row"
-                    className="sticky left-0 z-20 bg-ui-surface px-2 py-1.5 text-left border-r border-ui-stroke-subtle"
+                    className="explore-sticky-topic-cell sticky left-0 z-20 px-2 py-1.5 text-left"
                   >
                     <span className="flex min-w-0 items-center gap-2 type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
                       <span className="shrink-0">
