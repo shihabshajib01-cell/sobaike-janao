@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Navigate } from 'react-router-dom';
 import { SectionKey } from '../theme/tokens';
 import { PublicReportService } from '../services/publicReportService';
 import { useTaxonomy } from '../services/taxonomyService';
@@ -37,7 +38,7 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({
   seoOverride = null,
 }) => {
   const { language, browseLocation, browseLocationStatus } = useApp();
-  const { segments, getFeedSubcategories } = useTaxonomy();
+  const { segments, getFeedSubcategories, isAuthoritative } = useTaxonomy();
   const { setDynamicSeo } = useSeo();
   usePublishedBannerRuntime();
   const runtimeBannerContent = getRuntimeBannerContent(section);
@@ -222,6 +223,10 @@ export const StandardCategoryPage: React.FC<StandardCategoryPageProps> = ({
     },
     [language, segmentSeo, subcategories]
   );
+
+  if (isAuthoritative && !segmentSeo) {
+    return <Navigate to={language === 'en' ? '/en' : '/'} replace />;
+  }
 
   if (!bannerContent) {
     return null;
