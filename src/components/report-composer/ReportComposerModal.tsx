@@ -39,6 +39,7 @@ import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { ModalActions } from '../ui/ModalActions';
 import { CategoryBadge } from '../ui/CategoryBadge';
+import { BanglaPhoneticProvider, BanglaPhoneticToggle } from '../ui/BanglaPhonetic';
 import { PublicReportingConfigService, PublicReportingForm } from '../../services/reportingFormConfig';
 
 export interface ReportComposerModalProps {
@@ -1121,8 +1122,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
   return (
     <>
-      <Modal
-        id="report-composer-modal"
+      <BanglaPhoneticProvider language={language}>
+        <Modal
+          id="report-composer-modal"
         isOpen={isOpen}
         onClose={handleRequestClose}
         maxWidth={submissionResult ? 'md' : 'composer'}
@@ -1247,6 +1249,19 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
 
                   {effectiveCurrentStep === 3 && formData.segment && (
                     <>
+                      <div className="flex items-center justify-between gap-4 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle px-4 py-3">
+                        <div className="min-w-0">
+                          <p className="type-label text-ui-content-primary">
+                            {language === 'bn' ? 'বাংলা ফনেটিক টাইপিং' : 'Bangla phonetic typing'}
+                          </p>
+                          <p className="type-helper text-ui-content-secondary">
+                            {language === 'bn'
+                              ? 'ইংরেজি অক্ষরে লিখে Space চাপলে বাংলা হবে।'
+                              : 'Type with English letters and press Space to convert words to Bangla.'}
+                          </p>
+                        </div>
+                        <BanglaPhoneticToggle id="report-form" />
+                      </div>
                       {isMobJusticeReport && (
                         <MobJusticeDetailsFields
                           value={mobJusticeDetails}
@@ -1339,7 +1354,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
               />
             )}
         </>
-      </Modal>
+        </Modal>
+      </BanglaPhoneticProvider>
 
       {/* Mandatory Rape Pre-Report Consent Modal */}
       <Modal

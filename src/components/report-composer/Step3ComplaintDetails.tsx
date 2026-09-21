@@ -2093,6 +2093,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 <TextField
                   id="operator-contact"
                   type="text"
+                  phonetic={false}
                   label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
                   value={formData.publicProfileHandle || ''}
                   onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
@@ -2186,6 +2187,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   <TextField
                     id="extortion-contact"
                     type="text"
+                    phonetic={false}
                     label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
                     value={formData.publicProfileHandle || ''}
                     onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
@@ -2289,6 +2291,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                           <TextField
                             id={`party-${party.id}-contact`}
                             type="text"
+                            phonetic={false}
                             label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
                             value={party.phoneOrContact || party.publicProfileHandle || ''}
                             onChange={(e) =>
