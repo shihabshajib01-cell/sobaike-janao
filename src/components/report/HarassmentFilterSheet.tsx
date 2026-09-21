@@ -14,6 +14,7 @@ import { Modal } from '../ui/Modal';
 import { SearchableSelect } from '../ui/SearchableSelect';
 import { Select } from '../ui/Select';
 import { HarassmentClassificationFilters } from './HarassmentClassificationFilters';
+import { sortByLocalizedName } from '../../utils/sorters';
 
 export interface HarassmentFilterValue {
   divisionId: string;
@@ -57,10 +58,13 @@ export const HarassmentFilterSheet: React.FC<HarassmentFilterSheetProps> = ({
   }, [isOpen, value.divisionId, value.districtId, value.classification]);
 
   const districtOptions = useMemo(() => {
-    return BANGLADESH_DISTRICTS.filter(
-      (district) => draftDivisionId === 'all' || district.divisionId === draftDivisionId
+    return sortByLocalizedName(
+      BANGLADESH_DISTRICTS.filter(
+        (district) => draftDivisionId === 'all' || district.divisionId === draftDivisionId
+      ),
+      language
     );
-  }, [draftDivisionId]);
+  }, [draftDivisionId, language]);
 
   const handleDivisionChange = (divisionId: string) => {
     setDraftDivisionId(divisionId);
@@ -211,7 +215,7 @@ export const HarassmentFilterSheet: React.FC<HarassmentFilterSheetProps> = ({
           onChange={(event) => handleDivisionChange(event.target.value)}
           options={[
             { value: 'all', label: isBn ? 'সকল বিভাগ' : 'All divisions' },
-            ...DIVISIONS.map((division) => ({
+            ...sortByLocalizedName(DIVISIONS, language).map((division) => ({
               value: division.id,
               label: isBn ? division.nameBn : division.nameEn,
             })),
