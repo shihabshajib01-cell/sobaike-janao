@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Info } from 'lucide-react';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
 import { SubcategoryOption } from '../../data/reportOptions';
 import { useTaxonomy } from '../../services/taxonomyService';
 
@@ -25,7 +25,10 @@ export const Step2ComplaintTypeAccordion: React.FC<Step2ComplaintTypeAccordionPr
 
   const isSingleOption = allSubcategories.length === 1;
 
-  const headerTitle = language === 'bn' ? (segmentInfo?.nameBn || SECTIONS[segment].nameBn) : (segmentInfo?.nameEn || SECTIONS[segment].nameEn);
+  const headerTitle =
+    language === 'bn'
+      ? segmentInfo?.nameBn || segment
+      : segmentInfo?.nameEn || segment;
   const helperText =
     language === 'bn'
       ? 'অভিযোগের ধরন নির্বাচন করুন।'
