@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { ReportItem } from '../../types/report';
 import { BANGLADESH_DISTRICTS, DIVISIONS } from '../../data/districts';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { toBanglaDigits } from '../../utils/formatters';
 import { CategoryIcon } from '../branding/CategoryIcon';
 
@@ -13,7 +14,6 @@ export interface ReportTopicDivisionMatrixProps {
   onSelectCell?: (category: SectionKey, division: string) => void;
 }
 
-const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
 const TOPIC_COLUMN_WIDTH = 152;
 const DIVISION_COLUMN_WIDTH = 76;
 const MOBILE_HEADER_HEIGHT = 44;
@@ -26,13 +26,19 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
   activeDivision = 'all',
   onSelectCell,
 }) => {
+  const { segments } = useTaxonomy();
+  const categoryKeys = useMemo(
+    () => Object.keys(segments) as SectionKey[],
+    [segments]
+  );
+
   const { rows, visibleDivisions, recognizedCount } = useMemo(() => {
     const divisionTotals = new Map<string, number>();
     const matrix = new Map<string, number>();
     let recognized = 0;
 
     reports.forEach((report) => {
-      if (!CATEGORY_KEYS.includes(report.segment as SectionKey)) return;
+      if (!categoryKeys.includes(report.segment as SectionKey)) return;
 
       const districtEn = (report.districtEn || '').toLowerCase().trim();
       const districtBn = (report.districtBn || '').trim();
@@ -65,7 +71,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
         return a.nameEn.localeCompare(b.nameEn);
       });
 
-    const categoryRows = CATEGORY_KEYS.map((category) => {
+    const categoryRows = categoryKeys.map((category) => {
       const cells = divisions.map((division) => ({
         division,
         count: matrix.get(`${category}::${division.id}`) || 0,
@@ -84,7 +90,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
       visibleDivisions: divisions,
       recognizedCount: recognized,
     };
-  }, [reports]);
+  }, [reports, categoryKeys]);
 
   if (recognizedCount === 0 || visibleDivisions.length === 0 || rows.length === 0) {
     return null;
@@ -140,9 +146,11 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
             </div>
 
             {rows.map((row) => {
-              const category = SECTIONS[row.category];
+              const category = segments[row.category];
               const categoryLabel =
-                language === 'bn' ? category.shortNameBn : category.shortNameEn;
+                language === 'bn'
+                  ? category?.shortNameBn || row.category
+                  : category?.shortNameEn || row.category;
 
               return (
                 <div
@@ -186,7 +194,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
               </div>
 
               {rows.map((row) => {
-                const category = SECTIONS[row.category];
+                const category = segments[row.category];
                 const categoryLabel =
                   language === 'bn' ? category.shortNameBn : category.shortNameEn;
 
@@ -297,7 +305,7 @@ export const ReportTopicDivisionMatrix: React.FC<ReportTopicDivisionMatrixProps>
           </thead>
           <tbody>
             {rows.map((row) => {
-              const category = SECTIONS[row.category];
+              const category = segments[row.category];
               const categoryLabel =
                 language === 'bn' ? category.shortNameBn : category.shortNameEn;
 
