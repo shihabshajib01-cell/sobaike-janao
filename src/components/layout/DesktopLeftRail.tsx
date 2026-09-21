@@ -122,7 +122,6 @@ export const DesktopLeftRail: React.FC = () => {
         <nav className="space-y-1" aria-label={language === 'bn' ? 'প্রধান বিভাগ' : 'Main sections'}>
           {navItems.map((item) => {
             const isActive = currentRoute === item.path;
-            const secConfig = item.sectionKey ? SECTIONS[item.sectionKey] : null;
 
             return (
               <Link
