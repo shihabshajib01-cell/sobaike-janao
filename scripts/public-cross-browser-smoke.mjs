@@ -1,6 +1,7 @@
 import { firefox, webkit } from 'playwright';
 
 const siteUrl = process.env.SITE_URL || 'http://127.0.0.1:4173/';
+const siteOrigin = new URL(siteUrl).origin;
 
 const engines = [
   ['firefox', firefox],
@@ -35,6 +36,24 @@ for (const [engineName, launcher] of engines) {
   try {
     for (const viewport of viewports) {
       const context = await browser.newContext({ viewport });
+
+      // This smoke validates browser-engine compatibility of the built local app.
+      // Keep it deterministic and independent from runner TLS support for remote
+      // fonts, Supabase, banner media, and IP-location services. Live external
+      // integration is covered by the separate production/integration smokes.
+      await context.route('**/*', async (route) => {
+        const requestUrl = new URL(route.request().url());
+        if (
+          requestUrl.origin === siteOrigin ||
+          requestUrl.protocol === 'data:' ||
+          requestUrl.protocol === 'blob:'
+        ) {
+          await route.continue();
+          return;
+        }
+        await route.abort('blockedbyclient');
+      });
+
       const page = await context.newPage();
       const label = engineName + '/' + viewport.label;
       const diagnostics = [];
