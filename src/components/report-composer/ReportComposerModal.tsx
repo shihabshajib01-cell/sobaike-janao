@@ -1145,7 +1145,6 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             {!submissionResult && (
               <ReportComposerHeader
                 currentStep={effectiveCurrentStep}
-                totalSteps={4}
                 segment={formData.segment}
                 language={language}
                 onClose={handleRequestClose}
