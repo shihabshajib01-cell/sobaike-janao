@@ -7,6 +7,7 @@ import {
   HARASSMENT_REPORTING_FOR_OPTIONS,
   HarassmentClassificationFilterState,
 } from '../../data/harassmentClassification';
+import { sortOptionsByLabel } from '../../utils/sorters';
 
 export interface HarassmentClassificationFiltersProps {
   language: 'bn' | 'en';
@@ -56,10 +57,13 @@ export const HarassmentClassificationFilters: React.FC<HarassmentClassificationF
         noResultsText={isBn ? 'কোনো সম্পর্ক পাওয়া যায়নি' : 'No matching relationship'}
         options={[
           { value: 'all', label: isBn ? 'সকল সম্পর্ক' : 'All relationships' },
-          ...HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS.map((item) => ({
-            value: item.value,
-            label: isBn ? item.labelBn : item.labelEn,
-          })),
+          ...sortOptionsByLabel(
+            HARASSMENT_ABUSER_RELATIONSHIP_OPTIONS.map((item) => ({
+              value: item.value,
+              label: isBn ? item.labelBn : item.labelEn,
+            })),
+            language
+          ),
         ]}
       />
 
@@ -72,10 +76,13 @@ export const HarassmentClassificationFilters: React.FC<HarassmentClassificationF
         }
         options={[
           { value: 'all', label: isBn ? 'সকল' : 'All' },
-          ...HARASSMENT_REPORTING_FOR_OPTIONS.map((item) => ({
-            value: item.value,
-            label: isBn ? item.labelBn : item.labelEn,
-          })),
+          ...sortOptionsByLabel(
+            HARASSMENT_REPORTING_FOR_OPTIONS.map((item) => ({
+              value: item.value,
+              label: isBn ? item.labelBn : item.labelEn,
+            })),
+            language
+          ),
         ]}
       />
     </div>
