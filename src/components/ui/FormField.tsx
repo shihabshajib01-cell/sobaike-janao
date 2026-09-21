@@ -11,6 +11,7 @@ export interface FormFieldProps {
   className?: string;
   labelClassName?: string;
   groupLabel?: boolean;
+  labelAction?: React.ReactNode;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -23,32 +24,42 @@ export const FormField: React.FC<FormFieldProps> = ({
   className = '',
   labelClassName = 'type-label text-role-on-surface',
   groupLabel = false,
+  labelAction,
 }) => {
   const { helperId, errorId, labelId } = formFieldIds(id);
 
+  const labelNode = label ? (
+    groupLabel ? (
+      <div id={labelId} className={`block ${labelClassName}`}>
+        {label}
+        {required ? (
+          <span className="text-role-validation ml-1" aria-hidden="true">
+            *
+          </span>
+        ) : null}
+      </div>
+    ) : (
+      <label id={labelId} htmlFor={id} className={`block ${labelClassName}`}>
+        {label}
+        {required ? (
+          <span className="text-role-validation ml-1" aria-hidden="true">
+            *
+          </span>
+        ) : null}
+      </label>
+    )
+  ) : null;
+
   return (
     <div className={`w-full min-w-0 text-left space-y-1.5 ${className}`}>
-      {label ? (
-        groupLabel ? (
-          <div id={labelId} className={`block ${labelClassName}`}>
-            {label}
-            {required ? (
-              <span className="text-role-validation ml-1" aria-hidden="true">
-                *
-              </span>
-            ) : null}
-          </div>
-        ) : (
-          <label id={labelId} htmlFor={id} className={`block ${labelClassName}`}>
-            {label}
-            {required ? (
-              <span className="text-role-validation ml-1" aria-hidden="true">
-                *
-              </span>
-            ) : null}
-          </label>
-        )
-      ) : null}
+      {labelAction ? (
+        <div className="flex items-start justify-between gap-3">
+          {labelNode}
+          <div className="ml-auto -my-2 shrink-0">{labelAction}</div>
+        </div>
+      ) : (
+        labelNode
+      )}
 
       {children}
 
