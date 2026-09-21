@@ -2,7 +2,7 @@
 <html lang="bn">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-ZuBJaMmuv0yolgULJguoc6qsYB9AZnk9A+UyiEbNHQk=' 'sha256-hHJhycXH8TAtrRzB3h4PkB6lfyaYw8DlVQU7vM2yA2s=' 'sha256-IWrS4XiYxknqBB85CwZVClri2QuTvVXaiExNemMMc14=' 'sha256-rZC2NXhYhnI2CiFjJ5LOfxnFClhtlVJoGSbPy3iE9q0='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://ahiaymyqfmyyrjkwgvhi.supabase.co wss://ahiaymyqfmyyrjkwgvhi.supabase.co; worker-src 'self' blob:; manifest-src 'self'; frame-src 'none'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-ZuBJaMmuv0yolgULJguoc6qsYB9AZnk9A+UyiEbNHQk=' 'sha256-hHJhycXH8TAtrRzB3h4PkB6lfyaYw8DlVQU7vM2yA2s=' 'sha256-IWrS4XiYxknqBB85CwZVClri2QuTvVXaiExNemMMc14=' 'sha256-rZC2NXhYhnI2CiFjJ5LOfxnFClhtlVJoGSbPy3iE9q0=' 'sha256-77CIbpEWx3dorojLRwD7C0FhSm8MTcY0apR2M2zR4fo='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://ahiaymyqfmyyrjkwgvhi.supabase.co wss://ahiaymyqfmyyrjkwgvhi.supabase.co; worker-src 'self' blob:; manifest-src 'self'; frame-src 'none'; upgrade-insecure-requests" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <script>document.documentElement.classList.add('js');if(window.top!==window.self){document.documentElement.style.display='none';}</script>
@@ -99,6 +99,10 @@
           }
           document.documentElement.setAttribute('data-theme', theme);
           document.documentElement.style.colorScheme = theme;
+          var themeColor = document.querySelector('meta[name="theme-color"]');
+          if (themeColor) {
+            themeColor.setAttribute('content', theme === 'dark' ? '#18191A' : '#1B4D6B');
+          }
           if (theme === 'dark') {
             document.documentElement.classList.add('dark');
           } else {
@@ -107,6 +111,10 @@
         } catch (e) {
           document.documentElement.setAttribute('data-theme', 'light');
           document.documentElement.style.colorScheme = 'light';
+          var fallbackThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (fallbackThemeColor) {
+            fallbackThemeColor.setAttribute('content', '#1B4D6B');
+          }
           document.documentElement.classList.remove('dark');
         }
 
