@@ -1365,3 +1365,35 @@
 .home-feed-virtual-page[data-mounted='false'] {
   contain: layout paint style;
 }
+
+
+/* Explore matrix: keep the topic/category column sticky without a hard opaque slab.
+   The surface stays readable over horizontally scrolling cells, then softly fades at
+   the right edge so the sticky area feels integrated with the table instead of
+   looking like a separate white panel. */
+.explore-sticky-topic-cell {
+  background:
+    linear-gradient(
+      90deg,
+      var(--ui-surface) 0%,
+      var(--ui-surface) calc(100% - 18px),
+      color-mix(in srgb, var(--ui-surface) 88%, transparent) calc(100% - 10px),
+      transparent 100%
+    );
+  border-right: 0;
+}
+
+.explore-sticky-topic-cell::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  right: -10px;
+  width: 10px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ui-surface) 34%, transparent),
+      transparent
+    );
+}
