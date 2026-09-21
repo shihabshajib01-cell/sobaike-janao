@@ -230,7 +230,11 @@ export const useBanglaPhoneticInput = (
     let nextValue = element.value;
     let nextCaret = element.selectionStart ?? nextValue.length;
 
-    if (\n      !context.enabled ||\n      isComposingRef.current ||\n      Boolean((event.nativeEvent as InputEvent).isComposing)\n    ) {
+    if (
+      !context.enabled ||
+      isComposingRef.current ||
+      Boolean((event.nativeEvent as InputEvent).isComposing)
+    ) {
       lastCommitRef.current = null;
       onChange?.(event);
       return;
