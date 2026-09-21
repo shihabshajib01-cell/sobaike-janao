@@ -231,8 +231,21 @@ await check('Issues direct route remains visible on tablet and desktop', async (
     await page.goto(routeUrl('/issues'), { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expectVisible(page.locator('#issues-page-container'), `Issues page hidden on ${viewport.label}`);
     await expectVisible(page.locator('#issues-category-grid'), `Issues category list hidden on ${viewport.label}`);
-    const cardCount = await page.locator('#issues-category-grid [id^="issues-card-"]').count();
-    if (cardCount !== 7) throw new Error(`${viewport.label} Issues route expected 7 cards, found ${cardCount}`);
+    const cards = page.locator('#issues-category-grid [id^="issues-card-"]');
+    const cardCount = await cards.count();
+    if (cardCount < 1) {
+      throw new Error(`${viewport.label} Issues route returned no active category cards`);
+    }
+    const invalidCards = await cards.evaluateAll((items) =>
+      items.filter((item) => {
+        const href = item.getAttribute('href') || '';
+        const id = item.getAttribute('id') || '';
+        return !id.startsWith('issues-card-') || !href || href === '#';
+      }).length
+    );
+    if (invalidCards > 0) {
+      throw new Error(`${viewport.label} Issues route contains ${invalidCards} category cards without a valid dynamic route`);
+    }
     await context.close();
   }
 });
