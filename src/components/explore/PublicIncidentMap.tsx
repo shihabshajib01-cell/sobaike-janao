@@ -14,6 +14,7 @@ import { BANGLADESH_DISTRICTS, DistrictInfo } from '../../data/districts';
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
 import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 import { HeatmapLegend } from './HeatmapLegend';
 
 export interface PublicIncidentMapProps {
@@ -78,6 +79,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
+  const { resolvedTheme } = useTheme();
   const { segments } = useTaxonomy();
   const categoryKeys = useMemo(
     () => Object.keys(segments) as SectionKey[],
@@ -174,9 +176,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     districtCounts,
   ]);
 
-  const isDarkMode =
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark');
+  const isDarkMode = resolvedTheme === 'dark';
 
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
