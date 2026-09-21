@@ -12,6 +12,7 @@ import { HEATMAP_TOKENS } from '../../theme/data-viz-tokens';
 import { BANGLADESH_DISTRICTS, DistrictInfo } from '../../data/districts';
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
+import { useApp } from '../../context/AppContext';
 import { HeatmapLegend } from './HeatmapLegend';
 
 export interface PublicIncidentMapProps {
@@ -74,6 +75,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
+  const { navigateTo } = useApp();
   const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('density');
 
   const isInitialMount = useRef(true);
@@ -378,6 +380,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           direction: 'top',
           opacity: 0.96,
         });
+        marker.on('click', () => navigateTo(`/report-detail/${report.id}`));
         marker.addTo(layerGroup);
       });
     }
@@ -392,6 +395,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     language,
     mapLayerMode,
     maxHeatWeight,
+    navigateTo,
     onSelectDistrict,
     reportsWithRealCoords,
   ]);
