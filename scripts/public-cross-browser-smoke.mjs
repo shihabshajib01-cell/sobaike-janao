@@ -9,7 +9,7 @@ const engines = [
 
 const viewports = [
   { label: 'mobile', width: 390, height: 844 },
-  { label: 'desktop', width: 1365, height: 900 },
+  { label: 'desktop', width: 1536, height: 960 },
 ];
 
 const failures = [];
@@ -31,14 +31,15 @@ for (const [engineName, launcher] of engines) {
       const label = engineName + '/' + viewport.label;
 
       try {
-        await page.addInitScript(() => {
-          localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
-          if (!localStorage.getItem('sobaike-janao-theme')) {
-            localStorage.setItem('sobaike-janao-theme', 'light');
-          }
-        });
-
+        // Seed persisted preferences on the real site origin, then reload.
+        // This avoids engine-specific localStorage behavior on the initial
+        // about:blank document while still testing first-paint restoration.
         await page.goto(siteUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.evaluate(() => {
+          localStorage.setItem('sobaike_responsibility_notice_v1', 'accepted');
+          localStorage.setItem('sobaike-janao-theme', 'light');
+        });
+        await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
         await expectVisible(page.locator('#main-content'), label + ' main content');
 
         if ((await page.locator('html').getAttribute('lang')) !== 'bn') {
