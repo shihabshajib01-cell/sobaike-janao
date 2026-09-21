@@ -10,6 +10,7 @@ import { TextField } from '../ui/TextField';
 import { TextAreaField } from '../ui/TextAreaField';
 import { ContactField } from '../ui/ContactField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
+import { BanglaPhoneticFormControl, BanglaPhoneticProvider } from '../ui/BanglaPhonetic';
 
 /**
  * Rollout gate: Controls whether the simplified Subject Response form is enabled.
@@ -178,7 +179,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
   return (
     <>
-      <Modal
+      <BanglaPhoneticProvider language={language}>
+        <Modal
       id="subject-response-modal"
       isOpen={isOpen}
       onClose={handleRequestClose}
@@ -284,6 +286,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
         </div>
       ) : (
         <form id="subject-response-form" onSubmit={handleSubmit} noValidate className="space-y-4">
+            <BanglaPhoneticFormControl id="subject-response-form" />
+
             {error && (
               <div role="alert" className="p-3.5 bg-ui-error-bg border border-ui-error-border text-ui-error-text rounded-[var(--radius-control)] type-compact font-[var(--font-weight-medium)]">
                 {error}
@@ -473,7 +477,8 @@ export const SubjectResponseModal: React.FC<SubjectResponseModalProps> = ({
 
         </form>
       )}
-      </Modal>
+        </Modal>
+      </BanglaPhoneticProvider>
 
       <UnsavedChangesDialog
         id="subject-response-discard-confirm-modal"

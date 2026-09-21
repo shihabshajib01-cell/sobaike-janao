@@ -203,6 +203,27 @@ export const BanglaPhoneticToggle: React.FC<{ id: string }> = ({ id }) => {
   );
 };
 
+export const BanglaPhoneticFormControl: React.FC<{ id: string }> = ({ id }) => {
+  const context = useContext(BanglaPhoneticContext);
+  if (!context) return null;
+
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-[var(--radius-control)] border border-ui-stroke-subtle bg-ui-surface-subtle px-4 py-3">
+      <div className="min-w-0">
+        <p className="type-label text-ui-content-primary">
+          {context.language === 'bn' ? 'বাংলা ফনেটিক টাইপিং' : 'Bangla phonetic typing'}
+        </p>
+        <p className="type-helper text-ui-content-secondary">
+          {context.language === 'bn'
+            ? 'ইংরেজি অক্ষরে লিখে Space চাপলে বাংলা হবে।'
+            : 'Type with English letters and press Space to convert words to Bangla.'}
+        </p>
+      </div>
+      <BanglaPhoneticToggle id={id} />
+    </div>
+  );
+};
+
 export const useBanglaPhoneticInput = (
   id: string,
   eligible: boolean
