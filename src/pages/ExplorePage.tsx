@@ -19,6 +19,7 @@ import { ReportGeographicBreakdown } from '../components/explore/ReportGeographi
 import { ReportTopicDivisionMatrix } from '../components/explore/ReportTopicDivisionMatrix';
 import { PublicPageContainer } from '../components/layout/PublicPageContainer';
 import { toBanglaDigits } from '../utils/formatters';
+import { sortByLocalizedName } from '../utils/sorters';
 import { CategoryIcon } from '../components/branding/CategoryIcon';
 import { MapIcon } from '../components/explore/MapIcon';
 import { Modal } from '../components/ui/Modal';
@@ -216,25 +217,31 @@ export const ExplorePage: React.FC = () => {
 
   // Available districts filtered by selected division if set
   const availableDistricts = useMemo(() => {
-    if (selectedDivision === 'all') return BANGLADESH_DISTRICTS;
-    return BANGLADESH_DISTRICTS.filter(
-      (d) =>
-        d.divisionEn.toLowerCase() === selectedDivision.toLowerCase() ||
-        d.divisionBn === selectedDivision ||
-        d.divisionId === selectedDivision.toLowerCase()
-    );
-  }, [selectedDivision]);
+    const districts =
+      selectedDivision === 'all'
+        ? BANGLADESH_DISTRICTS
+        : BANGLADESH_DISTRICTS.filter(
+            (d) =>
+              d.divisionEn.toLowerCase() === selectedDivision.toLowerCase() ||
+              d.divisionBn === selectedDivision ||
+              d.divisionId === selectedDivision.toLowerCase()
+          );
+    return sortByLocalizedName(districts, language);
+  }, [selectedDivision, language]);
 
   // Available districts filtered by draft division in mobile filter sheet
   const draftAvailableDistricts = useMemo(() => {
-    if (draftDivision === 'all') return BANGLADESH_DISTRICTS;
-    return BANGLADESH_DISTRICTS.filter(
-      (d) =>
-        d.divisionEn.toLowerCase() === draftDivision.toLowerCase() ||
-        d.divisionBn === draftDivision ||
-        d.divisionId === draftDivision.toLowerCase()
-    );
-  }, [draftDivision]);
+    const districts =
+      draftDivision === 'all'
+        ? BANGLADESH_DISTRICTS
+        : BANGLADESH_DISTRICTS.filter(
+            (d) =>
+              d.divisionEn.toLowerCase() === draftDivision.toLowerCase() ||
+              d.divisionBn === draftDivision ||
+              d.divisionId === draftDivision.toLowerCase()
+          );
+    return sortByLocalizedName(districts, language);
+  }, [draftDivision, language]);
 
   const handleResetFilters = () => {
     setSearchQuery('');
@@ -532,7 +539,7 @@ export const ExplorePage: React.FC = () => {
               noResultsText={language === 'bn' ? 'কোনো বিভাগ পাওয়া যায়নি' : 'No matching division'}
               options={[
                 { value: 'all', label: language === 'bn' ? 'সকল বিভাগ' : 'All divisions' },
-                ...DIVISIONS.map((division) => ({
+                ...sortByLocalizedName(DIVISIONS, language).map((division) => ({
                   value: division.nameEn,
                   label: language === 'bn' ? division.nameBn : division.nameEn,
                   keywords: [division.nameBn, division.nameEn],
@@ -1198,7 +1205,7 @@ export const ExplorePage: React.FC = () => {
             noResultsText={language === 'bn' ? 'কোনো বিভাগ পাওয়া যায়নি' : 'No matching division'}
             options={[
               { value: 'all', label: language === 'bn' ? 'সকল বিভাগ' : 'All divisions' },
-              ...DIVISIONS.map((division) => ({ value: division.nameEn, label: language === 'bn' ? division.nameBn : division.nameEn, keywords: [division.nameBn, division.nameEn] })),
+              ...sortByLocalizedName(DIVISIONS, language).map((division) => ({ value: division.nameEn, label: language === 'bn' ? division.nameBn : division.nameEn, keywords: [division.nameBn, division.nameEn] })),
             ]}
           />
 
