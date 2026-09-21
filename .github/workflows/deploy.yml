@@ -19,7 +19,9 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-${{ github.event_name }}-${{ github.ref }}
+  # All production-capable events for the same ref share one lane. This prevents
+  # a scheduled/manual SEO refresh from racing a normal push deployment.
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -28,7 +30,7 @@ jobs:
 
     steps:
       - name: Require successful CI for exact revision
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -152,9 +154,10 @@ jobs:
 
   deploy:
     if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'schedule'
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' ||
+       github.event_name == 'workflow_dispatch' ||
+       github.event_name == 'schedule')
     needs: build
     runs-on: ubuntu-latest
 
