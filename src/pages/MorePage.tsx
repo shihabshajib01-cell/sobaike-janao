@@ -68,6 +68,8 @@ export const MorePage: React.FC = () => {
     browseLocationStatus === 'available' && browseLocation?.source === 'device';
   const hasApproximateBrowseLocation =
     browseLocationStatus === 'available' && browseLocation?.source === 'ip';
+  const hasApproximateBrowsePreference =
+    VisitorSessionService.getLocationChoice() === 'not_now';
 
   const tabs: Array<{ key: InfoTab; labelBn: string; labelEn: string; icon: React.ComponentType<{ className?: string }> }> = [
     { key: 'about', labelBn: 'সম্পর্কে', labelEn: 'About', icon: Info },
@@ -339,6 +341,10 @@ export const MorePage: React.FC = () => {
                     ? language === 'bn'
                       ? 'এখন আনুমানিক এলাকার লোকেশন ব্যবহার হচ্ছে।'
                       : 'Approximate area location is currently being used.'
+                    : hasApproximateBrowsePreference
+                    ? language === 'bn'
+                      ? 'আনুমানিক এলাকার লোকেশন নির্বাচন করা আছে, তবে এটি সাময়িকভাবে পাওয়া যাচ্ছে না।'
+                      : 'Approximate area location is selected, but it is temporarily unavailable.'
                     : language === 'bn'
                     ? 'বর্তমানে কোনো লোকেশন পাওয়া যাচ্ছে না।'
                     : 'Location is currently unavailable.'}
