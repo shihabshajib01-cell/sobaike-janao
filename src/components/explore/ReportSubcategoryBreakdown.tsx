@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ReportItem } from '../../types/report';
-import { SUBCATEGORIES } from '../../data/categories';
-import { SECTIONS, SectionKey } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { CategoryIcon } from '../branding/CategoryIcon';
 import { toBanglaDigits } from '../../utils/formatters';
 
@@ -33,6 +33,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
 }) => {
   const totalReports = reports.length;
   const [isExpanded, setIsExpanded] = useState(false);
+  const { segments, subcategories } = useTaxonomy();
 
   const { subcategoryStats, recognizedSubcategoryReportCount } = useMemo(() => {
     if (totalReports === 0) {
@@ -52,7 +53,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
       if (!seg || !subId) return;
       if (subId === 'all') return;
 
-      const sectionSubcategories = SUBCATEGORIES[seg];
+      const sectionSubcategories = subcategories[seg];
       if (!sectionSubcategories) return;
 
       const foundSub = sectionSubcategories.find((s) => s.id === subId);
@@ -60,7 +61,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
 
       recognizedCount += 1;
       const compositeKey = `${seg}::${subId}`;
-      const sectionInfo = SECTIONS[seg];
+      const sectionInfo = segments[seg];
 
       if (!map.has(compositeKey)) {
         map.set(compositeKey, {
@@ -71,7 +72,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
           nameEn: foundSub.nameEn,
           parentShortNameBn: sectionInfo?.shortNameBn || seg,
           parentShortNameEn: sectionInfo?.shortNameEn || seg,
-          primaryColor: SECTIONS[seg].primaryColor,
+          primaryColor: sectionInfo?.primaryColor || 'var(--md-secondary)',
           count: 0,
           percentage: 0,
         });
@@ -97,7 +98,7 @@ export const ReportSubcategoryBreakdown: React.FC<ReportSubcategoryBreakdownProp
       subcategoryStats: list,
       recognizedSubcategoryReportCount: recognizedCount,
     };
-  }, [reports, totalReports, language]);
+  }, [reports, totalReports, language, segments, subcategories]);
 
   if (totalReports === 0) {
     return null;
