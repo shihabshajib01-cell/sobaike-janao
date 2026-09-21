@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { ReportItem } from '../../types/report';
 import { BANGLADESH_DISTRICTS, DIVISIONS } from '../../data/districts';
-import { SectionKey, SECTIONS } from '../../theme/tokens';
+import { SectionKey } from '../../theme/tokens';
+import { useTaxonomy } from '../../services/taxonomyService';
 import { toBanglaDigits, formatRankNumber } from '../../utils/formatters';
 import { CategoryIcon } from '../branding/CategoryIcon';
 import { MapIcon } from './MapIcon';
@@ -23,10 +24,9 @@ interface RankedDistrict {
   divisionBn: string;
   divisionEn: string;
   count: number;
-  categoryCounts: Partial<Record<SectionKey, number>>;
+  categoryCounts: Partial<Record<string, number>>;
 }
 
-const CATEGORY_KEYS = Object.keys(SECTIONS) as SectionKey[];
 
 export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   reports,
@@ -38,6 +38,11 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
   selectedSection = 'all',
 }) => {
   const [showAllDistricts, setShowAllDistricts] = useState(false);
+  const { segments } = useTaxonomy();
+  const categoryKeys = useMemo(
+    () => Object.keys(segments) as SectionKey[],
+    [segments]
+  );
 
   const rankingSource = rankingReports || reports;
 
@@ -197,7 +202,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
   const activeCategoryCounts = useMemo(() => {
     const counts = new Map<SectionKey, number>(
-      CATEGORY_KEYS.map((key) => [key, 0])
+      categoryKeys.map((key) => [key, 0])
     );
     reports.forEach((report) => {
       counts.set(report.segment, (counts.get(report.segment) || 0) + 1);
@@ -209,12 +214,12 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
 
   const categories = useMemo(
     () =>
-      CATEGORY_KEYS.map((key) => ({
+      categoryKeys.map((key) => ({
         key,
         label:
           language === 'bn'
-            ? SECTIONS[key].shortNameBn
-            : SECTIONS[key].shortNameEn,
+            ? segments[key]?.shortNameBn || key
+            : segments[key]?.shortNameEn || key,
         count: activeCategoryCounts.get(key) || 0,
       }))
         .filter((item) => item.count > 0)
@@ -290,7 +295,7 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
         ? Math.round((item.count / rankingSource.length) * 100)
         : 0;
 
-    const topCategories = CATEGORY_KEYS.map((key) => ({
+    const topCategories = categoryKeys.map((key) => ({
       key,
       count: item.categoryCounts[key] || 0,
     }))
@@ -346,8 +351,8 @@ export const DistrictRankingPanel: React.FC<DistrictRankingPanelProps> = ({
                   className="inline-flex items-center gap-1"
                   title={
                     language === 'bn'
-                      ? SECTIONS[category.key].shortNameBn
-                      : SECTIONS[category.key].shortNameEn
+                      ? segments[category.key]?.shortNameBn || category.key
+                      : segments[category.key]?.shortNameEn || category.key
                   }
                 >
                   <CategoryIcon section={category.key} size="xs" />
