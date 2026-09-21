@@ -421,6 +421,7 @@ export function useTaxonomy() {
   return {
     segments: TaxonomyService.getSegments(),
     subcategories: TaxonomyService.getAllSubcategories(),
+    isAuthoritative: isFetched,
     getSubcategories: (segment: SectionKey) => TaxonomyService.getSubcategories(segment),
     getFeedSubcategories: (segment: SectionKey) => TaxonomyService.getFeedSubcategories(segment),
     getSegment: (key: SectionKey) => TaxonomyService.getSegment(key),
