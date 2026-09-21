@@ -9,6 +9,7 @@ import { TextAreaField } from '../ui/TextAreaField';
 import { DateField } from '../ui/DateField';
 import { ContactField } from '../ui/ContactField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
+import { BanglaPhoneticFormControl, BanglaPhoneticProvider } from '../ui/BanglaPhonetic';
 
 interface CitizenActionModalProps {
   isOpen: boolean;
@@ -161,7 +162,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
 
   return (
     <>
-      <Modal
+      <BanglaPhoneticProvider language={language}>
+        <Modal
       id="citizen-action-modal"
       isOpen={isOpen}
       onClose={handleRequestClose}
@@ -237,6 +239,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
         </div>
       ) : (
         <form id="citizen-action-form" onSubmit={handleSubmit} noValidate className="space-y-4">
+          <BanglaPhoneticFormControl id="citizen-response-form" />
+
           {error && (
             <div
               role="alert"
@@ -312,7 +316,8 @@ export const CitizenActionModal: React.FC<CitizenActionModalProps> = ({
           </div>
         </form>
       )}
-      </Modal>
+        </Modal>
+      </BanglaPhoneticProvider>
 
       <UnsavedChangesDialog
         id="citizen-action-discard-confirm-modal"
