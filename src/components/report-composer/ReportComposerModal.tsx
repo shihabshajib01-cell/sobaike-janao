@@ -143,6 +143,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             'rideShareIncidentType',
             'rideShareRole',
             'rideShareVehicleType',
+            'rideShareVehicleRegistration',
+            'rideShareTripId',
           ].includes(field.storageKey)
       )
       .sort((a, b) => a.sortOrder - b.sortOrder) || [];
@@ -431,6 +433,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
           prev.subcategoryId !== subcategoryId;
         const selectingChildSafety =
           prev.segment === 'public_safety' && subcategoryId === 'child_abduction_murder';
+        const switchingRideSharingSafety =
+          prev.segment === 'public_safety' &&
+          (subcategoryId === 'ride_sharing_safety' || prev.subcategoryId === 'ride_sharing_safety');
 
         return {
           ...prev,
@@ -462,6 +467,17 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                 hasSupportingInfo: false,
                 evidenceTypes: [],
                 evidenceDescription: '',
+              }
+            : {}),
+          ...(switchingRideSharingSafety
+            ? {
+                reportedSubject: '',
+                roleOrDesignation: '',
+                organization: '',
+                publicProfileHandle: '',
+                identifyingDescription: '',
+                mentionedParties: [],
+                relationshipContext: '',
               }
             : {}),
           sexualHarassmentType: '',
@@ -949,12 +965,24 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
         subjectType: isPartySegment ? (formData.subjectType || 'unknown') : undefined,
         reportedSubject: isPartySegment ? resolvedReportedSubject : undefined,
         roleOrDesignation: isPartySegment ? (formData.roleOrDesignation?.trim() || undefined) : undefined,
-        organization: isPartySegment ? resolvedOrganization : undefined,
-        publicProfileHandle: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
-        phoneOrContact: isPartySegment ? (formData.publicProfileHandle?.trim() || undefined) : undefined,
+        organization:
+          isPartySegment && !isRideSharingSafetyReport ? resolvedOrganization : undefined,
+        publicProfileHandle:
+          isPartySegment && !isRideSharingSafetyReport
+            ? (formData.publicProfileHandle?.trim() || undefined)
+            : undefined,
+        phoneOrContact:
+          isPartySegment && !isRideSharingSafetyReport
+            ? (formData.publicProfileHandle?.trim() || undefined)
+            : undefined,
         identifyingDescription: isPartySegment ? (formData.identifyingDescription?.trim() || undefined) : undefined,
         mentionedParties: (() => {
-          if (!isPartySegment || !formData.mentionedParties || formData.mentionedParties.length === 0) {
+          if (
+            !isPartySegment ||
+            isRideSharingSafetyReport ||
+            !formData.mentionedParties ||
+            formData.mentionedParties.length === 0
+          ) {
             return undefined;
           }
           const meaningful = formData.mentionedParties.filter(isMeaningfulMentionedParty);
