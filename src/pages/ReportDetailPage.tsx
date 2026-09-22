@@ -491,7 +491,7 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
       className="w-full max-w-[900px] mx-auto"
     >
       <div className="w-full space-y-4 md:space-y-5">
-        <div className="flex items-center justify-between gap-3 md:gap-4">
+        <div\n          id="report-detail-desktop-actions"\n          className="hidden md:flex items-center justify-between gap-4"\n        >
           <Button
             type="button"
             variant="secondary"
