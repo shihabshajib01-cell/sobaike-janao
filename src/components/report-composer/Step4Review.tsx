@@ -106,7 +106,9 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     formData.roleOrDesignation?.trim() ||
     formData.organization?.trim() ||
     formData.publicProfileHandle?.trim() ||
-    formData.identifyingDescription?.trim()
+    formData.identifyingDescription?.trim() ||
+    String(formData.customFieldAnswers?.rideShareVehicleRegistration || '').trim() ||
+    String(formData.customFieldAnswers?.rideShareTripId || '').trim()
   );
 
   const meaningfulMentionedParties = (formData.mentionedParties || []).filter(isMeaningfulMentionedParty);
@@ -386,30 +388,39 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
 
             {isRideSharingSafetyReport && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
-                {rideSharingFields.map((field) => {
-                  const rawValue = String(formData.customFieldAnswers?.[field.storageKey] || '');
-                  if (!rawValue && !field.required) return null;
-                  const option = field.options.find((item) => item.value === rawValue);
-                  const displayValue = option
-                    ? language === 'bn'
-                      ? option.labelBn
-                      : option.labelEn
-                    : rawValue || '-';
+                {rideSharingFields
+                  .filter((field) =>
+                    [
+                      'rideSharePlatform',
+                      'rideShareIncidentType',
+                      'rideShareRole',
+                      'rideShareVehicleType',
+                    ].includes(field.storageKey)
+                  )
+                  .map((field) => {
+                    const rawValue = String(formData.customFieldAnswers?.[field.storageKey] || '');
+                    if (!rawValue && !field.required) return null;
+                    const option = field.options.find((item) => item.value === rawValue);
+                    const displayValue = option
+                      ? language === 'bn'
+                        ? option.labelBn
+                        : option.labelEn
+                      : rawValue || '-';
 
-                  return (
-                    <div
-                      key={field.storageKey}
-                      className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle"
-                    >
-                      <span className="type-compact text-ui-content-muted block mb-0.5">
-                        {language === 'bn' ? field.labelBn : field.labelEn}
-                      </span>
-                      <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
-                        {displayValue}
-                      </p>
-                    </div>
-                  );
-                })}
+                    return (
+                      <div
+                        key={field.storageKey}
+                        className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle"
+                      >
+                        <span className="type-compact text-ui-content-muted block mb-0.5">
+                          {language === 'bn' ? field.labelBn : field.labelEn}
+                        </span>
+                        <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                          {displayValue}
+                        </p>
+                      </div>
+                    );
+                  })}
               </div>
             )}
 
@@ -837,7 +848,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     )}
 
                     {/* Group / Organization / Association */}
-                    {formData.organization?.trim() && (
+                    {subjectConfig?.showOrganization !== false && formData.organization?.trim() && (
                       <div className="pt-0.5">
                         <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                           {language === 'bn'
@@ -851,7 +862,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     )}
 
                     {/* Phone / Contact */}
-                    {formData.publicProfileHandle?.trim() && (
+                    {subjectConfig?.showContact !== false && formData.publicProfileHandle?.trim() && (
                       <div className="pt-0.5">
                         <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
                           {language === 'bn' ? 'ফোন / যোগাযোগ: ' : 'Phone / Contact: '}
@@ -863,10 +874,29 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                     )}
 
                     {/* Other Identifying Details */}
+                    {isRideSharingSafetyReport &&
+                      ['rideShareVehicleRegistration', 'rideShareTripId'].map((storageKey) => {
+                        const field = rideSharingFields.find((item) => item.storageKey === storageKey);
+                        const value = String(formData.customFieldAnswers?.[storageKey] || '').trim();
+                        if (!field || !value) return null;
+                        return (
+                          <div key={storageKey} className="pt-0.5">
+                            <span className="text-ui-content-secondary font-[var(--font-weight-medium)]">
+                              {language === 'bn' ? `${field.labelBn}: ` : `${field.labelEn}: `}
+                            </span>
+                            <span className="text-ui-content-primary font-[var(--font-weight-medium)]">
+                              {value}
+                            </span>
+                          </div>
+                        );
+                      })}
+
                     {formData.identifyingDescription?.trim() && (
                       <div className="pt-1 border-t border-ui-divider">
                         <span className="text-ui-content-secondary font-[var(--font-weight-medium)] block mb-0.5">
-                          {language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য: ' : 'Other Identifying Details: '}
+                          {language === 'bn'
+                            ? `${subjectConfig?.identifyingLabelBn || 'অন্যান্য শনাক্তকারী তথ্য'}: `
+                            : `${subjectConfig?.identifyingLabelEn || 'Other Identifying Details'}: `}
                         </span>
                         <p className="text-ui-content-primary italic whitespace-pre-wrap">
                           {formData.identifyingDescription.trim()}
@@ -877,7 +907,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                 )}
 
                 {/* Additional Mentioned Parties */}
-                {meaningfulMentionedParties.length > 0 && (
+                {subjectConfig?.allowAdditionalParties !== false && meaningfulMentionedParties.length > 0 && (
                   <div className={`space-y-2 type-compact ${hasExtortionPrimaryPartyData ? 'pt-2 border-t border-ui-divider' : ''}`}>
                     <span className="font-[var(--font-weight-bold)] text-ui-content-primary block">
                       {language === 'bn'
