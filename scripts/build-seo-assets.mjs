@@ -1359,14 +1359,21 @@ async function main() {
 
   await writeFile(join(DIST_DIR, 'sitemap.xml'), sitemap, 'utf8');
 
+  const reportRouteRecords = reportPages
+    .map((page) => ({
+      id: cleanText(page.id),
+      modifiedAt: page.modifiedAt || page.publishedAt || null,
+      indexable: page.sitemap === true,
+    }))
+    .filter((entry) => entry.id)
+    .sort((a, b) => a.id.localeCompare(b.id));
+
   const reportRouteManifest = {
-    version: 1,
+    version: 2,
     generatedAt: new Date().toISOString(),
-    reportCount: reportPages.length,
-    reportIds: reportPages
-      .map((page) => cleanText(page.id))
-      .filter(Boolean)
-      .sort(),
+    reportCount: reportRouteRecords.length,
+    reportIds: reportRouteRecords.map((entry) => entry.id),
+    reports: reportRouteRecords,
   };
 
   await writeFile(
