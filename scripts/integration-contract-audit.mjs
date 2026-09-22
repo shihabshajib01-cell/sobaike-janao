@@ -92,6 +92,22 @@ if (!deployWorkflow.includes("if: github.ref == 'refs/heads/main' && github.even
   fail('Exact-revision CI gate no longer covers all main-branch production-capable events');
 }
 
+const seoFreshnessWorkflow = read('.github/workflows/seo-freshness-watch.yml');
+for (const needle of [
+  "cron: '2-57/5 * * * *'",
+  'actions: write',
+  'group: seo-freshness-watch-production',
+  'cancel-in-progress: true',
+  'get_public_home_feed_page',
+  'actions/workflows/deploy.yml/runs?branch=main',
+  'actions/workflows/deploy.yml/dispatches',
+  '"ref":"main"',
+]) {
+  if (!seoFreshnessWorkflow.includes(needle)) {
+    fail('SEO freshness watcher is missing required production guard: ' + needle);
+  }
+}
+
 for (const needle of [
   'actions: read',
   'Require successful CI for exact revision',
