@@ -99,6 +99,7 @@ for (const needle of [
   'group: seo-freshness-watch-production',
   'cancel-in-progress: true',
   'get_public_home_feed_page',
+  'public-report-routes.json',
   'actions/workflows/deploy.yml/runs?branch=main',
   'actions/workflows/deploy.yml/dispatches',
   '"ref":"main"',
@@ -216,6 +217,18 @@ if (seoBuilder.includes("rpc/get_public_published_reports")) {
 }
 if (!seoBuilder.includes("throw error;")) {
   fail('SEO sitemap builder must fail closed when a credentialed report fetch fails');
+}
+for (const needle of [
+  'public-report-routes.json',
+  'reportRouteManifest',
+  'reportIds',
+]) {
+  if (!seoBuilder.includes(needle)) {
+    fail('SEO builder is missing report route manifest contract: ' + needle);
+  }
+}
+if (!deployWorkflow.includes('test -f dist/public-report-routes.json')) {
+  fail('Deploy workflow does not require the generated report route manifest');
 }
 
 
