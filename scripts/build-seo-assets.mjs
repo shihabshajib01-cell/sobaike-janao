@@ -886,47 +886,22 @@ async function fetchSupabaseJson(path, options = {}) {
 }
 
 async function loadPublishedReports() {
-  const pageSize = 50;
-  const maxPages = 100;
-  let offset = 0;
-  const byId = new Map();
-
   try {
-    for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
-      const page = await fetchSupabaseJson('rpc/get_public_home_feed_page', {
-        method: 'POST',
-        body: JSON.stringify({
-          p_visitor_lat: null,
-          p_visitor_lng: null,
-          p_filter: 'all',
-          p_district: 'all',
-          p_offset: offset,
-          p_limit: pageSize,
-        }),
-      });
+    const reports = await fetchSupabaseJson('rpc/get_public_published_reports', {
+      method: 'POST',
+      body: '{}',
+    });
 
-      if (page === null) {
-        console.warn('[seo-build] Published reports skipped because Supabase build credentials are unavailable.');
-        return [];
-      }
-
-      const items = Array.isArray(page?.items) ? page.items : [];
-      for (const report of items) {
-        if (report?.id) byId.set(report.id, report);
-      }
-
-      if (!page?.hasMore) {
-        return [...byId.values()];
-      }
-
-      const nextOffset = Number(page?.nextOffset);
-      if (!Number.isInteger(nextOffset) || nextOffset <= offset) {
-        throw new Error('Paginated public feed returned an invalid nextOffset.');
-      }
-      offset = nextOffset;
+    if (reports === null) {
+      console.warn('[seo-build] Published reports skipped because Supabase build credentials are unavailable.');
+      return [];
     }
 
-    throw new Error(`Paginated public feed exceeded ${maxPages} SEO build pages.`);
+    if (!Array.isArray(reports)) {
+      throw new Error('Canonical published-report RPC returned a non-array payload.');
+    }
+
+    return reports;
   } catch (error) {
     console.error('[seo-build] Published reports unavailable:', error.message);
     throw error;
