@@ -25,8 +25,13 @@ export interface ReportSubjectConfig {
   organizationLabelEn?: string;
   organizationPlaceholderBn?: string;
   organizationPlaceholderEn?: string;
+  identifyingLabelBn?: string;
+  identifyingLabelEn?: string;
   identifyingPlaceholderBn?: string;
   identifyingPlaceholderEn?: string;
+  showContact?: boolean;
+  showOrganization?: boolean;
+  allowAdditionalParties?: boolean;
   options: SubjectOptionItem[];
 }
 
@@ -247,6 +252,31 @@ export const REPORT_SUBJECT_CONFIGS: Record<string, ReportSubjectConfig> = {
     identifyingPlaceholderBn: 'চেহারা, পোশাক, মোটরসাইকেল / যানবাহন, নম্বরপ্লেট বা অন্য শনাক্তকারী তথ্য',
     identifyingPlaceholderEn: 'Appearance, clothing, motorcycle / vehicle, plate number, or other identifying details',
     options: GENERIC_PERSON_GROUP_OPTIONS,
+  },
+  'public_safety:ride_sharing_safety': {
+    sectionTitleBn: 'চালক / যাত্রী / সংশ্লিষ্ট পক্ষের তথ্য',
+    sectionTitleEn: 'Driver / passenger / related party information',
+    questionBn: 'ঘটনার সঙ্গে সংশ্লিষ্ট চালক, যাত্রী বা অন্য পক্ষ সম্পর্কে জানা তথ্য দিন।',
+    questionEn: 'Add any known information about the driver, passenger, or other party involved in the incident.',
+    nameLabelBn: 'নাম / অ্যাপে দেখানো পরিচিতি',
+    nameLabelEn: 'Name / identity shown in the app',
+    namePlaceholderBn: 'অ্যাপে দেখানো নাম বা পরিচিতি জানা থাকলে লিখুন',
+    namePlaceholderEn: 'Enter the name or identity shown in the app if known',
+    roleLabelBn: 'সংশ্লিষ্ট ব্যক্তির ভূমিকা',
+    roleLabelEn: 'Related person role',
+    rolePlaceholderBn: 'যেমন: চালক, যাত্রী বা অন্য সংশ্লিষ্ট ব্যক্তি',
+    rolePlaceholderEn: 'e.g. Driver, passenger, or another related person',
+    identifyingLabelBn: 'অন্যান্য শনাক্তকারী তথ্য',
+    identifyingLabelEn: 'Other identifying details',
+    identifyingPlaceholderBn: 'চেহারা, পোশাক, যানবাহনের বর্ণনা বা অন্য শনাক্তকারী তথ্য',
+    identifyingPlaceholderEn: 'Appearance, clothing, vehicle description, or other identifying details',
+    showContact: false,
+    showOrganization: false,
+    allowAdditionalParties: false,
+    options: [
+      { value: 'individual', labelBn: 'ব্যক্তি', labelEn: 'Individual' },
+      UNKNOWN_OPTION,
+    ],
   },
   'public_safety:default': {
     sectionTitleBn: 'সন্দেহভাজন / জড়িত পক্ষের তথ্য',
