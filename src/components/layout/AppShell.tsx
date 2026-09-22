@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate, Link, useParams } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { LocationReminderBar } from '../location/LocationReminderBar';
@@ -446,6 +446,36 @@ export const AppShell: React.FC = () => {
               </div>
               <span>{language === 'bn' ? 'জনস্বার্থ রেকর্ড' : 'Public interest record'}</span>
             </div>
+
+            <p className="mt-3 max-w-3xl text-ui-content-secondary">
+              {language === 'bn'
+                ? 'প্রকাশের আগে প্রতিবেদন পর্যালোচনা করা হয়; উৎস পাওয়া গেলে প্রতিবেদন পাতায় উৎসের নাম ও লিংক দেখানো হয়। প্রকাশিত হওয়া কোনো অভিযোগের সরকারি বা বিচারিক সত্যতা প্রমাণ করে না।'
+                : 'Reports are reviewed before publication; when sources are available, the report page shows the source name and URL. Publication does not mean an allegation has been proven by a court or government authority.'}
+            </p>
+
+            <nav
+              aria-label={language === 'bn' ? 'তথ্য ও নীতিমালা' : 'Information and policies'}
+              className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2"
+            >
+              <Link
+                to={language === 'en' ? '/en/more' : '/more'}
+                className="font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+              >
+                {language === 'bn' ? 'সম্পর্কে, নীতিমালা ও সহায়তা' : 'About, policies & help'}
+              </Link>
+              <Link
+                to={language === 'en' ? '/en/report' : '/report'}
+                className="font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+              >
+                {language === 'bn' ? 'কীভাবে প্রতিবেদন করবেন' : 'How to report'}
+              </Link>
+              <Link
+                to={language === 'en' ? '/en/issues' : '/issues'}
+                className="font-[var(--font-weight-semibold)] text-ui-content-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus ui-radius-badge-md"
+              >
+                {language === 'bn' ? 'প্রতিবেদনের বিষয়সমূহ' : 'Reporting topics'}
+              </Link>
+            </nav>
           </footer>
         </main>
       </div>

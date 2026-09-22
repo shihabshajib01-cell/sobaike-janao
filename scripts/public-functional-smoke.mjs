@@ -797,6 +797,53 @@ await check('Tablet menu, language toggle and theme controls are interactive', a
   await context.close();
 });
 
+await check('Hydrated homepage preserves canonical SEO identity and favicon schema', async () => {
+  const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  await attachRuntimeGuards(page, 'homepage-seo');
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(650);
+
+  const expectedTitle =
+    'Sobaike Janao | সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম';
+  const hydratedTitle = await page.title();
+  if (hydratedTitle !== expectedTitle) {
+    throw new Error(`hydrated homepage title drifted: ${hydratedTitle}`);
+  }
+
+  const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+  if (canonical !== routeUrl('/')) {
+    throw new Error(`hydrated homepage canonical drifted: ${canonical}`);
+  }
+
+  const jsonLd = await page.locator('#seo-jsonld').textContent();
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonLd || '');
+  } catch {
+    throw new Error('hydrated homepage JSON-LD is invalid');
+  }
+
+  const graph = Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [parsed];
+  const organization = graph.find(
+    (node) => node?.['@type'] === 'Organization' && node?.name === 'Sobaike Janao'
+  );
+  const expectedLogoUrl = new URL('/favicon.png', SITE_URL).toString();
+  if (
+    !organization ||
+    organization.logo?.url !== expectedLogoUrl ||
+    organization.logo?.width !== 512 ||
+    organization.logo?.height !== 512
+  ) {
+    throw new Error(
+      `hydrated Organization logo drifted: ${JSON.stringify(organization?.logo || null)}`
+    );
+  }
+
+  await context.close();
+});
+
 await check('English SEO variant is prerendered, URL-addressable and self-canonical', async () => {
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);

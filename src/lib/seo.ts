@@ -38,6 +38,7 @@ const ENTITY_DESCRIPTION =
   'Independent, moderated citizen-reporting and public-interest information platform for Bangladesh.';
 
 const DEFAULT_SOCIAL_IMAGE = '/brand/og-social-1200x630.png';
+const HOME_BN_TITLE = 'Sobaike Janao | সবাইকে জানাও | নাগরিক প্রতিবেদন প্ল্যাটফর্ম';
 
 const SEO_TEST_MARKER_PATTERN =
   /(test only|system verification|test post|পরীক্ষামূলক পোস্ট)/i;
@@ -127,7 +128,7 @@ export function isSeoIndexableReportContent(
 
 export const DEFAULT_FALLBACK_SEO: Record<'bn' | 'en', SeoMetadata> = {
   bn: {
-    title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
+    title: HOME_BN_TITLE,
     description:
       'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম—বিষয় ও এলাকা অনুযায়ী প্রতিবেদন দেখুন ও ঘটনা জানান।',
     socialDescription:
@@ -178,7 +179,7 @@ const routeSeo = (
 export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> = {
   '/': routeSeo(
     {
-      title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম',
+      title: HOME_BN_TITLE,
       description:
         'Sobaike Janao (সবাইকে জানাও) বাংলাদেশের স্বাধীন, মডারেটেড নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম—বিষয় ও এলাকা অনুযায়ী প্রতিবেদন দেখুন ও ঘটনা জানান।',
       socialDescription:
@@ -463,7 +464,7 @@ function updateJsonLd(
     },
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png`,
+      url: `${SITE_ORIGIN}/favicon.png`,
       width: 512,
       height: 512,
     },

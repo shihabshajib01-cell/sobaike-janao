@@ -23,6 +23,8 @@ export interface CategoryHeroBannerProps {
   desktopDescriptionBn?: string;
   desktopDescriptionEn?: string;
   illustrationSrc?: string;
+  illustrationAltBn?: string;
+  illustrationAltEn?: string;
   deferIllustration?: boolean;
   desktopMediaPosition?: string;
   desktopMediaScale?: number;
@@ -74,6 +76,8 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   desktopDescriptionBn,
   desktopDescriptionEn,
   illustrationSrc,
+  illustrationAltBn,
+  illustrationAltEn,
   deferIllustration = false,
   desktopMediaPosition,
   desktopMediaScale,
@@ -126,6 +130,11 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
     language === 'bn'
       ? mobileDescriptionBn || descriptionBn
       : mobileDescriptionEn || descriptionEn;
+
+  const illustrationAlt =
+    language === 'bn'
+      ? illustrationAltBn || `${titleBn} বিষয়ক চিত্র`
+      : illustrationAltEn || `${titleEn} illustration`;
 
   return (
     <div className={`hero-slider-grid ${className || ''}`.trim()}>
@@ -224,8 +233,7 @@ export const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
           ) : (
             <img
               src={resolvePublicAsset(illustrationSrc)}
-              alt=""
-              aria-hidden="true"
+              alt={illustrationAlt}
               width={1600}
               height={900}
               loading={active ? 'eager' : 'lazy'}

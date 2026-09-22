@@ -191,6 +191,18 @@ jobs:
             exit 1
           fi
 
+          favicon_ico_status=$(curl -L -sS -o /tmp/favicon.ico -w '%{http_code}' "${SITE_URL}favicon.ico")
+          if [[ "${favicon_ico_status}" != "200" ]]; then
+            echo "ERROR: favicon.ico compatibility endpoint returned HTTP ${favicon_ico_status}"
+            exit 1
+          fi
+
+          custom_404_status=$(curl -L -sS -o /tmp/custom-404.html -w '%{http_code}' "${SITE_URL}__seo_missing_page_check_9f7c2a")
+          if [[ "${custom_404_status}" != "404" ]]; then
+            echo "ERROR: custom missing-page request returned HTTP ${custom_404_status}, expected 404"
+            exit 1
+          fi
+
           legacy_favicon_status=$(curl -L -sS -o /tmp/legacy-favicon-response -w '%{http_code}' "${SITE_URL}brand/sobaike-janao-favicon.svg")
           case "${legacy_favicon_status}" in
             404|410)
@@ -213,6 +225,8 @@ jobs:
           robots = Path('/tmp/robots.txt').read_text(errors='replace')
           sitemap = Path('/tmp/sitemap.xml').read_text(errors='replace')
           favicon = Path('/tmp/favicon.png').read_bytes()
+          favicon_ico = Path('/tmp/favicon.ico').read_bytes()
+          custom_404 = Path('/tmp/custom-404.html').read_text(errors='replace')
           route_manifest = json.loads(
               Path('/tmp/public-report-routes.json').read_text(errors='replace')
           )
@@ -288,6 +302,23 @@ jobs:
                   f'ERROR: live favicon dimensions are invalid: {favicon_width}x{favicon_height}'
               )
 
+          if (
+              len(favicon_ico) <= 22
+              or favicon_ico[:4] != b'\x00\x00\x01\x00'
+              or int.from_bytes(favicon_ico[4:6], 'little') < 1
+          ):
+              raise SystemExit('ERROR: live favicon.ico is not a valid ICO container')
+
+          if 'id="custom-404"' not in custom_404:
+              raise SystemExit('ERROR: live 404 response does not render the custom 404 page')
+          custom_404_robots = re.search(
+              r'<meta\s+[^>]*name=["\']robots["\'][^>]*content=["\']([^"\']+)["\']',
+              custom_404,
+              re.I,
+          )
+          if not custom_404_robots or 'noindex' not in custom_404_robots.group(1).lower():
+              raise SystemExit('ERROR: custom 404 page is missing noindex')
+
           robots_meta = must(
               r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)["\']',
               'robots meta',
@@ -338,8 +369,9 @@ jobs:
 
           Path('/tmp/seo-report-url.txt').write_text(report_urls[0])
           print(
-              f'Live SEO homepage/sitemap/favicon checks passed '
-              f'({len(locs)} sitemap URLs; favicon {favicon_width}x{favicon_height})'
+              f'Live SEO homepage/sitemap/favicon/404 checks passed '
+              f'({len(locs)} sitemap URLs; favicon {favicon_width}x{favicon_height}; '
+              f'favicon.ico {len(favicon_ico)} bytes)'
           )
           PY
 
