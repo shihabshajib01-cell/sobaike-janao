@@ -936,7 +936,7 @@ await check('Public report detail route renders when a published report is avail
   const supabaseKey = process.env.SUPABASE_KEY;
   if (!supabaseUrl || !supabaseKey) throw new Error('Supabase test credentials are unavailable');
 
-  const [response, sitemapResponse] = await Promise.all([
+  const [response, manifestResponse] = await Promise.all([
     fetch(`${supabaseUrl}/rest/v1/rpc/get_public_published_reports`, {
       method: 'POST',
       headers: {
@@ -946,20 +946,22 @@ await check('Public report detail route renders when a published report is avail
       },
       body: '{}',
     }),
-    fetch(routeUrl('/sitemap.xml'), {
+    fetch(routeUrl('/public-report-routes.json'), {
       headers: { 'Cache-Control': 'no-cache' },
     }),
   ]);
 
   if (!response.ok) throw new Error(`published reports RPC returned ${response.status}`);
-  if (!sitemapResponse.ok) throw new Error(`live sitemap returned ${sitemapResponse.status}`);
+  if (!manifestResponse.ok) {
+    throw new Error(`live report-route manifest returned ${manifestResponse.status}`);
+  }
 
   const data = await response.json();
-  const sitemap = await sitemapResponse.text();
-  const sitemapUrls = new Set(
-    [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
-      match[1].replace(/&amp;/g, '&')
-    )
+  const manifest = await manifestResponse.json();
+  const deployedReportIds = new Set(
+    Array.isArray(manifest?.reportIds)
+      ? manifest.reportIds.map((id) => String(id || '').trim()).filter(Boolean)
+      : []
   );
 
   const reports = [];
@@ -1000,9 +1002,7 @@ await check('Public report detail route renders when a published report is avail
   const staleMissing = [];
 
   for (const candidate of reports) {
-    const path = canonicalPathFor(candidate);
-    const absolute = new URL(path.replace(/^\//, ''), SITE_URL).toString();
-    if (sitemapUrls.has(absolute)) continue;
+    if (deployedReportIds.has(String(candidate.id))) continue;
 
     const publishedAtMs = Date.parse(String(candidate.publishedAt || ''));
     const ageMs = Number.isFinite(publishedAtMs) ? Math.max(0, now - publishedAtMs) : Infinity;
@@ -1023,20 +1023,18 @@ await check('Public report detail route renders when a published report is avail
 
   if (freshPending.length > 0) {
     warnings.push(
-      'Fresh published report SEO routes are awaiting the five-minute watcher: ' +
+      'Fresh published report routes are awaiting the five-minute SEO watcher: ' +
         freshPending.slice(0, 10).map((item) => item.id).join(', ')
     );
   }
 
-  const report = reports.find((candidate) => {
-    const path = canonicalPathFor(candidate);
-    const absolute = new URL(path.replace(/^\//, ''), SITE_URL).toString();
-    return sitemapUrls.has(absolute);
-  });
+  const report = reports.find((candidate) =>
+    deployedReportIds.has(String(candidate.id))
+  );
 
   if (!report) {
     warnings.push(
-      'Only newly published reports are awaiting static SEO refresh; direct route check skipped'
+      'Only newly published reports are awaiting static route refresh; direct route check skipped'
     );
     return;
   }
