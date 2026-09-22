@@ -224,6 +224,30 @@ if (!composerModal.includes('generateSecureIdempotencyKey')) {
   failures.push('ReportComposerModal.tsx: submission must keep an idempotency key contract');
 }
 
+for (const token of [
+  "formData.subcategoryId === 'ride_sharing_safety'",
+  '!isRideSharingSafetyReport',
+  'rideSharingFields={rideSharingFields}',
+]) {
+  if (!composerModal.includes(token)) {
+    failures.push(`ReportComposerModal.tsx: Ride-sharing Safety must stay inside the established core intake: ${token}`);
+  }
+}
+const step3Composer = read('src/components/report-composer/Step3ComplaintDetails.tsx');
+for (const token of [
+  "formData.subcategoryId === 'ride_sharing_safety'",
+  'ride-sharing-platform-select',
+  'ride-sharing-incident-type-select',
+  'ride-sharing-role-select',
+  'ride-sharing-vehicle-type-select',
+  'id="composer-section-narrative"',
+  'id="composer-section-location"',
+]) {
+  if (!step3Composer.includes(token)) {
+    failures.push(`Step3ComplaintDetails.tsx: Ride-sharing Safety core-intake regression guard missing ${token}`);
+  }
+}
+
 const reportState = read('src/services/reportFormState.ts');
 for (const token of [
   "const LEGACY_DRAFT_KEYS",
