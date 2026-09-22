@@ -237,6 +237,22 @@ if (!deployWorkflow.includes('test -f dist/public-report-routes.json')) {
   fail('Deploy workflow does not require the generated report route manifest');
 }
 
+const paginatedFreshnessMigration =
+  'supabase/migrations/20260922020910_add_updated_at_to_public_home_feed_page.sql';
+if (!fs.existsSync(paginatedFreshnessMigration)) {
+  fail('missing paginated Public feed freshness migration');
+}
+const paginatedFreshnessSql = read(paginatedFreshnessMigration);
+for (const needle of [
+  'c.updated_at as updated_at',
+  "'updatedAt'",
+  'get_public_home_feed_page',
+]) {
+  if (!paginatedFreshnessSql.includes(needle)) {
+    fail('paginated Public feed freshness migration is missing: ' + needle);
+  }
+}
+
 
 const formPrepublicationAuditCorrectionFile =
   'supabase/migrations/20260919162702_restore_prepublication_after_lifecycle_audit.sql';
