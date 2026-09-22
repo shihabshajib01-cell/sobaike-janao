@@ -123,6 +123,18 @@ for (const needle of [
   }
 }
 
+const evidenceIsolationMigration = read('supabase/migrations/20260922101337_public_evidence_storage_helper_isolation.sql');
+for (const needle of [
+  'private.can_upload_public_complaint_evidence',
+  'private.is_published_complaint_evidence',
+  'drop function public.can_upload_public_complaint_evidence',
+  'drop function public.is_published_complaint_evidence',
+]) {
+  if (!evidenceIsolationMigration.includes(needle)) {
+    fail('private evidence-policy helper isolation is missing: ' + needle);
+  }
+}
+
 const privacyPage = read('src/pages/MorePage.tsx');
 if (!privacyPage.includes('IPWho (ipwho.is)')) {
   fail('approximate-location third-party disclosure is missing');
