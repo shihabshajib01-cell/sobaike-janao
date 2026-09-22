@@ -214,7 +214,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       formData.roleOrDesignation?.trim() ||
       formData.organization?.trim() ||
       formData.publicProfileHandle?.trim() ||
-      formData.identifyingDescription?.trim()
+      formData.identifyingDescription?.trim() ||
+      String(formData.customFieldAnswers?.rideShareVehicleRegistration || '').trim() ||
+      String(formData.customFieldAnswers?.rideShareTripId || '').trim()
     );
 
     const hasExtortionPartyData = Boolean(
@@ -2263,19 +2265,21 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         : subjectConfig.namePlaceholderEn || 'Enter the name or known identity if available'
                     }
                   />
-                  <TextField
-                    id="extortion-contact"
-                    type="text"
-                    phonetic={false}
-                    label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
-                    value={formData.publicProfileHandle || ''}
-                    onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
-                    placeholder={
-                      language === 'bn'
-                        ? 'ফোন নম্বর, অনলাইন পরিচিতি বা অন্য যোগাযোগের তথ্য'
-                        : 'Phone number, online identity, or other contact information'
-                    }
-                  />
+                  {subjectConfig.showContact !== false && (
+                    <TextField
+                      id="extortion-contact"
+                      type="text"
+                      phonetic={false}
+                      label={language === 'bn' ? 'ফোন / যোগাযোগ' : 'Phone / contact'}
+                      value={formData.publicProfileHandle || ''}
+                      onChange={(e) => onUpdateFormData({ publicProfileHandle: e.target.value })}
+                      placeholder={
+                        language === 'bn'
+                          ? 'ফোন নম্বর, অনলাইন পরিচিতি বা অন্য যোগাযোগের তথ্য'
+                          : 'Phone number, online identity, or other contact information'
+                      }
+                    />
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2295,28 +2299,76 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                         : subjectConfig.rolePlaceholderEn || 'Enter the role or designation if known'
                     }
                   />
-                  <TextField
-                    id="extortion-org"
-                    type="text"
-                    label={
-                      language === 'bn'
-                        ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
-                        : subjectConfig.organizationLabelEn || 'Group / organization'
-                    }
-                    value={formData.organization || ''}
-                    onChange={(e) => onUpdateFormData({ organization: e.target.value })}
-                    placeholder={
-                      language === 'bn'
-                        ? subjectConfig.organizationPlaceholderBn || 'সংশ্লিষ্ট দল, প্রতিষ্ঠান বা সংগঠনের নাম জানা থাকলে লিখুন'
-                        : subjectConfig.organizationPlaceholderEn || 'Enter the related group or organization if known'
-                    }
-                  />
+                  {subjectConfig.showOrganization !== false && (
+                    <TextField
+                      id="extortion-org"
+                      type="text"
+                      label={
+                        language === 'bn'
+                          ? subjectConfig.organizationLabelBn || 'দল / প্রতিষ্ঠান / সংগঠন'
+                          : subjectConfig.organizationLabelEn || 'Group / organization'
+                      }
+                      value={formData.organization || ''}
+                      onChange={(e) => onUpdateFormData({ organization: e.target.value })}
+                      placeholder={
+                        language === 'bn'
+                          ? subjectConfig.organizationPlaceholderBn || 'সংশ্লিষ্ট দল, প্রতিষ্ঠান বা সংগঠনের নাম জানা থাকলে লিখুন'
+                          : subjectConfig.organizationPlaceholderEn || 'Enter the related group or organization if known'
+                      }
+                    />
+                  )}
                 </div>
+
+                {isRideSharingSafetyReport && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {(['rideShareVehicleRegistration', 'rideShareTripId'] as const).map((storageKey) => {
+                      const field = getRideSharingField(storageKey);
+                      if (!field) return null;
+                      return (
+                        <TextField
+                          key={storageKey}
+                          id={
+                            storageKey === 'rideShareVehicleRegistration'
+                              ? 'ride-sharing-vehicle-registration-input'
+                              : 'ride-sharing-trip-id-input'
+                          }
+                          type="text"
+                          phonetic={false}
+                          label={language === 'bn' ? field.labelBn : field.labelEn}
+                          value={String(formData.customFieldAnswers?.[storageKey] || '')}
+                          maxLength={
+                            typeof field.validation?.maxLength === 'number'
+                              ? field.validation.maxLength
+                              : undefined
+                          }
+                          helperText={language === 'bn' ? field.helperBn : field.helperEn}
+                          placeholder={
+                            language === 'bn'
+                              ? field.placeholderBn || ''
+                              : field.placeholderEn || ''
+                          }
+                          onChange={(event) =>
+                            onUpdateFormData({
+                              customFieldAnswers: {
+                                ...(formData.customFieldAnswers || {}),
+                                [storageKey]: event.target.value,
+                              },
+                            })
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                )}
 
                 <TextAreaField
                   id="extortion-identifying-desc"
                   rows={2}
-                  label={language === 'bn' ? 'অন্যান্য শনাক্তকারী তথ্য' : 'Other identifying details'}
+                  label={
+                    language === 'bn'
+                      ? subjectConfig.identifyingLabelBn || 'অন্যান্য শনাক্তকারী তথ্য'
+                      : subjectConfig.identifyingLabelEn || 'Other identifying details'
+                  }
                   value={formData.identifyingDescription || ''}
                   onChange={(e) => onUpdateFormData({ identifyingDescription: e.target.value })}
                   placeholder={
@@ -2329,7 +2381,9 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
 
               {/* Additional Mentioned Parties */}
               <div className="space-y-3 pt-1">
-                {formData.mentionedParties && formData.mentionedParties.length > 0 && (
+                {subjectConfig.allowAdditionalParties !== false &&
+                  formData.mentionedParties &&
+                  formData.mentionedParties.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="type-h4 text-ui-content-primary">
                       {language === 'bn' ? 'অতিরিক্ত সংশ্লিষ্ট পক্ষসমূহ' : 'Additional mentioned parties'}
@@ -2430,7 +2484,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                 )}
 
                 {/* Add Another Party Action - Only visible after primary party has at least one meaningful info */}
-                {hasExtortionPrimaryPartyData && (
+                {subjectConfig.allowAdditionalParties !== false && hasExtortionPrimaryPartyData && (
                   <div>
                     <button
                       type="button"
