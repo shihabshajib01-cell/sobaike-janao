@@ -40,7 +40,7 @@ import { Checkbox } from '../ui/Checkbox';
 import { ModalActions } from '../ui/ModalActions';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { BanglaPhoneticProvider, BanglaPhoneticToggle } from '../ui/BanglaPhonetic';
-import { PublicReportingConfigService, PublicReportingForm } from '../../services/reportingFormConfig';
+import { PublicReportingConfigService, PublicReportingField, PublicReportingForm } from '../../services/reportingFormConfig';
 
 export interface ReportComposerModalProps {
   isOpen: boolean;
@@ -130,6 +130,22 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     formData.segment === 'public_safety' && formData.subcategoryId === 'mob-justice';
   const isChildSafetyReport =
     formData.segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
+  const isRideSharingSafetyReport =
+    formData.segment === 'public_safety' && formData.subcategoryId === 'ride_sharing_safety';
+  const rideSharingFields: PublicReportingField[] =
+    reportingForm?.fields
+      .filter(
+        (field) =>
+          field.active &&
+          field.storageMode === 'custom_json' &&
+          [
+            'rideSharePlatform',
+            'rideShareIncidentType',
+            'rideShareRole',
+            'rideShareVehicleType',
+          ].includes(field.storageKey)
+      )
+      .sort((a, b) => a.sortOrder - b.sortOrder) || [];
   const childIncidentTypeOptions =
     reportingForm?.fields.find(
       (field) =>
@@ -274,6 +290,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     formData.subcategoryId,
     rapePublishingConsentAccepted,
     isChildSafetyReport,
+    isRideSharingSafetyReport,
     isReportingFormLoading,
     reportingForm,
     language,
@@ -513,7 +530,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (!formData.subcategoryId) return;
 
     if (
-      isChildSafetyReport &&
+      (isChildSafetyReport || isRideSharingSafetyReport) &&
       (isReportingFormLoading || !reportingForm || reportingForm.engineMode !== 'schema')
     ) {
       setSubmitError(
@@ -551,14 +568,24 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const handleNextFromStep3 = useCallback(() => {
     if (!validateMobJusticeSection()) return;
 
-    if (reportingForm?.engineMode === 'schema' && !isChildSafetyReport) {
+    if (
+      reportingForm?.engineMode === 'schema' &&
+      !isChildSafetyReport &&
+      !isRideSharingSafetyReport
+    ) {
       if (!configuredFieldsRef.current?.validateAndProceed()) return;
     } else {
       if (!step3Ref.current?.validateAndProceed()) return;
     }
 
     handleGoToStep(4);
-  }, [handleGoToStep, reportingForm?.engineMode, isChildSafetyReport, validateMobJusticeSection]);
+  }, [
+    handleGoToStep,
+    reportingForm?.engineMode,
+    isChildSafetyReport,
+    isRideSharingSafetyReport,
+    validateMobJusticeSection,
+  ]);
 
   // Rape Consent Modal Handlers
   const handleAgreeRapeConsent = useCallback(() => {
@@ -623,14 +650,14 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
     if (!formData.segment || !formData.subcategoryId) return;
 
     if (
-      isChildSafetyReport &&
+      (isChildSafetyReport || isRideSharingSafetyReport) &&
       (!reportingForm || reportingForm.engineMode !== 'schema')
     ) {
       setFormData((prev) => ({ ...prev, currentStep: 2 }));
       setSubmitError(
         language === 'bn'
-          ? 'শিশু নিরাপত্তা প্রতিবেদনের ফর্ম কনফিগারেশন যাচাই করা যায়নি। আবার ধরন নির্বাচন করে চেষ্টা করুন।'
-          : 'The child-safety form configuration could not be verified. Re-select the report type and try again.'
+          ? 'এই প্রতিবেদনের সর্বশেষ ফর্ম কনফিগারেশন যাচাই করা যায়নি। আবার ধরন নির্বাচন করে চেষ্টা করুন।'
+          : 'The latest form configuration for this report could not be verified. Re-select the report type and try again.'
       );
       return;
     }
@@ -1274,7 +1301,9 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           language={language}
                         />
                       )}
-                      {reportingForm?.engineMode === 'schema' && !isChildSafetyReport ? (
+                      {reportingForm?.engineMode === 'schema' &&
+                      !isChildSafetyReport &&
+                      !isRideSharingSafetyReport ? (
                         <ConfiguredFieldsSection
                           ref={configuredFieldsRef}
                           form={reportingForm}
@@ -1289,6 +1318,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           ref={step3Ref}
                           segment={formData.segment}
                           childIncidentTypeOptions={childIncidentTypeOptions}
+                          rideSharingFields={rideSharingFields}
                           formData={formData}
                           pendingImages={pendingImages}
                           onPendingImagesChange={handlePendingImagesChange}
@@ -1310,7 +1340,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                           onEdit={() => handleGoToStep(3)}
                         />
                       )}
-                      {!isChildSafetyReport && (
+                      {!isChildSafetyReport && !isRideSharingSafetyReport && (
                         <ConfiguredFieldsReview
                           form={reportingForm}
                           language={language}
@@ -1322,6 +1352,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                         segment={formData.segment}
                         formData={formData}
                         childIncidentTypeOptions={childIncidentTypeOptions}
+                        rideSharingFields={rideSharingFields}
                         pendingImages={pendingImages}
                         onEditStep={(step, secKey) => handleGoToStep(step, secKey)}
                         onSubmit={handleSubmitReport}
