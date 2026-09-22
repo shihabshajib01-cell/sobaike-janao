@@ -355,6 +355,11 @@ export const MorePage: React.FC = () => {
                     ? 'এটি শুধু ব্রাউজিং ও কাছাকাছি প্রতিবেদন দেখানোর জন্য। প্রতিবেদন জমা দেওয়ার সময় আলাদাভাবে ডিভাইস লোকেশন প্রয়োজন।'
                     : 'This preference is for browsing and nearby reports only. Report submission still requires a separate device-location check.'}
                 </p>
+                <p className="type-meta text-ui-content-muted">
+                  {language === 'bn'
+                    ? 'আনুমানিক লোকেশন ব্যবহার করলে আমাদের সার্ভার IPWho (ipwho.is)-এর কাছে অনুরোধের IP ঠিকানা পাঠিয়ে আনুমানিক শহর, অঞ্চল ও কোঅর্ডিনেট নেয়। এটি নির্ভুল ডিভাইস লোকেশন নয়।'
+                    : 'When approximate location is used, our server sends the request IP address to IPWho (ipwho.is) to resolve an approximate city, region and coordinates. This is not precise device location.'}
+                </p>
               </div>
             </div>
 

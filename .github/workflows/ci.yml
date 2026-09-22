@@ -122,7 +122,7 @@ jobs:
 
       - name: Install accessibility browser runtime
         run: |
-          npm install --no-save playwright@1.55.0 @axe-core/playwright@4.10.2
+          npm install --no-save playwright@1.63.0 @axe-core/playwright@4.13.0
           npx playwright install --with-deps chromium firefox webkit
 
       - name: Run local WCAG accessibility smoke

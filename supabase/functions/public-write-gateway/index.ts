@@ -9,6 +9,8 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
 ]);
 
+const MAX_REQUEST_BYTES = 262_144;
+
 const corsHeadersFor = (req: Request) => {
   const origin = req.headers.get("Origin") || "";
   return {
@@ -110,7 +112,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const declaredLength = Number(req.headers.get("content-length") || 0);
-  if (declaredLength > 262144) {
+  if (declaredLength > MAX_REQUEST_BYTES) {
     return json(req, { error: "Request payload is too large.", code: "PAYLOAD_TOO_LARGE" }, 413);
   }
 
@@ -125,9 +127,20 @@ Deno.serve(async (req: Request) => {
     return json(req, { error: "Unable to verify request source.", code: "SOURCE_UNAVAILABLE" }, 503);
   }
 
+  let rawBody: Uint8Array;
+  try {
+    rawBody = new Uint8Array(await req.arrayBuffer());
+  } catch {
+    return json(req, { error: "Invalid request body.", code: "INVALID_BODY" }, 400);
+  }
+
+  if (rawBody.byteLength > MAX_REQUEST_BYTES) {
+    return json(req, { error: "Request payload is too large.", code: "PAYLOAD_TOO_LARGE" }, 413);
+  }
+
   let body: PublicWriteBody;
   try {
-    body = await req.json();
+    body = JSON.parse(new TextDecoder().decode(rawBody));
   } catch {
     return json(req, { error: "Invalid JSON request.", code: "INVALID_JSON" }, 400);
   }

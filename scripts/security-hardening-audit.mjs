@@ -101,4 +101,38 @@ for (const needle of [
   }
 }
 
+const leastPrivilegeMigration = read('supabase/migrations/20260922100639_public_security_least_privilege_closeout.sql');
+for (const needle of [
+  'bangladesh_divisions',
+  'sanitize_ride_sharing_complaint_party',
+  'get_public_home_feed_with_engagement',
+  'alter default privileges for role postgres in schema public',
+]) {
+  if (!leastPrivilegeMigration.includes(needle)) {
+    fail('least-privilege closeout migration is missing: ' + needle);
+  }
+}
+
+for (const needle of [
+  'MAX_REQUEST_BYTES = 262_144',
+  'await req.arrayBuffer()',
+  'rawBody.byteLength > MAX_REQUEST_BYTES',
+]) {
+  if (!edgeGateway.includes(needle)) {
+    fail('public-write-gateway hard body-size guard is missing: ' + needle);
+  }
+}
+
+const privacyPage = read('src/pages/MorePage.tsx');
+if (!privacyPage.includes('IPWho (ipwho.is)')) {
+  fail('approximate-location third-party disclosure is missing');
+}
+
+const ciWorkflow = read('.github/workflows/ci.yml');
+for (const needle of ['playwright@1.63.0', '@axe-core/playwright@4.13.0']) {
+  if (!ciWorkflow.includes(needle)) {
+    fail('CI browser security tooling is not pinned to the audited stable version: ' + needle);
+  }
+}
+
 console.log('Security hardening audit passed: public writes are gateway-bound, direct evidence registration is revoked, legacy engagement RPCs are revoked, IP-location has persistent throttling, and CSP inline scripts are hash-locked.');
