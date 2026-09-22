@@ -351,6 +351,9 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   );
   await assertControlAndIconSize(page, '#mobile-report-detail-back-btn', 'Report detail back');
   await assertControlAndIconSize(page, '#mobile-report-detail-share-btn', 'Report detail share');
+  if (await page.locator('#report-detail-desktop-actions').isVisible()) {
+    throw new Error('Report detail desktop action row must stay hidden on mobile');
+  }
 
   if ((await page.locator('#bottom-nav').count()) !== 0) {
     throw new Error('Report detail incorrectly shows the global bottom navigation');
