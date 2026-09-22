@@ -43,18 +43,20 @@ jobs:
             throw new Error('SEO freshness watcher configuration is incomplete.');
           }
 
-          const sitemapResponse = await fetch(siteUrl + '/sitemap.xml', {
+          const manifestResponse = await fetch(siteUrl + '/public-report-routes.json', {
             headers: { 'Cache-Control': 'no-cache' },
           });
-          if (!sitemapResponse.ok) {
-            throw new Error('Live sitemap returned HTTP ' + sitemapResponse.status);
+          if (!manifestResponse.ok) {
+            throw new Error(
+              'Live report-route manifest returned HTTP ' + manifestResponse.status
+            );
           }
 
-          const sitemap = await sitemapResponse.text();
-          const sitemapUrls = new Set(
-            [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
-              match[1].replace(/&amp;/g, '&')
-            )
+          const manifest = await manifestResponse.json();
+          const deployedReportIds = new Set(
+            Array.isArray(manifest?.reportIds)
+              ? manifest.reportIds.map((id) => String(id || '').trim()).filter(Boolean)
+              : []
           );
 
           const reports = [];
@@ -101,26 +103,10 @@ jobs:
             offset = Math.floor(nextOffset);
           }
 
-          const canonicalPath = (report) => {
-            const id = String(report?.id || '').trim();
-            if (!id) return null;
-            const hasBn =
-              typeof report?.titleBn === 'string' && report.titleBn.trim().length > 0;
-            const hasEn =
-              typeof report?.titleEn === 'string' && report.titleEn.trim().length > 0;
-            const prefix = hasEn && !hasBn ? '/en/report-detail/' : '/report-detail/';
-            return prefix + encodeURIComponent(id);
-          };
-
           const missing = reports
-            .map((report) => {
-              const path = canonicalPath(report);
-              return path
-                ? { id: String(report.id), url: siteUrl + path }
-                : null;
-            })
+            .map((report) => String(report?.id || '').trim())
             .filter(Boolean)
-            .filter((item) => !sitemapUrls.has(item.url));
+            .filter((id) => !deployedReportIds.has(id));
 
           fs.appendFileSync(
             outputPath,
@@ -130,12 +116,12 @@ jobs:
 
           if (missing.length > 0) {
             console.log(
-              'Published report SEO routes missing from live sitemap: ' +
-                missing.slice(0, 20).map((item) => item.id).join(', ')
+              'Published report routes missing from live deployment manifest: ' +
+                missing.slice(0, 20).join(', ')
             );
           } else {
             console.log(
-              'SEO freshness is current across ' + reports.length + ' published reports.'
+              'SEO route deployment is current across ' + reports.length + ' published reports.'
             );
           }
           NODE
