@@ -188,6 +188,33 @@ record(
     faviconPngValid,
   `href=${rootFavicon}; type=${rootFaviconType}; sizes=${rootFaviconSizes}; png=${faviconPngWidth}x${faviconPngHeight}`
 );
+
+let faviconIcoValid = false;
+let faviconIcoBytes = 0;
+try {
+  const icoBytes = await readFile(join(DIST, 'favicon.ico'));
+  faviconIcoBytes = icoBytes.length;
+  faviconIcoValid =
+    icoBytes.length > 22 &&
+    icoBytes[0] === 0 &&
+    icoBytes[1] === 0 &&
+    icoBytes[2] === 1 &&
+    icoBytes[3] === 0 &&
+    icoBytes.readUInt16LE(4) >= 1;
+} catch {
+  faviconIcoValid = false;
+}
+record(
+  'Browser/scanner favicon.ico compatibility',
+  faviconIcoValid && rootHtml.includes('href="/favicon.ico"'),
+  `${faviconIcoBytes} bytes`
+);
+record(
+  'External font stylesheet is non-render-blocking',
+  rootHtml.includes('id="site-font-stylesheet" rel="preload" as="style"') &&
+    rootHtml.includes('src="/font-style-loader.js"') &&
+    !/<link[^>]+fonts\.googleapis\.com[^>]+rel=["']stylesheet["']/i.test(rootHtml)
+);
 record(
   'Legacy SVG favicon declarations removed',
   !rootHtml.includes('sobaike-janao-favicon.svg')
@@ -323,6 +350,51 @@ record(
   homeSeoContentSource.includes('home-platform-information') &&
     homeSeoContentSource.includes('Responsible reporting and verification') &&
     homeSeoContentSource.includes('দায়িত্বশীল প্রতিবেদন ও যাচাই')
+);
+
+const runtimeSeoSource = await readFile('src/lib/seo.ts', 'utf8');
+record(
+  'Hydrated homepage title matches prerendered identity',
+  runtimeSeoSource.includes(`const HOME_BN_TITLE = '${rootTitle}';`) &&
+    !runtimeSeoSource.includes("title: 'সবাইকে জানাও | বাংলাদেশের নাগরিক প্রতিবেদন প্ল্যাটফর্ম'")
+);
+record(
+  'Hydrated structured data uses the stable favicon',
+  runtimeSeoSource.includes('url: \`${SITE_ORIGIN}/favicon.png\`,') &&
+    !runtimeSeoSource.includes('url: \`${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png\`,')
+);
+
+const heroBannerSource = await readFile(
+  'src/components/category/CategoryHeroBanner.tsx',
+  'utf8'
+);
+record(
+  'Hero illustrations expose descriptive alt text',
+  heroBannerSource.includes('alt={illustrationAlt}') &&
+    !heroBannerSource.includes('alt=""')
+);
+
+const appShellSource = await readFile('src/components/layout/AppShell.tsx', 'utf8');
+record(
+  'Visible trust and policy links are exposed',
+  appShellSource.includes('About, policies & help') &&
+    appShellSource.includes('Reports are reviewed before publication')
+);
+
+const custom404Html = await readFile(join(DIST, '404.html'), 'utf8');
+const custom404Recovery = await readFile(join(DIST, 'spa-404-recovery.js'), 'utf8');
+record(
+  'Custom 404 page is helpful and non-indexable',
+  custom404Html.includes('id="custom-404"') &&
+    /name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(custom404Html) &&
+    custom404Html.includes('href="/issues"') &&
+    custom404Html.includes('href="/more"')
+);
+record(
+  '404 SPA recovery is scoped to known application routes',
+  custom404Recovery.includes('dynamicRoute') &&
+    custom404Recovery.includes('staticRoutes') &&
+    custom404Recovery.includes("window.location.replace('/')")
 );
 
 const llmsTxt = await readFile(join(DIST, 'llms.txt'), 'utf8');
