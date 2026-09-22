@@ -1145,7 +1145,7 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
   const canContinueStep1 = Boolean(formData.segment) && !selectedComingSoon;
   const canContinueStep2 =
     Boolean(formData.subcategoryId) &&
-    (!isChildSafetyReport ||
+    (!(isChildSafetyReport || isRideSharingSafetyReport) ||
       (!isReportingFormLoading && reportingForm?.engineMode === 'schema'));
 
   // Render-level defense guard: ensure Step 3/4 is NEVER rendered if rape consent is missing
