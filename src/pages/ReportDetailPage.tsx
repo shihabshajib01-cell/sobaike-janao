@@ -566,6 +566,16 @@ export const ReportDetailPage: React.FC<ReportDetailPageProps> = ({ reportId }) 
             </div>
           )}
 
+          <p className="max-w-[760px] type-meta text-ui-content-muted">
+            {language === 'bn'
+              ? hasVerifiedSources
+                ? 'প্রকাশের আগে প্রতিবেদনটি মডারেশন করা হয়েছে এবং উপরের লিংকগুলো মূল উৎস হিসেবে দেখানো হয়েছে। প্রকাশিত হওয়া কোনো অভিযোগের সরকারি বা বিচারিক সত্যতা প্রমাণ করে না।'
+                : 'এটি একটি মডারেটেড নাগরিক প্রতিবেদন। প্রকাশিত হওয়া কোনো অভিযোগের সরকারি বা বিচারিক সত্যতা প্রমাণ করে না; তথ্য, প্রেক্ষাপট ও পরবর্তী আপডেট একসঙ্গে বিবেচনা করুন।'
+              : hasVerifiedSources
+                ? 'This report was moderated before publication and the links above are shown as its source references. Publication does not mean an allegation has been proven by a court or government authority.'
+                : 'This is a moderated citizen report. Publication does not mean an allegation has been proven by a court or government authority; consider the report details, context, and later updates together.'}
+          </p>
+
           <div className="border-t border-ui-divider" aria-hidden="true" />
 
           <div className="flex items-center justify-between gap-4 type-meta text-ui-content-secondary min-w-0">
