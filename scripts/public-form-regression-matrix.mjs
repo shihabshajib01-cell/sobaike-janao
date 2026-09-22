@@ -361,6 +361,44 @@ await check('Ride-sharing Safety extends the established core intake without a p
   await page.locator('#ride-sharing-vehicle-type-select').selectOption('motorcycle');
   await page.locator('#complaint-date-input').fill('2026-09-19');
 
+  const partyHeader = page.locator('#composer-section-parties-header');
+  await expectVisible(partyHeader, 'ride-sharing safety: related-party section header missing');
+  if ((await partyHeader.getAttribute('aria-expanded')) !== 'true') {
+    await partyHeader.click();
+  }
+
+  for (const selector of [
+    '#extortion-subject-name',
+    '#extortion-role',
+    '#ride-sharing-vehicle-registration-input',
+    '#ride-sharing-trip-id-input',
+    '#extortion-identifying-desc',
+  ]) {
+    await expectVisible(page.locator(selector), `ride-sharing safety: expected related-party field missing: ${selector}`);
+  }
+  for (const selector of ['#extortion-contact', '#extortion-org']) {
+    if ((await page.locator(selector).count()) > 0) {
+      throw new Error(`ride-sharing safety: unrelated/private field must not be shown: ${selector}`);
+    }
+  }
+  const partyText = await page.locator('#composer-section-parties').innerText();
+  for (const expected of [
+    'চালক / যাত্রী / সংশ্লিষ্ট পক্ষের তথ্য',
+    'নাম / অ্যাপে দেখানো পরিচিতি',
+    'সংশ্লিষ্ট ব্যক্তির ভূমিকা',
+    'যানবাহনের রেজিস্ট্রেশন নম্বর',
+    'রাইড / ট্রিপ আইডি',
+  ]) {
+    if (!partyText.includes(expected)) {
+      throw new Error(`ride-sharing safety: related-party copy is missing ${expected}`);
+    }
+  }
+
+  await page.locator('#extortion-subject-name').fill('অ্যাপে দেখানো নাম');
+  await page.locator('#extortion-role').fill('চালক');
+  await page.locator('#ride-sharing-vehicle-registration-input').fill('ঢাকা মেট্রো-গ ১২-৩৪৫৬');
+  await page.locator('#ride-sharing-trip-id-input').fill('PATHAO-TEST-123');
+
   await chooseFirstSearchableOption(page, '#complaint-division-select');
   await chooseFirstSearchableOption(page, '#complaint-district-select');
   await chooseFirstSearchableOption(page, '#complaint-thana-select');
@@ -368,6 +406,17 @@ await check('Ride-sharing Safety extends the established core intake without a p
   await page.locator('#composer-footer-step3-review-btn').click();
   await expectVisible(page.locator('#review-section-incident'), 'ride-sharing safety: standard review incident section missing');
   await expectVisible(page.locator('#review-section-location'), 'ride-sharing safety: standard review location section missing');
+  await expectVisible(page.locator('#review-section-parties'), 'ride-sharing safety: standard review related-party section missing');
+  await page.locator('#review-section-parties-header').click();
+  const partyReviewText = await page.locator('#review-section-parties').innerText();
+  for (const expected of ['অ্যাপে দেখানো নাম', 'চালক', 'ঢাকা মেট্রো-গ ১২-৩৪৫৬', 'PATHAO-TEST-123']) {
+    if (!partyReviewText.includes(expected)) {
+      throw new Error(`ride-sharing safety: related-party review is missing ${expected}`);
+    }
+  }
+  if (/ফোন\s*\/\s*যোগাযোগ|দল\s*\/\s*প্রতিষ্ঠান\s*\/\s*সংগঠন/.test(partyReviewText)) {
+    throw new Error('ride-sharing safety: hidden phone/organization fields leaked into review');
+  }
 
   if ((await page.locator('#composer-section-configured-fields-review').count()) > 0) {
     throw new Error('ride-sharing safety: separate configured-fields review must not be present');
