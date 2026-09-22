@@ -136,6 +136,7 @@ jobs:
           test -f dist/404.html
           test -f dist/robots.txt
           test -f dist/sitemap.xml
+          test -f dist/public-report-routes.json
           test -f dist/favicon.png
           test -f dist/issues/index.html
           test -f dist/explore/index.html
