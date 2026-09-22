@@ -142,6 +142,14 @@ export const SEGMENT_SUBCATEGORIES: Record<SectionKey, SubcategoryOption[]> = {
       descriptionEn: 'Report child abduction, suspected abduction linked to a missing child, or murder of a child',
       isSensitive: true,
     },
+    {
+      id: 'ride_sharing_safety',
+      nameBn: 'রাইড-শেয়ারিং নিরাপত্তা',
+      nameEn: 'Ride-sharing Safety',
+      descriptionBn: 'অ্যাপভিত্তিক রাইডে চালক, যাত্রী, যানবাহন বা যাত্রাপথে ঘটে যাওয়া নিরাপত্তাজনিত ঘটনার তথ্য জানান',
+      descriptionEn: 'Report safety incidents involving app-based rides, drivers, passengers, vehicles, or the journey',
+      isSensitive: true,
+    },
   ],
   road_transport: [
     {
