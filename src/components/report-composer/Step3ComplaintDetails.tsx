@@ -71,7 +71,7 @@ import { MonthField } from '../ui/MonthField';
 import { isValidEmailOrPhone } from '../ui/formValidation';
 import { NumberField } from '../ui/NumberField';
 import { ContactField } from '../ui/ContactField';
-import { PublicFieldOption } from '../../services/reportingFormConfig';
+import { PublicFieldOption, PublicReportingField } from '../../services/reportingFormConfig';
 
 export interface Step3Handle {
   validateAndProceed: () => boolean;
@@ -89,6 +89,7 @@ export interface Step3ComplaintDetailsProps {
   segment: SectionKey;
   formData: ReportFormData;
   childIncidentTypeOptions?: PublicFieldOption[];
+  rideSharingFields?: PublicReportingField[];
   pendingImages: AttachedImagePreview[];
   onPendingImagesChange: (images: AttachedImagePreview[]) => void;
   onUpdateFormData: (updates: Partial<ReportFormData>) => void;
@@ -136,6 +137,7 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
       segment,
       formData,
       childIncidentTypeOptions = [],
+      rideSharingFields = [],
       pendingImages,
       onPendingImagesChange,
       onUpdateFormData,
@@ -150,6 +152,15 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
     // Segment structure conditions
     const isChildSafetyReport =
       segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
+    const isRideSharingSafetyReport =
+      segment === 'public_safety' && formData.subcategoryId === 'ride_sharing_safety';
+    const getRideSharingField = (storageKey: string) =>
+      rideSharingFields.find(
+        (field) =>
+          field.active &&
+          field.storageMode === 'custom_json' &&
+          field.storageKey === storageKey
+      );
     const showsPartySection =
       segment === 'rickshaw' ||
       segment === 'extortion' ||
@@ -887,6 +898,18 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             language === 'bn' ? 'ঘটনার ধরন নির্বাচন করুন।' : 'Select the incident type.';
         }
 
+        if (isRideSharingSafetyReport) {
+          for (const field of rideSharingFields.filter((item) => item.active && item.required)) {
+            if (!String(formData.customFieldAnswers?.[field.storageKey] || '').trim()) {
+              const fieldLabel = language === 'bn' ? field.labelBn : field.labelEn;
+              newErrors[field.storageKey] =
+                language === 'bn'
+                  ? `${fieldLabel} নির্বাচন করুন।`
+                  : `Select ${fieldLabel.toLowerCase()}.`;
+            }
+          }
+        }
+
         if (!formData.incidentDate) {
           newErrors.incidentDate =
             language === 'bn' ? 'ঘটনার তারিখ নির্বাচন করুন।' : 'Select the incident date.';
@@ -1075,6 +1098,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             ['sexualHarassmentContext', 'sexual-harassment-context-select'],
             ['sexualHarassmentInstitution', 'sexual-harassment-institution-input'],
             ['childIncidentType', 'child-incident-type-select'],
+            ['rideSharePlatform', 'ride-sharing-platform-select'],
+            ['rideShareIncidentType', 'ride-sharing-incident-type-select'],
+            ['rideShareRole', 'ride-sharing-role-select'],
+            ['rideShareVehicleType', 'ride-sharing-vehicle-type-select'],
             ['division', 'complaint-division-select'],
             ['district', 'complaint-district-select'],
             ['upazilaOrThana', 'complaint-thana-select'],
@@ -1147,6 +1174,10 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
             errors.previousBillAmount ||
             errors.briberyAmount ||
             errors.childIncidentType ||
+            errors.rideSharePlatform ||
+            errors.rideShareIncidentType ||
+            errors.rideShareRole ||
+            errors.rideShareVehicleType ||
             errors.sexualHarassmentType ||
             errors.sexualHarassmentContext ||
             errors.sexualHarassmentInstitution
@@ -1399,6 +1430,54 @@ export const Step3ComplaintDetails = forwardRef<Step3Handle, Step3ComplaintDetai
                   label: language === 'bn' ? option.labelBn : option.labelEn,
                 }))}
               />
+            )}
+
+            {isRideSharingSafetyReport && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  ['rideSharePlatform', 'ride-sharing-platform-select'],
+                  ['rideShareIncidentType', 'ride-sharing-incident-type-select'],
+                  ['rideShareRole', 'ride-sharing-role-select'],
+                  ['rideShareVehicleType', 'ride-sharing-vehicle-type-select'],
+                ].map(([storageKey, controlId]) => {
+                  const field = getRideSharingField(storageKey);
+                  if (!field) return null;
+                  const value = String(formData.customFieldAnswers?.[storageKey] || '');
+                  const helperText = language === 'bn' ? field.helperBn : field.helperEn;
+
+                  return (
+                    <Select
+                      key={storageKey}
+                      id={controlId}
+                      label={language === 'bn' ? field.labelBn : field.labelEn}
+                      required={field.required}
+                      value={value}
+                      error={errors[storageKey]}
+                      helperText={helperText}
+                      onChange={(event) => {
+                        onUpdateFormData({
+                          customFieldAnswers: {
+                            ...(formData.customFieldAnswers || {}),
+                            [storageKey]: event.target.value,
+                          },
+                        });
+                        if (errors[storageKey]) {
+                          setErrors((prev) => ({ ...prev, [storageKey]: '' }));
+                        }
+                      }}
+                      placeholder={
+                        language === 'bn'
+                          ? field.placeholderBn || 'নির্বাচন করুন'
+                          : field.placeholderEn || 'Select'
+                      }
+                      options={field.options.map((option) => ({
+                        value: option.value,
+                        label: language === 'bn' ? option.labelBn : option.labelEn,
+                      }))}
+                    />
+                  );
+                })}
+              </div>
             )}
 
             {isBriberyReport && (
