@@ -745,6 +745,7 @@ function injectMeta(template, page) {
           isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
           ...(page.publishedAt ? { datePublished: page.publishedAt } : {}),
           ...(page.modifiedAt ? { dateModified: page.modifiedAt } : {}),
+          publishingPrinciples: `${SITE_ORIGIN}/more`,
           image: DEFAULT_IMAGE,
           ...(page.articleSection ? { articleSection: page.articleSection } : {}),
           ...(page.contentLocation
@@ -785,6 +786,7 @@ function injectMeta(template, page) {
         name: 'Sobaike Janao',
         alternateName: BRAND_ALTERNATE_NAMES,
         description: ENTITY_DESCRIPTION,
+        publishingPrinciples: `${SITE_ORIGIN}/more`,
         areaServed: {
           '@type': 'Country',
           name: 'Bangladesh',
