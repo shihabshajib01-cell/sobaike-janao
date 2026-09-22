@@ -298,6 +298,7 @@ const schemaRaw =
 let schemaValid = false;
 let siteIdentityValid = false;
 let currentBrandLogoValid = false;
+let publishingPrinciplesValid = false;
 try {
   const parsed = JSON.parse(schemaRaw);
   const graph = Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [parsed];
@@ -325,14 +326,21 @@ try {
     organization?.logo?.url === `${SITE_ORIGIN}/favicon.png` &&
     organization?.logo?.width === 512 &&
     organization?.logo?.height === 512;
+  publishingPrinciplesValid =
+    organization?.publishingPrinciples === `${SITE_ORIGIN}/more`;
 } catch {
   schemaValid = false;
   siteIdentityValid = false;
   currentBrandLogoValid = false;
+  publishingPrinciplesValid = false;
 }
 record('Structured data graph valid', schemaValid);
 record('Structured site identity is consistent', siteIdentityValid);
 record('Structured data uses current brand logo', currentBrandLogoValid);
+record(
+  'Publishing principles are machine-readable',
+  publishingPrinciplesValid
+);
 record(
   'Entity description is explicit',
   schemaRaw.includes('citizen-reporting and public-interest information platform for Bangladesh')
@@ -362,6 +370,10 @@ record(
   'Hydrated structured data uses the stable favicon',
   runtimeSeoSource.includes('url: \`${SITE_ORIGIN}/favicon.png\`,') &&
     !runtimeSeoSource.includes('url: \`${SITE_ORIGIN}/brand/sobaike-janao-icon-512.png\`,')
+);
+record(
+  'Hydrated schema exposes publishing principles',
+  runtimeSeoSource.includes('publishingPrinciples: \`${SITE_ORIGIN}/more\`,')
 );
 
 const heroBannerSource = await readFile(
