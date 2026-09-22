@@ -582,8 +582,8 @@ jobs:
             '{"p_storage_path":"public-submissions/security-test/file.webp"}' \
             /tmp/current-helper.json)
 
-          if [ "$current_code" != "200" ] || [ "$(cat /tmp/current-helper.json)" != "false" ]; then
-            echo "ERROR: current evidence policy helper contract changed unexpectedly"
+          if [ "$current_code" = "200" ] || ! grep -q '"code":"PGRST202"' /tmp/current-helper.json; then
+            echo "ERROR: evidence upload policy helper must stay outside the public Data API (HTTP $current_code)"
             cat /tmp/current-helper.json
             exit 1
           fi
@@ -593,10 +593,10 @@ jobs:
             '{"p_storage_path":"public-submissions/security-test/file.webp"}' \
             /tmp/published-read-helper.json)
 
-          if [ "$published_read_code" != "200" ] || [ "$(cat /tmp/published-read-helper.json)" != "false" ]; then
-            echo "ERROR: published-evidence read helper contract changed unexpectedly"
+          if [ "$published_read_code" = "200" ] || ! grep -q '"code":"PGRST202"' /tmp/published-read-helper.json; then
+            echo "ERROR: evidence read policy helper must stay outside the public Data API (HTTP $published_read_code)"
             cat /tmp/published-read-helper.json
             exit 1
           fi
 
-          echo "Anonymous RPC surface hardening check passed"
+          echo "Anonymous RPC surface hardening check passed; evidence policy helpers are private-schema only"
