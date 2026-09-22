@@ -298,6 +298,7 @@ const schemaRaw =
 let schemaValid = false;
 let siteIdentityValid = false;
 let currentBrandLogoValid = false;
+let publishingPrinciplesValid = false;
 try {
   const parsed = JSON.parse(schemaRaw);
   const graph = Array.isArray(parsed?.['@graph']) ? parsed['@graph'] : [parsed];
@@ -325,17 +326,20 @@ try {
     organization?.logo?.url === `${SITE_ORIGIN}/favicon.png` &&
     organization?.logo?.width === 512 &&
     organization?.logo?.height === 512;
+  publishingPrinciplesValid =
+    organization?.publishingPrinciples === `${SITE_ORIGIN}/more`;
 } catch {
   schemaValid = false;
   siteIdentityValid = false;
   currentBrandLogoValid = false;
+  publishingPrinciplesValid = false;
 }
 record('Structured data graph valid', schemaValid);
 record('Structured site identity is consistent', siteIdentityValid);
 record('Structured data uses current brand logo', currentBrandLogoValid);
 record(
   'Publishing principles are machine-readable',
-  organization?.publishingPrinciples === `${SITE_ORIGIN}/more`
+  publishingPrinciplesValid
 );
 record(
   'Entity description is explicit',
