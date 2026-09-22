@@ -1,0 +1,183 @@
+name: SEO Freshness Watch
+
+on:
+  schedule:
+    # Lightweight watcher: detect newly published report routes without rebuilding
+    # the site every five minutes. Avoid minute 0 where GitHub schedule load is higher.
+    - cron: '2-57/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: seo-freshness-watch-production
+  cancel-in-progress: true
+
+jobs:
+  refresh-if-needed:
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: https://shobaikejanao.com
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Detect published reports missing from live SEO routes
+        id: freshness
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const siteUrl = String(process.env.SITE_URL || '').replace(/\/$/, '');
+          const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
+          const supabaseKey = process.env.SUPABASE_KEY || '';
+          const outputPath = process.env.GITHUB_OUTPUT;
+
+          if (!siteUrl || !supabaseUrl || !supabaseKey || !outputPath) {
+            throw new Error('SEO freshness watcher configuration is incomplete.');
+          }
+
+          const sitemapResponse = await fetch(siteUrl + '/sitemap.xml', {
+            headers: { 'Cache-Control': 'no-cache' },
+          });
+          if (!sitemapResponse.ok) {
+            throw new Error('Live sitemap returned HTTP ' + sitemapResponse.status);
+          }
+
+          const sitemap = await sitemapResponse.text();
+          const sitemapUrls = new Set(
+            [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
+              match[1].replace(/&amp;/g, '&')
+            )
+          );
+
+          const reports = [];
+          let offset = 0;
+          const limit = 50;
+
+          for (let page = 0; page < 200; page += 1) {
+            const response = await fetch(
+              supabaseUrl + '/rest/v1/rpc/get_public_home_feed_page',
+              {
+                method: 'POST',
+                headers: {
+                  apikey: supabaseKey,
+                  Authorization: 'Bearer ' + supabaseKey,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  p_visitor_lat: null,
+                  p_visitor_lng: null,
+                  p_filter: 'all',
+                  p_district: 'all',
+                  p_offset: offset,
+                  p_limit: limit,
+                }),
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error(
+                'Published report page RPC returned HTTP ' + response.status
+              );
+            }
+
+            const payload = await response.json();
+            const items = Array.isArray(payload?.items) ? payload.items : [];
+            reports.push(...items);
+
+            if (payload?.hasMore !== true) break;
+
+            const nextOffset = Number(payload?.nextOffset);
+            if (!Number.isFinite(nextOffset) || nextOffset <= offset) {
+              throw new Error('Published report pagination returned an invalid nextOffset.');
+            }
+            offset = Math.floor(nextOffset);
+          }
+
+          const canonicalPath = (report) => {
+            const id = String(report?.id || '').trim();
+            if (!id) return null;
+            const hasBn =
+              typeof report?.titleBn === 'string' && report.titleBn.trim().length > 0;
+            const hasEn =
+              typeof report?.titleEn === 'string' && report.titleEn.trim().length > 0;
+            const prefix = hasEn && !hasBn ? '/en/report-detail/' : '/report-detail/';
+            return prefix + encodeURIComponent(id);
+          };
+
+          const missing = reports
+            .map((report) => {
+              const path = canonicalPath(report);
+              return path
+                ? { id: String(report.id), url: siteUrl + path }
+                : null;
+            })
+            .filter(Boolean)
+            .filter((item) => !sitemapUrls.has(item.url));
+
+          fs.appendFileSync(
+            outputPath,
+            'needs_refresh=' + (missing.length > 0 ? 'true' : 'false') + '\n' +
+              'missing_count=' + missing.length + '\n'
+          );
+
+          if (missing.length > 0) {
+            console.log(
+              'Published report SEO routes missing from live sitemap: ' +
+                missing.slice(0, 20).map((item) => item.id).join(', ')
+            );
+          } else {
+            console.log(
+              'SEO freshness is current across ' + reports.length + ' published reports.'
+            );
+          }
+          NODE
+
+      - name: Dispatch Public deploy when SEO routes are stale
+        if: steps.freshness.outputs.needs_refresh == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl --fail-with-body -sS \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/deploy.yml/runs?branch=main&per_page=20" \
+            -o /tmp/deploy-runs.json
+
+          active=$(node <<'NODE'
+          const fs = require('node:fs');
+          const data = JSON.parse(fs.readFileSync('/tmp/deploy-runs.json', 'utf8'));
+          const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
+          console.log(
+            runs.some((run) =>
+              ['queued', 'in_progress', 'pending', 'requested', 'waiting'].includes(run.status)
+            )
+              ? 'true'
+              : 'false'
+          );
+          NODE
+          )
+
+          if [ "${active}" = "true" ]; then
+            echo "A Public deploy is already active; the next freshness check will verify it."
+            exit 0
+          fi
+
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/deploy.yml/dispatches" \
+            -d '{"ref":"main"}'
+
+          echo "Dispatched Public deploy for missing published-report SEO routes."
