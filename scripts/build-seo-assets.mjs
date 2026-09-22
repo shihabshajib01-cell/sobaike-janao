@@ -1010,6 +1010,7 @@ function reportPage(report, segmentById, subcategoryByKey) {
   const description = normalizeSeoDescription(sourceDescription, sourceLanguage);
 
   return {
+    id,
     path: `/report-detail/${encodeURIComponent(id)}`,
     title,
     titleEn: title,
@@ -1358,6 +1359,22 @@ async function main() {
 
   await writeFile(join(DIST_DIR, 'sitemap.xml'), sitemap, 'utf8');
 
+  const reportRouteManifest = {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    reportCount: reportPages.length,
+    reportIds: reportPages
+      .map((page) => cleanText(page.id))
+      .filter(Boolean)
+      .sort(),
+  };
+
+  await writeFile(
+    join(DIST_DIR, 'public-report-routes.json'),
+    JSON.stringify(reportRouteManifest, null, 2) + '\n',
+    'utf8'
+  );
+
   const robots = [
     'User-agent: *',
     'Allow: /',
@@ -1369,7 +1386,7 @@ async function main() {
   await writeFile(join(DIST_DIR, 'robots.txt'), robots, 'utf8');
 
   console.log(
-    `[seo-build] Generated ${pages.length - 1} route entry pages and ${sitemapEntries.length} sitemap URLs.`
+    `[seo-build] Generated ${pages.length - 1} route entry pages, ${sitemapEntries.length} sitemap URLs, and ${reportRouteManifest.reportCount} report routes.`
   );
 }
 
