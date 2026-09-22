@@ -143,6 +143,8 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
             'rideShareIncidentType',
             'rideShareRole',
             'rideShareVehicleType',
+            'rideShareVehicleRegistration',
+            'rideShareTripId',
           ].includes(field.storageKey)
       )
       .sort((a, b) => a.sortOrder - b.sortOrder) || [];
