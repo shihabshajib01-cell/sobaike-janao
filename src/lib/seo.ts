@@ -458,6 +458,7 @@ function updateJsonLd(
     name: 'Sobaike Janao',
     alternateName: [...BRAND_ALTERNATE_NAMES],
     description: ENTITY_DESCRIPTION,
+    publishingPrinciples: `${SITE_ORIGIN}/more`,
     areaServed: {
       '@type': 'Country',
       name: 'Bangladesh',
@@ -521,6 +522,7 @@ function updateJsonLd(
     page.mainEntityOfPage = { '@id': pageId };
     if (metadata.publishedTime) page.datePublished = metadata.publishedTime;
     if (metadata.modifiedTime) page.dateModified = metadata.modifiedTime;
+    page.publishingPrinciples = `${SITE_ORIGIN}/more`;
   }
 
   scriptElement.textContent = JSON.stringify({
