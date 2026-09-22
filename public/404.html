@@ -1,21 +1,41 @@
 <!doctype html>
-<html lang="en">
+<html lang="bn">
   <head>
     <meta charset="UTF-8" />
-    <meta name="robots" content="noindex" />
+    <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Redirecting…</title>
+    <meta name="theme-color" content="#1B4D6B" />
+    <title>পৃষ্ঠা পাওয়া যায়নি | Sobaike Janao</title>
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
+    <link rel="icon" type="image/x-icon" sizes="any" href="/favicon.ico" />
+    <link rel="stylesheet" href="/404.css" />
+    <script defer src="/spa-404-recovery.js"></script>
   </head>
   <body>
-    <script>
-      (function () {
-        try {
-          window.sessionStorage.setItem('sobaike_spa_redirect_v1', window.location.href);
-        } catch (e) {
-          // Continue to the application root when sessionStorage is unavailable.
-        }
-        window.location.replace('/');
-      })();
-    </script>
+    <main id="custom-404" class="not-found-shell">
+      <section class="not-found-card" aria-labelledby="not-found-title">
+        <img
+          class="not-found-logo"
+          src="/favicon.png"
+          width="72"
+          height="72"
+          alt="Sobaike Janao"
+        />
+        <p class="not-found-code">404</p>
+        <h1 id="not-found-title">পৃষ্ঠা পাওয়া যায়নি</h1>
+        <p class="not-found-copy">
+          আপনি যে পৃষ্ঠাটি খুঁজছেন সেটি নেই, সরানো হয়েছে, অথবা লিংকটি সঠিক নয়।
+        </p>
+        <p class="not-found-copy" lang="en">
+          The page you requested does not exist, was moved, or the link is incorrect.
+        </p>
+        <nav class="not-found-actions" aria-label="সহায়ক লিংক">
+          <a class="not-found-primary" href="/">মূলপাতা / Home</a>
+          <a href="/issues">বিষয়সমূহ / Issues</a>
+          <a href="/search">অনুসন্ধান / Search</a>
+          <a href="/more">তথ্য ও সহায়তা / Help</a>
+        </nav>
+      </section>
+    </main>
   </body>
 </html>
