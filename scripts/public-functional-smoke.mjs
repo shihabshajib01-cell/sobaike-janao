@@ -935,35 +935,114 @@ await check('Public report detail route renders when a published report is avail
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_KEY;
   if (!supabaseUrl || !supabaseKey) throw new Error('Supabase test credentials are unavailable');
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/get_public_published_reports`, {
-    method: 'POST',
-    headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
-    body: '{}',
-  });
+
+  const [response, sitemapResponse] = await Promise.all([
+    fetch(`${supabaseUrl}/rest/v1/rpc/get_public_published_reports`, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+    }),
+    fetch(routeUrl('/sitemap.xml'), {
+      headers: { 'Cache-Control': 'no-cache' },
+    }),
+  ]);
+
   if (!response.ok) throw new Error(`published reports RPC returned ${response.status}`);
+  if (!sitemapResponse.ok) throw new Error(`live sitemap returned ${sitemapResponse.status}`);
+
   const data = await response.json();
+  const sitemap = await sitemapResponse.text();
+  const sitemapUrls = new Set(
+    [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
+      match[1].replace(/&amp;/g, '&')
+    )
+  );
+
+  const reports = [];
   const queue = [data];
-  let report = null;
-  while (queue.length && !report) {
+  while (queue.length) {
     const item = queue.shift();
-    if (Array.isArray(item)) queue.push(...item);
-    else if (item && typeof item === 'object') {
-      if (typeof item.id === 'string' && item.id) report = item;
-      else queue.push(...Object.values(item));
+    if (Array.isArray(item)) {
+      queue.push(...item);
+      continue;
     }
+    if (!item || typeof item !== 'object') continue;
+    if (typeof item.id === 'string' && item.id) {
+      reports.push(item);
+      continue;
+    }
+    queue.push(...Object.values(item));
   }
-  if (!report) {
+
+  if (reports.length === 0) {
     warnings.push('No published report available; report-detail browser check skipped');
     return;
   }
 
-  const reportId = report.id;
-  const hasBanglaTitle = typeof report.titleBn === 'string' && report.titleBn.trim().length > 0;
-  const hasEnglishTitle = typeof report.titleEn === 'string' && report.titleEn.trim().length > 0;
-  const canonicalReportPath =
-    hasEnglishTitle && !hasBanglaTitle
+  const canonicalPathFor = (item) => {
+    const reportId = String(item.id || '').trim();
+    const hasBanglaTitle =
+      typeof item.titleBn === 'string' && item.titleBn.trim().length > 0;
+    const hasEnglishTitle =
+      typeof item.titleEn === 'string' && item.titleEn.trim().length > 0;
+    return hasEnglishTitle && !hasBanglaTitle
       ? `/en/report-detail/${encodeURIComponent(reportId)}`
       : `/report-detail/${encodeURIComponent(reportId)}`;
+  };
+
+  const now = Date.now();
+  const STATIC_SEO_FRESHNESS_SLA_MS = 15 * 60 * 1000;
+  const freshPending = [];
+  const staleMissing = [];
+
+  for (const candidate of reports) {
+    const path = canonicalPathFor(candidate);
+    const absolute = new URL(path.replace(/^\//, ''), SITE_URL).toString();
+    if (sitemapUrls.has(absolute)) continue;
+
+    const publishedAtMs = Date.parse(String(candidate.publishedAt || ''));
+    const ageMs = Number.isFinite(publishedAtMs) ? Math.max(0, now - publishedAtMs) : Infinity;
+    const entry = { id: candidate.id, ageMs };
+    if (ageMs > STATIC_SEO_FRESHNESS_SLA_MS) staleMissing.push(entry);
+    else freshPending.push(entry);
+  }
+
+  if (staleMissing.length > 0) {
+    throw new Error(
+      'published report SEO routes exceeded the 15-minute freshness SLA: ' +
+        staleMissing
+          .slice(0, 10)
+          .map((item) => `${item.id} (${Math.round(item.ageMs / 60000)}m)`)
+          .join(', ')
+    );
+  }
+
+  if (freshPending.length > 0) {
+    warnings.push(
+      'Fresh published report SEO routes are awaiting the five-minute watcher: ' +
+        freshPending.slice(0, 10).map((item) => item.id).join(', ')
+    );
+  }
+
+  const report = reports.find((candidate) => {
+    const path = canonicalPathFor(candidate);
+    const absolute = new URL(path.replace(/^\//, ''), SITE_URL).toString();
+    return sitemapUrls.has(absolute);
+  });
+
+  if (!report) {
+    warnings.push(
+      'Only newly published reports are awaiting static SEO refresh; direct route check skipped'
+    );
+    return;
+  }
+
+  const reportId = report.id;
+  const canonicalReportPath = canonicalPathFor(report);
 
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);
