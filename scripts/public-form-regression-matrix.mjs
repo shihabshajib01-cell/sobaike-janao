@@ -170,6 +170,11 @@ const representativePaths = [
     expectedAny: ['#composer-section-narrative', '#child-incident-type-select'],
   },
   {
+    segment: 'public_safety',
+    subcategory: 'ride_sharing_safety',
+    expectedAny: ['#composer-section-narrative', '#ride-sharing-platform-select'],
+  },
+  {
     segment: 'road_transport',
     subcategory: 'road-accident',
     expectedAny: ['#complaint-date-input', '#composer-section-configured-fields'],
@@ -315,6 +320,67 @@ await check('Child safety keeps the established report format with only the appr
   }
 
   await assertComposerGeometry(page, 'public_safety/child_abduction_murder standard format');
+  await context.close();
+});
+
+await check('Ride-sharing Safety extends the established core intake without a parallel form', async () => {
+  const context = await makeContext(browser, { width: 390, height: 844 });
+  const page = await context.newPage();
+  await openStep3(page, {
+    segment: 'public_safety',
+    subcategory: 'ride_sharing_safety',
+  });
+
+  for (const selector of [
+    '#composer-section-narrative',
+    '#complaint-title-input',
+    '#complaint-desc-input',
+    '#ride-sharing-platform-select',
+    '#ride-sharing-incident-type-select',
+    '#ride-sharing-role-select',
+    '#ride-sharing-vehicle-type-select',
+    '#complaint-date-input',
+    '#complaint-time-input',
+    '#complaint-frequency-select',
+    '#composer-section-location',
+    '#composer-section-parties',
+    '#composer-section-attachments',
+  ]) {
+    await expectVisible(page.locator(selector), `ride-sharing safety: expected core-intake control missing: ${selector}`);
+  }
+
+  if ((await page.locator('#composer-section-configured-fields').count()) > 0) {
+    throw new Error('ride-sharing safety: parallel schema form surface must not replace the core intake');
+  }
+
+  await page.locator('#complaint-title-input').fill('রাইড-শেয়ারিং নিরাপত্তা ঘটনা');
+  await page.locator('#complaint-desc-input').fill('পরীক্ষামূলক রিপোর্ট: রাইড চলাকালে নিরাপত্তাজনিত ঘটনার সংক্ষিপ্ত বিবরণ।');
+  await page.locator('#ride-sharing-platform-select').selectOption('pathao');
+  await page.locator('#ride-sharing-incident-type-select').selectOption('route_deviation');
+  await page.locator('#ride-sharing-role-select').selectOption('passenger');
+  await page.locator('#ride-sharing-vehicle-type-select').selectOption('motorcycle');
+  await page.locator('#complaint-date-input').fill('2026-09-19');
+
+  await chooseFirstSearchableOption(page, '#complaint-division-select');
+  await chooseFirstSearchableOption(page, '#complaint-district-select');
+  await chooseFirstSearchableOption(page, '#complaint-thana-select');
+
+  await page.locator('#composer-footer-step3-review-btn').click();
+  await expectVisible(page.locator('#review-section-incident'), 'ride-sharing safety: standard review incident section missing');
+  await expectVisible(page.locator('#review-section-location'), 'ride-sharing safety: standard review location section missing');
+
+  if ((await page.locator('#composer-section-configured-fields-review').count()) > 0) {
+    throw new Error('ride-sharing safety: separate configured-fields review must not be present');
+  }
+
+  const reviewText = await page.locator('#review-section-incident').innerText();
+  for (const expected of ['Pathao', 'ভুল পথে নেওয়া', 'যাত্রী', 'মোটরসাইকেল']) {
+    if (!reviewText.includes(expected)) {
+      throw new Error(`ride-sharing safety: standard review is missing ${expected}`);
+    }
+  }
+
+  await assertComposerGeometry(page, 'public_safety/ride_sharing_safety core intake');
   await context.close();
 });
 

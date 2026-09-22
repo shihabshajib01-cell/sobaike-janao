@@ -41,12 +41,13 @@ import {
   SEXUAL_HARASSMENT_TYPE_OPTIONS,
   getSexualHarassmentOptionLabel,
 } from '../../data/sexualHarassmentOptions';
-import { PublicFieldOption } from '../../services/reportingFormConfig';
+import { PublicFieldOption, PublicReportingField } from '../../services/reportingFormConfig';
 
 export interface Step4ReviewProps {
   segment: SectionKey;
   formData: ReportFormData;
   childIncidentTypeOptions?: PublicFieldOption[];
+  rideSharingFields?: PublicReportingField[];
   pendingImages: AttachedImagePreview[];
   onEditStep: (
     step: number,
@@ -62,6 +63,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
   segment,
   formData,
   childIncidentTypeOptions = [],
+  rideSharingFields = [],
   pendingImages,
   onEditStep,
   language,
@@ -88,6 +90,8 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
     segment === 'harassment' && formData.subcategoryId === 'blackmail-coercion';
   const isChildSafetyReport =
     segment === 'public_safety' && formData.subcategoryId === 'child_abduction_murder';
+  const isRideSharingSafetyReport =
+    segment === 'public_safety' && formData.subcategoryId === 'ride_sharing_safety';
 
   const hasRickshawOperatorData = Boolean(
     formData.reportedSubject?.trim() ||
@@ -377,6 +381,35 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
                       : childIncidentTypeLabel.labelEn
                     : '-'}
                 </p>
+              </div>
+            )}
+
+            {isRideSharingSafetyReport && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+                {rideSharingFields.map((field) => {
+                  const rawValue = String(formData.customFieldAnswers?.[field.storageKey] || '');
+                  if (!rawValue && !field.required) return null;
+                  const option = field.options.find((item) => item.value === rawValue);
+                  const displayValue = option
+                    ? language === 'bn'
+                      ? option.labelBn
+                      : option.labelEn
+                    : rawValue || '-';
+
+                  return (
+                    <div
+                      key={field.storageKey}
+                      className="p-2.5 rounded-[var(--radius-control)] bg-ui-surface border border-ui-stroke-subtle"
+                    >
+                      <span className="type-compact text-ui-content-muted block mb-0.5">
+                        {language === 'bn' ? field.labelBn : field.labelEn}
+                      </span>
+                      <p className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
+                        {displayValue}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
