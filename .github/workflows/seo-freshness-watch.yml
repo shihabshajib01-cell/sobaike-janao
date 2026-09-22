@@ -53,10 +53,28 @@ jobs:
           }
 
           const manifest = await manifestResponse.json();
-          const deployedReportIds = new Set(
-            Array.isArray(manifest?.reportIds)
-              ? manifest.reportIds.map((id) => String(id || '').trim()).filter(Boolean)
-              : []
+          const deployedReports = new Map(
+            Array.isArray(manifest?.reports)
+              ? manifest.reports
+                  .map((entry) => {
+                    const id = String(entry?.id || '').trim();
+                    return id
+                      ? [
+                          id,
+                          {
+                            modifiedAt: entry?.modifiedAt || null,
+                            indexable: entry?.indexable === true,
+                          },
+                        ]
+                      : null;
+                  })
+                  .filter(Boolean)
+              : Array.isArray(manifest?.reportIds)
+                ? manifest.reportIds
+                    .map((id) => String(id || '').trim())
+                    .filter(Boolean)
+                    .map((id) => [id, { modifiedAt: null, indexable: false }])
+                : []
           );
 
           const reports = [];
@@ -103,21 +121,58 @@ jobs:
             offset = Math.floor(nextOffset);
           }
 
-          const missing = reports
-            .map((report) => String(report?.id || '').trim())
-            .filter(Boolean)
-            .filter((id) => !deployedReportIds.has(id));
+          const liveReports = new Map(
+            reports
+              .map((report) => {
+                const id = String(report?.id || '').trim();
+                return id ? [id, report] : null;
+              })
+              .filter(Boolean)
+          );
+
+          const missing = [];
+          const changed = [];
+
+          for (const [id, report] of liveReports) {
+            const deployed = deployedReports.get(id);
+            if (!deployed) {
+              missing.push(id);
+              continue;
+            }
+
+            const liveModifiedAt = report?.updatedAt || report?.publishedAt || null;
+            const liveModifiedMs = Date.parse(String(liveModifiedAt || ''));
+            const deployedModifiedMs = Date.parse(String(deployed.modifiedAt || ''));
+
+            if (
+              Number.isFinite(liveModifiedMs) &&
+              (!Number.isFinite(deployedModifiedMs) ||
+                liveModifiedMs > deployedModifiedMs + 1000)
+            ) {
+              changed.push(id);
+            }
+          }
+
+          const removed = [...deployedReports.keys()].filter(
+            (id) => !liveReports.has(id)
+          );
+          const needsRefresh =
+            missing.length > 0 || changed.length > 0 || removed.length > 0;
 
           fs.appendFileSync(
             outputPath,
-            'needs_refresh=' + (missing.length > 0 ? 'true' : 'false') + '\n' +
-              'missing_count=' + missing.length + '\n'
+            'needs_refresh=' + (needsRefresh ? 'true' : 'false') + '\n' +
+              'missing_count=' + missing.length + '\n' +
+              'changed_count=' + changed.length + '\n' +
+              'removed_count=' + removed.length + '\n'
           );
 
-          if (missing.length > 0) {
+          if (needsRefresh) {
             console.log(
-              'Published report routes missing from live deployment manifest: ' +
-                missing.slice(0, 20).join(', ')
+              'Published report route refresh required: ' +
+                'missing=' + missing.slice(0, 20).join(',') +
+                '; changed=' + changed.slice(0, 20).join(',') +
+                '; removed=' + removed.slice(0, 20).join(',')
             );
           } else {
             console.log(

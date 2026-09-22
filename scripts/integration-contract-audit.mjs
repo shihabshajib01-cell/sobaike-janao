@@ -100,6 +100,9 @@ for (const needle of [
   'cancel-in-progress: true',
   'get_public_home_feed_page',
   'public-report-routes.json',
+  'manifest?.reports',
+  'changed_count',
+  'removed_count',
   'actions/workflows/deploy.yml/runs?branch=main',
   'actions/workflows/deploy.yml/dispatches',
   '"ref":"main"',
@@ -222,6 +225,9 @@ for (const needle of [
   'public-report-routes.json',
   'reportRouteManifest',
   'reportIds',
+  'reports: reportRouteRecords',
+  'modifiedAt: page.modifiedAt || page.publishedAt || null',
+  'indexable: page.sitemap === true',
 ]) {
   if (!seoBuilder.includes(needle)) {
     fail('SEO builder is missing report route manifest contract: ' + needle);

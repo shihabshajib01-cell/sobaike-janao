@@ -183,6 +183,7 @@ jobs:
 
           curl --fail-with-body -L -sS "${SITE_URL}robots.txt" -o /tmp/robots.txt
           curl --fail-with-body -L -sS "${SITE_URL}sitemap.xml" -o /tmp/sitemap.xml
+          curl --fail-with-body -L -sS "${SITE_URL}public-report-routes.json" -o /tmp/public-report-routes.json
 
           favicon_content_type=$(curl --fail-with-body -L -sS -o /tmp/favicon.png -w '%{content_type}' "${SITE_URL}favicon.png")
           if [[ "${favicon_content_type}" != image/png* ]]; then
@@ -212,6 +213,35 @@ jobs:
           robots = Path('/tmp/robots.txt').read_text(errors='replace')
           sitemap = Path('/tmp/sitemap.xml').read_text(errors='replace')
           favicon = Path('/tmp/favicon.png').read_bytes()
+          route_manifest = json.loads(
+              Path('/tmp/public-report-routes.json').read_text(errors='replace')
+          )
+
+          if route_manifest.get('version') != 2:
+              raise SystemExit(
+                  f"ERROR: report-route manifest version mismatch: {route_manifest.get('version')}"
+              )
+          route_ids = route_manifest.get('reportIds')
+          route_records = route_manifest.get('reports')
+          route_count = route_manifest.get('reportCount')
+          if not isinstance(route_ids, list) or not isinstance(route_records, list):
+              raise SystemExit('ERROR: report-route manifest arrays are missing')
+          if route_count != len(route_ids) or route_count != len(route_records):
+              raise SystemExit(
+                  f'ERROR: report-route manifest count mismatch: count={route_count}, '
+                  f'ids={len(route_ids)}, records={len(route_records)}'
+              )
+          if len(route_ids) != len(set(route_ids)):
+              raise SystemExit('ERROR: duplicate report IDs in report-route manifest')
+          record_ids = [entry.get('id') for entry in route_records if isinstance(entry, dict)]
+          if sorted(route_ids) != sorted(record_ids):
+              raise SystemExit('ERROR: report-route manifest records do not match reportIds')
+          if any(
+              not isinstance(entry.get('indexable'), bool) or not entry.get('modifiedAt')
+              for entry in route_records
+              if isinstance(entry, dict)
+          ):
+              raise SystemExit('ERROR: report-route manifest freshness metadata is incomplete')
 
           def must(pattern, label, flags=0):
               match = re.search(pattern, html, flags)

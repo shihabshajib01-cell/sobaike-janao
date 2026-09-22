@@ -958,11 +958,30 @@ await check('Public report detail route renders when a published report is avail
 
   const data = await response.json();
   const manifest = await manifestResponse.json();
-  const deployedReportIds = new Set(
-    Array.isArray(manifest?.reportIds)
-      ? manifest.reportIds.map((id) => String(id || '').trim()).filter(Boolean)
-      : []
+  const deployedReports = new Map(
+    Array.isArray(manifest?.reports)
+      ? manifest.reports
+          .map((entry) => {
+            const id = String(entry?.id || '').trim();
+            return id
+              ? [
+                  id,
+                  {
+                    modifiedAt: entry?.modifiedAt || null,
+                    indexable: entry?.indexable === true,
+                  },
+                ]
+              : null;
+          })
+          .filter(Boolean)
+      : Array.isArray(manifest?.reportIds)
+        ? manifest.reportIds
+            .map((id) => String(id || '').trim())
+            .filter(Boolean)
+            .map((id) => [id, { modifiedAt: null, indexable: false }])
+        : []
   );
+  const deployedReportIds = new Set(deployedReports.keys());
 
   const reports = [];
   const queue = [data];
@@ -999,42 +1018,81 @@ await check('Public report detail route renders when a published report is avail
   const now = Date.now();
   const STATIC_SEO_FRESHNESS_SLA_MS = 15 * 60 * 1000;
   const freshPending = [];
-  const staleMissing = [];
+  const stalePending = [];
 
   for (const candidate of reports) {
-    if (deployedReportIds.has(String(candidate.id))) continue;
+    const id = String(candidate.id || '').trim();
+    const deployed = deployedReports.get(id);
+    const liveModifiedAt = candidate.updatedAt || candidate.publishedAt || null;
+    const liveModifiedMs = Date.parse(String(liveModifiedAt || ''));
+    const deployedModifiedMs = Date.parse(String(deployed?.modifiedAt || ''));
+    const routeMissing = !deployed;
+    const routeChanged =
+      Boolean(deployed) &&
+      Number.isFinite(liveModifiedMs) &&
+      (!Number.isFinite(deployedModifiedMs) ||
+        liveModifiedMs > deployedModifiedMs + 1000);
 
-    const publishedAtMs = Date.parse(String(candidate.publishedAt || ''));
-    const ageMs = Number.isFinite(publishedAtMs) ? Math.max(0, now - publishedAtMs) : Infinity;
-    const entry = { id: candidate.id, ageMs };
-    if (ageMs > STATIC_SEO_FRESHNESS_SLA_MS) staleMissing.push(entry);
+    if (!routeMissing && !routeChanged) continue;
+
+    const eventMs = Number.isFinite(liveModifiedMs)
+      ? liveModifiedMs
+      : Date.parse(String(candidate.publishedAt || ''));
+    const ageMs = Number.isFinite(eventMs) ? Math.max(0, now - eventMs) : Infinity;
+    const entry = {
+      id,
+      ageMs,
+      reason: routeMissing ? 'missing' : 'changed',
+    };
+
+    if (ageMs > STATIC_SEO_FRESHNESS_SLA_MS) stalePending.push(entry);
     else freshPending.push(entry);
   }
 
-  if (staleMissing.length > 0) {
+  if (stalePending.length > 0) {
     throw new Error(
-      'published report SEO routes exceeded the 15-minute freshness SLA: ' +
-        staleMissing
+      'published report static routes exceeded the 15-minute freshness SLA: ' +
+        stalePending
           .slice(0, 10)
-          .map((item) => `${item.id} (${Math.round(item.ageMs / 60000)}m)`)
+          .map(
+            (item) =>
+              `${item.id}:${item.reason} (${Math.round(item.ageMs / 60000)}m)`
+          )
           .join(', ')
     );
   }
 
   if (freshPending.length > 0) {
     warnings.push(
-      'Fresh published report routes are awaiting the five-minute SEO watcher: ' +
-        freshPending.slice(0, 10).map((item) => item.id).join(', ')
+      'Fresh report route changes are awaiting the five-minute SEO watcher: ' +
+        freshPending
+          .slice(0, 10)
+          .map((item) => `${item.id}:${item.reason}`)
+          .join(', ')
     );
   }
 
-  const report = reports.find((candidate) =>
-    deployedReportIds.has(String(candidate.id))
+  const liveReportIds = new Set(
+    reports.map((candidate) => String(candidate.id || '').trim()).filter(Boolean)
   );
+  const removedRouteIds = [...deployedReportIds].filter(
+    (id) => !liveReportIds.has(id)
+  );
+  if (removedRouteIds.length > 0) {
+    warnings.push(
+      'Retired report routes are awaiting the SEO watcher: ' +
+        removedRouteIds.slice(0, 10).join(', ')
+    );
+  }
+
+  const report = reports.find((candidate) => {
+    const deployed = deployedReports.get(String(candidate.id || '').trim());
+    return deployed?.indexable === true;
+  });
 
   if (!report) {
     warnings.push(
-      'Only newly published reports are awaiting static route refresh; direct route check skipped'
+      'No deployed indexable report is currently available for direct SEO route assertions'
     );
     return;
   }
