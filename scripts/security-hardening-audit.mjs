@@ -135,6 +135,32 @@ for (const needle of [
   }
 }
 
+const sessionRaceMigration = read('supabase/migrations/20260922110131_close_remaining_auth_session_and_rate_races.sql');
+for (const needle of [
+  'private.is_current_auth_session_valid',
+  'auth.sessions',
+  'public-evidence-upload:',
+  'response:visitor:',
+  'engagement:report:',
+  'pg_advisory_xact_lock',
+]) {
+  if (!sessionRaceMigration.includes(needle)) {
+    fail('session/race hardening migration is missing: ' + needle);
+  }
+}
+
+const sensitiveReadMigration = read('supabase/migrations/20260922110302_require_aal2_for_sensitive_private_reads.sql');
+for (const needle of [
+  'complaints.evidence_view',
+  'complaints.export',
+  'location_activity.view',
+  'AAL2 authentication is required for private reporter device telemetry',
+]) {
+  if (!sensitiveReadMigration.includes(needle)) {
+    fail('sensitive private-read AAL2 hardening is missing: ' + needle);
+  }
+}
+
 const privacyPage = read('src/pages/MorePage.tsx');
 if (!privacyPage.includes('IPWho (ipwho.is)')) {
   fail('approximate-location third-party disclosure is missing');
