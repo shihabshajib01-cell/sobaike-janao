@@ -183,7 +183,23 @@ jobs:
 
           curl --fail-with-body -L -sS "${SITE_URL}robots.txt" -o /tmp/robots.txt
           curl --fail-with-body -L -sS "${SITE_URL}sitemap.xml" -o /tmp/sitemap.xml
-          curl --fail-with-body -L -sS "${SITE_URL}favicon.png" -o /tmp/favicon.png
+
+          favicon_content_type=$(curl --fail-with-body -L -sS -o /tmp/favicon.png -w '%{content_type}' "${SITE_URL}favicon.png")
+          if [[ "${favicon_content_type}" != image/png* ]]; then
+            echo "ERROR: live favicon content type is not image/png: ${favicon_content_type}"
+            exit 1
+          fi
+
+          legacy_favicon_status=$(curl -L -sS -o /tmp/legacy-favicon-response -w '%{http_code}' "${SITE_URL}brand/sobaike-janao-favicon.svg")
+          case "${legacy_favicon_status}" in
+            404|410)
+              echo "Legacy SVG favicon endpoint is retired (HTTP ${legacy_favicon_status})."
+              ;;
+            *)
+              echo "ERROR: legacy SVG favicon endpoint still resolves unexpectedly (HTTP ${legacy_favicon_status})."
+              exit 1
+              ;;
+          esac
 
           python - <<'PY'
           import json
