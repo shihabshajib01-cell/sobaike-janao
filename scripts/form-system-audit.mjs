@@ -228,6 +228,7 @@ for (const token of [
   "formData.subcategoryId === 'ride_sharing_safety'",
   '!isRideSharingSafetyReport',
   'rideSharingFields={rideSharingFields}',
+  '!(isChildSafetyReport || isRideSharingSafetyReport)',
 ]) {
   if (!composerModal.includes(token)) {
     failures.push(`ReportComposerModal.tsx: Ride-sharing Safety must stay inside the established core intake: ${token}`);
