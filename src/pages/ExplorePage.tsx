@@ -100,6 +100,32 @@ export const ExplorePage: React.FC = () => {
     }
   }, [selectedSection, selectedSubcategory]);
 
+  // A selected map district exposes an existing mobile action card below the
+  // canvas. If it is partly underneath the floating navigation, gently reveal
+  // only the covered portion, preserving map context and normal page scrolling.
+  useEffect(() => {
+    if (viewMode !== 'heatmap' || selectedDistrict === 'all' ||
+        typeof window === 'undefined' || window.matchMedia('(min-width: 768px)').matches) return;
+    const frame = window.requestAnimationFrame(() => {
+      const card = document.getElementById('explore-mobile-selected-area-action');
+      if (!card) return;
+      const nav = document.getElementById('bottom-nav');
+      const compactNav = document.getElementById('bottom-nav-compact');
+      const activeNav = nav?.getAttribute('aria-hidden') !== 'true'
+        ? nav
+        : compactNav?.getAttribute('aria-hidden') !== 'true' ? compactNav : null;
+      const safeBottom = activeNav
+        ? Math.min(window.innerHeight - 12, activeNav.getBoundingClientRect().top - 12)
+        : window.innerHeight - 24;
+      const rect = card.getBoundingClientRect();
+      // Never jump to a distant card. Only repair a real, visible overlap.
+      if (rect.top < safeBottom && rect.bottom > safeBottom) {
+        window.scrollBy({ top: Math.min(rect.bottom - safeBottom + 12, 140), behavior: 'smooth' });
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedDistrict, viewMode]);
+
   // Responsive resize safety: automatically close mobile sheets when transitioning to tablet/desktop (>= 768px)
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -997,7 +1023,7 @@ export const ExplorePage: React.FC = () => {
 
               {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
               {selectedDistrict !== 'all' && (
-                <div className="block md:hidden w-full">
+                <div id="explore-mobile-selected-area-action" className="block md:hidden w-full">
                   <div className="bg-ui-surface border border-ui-stroke-subtle ui-radius-card p-3.5 sm:p-4 shadow-[var(--elevation-2xs)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 ui-radius-control bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">
