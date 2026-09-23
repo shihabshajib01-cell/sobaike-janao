@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 
-const origin = (process.env.SITE_URL || 'https://shobaikejanao.com/').replace(/\\/?$/, '/');
+const origin = new URL(process.env.SITE_URL || 'https://shobaikejanao.com/').origin + '/';
 mkdirSync('map-smoke-artifacts', { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const failures = [];
@@ -19,7 +19,7 @@ async function exercise({ label, route, viewport, theme, selectDistrict }) {
   const page = await context.newPage();
   const mapTileRequests = [];
   page.on('request', (request) => {
-    if (/basemaps\\.cartocdn\\.com|tile\\.openstreetmap\\.org|maps\\.googleapis\\.com/.test(request.url())) {
+    if (/basemaps\.cartocdn\.com|tile\.openstreetmap\.org|maps\.googleapis\.com/.test(request.url())) {
       mapTileRequests.push(request.url());
     }
   });
@@ -101,7 +101,7 @@ await exercise({ label: 'bn-mobile-dark', route: 'explore', viewport: { width: 3
 await exercise({ label: 'en-desktop', route: 'en/explore', viewport: { width: 1440, height: 900 }, theme: 'light', selectDistrict: false });
 await browser.close();
 if (failures.length) {
-  console.error(failures.join('\\n\\n'));
+  console.error(failures.join('\n\n'));
   process.exitCode = 1;
 } else {
   console.log('PASS: live Bangladesh-only mobile/light/dark, selected district, English desktop');
