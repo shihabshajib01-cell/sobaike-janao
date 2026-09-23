@@ -35,7 +35,7 @@ interface DistrictAggregate {
 }
 
 const BANGLADESH_CENTER: [number, number] = [23.685, 90.3563];
-const BOUNDARY_ATTRIBUTION = 'District boundaries: BBS/OCHA (2020), adapted (CC BY 3.0 IGO)';
+const BOUNDARY_ATTRIBUTION = 'District boundaries: BBS/OCHA (2020), adapted (<a href="https://creativecommons.org/licenses/by/3.0/igo/" target="_blank" rel="noopener noreferrer">CC BY 3.0 IGO</a>)';
 const BANGLADESH_BOUNDS: L.LatLngBoundsExpression = [
   [20.7, 88.0],
   [26.6, 92.7],
