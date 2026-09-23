@@ -45,6 +45,7 @@ if (existsSync(publicMapSource)) {
   assert.match(map, /useState<MapLayerMode>\('districts'\)/, 'Default map must expose district geography');
   assert.doesNotMatch(map, /L\.tileLayer\(/, 'Public map must render Bangladesh only; no world raster tiles');
   assert.match(map, /countryBounds\.pad\(0\.05\)/, 'Country geography must constrain the map viewport');
+  assert.match(map, /zoomSnap:\s*0\.1/, 'Country fit must use fractional zoom to avoid undersized geography');
   assert.match(map, /district-map-legend/, 'District color legend must be visible outside the canvas');
   assert.doesNotMatch(map, /Larger bubbles mean more reports|বড় বৃত্ত মানে বেশি/, 'Old bubble copy must not describe polygon mode');
   assert.doesNotMatch(map, /basemaps\.cartocdn\.com/, 'Never reintroduce unkeyed CARTO raster tiles');
