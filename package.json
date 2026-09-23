@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "vite build && node scripts/build-seo-assets.mjs && npm run audit:seo && npm run audit:performance && npm run audit:form-system && npm run audit:location-contract",
+    "build": "npm run audit:district-boundaries && vite build && node scripts/build-seo-assets.mjs && npm run audit:seo && npm run audit:performance && npm run audit:form-system && npm run audit:location-contract",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "audit:design-system": "node scripts/design-system-audit.mjs",
@@ -17,7 +17,8 @@
     "audit:form-system": "node scripts/form-system-audit.mjs",
     "audit:location-contract": "node scripts/location-contract-audit.mjs",
     "audit:security-hardening": "node scripts/security-hardening-audit.mjs",
-    "audit:category-theme": "node scripts/category-theme-audit.mjs"
+    "audit:category-theme": "node scripts/category-theme-audit.mjs",
+    "audit:district-boundaries": "node scripts/district-boundary-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
