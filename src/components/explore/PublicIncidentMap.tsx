@@ -87,12 +87,12 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     () => Object.keys(segments) as SectionKey[],
     [segments]
   );
-  const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('density');
-  // District geometry is a same-origin static asset, loaded only when this view is selected.
+  // The new district geography is the initial view; Density and Points remain available.
+  const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('districts');
+  // Fetch only within the Explore map chunk; retaining the existing marker fallback on failure.
   // A failed load leaves the existing district markers available as a safe fallback.
   const [districtGeometry, setDistrictGeometry] = useState<any | null>(null);
   useEffect(() => {
-    if (mapLayerMode !== 'districts' || districtGeometry) return;
     const controller = new AbortController();
     const load = async () => {
       try {
@@ -112,7 +112,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     };
     void load();
     return () => controller.abort();
-  }, [mapLayerMode, districtGeometry]);
+  }, []);
 
   const isInitialMount = useRef(true);
 
@@ -222,14 +222,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       attributionControl: true,
     });
 
-    const tileUrl = isDarkMode
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-
-    const tileLayer = L.tileLayer(tileUrl, {
+    // CARTO's previous raster URL now watermarks every tile without an API key.
+    // Use the existing admin map's compliant, keyless OSM provider for both themes;
+    // CSS transforms only the dark tiles, never the overlays or attribution.
+    const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
-      subdomains: 'abcd',
+        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+      className: isDarkMode ? 'public-map-tiles-dark' : undefined,
       maxZoom: 19,
     }).addTo(map);
 
@@ -303,6 +302,24 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         Number.isFinite(point[1])
     );
 
+    const addDistrictOutlines = () => {
+      if (!districtGeometry) return;
+      const rootStyle = window.getComputedStyle(document.documentElement);
+      const outline = rootStyle.getPropertyValue('--md-outline').trim() || HEATMAP_TOKENS.colors.mediumHigh;
+      const polygons = L.geoJSON(districtGeometry as any, {
+        style: {
+          color: outline,
+          weight: 1.1,
+          opacity: 0.85,
+          fillOpacity: 0,
+          interactive: false,
+        },
+      });
+      polygons.addTo(map);
+      map.attributionControl?.addAttribution(BOUNDARY_ATTRIBUTION);
+      polygonLayerRef.current = polygons;
+    };
+
     if (mapLayerMode === 'density') {
       if (safePoints.length > 0 && typeof (L as any).heatLayer === 'function') {
         try {
@@ -321,6 +338,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           console.warn('[PublicIncidentMap] Heatmap layer creation error:', err);
         }
       }
+      addDistrictOutlines();
       return;
     }
 
@@ -379,6 +397,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       return;
     }
 
+    // Points and coordinate-less fallbacks retain their original markers.
+    // Non-interactive geography stays visible without intercepting marker clicks.
+    addDistrictOutlines();
     const layerGroup = L.layerGroup();
 
     if (mapLayerMode === 'districts' || !hasRealCoords) {
@@ -503,6 +524,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     reportsWithRealCoords,
     districtGeometry,
     selectedDistrict,
+    isDarkMode,
   ]);
 
   useEffect(() => {
