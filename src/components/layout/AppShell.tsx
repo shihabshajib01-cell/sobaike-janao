@@ -440,8 +440,8 @@ export const AppShell: React.FC = () => {
                 <span>•</span>
                 <span>
                   {language === 'bn'
-                    ? 'নাগরিক তথ্য ও অভিযোগ প্ল্যাটফর্ম'
-                    : 'Citizen reporting platform'}
+                    ? 'স্বাধীন নাগরিক প্রতিবেদন ও জনস্বার্থ তথ্য প্ল্যাটফর্ম'
+                    : 'Independent citizen reporting & public-interest information platform'}
                 </span>
               </div>
               <span>{language === 'bn' ? 'জনস্বার্থ রেকর্ড' : 'Public interest record'}</span>
