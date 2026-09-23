@@ -380,8 +380,30 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             ? `${toBanglaDigits(entry?.count || 0)}টি প্রতিবেদন`
             : `${entry?.count || 0} reports`;
           content.append(heading, total);
-          (layer as L.Path).bindTooltip(content, { direction: 'top', opacity: 0.96 });
+          const polygonPath = layer as L.Path;
+          polygonPath.bindTooltip(content, { direction: 'top', opacity: 0.96 });
           layer.on('click', () => onSelectDistrict(district.nameEn));
+          // Preserve click interaction and make the same 64 districts reachable
+          // by keyboard. District filters remain the alternative accessible route.
+          layer.on('add', () => {
+            const element = polygonPath.getElement();
+            if (!element) return;
+            element.setAttribute('data-district-id', district.id);
+            element.setAttribute('tabindex', '0');
+            element.setAttribute('role', 'button');
+            element.setAttribute(
+              'aria-label',
+              language === 'bn'
+                ? `${district.nameBn} জেলা, ${toBanglaDigits(entry?.count || 0)}টি প্রতিবেদন। নির্বাচন করুন`
+                : `${district.nameEn} district, ${entry?.count || 0} reports. Select district`
+            );
+            element.addEventListener('keydown', (event: KeyboardEvent) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onSelectDistrict(district.nameEn);
+              }
+            });
+          });
         },
       });
       polygons.addTo(map);
