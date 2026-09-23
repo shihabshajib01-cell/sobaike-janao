@@ -101,9 +101,9 @@ assert.equal(upazilaCodes.size, 498);
 assert.equal(verifiedUpazilas, 351, 'Name-verified upazila identity coverage changed');
 if (existsSync(publicMapSource)) {
   const map = readFileSync(publicMapSource, 'utf8');
-  assert.match(map, /geo\\/upazilas\\//, 'Map must lazily load real upazila geometry');
-  assert.match(map, /containsCoordinate/, 'Only precise-coordinate reports may be counted by upazila');
-  assert.match(map, /onSelectDistrict\\('all'\\)/, 'Map must retain back navigation');
-  assert.doesNotMatch(map, /Math\\.random\\(/, 'Never display demo data as report counts');
+  assert(map.includes('geo/upazilas/'), 'Map must lazily load real upazila geometry');
+  assert(map.includes('containsCoordinate'), 'Only precise-coordinate reports may be counted by upazila');
+  assert(map.includes("onSelectDistrict('all')"), 'Map must retain back navigation');
+  assert(!map.includes('Math.random('), 'Never display demo data as report counts');
 }
 console.log('PASS: Historical upazila dataset (498), 351 verified names / 147 unmatched, 64 parent P-codes, lazy asset budgets');
