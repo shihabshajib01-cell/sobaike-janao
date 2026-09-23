@@ -1,0 +1,17 @@
+{
+  "type": "UpazilaBoundaryManifest",
+  "source_sha256": "03c58c72155b5911199be955186ae7c54316da7ea72d6ed057738e0dc2eb2805",
+  "source_feature_count": 498,
+  "sql_canonical_row_count_at_audit": 601,
+  "all_districts_covered": 64,
+  "division_files": {
+    "barisal": "geo/upazilas/barisal-2020.geojson",
+    "chittagong": "geo/upazilas/chittagong-2020.geojson",
+    "dhaka": "geo/upazilas/dhaka-2020.geojson",
+    "khulna": "geo/upazilas/khulna-2020.geojson",
+    "mymensingh": "geo/upazilas/mymensingh-2020.geojson",
+    "rajshahi": "geo/upazilas/rajshahi-2020.geojson",
+    "rangpur": "geo/upazilas/rangpur-2020.geojson",
+    "sylhet": "geo/upazilas/sylhet-2020.geojson"
+  }
+}
