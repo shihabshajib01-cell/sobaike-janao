@@ -1439,3 +1439,50 @@
 .public-bangladesh-map-canvas.leaflet-container {
   background: var(--ui-surface-subtle);
 }
+
+/* Passive geographic labels belong to the Bangladesh-only vector map.
+   They use the existing semantic roles and never intercept polygon clicks. */
+.public-bangladesh-map-canvas .leaflet-tooltip.public-map-city-label,
+.public-bangladesh-map-canvas .leaflet-tooltip.public-map-district-label {
+  font-family: var(--font-ui);
+  line-height: 1.25;
+  white-space: nowrap;
+  pointer-events: none;
+  border-radius: var(--radius-control);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.10);
+  border: 1px solid var(--ui-border-subtle);
+  color: var(--ui-text-primary);
+  background: var(--ui-surface);
+  text-shadow: none;
+  padding: 2px 5px;
+}
+.public-bangladesh-map-canvas .leaflet-tooltip.public-map-city-label::before,
+.public-bangladesh-map-canvas .leaflet-tooltip.public-map-district-label::before {
+  display: none;
+}
+.public-bangladesh-map-canvas .leaflet-tooltip.public-map-city-label {
+  font-weight: var(--font-weight-semibold);
+  font-size: 12px;
+}
+.public-bangladesh-map-canvas .leaflet-tooltip.public-map-city-label::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  left: calc(50% - 2.5px);
+  bottom: -7px;
+  border-radius: 50%;
+  background: var(--ui-accent);
+}
+.public-bangladesh-map-canvas .leaflet-tooltip.public-map-district-label {
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--ui-text-secondary);
+}
+@media (max-width: 600px) {
+  .public-bangladesh-map-canvas .leaflet-tooltip.public-map-city-label {
+    font-size: 11px;
+    padding: 2px 4px;
+  }
+}
+
