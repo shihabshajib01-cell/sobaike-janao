@@ -1321,6 +1321,28 @@ export const ReportComposerModal: React.FC<ReportComposerModalProps> = ({
                         </div>
                         <BanglaPhoneticToggle id="report-form" />
                       </div>
+
+                      <div
+                        id="composer-privacy-baseline-notice"
+                        role="note"
+                        className="flex items-start gap-2 rounded-[var(--radius-control)] bg-ui-surface-subtle p-3 text-left"
+                      >
+                        <Shield
+                          className="mt-0.5 h-4 w-4 shrink-0 text-ui-content-primary"
+                          aria-hidden="true"
+                        />
+                        <div className="min-w-0 space-y-0.5">
+                          <p className="type-label font-[var(--font-weight-semibold)] text-ui-content-primary">
+                            {language === 'bn' ? 'গোপনীয়তা' : 'Privacy'}
+                          </p>
+                          <p className="type-helper text-ui-content-secondary">
+                            {language === 'bn'
+                              ? 'ফোন নম্বর বা ইমেইল ছাড়াই প্রতিবেদন জমা দেওয়া যায়। পরিচয় বা যোগাযোগের তথ্য দিলে তা ডিফল্টভাবে প্রকাশিত প্রতিবেদনে দেখানো হয় না। যেসব ফর্মে আলাদা গোপনীয়তা অপশন আছে, সেখানে আপনার নির্বাচিত সেটিং প্রযোজ্য হবে।'
+                              : 'You can submit without a phone number or email. If you provide identity or contact details, they are not shown in the public report by default. Where a form includes privacy options, your selected setting applies.'}
+                          </p>
+                        </div>
+                      </div>
+
                       {isMobJusticeReport && (
                         <MobJusticeDetailsFields
                           value={mobJusticeDetails}
