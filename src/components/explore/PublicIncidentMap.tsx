@@ -10,7 +10,7 @@ import { ReportItem } from '../../types/report';
 import { SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { HEATMAP_TOKENS } from '../../theme/data-viz-tokens';
-import { BANGLADESH_DISTRICTS, DistrictInfo } from '../../data/districts';
+import { BANGLADESH_DISTRICTS, DIVISIONS, DistrictInfo } from '../../data/districts';
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
 import { useApp } from '../../context/AppContext';
@@ -35,7 +35,6 @@ interface DistrictAggregate {
 }
 
 const BANGLADESH_CENTER: [number, number] = [23.685, 90.3563];
-const BOUNDARY_ATTRIBUTION = 'District boundaries: BBS/OCHA (2020), adapted (<a href="https://creativecommons.org/licenses/by/3.0/igo/" target="_blank" rel="noopener noreferrer">CC BY 3.0 IGO</a>)';
 const BANGLADESH_BOUNDS: L.LatLngBoundsExpression = [
   [20.3, 87.75],
   [26.85, 92.85],
@@ -86,6 +85,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const heatLayerRef = useRef<L.HeatLayer | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const polygonLayerRef = useRef<L.GeoJSON | null>(null);
+  const riverLayerRef = useRef<L.GeoJSON | null>(null);
+  const labelLayerRef = useRef<L.LayerGroup | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
@@ -100,6 +101,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   // Fetch only within the Explore map chunk; retaining the existing marker fallback on failure.
   // A failed load leaves the existing district markers available as a safe fallback.
   const [districtGeometry, setDistrictGeometry] = useState<any | null>(null);
+  const [riverGeometry, setRiverGeometry] = useState<any | null>(null);
   useEffect(() => {
     const controller = new AbortController();
     const load = async () => {
@@ -116,6 +118,30 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         if (!controller.signal.aborted) setDistrictGeometry(result);
       } catch (error) {
         if (!controller.signal.aborted) console.warn('[PublicIncidentMap] Retaining district marker fallback:', error);
+      }
+    };
+    void load();
+    return () => controller.abort();
+  }, []);
+
+  // Public-domain Natural Earth lines are pre-clipped to the 2020 Bangladesh
+  // district mask. No neighboring country geometry or third-party tile API.
+  useEffect(() => {
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.BASE_URL}geo/bangladesh-major-rivers-natural-earth-50m.geojson`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`River asset HTTP ${response.status}`);
+        const result = await response.json();
+        if (result?.type !== 'FeatureCollection' || !Array.isArray(result.features) ||
+            result.features.some((feature: any) => feature?.geometry?.type !== 'MultiLineString')) {
+          throw new Error('Bangladesh-only river asset failed validation');
+        }
+        if (!controller.signal.aborted) setRiverGeometry(result);
+      } catch (error) {
+        if (!controller.signal.aborted) console.warn('[PublicIncidentMap] Continuing without optional rivers:', error);
       }
     };
     void load();
@@ -226,15 +252,23 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     const map = L.map(mapContainerRef.current, {
       center: BANGLADESH_CENTER,
       zoom: 6,
-      minZoom: 5,
+      zoomSnap: 0.1,
+      zoomDelta: 0.5,
+      minZoom: 4,
       maxZoom: 12,
       maxBounds: BANGLADESH_BOUNDS,
       maxBoundsViscosity: 1,
       zoomControl: false,
-      attributionControl: true,
+      attributionControl: false,
       scrollWheelZoom: false,
     });
 
+    // Distinct panes keep geography below river context and passive labels.
+    // All three layers are clipped/located within Bangladesh.
+    map.createPane('bangladesh-rivers').style.zIndex = '430';
+    map.getPane('bangladesh-rivers')!.style.pointerEvents = 'none';
+    map.createPane('bangladesh-labels').style.zIndex = '650';
+    map.getPane('bangladesh-labels')!.style.pointerEvents = 'none';
     mapInstanceRef.current = map;
     setIsMapReady(true);
 
@@ -249,13 +283,80 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       }
       if (polygonLayerRef.current) {
         map.removeLayer(polygonLayerRef.current);
-        map.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
         polygonLayerRef.current = null;
+      }
+      if (riverLayerRef.current) {
+        map.removeLayer(riverLayerRef.current);
+        riverLayerRef.current = null;
+      }
+      if (labelLayerRef.current) {
+        map.removeLayer(labelLayerRef.current);
+        labelLayerRef.current = null;
       }
       map.remove();
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Hydrological context is optional. Rivers are simplified reference lines,
+  // never treated as precise address or incident location data.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !isMapReady || !districtGeometry || !riverGeometry) return;
+    const rootStyle = getComputedStyle(document.documentElement);
+    const riverColor = rootStyle.getPropertyValue('--md-info').trim() || HEATMAP_TOKENS.colors.mediumHigh;
+    const rivers = L.geoJSON(riverGeometry as any, {
+      pane: 'bangladesh-rivers',
+      interactive: false,
+      style: {
+        color: riverColor,
+        weight: 1.35,
+        opacity: 0.66,
+      },
+    }).addTo(map);
+    riverLayerRef.current = rivers;
+    return () => {
+      map.removeLayer(rivers);
+      if (riverLayerRef.current === rivers) riverLayerRef.current = null;
+    };
+  }, [isMapReady, districtGeometry, riverGeometry, isDarkMode]);
+
+  // Eight established divisional-city labels at national zoom; district names
+  // take over at local zoom. Passive labels never intercept district clicks.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !isMapReady || !districtGeometry) return;
+    const labels = L.layerGroup().addTo(map);
+    labelLayerRef.current = labels;
+    const drawLabels = () => {
+      labels.clearLayers();
+      const zoomed = map.getZoom() >= 8.35;
+      const locations = zoomed ? BANGLADESH_DISTRICTS : DIVISIONS;
+      const viewport = map.getBounds().pad(0.06);
+      for (const location of locations) {
+        const coordinate: L.LatLngTuple = [location.lat, location.lng];
+        if (!viewport.contains(coordinate)) continue;
+        const label = L.tooltip({
+          permanent: true,
+          direction: 'center',
+          interactive: false,
+          opacity: 1,
+          pane: 'bangladesh-labels',
+          className: zoomed ? 'public-map-district-label' : 'public-map-city-label',
+        });
+        label.setLatLng(coordinate);
+        label.setContent(language === 'bn' ? location.nameBn : location.nameEn);
+        labels.addLayer(label);
+      }
+    };
+    map.on('zoomend moveend', drawLabels);
+    drawLabels();
+    return () => {
+      map.off('zoomend moveend', drawLabels);
+      map.removeLayer(labels);
+      if (labelLayerRef.current === labels) labelLayerRef.current = null;
+    };
+  }, [isMapReady, districtGeometry, language]);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !isMapReady) return;
@@ -278,7 +379,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
     if (polygonLayerRef.current) {
       map.removeLayer(polygonLayerRef.current);
-      map.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = null;
     }
 
@@ -303,17 +403,18 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       if (!districtGeometry) return;
       const rootStyle = window.getComputedStyle(document.documentElement);
       const outline = rootStyle.getPropertyValue('--md-outline').trim() || HEATMAP_TOKENS.colors.mediumHigh;
+      const tint = rootStyle.getPropertyValue('--ui-selected-bg').trim() || HEATMAP_TOKENS.colors.low;
       const polygons = L.geoJSON(districtGeometry as any, {
         style: {
           color: outline,
-          weight: 1.1,
-          opacity: 0.85,
-          fillOpacity: 0,
+          weight: 1,
+          opacity: 0.75,
+          fillColor: tint,
+          fillOpacity: mapLayerMode === 'points' ? 0.4 : 0.15,
           interactive: false,
         },
       });
       polygons.addTo(map);
-      map.attributionControl?.addAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = polygons;
     };
 
@@ -345,8 +446,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       const style = getComputedStyle(document.documentElement);
       const outline = style.getPropertyValue('--md-outline-variant').trim() ||
         style.getPropertyValue('--md-outline').trim() || HEATMAP_TOKENS.colors.mediumHigh;
-      const emptyFill = style.getPropertyValue('--md-surface-container').trim() ||
-        style.getPropertyValue('--md-surface').trim() || HEATMAP_TOKENS.colors.low;
+      // Give empty districts a quiet but visible country silhouette against
+      // the outside canvas, using an existing design-system background role.
+      const emptyFill = style.getPropertyValue('--ui-selected-bg').trim() ||
+        style.getPropertyValue('--md-secondary-container').trim() || HEATMAP_TOKENS.colors.low;
 
       const polygons = L.geoJSON(districtGeometry as any, {
         style: (feature: any) => {
@@ -362,7 +465,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             weight: selected ? 2.6 : 1,
             opacity: selected ? 1 : 0.85,
             fillColor: count > 0 ? DISTRICT_SHADES[intensity] : emptyFill,
-            fillOpacity: count > 0 ? 0.88 : 0.5,
+            fillOpacity: count > 0 ? 0.88 : 0.78,
             interactive: true,
           };
         },
@@ -408,7 +511,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         },
       });
       polygons.addTo(map);
-      map.attributionControl?.addAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = polygons;
       return;
     }
@@ -551,10 +653,12 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     if (!map || !isMapReady) return;
     map.setMaxBounds(countryBounds.pad(0.05));
     const mobile = map.getSize().x < 600;
-    const padding: L.PointTuple = mobile ? [14, 18] : [32, 32];
+    const padding: L.PointTuple = mobile ? [9, 12] : [22, 22];
     const fitCountry = (animate: boolean) => {
       const min = map.getBoundsZoom(countryBounds, false, L.point(...padding));
-      map.setMinZoom(Math.max(4, min - 0.15));
+      // Leaflet's default integer zoom left the country needlessly small.
+      // Fractional zoom fits the entire shape closely without cutting it off.
+      map.setMinZoom(Math.max(4, min - 0.2));
       if (animate) {
         map.flyToBounds(countryBounds, { padding, duration: 0.55 });
       } else {
@@ -579,8 +683,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       const bounds = L.geoJSON(feature as any).getBounds();
       if (bounds.isValid()) {
         map.flyToBounds(bounds, {
-          padding: mobile ? [42, 64] : [65, 65],
-          maxZoom: 9,
+          padding: mobile ? [50, 76] : [60, 65],
+          maxZoom: mobile ? 8.45 : 9,
           duration: 0.6,
         });
         return;
@@ -594,13 +698,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
   const handleZoomIn = () => {
     try {
-      mapInstanceRef.current?.zoomIn();
+      mapInstanceRef.current?.zoomIn(0.5);
     } catch {}
   };
 
   const handleZoomOut = () => {
     try {
-      mapInstanceRef.current?.zoomOut();
+      mapInstanceRef.current?.zoomOut(0.5);
     } catch {}
   };
 
@@ -609,7 +713,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     // effect restores the Bangladesh-only viewport without competing flyTo calls.
     if (selectedDistrict === 'all') {
       mapInstanceRef.current?.flyToBounds(countryBounds, {
-        padding: [14, 18],
+        padding: [9, 12],
         duration: 0.55,
       });
     }
@@ -696,7 +800,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       const map = mapInstanceRef.current;
       map?.invalidateSize();
       if (map && selectedDistrict === 'all' && countryBounds.isValid()) {
-        map.fitBounds(countryBounds, { padding: [14, 18], animate: false });
+        map.fitBounds(countryBounds, { padding: [9, 12], animate: false });
       }
     });
     observer.observe(mapContainerRef.current);
@@ -804,7 +908,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             ? 'প্রতিবেদন মানচিত্র'
             : 'Reports map'
         }
-        className="relative isolate z-0 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface shadow-[var(--elevation-xs)] overflow-hidden flex flex-col h-[460px] sm:h-[490px] md:h-[540px] md:min-h-[540px]"
+        className="relative isolate z-0 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface shadow-[var(--elevation-xs)] overflow-hidden flex flex-col h-[min(64dvh,540px)] min-h-[450px] md:h-[540px] md:min-h-[540px]"
       >
         <div className="absolute top-3 right-3 z-[500] flex flex-col gap-1.5">
           <button
@@ -841,11 +945,23 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
         <div
           ref={mapContainerRef}
-          className="public-bangladesh-map-canvas w-full flex-1 z-10 h-[460px] sm:h-[490px] md:h-[540px]"
+          className="public-bangladesh-map-canvas w-full flex-1 z-10 h-full"
         />
 
 
       </div>
+
+      {/* Legal/source credit is outside the map so it cannot hide geography or
+          compete with the mobile zoom and selection controls. */}
+      <p id="public-map-data-credits" className="type-meta leading-relaxed text-ui-content-muted px-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+        <a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Leaflet</a>
+        <span aria-hidden="true">·</span>
+        <span>{language === 'bn' ? 'সীমানা: BBS/OCHA ২০২০' : 'Boundaries: BBS/OCHA 2020'}</span>
+        <a href="https://creativecommons.org/licenses/by/3.0/igo/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">CC BY 3.0 IGO</a>
+        <span aria-hidden="true">·</span>
+        <span>{language === 'bn' ? 'নদী:' : 'Rivers:'}</span>
+        <a href="https://www.naturalearthdata.com/downloads/50m-physical-vectors/50m-rivers-lake-centerlines/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Natural Earth</a>
+      </p>
 
       {/* Explanations sit outside the map, leaving every district selectable on a phone. */}
       {mapLayerMode === 'districts' && districtGeometry && (
