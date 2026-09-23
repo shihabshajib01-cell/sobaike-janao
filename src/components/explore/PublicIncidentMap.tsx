@@ -37,8 +37,17 @@ interface DistrictAggregate {
 const BANGLADESH_CENTER: [number, number] = [23.685, 90.3563];
 const BOUNDARY_ATTRIBUTION = 'District boundaries: BBS/OCHA (2020), adapted (<a href="https://creativecommons.org/licenses/by/3.0/igo/" target="_blank" rel="noopener noreferrer">CC BY 3.0 IGO</a>)';
 const BANGLADESH_BOUNDS: L.LatLngBoundsExpression = [
-  [20.7, 88.0],
-  [26.6, 92.7],
+  [20.3, 87.75],
+  [26.85, 92.85],
+];
+
+// The existing design-system density palette also applies to district shading.
+const DISTRICT_SHADES = [
+  HEATMAP_TOKENS.colors.low,
+  HEATMAP_TOKENS.colors.lowMedium,
+  HEATMAP_TOKENS.colors.medium,
+  HEATMAP_TOKENS.colors.mediumHigh,
+  HEATMAP_TOKENS.colors.high,
 ];
 
 const isValidCoordinate = (report: ReportItem) => {
@@ -77,7 +86,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const heatLayerRef = useRef<L.HeatLayer | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const polygonLayerRef = useRef<L.GeoJSON | null>(null);
-  const tileLayerRef = useRef<L.TileLayer | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
@@ -115,6 +123,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   }, []);
 
   const isInitialMount = useRef(true);
+  const countryBounds = useMemo(() => {
+    if (!districtGeometry) return L.latLngBounds(BANGLADESH_BOUNDS);
+    const bounds = L.geoJSON(districtGeometry as any).getBounds();
+    return bounds.isValid() ? bounds : L.latLngBounds(BANGLADESH_BOUNDS);
+  }, [districtGeometry]);
 
   const reportsWithRealCoords = useMemo(
     () => reports.filter(isValidCoordinate),
@@ -205,60 +218,44 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
   const isDarkMode = resolvedTheme === 'dark';
 
+  // Geography-only canvas: there is no world map, commercial tile dependency,
+  // surrounding country layer, or other geography outside the 64 districts.
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
       center: BANGLADESH_CENTER,
-      zoom: 7.2,
-      minZoom: 6,
-      maxZoom: 16,
-      maxBounds: [
-        [19.5, 86.5],
-        [27.5, 94.0],
-      ],
-      maxBoundsViscosity: 0.85,
+      zoom: 6,
+      minZoom: 5,
+      maxZoom: 12,
+      maxBounds: BANGLADESH_BOUNDS,
+      maxBoundsViscosity: 1,
       zoomControl: false,
       attributionControl: true,
+      scrollWheelZoom: false,
     });
 
-    // CARTO's previous raster URL now watermarks every tile without an API key.
-    // Use the existing admin map's compliant, keyless OSM provider for both themes;
-    // CSS transforms only the dark tiles, never the overlays or attribution.
-    const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
-      className: isDarkMode ? 'public-map-tiles-dark' : undefined,
-      maxZoom: 19,
-    }).addTo(map);
-
-    tileLayerRef.current = tileLayer;
     mapInstanceRef.current = map;
     setIsMapReady(true);
 
     return () => {
-      if (heatLayerRef.current && mapInstanceRef.current) {
-        try {
-          mapInstanceRef.current.removeLayer(heatLayerRef.current);
-        } catch {}
+      if (heatLayerRef.current) {
+        map.removeLayer(heatLayerRef.current);
         heatLayerRef.current = null;
       }
-      if (markerLayerRef.current && mapInstanceRef.current) {
-        try {
-          mapInstanceRef.current.removeLayer(markerLayerRef.current);
-        } catch {}
+      if (markerLayerRef.current) {
+        map.removeLayer(markerLayerRef.current);
         markerLayerRef.current = null;
       }
-      if (polygonLayerRef.current && mapInstanceRef.current) {
-        mapInstanceRef.current.removeLayer(polygonLayerRef.current);
-        mapInstanceRef.current.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
+      if (polygonLayerRef.current) {
+        map.removeLayer(polygonLayerRef.current);
+        map.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
         polygonLayerRef.current = null;
       }
       map.remove();
       mapInstanceRef.current = null;
-      tileLayerRef.current = null;
     };
-  }, [isDarkMode]);
+  }, []);
 
   useEffect(() => {
     if (!mapInstanceRef.current || !isMapReady) return;
@@ -350,26 +347,22 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         style.getPropertyValue('--md-outline').trim() || HEATMAP_TOKENS.colors.mediumHigh;
       const emptyFill = style.getPropertyValue('--md-surface-container').trim() ||
         style.getPropertyValue('--md-surface').trim() || HEATMAP_TOKENS.colors.low;
-      const shades = [
-        HEATMAP_TOKENS.colors.low,
-        HEATMAP_TOKENS.colors.lowMedium,
-        HEATMAP_TOKENS.colors.medium,
-        HEATMAP_TOKENS.colors.mediumHigh,
-        HEATMAP_TOKENS.colors.high,
-      ];
+
       const polygons = L.geoJSON(districtGeometry as any, {
         style: (feature: any) => {
           const id = feature?.properties?.district_id as string;
           const count = counts.get(id)?.count || 0;
           const selected = selectedDistrict.toLowerCase() === id ||
             BANGLADESH_DISTRICTS.some(d => d.id === id && d.nameEn.toLowerCase() === selectedDistrict.toLowerCase());
-          const intensity = count > 0 ? Math.min(4, Math.floor((count / maxCount) * 4)) : 0;
+          const intensity = count > 0
+            ? Math.min(4, Math.floor(4 * Math.log1p(count) / Math.log1p(maxCount)))
+            : 0;
           return {
             color: selected ? HEATMAP_TOKENS.colors.high : outline,
-            weight: selected ? 2.5 : 0.85,
-            opacity: selected ? 1 : 0.8,
-            fillColor: count > 0 ? shades[intensity] : emptyFill,
-            fillOpacity: count > 0 ? 0.69 : 0.24,
+            weight: selected ? 2.6 : 1,
+            opacity: selected ? 1 : 0.85,
+            fillColor: count > 0 ? DISTRICT_SHADES[intensity] : emptyFill,
+            fillOpacity: count > 0 ? 0.88 : 0.5,
             interactive: true,
           };
         },
@@ -387,8 +380,31 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             ? `${toBanglaDigits(entry?.count || 0)}টি প্রতিবেদন`
             : `${entry?.count || 0} reports`;
           content.append(heading, total);
-          (layer as L.Path).bindTooltip(content, { direction: 'top', opacity: 0.96 });
+          const polygonPath = layer as L.Path;
+          polygonPath.bindTooltip(content, { direction: 'top', opacity: 0.96 });
           layer.on('click', () => onSelectDistrict(district.nameEn));
+          // Preserve click interaction and make the same 64 districts reachable
+          // by keyboard. District filters remain the alternative accessible route.
+          layer.on('add', () => {
+            const element = polygonPath.getElement();
+            if (!element) return;
+            element.setAttribute('data-district-id', district.id);
+            element.setAttribute('tabindex', '0');
+            element.setAttribute('role', 'button');
+            element.setAttribute(
+              'aria-label',
+              language === 'bn'
+                ? `${district.nameBn} জেলা, ${toBanglaDigits(entry?.count || 0)}টি প্রতিবেদন। নির্বাচন করুন`
+                : `${district.nameEn} district, ${entry?.count || 0} reports. Select district`
+            );
+            element.addEventListener('keydown', (event: Event) => {
+              const keyboard = event as KeyboardEvent;
+              if (keyboard.key === 'Enter' || keyboard.key === ' ') {
+                keyboard.preventDefault();
+                onSelectDistrict(district.nameEn);
+              }
+            });
+          });
         },
       });
       polygons.addTo(map);
@@ -527,84 +543,54 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     isDarkMode,
   ]);
 
+  // Fit the actual district geometry, not a wider world-map rectangle.
+  // Selected districts fit their true polygon bounds; the full-country view
+  // is restored whenever the selection is cleared or reset.
   useEffect(() => {
-    if (!mapInstanceRef.current || !isMapReady) return;
-
     const map = mapInstanceRef.current;
+    if (!map || !isMapReady) return;
+    map.setMaxBounds(countryBounds.pad(0.05));
+    const mobile = map.getSize().x < 600;
+    const padding: L.PointTuple = mobile ? [14, 18] : [32, 32];
+    const fitCountry = (animate: boolean) => {
+      const min = map.getBoundsZoom(countryBounds, false, L.point(...padding));
+      map.setMinZoom(Math.max(4, min - 0.15));
+      if (animate) {
+        map.flyToBounds(countryBounds, { padding, duration: 0.55 });
+      } else {
+        map.fitBounds(countryBounds, { padding, animate: false });
+      }
+    };
 
-    if (isInitialMount.current) {
+    if (selectedDistrict === 'all') {
+      fitCountry(!isInitialMount.current);
       isInitialMount.current = false;
-      if (selectedDistrict === 'all') {
-        try {
-          const size = map.getSize();
-          if (!size || size.x <= 50 || size.y <= 50) {
-            map.invalidateSize();
-          }
-          map.fitBounds(BANGLADESH_BOUNDS, {
-            padding: [16, 16],
-            animate: false,
-          });
-        } catch (err) {
-          console.warn('[PublicIncidentMap] initial fitBounds error:', err);
-          try {
-            map.fitBounds(BANGLADESH_BOUNDS, { animate: false });
-          } catch {
-            try {
-              map.setView(BANGLADESH_CENTER, 7.2);
-            } catch {}
-          }
-        }
+      return;
+    }
+    isInitialMount.current = false;
+    const district = BANGLADESH_DISTRICTS.find((d) =>
+      d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+      d.nameBn === selectedDistrict || d.id === selectedDistrict.toLowerCase()
+    );
+    const feature = districtGeometry?.features.find(
+      (item: any) => item?.properties?.district_id === district?.id
+    );
+    if (feature) {
+      const bounds = L.geoJSON(feature as any).getBounds();
+      if (bounds.isValid()) {
+        map.flyToBounds(bounds, {
+          padding: mobile ? [42, 64] : [65, 65],
+          maxZoom: 9,
+          duration: 0.6,
+        });
         return;
       }
     }
-
-    if (selectedDistrict === 'all') {
-      try {
-        const size = map.getSize();
-        if (!size || size.x <= 50 || size.y <= 50) {
-          map.invalidateSize();
-          map.setView(BANGLADESH_CENTER, 7.2);
-        } else {
-          map.flyToBounds(BANGLADESH_BOUNDS, {
-            padding: [16, 16],
-            duration: 0.8,
-          });
-        }
-      } catch (err) {
-        console.warn('[PublicIncidentMap] flyToBounds error:', err);
-        try {
-          map.setView(BANGLADESH_CENTER, 7.2);
-        } catch {}
-      }
-    } else {
-      const found = BANGLADESH_DISTRICTS.find(
-        (d) =>
-          d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
-          d.nameBn === selectedDistrict ||
-          d.id === selectedDistrict.toLowerCase()
-      );
-      if (
-        found &&
-        Number.isFinite(Number(found.lat)) &&
-        Number.isFinite(Number(found.lng))
-      ) {
-        try {
-          const size = map.getSize();
-          if (!size || size.x <= 50 || size.y <= 50) {
-            map.invalidateSize();
-          }
-          map.flyTo([Number(found.lat), Number(found.lng)], 10, {
-            duration: 0.9,
-          });
-        } catch (err) {
-          console.warn('[PublicIncidentMap] flyTo error:', err);
-          try {
-            map.setView([Number(found.lat), Number(found.lng)], 10);
-          } catch {}
-        }
-      }
+    if (district) {
+      map.flyTo([district.lat, district.lng], 8, { duration: 0.55 });
     }
-  }, [selectedDistrict, isMapReady]);
+  }, [selectedDistrict, isMapReady, countryBounds, districtGeometry]);
+
 
   const handleZoomIn = () => {
     try {
@@ -619,22 +605,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   };
 
   const handleResetView = () => {
-    if (mapInstanceRef.current) {
-      try {
-        const map = mapInstanceRef.current;
-        const size = map.getSize();
-        if (!size || size.x <= 50 || size.y <= 50) {
-          map.invalidateSize();
-          map.setView(BANGLADESH_CENTER, 7.2);
-        } else {
-          map.flyToBounds(BANGLADESH_BOUNDS, {
-            padding: [16, 16],
-            duration: 0.8,
-          });
-        }
-      } catch {
-        mapInstanceRef.current?.setView(BANGLADESH_CENTER, 7.2);
-      }
+    // Reset selection through the existing Explore filter handler; the bounds
+    // effect restores the Bangladesh-only viewport without competing flyTo calls.
+    if (selectedDistrict === 'all') {
+      mapInstanceRef.current?.flyToBounds(countryBounds, {
+        padding: [14, 18],
+        duration: 0.55,
+      });
     }
     onSelectDistrict('all');
   };
@@ -671,6 +648,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         : 'No reports match the current filters.';
     }
 
+    if (mapLayerMode === 'districts' && districtGeometry) {
+      const mapped = totalMappedInDistricts;
+      return language === 'bn'
+        ? `জেলা অনুযায়ী ${toBanglaDigits(totalReportsCount)}টি প্রকাশিত প্রতিবেদনের মধ্যে ${toBanglaDigits(mapped)}টি মানচিত্রে দেখানো হয়েছে।`
+        : `${mapped} of ${totalReportsCount} published reports are mapped by district.`;
+    }
+
     if (selectedDistrictObj) {
       const fallbackSuffix = isDistrictFallback
         ? language === 'bn'
@@ -701,16 +685,23 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     mappedCount,
     selectedDistrictObj,
     totalReportsCount,
+    mapLayerMode,
+    districtGeometry,
+    totalMappedInDistricts,
   ]);
 
   useEffect(() => {
     if (!mapContainerRef.current || !mapInstanceRef.current) return;
     const observer = new ResizeObserver(() => {
-      mapInstanceRef.current?.invalidateSize();
+      const map = mapInstanceRef.current;
+      map?.invalidateSize();
+      if (map && selectedDistrict === 'all' && countryBounds.isValid()) {
+        map.fitBounds(countryBounds, { padding: [14, 18], animate: false });
+      }
     });
     observer.observe(mapContainerRef.current);
     return () => observer.disconnect();
-  }, [isMapReady]);
+  }, [isMapReady, selectedDistrict, countryBounds]);
 
   const modeDescription =
     mapLayerMode === 'density'
@@ -813,9 +804,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             ? 'প্রতিবেদন মানচিত্র'
             : 'Reports map'
         }
-        className="relative isolate z-0 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface shadow-[var(--elevation-xs)] overflow-hidden flex flex-col h-[350px] sm:h-[390px] md:h-[540px] md:min-h-[540px]"
+        className="relative isolate z-0 rounded-[var(--radius-card)] border border-ui-stroke-subtle bg-ui-surface shadow-[var(--elevation-xs)] overflow-hidden flex flex-col h-[460px] sm:h-[490px] md:h-[540px] md:min-h-[540px]"
       >
-        <div className="absolute top-3.5 right-3.5 z-[500] flex flex-col gap-1.5 shadow-[var(--elevation-sm)]">
+        <div className="absolute top-3 right-3 z-[500] flex flex-col gap-1.5">
           <button
             type="button"
             onClick={handleZoomIn}
@@ -847,70 +838,69 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           </button>
         </div>
 
-        {totalReportsCount > 0 && mapLayerMode === 'density' && (
-          <div className="absolute top-3.5 left-3.5 z-[500]">
-            <HeatmapLegend language={language} />
-          </div>
-        )}
-
-        {totalReportsCount > 0 && mapLayerMode !== 'density' && (
-          <div className="absolute top-3.5 left-3.5 z-[500] max-w-[220px] rounded-[var(--radius-control)] bg-ui-surface/95 backdrop-blur-md border border-ui-stroke-subtle px-3 py-2.5 shadow-[var(--elevation-sm)]">
-            <div className="type-compact font-[var(--font-weight-bold)] text-ui-content-primary">
-              {mapLayerMode === 'districts'
-                ? language === 'bn'
-                  ? 'জেলা তুলনা'
-                  : 'District comparison'
-                : language === 'bn'
-                  ? 'প্রতিবেদন অবস্থান'
-                  : 'Report locations'}
-            </div>
-            <p className="type-compact text-ui-content-secondary mt-0.5 leading-snug">
-              {mapLayerMode === 'districts'
-                ? language === 'bn'
-                  ? 'বড় বৃত্ত মানে বেশি প্রতিবেদন। রঙ শীর্ষ বিষয় দেখায়।'
-                  : 'Larger bubbles mean more reports. Color shows the top topic.'
-                : hasRealCoords
-                  ? language === 'bn'
-                    ? 'প্রতিটি বিন্দু একটি সুনির্দিষ্ট প্রতিবেদন অবস্থান।'
-                    : 'Each point represents a report with a precise location.'
-                  : language === 'bn'
-                    ? 'সুনির্দিষ্ট পয়েন্ট না থাকায় জেলা অবস্থান দেখানো হচ্ছে।'
-                    : 'District locations are shown because precise points are unavailable.'}
-            </p>
-          </div>
-        )}
 
         <div
           ref={mapContainerRef}
-          className="w-full flex-1 z-10 h-[350px] sm:h-[390px] md:h-[540px]"
-          style={{ backgroundColor: 'var(--ui-surface-subtle)' }}
+          className="public-bangladesh-map-canvas w-full flex-1 z-10 h-[460px] sm:h-[490px] md:h-[540px]"
         />
 
-        {totalReportsCount === 0 && (
-          <div className="absolute inset-0 z-[550] bg-ui-surface/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-3">
-            <MapIcon name="alert-circle" size="xl" className="text-ui-content-muted" />
-            <h4 className="type-h3 font-[var(--font-weight-bold)] text-ui-content-primary">
-              {language === 'bn'
-                ? 'এই ফিল্টারে কোনো প্রতিবেদন নেই'
-                : 'No reports match these filters'}
-            </h4>
-            <p className="type-compact text-ui-content-muted max-w-xs">
-              {language === 'bn'
-                ? 'বর্তমান অনুসন্ধান বা ফিল্টারের সাথে কোনো তথ্যের মিল পাওয়া যায়নি।'
-                : 'No reports found matching your current filter selection.'}
-            </p>
-            {onResetFilters && (
-              <button
-                type="button"
-                onClick={onResetFilters}
-                className="btn-primary-action px-4 py-2 rounded-[var(--radius-control)] type-compact font-[var(--font-weight-semibold)] min-h-[44px] cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus"
-              >
-                {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
-              </button>
-            )}
-          </div>
-        )}
+
       </div>
+
+      {/* Explanations sit outside the map, leaving every district selectable on a phone. */}
+      {mapLayerMode === 'districts' && districtGeometry && (
+        <div
+          id="district-map-legend"
+          role="region"
+          aria-label={language === 'bn' ? 'জেলা রঙের নির্দেশিকা' : 'District color legend'}
+          className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control px-3 py-2.5 flex flex-col sm:flex-row sm:items-center gap-2.5"
+        >
+          <span className="type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+            {language === 'bn' ? 'জেলা অনুযায়ী প্রকাশিত প্রতিবেদন' : 'Published reports by district'}
+          </span>
+          <div className="flex flex-wrap items-center gap-2.5 type-meta text-ui-content-secondary">
+            <span className="flex items-center gap-1.5">
+              <span aria-hidden="true" className="h-3 w-3 border border-ui-stroke-default ui-radius-badge-md bg-ui-surface" />
+              {language === 'bn' ? 'প্রতিবেদন নেই' : 'No reports'}
+            </span>
+            <span className="flex items-center gap-1.5">
+              {language === 'bn' ? 'কম' : 'Low'}
+              <span className="inline-flex overflow-hidden ui-radius-badge-md border border-ui-stroke-subtle" aria-hidden="true">
+                {DISTRICT_SHADES.map((shade) => (
+                  <span key={shade} className="h-3 w-5" style={{ backgroundColor: shade }} />
+                ))}
+              </span>
+              {language === 'bn' ? 'বেশি' : 'High'}
+            </span>
+          </div>
+          <span className="type-meta text-ui-content-muted">
+            {language === 'bn' ? 'শুধু বর্তমান ফিল্টারের প্রতিবেদন; ঘটনার প্রকৃত হার নয়।' : 'Current filtered reports only; not incident prevalence.'}
+          </span>
+        </div>
+      )}
+      {mapLayerMode === 'density' && totalReportsCount > 0 && (
+        <HeatmapLegend language={language} className="!max-w-none" />
+      )}
+      {mapLayerMode === 'points' && (
+        <p className="type-meta text-ui-content-secondary">
+          {language === 'bn'
+            ? hasRealCoords ? 'বিন্দুগুলো সুনির্দিষ্ট অবস্থানের প্রকাশিত প্রতিবেদন দেখায়।' : 'সুনির্দিষ্ট অবস্থান না থাকায় জেলা অনুযায়ী প্রতিবেদন দেখানো হচ্ছে।'
+            : hasRealCoords ? 'Dots represent published reports with precise locations.' : 'District locations are shown because precise coordinates are unavailable.'}
+        </p>
+      )}
+      {totalReportsCount === 0 && (
+        <div className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control p-3 flex flex-wrap items-center gap-3">
+          <span role="status" className="type-meta text-ui-content-secondary">
+            {language === 'bn' ? 'বর্তমান ফিল্টারে কোনো প্রতিবেদন নেই।' : 'No reports match the current filters.'}
+          </span>
+          {onResetFilters && (
+            <button type="button" onClick={onResetFilters}
+              className="btn-primary-action px-3 min-h-[44px] ui-radius-control type-compact focus:outline-none focus-visible:ring-2 focus-visible:ring-ui-focus">
+              {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset filters'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

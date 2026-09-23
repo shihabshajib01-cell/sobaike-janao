@@ -943,8 +943,8 @@ export const ExplorePage: React.FC = () => {
       {/* 5. Selected Mode Content (Map vs Reports) or Zero Result Recovery */}
       {!isLoading && !fetchError && (
         <>
-          {filteredReports.length === 0 ? (
-            /* Authoritative Zero-Result Recovery State */
+          {filteredReports.length === 0 && viewMode !== 'heatmap' ? (
+            /* Reports-only zero result; keep the geography available when inspecting an empty district. */
             <div
               role="status"
               className="bg-ui-surface border border-ui-stroke-subtle ui-radius-card p-8 sm:p-10 text-center space-y-4 shadow-[var(--elevation-2xs)]"

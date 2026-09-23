@@ -189,6 +189,7 @@ export const AppShell: React.FC = () => {
   const [routeAnnouncement, setRouteAnnouncement] = useState('');
   const previousNavigationKeyRef = useRef(`${language}:${currentRoute}`);
   const hideMobileMainNavigation = shouldHideBottomNav(currentRoute);
+  const isExploreRoute = currentRoute === '/explore' || currentRoute === '/en/explore';
 
   const activeCategoryTheme = React.useMemo(() => {
     const route = currentRoute.replace(/^\/en(?=\/|$)/, '') || '/';
@@ -359,8 +360,12 @@ export const AppShell: React.FC = () => {
         <main
           id="main-content"
           tabIndex={-1}
-          className={`w-full mx-auto max-w-[var(--layout-content-max)] flex-1 flex flex-col justify-between focus:outline-none ${
-            hideMobileMainNavigation ? 'pb-6 md:pb-0' : 'pb-28 pb-safe md:pb-0'
+          className={`w-full mx-auto max-w-[var(--layout-content-max)] flex-1 flex flex-col ${isExploreRoute ? 'justify-start' : 'justify-between'} focus:outline-none ${
+            hideMobileMainNavigation
+              ? 'pb-6 md:pb-0'
+              : isExploreRoute
+                ? 'pb-[calc(10rem+env(safe-area-inset-bottom,0px))] md:pb-0'
+                : 'pb-28 pb-safe md:pb-0'
           }`}
         >
           <div className="w-full">
@@ -433,7 +438,7 @@ export const AppShell: React.FC = () => {
             </SeoManager>
           </div>
 
-          <footer className="pt-8 pb-6 border-t border-ui-divider mt-10 type-meta text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0">
+          <footer className={`pt-8 pb-6 border-t border-ui-divider ${isExploreRoute ? 'mt-5 md:mt-10' : 'mt-10'} type-meta text-ui-content-muted px-4 md:px-6 lg:px-8 min-[1440px]:px-0`}>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="font-[var(--font-weight-bold)] text-ui-content-primary">সবাইকে জানাও</span>
