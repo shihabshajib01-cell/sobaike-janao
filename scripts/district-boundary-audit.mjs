@@ -74,9 +74,9 @@ if (existsSync(publicMapSource)) {
 // Geographic coverage is partial, but the selected location registry must
 // provide 100% of the existing SQL contract's 601 canonical names/IDs.
 const locationSource = readFileSync('src/data/upazilas.ts', 'utf8');
-const locationSection = locationSource.split('export const BANGLADESH_UPAZILAS:')[1]?.split('\\n];')[0];
+const locationSection = locationSource.split('export const BANGLADESH_UPAZILAS:')[1]?.split('\n];')[0];
 assert(locationSection, 'Canonical upazila/thana registry missing');
-const locationRows = [...locationSection.matchAll(/\\{ id: '([^']+)', nameBn: '[^']+', nameEn: (?:'[^']+'|"[^"]+"), districtId: '([^']+)'/g)]
+const locationRows = [...locationSection.matchAll(/\{ id: '([^']+)', nameBn: '[^']+', nameEn: (?:'[^']+'|"[^"]+"), districtId: '([^']+)'/g)]
   .map(match => ({ id: match[1], districtId: match[2] }));
 const locationIDs = new Set(locationRows.map(row => row.id));
 assert.equal(locationIDs.size, 601, 'Every existing canonical upazila/thana must remain available');
