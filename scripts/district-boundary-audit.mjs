@@ -37,3 +37,15 @@ if (existsSync('src/data/districts.ts')) {
   assert.deepEqual([...ids].sort(), [...canonical].sort(), 'Boundary/SQL canonical district identity drift');
 }
 console.log('PASS: 64 mapped districts, unique P-codes, closed polygon rings, lazy gzip budget');
+
+const publicMapSource = 'src/components/explore/PublicIncidentMap.tsx';
+if (existsSync(publicMapSource)) {
+  const map = readFileSync(publicMapSource, 'utf8');
+  const css = readFileSync('src/index.css', 'utf8');
+  assert.match(map, /useState<MapLayerMode>\('districts'\)/, 'Default map must expose district geography');
+  assert.match(map, /tile\.openstreetmap\.org/, 'Map requires a valid keyless tile provider');
+  assert.doesNotMatch(map, /basemaps\.cartocdn\.com/, 'Never reintroduce unkeyed CARTO raster tiles');
+  assert.match(map, /addDistrictOutlines\(\)/, 'District outlines must remain visible in Density and Points');
+  assert.match(map, /isDarkMode,\s*\n\s*\]\);/, 'Both map layers must update after theme changes');
+  assert.match(css, /\.public-map-tiles-dark \.leaflet-tile/, 'Dark map tiles must have isolated styling');
+}
