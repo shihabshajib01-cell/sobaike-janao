@@ -447,6 +447,86 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       return;
     }
 
+    if (mapLayerMode === 'districts' && activeUpazilaFeatures.length > 0) {
+      const rootStyle = getComputedStyle(document.documentElement);
+      const outline = rootStyle.getPropertyValue('--md-outline').trim() ||
+        HEATMAP_TOKENS.colors.mediumHigh;
+      const normalFill = rootStyle.getPropertyValue('--md-surface-container').trim() ||
+        rootStyle.getPropertyValue('--md-surface').trim() || HEATMAP_TOKENS.colors.low;
+      const current = activeUpazilaFeatures.find(feature =>
+        feature.properties.pcode === selectedUpazila
+      );
+      const polygons = L.geoJSON({
+        type: 'FeatureCollection',
+        features: activeUpazilaFeatures,
+      } as any, {
+        style: (feature: any) => {
+          const active = feature?.properties?.pcode === selectedUpazila;
+          return {
+            color: active ? HEATMAP_TOKENS.colors.high : outline,
+            weight: active ? 2.8 : 1.25,
+            opacity: 0.95,
+            fillColor: active ? HEATMAP_TOKENS.colors.high : normalFill,
+            fillOpacity: active ? 0.8 : 0.44,
+            interactive: true,
+          };
+        },
+        onEachFeature: (feature: any, layer: L.Layer) => {
+          const properties = feature.properties;
+          const label = language === 'bn'
+            ? properties.name_bn || properties.name_en
+            : properties.name_en;
+          const preciseCount = reportsWithRealCoords.filter(report =>
+            containsCoordinate(feature.geometry,
+              Number(report.coordinates?.lat), Number(report.coordinates?.lng))
+          ).length;
+          const tooltip = document.createElement('div');
+          const title = document.createElement('strong');
+          title.textContent = label;
+          const note = document.createElement('div');
+          note.textContent = language === 'bn'
+            ? `সুনির্দিষ্ট অবস্থানযুক্ত ${toBanglaDigits(preciseCount)}টি প্রতিবেদন; অন্যগুলোর অবস্থান অনিশ্চিত`
+            : `${preciseCount} precisely located reports; other locations unconfirmed`;
+          tooltip.append(title, note);
+          const path = layer as L.Path;
+          path.bindTooltip(tooltip, { direction: 'top', opacity: 0.97 });
+          const select = () => {
+            setSelectedUpazila(properties.pcode);
+            const bounds = L.geoJSON(feature as any).getBounds();
+            if (bounds.isValid()) {
+              map.flyToBounds(bounds.pad(0.38), {
+                padding: [30, 32],
+                maxZoom: 10,
+                duration: 0.5,
+              });
+            }
+          };
+          layer.on('click', select);
+          layer.on('add', () => {
+            const element = path.getElement();
+            if (!element) return;
+            element.setAttribute('tabindex', '0');
+            element.setAttribute('role', 'button');
+            element.setAttribute('aria-label', language === 'bn'
+              ? `${label} উপজেলা নির্বাচন করুন`
+              : `Select ${label} upazila`);
+            element.addEventListener('keydown', (event: Event) => {
+              const keyboard = event as KeyboardEvent;
+              if (keyboard.key === 'Enter' || keyboard.key === ' ') {
+                keyboard.preventDefault();
+                select();
+              }
+            });
+          });
+        },
+      });
+      // Do not add any other country or unverified upazila choropleth values.
+      polygons.addTo(map);
+      upazilaLayerRef.current = polygons;
+      if (current) polygons.bringToFront();
+      return;
+    }
+
     if (mapLayerMode === 'districts' && districtGeometry) {
       const counts = new Map(districtCounts.map(entry => [entry.district.id, entry]));
       const maxCount = Math.max(1, ...districtCounts.map(entry => entry.count));
@@ -648,6 +728,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     districtGeometry,
     selectedDistrict,
     resolvedTheme,
+    activeUpazilaFeatures,
+    selectedUpazila,
   ]);
 
   // Bangladesh-only geographic context: division labels at country scale,
