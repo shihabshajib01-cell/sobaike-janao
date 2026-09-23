@@ -35,6 +35,7 @@ interface DistrictAggregate {
 }
 
 const BANGLADESH_CENTER: [number, number] = [23.685, 90.3563];
+const BOUNDARY_ATTRIBUTION = 'District boundaries: BBS/OCHA (2020), adapted (CC BY 3.0 IGO)';
 const BANGLADESH_BOUNDS: L.LatLngBoundsExpression = [
   [20.7, 88.0],
   [26.6, 92.7],
@@ -251,6 +252,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       }
       if (polygonLayerRef.current && mapInstanceRef.current) {
         mapInstanceRef.current.removeLayer(polygonLayerRef.current);
+        mapInstanceRef.current.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
         polygonLayerRef.current = null;
       }
       map.remove();
@@ -280,6 +282,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
     if (polygonLayerRef.current) {
       map.removeLayer(polygonLayerRef.current);
+      map.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = null;
     }
 
@@ -371,6 +374,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         },
       });
       polygons.addTo(map);
+      map.attributionControl?.addAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = polygons;
       return;
     }
