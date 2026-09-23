@@ -140,6 +140,7 @@ jobs:
           test -f dist/favicon.png
           test -f dist/issues/index.html
           test -f dist/explore/index.html
+          test -f dist/geo/bangladesh-districts-2020.geojson
           grep -q "https://shobaikejanao.com/sitemap.xml" dist/robots.txt
           grep -q 'href="/favicon.png"' dist/index.html
           grep -q "https://shobaikejanao.com/issues" dist/issues/index.html
