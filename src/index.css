@@ -1439,3 +1439,51 @@
 .public-bangladesh-map-canvas.leaflet-container {
   background: var(--ui-surface-subtle);
 }
+
+
+/* Bangladesh-only vector map labels. No external/world basemap is restored. */
+.bangladesh-map-label-host {
+  background: transparent !important;
+  border: 0 !important;
+  pointer-events: none !important;
+}
+
+.bangladesh-map-label {
+  display: inline-block;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  color: var(--ui-text-secondary);
+  text-shadow:
+    0 1px 0 var(--ui-surface),
+    1px 0 0 var(--ui-surface),
+    0 -1px 0 var(--ui-surface),
+    -1px 0 0 var(--ui-surface);
+  font-family: var(--font-ui);
+  pointer-events: none;
+  user-select: none;
+}
+
+.bangladesh-map-label.is-division {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: var(--font-weight-bold);
+  color: var(--ui-text-primary);
+}
+
+.bangladesh-map-label.is-district {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: var(--font-weight-semibold);
+}
+
+.bangladesh-map-label.is-selected {
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  color: var(--ui-primary-action-bg);
+}
+
+@media (max-width: 480px) {
+  .bangladesh-map-label.is-district {
+    font-size: 9px;
+  }
+}
