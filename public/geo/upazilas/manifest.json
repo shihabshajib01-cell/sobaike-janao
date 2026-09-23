@@ -13,5 +13,8 @@
     "rajshahi": "geo/upazilas/rajshahi-2020.geojson",
     "rangpur": "geo/upazilas/rangpur-2020.geojson",
     "sylhet": "geo/upazilas/sylhet-2020.geojson"
-  }
+  },
+  "uniquely_matched_sql_names": 351,
+  "unmatched_sql_names": 147,
+  "note": "Only uniquely matched source names/aliases have canonical_id and name_bn. Unmatched map shapes remain geography-only and must not be silently equated to SQL taxonomy."
 }
