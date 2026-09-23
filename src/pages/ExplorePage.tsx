@@ -997,7 +997,7 @@ export const ExplorePage: React.FC = () => {
 
               {/* Mobile Selected-Area Trigger Card (Mobile only, when district is selected) */}
               {selectedDistrict !== 'all' && (
-                <div className="block md:hidden w-full">
+                <div className="block md:hidden w-full mb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]">
                   <div className="bg-ui-surface border border-ui-stroke-subtle ui-radius-card p-3.5 sm:p-4 shadow-[var(--elevation-2xs)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 ui-radius-control bg-ui-surface-subtle border border-ui-stroke-subtle flex items-center justify-center shrink-0 text-ui-content-primary">

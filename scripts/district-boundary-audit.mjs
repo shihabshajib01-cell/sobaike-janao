@@ -45,15 +45,23 @@ if (existsSync(publicMapSource)) {
   assert.match(map, /useState<MapLayerMode>\('districts'\)/, 'Default map must expose district geography');
   assert.doesNotMatch(map, /L\.tileLayer\(/, 'Public map must render Bangladesh only; no world raster tiles');
   assert.match(map, /countryBounds\.pad\(0\.05\)/, 'Country geography must constrain the map viewport');
+  assert.match(map, /attributionControl: false/, 'Leaflet attribution must not obscure the mobile map canvas');
+  assert.match(map, /bangladesh-map-label/, 'Bangladesh-only map must retain internal geographic labels');
+  assert.match(map, /DIVISIONS/, 'National view must provide division-level context');
+  assert.match(map, /bounds\.pad\(mobile \? 1\.15 : 0\.75\)/, 'Selected district must retain neighboring geographic context');
+  assert.match(map, /Map: Leaflet · District boundaries: BBS\/OCHA 2020/, 'Compact source attribution must remain outside the canvas');
   assert.match(map, /district-map-legend/, 'District color legend must be visible outside the canvas');
   assert.doesNotMatch(map, /Larger bubbles mean more reports|বড় বৃত্ত মানে বেশি/, 'Old bubble copy must not describe polygon mode');
   assert.doesNotMatch(map, /basemaps\.cartocdn\.com/, 'Never reintroduce unkeyed CARTO raster tiles');
   assert.match(map, /addDistrictOutlines\(\)/, 'District outlines must remain visible in Density and Points');
-  assert.match(map, /isDarkMode,\s*\n\s*\]\);/, 'Both map layers must update after theme changes');
+  assert.match(map, /resolvedTheme,\s*\n\s*\]\);/, 'Vector map styles must update after theme changes');
   assert.match(css, /\.public-bangladesh-map-canvas\.leaflet-container/, 'The country-only canvas needs a theme-aware background');
   assert.match(map, /mapLayerMode === 'density'/, 'Density mode must remain available');
   assert.match(map, /mapLayerMode === 'points'/, 'Points mode must remain available');
   const shell = readFileSync('src/components/layout/AppShell.tsx', 'utf8');
   assert.match(shell, /isExploreRoute \? 'justify-start' : 'justify-between'/, 'Mobile Explore footer must not have excess flex spacing');
   assert.match(shell, /pb-\[calc\(10rem\+env\(safe-area-inset-bottom,0px\)\)\]/, 'Explore page must clear the fixed bottom navigation');
+  const explore = readFileSync('src/pages/ExplorePage.tsx', 'utf8');
+  assert.match(explore, /mb-\[calc\(5\.5rem\+env\(safe-area-inset-bottom,0px\)\)\]/, 'Selected-area action must clear mobile bottom navigation');
+  assert.match(css, /\.bangladesh-map-label\.is-district/, 'District label styling must be present');
 }
