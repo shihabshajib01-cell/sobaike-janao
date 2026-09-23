@@ -4150,5 +4150,7 @@
       "district_id": "sherpur",
       "pcode": "BD458970"
     }
-  ]
+  ],
+  "registry_without_verified_polygons_count": 250,
+  "historic_polygons_without_verified_registry_matches_count": 147
 }
