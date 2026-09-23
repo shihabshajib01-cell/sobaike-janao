@@ -54,7 +54,7 @@ if (existsSync(publicMapSource)) {
   assert.doesNotMatch(map, /Larger bubbles mean more reports|বড় বৃত্ত মানে বেশি/, 'Old bubble copy must not describe polygon mode');
   assert.doesNotMatch(map, /basemaps\.cartocdn\.com/, 'Never reintroduce unkeyed CARTO raster tiles');
   assert.match(map, /addDistrictOutlines\(\)/, 'District outlines must remain visible in Density and Points');
-  assert.match(map, /resolvedTheme,\s*\n\s*\]\);/, 'Vector map styles must update after theme changes');
+  assert.match(map, /resolvedTheme,\s*\n\s*activeUpazilaFeatures,/, 'Vector map styles must update after theme changes');
   assert.match(css, /\.public-bangladesh-map-canvas\.leaflet-container/, 'The country-only canvas needs a theme-aware background');
   assert.match(map, /mapLayerMode === 'density'/, 'Density mode must remain available');
   assert.match(map, /mapLayerMode === 'points'/, 'Points mode must remain available');
