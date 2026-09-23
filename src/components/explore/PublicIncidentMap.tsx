@@ -926,26 +926,35 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   }, [selectedDistrict, selectedDivision, isMapReady, countryBounds, districtGeometry]);
 
 
-  const handleSelectUpazila = (pcode: string | null) => {
-    setSelectedUpazila(pcode);
-    if (!pcode) {
-      const district = districtGeometry?.features?.find((f: any) =>
-        f?.properties?.district_id === districtForUpazilas?.id
+  const handleSelectUpazila = (locationKey: string | null) => {
+    setSelectedUpazila(locationKey);
+    const showDistrict = () => {
+      const district = districtGeometry?.features?.find((feature: any) =>
+        feature?.properties?.district_id === districtForUpazilas?.id
       );
-      if (district) {
-        const bounds = L.geoJSON(district as any).getBounds();
-        mapInstanceRef.current?.flyToBounds(bounds.pad(0.3), {
-          padding: [20, 30],
-          maxZoom: 8,
-          duration: 0.45,
-        });
-      }
+      if (!district) return;
+      const bounds = L.geoJSON(district as any).getBounds();
+      if (!bounds.isValid()) return;
+      mapInstanceRef.current?.flyToBounds(bounds.pad(0.3), {
+        padding: [20, 30],
+        maxZoom: 8,
+        duration: 0.45,
+      });
+    };
+    // Never leave the map zoomed into a different upazila when the newly
+    // selected canonical entry does not have an independently matched polygon.
+    if (!locationKey) {
+      showDistrict();
       return;
     }
-    const feature = activeUpazilaFeatures.find(f =>
-      f.properties.canonical_id === pcode || f.properties.pcode === pcode
+    const feature = activeUpazilaFeatures.find(item =>
+      item.properties.canonical_id === locationKey ||
+      item.properties.pcode === locationKey
     );
-    if (!feature) return;
+    if (!feature) {
+      showDistrict();
+      return;
+    }
     const bounds = L.geoJSON(feature as any).getBounds();
     if (bounds.isValid()) {
       mapInstanceRef.current?.flyToBounds(bounds.pad(0.38), {
