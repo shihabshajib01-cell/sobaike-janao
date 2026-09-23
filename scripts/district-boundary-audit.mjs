@@ -65,3 +65,45 @@ if (existsSync(publicMapSource)) {
   assert.match(explore, /mb-\[calc\(5\.5rem\+env\(safe-area-inset-bottom,0px\)\)\]/, 'Selected-area action must clear mobile bottom navigation');
   assert.match(css, /\.bangladesh-map-label\.is-district/, 'District label styling must be present');
 }
+
+const manifest = JSON.parse(readFileSync('public/geo/upazilas/manifest.json', 'utf8'));
+assert.equal(manifest.source_feature_count, 498);
+assert.equal(manifest.sql_canonical_row_count_at_audit, 601);
+assert.equal(manifest.uniquely_matched_sql_names, 351);
+assert.equal(manifest.unmatched_sql_names, 147);
+const districtCodes = new Map(geo.features.map(f => [f.properties.ADM2_PCODE, f.properties.district_id]));
+const upazilaCodes = new Set();
+let verifiedUpazilas = 0;
+for (const [division, path] of Object.entries(manifest.division_files)) {
+  const source = readFileSync('public/' + path, 'utf8');
+  assert(gzipSync(source).length < 115000, 'Lazy upazila division asset exceeded 115KB gzip: ' + division);
+  const section = JSON.parse(source);
+  assert.equal(section.type, 'FeatureCollection');
+  assert.equal(section.metadata.division, division);
+  for (const item of section.features) {
+    const p = item.properties;
+    assert.match(p.pcode, /^BD[0-9]{6}$/);
+    assert.equal(p.parent_pcode, p.pcode.slice(0, 6));
+    assert.equal(districtCodes.get(p.parent_pcode), p.district_id);
+    assert(!upazilaCodes.has(p.pcode), 'Duplicate upazila P-code');
+    upazilaCodes.add(p.pcode);
+    assert(item.geometry && ['Polygon', 'MultiPolygon'].includes(item.geometry.type));
+    if (p.canonical_id) {
+      assert.equal(typeof p.name_bn, 'string');
+      assert(p.name_bn.length > 0);
+      verifiedUpazilas += 1;
+    } else {
+      assert(!p.name_bn, 'Unverified translation must not be invented');
+    }
+  }
+}
+assert.equal(upazilaCodes.size, 498);
+assert.equal(verifiedUpazilas, 351, 'Name-verified upazila identity coverage changed');
+if (existsSync(publicMapSource)) {
+  const map = readFileSync(publicMapSource, 'utf8');
+  assert.match(map, /geo\\/upazilas\\//, 'Map must lazily load real upazila geometry');
+  assert.match(map, /containsCoordinate/, 'Only precise-coordinate reports may be counted by upazila');
+  assert.match(map, /onSelectDistrict\\('all'\\)/, 'Map must retain back navigation');
+  assert.doesNotMatch(map, /Math\\.random\\(/, 'Never display demo data as report counts');
+}
+console.log('PASS: Historical upazila dataset (498), 351 verified names / 147 unmatched, 64 parent P-codes, lazy asset budgets');
