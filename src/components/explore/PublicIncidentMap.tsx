@@ -49,6 +49,33 @@ const DISTRICT_SHADES = [
   HEATMAP_TOKENS.colors.high,
 ];
 
+// Coordinate-based matches are evidence of location; text-only locations are not
+// silently assigned to upazilas. Holes and MultiPolygons are respected.
+const containsCoordinate = (geometry: any, lat: number, lng: number): boolean => {
+  const inRing = (ring: number[][]) => {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [ax, ay] = ring[i], [bx, by] = ring[j];
+      if ((ay > lat) !== (by > lat) &&
+          lng < ((bx - ax) * (lat - ay)) / (by - ay) + ax) inside = !inside;
+    }
+    return inside;
+  };
+  const inPolygon = (rings: number[][][]) =>
+    rings.length > 0 && inRing(rings[0]) && !rings.slice(1).some(inRing);
+  if (geometry?.type === 'Polygon') return inPolygon(geometry.coordinates);
+  if (geometry?.type === 'MultiPolygon') return geometry.coordinates.some(inPolygon);
+  return false;
+};
+
+const EMPTY_UPAZILA_FEATURES: any[] = [];
+
+const UPAZILA_DIVISION_ASSETS: Record<string, string> = {
+  barisal: 'barisal', chittagong: 'chittagong', dhaka: 'dhaka',
+  khulna: 'khulna', mymensingh: 'mymensingh', rajshahi: 'rajshahi',
+  rangpur: 'rangpur', sylhet: 'sylhet',
+};
+
 const isValidCoordinate = (report: ReportItem) => {
   const lat = Number(report.coordinates?.lat);
   const lng = Number(report.coordinates?.lng);
@@ -86,6 +113,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const polygonLayerRef = useRef<L.GeoJSON | null>(null);
   const labelLayerRef = useRef<L.LayerGroup | null>(null);
+  const upazilaLayerRef = useRef<L.GeoJSON | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
@@ -100,6 +128,76 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   // Fetch only within the Explore map chunk; retaining the existing marker fallback on failure.
   // A failed load leaves the existing district markers available as a safe fallback.
   const [districtGeometry, setDistrictGeometry] = useState<any | null>(null);
+  const [upazilaData, setUpazilaData] = useState<{ districtId: string; features: any[] } | null>(null);
+  const [upazilaLoadState, setUpazilaLoadState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [selectedUpazila, setSelectedUpazila] = useState<string | null>(null);
+  const districtForUpazilas = BANGLADESH_DISTRICTS.find(
+    d => selectedDistrict !== 'all' &&
+      (d.id === selectedDistrict.toLowerCase() ||
+       d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() || d.nameBn === selectedDistrict)
+  );
+  const activeUpazilaFeatures = upazilaData && upazilaData.districtId === districtForUpazilas?.id
+    ? upazilaData.features
+    : EMPTY_UPAZILA_FEATURES;
+
+  // Existing district selection controls the drilldown. The new geography is
+  // lazily fetched only after a user chooses a district; no 498-feature bundle
+  // is loaded on the national initial view.
+  useEffect(() => {
+    setSelectedUpazila(null);
+    setUpazilaData(null);
+    if (!districtForUpazilas || mapLayerMode !== 'districts' || !districtGeometry) {
+      setUpazilaLoadState('idle');
+      return;
+    }
+    const districtFeature = districtGeometry.features.find(
+      (f: any) => f?.properties?.district_id === districtForUpazilas.id
+    );
+    const division = UPAZILA_DIVISION_ASSETS[districtForUpazilas.divisionId];
+    if (!districtFeature || !division) {
+      setUpazilaLoadState('error');
+      return;
+    }
+    const controller = new AbortController();
+    setUpazilaLoadState('loading');
+    const load = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.BASE_URL}geo/upazilas/${division}-2020.geojson`,
+          { signal: controller.signal }
+        );
+        if (!response.ok) throw new Error('Upazila geography HTTP ' + response.status);
+        const result = await response.json();
+        if (result?.type !== 'FeatureCollection' || !Array.isArray(result.features)) {
+          throw new Error('Invalid upazila geography collection');
+        }
+        const features = result.features.filter((feature: any) =>
+          feature?.properties?.parent_pcode === districtFeature.properties.ADM2_PCODE &&
+          feature?.properties?.district_id === districtForUpazilas.id &&
+          typeof feature?.properties?.name_en === 'string' && feature.geometry
+        );
+        if (!features.length || new Set(features.map((feature: any) => feature.properties.pcode)).size !== features.length) {
+          throw new Error('Upazila geography failed district/P-code verification');
+        }
+        if (!controller.signal.aborted) {
+          setUpazilaData({ districtId: districtForUpazilas.id, features });
+          setUpazilaLoadState('idle');
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setUpazilaLoadState('error');
+          console.warn('[PublicIncidentMap] Upazila layer unavailable; retaining district map:', error);
+        }
+      }
+    };
+    void load();
+    return () => controller.abort();
+  }, [selectedDistrict, districtGeometry, mapLayerMode]);
+
+  const selectedUpazilaFeature = activeUpazilaFeatures.find(
+    feature => feature.properties.pcode === selectedUpazila
+  );
+
   useEffect(() => {
     const controller = new AbortController();
     const load = async () => {
@@ -133,6 +231,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     () => reports.filter(isValidCoordinate),
     [reports]
   );
+  const selectedUpazilaReports = useMemo(() => {
+    if (!selectedUpazilaFeature || selectedUpazilaFeature.properties.invalid_source_geometry) return [];
+    return reportsWithRealCoords.filter(report =>
+      containsCoordinate(selectedUpazilaFeature.geometry,
+        Number(report.coordinates?.lat), Number(report.coordinates?.lng))
+    );
+  }, [reportsWithRealCoords, selectedUpazilaFeature]);
 
   const { districtCounts, totalMappedInDistricts } = useMemo(() => {
     const map = new Map<string, DistrictAggregate>();
@@ -249,6 +354,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         map.removeLayer(polygonLayerRef.current);
         polygonLayerRef.current = null;
       }
+      if (upazilaLayerRef.current) {
+        map.removeLayer(upazilaLayerRef.current);
+        upazilaLayerRef.current = null;
+      }
       if (labelLayerRef.current) {
         map.removeLayer(labelLayerRef.current);
         labelLayerRef.current = null;
@@ -280,6 +389,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     if (polygonLayerRef.current) {
       map.removeLayer(polygonLayerRef.current);
       polygonLayerRef.current = null;
+    }
+    if (upazilaLayerRef.current) {
+      map.removeLayer(upazilaLayerRef.current);
+      upazilaLayerRef.current = null;
     }
 
     const resolveCategoryColor = (section: SectionKey) => {
@@ -335,6 +448,91 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         }
       }
       addDistrictOutlines();
+      return;
+    }
+
+    if (mapLayerMode === 'districts' && activeUpazilaFeatures.length > 0) {
+      const rootStyle = getComputedStyle(document.documentElement);
+      const outline = rootStyle.getPropertyValue('--md-outline').trim() ||
+        HEATMAP_TOKENS.colors.mediumHigh;
+      const normalFill = rootStyle.getPropertyValue('--md-surface-container').trim() ||
+        rootStyle.getPropertyValue('--md-surface').trim() || HEATMAP_TOKENS.colors.low;
+      const polygons = L.geoJSON({
+        type: 'FeatureCollection',
+        features: activeUpazilaFeatures,
+      } as any, {
+        style: (feature: any) => {
+          const active = feature?.properties?.pcode === selectedUpazila;
+          return {
+            color: active ? HEATMAP_TOKENS.colors.high : outline,
+            weight: active ? 2.8 : 1.25,
+            opacity: 0.95,
+            fillColor: active ? HEATMAP_TOKENS.colors.high : normalFill,
+            fillOpacity: active ? 0.8 : 0.44,
+            interactive: true,
+          };
+        },
+        onEachFeature: (feature: any, layer: L.Layer) => {
+          const properties = feature.properties;
+          const label = language === 'bn'
+            ? properties.name_bn || properties.name_en
+            : properties.name_en;
+          const validBoundary = !properties.invalid_source_geometry;
+          const preciseCount = validBoundary ? reportsWithRealCoords.filter(report =>
+            containsCoordinate(feature.geometry,
+              Number(report.coordinates?.lat), Number(report.coordinates?.lng))
+          ).length : null;
+          const tooltip = document.createElement('div');
+          const title = document.createElement('strong');
+          title.textContent = label;
+          const note = document.createElement('div');
+          note.textContent = !validBoundary
+            ? language === 'bn'
+              ? 'সীমানার উৎসে জ্যামিতিক ত্রুটি আছে; অবস্থানভিত্তিক গণনা উপলব্ধ নয়'
+              : 'Source polygon needs repair; precise-location counts unavailable'
+            : reportsWithRealCoords.length === 0
+              ? language === 'bn'
+                ? 'উপজেলা অনুযায়ী প্রতিবেদনের সংখ্যা উপলব্ধ নয়; প্রকাশিত ডেটায় সুনির্দিষ্ট স্থানাঙ্ক নেই'
+                : 'Upazila report counts unavailable: precise coordinates are not in the public feed'
+              : language === 'bn'
+                ? `সুনির্দিষ্ট অবস্থানযুক্ত ${toBanglaDigits(preciseCount!)}টি প্রতিবেদন; অন্যগুলোর অবস্থান অনিশ্চিত`
+                : `${preciseCount} precisely located reports; other locations unconfirmed`;
+          tooltip.append(title, note);
+          const path = layer as L.Path;
+          path.bindTooltip(tooltip, { direction: 'top', opacity: 0.97 });
+          const select = () => {
+            setSelectedUpazila(properties.pcode);
+            const bounds = L.geoJSON(feature as any).getBounds();
+            if (bounds.isValid()) {
+              map.flyToBounds(bounds.pad(0.38), {
+                padding: [30, 32],
+                maxZoom: 10,
+                duration: 0.5,
+              });
+            }
+          };
+          layer.on('click', select);
+          layer.on('add', () => {
+            const element = path.getElement();
+            if (!element) return;
+            element.setAttribute('tabindex', '0');
+            element.setAttribute('role', 'button');
+            element.setAttribute('aria-label', language === 'bn'
+              ? `${label} উপজেলা নির্বাচন করুন`
+              : `Select ${label} upazila`);
+            element.addEventListener('keydown', (event: Event) => {
+              const keyboard = event as KeyboardEvent;
+              if (keyboard.key === 'Enter' || keyboard.key === ' ') {
+                keyboard.preventDefault();
+                select();
+              }
+            });
+          });
+        },
+      });
+      // Do not add any other country or unverified upazila choropleth values.
+      polygons.addTo(map);
+      upazilaLayerRef.current = polygons;
       return;
     }
 
@@ -539,6 +737,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     districtGeometry,
     selectedDistrict,
     resolvedTheme,
+    activeUpazilaFeatures,
+    selectedUpazila,
   ]);
 
   // Bangladesh-only geographic context: division labels at country scale,
@@ -643,6 +843,34 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     }
   }, [selectedDistrict, isMapReady, countryBounds, districtGeometry]);
 
+
+  const handleSelectUpazila = (pcode: string | null) => {
+    setSelectedUpazila(pcode);
+    if (!pcode) {
+      const district = districtGeometry?.features?.find((f: any) =>
+        f?.properties?.district_id === districtForUpazilas?.id
+      );
+      if (district) {
+        const bounds = L.geoJSON(district as any).getBounds();
+        mapInstanceRef.current?.flyToBounds(bounds.pad(0.3), {
+          padding: [20, 30],
+          maxZoom: 8,
+          duration: 0.45,
+        });
+      }
+      return;
+    }
+    const feature = activeUpazilaFeatures.find(f => f.properties.pcode === pcode);
+    if (!feature) return;
+    const bounds = L.geoJSON(feature as any).getBounds();
+    if (bounds.isValid()) {
+      mapInstanceRef.current?.flyToBounds(bounds.pad(0.38), {
+        padding: [30, 32],
+        maxZoom: 10,
+        duration: 0.5,
+      });
+    }
+  };
 
   const handleZoomIn = () => {
     try {
@@ -836,6 +1064,60 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         </div>
       </div>
 
+      {mapLayerMode === 'districts' && districtForUpazilas && (
+        <div className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control p-3 space-y-2" role="region"
+          aria-label={language === 'bn' ? 'জেলা ও উপজেলার মানচিত্র' : 'District and upazila navigation'}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onClick={() => onSelectDistrict('all')}
+              className="min-h-[44px] px-2 text-ui-content-primary type-compact font-[var(--font-weight-semibold)] underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ui-focus">
+              {language === 'bn' ? '← সব জেলায় ফিরুন' : '← Back to all districts'}
+            </button>
+            <strong className="type-compact text-ui-content-primary">
+              {language === 'bn' ? districtForUpazilas.nameBn : districtForUpazilas.nameEn}
+              {' · '}
+              {language === 'bn' ? 'উপজেলা মানচিত্র' : 'Upazila map'}
+            </strong>
+          </div>
+          {upazilaLoadState === 'loading' && (
+            <p role="status" className="type-meta text-ui-content-secondary">
+              {language === 'bn' ? 'উপজেলার সীমানা লোড হচ্ছে…' : 'Loading upazila boundaries…'}
+            </p>
+          )}
+          {upazilaLoadState === 'error' && (
+            <p role="status" className="type-meta text-ui-content-secondary">
+              {language === 'bn' ? 'এই জেলার উপজেলার সীমানা এখন পাওয়া যাচ্ছে না। জেলার মানচিত্র চালু আছে।'
+                : 'Upazila boundaries are unavailable for this district. District map remains available.'}
+            </p>
+          )}
+          {activeUpazilaFeatures.length > 0 && (
+            <>
+              <label htmlFor="map-upazila-select" className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                {language === 'bn' ? 'উপজেলা নির্বাচন করুন' : 'Select an upazila'}
+              </label>
+              <select id="map-upazila-select" value={selectedUpazila || ''}
+                onChange={event => handleSelectUpazila(event.target.value || null)}
+                className="w-full min-h-[44px] border border-ui-stroke-default bg-ui-surface text-ui-content-primary ui-radius-control px-3 type-body focus-visible:ring-2 focus-visible:ring-ui-focus">
+                <option value="">{language === 'bn' ? 'সকল উপজেলা' : 'All upazilas'}</option>
+                {[...activeUpazilaFeatures]
+                  .sort((a, b) => a.properties.name_en.localeCompare(b.properties.name_en))
+                  .map(feature => (
+                    <option key={feature.properties.pcode} value={feature.properties.pcode}>
+                      {language === 'bn'
+                        ? feature.properties.name_bn || feature.properties.name_en
+                        : feature.properties.name_en}
+                    </option>
+                  ))}
+              </select>
+              <p className="type-meta text-ui-content-secondary">
+                {language === 'bn'
+                  ? 'এটি সীমানা অনুযায়ী ভৌগোলিক নির্বাচন; বিদ্যমান প্রতিবেদন ফিল্টার জেলা-ভিত্তিক থাকবে।'
+                  : 'This selection explores geographic boundaries; existing report filters remain district-based.'}
+              </p>
+            </>
+          )}
+        </div>
+      )}
+
       <div
         role="status"
         aria-live="polite"
@@ -903,6 +1185,53 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
       </div>
 
+      {mapLayerMode === 'districts' && selectedUpazilaFeature && (
+        <section className="bg-ui-surface border border-ui-stroke-subtle ui-radius-card p-3.5 space-y-2.5"
+          aria-labelledby="selected-upazila-heading">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h4 id="selected-upazila-heading" className="type-h4 text-ui-content-primary">
+              {language === 'bn'
+                ? selectedUpazilaFeature.properties.name_bn || selectedUpazilaFeature.properties.name_en
+                : selectedUpazilaFeature.properties.name_en}
+            </h4>
+            <button type="button" onClick={() => handleSelectUpazila(null)}
+              className="min-h-[44px] px-2 type-compact underline underline-offset-4 text-ui-content-primary focus-visible:ring-2 focus-visible:ring-ui-focus">
+              {language === 'bn' ? 'উপজেলা নির্বাচন মুছুন' : 'Clear upazila'}
+            </button>
+          </div>
+          <p className="type-compact text-ui-content-secondary">
+            {selectedUpazilaFeature.properties.invalid_source_geometry
+              ? language === 'bn'
+                ? 'এই উপজেলার মূল সীমানায় জ্যামিতিক ত্রুটি আছে। নির্ভুল অবস্থান যাচাই না হওয়া পর্যন্ত এখানে কোনো প্রতিবেদন গণনা করা হচ্ছে না।'
+                : 'This source polygon has a geometry defect. Reports are not assigned here until its boundary has been independently corrected.'
+              : reportsWithRealCoords.length === 0
+                ? language === 'bn'
+                  ? 'উপজেলার সীমানা দেখা যাচ্ছে, তবে নিরাপত্তার কারণে প্রকাশিত প্রতিবেদনে সুনির্দিষ্ট স্থানাঙ্ক নেই। উপজেলা অনুযায়ী প্রতিবেদন গণনা বর্তমানে উপলব্ধ নয়।'
+                  : 'Upazila boundaries are available, but the public reporting API intentionally omits precise coordinates. Upazila report totals are therefore unavailable.'
+                : language === 'bn'
+                  ? `সুনির্দিষ্ট অবস্থান যাচাইযোগ্য ${toBanglaDigits(selectedUpazilaReports.length)}টি প্রতিবেদন। অন্য জেলা-ভিত্তিক প্রতিবেদনগুলো অনুমান করে এখানে দেখানো হয়নি।`
+                  : `${selectedUpazilaReports.length} published reports with precise coordinates inside this boundary. Other district-level reports are not assigned by guesswork.`}
+          </p>
+          {selectedUpazilaReports.length > 0 && (
+            <ul className="space-y-1.5">
+              {selectedUpazilaReports.map(report => (
+                <li key={report.id}>
+                  <button type="button" onClick={() => navigateTo(`/report-detail/${report.id}`)}
+                    className="min-h-[44px] w-full text-left type-compact font-[var(--font-weight-semibold)] text-ui-content-primary underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-ui-focus">
+                    {language === 'bn' ? report.titleBn : report.titleEn}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="type-meta text-ui-content-muted">
+            {language === 'bn'
+              ? 'এই সীমানাগুলো ঐতিহাসিক রেফারেন্স; বর্তমান উপজেলার সম্পূর্ণ সরকারি তালিকা নয়।'
+              : 'These are historical reference boundaries, not a complete current official upazila register.'}
+          </p>
+        </section>
+      )}
+
       {/* Explanations sit outside the map, leaving every district selectable on a phone. */}
       {mapLayerMode === 'districts' && districtGeometry && (
         <div
@@ -948,6 +1277,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         {language === 'bn' ? 'মানচিত্র: Leaflet · জেলা সীমানা: BBS/OCHA 2020' : 'Map: Leaflet · District boundaries: BBS/OCHA 2020'} ·{' '}
         <a href="https://creativecommons.org/licenses/by/3.0/igo/" target="_blank" rel="noopener noreferrer"
           className="underline underline-offset-2 hover:text-ui-content-primary">CC BY 3.0 IGO</a>
+        {activeUpazilaFeatures.length > 0 && (
+          <span className="ml-1">
+            {language === 'bn'
+              ? '· উপজেলা সীমানা: সরবরাহকৃত ঐতিহাসিক তথ্য, বর্তমান বৈধতা যাচাইসাপেক্ষ'
+              : '· Upazila boundaries: provided historical geometry; current validity unverified'}
+          </span>
+        )}
       </p>
 
       {totalReportsCount === 0 && (
