@@ -49,6 +49,31 @@ const DISTRICT_SHADES = [
   HEATMAP_TOKENS.colors.high,
 ];
 
+// Coordinate-based matches are evidence of location; text-only locations are not
+// silently assigned to upazilas. Holes and MultiPolygons are respected.
+const containsCoordinate = (geometry: any, lat: number, lng: number): boolean => {
+  const inRing = (ring: number[][]) => {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [ax, ay] = ring[i], [bx, by] = ring[j];
+      if ((ay > lat) !== (by > lat) &&
+          lng < ((bx - ax) * (lat - ay)) / (by - ay) + ax) inside = !inside;
+    }
+    return inside;
+  };
+  const inPolygon = (rings: number[][][]) =>
+    rings.length > 0 && inRing(rings[0]) && !rings.slice(1).some(inRing);
+  if (geometry?.type === 'Polygon') return inPolygon(geometry.coordinates);
+  if (geometry?.type === 'MultiPolygon') return geometry.coordinates.some(inPolygon);
+  return false;
+};
+
+const UPAZILA_DIVISION_ASSETS: Record<string, string> = {
+  barisal: 'barisal', chittagong: 'chittagong', dhaka: 'dhaka',
+  khulna: 'khulna', mymensingh: 'mymensingh', rajshahi: 'rajshahi',
+  rangpur: 'rangpur', sylhet: 'sylhet',
+};
+
 const isValidCoordinate = (report: ReportItem) => {
   const lat = Number(report.coordinates?.lat);
   const lng = Number(report.coordinates?.lng);
@@ -86,6 +111,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const polygonLayerRef = useRef<L.GeoJSON | null>(null);
   const labelLayerRef = useRef<L.LayerGroup | null>(null);
+  const upazilaLayerRef = useRef<L.GeoJSON | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
@@ -100,6 +126,74 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   // Fetch only within the Explore map chunk; retaining the existing marker fallback on failure.
   // A failed load leaves the existing district markers available as a safe fallback.
   const [districtGeometry, setDistrictGeometry] = useState<any | null>(null);
+  const [upazilaData, setUpazilaData] = useState<{ districtId: string; features: any[] } | null>(null);
+  const [upazilaLoadState, setUpazilaLoadState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [selectedUpazila, setSelectedUpazila] = useState<string | null>(null);
+  const districtForUpazilas = BANGLADESH_DISTRICTS.find(
+    d => selectedDistrict !== 'all' &&
+      (d.id === selectedDistrict.toLowerCase() ||
+       d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() || d.nameBn === selectedDistrict)
+  );
+  const activeUpazilaFeatures = upazilaData?.districtId === districtForUpazilas?.id ? upazilaData.features : [];
+
+  // Existing district selection controls the drilldown. The new geography is
+  // lazily fetched only after a user chooses a district; no 498-feature bundle
+  // is loaded on the national initial view.
+  useEffect(() => {
+    setSelectedUpazila(null);
+    setUpazilaData(null);
+    if (!districtForUpazilas || mapLayerMode !== 'districts' || !districtGeometry) {
+      setUpazilaLoadState('idle');
+      return;
+    }
+    const districtFeature = districtGeometry.features.find(
+      (f: any) => f?.properties?.district_id === districtForUpazilas.id
+    );
+    const division = UPAZILA_DIVISION_ASSETS[districtForUpazilas.divisionId];
+    if (!districtFeature || !division) {
+      setUpazilaLoadState('error');
+      return;
+    }
+    const controller = new AbortController();
+    setUpazilaLoadState('loading');
+    const load = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.BASE_URL}geo/upazilas/${division}-2020.geojson`,
+          { signal: controller.signal }
+        );
+        if (!response.ok) throw new Error('Upazila geography HTTP ' + response.status);
+        const result = await response.json();
+        if (result?.type !== 'FeatureCollection' || !Array.isArray(result.features)) {
+          throw new Error('Invalid upazila geography collection');
+        }
+        const features = result.features.filter((feature: any) =>
+          feature?.properties?.parent_pcode === districtFeature.properties.ADM2_PCODE &&
+          feature?.properties?.district_id === districtForUpazilas.id &&
+          typeof feature?.properties?.name_en === 'string' && feature.geometry
+        );
+        if (!features.length || new Set(features.map((feature: any) => feature.properties.pcode)).size !== features.length) {
+          throw new Error('Upazila geography failed district/P-code verification');
+        }
+        if (!controller.signal.aborted) {
+          setUpazilaData({ districtId: districtForUpazilas.id, features });
+          setUpazilaLoadState('idle');
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setUpazilaLoadState('error');
+          console.warn('[PublicIncidentMap] Upazila layer unavailable; retaining district map:', error);
+        }
+      }
+    };
+    void load();
+    return () => controller.abort();
+  }, [selectedDistrict, districtGeometry, mapLayerMode]);
+
+  const selectedUpazilaFeature = activeUpazilaFeatures.find(
+    feature => feature.properties.pcode === selectedUpazila
+  );
+
   useEffect(() => {
     const controller = new AbortController();
     const load = async () => {
@@ -133,6 +227,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     () => reports.filter(isValidCoordinate),
     [reports]
   );
+  const selectedUpazilaReports = useMemo(() => {
+    if (!selectedUpazilaFeature) return [];
+    return reportsWithRealCoords.filter(report =>
+      containsCoordinate(selectedUpazilaFeature.geometry,
+        Number(report.coordinates?.lat), Number(report.coordinates?.lng))
+    );
+  }, [reportsWithRealCoords, selectedUpazilaFeature]);
 
   const { districtCounts, totalMappedInDistricts } = useMemo(() => {
     const map = new Map<string, DistrictAggregate>();
@@ -249,6 +350,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         map.removeLayer(polygonLayerRef.current);
         polygonLayerRef.current = null;
       }
+      if (upazilaLayerRef.current) {
+        map.removeLayer(upazilaLayerRef.current);
+        upazilaLayerRef.current = null;
+      }
       if (labelLayerRef.current) {
         map.removeLayer(labelLayerRef.current);
         labelLayerRef.current = null;
@@ -280,6 +385,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     if (polygonLayerRef.current) {
       map.removeLayer(polygonLayerRef.current);
       polygonLayerRef.current = null;
+    }
+    if (upazilaLayerRef.current) {
+      map.removeLayer(upazilaLayerRef.current);
+      upazilaLayerRef.current = null;
     }
 
     const resolveCategoryColor = (section: SectionKey) => {
