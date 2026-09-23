@@ -45,6 +45,11 @@ if (existsSync(publicMapSource)) {
   assert.match(map, /useState<MapLayerMode>\('districts'\)/, 'Default map must expose district geography');
   assert.doesNotMatch(map, /L\.tileLayer\(/, 'Public map must render Bangladesh only; no world raster tiles');
   assert.match(map, /countryBounds\.pad\(0\.05\)/, 'Country geography must constrain the map viewport');
+  assert.match(map, /window\.matchMedia\('\(hover: hover\) and \(pointer: fine\)'\)/, 'Desktop wheel zoom must be restricted to precision-pointer devices');
+  assert.match(map, /scrollWheelZoom: desktopPointer\.matches/, 'Desktop mouse wheel must zoom the map');
+  assert.match(map, /desktopPointer\.addEventListener\('change', syncWheelZoom\)/, 'Wheel zoom must update when pointer capability changes');
+  assert.match(map, /desktopPointer\.removeEventListener\('change', syncWheelZoom\)/, 'Remove pointer listener during map teardown');
+  assert.match(map, /map\.scrollWheelZoom\.disable\(\)/, 'Touch-first devices must retain normal page scrolling');
   assert.match(map, /attributionControl: false/, 'Leaflet attribution must not obscure the mobile map canvas');
   assert.match(map, /bangladesh-map-label/, 'Bangladesh-only map must retain internal geographic labels');
   assert.match(map, /DIVISIONS/, 'National view must provide division-level context');
