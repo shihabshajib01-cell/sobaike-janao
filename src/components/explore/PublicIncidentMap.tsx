@@ -1139,13 +1139,66 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         </div>
       </div>
 
+      {mapLayerMode === 'districts' && (
+        <div className="bg-ui-surface border border-ui-stroke-subtle ui-radius-control p-3 space-y-2"
+          role="region"
+          aria-label={language === 'bn' ? 'বিভাগ ও জেলা নির্বাচন' : 'Division and district navigation'}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="space-y-1">
+              <label htmlFor="map-division-select"
+                className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                {language === 'bn' ? 'বিভাগ (৮)' : 'Division (8)'}
+              </label>
+              <select id="map-division-select" value={activeDivision?.nameEn || 'all'}
+                onChange={event => {
+                  onSelectDivision(event.target.value);
+                  onSelectDistrict('all');
+                }}
+                className="w-full min-h-[44px] border border-ui-stroke-default bg-ui-surface text-ui-content-primary ui-radius-control px-3 type-body focus-visible:ring-2 focus-visible:ring-ui-focus">
+                <option value="all">{language === 'bn' ? 'সকল বিভাগ' : 'All divisions'}</option>
+                {DIVISIONS.map(division => (
+                  <option key={division.id} value={division.nameEn}>
+                    {language === 'bn' ? division.nameBn : division.nameEn}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="map-district-select"
+                className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+                {language === 'bn' ? 'জেলা (৬৪)' : 'District (64)'}
+              </label>
+              <select id="map-district-select" value={districtForUpazilas?.nameEn || 'all'}
+                onChange={event => onSelectDistrict(event.target.value)}
+                className="w-full min-h-[44px] border border-ui-stroke-default bg-ui-surface text-ui-content-primary ui-radius-control px-3 type-body focus-visible:ring-2 focus-visible:ring-ui-focus">
+                <option value="all">{language === 'bn' ? 'সকল জেলা' : 'All districts'}</option>
+                {availableMapDistricts.map(district => (
+                  <option key={district.id} value={district.nameEn}>
+                    {language === 'bn'
+                      ? `${district.nameBn} (${district.divisionBn})`
+                      : `${district.nameEn} (${district.divisionEn})`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <p className="type-meta text-ui-content-muted">
+            {language === 'bn'
+              ? 'এই বিভাগ ও জেলার নিয়ন্ত্রণ বিদ্যমান প্রতিবেদন ফিল্টারের সাথেও সংযুক্ত।'
+              : 'These division and district controls use the existing report filters.'}
+          </p>
+        </div>
+      )}
+
       {mapLayerMode === 'districts' && districtForUpazilas && (
         <div className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control p-3 space-y-2" role="region"
           aria-label={language === 'bn' ? 'জেলা ও উপজেলার মানচিত্র' : 'District and upazila navigation'}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <button type="button" onClick={() => onSelectDistrict('all')}
               className="min-h-[44px] px-2 text-ui-content-primary type-compact font-[var(--font-weight-semibold)] underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ui-focus">
-              {language === 'bn' ? '← সব জেলায় ফিরুন' : '← Back to all districts'}
+              {language === 'bn'
+                ? (activeDivision ? '← নির্বাচিত বিভাগে ফিরুন' : '← সব জেলায় ফিরুন')
+                : (activeDivision ? '← Back to division' : '← Back to all districts')}
             </button>
             <strong className="type-compact text-ui-content-primary">
               {language === 'bn' ? districtForUpazilas.nameBn : districtForUpazilas.nameEn}
@@ -1164,31 +1217,62 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
                 : 'Upazila boundaries are unavailable for this district. District map remains available.'}
             </p>
           )}
-          {activeUpazilaFeatures.length > 0 && (
-            <>
-              <label htmlFor="map-upazila-select" className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
-                {language === 'bn' ? 'উপজেলা নির্বাচন করুন' : 'Select an upazila'}
-              </label>
-              <select id="map-upazila-select" value={selectedUpazila || ''}
-                onChange={event => handleSelectUpazila(event.target.value || null)}
-                className="w-full min-h-[44px] border border-ui-stroke-default bg-ui-surface text-ui-content-primary ui-radius-control px-3 type-body focus-visible:ring-2 focus-visible:ring-ui-focus">
-                <option value="">{language === 'bn' ? 'সকল উপজেলা' : 'All upazilas'}</option>
-                {[...activeUpazilaFeatures]
-                  .sort((a, b) => a.properties.name_en.localeCompare(b.properties.name_en))
+          <label htmlFor="map-upazila-select"
+            className="block type-compact font-[var(--font-weight-semibold)] text-ui-content-primary">
+            {language === 'bn'
+              ? `উপজেলা / থানা (${toBanglaDigits(canonicalUpazilaOptions.length)})`
+              : `Upazila / Thana (${canonicalUpazilaOptions.length})`}
+          </label>
+          <select id="map-upazila-select" value={selectedUpazila || ''}
+            onChange={event => handleSelectUpazila(event.target.value || null)}
+            className="w-full min-h-[44px] border border-ui-stroke-default bg-ui-surface text-ui-content-primary ui-radius-control px-3 type-body focus-visible:ring-2 focus-visible:ring-ui-focus">
+            <option value="">{language === 'bn' ? 'সকল উপজেলা / থানা' : 'All upazilas / thanas'}</option>
+            <optgroup label={language === 'bn' ? 'প্রকল্পের বর্তমান উপজেলা / থানা তালিকা' : 'Current project upazila / thana registry'}>
+              {[...canonicalUpazilaOptions]
+                .sort((first, second) => (language === 'bn' ? first.nameBn : first.nameEn)
+                  .localeCompare(language === 'bn' ? second.nameBn : second.nameEn))
+                .map(item => (
+                  <option key={item.id} value={item.id}>
+                    {language === 'bn' ? item.nameBn : item.nameEn}
+                    {!matchedCanonicalIDs.has(item.id)
+                      ? (language === 'bn' ? ' — যাচাইকৃত সীমানা নেই' : ' — boundary not verified')
+                      : ''}
+                  </option>
+                ))}
+            </optgroup>
+            {activeUpazilaFeatures.some(item => !item.properties.canonical_id) && (
+              <optgroup label={language === 'bn'
+                ? 'ঐতিহাসিক সীমানা — বর্তমান তালিকার সাথে পরিচয় যাচাই হয়নি'
+                : 'Historical polygons — unmatched to current registry'}>
+                {activeUpazilaFeatures.filter(item => !item.properties.canonical_id)
+                  .sort((first, second) => first.properties.name_en.localeCompare(second.properties.name_en))
                   .map(feature => (
                     <option key={feature.properties.pcode} value={feature.properties.pcode}>
-                      {language === 'bn'
-                        ? feature.properties.name_bn || feature.properties.name_en
-                        : feature.properties.name_en}
+                      {feature.properties.name_en} — {language === 'bn' ? 'যাচাই হয়নি' : 'unverified'}
                     </option>
                   ))}
-              </select>
-              <p className="type-meta text-ui-content-secondary">
-                {language === 'bn'
-                  ? 'এটি সীমানা অনুযায়ী ভৌগোলিক নির্বাচন; বিদ্যমান প্রতিবেদন ফিল্টার জেলা-ভিত্তিক থাকবে।'
-                  : 'This selection explores geographic boundaries; existing report filters remain district-based.'}
-              </p>
-            </>
+              </optgroup>
+            )}
+          </select>
+          <p className="type-meta text-ui-content-secondary">
+            {language === 'bn'
+              ? '৬০১টি বর্তমান রেকর্ডই তাদের নিজ নিজ জেলায় নির্বাচন করা যায়। সীমানা না মিললে তা স্পষ্টভাবে চিহ্নিত থাকবে; প্রতিবেদন ফিল্টার জেলা পর্যন্ত সীমিত।'
+              : 'All 601 project records are selectable within their districts. Unmatched boundaries are explicitly marked; public report filtering remains district-level.'}
+          </p>
+          {upazilaLoadState === 'idle' && upazilaData?.districtId === districtForUpazilas.id && (
+            <p className="type-meta text-ui-content-muted">
+              {language === 'bn'
+                ? `এই জেলার ${toBanglaDigits(matchedCanonicalIDs.size)}টি রেকর্ডের ঐতিহাসিক সীমানার পরিচয় নিশ্চিত হয়েছে।`
+                : `${matchedCanonicalIDs.size} records in this district have matched historical polygon identities.`}
+            </p>
+          )}
+          {selectedCanonicalUpazila && !matchedCanonicalIDs.has(selectedCanonicalUpazila.id) &&
+            upazilaLoadState !== 'loading' && (
+            <p role="status" className="type-compact text-ui-content-secondary">
+              {language === 'bn'
+                ? 'এই উপজেলা / থানার জন্য বর্তমান তালিকার সাথে নিশ্চিত সীমানা এখনো পাওয়া যায়নি। জেলার মানচিত্র দেখানো হচ্ছে।'
+                : 'No verified polygon matches this upazila / thana. The district map remains available.'}
+            </p>
           )}
         </div>
       )}
