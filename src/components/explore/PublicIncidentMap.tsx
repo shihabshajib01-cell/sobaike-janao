@@ -326,6 +326,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
+    // A precision mouse/trackpad should zoom the desktop map with its wheel.
+    // Keep wheel capture disabled for touch-first devices so page scrolling stays
+    // natural; Leaflet's pinch and explicit +/- controls remain unchanged.
+    const desktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)');
     const map = L.map(mapContainerRef.current, {
       center: BANGLADESH_CENTER,
       zoom: 6,
@@ -335,13 +339,21 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       maxBoundsViscosity: 1,
       zoomControl: false,
       attributionControl: false,
-      scrollWheelZoom: false,
+      scrollWheelZoom: desktopPointer.matches,
     });
 
+    // A mouse can be connected or disconnected without reinitializing the map
+    // or discarding its current district/upazila selection and zoom level.
+    const syncWheelZoom = () => {
+      if (desktopPointer.matches) map.scrollWheelZoom.enable();
+      else map.scrollWheelZoom.disable();
+    };
+    desktopPointer.addEventListener('change', syncWheelZoom);
     mapInstanceRef.current = map;
     setIsMapReady(true);
 
     return () => {
+      desktopPointer.removeEventListener('change', syncWheelZoom);
       if (heatLayerRef.current) {
         map.removeLayer(heatLayerRef.current);
         heatLayerRef.current = null;
