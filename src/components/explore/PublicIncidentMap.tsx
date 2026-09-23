@@ -10,7 +10,7 @@ import { ReportItem } from '../../types/report';
 import { SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { HEATMAP_TOKENS } from '../../theme/data-viz-tokens';
-import { BANGLADESH_DISTRICTS, DistrictInfo } from '../../data/districts';
+import { BANGLADESH_DISTRICTS, DIVISIONS, DistrictInfo } from '../../data/districts';
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
 import { useApp } from '../../context/AppContext';
@@ -86,6 +86,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const heatLayerRef = useRef<L.HeatLayer | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const polygonLayerRef = useRef<L.GeoJSON | null>(null);
+  const labelLayerRef = useRef<L.LayerGroup | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
@@ -231,7 +232,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       maxBounds: BANGLADESH_BOUNDS,
       maxBoundsViscosity: 1,
       zoomControl: false,
-      attributionControl: true,
+      attributionControl: false,
       scrollWheelZoom: false,
     });
 
@@ -249,8 +250,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       }
       if (polygonLayerRef.current) {
         map.removeLayer(polygonLayerRef.current);
-        map.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
         polygonLayerRef.current = null;
+      }
+      if (labelLayerRef.current) {
+        map.removeLayer(labelLayerRef.current);
+        labelLayerRef.current = null;
       }
       map.remove();
       mapInstanceRef.current = null;
@@ -278,7 +282,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
     if (polygonLayerRef.current) {
       map.removeLayer(polygonLayerRef.current);
-      map.attributionControl?.removeAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = null;
     }
 
@@ -313,7 +316,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         },
       });
       polygons.addTo(map);
-      map.attributionControl?.addAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = polygons;
     };
 
@@ -408,7 +410,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         },
       });
       polygons.addTo(map);
-      map.attributionControl?.addAttribution(BOUNDARY_ATTRIBUTION);
       polygonLayerRef.current = polygons;
       return;
     }
@@ -543,6 +544,61 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     isDarkMode,
   ]);
 
+  // Bangladesh-only geographic context: division labels at country scale,
+  // district labels when zoomed in. Labels never intercept polygon taps.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !isMapReady) return;
+
+    const renderLabels = () => {
+      if (labelLayerRef.current) map.removeLayer(labelLayerRef.current);
+      const layer = L.layerGroup();
+      const showDistricts = map.getZoom() >= 6.65 || selectedDistrict !== 'all';
+      const items = showDistricts
+        ? BANGLADESH_DISTRICTS.map((item) => ({
+            label: language === 'bn' ? item.nameBn : item.nameEn,
+            lat: item.lat,
+            lng: item.lng,
+            selected:
+              selectedDistrict !== 'all' &&
+              (item.id === selectedDistrict.toLowerCase() ||
+               item.nameEn.toLowerCase() === selectedDistrict.toLowerCase() ||
+               item.nameBn === selectedDistrict),
+          }))
+        : DIVISIONS.map((item) => ({
+            label: language === 'bn' ? item.nameBn : item.nameEn,
+            lat: item.lat,
+            lng: item.lng,
+            selected: false,
+          }));
+
+      const viewport = map.getBounds().pad(0.08);
+      for (const item of items) {
+        if (!viewport.contains([item.lat, item.lng])) continue;
+        L.marker([item.lat, item.lng], {
+          interactive: false,
+          keyboard: false,
+          icon: L.divIcon({
+            className: 'bangladesh-map-label-host',
+            html: `<span class="bangladesh-map-label ${showDistricts ? 'is-district' : 'is-division'} ${item.selected ? 'is-selected' : ''}">${item.label}</span>`,
+          }),
+        }).addTo(layer);
+      }
+      layer.addTo(map);
+      labelLayerRef.current = layer;
+    };
+
+    renderLabels();
+    map.on('zoomend moveend', renderLabels);
+    return () => {
+      map.off('zoomend moveend', renderLabels);
+      if (labelLayerRef.current) {
+        map.removeLayer(labelLayerRef.current);
+        labelLayerRef.current = null;
+      }
+    };
+  }, [isMapReady, language, selectedDistrict]);
+
   // Fit the actual district geometry, not a wider world-map rectangle.
   // Selected districts fit their true polygon bounds; the full-country view
   // is restored whenever the selection is cleared or reset.
@@ -551,15 +607,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     if (!map || !isMapReady) return;
     map.setMaxBounds(countryBounds.pad(0.05));
     const mobile = map.getSize().x < 600;
-    const padding: L.PointTuple = mobile ? [14, 18] : [32, 32];
+    const padding: L.PointTuple = mobile ? [2, 4] : [18, 18];
     const fitCountry = (animate: boolean) => {
-      const min = map.getBoundsZoom(countryBounds, false, L.point(...padding));
-      map.setMinZoom(Math.max(4, min - 0.15));
-      if (animate) {
-        map.flyToBounds(countryBounds, { padding, duration: 0.55 });
-      } else {
-        map.fitBounds(countryBounds, { padding, animate: false });
-      }
+      const fitZoom = map.getBoundsZoom(countryBounds, false, L.point(...padding));
+      map.setMinZoom(Math.max(4, fitZoom - 0.02));
+      const center = countryBounds.getCenter();
+      if (animate) map.flyTo(center, fitZoom, { duration: 0.45 });
+      else map.setView(center, fitZoom, { animate: false });
     };
 
     if (selectedDistrict === 'all') {
@@ -578,10 +632,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     if (feature) {
       const bounds = L.geoJSON(feature as any).getBounds();
       if (bounds.isValid()) {
-        map.flyToBounds(bounds, {
-          padding: mobile ? [42, 64] : [65, 65],
-          maxZoom: 9,
-          duration: 0.6,
+        const contextualBounds = bounds.pad(mobile ? 1.15 : 0.75);
+        map.flyToBounds(contextualBounds, {
+          padding: mobile ? [18, 26] : [42, 42],
+          maxZoom: mobile ? 7.35 : 8,
+          duration: 0.5,
         });
         return;
       }
@@ -608,10 +663,12 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     // Reset selection through the existing Explore filter handler; the bounds
     // effect restores the Bangladesh-only viewport without competing flyTo calls.
     if (selectedDistrict === 'all') {
-      mapInstanceRef.current?.flyToBounds(countryBounds, {
-        padding: [14, 18],
-        duration: 0.55,
-      });
+      const map = mapInstanceRef.current;
+      if (map) {
+        const padding: L.PointTuple = map.getSize().x < 600 ? [2, 4] : [18, 18];
+        const fitZoom = map.getBoundsZoom(countryBounds, false, L.point(...padding));
+        map.flyTo(countryBounds.getCenter(), fitZoom, { duration: 0.45 });
+      }
     }
     onSelectDistrict('all');
   };
@@ -696,7 +753,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       const map = mapInstanceRef.current;
       map?.invalidateSize();
       if (map && selectedDistrict === 'all' && countryBounds.isValid()) {
-        map.fitBounds(countryBounds, { padding: [14, 18], animate: false });
+        const padding: L.PointTuple = map.getSize().x < 600 ? [2, 4] : [18, 18];
+        const fitZoom = map.getBoundsZoom(countryBounds, false, L.point(...padding));
+        map.setView(countryBounds.getCenter(), fitZoom, { animate: false });
       }
     });
     observer.observe(mapContainerRef.current);
@@ -888,6 +947,12 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             : hasRealCoords ? 'Dots represent published reports with precise locations.' : 'District locations are shown because precise coordinates are unavailable.'}
         </p>
       )}
+      <p className="type-small text-ui-content-muted leading-snug">
+        {language === 'bn' ? 'মানচিত্র: Leaflet · জেলা সীমানা: BBS/OCHA 2020' : 'Map: Leaflet · District boundaries: BBS/OCHA 2020'} ·{' '}
+        <a href="https://creativecommons.org/licenses/by/3.0/igo/" target="_blank" rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-ui-content-primary">CC BY 3.0 IGO</a>
+      </p>
+
       {totalReportsCount === 0 && (
         <div className="bg-ui-surface-subtle border border-ui-stroke-subtle ui-radius-control p-3 flex flex-wrap items-center gap-3">
           <span role="status" className="type-meta text-ui-content-secondary">
