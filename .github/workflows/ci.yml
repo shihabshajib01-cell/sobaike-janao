@@ -105,6 +105,9 @@ jobs:
       - name: Accessibility source audit
         run: npm run audit:accessibility
 
+      - name: Validate read-only live map browser smoke syntax
+        run: node --check scripts/live-bangladesh-map-smoke.mjs
+
       - name: Lint
         run: npm run lint
 
