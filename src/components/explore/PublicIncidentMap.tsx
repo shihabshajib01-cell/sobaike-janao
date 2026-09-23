@@ -14,7 +14,6 @@ import { BANGLADESH_DISTRICTS, DIVISIONS, DistrictInfo } from '../../data/distri
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
 import { useApp } from '../../context/AppContext';
-import { useTheme } from '../../context/ThemeContext';
 import { HeatmapLegend } from './HeatmapLegend';
 
 export interface PublicIncidentMapProps {
@@ -35,7 +34,6 @@ interface DistrictAggregate {
 }
 
 const BANGLADESH_CENTER: [number, number] = [23.685, 90.3563];
-const BOUNDARY_ATTRIBUTION = 'District boundaries: BBS/OCHA (2020), adapted (<a href="https://creativecommons.org/licenses/by/3.0/igo/" target="_blank" rel="noopener noreferrer">CC BY 3.0 IGO</a>)';
 const BANGLADESH_BOUNDS: L.LatLngBoundsExpression = [
   [20.3, 87.75],
   [26.85, 92.85],
@@ -90,7 +88,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
-  const { resolvedTheme } = useTheme();
   const { segments } = useTaxonomy();
   const categoryKeys = useMemo(
     () => Object.keys(segments) as SectionKey[],
@@ -216,8 +213,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     reportsWithRealCoords,
     districtCounts,
   ]);
-
-  const isDarkMode = resolvedTheme === 'dark';
 
   // Geography-only canvas: there is no world map, commercial tile dependency,
   // surrounding country layer, or other geography outside the 64 districts.
@@ -541,7 +536,6 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     reportsWithRealCoords,
     districtGeometry,
     selectedDistrict,
-    isDarkMode,
   ]);
 
   // Bangladesh-only geographic context: division labels at country scale,
