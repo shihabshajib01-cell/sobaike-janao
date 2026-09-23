@@ -43,9 +43,17 @@ if (existsSync(publicMapSource)) {
   const map = readFileSync(publicMapSource, 'utf8');
   const css = readFileSync('src/index.css', 'utf8');
   assert.match(map, /useState<MapLayerMode>\('districts'\)/, 'Default map must expose district geography');
-  assert.match(map, /tile\.openstreetmap\.org/, 'Map requires a valid keyless tile provider');
+  assert.doesNotMatch(map, /L\.tileLayer\(/, 'Public map must render Bangladesh only; no world raster tiles');
+  assert.match(map, /countryBounds\.pad\(0\.05\)/, 'Country geography must constrain the map viewport');
+  assert.match(map, /district-map-legend/, 'District color legend must be visible outside the canvas');
+  assert.doesNotMatch(map, /Larger bubbles mean more reports|বড় বৃত্ত মানে বেশি/, 'Old bubble copy must not describe polygon mode');
   assert.doesNotMatch(map, /basemaps\.cartocdn\.com/, 'Never reintroduce unkeyed CARTO raster tiles');
   assert.match(map, /addDistrictOutlines\(\)/, 'District outlines must remain visible in Density and Points');
   assert.match(map, /isDarkMode,\s*\n\s*\]\);/, 'Both map layers must update after theme changes');
-  assert.match(css, /\.public-map-tiles-dark \.leaflet-tile/, 'Dark map tiles must have isolated styling');
+  assert.match(css, /\.public-bangladesh-map-canvas\.leaflet-container/, 'The country-only canvas needs a theme-aware background');
+  assert.match(map, /mapLayerMode === 'density'/, 'Density mode must remain available');
+  assert.match(map, /mapLayerMode === 'points'/, 'Points mode must remain available');
+  const shell = readFileSync('src/components/layout/AppShell.tsx', 'utf8');
+  assert.match(shell, /isExploreRoute \? 'justify-start' : 'justify-between'/, 'Mobile Explore footer must not have excess flex spacing');
+  assert.match(shell, /pb-\[calc\(10rem\+env\(safe-area-inset-bottom,0px\)\)\]/, 'Explore page must clear the fixed bottom navigation');
 }
