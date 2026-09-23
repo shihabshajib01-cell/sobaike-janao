@@ -71,6 +71,39 @@ if (existsSync(publicMapSource)) {
   assert.match(css, /\.bangladesh-map-label\.is-district/, 'District label styling must be present');
 }
 
+// Geographic coverage is partial, but the selected location registry must
+// provide 100% of the existing SQL contract's 601 canonical names/IDs.
+const locationSource = readFileSync('src/data/upazilas.ts', 'utf8');
+const locationSection = locationSource.split('export const BANGLADESH_UPAZILAS:')[1]?.split('\n];')[0];
+assert(locationSection, 'Canonical upazila/thana registry missing');
+const locationRows = [...locationSection.matchAll(/\{ id: '([^']+)', nameBn: '[^']+', nameEn: (?:'[^']+'|"[^"]+"), districtId: '([^']+)'/g)]
+  .map(match => ({ id: match[1], districtId: match[2] }));
+const locationIDs = new Set(locationRows.map(row => row.id));
+assert.equal(locationIDs.size, 601, 'Every existing canonical upazila/thana must remain available');
+assert.equal(locationRows.length, 601, 'Duplicate or dropped upazila/thana entry');
+assert(locationRows.every(row => ids.has(row.districtId)), 'Every upazila must reference a canonical district');
+const reconciliation = JSON.parse(readFileSync('docs/upazila-map-coverage-crosswalk.json', 'utf8'));
+assert.equal(reconciliation.registry_total, 601);
+assert.equal(reconciliation.verified_polygon_registry_matches, 351);
+assert.equal(reconciliation.registry_without_verified_polygons_count, 250);
+assert.equal(reconciliation.historic_polygons_without_verified_registry_matches_count, 147);
+const matchedIDs = new Set(reconciliation.verified.map(row => row.id));
+const missingIDs = new Set(reconciliation.registry_without_verified_polygons.map(row => row.id));
+assert.equal(matchedIDs.size, 351);
+assert.equal(missingIDs.size, 250);
+assert([...matchedIDs].every(id => locationIDs.has(id) && !missingIDs.has(id)));
+assert([...missingIDs].every(id => locationIDs.has(id)));
+assert.equal(new Set([...matchedIDs, ...missingIDs]).size, 601,
+  'Every canonical location must have an explicit verified or unverified boundary status');
+if (existsSync(publicMapSource)) {
+  const map = readFileSync(publicMapSource, 'utf8');
+  const explore = readFileSync('src/pages/ExplorePage.tsx', 'utf8');
+  assert(map.includes('getUpazilasByDistrict'), 'Map must list every canonical registry location by district');
+  assert(map.includes('map-upazila-select'), 'Upazila navigation must remain accessible');
+  assert(map.includes('boundary not verified'), 'Missing boundaries must be visibly disclosed');
+  assert(map.includes('map-division-select') && map.includes('map-district-select'), 'Map must expose complete three-level navigation');
+  assert(explore.includes('onSelectDivision={(division) =>'), 'Map and Explore division filter must stay synchronized');
+}
 const manifest = JSON.parse(readFileSync('public/geo/upazilas/manifest.json', 'utf8'));
 assert.equal(manifest.source_feature_count, 498);
 assert.equal(manifest.sql_canonical_row_count_at_audit, 601);
