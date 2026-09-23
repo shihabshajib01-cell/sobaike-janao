@@ -75,6 +75,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const heatLayerRef = useRef<L.HeatLayer | null>(null);
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
+  const polygonLayerRef = useRef<L.GeoJSON | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
@@ -86,6 +87,31 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     [segments]
   );
   const [mapLayerMode, setMapLayerMode] = useState<MapLayerMode>('density');
+  // District geometry is a same-origin static asset, loaded only when this view is selected.
+  // A failed load leaves the existing district markers available as a safe fallback.
+  const [districtGeometry, setDistrictGeometry] = useState<any | null>(null);
+  useEffect(() => {
+    if (mapLayerMode !== 'districts' || districtGeometry) return;
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.BASE_URL}geo/bangladesh-districts-2020.geojson`, { signal: controller.signal });
+        if (!response.ok) throw new Error(`District asset HTTP ${response.status}`);
+        const result = await response.json();
+        const features: any[] = result?.features;
+        if (result?.type !== 'FeatureCollection' || !Array.isArray(features) || features.length !== 64 ||
+            new Set(features.map(f => f?.properties?.district_id)).size !== 64 ||
+            features.some(f => !f?.properties?.district_id || !f?.properties?.ADM2_PCODE || !f?.geometry)) {
+          throw new Error('District asset failed 64-district validation');
+        }
+        if (!controller.signal.aborted) setDistrictGeometry(result);
+      } catch (error) {
+        if (!controller.signal.aborted) console.warn('[PublicIncidentMap] Retaining district marker fallback:', error);
+      }
+    };
+    void load();
+    return () => controller.abort();
+  }, [mapLayerMode, districtGeometry]);
 
   const isInitialMount = useRef(true);
 
@@ -223,6 +249,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         } catch {}
         markerLayerRef.current = null;
       }
+      if (polygonLayerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(polygonLayerRef.current);
+        polygonLayerRef.current = null;
+      }
       map.remove();
       mapInstanceRef.current = null;
       tileLayerRef.current = null;
@@ -246,6 +276,11 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         map.removeLayer(markerLayerRef.current);
       } catch {}
       markerLayerRef.current = null;
+    }
+
+    if (polygonLayerRef.current) {
+      map.removeLayer(polygonLayerRef.current);
+      polygonLayerRef.current = null;
     }
 
     const resolveCategoryColor = (section: SectionKey) => {
@@ -283,6 +318,60 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           console.warn('[PublicIncidentMap] Heatmap layer creation error:', err);
         }
       }
+      return;
+    }
+
+    if (mapLayerMode === 'districts' && districtGeometry) {
+      const counts = new Map(districtCounts.map(entry => [entry.district.id, entry]));
+      const maxCount = Math.max(1, ...districtCounts.map(entry => entry.count));
+      const style = getComputedStyle(document.documentElement);
+      const outline = style.getPropertyValue('--md-outline-variant').trim() ||
+        style.getPropertyValue('--md-outline').trim() || HEATMAP_TOKENS.colors.mediumHigh;
+      const emptyFill = style.getPropertyValue('--md-surface-container').trim() ||
+        style.getPropertyValue('--md-surface').trim() || HEATMAP_TOKENS.colors.low;
+      const shades = [
+        HEATMAP_TOKENS.colors.low,
+        HEATMAP_TOKENS.colors.lowMedium,
+        HEATMAP_TOKENS.colors.medium,
+        HEATMAP_TOKENS.colors.mediumHigh,
+        HEATMAP_TOKENS.colors.high,
+      ];
+      const polygons = L.geoJSON(districtGeometry as any, {
+        style: (feature: any) => {
+          const id = feature?.properties?.district_id as string;
+          const count = counts.get(id)?.count || 0;
+          const selected = selectedDistrict.toLowerCase() === id ||
+            BANGLADESH_DISTRICTS.some(d => d.id === id && d.nameEn.toLowerCase() === selectedDistrict.toLowerCase());
+          const intensity = count > 0 ? Math.min(4, Math.floor((count / maxCount) * 4)) : 0;
+          return {
+            color: selected ? HEATMAP_TOKENS.colors.high : outline,
+            weight: selected ? 2.5 : 0.85,
+            opacity: selected ? 1 : 0.8,
+            fillColor: count > 0 ? shades[intensity] : emptyFill,
+            fillOpacity: count > 0 ? 0.69 : 0.24,
+            interactive: true,
+          };
+        },
+        onEachFeature: (feature: any, layer: L.Layer) => {
+          const id = feature?.properties?.district_id as string;
+          const district = BANGLADESH_DISTRICTS.find(d => d.id === id);
+          if (!district) return;
+          const entry = counts.get(id);
+          const content = document.createElement('div');
+          content.className = 'space-y-1';
+          const heading = document.createElement('strong');
+          heading.textContent = language === 'bn' ? district.nameBn : district.nameEn;
+          const total = document.createElement('div');
+          total.textContent = language === 'bn'
+            ? `${toBanglaDigits(entry?.count || 0)}টি প্রতিবেদন`
+            : `${entry?.count || 0} reports`;
+          content.append(heading, total);
+          (layer as L.Path).bindTooltip(content, { direction: 'top', opacity: 0.96 });
+          layer.on('click', () => onSelectDistrict(district.nameEn));
+        },
+      });
+      polygons.addTo(map);
+      polygonLayerRef.current = polygons;
       return;
     }
 
@@ -408,6 +497,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     navigateTo,
     onSelectDistrict,
     reportsWithRealCoords,
+    districtGeometry,
+    selectedDistrict,
   ]);
 
   useEffect(() => {
@@ -602,8 +693,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         : 'Compare hotspots by density'
       : mapLayerMode === 'districts'
         ? language === 'bn'
-          ? 'বৃত্তের আকারে জেলা অনুযায়ী প্রতিবেদন তুলনা করুন'
-          : 'Compare districts by report-volume bubbles'
+          ? districtGeometry ? 'জেলার সীমানায় প্রতিবেদন তুলনা করুন' : 'বৃত্তের আকারে জেলা অনুযায়ী প্রতিবেদন তুলনা করুন'
+          : districtGeometry ? 'Compare reports across district boundaries' : 'Compare districts by report-volume bubbles'
         : hasRealCoords
           ? language === 'bn'
             ? 'সুনির্দিষ্ট অবস্থানের প্রতিবেদন পয়েন্ট দেখুন'
