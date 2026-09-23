@@ -14,6 +14,7 @@ import { BANGLADESH_DISTRICTS, DIVISIONS, DistrictInfo } from '../../data/distri
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
 import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 import { HeatmapLegend } from './HeatmapLegend';
 
 export interface PublicIncidentMapProps {
@@ -88,6 +89,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
 
   const [isMapReady, setIsMapReady] = useState(false);
   const { navigateTo } = useApp();
+  const { resolvedTheme } = useTheme();
   const { segments } = useTaxonomy();
   const categoryKeys = useMemo(
     () => Object.keys(segments) as SectionKey[],
@@ -536,6 +538,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     reportsWithRealCoords,
     districtGeometry,
     selectedDistrict,
+    resolvedTheme,
   ]);
 
   // Bangladesh-only geographic context: division labels at country scale,
