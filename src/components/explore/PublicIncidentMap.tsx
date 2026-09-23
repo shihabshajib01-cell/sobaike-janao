@@ -226,6 +226,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     const map = L.map(mapContainerRef.current, {
       center: BANGLADESH_CENTER,
       zoom: 6,
+      zoomSnap: 0.1,
+      zoomDelta: 0.5,
       minZoom: 5,
       maxZoom: 12,
       maxBounds: BANGLADESH_BOUNDS,
