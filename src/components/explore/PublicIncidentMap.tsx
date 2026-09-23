@@ -397,9 +397,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
                 ? `${district.nameBn} জেলা, ${toBanglaDigits(entry?.count || 0)}টি প্রতিবেদন। নির্বাচন করুন`
                 : `${district.nameEn} district, ${entry?.count || 0} reports. Select district`
             );
-            element.addEventListener('keydown', (event: KeyboardEvent) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
+            element.addEventListener('keydown', (event: Event) => {
+              const keyboard = event as KeyboardEvent;
+              if (keyboard.key === 'Enter' || keyboard.key === ' ') {
+                keyboard.preventDefault();
                 onSelectDistrict(district.nameEn);
               }
             });
