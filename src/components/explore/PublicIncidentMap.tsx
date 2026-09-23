@@ -798,9 +798,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     const renderLabels = () => {
       if (labelLayerRef.current) map.removeLayer(labelLayerRef.current);
       const layer = L.layerGroup();
-      const showDistricts = map.getZoom() >= 6.65 || selectedDistrict !== 'all';
+      const showDistricts = map.getZoom() >= 6.65 ||
+        selectedDistrict !== 'all' || selectedDivision !== 'all';
       const items = showDistricts
-        ? BANGLADESH_DISTRICTS.map((item) => ({
+        ? availableMapDistricts.map((item) => ({
             label: language === 'bn' ? item.nameBn : item.nameEn,
             lat: item.lat,
             lng: item.lng,
@@ -842,7 +843,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         labelLayerRef.current = null;
       }
     };
-  }, [isMapReady, language, selectedDistrict]);
+  }, [isMapReady, language, selectedDistrict, selectedDivision]);
 
   // Fit the actual district geometry, not a wider world-map rectangle.
   // Selected districts fit their true polygon bounds; the full-country view
@@ -862,6 +863,27 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     };
 
     if (selectedDistrict === 'all') {
+      const divisionDistricts = activeDivision
+        ? BANGLADESH_DISTRICTS.filter(item => item.divisionId === activeDivision.id)
+        : [];
+      const divisionFeatures = districtGeometry?.features.filter((feature: any) =>
+        divisionDistricts.some(item => item.id === feature?.properties?.district_id)
+      ) || [];
+      if (divisionFeatures.length > 0) {
+        const bounds = L.geoJSON({
+          type: 'FeatureCollection',
+          features: divisionFeatures,
+        } as any).getBounds();
+        if (bounds.isValid()) {
+          map.flyToBounds(bounds.pad(mobile ? 0.11 : 0.09), {
+            padding: mobile ? [12, 18] : [24, 30],
+            maxZoom: mobile ? 7.1 : 8,
+            duration: isInitialMount.current ? 0 : 0.45,
+          });
+          isInitialMount.current = false;
+          return;
+        }
+      }
       fitCountry(!isInitialMount.current);
       isInitialMount.current = false;
       return;
@@ -889,7 +911,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     if (district) {
       map.flyTo([district.lat, district.lng], 8, { duration: 0.55 });
     }
-  }, [selectedDistrict, isMapReady, countryBounds, districtGeometry]);
+  }, [selectedDistrict, selectedDivision, isMapReady, countryBounds, districtGeometry]);
 
 
   const handleSelectUpazila = (pcode: string | null) => {
@@ -945,6 +967,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         map.flyTo(countryBounds.getCenter(), fitZoom, { duration: 0.45 });
       }
     }
+    onSelectDivision('all');
     onSelectDistrict('all');
   };
 
@@ -965,7 +988,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     ? language === 'bn'
       ? `${selectedDistrictObj.nameBn} জেলা`
       : selectedDistrictObj.nameEn
-    : selectedSectionMeta
+    : activeDivision
+      ? language === 'bn' ? `${activeDivision.nameBn} বিভাগ` : `${activeDivision.nameEn} Division`
+      : selectedSectionMeta
       ? language === 'bn'
         ? selectedSectionMeta.shortNameBn
         : selectedSectionMeta.shortNameEn
