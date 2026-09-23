@@ -256,6 +256,14 @@ await check('Home uses the shared filter rail and report cards are keyboard reac
   const page = await context.newPage();
   await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
   await expectVisible(page.locator('#home-feed-filter-rail'), 'Home shared filter rail missing');
+  await expectVisible(
+    page.locator('#home-independence-note'),
+    'Home independent-platform clarification missing'
+  );
+  const mostViewedLabel = (await page.locator('#filter-chip-popular').innerText()).trim();
+  if (!/সর্বাধিক দেখা|Most viewed/i.test(mostViewedLabel)) {
+    throw new Error(`Home popular filter still exposes the wrong user-facing label: "${mostViewedLabel}"`);
+  }
 
   const homeFeed = page.locator('#home-virtualized-feed');
   await homeFeed.waitFor({ state: 'attached', timeout: 15000 });

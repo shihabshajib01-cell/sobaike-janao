@@ -116,7 +116,11 @@ try {
   if ((await mobJustice.getAttribute('aria-checked')) !== 'true') throw new Error('Mob Justice did not become selected');
   await page.locator('#composer-footer-step2-next-btn').click();
 
-  // Step 3: required Mob Justice classification fields.
+  // Step 3: privacy baseline + required Mob Justice classification fields.
+  await expectVisible(
+    page.locator('#composer-privacy-baseline-notice'),
+    'Report composer privacy baseline notice missing'
+  );
   await expectVisible(page.locator('#composer-section-mob-justice'), 'Mob Justice details section missing');
   for (const selector of ['#mob-justice-trigger', '#mob-justice-outcome', '#mob-justice-ongoing-status']) {
     const control = page.locator(selector);

@@ -3,7 +3,8 @@ import {
   AlertCircle,
   Sparkles,
   LayoutGrid,
-  TrendingUp,
+  Eye,
+  ShieldCheck,
   LoaderCircle,
 } from 'lucide-react';
 import { PublicFeedUpdateService } from '../services/publicFeedUpdateService';
@@ -517,6 +518,22 @@ export const HomePage: React.FC = () => {
 
       <ServiceHeroCarousel id="home-service-carousel" className="mb-2" />
 
+      <p
+        id="home-independence-note"
+        role="note"
+        className="mb-4 flex items-start gap-2 type-meta text-ui-content-secondary"
+      >
+        <ShieldCheck
+          className="mt-0.5 h-4 w-4 shrink-0 text-ui-content-primary"
+          aria-hidden="true"
+        />
+        <span>
+          {language === 'bn'
+            ? 'স্বাধীন নাগরিক প্ল্যাটফর্ম · কোনো সরকারি বা আইনশৃঙ্খলা রক্ষাকারী সংস্থার অংশ নয়'
+            : 'Independent citizen platform · Not affiliated with any government or law-enforcement agency'}
+        </span>
+      </p>
+
       <section id="home-feed-section" className="space-y-4 pt-1">
         <div className="flex items-start justify-between gap-2 sm:gap-3 border-b border-ui-stroke-subtle pb-3">
           <div className="min-w-0 flex-1">
@@ -578,8 +595,8 @@ export const HomePage: React.FC = () => {
           />
           <FilterChip
             id="filter-chip-popular"
-            label={language === 'bn' ? 'জনপ্রিয়' : 'Popular'}
-            icon={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
+            label={language === 'bn' ? 'সর্বাধিক দেখা' : 'Most viewed'}
+            icon={<Eye className="w-3.5 h-3.5" aria-hidden="true" />}
             selected={feedFilter === 'popular'}
             onClick={() => setFeedFilter('popular')}
           />
