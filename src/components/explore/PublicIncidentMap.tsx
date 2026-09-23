@@ -11,6 +11,7 @@ import { SectionKey } from '../../theme/tokens';
 import { useTaxonomy } from '../../services/taxonomyService';
 import { HEATMAP_TOKENS } from '../../theme/data-viz-tokens';
 import { BANGLADESH_DISTRICTS, DIVISIONS, DistrictInfo } from '../../data/districts';
+import { getUpazilasByDistrict } from '../../data/upazilas';
 import { toBanglaDigits } from '../../utils/formatters';
 import { MapIcon } from './MapIcon';
 import { useApp } from '../../context/AppContext';
@@ -21,6 +22,8 @@ export interface PublicIncidentMapProps {
   reports: ReportItem[];
   language: 'bn' | 'en';
   selectedSection: SectionKey | 'all';
+  selectedDivision: string;
+  onSelectDivision: (division: string) => void;
   selectedDistrict: string;
   onSelectDistrict: (district: string) => void;
   onResetFilters?: () => void;
@@ -103,6 +106,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   reports,
   language,
   selectedSection,
+  selectedDivision,
+  onSelectDivision,
   selectedDistrict,
   onSelectDistrict,
   onResetFilters,
@@ -139,6 +144,27 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   const activeUpazilaFeatures = upazilaData && upazilaData.districtId === districtForUpazilas?.id
     ? upazilaData.features
     : EMPTY_UPAZILA_FEATURES;
+  // All 601 canonical location choices remain accessible regardless of the
+  // historical geometry asset's incomplete coverage.
+  const canonicalUpazilaOptions = useMemo(
+    () => districtForUpazilas ? getUpazilasByDistrict(districtForUpazilas.id) : [],
+    [districtForUpazilas?.id]
+  );
+  const matchedCanonicalIDs = useMemo(
+    () => new Set(activeUpazilaFeatures
+      .map(feature => feature.properties.canonical_id as string | undefined)
+      .filter((id): id is string => Boolean(id))),
+    [activeUpazilaFeatures]
+  );
+  const selectedCanonicalUpazila = canonicalUpazilaOptions.find(item => item.id === selectedUpazila);
+  const activeDivision = DIVISIONS.find(item =>
+    item.id === selectedDivision.toLowerCase() ||
+    item.nameEn.toLowerCase() === selectedDivision.toLowerCase() ||
+    item.nameBn === selectedDivision
+  );
+  const availableMapDistricts = selectedDivision === 'all' || !activeDivision
+    ? BANGLADESH_DISTRICTS
+    : BANGLADESH_DISTRICTS.filter(item => item.divisionId === activeDivision.id);
 
   // Existing district selection controls the drilldown. The new geography is
   // lazily fetched only after a user chooses a district; no 498-feature bundle
@@ -195,7 +221,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
   }, [selectedDistrict, districtGeometry, mapLayerMode]);
 
   const selectedUpazilaFeature = activeUpazilaFeatures.find(
-    feature => feature.properties.pcode === selectedUpazila
+    feature => feature.properties.canonical_id === selectedUpazila ||
+      feature.properties.pcode === selectedUpazila
   );
 
   useEffect(() => {
@@ -232,7 +259,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     [reports]
   );
   const selectedUpazilaReports = useMemo(() => {
-    if (!selectedUpazilaFeature || selectedUpazilaFeature.properties.invalid_source_geometry) return [];
+    if (!selectedUpazilaFeature ||
+      !selectedUpazilaFeature.properties.canonical_id ||
+      selectedUpazilaFeature.properties.invalid_source_geometry) return [];
     return reportsWithRealCoords.filter(report =>
       containsCoordinate(selectedUpazilaFeature.geometry,
         Number(report.coordinates?.lat), Number(report.coordinates?.lng))
@@ -474,7 +503,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
         features: activeUpazilaFeatures,
       } as any, {
         style: (feature: any) => {
-          const active = feature?.properties?.pcode === selectedUpazila;
+          const active = selectedUpazila !== null &&
+            (feature?.properties?.canonical_id === selectedUpazila ||
+              feature?.properties?.pcode === selectedUpazila);
           return {
             color: active ? HEATMAP_TOKENS.colors.high : outline,
             weight: active ? 2.8 : 1.25,
@@ -489,7 +520,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           const label = language === 'bn'
             ? properties.name_bn || properties.name_en
             : properties.name_en;
-          const validBoundary = !properties.invalid_source_geometry;
+          const validBoundary = Boolean(properties.canonical_id) &&
+            !properties.invalid_source_geometry;
           const preciseCount = validBoundary ? reportsWithRealCoords.filter(report =>
             containsCoordinate(feature.geometry,
               Number(report.coordinates?.lat), Number(report.coordinates?.lng))
@@ -499,9 +531,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           title.textContent = label;
           const note = document.createElement('div');
           note.textContent = !validBoundary
-            ? language === 'bn'
-              ? 'সীমানার উৎসে জ্যামিতিক ত্রুটি আছে; অবস্থানভিত্তিক গণনা উপলব্ধ নয়'
-              : 'Source polygon needs repair; precise-location counts unavailable'
+            ? properties.invalid_source_geometry
+              ? language === 'bn'
+                ? 'সীমানার উৎসে জ্যামিতিক ত্রুটি আছে; অবস্থানভিত্তিক গণনা উপলব্ধ নয়'
+                : 'Source polygon needs repair; precise-location counts unavailable'
+              : language === 'bn'
+                ? 'এটি ঐতিহাসিক সীমানা; বর্তমান উপজেলা/থানা তালিকার সাথে পরিচয় নিশ্চিত নয়'
+                : 'Historical polygon not yet matched to a verified registry location'
             : reportsWithRealCoords.length === 0
               ? language === 'bn'
                 ? 'উপজেলা অনুযায়ী প্রতিবেদনের সংখ্যা উপলব্ধ নয়; প্রকাশিত ডেটায় সুনির্দিষ্ট স্থানাঙ্ক নেই'
@@ -513,7 +549,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           const path = layer as L.Path;
           path.bindTooltip(tooltip, { direction: 'top', opacity: 0.97 });
           const select = () => {
-            setSelectedUpazila(properties.pcode);
+            setSelectedUpazila(properties.canonical_id || properties.pcode);
             const bounds = L.geoJSON(feature as any).getBounds();
             if (bounds.isValid()) {
               map.flyToBounds(bounds.pad(0.38), {
@@ -872,7 +908,9 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       }
       return;
     }
-    const feature = activeUpazilaFeatures.find(f => f.properties.pcode === pcode);
+    const feature = activeUpazilaFeatures.find(f =>
+      f.properties.canonical_id === pcode || f.properties.pcode === pcode
+    );
     if (!feature) return;
     const bounds = L.geoJSON(feature as any).getBounds();
     if (bounds.isValid()) {
