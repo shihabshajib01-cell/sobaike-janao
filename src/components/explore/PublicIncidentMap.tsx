@@ -136,7 +136,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       (d.id === selectedDistrict.toLowerCase() ||
        d.nameEn.toLowerCase() === selectedDistrict.toLowerCase() || d.nameBn === selectedDistrict)
   );
-  const activeUpazilaFeatures = upazilaData?.districtId === districtForUpazilas?.id
+  const activeUpazilaFeatures = upazilaData && upazilaData.districtId === districtForUpazilas?.id
     ? upazilaData.features
     : EMPTY_UPAZILA_FEATURES;
 
@@ -232,7 +232,7 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
     [reports]
   );
   const selectedUpazilaReports = useMemo(() => {
-    if (!selectedUpazilaFeature) return [];
+    if (!selectedUpazilaFeature || selectedUpazilaFeature.properties.invalid_source_geometry) return [];
     return reportsWithRealCoords.filter(report =>
       containsCoordinate(selectedUpazilaFeature.geometry,
         Number(report.coordinates?.lat), Number(report.coordinates?.lng))
@@ -477,17 +477,22 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           const label = language === 'bn'
             ? properties.name_bn || properties.name_en
             : properties.name_en;
-          const preciseCount = reportsWithRealCoords.filter(report =>
+          const validBoundary = !properties.invalid_source_geometry;
+          const preciseCount = validBoundary ? reportsWithRealCoords.filter(report =>
             containsCoordinate(feature.geometry,
               Number(report.coordinates?.lat), Number(report.coordinates?.lng))
-          ).length;
+          ).length : null;
           const tooltip = document.createElement('div');
           const title = document.createElement('strong');
           title.textContent = label;
           const note = document.createElement('div');
-          note.textContent = language === 'bn'
-            ? `সুনির্দিষ্ট অবস্থানযুক্ত ${toBanglaDigits(preciseCount)}টি প্রতিবেদন; অন্যগুলোর অবস্থান অনিশ্চিত`
-            : `${preciseCount} precisely located reports; other locations unconfirmed`;
+          note.textContent = !validBoundary
+            ? language === 'bn'
+              ? 'সীমানার উৎসে জ্যামিতিক ত্রুটি আছে; অবস্থানভিত্তিক গণনা উপলব্ধ নয়'
+              : 'Source polygon needs repair; precise-location counts unavailable'
+            : language === 'bn'
+              ? `সুনির্দিষ্ট অবস্থানযুক্ত ${toBanglaDigits(preciseCount!)}টি প্রতিবেদন; অন্যগুলোর অবস্থান অনিশ্চিত`
+              : `${preciseCount} precisely located reports; other locations unconfirmed`;
           tooltip.append(title, note);
           const path = layer as L.Path;
           path.bindTooltip(tooltip, { direction: 'top', opacity: 0.97 });
@@ -1191,9 +1196,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             </button>
           </div>
           <p className="type-compact text-ui-content-secondary">
-            {language === 'bn'
-              ? `সুনির্দিষ্ট অবস্থান যাচাইযোগ্য ${toBanglaDigits(selectedUpazilaReports.length)}টি প্রতিবেদন। অন্য জেলা-ভিত্তিক প্রতিবেদনগুলো অনুমান করে এখানে দেখানো হয়নি।`
-              : `${selectedUpazilaReports.length} published reports with precise coordinates inside this boundary. Other district-level reports are not assigned by guesswork.`}
+            {selectedUpazilaFeature.properties.invalid_source_geometry
+              ? language === 'bn'
+                ? 'এই উপজেলার মূল সীমানায় জ্যামিতিক ত্রুটি আছে। নির্ভুল অবস্থান যাচাই না হওয়া পর্যন্ত এখানে কোনো প্রতিবেদন গণনা করা হচ্ছে না।'
+                : 'This source polygon has a geometry defect. Reports are not assigned here until its boundary has been independently corrected.'
+              : language === 'bn'
+                ? `সুনির্দিষ্ট অবস্থান যাচাইযোগ্য ${toBanglaDigits(selectedUpazilaReports.length)}টি প্রতিবেদন। অন্য জেলা-ভিত্তিক প্রতিবেদনগুলো অনুমান করে এখানে দেখানো হয়নি।`
+                : `${selectedUpazilaReports.length} published reports with precise coordinates inside this boundary. Other district-level reports are not assigned by guesswork.`}
           </p>
           {selectedUpazilaReports.length > 0 && (
             <ul className="space-y-1.5">
