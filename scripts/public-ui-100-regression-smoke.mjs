@@ -164,6 +164,25 @@ async function check(name, fn) {
 
 const browser = await chromium.launch({ headless: true });
 
+await check('Large-desktop rail keeps the independent-platform identity', async () => {
+  const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  await seedReturningVisitor(context);
+  const page = await context.newPage();
+  await page.goto(routeUrl('/'), { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+  const note = page.locator('#desktop-rail-platform-note');
+  await expectVisible(note, 'Desktop rail platform note missing');
+  const text = (await note.innerText()).replace(/\s+/g, ' ').trim();
+  if (!/স্বাধীন নাগরিক প্ল্যাটফর্ম|Independent citizen platform/i.test(text)) {
+    throw new Error('Desktop rail does not identify the platform as independent: ' + text);
+  }
+  if (!/সরকারি সংস্থা নয়|Not a government service/i.test(text)) {
+    throw new Error('Desktop rail government disclaimer missing: ' + text);
+  }
+
+  await context.close();
+});
+
 await check('All seven category routes render on desktop', async () => {
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   await seedReturningVisitor(context);

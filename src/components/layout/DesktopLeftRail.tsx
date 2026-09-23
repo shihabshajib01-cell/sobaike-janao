@@ -187,12 +187,17 @@ export const DesktopLeftRail: React.FC = () => {
 
         <LanguageSelector variant="compact" idPrefix="rail-language" />
 
-        <div className="px-2 pt-1 type-meta text-ui-content-secondary leading-tight">
+        <div
+          id="desktop-rail-platform-note"
+          className="px-2 pt-1 type-meta text-ui-content-secondary leading-tight"
+        >
           <p className="font-[var(--font-weight-medium)] text-ui-content-secondary">
-            {language === 'bn' ? 'নাগরিক প্ল্যাটফর্ম' : 'Citizen platform'}
+            {language === 'bn'
+              ? 'স্বাধীন নাগরিক প্ল্যাটফর্ম'
+              : 'Independent citizen platform'}
           </p>
           <small className="text-ui-content-secondary">
-            {language === 'bn' ? 'বাংলাদেশ ২০২৬' : 'Bangladesh 2026'}
+            {language === 'bn' ? 'সরকারি সংস্থা নয়' : 'Not a government service'}
           </small>
         </div>
       </div>
