@@ -490,9 +490,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
             ? language === 'bn'
               ? 'সীমানার উৎসে জ্যামিতিক ত্রুটি আছে; অবস্থানভিত্তিক গণনা উপলব্ধ নয়'
               : 'Source polygon needs repair; precise-location counts unavailable'
-            : language === 'bn'
-              ? `সুনির্দিষ্ট অবস্থানযুক্ত ${toBanglaDigits(preciseCount!)}টি প্রতিবেদন; অন্যগুলোর অবস্থান অনিশ্চিত`
-              : `${preciseCount} precisely located reports; other locations unconfirmed`;
+            : reportsWithRealCoords.length === 0
+              ? language === 'bn'
+                ? 'উপজেলা অনুযায়ী প্রতিবেদনের সংখ্যা উপলব্ধ নয়; প্রকাশিত ডেটায় সুনির্দিষ্ট স্থানাঙ্ক নেই'
+                : 'Upazila report counts unavailable: precise coordinates are not in the public feed'
+              : language === 'bn'
+                ? `সুনির্দিষ্ট অবস্থানযুক্ত ${toBanglaDigits(preciseCount!)}টি প্রতিবেদন; অন্যগুলোর অবস্থান অনিশ্চিত`
+                : `${preciseCount} precisely located reports; other locations unconfirmed`;
           tooltip.append(title, note);
           const path = layer as L.Path;
           path.bindTooltip(tooltip, { direction: 'top', opacity: 0.97 });
@@ -1106,8 +1110,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
               </select>
               <p className="type-meta text-ui-content-secondary">
                 {language === 'bn'
-                  ? 'উপজেলার সীমানা দেখে নির্বাচন করুন। প্রতিবেদনের অবস্থান নিশ্চিত হলে তবেই উপজেলা অনুযায়ী দেখানো হয়।'
-                  : 'Select an upazila by boundary or name. Reports are assigned here only when precise coordinates are available.'}
+                  ? 'এটি সীমানা অনুযায়ী ভৌগোলিক নির্বাচন; বিদ্যমান প্রতিবেদন ফিল্টার জেলা-ভিত্তিক থাকবে।'
+                  : 'This selection explores geographic boundaries; existing report filters remain district-based.'}
               </p>
             </>
           )}
@@ -1200,9 +1204,13 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
               ? language === 'bn'
                 ? 'এই উপজেলার মূল সীমানায় জ্যামিতিক ত্রুটি আছে। নির্ভুল অবস্থান যাচাই না হওয়া পর্যন্ত এখানে কোনো প্রতিবেদন গণনা করা হচ্ছে না।'
                 : 'This source polygon has a geometry defect. Reports are not assigned here until its boundary has been independently corrected.'
-              : language === 'bn'
-                ? `সুনির্দিষ্ট অবস্থান যাচাইযোগ্য ${toBanglaDigits(selectedUpazilaReports.length)}টি প্রতিবেদন। অন্য জেলা-ভিত্তিক প্রতিবেদনগুলো অনুমান করে এখানে দেখানো হয়নি।`
-                : `${selectedUpazilaReports.length} published reports with precise coordinates inside this boundary. Other district-level reports are not assigned by guesswork.`}
+              : reportsWithRealCoords.length === 0
+                ? language === 'bn'
+                  ? 'উপজেলার সীমানা দেখা যাচ্ছে, তবে নিরাপত্তার কারণে প্রকাশিত প্রতিবেদনে সুনির্দিষ্ট স্থানাঙ্ক নেই। উপজেলা অনুযায়ী প্রতিবেদন গণনা বর্তমানে উপলব্ধ নয়।'
+                  : 'Upazila boundaries are available, but the public reporting API intentionally omits precise coordinates. Upazila report totals are therefore unavailable.'
+                : language === 'bn'
+                  ? `সুনির্দিষ্ট অবস্থান যাচাইযোগ্য ${toBanglaDigits(selectedUpazilaReports.length)}টি প্রতিবেদন। অন্য জেলা-ভিত্তিক প্রতিবেদনগুলো অনুমান করে এখানে দেখানো হয়নি।`
+                  : `${selectedUpazilaReports.length} published reports with precise coordinates inside this boundary. Other district-level reports are not assigned by guesswork.`}
           </p>
           {selectedUpazilaReports.length > 0 && (
             <ul className="space-y-1.5">
