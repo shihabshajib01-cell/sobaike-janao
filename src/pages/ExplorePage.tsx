@@ -989,6 +989,11 @@ export const ExplorePage: React.FC = () => {
                   reports={filteredReports}
                   language={language}
                   selectedSection={selectedSection}
+                  selectedDivision={selectedDivision}
+                  onSelectDivision={(division) => {
+                    setSelectedDivision(division);
+                    setSelectedDistrict('all');
+                  }}
                   selectedDistrict={selectedDistrict}
                   onSelectDistrict={handleSelectDistrict}
                   onResetFilters={handleResetFilters}
