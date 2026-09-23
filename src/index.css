@@ -1434,8 +1434,8 @@
   contain: layout paint style;
 }
 
-/* Keyless OSM dark-mode tiles: transform the raster tile images only.
-   Map vectors, the heatmap, controls, and required attribution remain unfiltered. */
-.public-map-tiles-dark .leaflet-tile {
-  filter: invert(0.94) hue-rotate(180deg) brightness(0.81) contrast(0.91) saturate(0.7);
+/* The Explore map draws Bangladesh district polygons only: no OSM/world tiles.
+   Keep the canvas and outside area neutral in both existing themes. */
+.public-bangladesh-map-canvas.leaflet-container {
+  background: var(--ui-surface-subtle);
 }
