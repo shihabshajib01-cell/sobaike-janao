@@ -85,8 +85,8 @@ assert(locationRows.every(row => ids.has(row.districtId)), 'Every upazila must r
 const reconciliation = JSON.parse(readFileSync('docs/upazila-map-coverage-crosswalk.json', 'utf8'));
 assert.equal(reconciliation.registry_total, 601);
 assert.equal(reconciliation.verified_polygon_registry_matches, 351);
-assert.equal(reconciliation.registry_without_verified_polygons, 250);
-assert.equal(reconciliation.historic_polygons_without_verified_registry_matches, 147);
+assert.equal(reconciliation.registry_without_verified_polygons_count, 250);
+assert.equal(reconciliation.historic_polygons_without_verified_registry_matches_count, 147);
 const matchedIDs = new Set(reconciliation.verified.map(row => row.id));
 const missingIDs = new Set(reconciliation.registry_without_verified_polygons.map(row => row.id));
 assert.equal(matchedIDs.size, 351);
