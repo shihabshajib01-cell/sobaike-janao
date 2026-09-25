@@ -210,10 +210,11 @@ record(
   `${faviconIcoBytes} bytes`
 );
 record(
-  'External font stylesheet is non-render-blocking',
-  rootHtml.includes('id="site-font-stylesheet" rel="preload" as="style"') &&
-    rootHtml.includes('src="/font-style-loader.js"') &&
-    !/<link[^>]+fonts\.googleapis\.com[^>]+rel=["']stylesheet["']/i.test(rootHtml)
+  'Visitor-facing fonts are same-origin',
+  rootHtml.includes('href="/fonts/fonts.css"') &&
+    !rootHtml.includes('fonts.googleapis.com') &&
+    !rootHtml.includes('fonts.gstatic.com') &&
+    !rootHtml.includes('font-style-loader.js')
 );
 record(
   'Legacy SVG favicon declarations removed',
