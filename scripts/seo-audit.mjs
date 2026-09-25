@@ -209,12 +209,21 @@ record(
   faviconIcoValid && rootHtml.includes('href="/favicon.ico"'),
   `${faviconIcoBytes} bytes`
 );
+let sameOriginFontCss = '';
+try {
+  sameOriginFontCss = await readFile(join(DIST, 'fonts', 'fonts.css'), 'utf8');
+} catch {
+  sameOriginFontCss = '';
+}
 record(
   'Visitor-facing fonts are same-origin',
-  rootHtml.includes('href="/fonts/fonts.css"') &&
-    !rootHtml.includes('fonts.googleapis.com') &&
+  !rootHtml.includes('fonts.googleapis.com') &&
     !rootHtml.includes('fonts.gstatic.com') &&
-    !rootHtml.includes('font-style-loader.js')
+    !rootHtml.includes('font-style-loader.js') &&
+    sameOriginFontCss.includes('@font-face') &&
+    sameOriginFontCss.includes('Noto Sans') &&
+    !sameOriginFontCss.includes('fonts.googleapis.com') &&
+    !sameOriginFontCss.includes('fonts.gstatic.com')
 );
 record(
   'Legacy SVG favicon declarations removed',
