@@ -369,6 +369,10 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
       zoomControl: false,
       attributionControl: false,
       scrollWheelZoom: desktopPointer.matches,
+      // Wide desktop canvases otherwise floor the country fit to a whole zoom
+      // level, leaving Bangladesh visibly undersized. Fractional zoom preserves
+      // the true aspect ratio while fitting the verified country bounds tightly.
+      zoomSnap: 0.1,
     });
 
     // A mouse can be connected or disconnected without reinitializing the map

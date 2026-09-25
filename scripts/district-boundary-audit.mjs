@@ -47,6 +47,7 @@ if (existsSync(publicMapSource)) {
   assert.match(map, /countryBounds\.pad\(0\.05\)/, 'Country geography must constrain the map viewport');
   assert.match(map, /window\.matchMedia\('\(hover: hover\) and \(pointer: fine\)'\)/, 'Desktop wheel zoom must be restricted to precision-pointer devices');
   assert.match(map, /scrollWheelZoom: desktopPointer\.matches/, 'Desktop mouse wheel must zoom the map');
+  assert.match(map, /zoomSnap: 0\.1/, 'Country fit must retain fractional zoom so wide desktop canvases do not undersize Bangladesh');
   assert.match(map, /desktopPointer\.addEventListener\('change', syncWheelZoom\)/, 'Wheel zoom must update when pointer capability changes');
   assert.match(map, /desktopPointer\.removeEventListener\('change', syncWheelZoom\)/, 'Remove pointer listener during map teardown');
   assert.match(map, /map\.scrollWheelZoom\.disable\(\)/, 'Touch-first devices must retain normal page scrolling');
