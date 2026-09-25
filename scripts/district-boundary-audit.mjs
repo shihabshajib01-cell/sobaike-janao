@@ -84,13 +84,13 @@ assert(locationRows.every(row => ids.has(row.districtId)), 'Every upazila/thana 
 
 const reconciliation = JSON.parse(readFileSync('docs/upazila-map-coverage-crosswalk.json', 'utf8'));
 assert.equal(reconciliation.registry_total, 601);
-assert.equal(reconciliation.verified_polygon_registry_matches, 543);
-assert.equal(reconciliation.registry_without_verified_polygons_count, 58);
+assert.equal(reconciliation.verified_polygon_registry_matches, 544);
+assert.equal(reconciliation.registry_without_verified_polygons_count, 57);
 assert.equal(reconciliation.records.length, 601);
 const verified = reconciliation.records.filter(row => row.status === 'verified_polygon');
 const unsupported = reconciliation.records.filter(row => row.status === 'no_verified_polygon');
-assert.equal(verified.length, 543);
-assert.equal(unsupported.length, 58);
+assert.equal(verified.length, 544);
+assert.equal(unsupported.length, 57);
 assert.equal(new Set(reconciliation.records.map(row => row.id)).size, 601);
 assert(reconciliation.records.every(row => locationIDs.has(row.id)));
 
@@ -98,8 +98,8 @@ const manifest = JSON.parse(readFileSync('public/geo/upazilas/manifest.json', 'u
 assert.equal(manifest.canonical_registry_count, 601);
 assert.equal(manifest.division_count, 8);
 assert.equal(manifest.district_count, 64);
-assert.equal(manifest.published_verified_polygon_count, 543);
-assert.equal(manifest.registry_without_verified_polygon_count, 58);
+assert.equal(manifest.published_verified_polygon_count, 544);
+assert.equal(manifest.registry_without_verified_polygon_count, 57);
 assert.equal(manifest.geoBoundaries_source_feature_count, 544);
 const districtCodes = new Map(geo.features.map(f => [f.properties.ADM2_PCODE, f.properties.district_id]));
 const polygonIDs = new Set();
@@ -128,8 +128,8 @@ for (const [division, path] of Object.entries(manifest.division_files)) {
     polygonTotal += 1;
   }
 }
-assert.equal(polygonTotal, 543);
-assert.equal(polygonIDs.size, 543);
+assert.equal(polygonTotal, 544);
+assert.equal(polygonIDs.size, 544);
 assert([...polygonIDs].every(id => verified.some(row => row.id === id)));
 assert(unsupported.every(row => !polygonIDs.has(row.id)));
 
@@ -146,4 +146,4 @@ if (existsSync(publicMapSource)) {
   assert(!map.includes('Math.random('), 'Never display demo data as report counts');
   assert(explore.includes('onSelectDivision={(division) =>'), 'Map and Explore division filter must stay synchronized');
 }
-console.log('PASS: 8 divisions / 64 districts / 601 canonical locations; 543 verified polygons + 58 explicit no-polygon statuses');
+console.log('PASS: 8 divisions / 64 districts / 601 canonical locations; 544 verified polygons + 57 explicit no-polygon statuses');

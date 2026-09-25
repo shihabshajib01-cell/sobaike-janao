@@ -5,9 +5,9 @@
   "division_total": 8,
   "district_total": 64,
   "registry_total": 601,
-  "verified_polygon_registry_matches": 543,
-  "registry_without_verified_polygons_count": 58,
-  "polygon_coverage_percent": 90.35,
+  "verified_polygon_registry_matches": 544,
+  "registry_without_verified_polygons_count": 57,
+  "polygon_coverage_percent": 90.52,
   "geometry_reference_year": "2020",
   "geometry_source": "geoBoundaries gbOpen BGD ADM3 (BBS/OCHA ROAP), plus one previously verified uploaded polygon",
   "records": [
@@ -2001,7 +2001,10 @@
       "division_id": "dhaka",
       "name_en": "Tejgaon Industrial Area",
       "name_bn": "তেজগাঁও শিল্পাঞ্চল",
-      "status": "no_verified_polygon"
+      "status": "verified_polygon",
+      "source_name": "Tejgaon Ind. Area",
+      "match_method": "retained_verified_uploaded_geometry",
+      "boundary_reference_year": "2020"
     },
     {
       "id": "dhaka-turag",
