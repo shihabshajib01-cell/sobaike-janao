@@ -71,77 +71,79 @@ if (existsSync(publicMapSource)) {
   assert.match(css, /\.bangladesh-map-label\.is-district/, 'District label styling must be present');
 }
 
-// Geographic coverage is partial, but the selected location registry must
-// provide 100% of the existing SQL contract's 601 canonical names/IDs.
+// Canonical 8/64/601 coverage and verified polygon contract.
 const locationSource = readFileSync('src/data/upazilas.ts', 'utf8');
 const locationSection = locationSource.split('export const BANGLADESH_UPAZILAS:')[1]?.split('\n];')[0];
 assert(locationSection, 'Canonical upazila/thana registry missing');
 const locationRows = [...locationSection.matchAll(/\{ id: '([^']+)', nameBn: '[^']+', nameEn: (?:'[^']+'|"[^"]+"), districtId: '([^']+)'/g)]
   .map(match => ({ id: match[1], districtId: match[2] }));
 const locationIDs = new Set(locationRows.map(row => row.id));
-assert.equal(locationIDs.size, 601, 'Every existing canonical upazila/thana must remain available');
+assert.equal(locationIDs.size, 601, 'Every canonical upazila/thana must remain available');
 assert.equal(locationRows.length, 601, 'Duplicate or dropped upazila/thana entry');
-assert(locationRows.every(row => ids.has(row.districtId)), 'Every upazila must reference a canonical district');
+assert(locationRows.every(row => ids.has(row.districtId)), 'Every upazila/thana must reference a canonical district');
+
 const reconciliation = JSON.parse(readFileSync('docs/upazila-map-coverage-crosswalk.json', 'utf8'));
 assert.equal(reconciliation.registry_total, 601);
-assert.equal(reconciliation.verified_polygon_registry_matches, 351);
-assert.equal(reconciliation.registry_without_verified_polygons_count, 250);
-assert.equal(reconciliation.historic_polygons_without_verified_registry_matches_count, 147);
-const matchedIDs = new Set(reconciliation.verified.map(row => row.id));
-const missingIDs = new Set(reconciliation.registry_without_verified_polygons.map(row => row.id));
-assert.equal(matchedIDs.size, 351);
-assert.equal(missingIDs.size, 250);
-assert([...matchedIDs].every(id => locationIDs.has(id) && !missingIDs.has(id)));
-assert([...missingIDs].every(id => locationIDs.has(id)));
-assert.equal(new Set([...matchedIDs, ...missingIDs]).size, 601,
-  'Every canonical location must have an explicit verified or unverified boundary status');
-if (existsSync(publicMapSource)) {
-  const map = readFileSync(publicMapSource, 'utf8');
-  const explore = readFileSync('src/pages/ExplorePage.tsx', 'utf8');
-  assert(map.includes('getUpazilasByDistrict'), 'Map must list every canonical registry location by district');
-  assert(map.includes('map-upazila-select'), 'Upazila navigation must remain accessible');
-  assert(map.includes('boundary not verified'), 'Missing boundaries must be visibly disclosed');
-  assert(map.includes('map-division-select') && map.includes('map-district-select'), 'Map must expose complete three-level navigation');
-  assert(explore.includes('onSelectDivision={(division) =>'), 'Map and Explore division filter must stay synchronized');
-}
+assert.equal(reconciliation.verified_polygon_registry_matches, 543);
+assert.equal(reconciliation.registry_without_verified_polygons_count, 58);
+assert.equal(reconciliation.records.length, 601);
+const verified = reconciliation.records.filter(row => row.status === 'verified_polygon');
+const unsupported = reconciliation.records.filter(row => row.status === 'no_verified_polygon');
+assert.equal(verified.length, 543);
+assert.equal(unsupported.length, 58);
+assert.equal(new Set(reconciliation.records.map(row => row.id)).size, 601);
+assert(reconciliation.records.every(row => locationIDs.has(row.id)));
+
 const manifest = JSON.parse(readFileSync('public/geo/upazilas/manifest.json', 'utf8'));
-assert.equal(manifest.source_feature_count, 498);
-assert.equal(manifest.sql_canonical_row_count_at_audit, 601);
-assert.equal(manifest.uniquely_matched_sql_names, 351);
-assert.equal(manifest.unmatched_sql_names, 147);
+assert.equal(manifest.canonical_registry_count, 601);
+assert.equal(manifest.division_count, 8);
+assert.equal(manifest.district_count, 64);
+assert.equal(manifest.published_verified_polygon_count, 543);
+assert.equal(manifest.registry_without_verified_polygon_count, 58);
+assert.equal(manifest.geoBoundaries_source_feature_count, 544);
 const districtCodes = new Map(geo.features.map(f => [f.properties.ADM2_PCODE, f.properties.district_id]));
-const upazilaCodes = new Set();
-let verifiedUpazilas = 0;
+const polygonIDs = new Set();
+const geometryKeys = new Set();
+let polygonTotal = 0;
 for (const [division, path] of Object.entries(manifest.division_files)) {
   const source = readFileSync('public/' + path, 'utf8');
-  assert(gzipSync(source).length < 115000, 'Lazy upazila division asset exceeded 115KB gzip: ' + division);
+  assert(gzipSync(source).length < 180000, 'Lazy upazila division asset exceeded 180KB gzip: ' + division);
   const section = JSON.parse(source);
   assert.equal(section.type, 'FeatureCollection');
   assert.equal(section.metadata.division, division);
   for (const item of section.features) {
     const p = item.properties;
-    assert.match(p.pcode, /^BD[0-9]{6}$/);
-    assert.equal(p.parent_pcode, p.pcode.slice(0, 6));
+    assert.equal(typeof p.canonical_id, 'string');
+    assert(locationIDs.has(p.canonical_id), 'Polygon references non-canonical location');
+    assert(!polygonIDs.has(p.canonical_id), 'Duplicate canonical polygon');
+    polygonIDs.add(p.canonical_id);
     assert.equal(districtCodes.get(p.parent_pcode), p.district_id);
-    assert(!upazilaCodes.has(p.pcode), 'Duplicate upazila P-code');
-    upazilaCodes.add(p.pcode);
+    assert.equal(typeof p.pcode, 'string');
+    assert(p.pcode.length > 0);
+    assert(!geometryKeys.has(p.pcode), 'Duplicate source geometry key');
+    geometryKeys.add(p.pcode);
+    assert.equal(typeof p.name_bn, 'string');
+    assert(p.name_bn.length > 0);
     assert(item.geometry && ['Polygon', 'MultiPolygon'].includes(item.geometry.type));
-    if (p.canonical_id) {
-      assert.equal(typeof p.name_bn, 'string');
-      assert(p.name_bn.length > 0);
-      verifiedUpazilas += 1;
-    } else {
-      assert(!p.name_bn, 'Unverified translation must not be invented');
-    }
+    polygonTotal += 1;
   }
 }
-assert.equal(upazilaCodes.size, 498);
-assert.equal(verifiedUpazilas, 351, 'Name-verified upazila identity coverage changed');
+assert.equal(polygonTotal, 543);
+assert.equal(polygonIDs.size, 543);
+assert([...polygonIDs].every(id => verified.some(row => row.id === id)));
+assert(unsupported.every(row => !polygonIDs.has(row.id)));
+
 if (existsSync(publicMapSource)) {
   const map = readFileSync(publicMapSource, 'utf8');
-  assert(map.includes('geo/upazilas/'), 'Map must lazily load real upazila geometry');
-  assert(map.includes('containsCoordinate'), 'Only precise-coordinate reports may be counted by upazila');
+  const explore = readFileSync('src/pages/ExplorePage.tsx', 'utf8');
+  assert(map.includes('getUpazilasByDistrict'), 'Map must list every canonical registry location by district');
+  assert(map.includes('map-upazila-select'), 'Upazila/thana navigation must remain accessible');
+  assert(map.includes('boundary not verified'), 'Unsupported boundaries must be visibly disclosed');
+  assert(map.includes('map-division-select') && map.includes('map-district-select'), 'Map must expose complete three-level navigation');
+  assert(map.includes('geo/upazilas/'), 'Map must lazily load verified upazila/thana geometry');
+  assert(map.includes('containsCoordinate'), 'Only precise-coordinate reports may be counted by polygon');
   assert(map.includes("onSelectDistrict('all')"), 'Map must retain back navigation');
   assert(!map.includes('Math.random('), 'Never display demo data as report counts');
+  assert(explore.includes('onSelectDivision={(division) =>'), 'Map and Explore division filter must stay synchronized');
 }
-console.log('PASS: Historical upazila dataset (498), 351 verified names / 147 unmatched, 64 parent P-codes, lazy asset budgets');
+console.log('PASS: 8 divisions / 64 districts / 601 canonical locations; 543 verified polygons + 58 explicit no-polygon statuses');

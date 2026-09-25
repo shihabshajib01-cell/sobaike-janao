@@ -1283,8 +1283,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
           {upazilaLoadState === 'idle' && upazilaData?.districtId === districtForUpazilas.id && (
             <p className="type-meta text-ui-content-muted">
               {language === 'bn'
-                ? `এই জেলার ${toBanglaDigits(matchedCanonicalIDs.size)}টি রেকর্ডের ঐতিহাসিক সীমানার পরিচয় নিশ্চিত হয়েছে।`
-                : `${matchedCanonicalIDs.size} records in this district have matched historical polygon identities.`}
+                ? `এই জেলার ${toBanglaDigits(matchedCanonicalIDs.size)}টি রেকর্ডের যাচাইকৃত রেফারেন্স সীমানা পাওয়া গেছে।`
+                : `${matchedCanonicalIDs.size} records in this district have matched verified boundary references.`}
             </p>
           )}
           {selectedCanonicalUpazila && !matchedCanonicalIDs.has(selectedCanonicalUpazila.id) &&
@@ -1395,8 +1395,8 @@ export const PublicIncidentMap: React.FC<PublicIncidentMapProps> = ({
                   : 'This source polygon has a geometry defect. Reports are not assigned until an independently validated boundary is available.'
                 : reportsWithRealCoords.length === 0
                   ? language === 'bn'
-                    ? 'উপজেলার ঐতিহাসিক সীমানা দেখা যাচ্ছে, তবে গোপনীয়তার কারণে প্রকাশিত প্রতিবেদনে সুনির্দিষ্ট স্থানাঙ্ক নেই। উপজেলা অনুযায়ী প্রতিবেদন গণনা বর্তমানে উপলব্ধ নয়।'
-                    : 'A historical boundary match is shown, but the public feed intentionally omits precise coordinates. Upazila report counts are unavailable.'
+                    ? 'উপজেলার যাচাইকৃত রেফারেন্স সীমানা দেখা যাচ্ছে, তবে গোপনীয়তার কারণে প্রকাশিত প্রতিবেদনে সুনির্দিষ্ট স্থানাঙ্ক নেই। উপজেলা অনুযায়ী প্রতিবেদন গণনা বর্তমানে উপলব্ধ নয়।'
+                    : 'A verified reference boundary is shown, but the public feed intentionally omits precise coordinates. Upazila report counts are unavailable.'
                   : language === 'bn'
                     ? `সুনির্দিষ্ট অবস্থান যাচাইযোগ্য ${toBanglaDigits(selectedUpazilaReports.length)}টি প্রতিবেদন। অন্য জেলা-ভিত্তিক প্রতিবেদনগুলো অনুমান করে এখানে দেখানো হয়নি।`
                     : `${selectedUpazilaReports.length} published reports with precise coordinates inside this boundary. Other district-level reports are not assigned by guesswork.`}
