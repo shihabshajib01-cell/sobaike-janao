@@ -44,7 +44,7 @@ jobs:
 
       - name: Install Playwright accessibility runtime
         run: |
-          npm install --no-save playwright@1.55.0 @axe-core/playwright@4.10.2
+          npm install --no-save playwright@1.63.0 @axe-core/playwright@4.13.0
           npx playwright install --with-deps chromium
 
       - name: Run comprehensive non-destructive Public browser smoke
