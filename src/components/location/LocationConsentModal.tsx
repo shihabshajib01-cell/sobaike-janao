@@ -176,8 +176,8 @@ export const LocationConsentModal: React.FC<LocationConsentModalProps> = ({
         <p className="type-body text-ui-content-secondary">
           {isReportMode
             ? (isBn
-                ? 'প্রতিবেদন জমা দিতে আপনার ডিভাইসের লোকেশন প্রয়োজন। লোকেশন চালু করে আবার চেষ্টা করুন।'
-                : 'Your device location is required to submit a report. Turn on location and try again.')
+                ? 'প্রতিবেদন জমা দিতে আপনার ডিভাইসের লোকেশন প্রয়োজন। এটি শুধু নিরাপত্তা ও মডারেশনের জন্য ব্যক্তিগতভাবে রাখা হয়—রিভিউ শেষ হলে মুছে ফেলা হয়, আর কোনো প্রতিবেদন ৭ দিনের বেশি রিভিউতে থাকলে লোকেশন তথ্যও মুছে যায়। এটি জনসমক্ষে দেখানো হয় না।'
+                : 'Your device location is required to submit a report. It is kept privately only for safety and moderation, removed when review finishes, and removed if a report remains under review for more than 7 days. It is never shown publicly.')
             : (isBn
                 ? 'লোকেশন চালু করলে কাছাকাছি এলাকার খবর আরও ভালোভাবে দেখানো যাবে। এখন নয় চাপলে কাছাকাছি এলাকা ধরে খবর দেখানো হবে। আপনার লোকেশন জনসমক্ষে দেখানো হবে না।'
                 : 'Turn on location for better nearby reports. If you choose Not now, we’ll still use a rough area for local reports. Your location will not be displayed publicly.')}

@@ -18,7 +18,10 @@
     "audit:location-contract": "node scripts/location-contract-audit.mjs",
     "audit:security-hardening": "node scripts/security-hardening-audit.mjs",
     "audit:category-theme": "node scripts/category-theme-audit.mjs",
-    "audit:district-boundaries": "node scripts/district-boundary-audit.mjs"
+    "audit:district-boundaries": "node scripts/district-boundary-audit.mjs",
+    "predev": "node scripts/vendor-fonts.mjs",
+    "prebuild": "node scripts/vendor-fonts.mjs",
+    "audit:git-history-secrets": "node scripts/git-history-secret-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

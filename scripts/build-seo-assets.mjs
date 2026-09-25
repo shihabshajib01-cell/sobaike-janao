@@ -117,8 +117,8 @@ const STATIC_PAGES = [
     title: 'ঘটনা বা অভিযোগ জানান | সবাইকে জানাও',
     description:
       'সবাইকে জানাও প্ল্যাটফর্মে জনস্বার্থ সংক্রান্ত ঘটনা বা অভিযোগ প্রাসঙ্গিক তথ্যসহ দায়িত্বশীলভাবে জমা দিন।',
-    robots: FULL_INDEX_ROBOTS,
-    sitemap: true,
+    robots: 'noindex, follow',
+    sitemap: false,
   },
   {
     path: '/search',

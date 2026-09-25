@@ -360,6 +360,11 @@ export const MorePage: React.FC = () => {
                     ? 'আনুমানিক লোকেশন ব্যবহার করলে আমাদের সার্ভার IPWho (ipwho.is)-এর কাছে অনুরোধের IP ঠিকানা পাঠিয়ে আনুমানিক শহর, অঞ্চল ও কোঅর্ডিনেট নেয়। এটি নির্ভুল ডিভাইস লোকেশন নয়।'
                     : 'When approximate location is used, our server sends the request IP address to IPWho (ipwho.is) to resolve an approximate city, region and coordinates. This is not precise device location.'}
                 </p>
+                <p className="type-meta text-ui-content-muted">
+                  {language === 'bn'
+                    ? 'প্রতিবেদন জমা দেওয়ার সময় নেওয়া নির্ভুল ডিভাইস লোকেশন শুধু ব্যক্তিগত নিরাপত্তা ও মডারেশন যাচাইয়ের জন্য। প্রতিবেদন রিভিউ শেষ হলে নির্ভুল লোকেশন ও ডিভাইস মেটাডাটা মুছে যায়; ৭ দিনের বেশি রিভিউতে থাকলেও এই তথ্য মুছে ফেলা হয়।'
+                    : 'Precise device location captured at report submission is used only for private safety and moderation checks. Precise location and device metadata are removed when review finishes, and are also removed if review remains open for more than 7 days.'}
+                </p>
               </div>
             </div>
 

@@ -54,6 +54,30 @@ jobs:
           PY
 
 
+      - name: Verify privacy and disclosure hardening
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body -L -sS "${SITE_URL}report" -o /tmp/public-report-page.html
+          curl --fail-with-body -L -sS "${SITE_URL}.well-known/security.txt" -o /tmp/security.txt
+          curl --fail-with-body -L -sS "${SITE_URL}fonts/fonts.css" -o /tmp/fonts.css
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          home=Path('/tmp/public-index.html').read_text(errors='replace')
+          report=Path('/tmp/public-report-page.html').read_text(errors='replace')
+          security=Path('/tmp/security.txt').read_text(errors='replace')
+          fonts=Path('/tmp/fonts.css').read_text(errors='replace')
+          if 'fonts.googleapis.com' in home or 'fonts.gstatic.com' in home: raise SystemExit('ERROR: external Google Fonts request remains')
+          if '/fonts/fonts.css' not in home or '@font-face' not in fonts or 'Noto Sans' not in fonts: raise SystemExit('ERROR: same-origin Noto font delivery failed')
+          robots=re.search(r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)["\']',report,re.I)
+          if not robots or 'noindex' not in robots.group(1).lower(): raise SystemExit('ERROR: /report must be noindex')
+          if 'ঘটনা বা অভিযোগ জানান' not in report and 'Report an Incident' not in report: raise SystemExit('ERROR: /report metadata is not report-specific')
+          for item in ['Contact: https://shobaikejanao.com/more','Canonical: https://shobaikejanao.com/.well-known/security.txt','Preferred-Languages: bn, en']:
+              if item not in security: raise SystemExit('ERROR: security.txt missing '+item)
+          print('Privacy/font/security.txt/report-route hardening checks passed')
+          PY
+
       - name: Verify Public-SQL-Admin sync contract
         shell: bash
         run: |

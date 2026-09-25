@@ -355,7 +355,9 @@ export const STATIC_ROUTE_SEO: Record<string, Record<'bn' | 'en', SeoMetadata>> 
       description:
         'Submit a public-interest incident or complaint responsibly with relevant details on Sobaike Janao.',
     },
-    '/report'
+    '/report',
+    'website',
+    'noindex, follow'
   ),
 };
 

@@ -38,3 +38,6 @@ Thumbs.db
 
 # Supabase CLI temporary files
 supabase/.temp/
+
+# Build-vendored same-origin Noto font assets
+public/fonts/

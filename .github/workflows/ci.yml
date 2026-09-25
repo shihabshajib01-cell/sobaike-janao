@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -86,6 +88,9 @@ jobs:
             echo "ERROR: public write gateway must not trust client X-Forwarded-For"
             exit 1
           fi
+
+      - name: Full Git history secret audit
+        run: npm run audit:git-history-secrets
 
       - name: Security hardening audit
         run: npm run audit:security-hardening
