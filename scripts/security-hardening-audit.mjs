@@ -210,6 +210,19 @@ if (!fs.existsSync('public/.well-known/security.txt')) {
   fail('security.txt is missing');
 }
 
+const popularityReadMigration = read('supabase/migrations/20260925050040_separate_category_popularity_snapshot_refresh.sql');
+for (const needle of [
+  'private.refresh_public_category_popularity_snapshot',
+  'create or replace function public.get_public_category_popularity()',
+  "language sql",
+  "stable",
+  "refresh-public-category-popularity-snapshot",
+]) {
+  if (!popularityReadMigration.includes(needle)) {
+    fail('read-only category popularity split is missing: ' + needle);
+  }
+}
+
 const privacyPage = read('src/pages/MorePage.tsx');
 if (!privacyPage.includes('IPWho (ipwho.is)')) {
   fail('approximate-location third-party disclosure is missing');
