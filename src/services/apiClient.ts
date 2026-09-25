@@ -266,55 +266,31 @@ class ApiClient {
 
     const reportId = data.reportId as string;
 
-    // Step 2 & 3: If images are attached, upload to private Supabase bucket and register evidence
+    // Evidence is never written directly from the browser. The Edge upload
+    // boundary validates the WebP container, strips metadata/unknown chunks,
+    // replaces the device filename, uploads privately, and registers evidence.
     if (hasImages && images) {
       for (const file of images) {
-        const storagePath = `public-submissions/${clientSubmissionId}/${file.name}`;
+        const form = new FormData();
+        form.append('clientSubmissionId', clientSubmissionId);
+        form.append('file', file, 'evidence.webp');
 
-        // Upload to private complaint-evidence bucket
-        const { error: uploadError } = await supabase.storage
-          .from('complaint-evidence')
-          .upload(storagePath, file, {
-            contentType: 'image/webp',
-            cacheControl: '3600',
-            upsert: false,
-          });
+        const { data: evidenceData, error: evidenceError } = await supabase.functions.invoke(
+          'public-evidence-upload',
+          { body: form }
+        );
 
-        if (uploadError) {
-          const isDuplicate =
-            uploadError.message?.toLowerCase().includes('already exists') ||
-            uploadError.message?.toLowerCase().includes('duplicate') ||
-            (uploadError as any).statusCode === '409' ||
-            (uploadError as any).status === 409;
-
-          if (!isDuplicate) {
-            const apiError: ApiError = {
-              code: 'EVIDENCE_UPLOAD_FAILED',
-              message: `Failed to upload image "${file.name}". ${uploadError.message}`,
-              messageBn:
-                'আপনার অভিযোগ সংরক্ষিত হয়েছে, তবে এক বা একাধিক ছবি আপলোড করা যায়নি। জমা সম্পন্ন করতে আবার চেষ্টা করুন।',
-            };
-            throw apiError;
-          }
-        }
-
-        // Register evidence through the same source-rate-limited write gateway
-        // used by complaints, responses, engagement, and session mutations.
-        const { error: regError } = await invokePublicWriteGateway({
-          action: 'evidence',
-          clientSubmissionId,
-          storagePath,
-          fileName: file.name,
-          fileSizeBytes: file.size,
-          caption: null,
-        });
-
-        if (regError) {
+        if (evidenceError || evidenceData?.success !== true) {
           const apiError: ApiError = {
-            code: regError.code || 'EVIDENCE_REGISTRATION_FAILED',
-            message: `Failed to register image "${file.name}". ${regError.message}`,
+            code:
+              evidenceData?.code ||
+              (evidenceError ? 'EVIDENCE_UPLOAD_FAILED' : 'EVIDENCE_REGISTRATION_FAILED'),
+            message:
+              evidenceData?.error ||
+              evidenceError?.message ||
+              'Evidence could not be sanitized and registered.',
             messageBn:
-              'আপনার অভিযোগ সংরক্ষিত হয়েছে, তবে ছবির নিবন্ধন সম্পন্ন হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
+              'আপনার অভিযোগ সংরক্ষিত হয়েছে, তবে ছবিটি নিরাপদভাবে প্রস্তুত ও সংরক্ষণ করা যায়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
           };
           throw apiError;
         }

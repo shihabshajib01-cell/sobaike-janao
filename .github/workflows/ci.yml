@@ -92,6 +92,9 @@ jobs:
       - name: Full Git history secret audit
         run: npm run audit:git-history-secrets
 
+      - name: Evidence metadata sanitization audit
+        run: npm run audit:evidence-metadata
+
       - name: Security hardening audit
         run: npm run audit:security-hardening
 

@@ -21,7 +21,8 @@
     "audit:district-boundaries": "node scripts/district-boundary-audit.mjs",
     "predev": "node scripts/vendor-fonts.mjs",
     "prebuild": "node scripts/vendor-fonts.mjs",
-    "audit:git-history-secrets": "node scripts/git-history-secret-audit.mjs"
+    "audit:git-history-secrets": "node scripts/git-history-secret-audit.mjs",
+    "audit:evidence-metadata": "node scripts/evidence-metadata-sanitization-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
