@@ -78,6 +78,26 @@ jobs:
           print('Privacy/font/security.txt/report-route hardening checks passed')
           PY
 
+      - name: Verify public evidence sanitizer rejects malformed input
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          printf 'not-a-valid-webp' > /tmp/invalid-evidence.webp
+          code=$(curl -sS -o /tmp/evidence-upload-response.json -w '%{http_code}' \
+            -X POST "$SUPABASE_URL/functions/v1/public-evidence-upload" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Origin: https://shobaikejanao.com" \
+            -F "clientSubmissionId=qa-invalid-evidence" \
+            -F "file=@/tmp/invalid-evidence.webp;type=image/webp")
+          if [ "$code" != "400" ]; then
+            echo "ERROR: malformed evidence returned HTTP $code"
+            cat /tmp/evidence-upload-response.json
+            exit 1
+          fi
+          grep -q '"code":"INVALID_WEBP"' /tmp/evidence-upload-response.json
+          echo "Server-side evidence sanitizer rejection check passed"
+
       - name: Verify Public-SQL-Admin sync contract
         shell: bash
         run: |

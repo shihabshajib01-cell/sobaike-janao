@@ -161,6 +161,55 @@ for (const needle of [
   }
 }
 
+const evidenceUpload = read('supabase/functions/public-evidence-upload/index.ts');
+const evidenceSanitizer = read('supabase/functions/_shared/webp-sanitizer.js');
+for (const needle of [
+  'sanitizeEvidenceWebP',
+  'service_assert_public_write_rate',
+  'register_public_complaint_evidence',
+  'metadataChunksRemoved',
+]) {
+  if (!evidenceUpload.includes(needle)) {
+    fail('server-trusted evidence upload boundary is missing: ' + needle);
+  }
+}
+for (const needle of ['EXIF', 'XMP ', 'ICCP', 'ANIM', 'ANMF', 'removedChunks']) {
+  if (!evidenceSanitizer.includes(needle)) {
+    fail('WebP metadata sanitization guard is missing: ' + needle);
+  }
+}
+if (!gateway.includes("public-evidence-upload")) {
+  fail('apiClient must route public evidence through public-evidence-upload');
+}
+if (gateway.includes(".from('complaint-evidence')") && gateway.includes('.upload(')) {
+  fail('browser must not upload complaint evidence directly to Storage');
+}
+
+const reporterPrivacyMigration = read('supabase/migrations/20260925012634_privacy_minimize_reporter_device_context.sql');
+for (const needle of [
+  'scrub_reporter_context_after_moderation',
+  'prune_reporter_submission_contexts',
+  "interval '7 days'",
+  "interval '24 hours'",
+]) {
+  if (!reporterPrivacyMigration.includes(needle)) {
+    fail('reporter telemetry minimization migration is missing: ' + needle);
+  }
+}
+
+if (html.includes('fonts.googleapis.com') || html.includes('fonts.gstatic.com')) {
+  fail('visitor-facing Google Fonts dependency must remain removed');
+}
+if (!html.includes('/fonts/fonts.css')) {
+  fail('same-origin font stylesheet is missing');
+}
+if (!fs.existsSync('scripts/vendor-fonts.mjs')) {
+  fail('same-origin font vendor script is missing');
+}
+if (!fs.existsSync('public/.well-known/security.txt')) {
+  fail('security.txt is missing');
+}
+
 const privacyPage = read('src/pages/MorePage.tsx');
 if (!privacyPage.includes('IPWho (ipwho.is)')) {
   fail('approximate-location third-party disclosure is missing');
