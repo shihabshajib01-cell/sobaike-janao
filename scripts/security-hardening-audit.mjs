@@ -223,6 +223,20 @@ for (const needle of [
   }
 }
 
+const adminHelperMigration = read('supabase/migrations/20260925150400_harden_admin_authorization_helper_surface.sql');
+for (const needle of [
+  'private.is_current_auth_session_valid',
+  'admin_get_my_authorization_context',
+  'get_caller_effective_permission_set',
+  'can_manage_role_scope',
+  'revoke execute on function public.get_caller_effective_permission_set()',
+  'revoke execute on function public.can_manage_role_scope(text)',
+]) {
+  if (!adminHelperMigration.includes(needle)) {
+    fail('admin authorization helper hardening is missing: ' + needle);
+  }
+}
+
 const privacyPage = read('src/pages/MorePage.tsx');
 if (!privacyPage.includes('IPWho (ipwho.is)')) {
   fail('approximate-location third-party disclosure is missing');
