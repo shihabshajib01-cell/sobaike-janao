@@ -223,7 +223,7 @@ for (const needle of [
   }
 }
 
-const adminHelperMigration = read('supabase/migrations/20260925150400_harden_admin_authorization_helper_surface.sql');
+const adminHelperMigration = read('supabase/migrations/20260925145914_harden_admin_authorization_helper_surface.sql');
 for (const needle of [
   'private.is_current_auth_session_valid',
   'admin_get_my_authorization_context',
